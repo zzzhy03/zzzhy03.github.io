@@ -19,8 +19,8 @@ selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 ---
 
-Write your biography here. Tell the world about yourself. Link to your favorite [subreddit](http://reddit.com). You can put a picture in, too. The code is already in, just name your picture `zhy.jpg` and put it in the `img/` folder.
+## [en]
+Zheng Hanyou is a third-year undergraduate student in the School of Computer Science, Wuhan University, with a profound interest in various technologies and innovations within Computer Science. His previous primary research interests have been around multimedia technologies related to video, image processing, and coding. Becides, recently, he has developed a strong interest in the fields of Computer Graphics, Robotics, Model Deployment, etc. In essence, he aspires to tangibly leverage artificial intelligence technologies to revolutionize human lifestyles. Consequently, he aims to pursue a Ph.D. degree, honing his expertise in one direction aligned with his interests, with the ultimate goal of making significant contributions to the field.
 
-Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page](/al-folio/publications/) automatically.
-
-Link to your social media connections, too. This theme is set up to use [Font Awesome icons](https://fontawesome.com/) and [Academicons](https://jpswalsh.github.io/academicons/), like the ones below. Add your Facebook, Twitter, LinkedIn, Google Scholar, or just disable all of them.
+## [zh]
+郑寒友是武汉大学计算机学院的三年级本科生，对计算机科学领域的各种技术和创新有着深厚的兴趣。他先前的主要研究兴趣集中在与视频、图像处理和编码相关的多媒体技术上。此外，最近，他对Computer Graphics, Robotics, Model Deployment等领域产生了浓厚的兴趣。总而言之，他渴望实际运用人工智能技术来彻底改变人类的生活方式。因此，他计划攻读博士学位，专攻与自己兴趣相符的某个方向，并在该领域做出重要贡献。
