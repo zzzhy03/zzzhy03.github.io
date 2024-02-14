@@ -18,7 +18,7 @@ latest_posts: true # includes a list of the newest posts
 selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 ---
-<details>
+<details open>
   <summary>en</summary>
   Zheng Hanyou is a third-year undergraduate student in the School of Computer Science, Wuhan University, with a profound interest in various technologies and innovations within Computer Science. His previous primary research interests have been around multimedia technologies related to video, image processing, and coding. Becides, recently, he has developed a strong interest in the fields of Computer Graphics, Robotics, Model Deployment, etc. In essence, he aspires to tangibly leverage artificial intelligence technologies to revolutionize human lifestyles. Consequently, he aims to pursue a Ph.D. degree, honing his expertise in one direction aligned with his interests, with the ultimate goal of making significant contributions to the field.
 </details>
