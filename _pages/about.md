@@ -9,7 +9,7 @@ profile:
   image: zhy.jpg
   cv_name: cv
   cv_pdf: ZHY_Resume_English_.pdf
-  image_circular: true # crops the image to make it circular
+  image_circular: false # crops the image to make it circular
   more_info: >
     <p>School of Computer Science</p>
     <p>Wuhan University</p>
