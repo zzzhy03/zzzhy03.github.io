@@ -7,6 +7,7 @@ permalink: /
 profile:
   align: right
   image: zhy.jpg
+  cv_name: cv
   cv_pdf: ZHY_Resume_English_.pdf
   image_circular: false # crops the image to make it circular
   more_info: >
