@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2505.18842",
+  "slug": "learning-to-point-visual-tokens",
+  "title": "v1: Learning to Point Visual Tokens for Multimodal Grounded Reasoning",
+  "authors": [
+    "Jiwan Chung",
+    "Junhyeok Kim",
+    "Siyeol Kim",
+    "Jaeyoung Lee",
+    "Min Soo Kim",
+    "Youngjae Yu"
+  ],
+  "publishedAt": "2025-05-24",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "COLM 2026",
+  "identifiers": {
+    "arxiv": "2505.18842"
+  },
+  "venueIds": [],
+  "publicationType": "peer-reviewed",
+  "categories": ["cs.CL", "cs.CV"],
+  "topicIds": ["vlm-mllm"],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual token pointing",
+    "point-and-copy",
+    "grounded reasoning",
+    "active visual referencing",
+    "continuous image embeddings"
+  ],
+  "facets": {
+    "task": ["reasoning"],
+    "representation": ["hybrid-representation"],
+    "conditioning": ["multimodal"],
+    "method": ["autoregressive"]
+  },
+  "abstract": "When thinking with images, humans rarely rely on a single glance: they revisit visual evidence while reasoning. In contrast, most Multimodal Language Models encode an image once to key-value cache and then reason purely in text, making it hard to re-ground intermediate steps. We empirically confirm this: as reasoning chains lengthen, models progressively lose focus on relevant regions. We introduce v1, a lightweight extension for active visual referencing via point-and-copy: the model selects relevant image patches and copies their embeddings back into the reasoning stream. Crucially, our point-and-copy mechanism retrieves patches using their semantic representations as keys, ensuring perceptual evidence remains aligned with the reasoning space. To train this behavior, we build v1g, a dataset of 300K multimodal reasoning traces with interleaved grounding annotations. Across multimodal mathematical reasoning benchmarks, v1 consistently outperforms comparable baselines. We release our code, model, and data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2505.18842v7",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2505.18842v7"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/jun297/v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 COLM 2026 对应的 arXiv 2505.18842v7 全文整理；Code URL 使用作者在 PDF 中印出的公开仓库。",
+    "ideaZh": "给 autoregressive MLLM 增加轻量 point-and-copy head，使模型在长推理过程中可选择输入 image patch，并把该 continuous embedding 重新注入 reasoning stream。",
+    "methodFlow": [
+      "Image Patch Encoding",
+      "Joint Vocabulary / Patch Pointer Logits",
+      "Patch Selection",
+      "Continuous Embedding Copy-back",
+      "Iterative Grounded Reasoning",
+      "Final Text Answer"
+    ],
+    "whyRelevantZh": "它直接推进 VLM/MLLM visual reasoning architecture，也很接近 visual-design agent：模型能在长计划或编辑过程中重新引用局部 canvas evidence，而不需要额外 crop 或 detector tool。",
+    "evidenceZh": "作者报告 MathVision-mini 的 matched three-way ablation 为 backbone 23.6、使用相同 grounded training 但 inference 禁用 pointing 25.3、完整 v1 34.5（Table 1, p. 6）；在相同 12,800-token budget 下，text-only 为 24.7、v1 为 34.5（Appendix Table 6, p. 17）。",
+    "caveatZh": "v1g boxes 由 Qwen2.5-VL attention pipeline 自动生成；作者报告 100-sample 人评中数据 boxes 的 comprehensiveness/tightness 只有 55.0%/46.0%，模型 pointing 也只有 55.7%/49.3%（Appendix Tables 8–9, pp. 19–20），主验证又集中在 visual math。",
+    "motivationZh": "多数 MLLM 只在序列开始时编码图像，reasoning chain 越长，模型越可能依赖 language priors 并失去对相关区域的关注。外部 crop/detector tools 能重新取证，但会增加独立 executor 与接口成本。",
+    "methodZh": "模型把输出空间扩展为 text vocabulary 与输入 image embeddings 的并集。Copy query/key heads 用当前 hidden state 和 patch semantic representations 产生 pointer logits，并与 LM logits 拼接；如果采样到 pointer index，对应 patch embedding 就成为下一步 continuous input，否则正常生成 text token。训练所用 v1g 从 TVC traces 出发，由 Gemini 插入 detect queries，再以 Qwen2.5-VL cross-attention 自动产生 grounding boxes。",
+    "experimentsZh": "作者在约 300K v1g traces 上全参数训练 Qwen2.5-VL-7B，并评测 MathVista-mini、MathVision-mini/full、MathVerse-mini，另测 EMMA、Gemma3 transfer、matched token budget 与 runtime。作者报告 mini/full average 为 50.6/38.4，inference 禁用 pointing 后为 39.6/28.7（Table 1, p. 6）；平均约复制 990 tokens，但作者测得 HuggingFace 与 batched vLLM wall-clock 相对 TVC 只增加约 7%（Appendix Table 3, p. 15）。100 个 outputs 的 pointing correctness/appropriateness 人评为 82.7%/87.7%（Appendix Table 9, p. 20）。",
+    "insightZh": "重新访问视觉证据不一定需要重新编码或调用外部工具；把输入 patch 当作可复制的 continuous source tokens，可以让 grounding 成为 autoregressive action。下一步真正关键的是弱监督或 RL 学习何时复制、复制多细以及何时停止。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

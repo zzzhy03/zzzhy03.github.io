@@ -1,0 +1,1522 @@
+{
+  "schemaVersion": 1,
+  "status": "active",
+  "reviewedAt": "2026-08-06",
+  "purposeZh": "Paper Reading 的个人研究雷达配置。它定义候选论文的检索、筛选、归类、阅读优先级与正式论文库字段，并已用于 Daily 与 Library 的真实数据流。",
+  "ui": {
+    "groupingStatus": "deferred",
+    "directionOrder": [
+      "lego",
+      "embroidery",
+      "fabrication",
+      "2d-design",
+      "3d-generation",
+      "3d-segmentation",
+      "3d-reconstruction",
+      "vlm-mllm",
+      "visual-design-agents",
+      "image-generation",
+      "video-generation",
+      "llm"
+    ]
+  },
+  "discoveryDefaults": {
+    "dailyQuota": null,
+    "quotaPolicy": "threshold-only",
+    "candidateLanguage": "en",
+    "requireTechnicalContribution": true,
+    "negativeSignalsAreContextual": true,
+    "allowEmptyDirectionBriefs": true,
+    "publicationTypes": [
+      "peer-reviewed",
+      "preprint",
+      "technical-report"
+    ],
+    "queryCompilerZh": "每个 query family 按 exactPhrases OR (anchors 中任一项 AND actions 中任一项) 编译。负面信号只在它描述论文主要对象时生效，不能因为出现在 related work 或参考文献中就拒绝论文。"
+  },
+  "attentionPolicies": {
+    "core-project": {
+      "labelZh": "核心项目 · 高召回",
+      "gateZh": "研究对象直接命中，且主要贡献属于 AI、Computer Graphics、Computer Vision 或计算生成即可；允许重要的小步推进，venue 不是硬门槛。",
+      "allowIncremental": true,
+      "allowPreprints": true,
+      "allowOfficialTechnicalReports": true,
+      "venueRole": "boost-only"
+    },
+    "continuous": {
+      "labelZh": "主要方向 · 持续关注",
+      "gateZh": "方向是主要贡献，并提出非纯 benchmark 式的方法、表示、数据或能力推进；直接相关的完整 preprint 可以进入。",
+      "allowIncremental": false,
+      "allowPreprints": true,
+      "allowOfficialTechnicalReports": true,
+      "venueRole": "ranking-signal"
+    },
+    "focused": {
+      "labelZh": "窄范围 · 定向关注",
+      "gateZh": "只收直接命中窄任务，或对该任务有明显基础作用的通用表示；普通 architecture tweak 和小幅指标提升不收。",
+      "allowIncremental": false,
+      "allowPreprints": true,
+      "allowOfficialTechnicalReports": false,
+      "venueRole": "ranking-signal"
+    },
+    "selective": {
+      "labelZh": "外围方向 · 选择性关注",
+      "gateZh": "只收范式变化、显著 generalization，或对核心项目与主要方向有明确迁移价值的工作。",
+      "allowIncremental": false,
+      "allowPreprints": true,
+      "allowOfficialTechnicalReports": false,
+      "venueRole": "strong-prior"
+    },
+    "landmark-or-transfer": {
+      "labelZh": "广域雷达 · 重大进展或直接迁移",
+      "gateZh": "满足领域级模型或范式变化，或者能直接迁移到核心项目与主要方向；好 venue 本身不足以触发收录。",
+      "allowIncremental": false,
+      "allowPreprints": true,
+      "allowOfficialTechnicalReports": true,
+      "venueRole": "strong-prior"
+    },
+    "landmark-only": {
+      "labelZh": "领域雷达 · Landmark only",
+      "gateZh": "只收重要 foundation model、官方 model report、改变能力边界的训练或 reasoning 范式，以及会广泛影响视觉与多模态研究的进展。",
+      "allowIncremental": false,
+      "allowPreprints": true,
+      "allowOfficialTechnicalReports": true,
+      "venueRole": "strong-prior"
+    }
+  },
+  "directions": [
+    {
+      "id": "lego",
+      "labelZh": "LEGO",
+      "labelEn": "LEGO",
+      "shortLabel": "LEGO",
+      "accent": "amber",
+      "attentionPolicy": "core-project",
+      "descriptionZh": "以 LEGO 或互锁积木模型为研究对象的 AI、Computer Graphics 和 Computer Vision 工作，不限制 generation、segmentation、reconstruction、representation、editing、assembly 或 rendering 等具体任务。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "LEGO",
+              "LEGO model",
+              "LEGO brick",
+              "brick-based model",
+              "interlocking brick"
+            ],
+            "actions": [
+              "generation",
+              "generative modeling",
+              "reconstruction",
+              "segmentation",
+              "representation",
+              "tokenization",
+              "assembly planning",
+              "synthesis",
+              "editing",
+              "rendering",
+              "computer vision",
+              "computer graphics",
+              "deep learning"
+            ],
+            "exactPhrases": [
+              "LEGO model generation",
+              "LEGO assembly generation",
+              "LEGO reconstruction",
+              "LEGO segmentation",
+              "brick-based shape generation",
+              "interlocking-brick assembly planning"
+            ]
+          }
+        ],
+        "hardNegativeSignals": [
+          "LEGO Serious Play",
+          "LEGO education",
+          "robotics education with LEGO",
+          "early childhood",
+          "classroom pedagogy",
+          "therapy",
+          "brand marketing",
+          "consumer behavior",
+          "toy sales"
+        ],
+        "conditionalNegativeSignals": [
+          "LEGO Mindstorms",
+          "masonry",
+          "brick wall"
+        ]
+      },
+      "includeWhenZh": [
+        "LEGO 或 brick-based representation 是研究对象本身，而不只是一个展示示例。",
+        "主要贡献具有实质 AI、Graphics、Vision 或 computational method。",
+        "精确命中时允许非目标 venue 与完整 arXiv preprint。"
+      ],
+      "excludeWhenZh": [
+        "育儿、教育、therapy、marketing、消费和普通玩具研究。",
+        "仅使用 LEGO 硬件做普通机器人控制，且没有视觉、图形或生成贡献。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "3d-generation",
+          "whenZh": "创建、编辑或组合新的 LEGO 模型。"
+        },
+        {
+          "topicId": "3d-segmentation",
+          "whenZh": "研究 brick、part 或 structure segmentation。"
+        },
+        {
+          "topicId": "3d-reconstruction",
+          "whenZh": "从特定输入忠实恢复 LEGO 结构。"
+        },
+        {
+          "topicId": "fabrication",
+          "whenZh": "assembly、connectivity 或 manufacturability constraint 是方法核心。"
+        },
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "agent 真正规划和迭代 LEGO design。"
+        }
+      ]
+    },
+    {
+      "id": "embroidery",
+      "labelZh": "Embroidery",
+      "labelEn": "Embroidery",
+      "shortLabel": "Embroidery",
+      "accent": "rose",
+      "attentionPolicy": "core-project",
+      "descriptionZh": "以 embroidery 视觉表示、图案生成、stitch/path 生成、digitization、editing、rendering 和可制造设计为核心的 AI 与图形学研究。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "embroidery",
+              "embroidered image",
+              "embroidery pattern",
+              "embroidery digitization",
+              "machine embroidery",
+              "stitch-based graphics"
+            ],
+            "actions": [
+              "generation",
+              "synthesis",
+              "stitch path generation",
+              "path planning",
+              "vectorization",
+              "reconstruction",
+              "segmentation",
+              "editing",
+              "rendering",
+              "neural representation",
+              "generative model",
+              "computer graphics",
+              "computer vision"
+            ],
+            "exactPhrases": [
+              "embroidery generation",
+              "embroidery design generation",
+              "embroidery digitization",
+              "stitch pattern generation",
+              "stitch path planning",
+              "neural embroidery rendering",
+              "computational embroidery"
+            ]
+          }
+        ],
+        "hardNegativeSignals": [
+          "surgical stitch",
+          "suture",
+          "embroidery machine fault detection",
+          "needle mechanism",
+          "motor control",
+          "production scheduling",
+          "textile supply chain",
+          "fabric defect detection",
+          "fashion recommendation",
+          "cultural heritage classification"
+        ],
+        "conditionalNegativeSignals": [
+          "yarn tension",
+          "textile material property",
+          "embroidery recognition",
+          "embroidery dataset"
+        ]
+      },
+      "includeWhenZh": [
+        "Embroidery 是主要研究对象。",
+        "主要贡献属于 AI、Graphics、Vision 或计算生成。",
+        "recognition 或 dataset 只有在服务新的 generation、representation 或 editing 方法时保留。"
+      ],
+      "excludeWhenZh": [
+        "纯纺织工业、机械结构、材料测试和生产优化。",
+        "只有文化、艺术史或分类贡献，没有生成或计算图形方法。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "2d-design",
+          "whenZh": "SVG、stroke、layer 或 editable path 是核心表示。"
+        },
+        {
+          "topicId": "fabrication",
+          "whenZh": "生成 machine-ready stitch path 或制造指令。"
+        },
+        {
+          "topicId": "image-generation",
+          "whenZh": "核心贡献是 raster embroidery synthesis。"
+        },
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "闭环 agent 规划、生成并修正 embroidery design。"
+        }
+      ]
+    },
+    {
+      "id": "fabrication",
+      "labelZh": "Fabrication",
+      "labelEn": "Generative Fabrication",
+      "shortLabel": "Fabrication",
+      "accent": "violet",
+      "attentionPolicy": "continuous",
+      "descriptionZh": "自动生成满足材料、工艺、装配或物理约束的设计、结构和制造指令，重点是如何 generate，而不是 fabrication interface。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "computational fabrication",
+              "digital fabrication",
+              "fabrication-aware",
+              "manufacturing-aware",
+              "manufacturability constraint"
+            ],
+            "actions": [
+              "generation",
+              "synthesis",
+              "generative design",
+              "inverse design",
+              "automatic planning",
+              "structure generation",
+              "geometry generation"
+            ],
+            "exactPhrases": [
+              "toolpath generation",
+              "fabrication path planning",
+              "cut path generation",
+              "assembly sequence generation",
+              "construction sequence generation",
+              "fabrication-aware generation",
+              "manufacturability-aware generation"
+            ]
+          },
+          {
+            "anchors": [
+              "knitting",
+              "weaving",
+              "textile",
+              "additive manufacturing",
+              "3D printing",
+              "laser cutting",
+              "CNC"
+            ],
+            "actions": [
+              "pattern generation",
+              "structure generation",
+              "design generation",
+              "toolpath generation",
+              "inverse design"
+            ],
+            "exactPhrases": []
+          }
+        ],
+        "hardNegativeSignals": [
+          "makerspace education",
+          "craft education",
+          "production scheduling",
+          "supply chain",
+          "machine fault diagnosis",
+          "process monitoring",
+          "defect detection",
+          "hardware design",
+          "mechanical actuator",
+          "material characterization"
+        ],
+        "conditionalNegativeSignals": [
+          "user study",
+          "authoring interface",
+          "interactive fabrication",
+          "topology optimization",
+          "process parameter optimization"
+        ]
+      },
+      "includeWhenZh": [
+        "输出包含 fabrication-ready geometry、pattern、toolpath、assembly sequence 或 construction plan。",
+        "Fabrication constraint 进入方法、目标函数或输出指令。",
+        "允许 procedural、optimization 和 inverse-design 等非 AI 方法，只要自动生成是核心。",
+        "Interactive 可以存在，但主要贡献仍须是 generation。"
+      ],
+      "excludeWhenZh": [
+        "只是把结果打印出来作为 downstream demo。",
+        "贡献主要是 GUI、authoring interaction、user study、硬件、材料或生产过程。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "2d-design",
+          "whenZh": "输出 SVG、cut path、pattern 或其他 structured 2D representation。"
+        },
+        {
+          "topicId": "3d-generation",
+          "whenZh": "输出新的 3D object、CAD 或 assembly。"
+        },
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "agent 自动规划、执行并检查制造结果。"
+        }
+      ]
+    },
+    {
+      "id": "2d-design",
+      "labelZh": "2D Design",
+      "labelEn": "2D Design",
+      "shortLabel": "2D Design",
+      "accent": "teal",
+      "attentionPolicy": "continuous",
+      "descriptionZh": "生成、编辑或理解显式、结构化、可编辑的二维视觉表示，包括 SVG、vector graphics、sketch、stroke、line art、layer、decomposition 和 explicit 2D primitives。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "vector graphics",
+              "SVG",
+              "scalable vector graphics"
+            ],
+            "actions": [
+              "generation",
+              "synthesis",
+              "editing",
+              "vectorization",
+              "reconstruction",
+              "diffusion",
+              "autoregressive modeling",
+              "generative model"
+            ],
+            "exactPhrases": [
+              "raster-to-vector",
+              "neural vectorization",
+              "differentiable vector graphics",
+              "structured graphic generation"
+            ]
+          },
+          {
+            "anchors": [
+              "sketch",
+              "line drawing",
+              "line art",
+              "stroke",
+              "drawing sequence"
+            ],
+            "actions": [
+              "generation",
+              "completion",
+              "editing",
+              "representation learning",
+              "synthesis"
+            ],
+            "exactPhrases": [
+              "layer decomposition",
+              "layered image generation",
+              "amodal layer decomposition",
+              "editable image decomposition",
+              "diagram generation",
+              "icon generation",
+              "font generation"
+            ]
+          },
+          {
+            "anchors": [
+              "2D Gaussian",
+              "explicit 2D primitive",
+              "differentiable rendering"
+            ],
+            "actions": [
+              "generation",
+              "representation",
+              "editing",
+              "rendering",
+              "generalizable"
+            ],
+            "exactPhrases": []
+          }
+        ],
+        "hardNegativeSignals": [
+          "2D object detection",
+          "semantic segmentation",
+          "instance segmentation",
+          "object recognition",
+          "OCR",
+          "document understanding",
+          "pose estimation",
+          "medical image analysis",
+          "remote sensing",
+          "UI layout generation",
+          "web page generation"
+        ],
+        "conditionalNegativeSignals": [
+          "graphic layout",
+          "chart generation",
+          "font",
+          "icon",
+          "diagram",
+          "image decomposition"
+        ]
+      },
+      "includeWhenZh": [
+        "核心输出或中间表示具有 structure/editability，或论文直接研究如何恢复和编辑这些结构。",
+        "Font、icon、diagram 仅在方法可迁移到一般 structured 2D design 时进入。",
+        "Layer decomposition、vectorization 属于本方向，不建立广义 2D Understanding。"
+      ],
+      "excludeWhenZh": [
+        "纯 raster image generation。",
+        "常规 detection、segmentation、recognition、OCR 与 UI/web layout。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "image-generation",
+          "whenZh": "论文同时对 structured 与 raster generation 提出实质创新。"
+        },
+        {
+          "topicId": "embroidery",
+          "whenZh": "结构化表示直接用于 embroidery。"
+        },
+        {
+          "topicId": "fabrication",
+          "whenZh": "结构输出直接成为 fabrication instruction。"
+        },
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "agent 操作 SVG、sketch、layer 或其他 2D design artifact。"
+        }
+      ]
+    },
+    {
+      "id": "3d-generation",
+      "labelZh": "3D Generation",
+      "labelEn": "3D Generation",
+      "shortLabel": "3D Generation",
+      "accent": "blue",
+      "attentionPolicy": "continuous",
+      "descriptionZh": "创建或编辑新的 3D geometry、appearance、object、scene、CAD 或 dynamic 3D 内容，包括 conditional generation、composition、completion 和 texture/material generation。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "3D generation",
+              "3D generative model",
+              "3D content generation",
+              "3D object generation",
+              "3D asset generation",
+              "3D scene generation",
+              "part-aware 3D generation",
+              "3D composition",
+              "3D editing",
+              "dynamic 3D generation",
+              "4D generation"
+            ],
+            "actions": [
+              "generation",
+              "synthesis",
+              "editing",
+              "completion",
+              "composition"
+            ],
+            "exactPhrases": [
+              "text-to-3D",
+              "image-to-3D generation",
+              "sketch-to-3D",
+              "video-to-3D generation"
+            ]
+          },
+          {
+            "anchors": [
+              "mesh",
+              "point cloud",
+              "3D Gaussian",
+              "NeRF",
+              "radiance field",
+              "SDF",
+              "implicit surface",
+              "voxel"
+            ],
+            "actions": [
+              "generation",
+              "generative modeling",
+              "synthesis",
+              "editing",
+              "completion"
+            ],
+            "exactPhrases": []
+          },
+          {
+            "anchors": [
+              "CAD",
+              "B-rep",
+              "parametric model",
+              "CAD program"
+            ],
+            "actions": [
+              "generation",
+              "synthesis",
+              "program synthesis",
+              "generative model",
+              "editing"
+            ],
+            "exactPhrases": []
+          }
+        ],
+        "hardNegativeSignals": [
+          "molecule generation",
+          "protein generation",
+          "crystal generation",
+          "medical anatomy generation",
+          "wireless channel modeling"
+        ],
+        "conditionalNegativeSignals": [
+          "novel view synthesis",
+          "depth estimation",
+          "pose estimation",
+          "SLAM",
+          "point cloud denoising",
+          "point cloud upsampling",
+          "3D reconstruction",
+          "human avatar",
+          "world model"
+        ]
+      },
+      "includeWhenZh": [
+        "目标是创造、补全、组合或编辑内容，而不是忠实恢复特定输入。",
+        "Object、part/assembly、scene、CAD 是常规收录范围。",
+        "Human/avatar、4D、environment/world generation 只收重大工作或有明确迁移价值的工作。",
+        "是否使用 generative prior 不决定分类，最终 objective 决定 Generation 或 Reconstruction。"
+      ],
+      "excludeWhenZh": [
+        "单纯 novel-view synthesis、rendering、geometry processing、denoising 或 upsampling。",
+        "只忠实恢复输入且没有生成目标的工作。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "fabrication",
+          "whenZh": "fabrication constraint 或 manufacturing instruction 是核心。"
+        },
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "agent 通过工具和 feedback 迭代 3D/CAD 内容。"
+        },
+        {
+          "topicId": "3d-segmentation",
+          "whenZh": "part segmentation 本身也是论文的独立贡献。"
+        }
+      ]
+    },
+    {
+      "id": "3d-segmentation",
+      "labelZh": "3D Segmentation",
+      "labelEn": "3D Segmentation",
+      "shortLabel": "3D Segmentation",
+      "accent": "teal",
+      "attentionPolicy": "focused",
+      "descriptionZh": "聚焦 object/part、promptable、open-vocabulary、semantic 和 instance 3D segmentation，以及确实显著推动 segmentation 的 point/mesh representation learning。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "3D segmentation",
+              "3D part segmentation",
+              "point cloud segmentation",
+              "mesh segmentation",
+              "3D instance segmentation",
+              "3D semantic segmentation",
+              "promptable 3D segmentation",
+              "open-vocabulary 3D segmentation",
+              "class-agnostic 3D segmentation",
+              "3D Gaussian segmentation",
+              "automatic part decomposition"
+            ],
+            "actions": [
+              "segmentation",
+              "decomposition",
+              "dense prediction",
+              "promptable",
+              "open vocabulary"
+            ],
+            "exactPhrases": []
+          },
+          {
+            "anchors": [
+              "point cloud pretraining",
+              "point foundation model",
+              "3D point encoder",
+              "mesh encoder",
+              "3D foundation model"
+            ],
+            "actions": [
+              "segmentation",
+              "part representation",
+              "part understanding",
+              "dense prediction"
+            ],
+            "exactPhrases": []
+          }
+        ],
+        "hardNegativeSignals": [
+          "medical volume segmentation",
+          "dental segmentation",
+          "remote sensing point cloud",
+          "plant segmentation",
+          "autonomous driving LiDAR segmentation"
+        ],
+        "conditionalNegativeSignals": [
+          "3D detection",
+          "tracking",
+          "pose estimation",
+          "registration",
+          "compression",
+          "point cloud classification",
+          "indoor scene segmentation",
+          "outdoor scene segmentation"
+        ]
+      },
+      "includeWhenZh": [
+        "Object/part、promptable、class-agnostic 和 open-vocabulary segmentation 优先。",
+        "Scene segmentation 需要明显方法变化，不能只是单 benchmark 小幅提升。",
+        "Point/mesh encoder 只有在 segmentation 或 part representation 是主要验证与迁移目标时进入。"
+      ],
+      "excludeWhenZh": [
+        "常规 detection、tracking、pose、registration、compression 与 autonomous-driving perception。",
+        "只提高一点指标的普通 encoder 或 segmentation head。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "3d-generation",
+          "whenZh": "segmentation 明确服务 generation/editing 且构成独立贡献。"
+        },
+        {
+          "topicId": "vlm-mllm",
+          "whenZh": "language-grounded/open-vocabulary 方法也推进了通用 multimodal capability。"
+        }
+      ]
+    },
+    {
+      "id": "3d-reconstruction",
+      "labelZh": "3D Reconstruction",
+      "labelEn": "3D Reconstruction",
+      "shortLabel": "3D Reconstruction",
+      "accent": "violet",
+      "attentionPolicy": "selective",
+      "descriptionZh": "从特定 image、video、multi-view 或 partial geometry 忠实恢复 object、scene、human 或 dynamic 3D，采用选择性关注。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "3D reconstruction",
+              "single-view 3D reconstruction",
+              "multi-view 3D reconstruction",
+              "sparse-view 3D reconstruction",
+              "image-to-3D reconstruction",
+              "scene reconstruction",
+              "surface reconstruction",
+              "dynamic scene reconstruction",
+              "4D reconstruction",
+              "human reconstruction",
+              "avatar reconstruction"
+            ],
+            "actions": [
+              "reconstruction",
+              "faithful recovery",
+              "surface recovery",
+              "geometry recovery"
+            ],
+            "exactPhrases": []
+          },
+          {
+            "anchors": [
+              "neural reconstruction",
+              "Gaussian reconstruction",
+              "radiance field reconstruction",
+              "feed-forward reconstruction",
+              "generative reconstruction"
+            ],
+            "actions": [
+              "object",
+              "scene",
+              "surface",
+              "geometry",
+              "dynamic"
+            ],
+            "exactPhrases": []
+          }
+        ],
+        "hardNegativeSignals": [
+          "medical reconstruction",
+          "archaeological reconstruction",
+          "remote sensing reconstruction",
+          "geological reconstruction",
+          "autonomous driving mapping"
+        ],
+        "conditionalNegativeSignals": [
+          "SLAM",
+          "localization",
+          "photogrammetry",
+          "depth estimation",
+          "point cloud registration",
+          "novel view synthesis",
+          "benchmark improvement"
+        ]
+      },
+      "includeWhenZh": [
+        "重大 reconstruction 范式、显著 generalization、重要 feed-forward/large reconstruction model。",
+        "对 LEGO、3D Generation、3D Segmentation、editable assets 或 Fabrication 有明确迁移价值。",
+        "不限 object-level，但 scene、human 和 dynamic reconstruction 保持高门槛。"
+      ],
+      "excludeWhenZh": [
+        "纯 SLAM、mapping、localization、pose、registration 或 novel-view synthesis。",
+        "单数据集上的细小指标推进。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "3d-generation",
+          "whenZh": "除 faithful recovery 外，论文也提出独立的 plausible content creation 目标。"
+        },
+        {
+          "topicId": "3d-segmentation",
+          "whenZh": "segmentation 或 part representation 也是方法的独立贡献。"
+        }
+      ]
+    },
+    {
+      "id": "vlm-mllm",
+      "labelZh": "VLM / MLLM",
+      "labelEn": "VLM / MLLM",
+      "shortLabel": "VLM / MLLM",
+      "accent": "amber",
+      "attentionPolicy": "continuous",
+      "descriptionZh": "重要 Vision-Language / Multimodal foundation model、视觉与空间推理、grounding、multimodal tokenization，以及对 2D/3D design 有迁移价值的能力。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "vision-language model",
+              "vision language model",
+              "multimodal large language model",
+              "MLLM",
+              "multimodal foundation model"
+            ],
+            "actions": [
+              "pretraining",
+              "foundation model",
+              "architecture",
+              "visual reasoning",
+              "spatial reasoning",
+              "grounding",
+              "multimodal generation"
+            ],
+            "exactPhrases": [
+              "native multimodal model",
+              "unified multimodal model",
+              "omnimodal model",
+              "any-to-any model",
+              "interleaved image-text generation",
+              "multimodal tokenization",
+              "visual tokenizer",
+              "3D vision-language model",
+              "3D language model"
+            ]
+          }
+        ],
+        "hardNegativeSignals": [
+          "vLLM inference",
+          "LLM serving",
+          "medical VLM",
+          "remote sensing VLM",
+          "autonomous driving VLM",
+          "sentiment analysis",
+          "misinformation detection"
+        ],
+        "conditionalNegativeSignals": [
+          "VQA benchmark",
+          "multimodal retrieval",
+          "image captioning",
+          "prompt engineering",
+          "chain-of-thought prompting",
+          "domain-specific assistant"
+        ]
+      },
+      "includeWhenZh": [
+        "新的 foundation model、pretraining/architecture 范式或明显改变视觉和空间推理能力的工作。",
+        "对 SVG、visual creation、3D、CAD 或 Fabrication 有直接迁移价值时可降低影响力门槛。"
+      ],
+      "excludeWhenZh": [
+        "普通 VQA、captioning、retrieval 小改进。",
+        "只用现有 VLM 包装一个 domain application，没有模型或通用能力贡献。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "论文的主要贡献是闭环设计 agent，同时也对 multimodal model 本身有实质创新。"
+        },
+        {
+          "topicId": "image-generation",
+          "whenZh": "模型本身显著推进 multimodal raster generation。"
+        },
+        {
+          "topicId": "3d-segmentation",
+          "whenZh": "3D-language alignment 明确推进 tracked segmentation task。"
+        }
+      ]
+    },
+    {
+      "id": "visual-design-agents",
+      "labelZh": "Visual Design Agents",
+      "labelEn": "Visual Design Agents",
+      "shortLabel": "Design Agents",
+      "accent": "rose",
+      "attentionPolicy": "focused",
+      "descriptionZh": "能够规划、调用视觉设计工具、观察 rendering result，并迭代生成或修改 2D、3D、CAD、image、video 或 fabrication design 的 agent。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "visual design agent",
+              "graphic design agent",
+              "creative design agent",
+              "3D modeling agent",
+              "CAD agent",
+              "image editing agent"
+            ],
+            "actions": [
+              "planning",
+              "tool use",
+              "visual feedback",
+              "rendering feedback",
+              "iterative refinement",
+              "editing"
+            ],
+            "exactPhrases": []
+          },
+          {
+            "anchors": [
+              "agent",
+              "agentic",
+              "multimodal agent",
+              "VLM agent",
+              "tool-using agent",
+              "computer-use agent"
+            ],
+            "actions": [
+              "SVG",
+              "vector graphics",
+              "image editing",
+              "visual design",
+              "Blender",
+              "CAD",
+              "3D modeling",
+              "rendering feedback",
+              "fabrication design"
+            ],
+            "exactPhrases": []
+          }
+        ],
+        "hardNegativeSignals": [
+          "web browsing agent",
+          "generic coding agent",
+          "research agent",
+          "office agent",
+          "data analysis agent",
+          "game-playing agent",
+          "multi-agent social simulation",
+          "customer service agent"
+        ],
+        "conditionalNegativeSignals": [
+          "copilot",
+          "user study",
+          "workflow automation",
+          "GUI agent",
+          "robotics agent",
+          "single-shot code generation"
+        ]
+      },
+      "includeWhenZh": [
+        "Agent 真正生成或修改视觉产物。",
+        "Planning、tool action、rendered observation、iterative correction 至少具有两个环节。",
+        "主要贡献是 agent 如何生成、操作与验证设计，而不是交互界面。"
+      ],
+      "excludeWhenZh": [
+        "Generic web、coding、research、office 或 gameplay agents。",
+        "单次让 LLM 输出 SVG/Blender code，或者贡献主要是 UI、user study 和现有模型编排。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "2d-design",
+          "whenZh": "操作 SVG、sketch、stroke、layer 或 vector artifact。"
+        },
+        {
+          "topicId": "3d-generation",
+          "whenZh": "操作 Blender、mesh、3D scene 或 CAD artifact。"
+        },
+        {
+          "topicId": "fabrication",
+          "whenZh": "生成 toolpath、assembly 或 fabrication-ready design。"
+        },
+        {
+          "topicId": "image-generation",
+          "whenZh": "闭环操作 raster image。"
+        },
+        {
+          "topicId": "video-generation",
+          "whenZh": "闭环生成或编辑 video。"
+        }
+      ]
+    },
+    {
+      "id": "image-generation",
+      "labelZh": "Image Generation",
+      "labelEn": "Image Generation",
+      "shortLabel": "Image Gen",
+      "accent": "blue",
+      "attentionPolicy": "landmark-or-transfer",
+      "descriptionZh": "Raster image generation 与 editing 的重大模型、范式变化，以及能直接迁移到 2D Design、Embroidery 或 3D Generation 的方法。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "text-to-image",
+              "image generation",
+              "image synthesis",
+              "image generative model",
+              "image foundation model",
+              "instruction-based image editing",
+              "controllable image generation",
+              "personalized image generation",
+              "compositional image generation",
+              "native image generation",
+              "unified image generation and understanding"
+            ],
+            "actions": [
+              "diffusion",
+              "flow matching",
+              "autoregressive",
+              "foundation model",
+              "multimodal model",
+              "editing"
+            ],
+            "exactPhrases": []
+          }
+        ],
+        "hardNegativeSignals": [
+          "super-resolution",
+          "image restoration",
+          "deblurring",
+          "dehazing",
+          "low-light enhancement",
+          "image compression",
+          "image quality assessment",
+          "denoising benchmark",
+          "watermark detection",
+          "AI-generated image detection"
+        ],
+        "conditionalNegativeSignals": [
+          "inpainting",
+          "outpainting",
+          "personalization",
+          "domain-specific generation",
+          "dataset"
+        ]
+      },
+      "includeWhenZh": [
+        "Foundation model、重要 architecture/training paradigm 或显著能力变化。",
+        "方法能直接迁移到 structured 2D、Embroidery 或 3D prior 时可降低影响力门槛。"
+      ],
+      "excludeWhenZh": [
+        "单一 narrow domain、小 benchmark 提升和普通应用包装。",
+        "Image Restoration、SR、deblurring、dehazing 等传统 processing。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "2d-design",
+          "whenZh": "同时对 structured/editable representation 有实质贡献。"
+        },
+        {
+          "topicId": "vlm-mllm",
+          "whenZh": "unified multimodal model 本身也显著推进理解或 reasoning。"
+        },
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "agent 通过 feedback 闭环操作 image。"
+        }
+      ]
+    },
+    {
+      "id": "video-generation",
+      "labelZh": "Video Generation",
+      "labelEn": "Video Generation",
+      "shortLabel": "Video Gen",
+      "accent": "violet",
+      "attentionPolicy": "landmark-or-transfer",
+      "descriptionZh": "Video generation 与 editing 的重要模型、长期一致性和 controllability 进展，以及与 3D/4D、视觉设计明显相关的方法。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "text-to-video",
+              "image-to-video",
+              "video generation",
+              "video synthesis",
+              "video generative model",
+              "video foundation model",
+              "video editing",
+              "controllable video generation",
+              "long video generation",
+              "consistent video generation",
+              "image animation"
+            ],
+            "actions": [
+              "diffusion",
+              "flow matching",
+              "autoregressive",
+              "foundation model",
+              "multimodal generation",
+              "editing"
+            ],
+            "exactPhrases": []
+          }
+        ],
+        "hardNegativeSignals": [
+          "video super-resolution",
+          "STVSR",
+          "VSR",
+          "frame interpolation",
+          "video restoration",
+          "video denoising",
+          "video deblurring",
+          "video compression",
+          "action recognition",
+          "video tracking",
+          "video segmentation",
+          "surveillance"
+        ],
+        "conditionalNegativeSignals": [
+          "talking head",
+          "human animation",
+          "video prediction",
+          "world model",
+          "domain-specific video generation"
+        ]
+      },
+      "includeWhenZh": [
+        "新的 foundation model、明显 paradigm shift，或长时一致性和控制能力的重要突破。",
+        "直接支持 3D/4D generation 或 visual creation workflow 时可降低影响力门槛。"
+      ],
+      "excludeWhenZh": [
+        "传统 VSR、STVSR、frame interpolation、restoration、compression 和 video understanding。",
+        "窄应用和普通 benchmark 小幅提升。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "3d-generation",
+          "whenZh": "明确生成 dynamic 3D/4D representation。"
+        },
+        {
+          "topicId": "vlm-mllm",
+          "whenZh": "unified multimodal model 自身有通用理解或生成贡献。"
+        },
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "agent 闭环生成或编辑 video。"
+        }
+      ]
+    },
+    {
+      "id": "llm",
+      "labelZh": "LLM",
+      "labelEn": "LLM",
+      "shortLabel": "LLM",
+      "accent": "amber",
+      "attentionPolicy": "landmark-only",
+      "descriptionZh": "仅关注重要 foundation language model、官方 model report、改变能力边界的训练/reasoning 范式，以及会广泛影响视觉与多模态研究的进展。",
+      "search": {
+        "queryFamilies": [
+          {
+            "anchors": [
+              "large language model",
+              "foundation language model",
+              "frontier language model",
+              "reasoning model"
+            ],
+            "actions": [
+              "technical report",
+              "model report",
+              "pretraining",
+              "scaling",
+              "new architecture",
+              "reasoning paradigm",
+              "test-time compute",
+              "reinforcement learning"
+            ],
+            "exactPhrases": [
+              "large language model technical report",
+              "foundation model technical report",
+              "reasoning model technical report",
+              "language model scaling",
+              "new language model architecture"
+            ]
+          }
+        ],
+        "hardNegativeSignals": [
+          "vLLM",
+          "inference serving",
+          "deployment benchmark",
+          "prompt engineering",
+          "RAG application",
+          "domain-specific chatbot",
+          "LLM agent framework",
+          "hallucination detection benchmark"
+        ],
+        "conditionalNegativeSignals": [
+          "quantization",
+          "pruning",
+          "distillation",
+          "long context",
+          "mixture of experts",
+          "evaluation benchmark",
+          "safety",
+          "alignment"
+        ]
+      },
+      "includeWhenZh": [
+        "重要官方 foundation/model report。",
+        "新训练、reasoning 或 architecture 范式已经造成领域级影响。",
+        "明显改变通用能力、成本或研究方式。",
+        "对 VLM、visual generation 或 design agents 有直接且重要的迁移影响。"
+      ],
+      "excludeWhenZh": [
+        "普通 fine-tuning、prompt、RAG、benchmark、inference serving 和 generic agent framework。",
+        "条件负面项不是重大模型或范式的核心创新。"
+      ],
+      "crossTopicHints": [
+        {
+          "topicId": "vlm-mllm",
+          "whenZh": "变化直接改变 multimodal model 的训练、reasoning 或能力边界。"
+        },
+        {
+          "topicId": "visual-design-agents",
+          "whenZh": "变化直接改变视觉设计 agent 的通用能力，而不是普通 agent 应用。"
+        }
+      ]
+    }
+  ],
+  "tagTaxonomy": {
+    "displayPolicyZh": "保留 paper.keywords 作为自由文本；可筛选标签必须来自以下受控维度。卡片默认显示最有信息量的 3–5 个标签，完整标签在详情和论文库筛选中使用。",
+    "dimensions": [
+      {
+        "id": "task",
+        "labelZh": "Task",
+        "values": [
+          { "id": "generation", "label": "Generation" },
+          { "id": "editing", "label": "Editing" },
+          { "id": "completion", "label": "Completion" },
+          { "id": "composition", "label": "Composition" },
+          { "id": "segmentation", "label": "Segmentation" },
+          { "id": "reconstruction", "label": "Reconstruction" },
+          { "id": "representation-learning", "label": "Representation Learning" },
+          { "id": "decomposition", "label": "Decomposition" },
+          { "id": "vectorization", "label": "Vectorization" },
+          { "id": "toolpath-generation", "label": "Toolpath Generation" },
+          { "id": "assembly-planning", "label": "Assembly Planning" },
+          { "id": "reasoning", "label": "Reasoning" },
+          { "id": "tool-use", "label": "Tool Use" },
+          { "id": "texture-material", "label": "Texture / Material" }
+        ]
+      },
+      {
+        "id": "content-scope",
+        "labelZh": "Content Scope",
+        "values": [
+          { "id": "part-assembly", "label": "Part / Assembly" },
+          { "id": "object", "label": "Object" },
+          { "id": "scene", "label": "Scene" },
+          { "id": "human-avatar", "label": "Human / Avatar" },
+          { "id": "environment-world", "label": "Environment / World" },
+          { "id": "2d-artifact", "label": "2D Artifact" },
+          { "id": "fabricatable-object", "label": "Fabricatable Object" }
+        ]
+      },
+      {
+        "id": "representation",
+        "labelZh": "Representation",
+        "values": [
+          { "id": "raster-image", "label": "Raster Image" },
+          { "id": "svg-vector", "label": "SVG / Vector" },
+          { "id": "stroke-sketch", "label": "Stroke / Sketch" },
+          { "id": "layered-2d", "label": "Layered 2D" },
+          { "id": "2d-gaussian", "label": "2D Gaussian" },
+          { "id": "mesh", "label": "Mesh" },
+          { "id": "point-cloud", "label": "Point Cloud" },
+          { "id": "3d-gaussian", "label": "3D Gaussian" },
+          { "id": "nerf-radiance-field", "label": "NeRF / Radiance Field" },
+          { "id": "voxel-triplane", "label": "Voxel / Triplane" },
+          { "id": "implicit-sdf", "label": "Implicit / SDF" },
+          { "id": "cad-brep-parametric", "label": "CAD / B-Rep / Parametric" },
+          { "id": "discrete-program", "label": "Discrete / Program" },
+          { "id": "hybrid-representation", "label": "Hybrid Representation" }
+        ]
+      },
+      {
+        "id": "conditioning",
+        "labelZh": "Conditioning",
+        "values": [
+          { "id": "text", "label": "Text" },
+          { "id": "single-image", "label": "Single Image" },
+          { "id": "multi-view", "label": "Multi-view" },
+          { "id": "video", "label": "Video" },
+          { "id": "sketch-layout", "label": "Sketch / Layout" },
+          { "id": "partial-3d", "label": "Partial 3D" },
+          { "id": "multimodal", "label": "Multimodal" },
+          { "id": "unconditional", "label": "Unconditional" }
+        ]
+      },
+      {
+        "id": "method",
+        "labelZh": "Method",
+        "values": [
+          { "id": "diffusion", "label": "Diffusion" },
+          { "id": "autoregressive", "label": "Autoregressive" },
+          { "id": "flow-matching", "label": "Flow Matching" },
+          { "id": "feed-forward", "label": "Feed-forward" },
+          { "id": "optimization-sds", "label": "Optimization / SDS" },
+          { "id": "vae-gan", "label": "VAE / GAN" },
+          { "id": "self-supervised", "label": "Self-supervised" },
+          { "id": "program-synthesis", "label": "Program Synthesis" },
+          { "id": "retrieval-composition", "label": "Retrieval / Composition" },
+          { "id": "llm-vlm-guided", "label": "LLM / VLM-guided" },
+          { "id": "reinforcement-learning", "label": "Reinforcement Learning" },
+          { "id": "hybrid-method", "label": "Hybrid Method" }
+        ]
+      },
+      {
+        "id": "prior-data",
+        "labelZh": "Prior / Data",
+        "values": [
+          { "id": "native-3d", "label": "Native 3D" },
+          { "id": "2d-prior", "label": "2D Prior" },
+          { "id": "multi-view-prior", "label": "Multi-view Prior" },
+          { "id": "video-prior", "label": "Video Prior" },
+          { "id": "synthetic-data", "label": "Synthetic Data" }
+        ]
+      },
+      {
+        "id": "output-property",
+        "labelZh": "Output Property",
+        "values": [
+          { "id": "part-aware", "label": "Part-aware" },
+          { "id": "controllable", "label": "Controllable" },
+          { "id": "editable", "label": "Editable" },
+          { "id": "asset-ready", "label": "Asset-ready" },
+          { "id": "animation-ready", "label": "Animation-ready" },
+          { "id": "fabrication-aware", "label": "Fabrication-aware" },
+          { "id": "physically-plausible", "label": "Physically Plausible" },
+          { "id": "efficient", "label": "Efficient" }
+        ]
+      }
+    ]
+  },
+  "routingRules": [
+    {
+      "id": "core-object-primary",
+      "ruleZh": "LEGO 或 Embroidery 是主要研究对象时，它始终是 primary topic，再依据真实任务增加技术方向。"
+    },
+    {
+      "id": "technology-use-is-not-contribution",
+      "ruleZh": "使用 Stable Diffusion、VLM、LLM、SAM 或 fabrication hardware 不自动进入对应方向；只有论文推进该方向时才交叉归类。"
+    },
+    {
+      "id": "generation-vs-reconstruction",
+      "ruleZh": "忠实恢复特定输入归 Reconstruction；创造 plausible 新内容归 Generation；两者都有独立贡献时才双归。"
+    },
+    {
+      "id": "structured-vs-raster-2d",
+      "ruleZh": "SVG、stroke、layer、vector 和 editable structure 归 2D Design；纯 raster pixels 归 Image Generation。"
+    },
+    {
+      "id": "editing-follows-artifact",
+      "ruleZh": "Editing 不独立成方向，按被编辑的 artifact 进入 2D Design、3D Generation、Image Generation 或 Video Generation。"
+    },
+    {
+      "id": "fabrication-centrality",
+      "ruleZh": "Fabrication process/material/assembly constraint 必须进入 generation 方法、目标函数或制造指令；仅 downstream demo 不算。"
+    },
+    {
+      "id": "segmentation-encoder-gate",
+      "ruleZh": "Point/mesh encoder 只有显著推进 segmentation 或 part representation 时才进入 3D Segmentation。"
+    },
+    {
+      "id": "agent-vs-vlm",
+      "ruleZh": "包装现有 VLM 完成闭环设计主要归 Visual Design Agents；提出新的 multimodal model/capability 主要归 VLM/MLLM。"
+    },
+    {
+      "id": "canonical-paper-once",
+      "ruleZh": "Canonical paper 只存一份；topicIds 可以多值，日报和 Library 中按 paper ID 去重。"
+    }
+  ],
+  "globalExclusions": [
+    {
+      "id": "restoration",
+      "labelZh": "Image / Video Restoration",
+      "signals": [
+        "image restoration",
+        "video restoration",
+        "super-resolution",
+        "VSR",
+        "STVSR",
+        "frame interpolation",
+        "deblurring",
+        "dehazing",
+        "low-light enhancement"
+      ]
+    },
+    {
+      "id": "general-geometry-processing",
+      "labelZh": "Generic Geometry Processing",
+      "signals": [
+        "generic meshing",
+        "surface parameterization",
+        "geometry optimization without generation",
+        "topology processing without fabrication"
+      ]
+    },
+    {
+      "id": "general-2d-perception",
+      "labelZh": "General 2D Perception",
+      "signals": [
+        "generic object detection",
+        "generic 2D segmentation",
+        "generic recognition",
+        "pose estimation"
+      ]
+    },
+    {
+      "id": "generic-agents",
+      "labelZh": "Generic Agents",
+      "signals": [
+        "web agent",
+        "coding agent",
+        "research agent",
+        "office agent",
+        "generic agent framework"
+      ]
+    },
+    {
+      "id": "interaction-first-fabrication",
+      "labelZh": "Interaction-first Fabrication",
+      "signals": [
+        "fabrication interface",
+        "maker user study",
+        "authoring interaction",
+        "craft education"
+      ]
+    },
+    {
+      "id": "industrial-textiles",
+      "labelZh": "Industrial Textile / Mechanical",
+      "signals": [
+        "textile manufacturing operations",
+        "needle mechanism",
+        "machine fault detection",
+        "material characterization"
+      ]
+    },
+    {
+      "id": "inference-serving",
+      "labelZh": "LLM Serving / MLSys",
+      "signals": [
+        "vLLM",
+        "LLM serving",
+        "inference scheduler",
+        "serving throughput"
+      ]
+    }
+  ],
+  "deduplication": {
+    "neverRekeyExistingPaper": true,
+    "identityOrder": [
+      "doi",
+      "versionless-arxiv-id",
+      "openreview-forum-id",
+      "normalized-title-first-author-year"
+    ],
+    "normalization": {
+      "doiLowercase": true,
+      "stripDoiUrlPrefix": true,
+      "stripArxivVersion": true,
+      "titleUnicodeForm": "NFKC",
+      "titleLowercase": true,
+      "titleStripPunctuation": true,
+      "titleCollapseWhitespace": true
+    },
+    "manualReview": {
+      "fuzzyTitleSimilarity": 0.94
+    },
+    "meaningfulUpdateFields": [
+      "venue",
+      "paper-version",
+      "code-release",
+      "project-release",
+      "model-release",
+      "dataset-release",
+      "material-result-correction"
+    ],
+    "updatePolicyZh": "Preprint 获得 DOI 或正式 venue 后补充 identifiers 和 publication metadata，但不更换 stable paper ID；重要更新可以再次进入 digest，不能创建重复 paper record。"
+  },
+  "library": {
+    "status": "implemented",
+    "route": "/paper_reading/library/",
+    "defaultView": "catalog",
+    "defaultSort": "collectedAt-desc",
+    "groupBy": null,
+    "pageSize": 24,
+    "urlSynchronizedFilters": true,
+    "paperFields": [
+      "primaryTopicId",
+      "identifiers",
+      "venueIds",
+      "facets",
+      "collectedAt",
+      "firstReportedDate",
+      "lastReportedDate",
+      "digestDates",
+      "publicationType"
+    ],
+    "searchFields": [
+      "title",
+      "authors",
+      "keywords",
+      "venue",
+      "ideaZh"
+    ],
+    "filterFields": [
+      "topicIds",
+      "venueIds",
+      "facets",
+      "hasCode",
+      "relevance",
+      "readingAction",
+      "collectedAt"
+    ],
+    "sortFields": [
+      "collectedAt",
+      "publishedAt",
+      "updatedAt",
+      "relevance"
+    ],
+    "viewResponsibilitiesZh": {
+      "daily": "今天发生了什么，什么值得记住。",
+      "library": "过去收录了什么，现在如何跨日期找到它。",
+      "readingList": "哪些论文是用户主动留下来准备处理的。"
+    }
+  }
+}

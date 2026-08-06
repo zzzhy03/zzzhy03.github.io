@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.01659",
+  "slug": "streamsplat",
+  "title": "StreamSplat: Streaming Feed-Forward 3D Gaussian Splatting",
+  "authors": [
+    "Changhao Song",
+    "Yuxuan Wang",
+    "Qibiao Li",
+    "Youcheng Cai",
+    "Ligang Liu"
+  ],
+  "publishedAt": "2026-08-03",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2608.01659"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.CV"],
+  "topicIds": ["3d-reconstruction"],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "streaming 3D reconstruction",
+    "feed-forward 3D Gaussian splatting",
+    "causal cache",
+    "persistent scene state",
+    "novel-view synthesis"
+  ],
+  "facets": {
+    "task": ["reconstruction"],
+    "content-scope": ["scene"],
+    "representation": ["3d-gaussian", "voxel-triplane"],
+    "conditioning": ["multi-view"],
+    "method": ["feed-forward"],
+    "prior-data": ["multi-view-prior"]
+  },
+  "abstract": "Feed-forward 3D Gaussian Splatting enables efficient novel-view synthesis without per-scene optimization, but most existing methods assume a fixed set of context views and process them jointly. This limits their applicability to online scenarios where calibrated views arrive sequentially and the scene must be updated causally. We present \\emph{StreamSplat}, a streaming feed-forward 3DGS framework that incrementally maintains a persistent geometry-grounded scene state and decodes it into renderable 3D Gaussians after each input chunk. StreamSplat centers on a \\textbf{Voxel-Aligned Causal Cache (VACC)}, which stores historical 3D tokens in a memory-bounded voxel structure so that memory grows with explored scene geometry rather than stream length. To better reuse history during causal prediction, we introduce \\textbf{History-Projected Depth Anchoring (HPDA)} to project cached geometry as depth guidance for current cost-volume estimation, and \\textbf{Cache-Guided Feature Injection (CGFI)} to inject cached latent evidence into Gaussian-token regression. Experiments on DL3DV, RealEstate10K, and ScanNet show that StreamSplat remains competitive with state-of-the-art feed-forward 3DGS methods under sparse causal inputs, despite not using future views or full-scene context. More importantly, it scales to long input streams with 256, 512, and 1024 views where fixed-view baselines run out of memory, yielding sustained improvements in novel-view synthesis quality as more observations arrive. The code will be made publicly available upon acceptance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.01659v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.01659v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv v2 全文整理；代码仅承诺 upon acceptance 公开，当前未加入 Code link。",
+    "ideaZh": "把 fixed-view feed-forward 3DGS 改成 causal streaming reconstruction：每 4 views 更新一个 voxel-aligned persistent 3D cache，并把历史 depth 与 latent features 投影回当前预测。",
+    "methodFlow": [
+      "Calibrated View Chunk Encoding",
+      "Depth-aware 3D Token Prediction",
+      "Voxel-Aligned Causal Cache Update",
+      "History-Projected Depth Anchoring",
+      "Cache-Guided Feature Injection",
+      "Anytime Gaussian Decoding"
+    ],
+    "whyRelevantZh": "它属于选择性跟踪的 3D reconstruction：重点是从特定输入 view stream 忠实维护场景状态，而不是借 generative prior 创造 asset。Persistent 3D memory、online update 与 anytime decode 值得知道，但离当前设计与制造主线较远。",
+    "evidenceZh": "最强证据是长 context 的可运行性：作者报告 ScanNet 从 256 到 512/1024 views 的 PSNR 由 15.85 提升至 16.98/18.07，而唯一可运行的 streaming baseline OF3GS 为 12.48/12.31，并在 1024 views OOM（Table 2，p. 7）。Ablation 中去掉 HPDA/CGFI 后 PSNR 由 15.85 降至 14.61/14.77；去掉 VACC 虽升至 16.14，却把 256-view memory 从 24.5 GB 增至 41.3 GB 且 512 views OOM（Table 3，p. 7）。以上均为作者报告结果。",
+    "caveatZh": "最弱证据是相对质量与资源效率：短/中 context 并非稳定领先，例如 DL3DV-64 PSNR 15.38，低于 ReSplat 16.80 和 Long-LRM 16.74（Table 1，p. 6）；ScanNet-1024 仍使用 87.3 GB（Table 2，p. 7），所以 memory-bounded 不等于全局常数或低资源。长序列仅有 OF3GS 可比较，ScanNet protocol 还预先使用 8 个 globally uniform anchors（Evaluation Protocol，p. 10）。",
+    "motivationZh": "现有 feed-forward 3DGS 通常把固定 context views 一次性 joint processing；输入持续到来时，重算全部 views 会让显存随 stream length 快速增长，也无法在每个时刻维护可渲染状态。纯 2D temporal memory 又缺少跨视角对齐所需的 geometry grounding。",
+    "methodZh": "ReSplat/DepthSplat-style backbone 每次处理 4-view chunk，cost volume 产生带 world-space position 的 3D tokens。VACC 以 0.04 voxel 存储每 voxel 最多 K=4 个 confidence-filtered pivots；HPDA 把 cached geometry 投影为当前 cost volume 的 depth anchors，CGFI 则按当前 uncertainty 注入历史 latent evidence，随后 Gaussian decoder 在每个 chunk 后都可输出 reconstruction。",
+    "experimentsZh": "作者在 DL3DV、RealEstate10K 与 ScanNet 上训练并测试 24–1024 views，使用单张 RTX PRO 6000 96 GB。24–128 views 与 DepthSplat、AnySplat、ReSplat、Long-LRM、OF3GS 比较，长 context 则基本只剩 OF3GS；DL3DV/RealEstate10K 256 views 的作者报告 PSNR 为 20.15/19.18，但显存为 93.1/53.1 GB（Table 2，p. 7）。论文报告 ScanNet-64 的 4-view update 加一次 render 为 143 ms、6.98 FPS（Sec. 4.1，p. 5），每种配置只跑一次且没有 variance。",
+    "insightZh": "Streaming reconstruction 的关键不是简单压缩 past frames，而是让 persistent state 落在可跨视角对齐的 3D coordinates 中，并分别服务 geometry estimation 与 feature prediction。采用这类设计时，应同时报告新探索空间导致的 cache growth，而不能只强调它不随重复观察数线性增长。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

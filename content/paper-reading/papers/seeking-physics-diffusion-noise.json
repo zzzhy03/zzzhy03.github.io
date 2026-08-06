@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2603.14294",
+  "slug": "seeking-physics-diffusion-noise",
+  "title": "Seeking Physics in Diffusion Noise",
+  "authors": [
+    "Chujun Tang",
+    "Lei Zhong",
+    "Fangqiang Ding"
+  ],
+  "publishedAt": "2026-03-15",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v3",
+  "identifiers": {
+    "arxiv": "2603.14294"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.AI", "cs.CV", "cs.LG", "cs.RO"],
+  "topicIds": ["video-generation"],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video diffusion",
+    "physical plausibility",
+    "diffusion features",
+    "physics verifier",
+    "trajectory selection",
+    "reward-gradient guidance"
+  ],
+  "facets": {
+    "task": ["generation"],
+    "content-scope": ["scene"],
+    "representation": ["raster-image"],
+    "conditioning": ["text", "single-image"],
+    "method": ["diffusion", "hybrid-method"],
+    "prior-data": ["video-prior"],
+    "output-property": ["physically-plausible", "efficient"]
+  },
+  "abstract": "Do video diffusion models encode signals predictive of physical plausibility? We probe intermediate denoising representations of pretrained Diffusion Transformers (DiTs) and find that physically plausible and implausible videos are partially separable in mid-layer feature space, even at high noise levels. Within-source and perceptual-quality controls suggest that this signal is not fully explained by generator identity or generic visual quality. We distill the signal into a lightweight, backbone-specific physics verifier trained on frozen features and use it in two complementary inference-time mechanisms under a fixed multi-trajectory budget: progressive trajectory selection, which scores trajectories at intermediate checkpoints and prunes weak candidates early, and reward-gradient guidance, which steers surviving trajectories by backpropagating through only the first few DiT blocks. Experiments on PhyGenBench and Physics-IQ across CogVideoX-2B/5B and Wan 2.1-14B show that progressive selection matches verifier-based Best-of-4 on CogVideoX-2B while reducing wall-clock inference time by 37%, whereas reward-gradient guidance substantially improves physical consistency on CogVideoX-5B, all without fine-tuning the video generator.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.14294v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.14294v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv v3 全文整理；未在该版本 PDF 中发现可核验的公开代码 URL。",
+    "ideaZh": "Video DiT 在尚未完成 denoising 时已暴露一部分 physical-plausibility signal；训练一个依赖具体 backbone 的轻量 verifier 后，可以在中途淘汰差轨迹，或把 verifier gradient 反传进采样过程。",
+    "methodFlow": [
+      "Probe Frozen DiT Features",
+      "Train Backbone-specific Physics Verifier",
+      "Progressively Prune Candidate Trajectories",
+      "Optionally Apply Reward-gradient Guidance",
+      "Decode the Surviving Video"
+    ],
+    "whyRelevantZh": "它把 physics-aware Video Generation 具体化为一个可迁移的 inference-time interface：在生成中间状态上建立可微 verifier，再根据置信度决定搜索预算或直接修正 trajectory。",
+    "evidenceZh": "作者报告在 t=600、layer 10 时 DiT feature 的 AUC 为 0.638，而 noisy VAE baseline 为 0.537（Tables 1–2, pp. 3–4）。CogVideoX-2B progressive selection 与 verifier Best-of-4 都得到 0.515，但 wall-clock 为 490s 对 778s，作者据此报告减少约 37%（Table 3 and Efficiency Analysis, pp. 6–7）。CogVideoX-5B guidance 将 PhyGenBench 从 0.363 提至 0.496，但 Wan 从 0.612 变为 0.606（Table 3, p. 6）。",
+    "caveatZh": "作者明确指出 physics signal 仅为中等强度、verifier 依赖具体 backbone、标注数据有限且 GPT-4o judge 存在噪声与偏差（Limitations, p. 8）。审阅还需注意：selection 仍接近两倍 single-trajectory compute，37% 是相对 Best-of-4 而非单次生成；Random Selection 已解释 CogVideoX-2B headline gain 的相当部分；generator 虽冻结，supervised verifier training 仍不可省略（Table 3 and Random-selection Control, pp. 6–7）。",
+    "motivationZh": "像素空间的 physics reward 往往必须等视频解码完成后才能评估，既慢又难以直接修改早期采样轨迹。论文先询问 pretrained video DiT 的 noisy intermediate features 是否已经包含物理合理性信息，再尝试把这种早期信号变成推理时的资源分配和方向修正机制。",
+    "methodZh": "作者冻结 CogVideoX / Wan，抽取不同 timestep 与 layer 的 video tokens，空间池化后用 causal temporal attention 训练约 1M 参数的 backbone-specific verifier。Progressive selection 在 t=600 与 t=400 将四条轨迹依次裁成两条和一条；reward-gradient guidance 则只通过选定 verifier layer 以及前若干 DiT blocks 反传，修改 surviving trajectory 的 denoising update（Algorithms 1–2, pp. 4–5）。",
+    "experimentsZh": "Probing 使用 VideoPhy 约 4,500 条标注视频；inference experiments 覆盖 CogVideoX-2B、CogVideoX-5B 与 Wan 2.1-14B，并在 PhyGenBench 和 Physics-IQ 上比较 Base、Random Selection、Best-of-4、DPO、LikePhys 与补充的 VideoREPA。作者报告 I2V Physics-IQ 从 0.242 提至 0.262、Spatial IoU 从 0.292 提至 0.317（Table 4, p. 7），三种 backbone 的 held-out verifier AUC 为 0.684 / 0.660 / 0.657（Table 5, p. 7）。Layer、timestep、VAE 与 random-selection controls 较完整，Wan 上接近零的 guidance 效果也构成重要负结果；但 headline physics 指标仍主要来自模型评估器。",
+    "insightZh": "这篇论文最重要的不是“模型已经懂物理”，而是展示了生成中间状态可被用作 early decision signal。可微 verifier 能做 compute reallocation，也能做 trajectory steering；同一结构可迁移到几何约束、可制造性或设计一致性，但必须同时承认 verifier 的 backbone 依赖和 domain-specific supervision。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

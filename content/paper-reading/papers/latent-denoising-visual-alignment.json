@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2604.21343",
+  "slug": "latent-denoising-visual-alignment",
+  "title": "Latent Denoising Improves Visual Alignment in Large Multimodal Models",
+  "authors": [
+    "Dhruv Parikh",
+    "Jacob Fein-Ashley",
+    "Rajgopal Kannan",
+    "Viktor Prasanna"
+  ],
+  "publishedAt": "2026-04-23",
+  "updatedAt": "2026-08-04",
+  "collectedAt": "2026-08-06",
+  "venue": "ACM Multimedia 2026",
+  "identifiers": {
+    "arxiv": "2604.21343"
+  },
+  "venueIds": ["acm-mm"],
+  "publicationType": "peer-reviewed",
+  "categories": ["cs.CV"],
+  "topicIds": ["vlm-mllm"],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "latent denoising",
+    "visual alignment",
+    "saliency-guided corruption",
+    "feature distillation",
+    "multimodal robustness"
+  ],
+  "facets": {
+    "task": ["representation-learning"],
+    "representation": ["hybrid-representation"],
+    "conditioning": ["multimodal"],
+    "method": ["hybrid-method"]
+  },
+  "abstract": "Large Multimodal Models (LMMs) such as LLaVA are typically trained with an autoregressive language modeling objective, providing only indirect supervision to visual tokens. This often yields weak internal visual representations and brittle behavior under distribution shift. Inspired by recent progress on latent denoising for learning high-quality visual tokenizers, we show that the same principle provides an effective form of visual supervision for improving internal visual feature alignment and multimodal understanding in LMMs. We propose a latent denoising framework that corrupts projected visual tokens using a saliency-aware mixture of masking and Gaussian noising. The LMM is trained to denoise these corrupted tokens by recovering clean teacher patch features from hidden states at a selected intermediate LLM layer using a decoder. To prevent representation collapse, our framework also preserves the teacher's intra-image similarity structure and applies intra-image contrastive patch distillation. During inference, corruption and auxiliary heads are disabled, introducing no additional inference-time overhead. Across a broad suite of standard multimodal benchmarks, our method consistently improves visual understanding and reasoning over strong baselines, and yields clear gains on compositional robustness benchmarks (e.g., NaturalBench). Moreover, under ImageNet-C-style non-adversarial common corruptions applied to benchmark images, our method maintains higher accuracy and exhibits reduced degradation at both moderate and severe corruption levels. Our code is available at https://github.com/dhruvashp/latent-denoising-for-lmms.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.21343v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.21343v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/dhruvashp/latent-denoising-for-lmms"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 ACM Multimedia 2026 对应的 arXiv 2604.21343v2 全文整理；Code URL 使用作者在 PDF 中印出的公开仓库。",
+    "ideaZh": "在 instruction tuning 期间对 projected visual patches 做 saliency-guided noise/masking，并让 LLM 中层恢复 frozen vision-encoder features，以 training-only auxiliary objective 强化内部视觉表征。",
+    "methodFlow": [
+      "Frozen Vision Features and Teacher Targets",
+      "Saliency-guided Noise / Mask Corruption",
+      "Standard Causal LMM Forward",
+      "Mid-layer Corrupted-token Decoding",
+      "Reconstruction / Relation / Contrastive Losses",
+      "Auxiliary-free Inference"
+    ],
+    "whyRelevantZh": "它是 VLM/MLLM 内部视觉表征监督的直接方法，也展示 generation-side denoising ideas 如何迁移到 understanding-side training；适合作为可插拔 regularizer 了解，而非新范式逐公式精读。",
+    "evidenceZh": "作者报告三种 7B architecture 分别在 15/18、18/18、17/18 个 clean benchmarks 上改善（Table 1, pp. 5–6）；Qwen2.5-VL 的 GQA 60.2→64.6、NaturalBench group accuracy 31.3→33.5、RealWorldQA 68.7→72.9（Table 1, p. 6），severity-5 common-corruption tests 的两种主表 architecture 在全部 11×4 settings 中提升（Tables 2–3, p. 6）。",
+    "caveatZh": "许多 clean gain 低于 1–2 points且没有 multi-seed variance；额外 training overhead 未量化，clean MME 在三种 architecture 中有两种退化，common-corruption protocol 又只为每张图在每个 family 内 hash 选择一个 subtype。",
+    "motivationZh": "标准 autoregressive language objective 只间接监督 visual tokens，可能让 LMM 的中间视觉表征较弱并在分布变化下脆弱。论文借鉴视觉 tokenizer 的 latent denoising，用明确的 clean feature recovery signal 约束 LLM 内部 visual states。",
+    "methodZh": "Frozen vision encoder 与 projector 产生 visual tokens 和 detached clean teacher patch features；saliency 高的 tokens 接受 Gaussian noising，低 saliency tokens 接受 hard masking。Corrupted tokens 与 instruction 进入标准 causal LLM，轻量 decoder 从选定中间 layer 只恢复 corrupted positions，并联合 normalized reconstruction、pairwise relational KL、intra-image contrastive loss 与 language loss。Inference 时关闭 corruption 与 decoder，不改变 base forward path。",
+    "experimentsZh": "作者测试 LLaVA-1.5+CLIP、LLaVA-1.5+SigLIP 与 Qwen2.5-VL-7B，在 18 个 clean benchmarks 和 ImageNet-C-style noise/blur/weather/digital corruptions 上与 matched no-denoising baselines 比较。作者报告 LLaVA+CLIP severity-5 noise 下 GQA drop 由 −4.5 缩小到 −3.1、MMStar drop 由 −4.2 缩小到 −1.5（Table 2, p. 6）；layer 16 的作者 aggregate 优于 layer 8/32，完整 saliency、mixed corruption 与 full auxiliary loss 在各自 ablation 中整体最好（Figs. 8–10, p. 8；Tables 9–13, p. 15）。",
+    "insightZh": "Denoising 可以成为理解模型的 feature-level curriculum，而不必真的在 inference 生成 pixels。更通用的设计是只破坏部分高价值/低价值 tokens、从中间 reasoning state 恢复结构与关系，并把 auxiliary branch 完全留在训练期。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

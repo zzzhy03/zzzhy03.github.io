@@ -6,9 +6,23 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "predev": "npm run validate:papers && npm run prepare:papers",
     "dev": "next dev",
+    "prebuild": "npm run validate:papers && npm run prepare:papers",
     "build": "next build",
-    "lint": "eslint ."
+    "pipeline:papers": "node scripts/paper-reading/pipeline.mjs",
+    "discover:papers": "node scripts/paper-reading/discover.mjs",
+    "prepare:paper-screening": "node scripts/paper-reading/screening/prepare.mjs",
+    "validate:paper-screening": "node scripts/paper-reading/screening/validate.mjs",
+    "validate:paper-fulltext": "node scripts/paper-reading/fulltext/validate.mjs",
+    "validate:paper-promotion": "node scripts/paper-reading/fulltext/validate-promotion.mjs",
+    "summarize:paper-fulltext": "node scripts/paper-reading/fulltext/summarize.mjs",
+    "lint": "eslint .",
+    "prepare:papers": "node scripts/build-paper-reading-feed.mjs",
+    "test:paper-discovery": "node --test scripts/paper-reading/tests/*.test.mjs",
+    "test:paper-pipeline": "node --test scripts/paper-reading/pipeline/tests/*.test.mjs",
+    "test:paper-screening": "node --test scripts/paper-reading/screening/tests/*.test.mjs",
+    "validate:papers": "node scripts/validate-paper-reading.mjs"
   },
   "dependencies": {
     "next": "16.3.0",

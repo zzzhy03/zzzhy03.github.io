@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2511.19418",
+  "slug": "chain-of-visual-thought",
+  "title": "Chain-of-Visual-Thought: Teaching VLMs to See and Think Better with Continuous Visual Tokens",
+  "authors": [
+    "Yiming Qin",
+    "Bomin Wei",
+    "Jiaxin Ge",
+    "Konstantinos Kallidromitis",
+    "Stephanie Fu",
+    "Trevor Darrell",
+    "XuDong Wang"
+  ],
+  "publishedAt": "2025-11-24",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v3",
+  "identifiers": {
+    "arxiv": "2511.19418"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.AI", "cs.CV", "cs.LG"],
+  "topicIds": ["vlm-mllm"],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "continuous visual tokens",
+    "visual chain of thought",
+    "dense perception",
+    "multimodal reasoning",
+    "visual expert distillation"
+  ],
+  "facets": {
+    "task": ["reasoning", "representation-learning"],
+    "representation": ["hybrid-representation"],
+    "conditioning": ["multimodal"],
+    "method": ["autoregressive", "hybrid-method"]
+  },
+  "abstract": "Vision-Language Models (VLMs) excel at reasoning in linguistic space but struggle with perceptual understanding that requires dense visual perception, e.g., spatial reasoning and geometric awareness. This limitation stems from the fact that current VLMs have limited mechanisms to capture dense visual information across spatial dimensions. We introduce Chain-of-Visual-Thought (COVT), a framework that enables VLMs to reason not only in words but also through continuous visual tokens-compact latent representations that encode rich perceptual cues. Within a small budget of roughly 20 tokens, COVT distills knowledge from lightweight vision experts, capturing complementary properties such as 2D appearance, 3D geometry, spatial layout, and edge structure. During training, the VLM with COVT autoregressively predicts these visual tokens to reconstruct dense supervision signals (e.g., depth, segmentation, edges, and DINO features). At inference, the model reasons directly in the continuous visual token space, preserving efficiency while optionally decoding dense predictions for interpretability. Evaluated across more than ten diverse perception benchmarks, including CV-Bench, MMVP, RealWorldQA, MMStar, WorldMedQA, and HRBench, integrating COVT into strong VLMs such as Qwen2.5-VL and LLaVA consistently improves performance by 3% to 16% and demonstrates that compact continuous visual thinking enables more precise, grounded, and interpretable multimodal intelligence.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2511.19418v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2511.19418v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Wakals/CoVT"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2511.19418v3 全文整理；Code URL 使用作者在 PDF 中印出的公开仓库。",
+    "ideaZh": "让 VLM 在 autoregressive reasoning sequence 中生成少量 continuous visual tokens，并用 segmentation、depth、edge 与 DINO dense supervision 赋予这些 latent thoughts 可感知语义。",
+    "methodFlow": [
+      "Image-question Encoding",
+      "Autoregressive Continuous Visual-token Prediction",
+      "Expert-space Projection and Dense Alignment",
+      "Four-stage Comprehension-to-reasoning Curriculum",
+      "Latent Visual Reasoning",
+      "Text Answer / Optional Visual Decode"
+    ],
+    "whyRelevantZh": "它直接推进 VLM/MLLM visual reasoning representation，也可能启发 2D/3D design agent 在文字计划中保存 segmentation、depth、edge 或 dense feature state，而不必每一步调用显式视觉工具。",
+    "evidenceZh": "作者报告 Qwen2.5-VL-7B 加入三类 CoVT 后，CV-Bench overall 74.5→80.0、depth subtask +14.0、MME-RealWorld +3.7、HRBench8K +4.5（Table 2, p. 6）；0 token、16 empty tokens 与过多 32 segmentation tokens 都弱于合适容量的 visual tokens（Table 4, p. 8）。",
+    "caveatZh": "Visual-token semantics 来自 SAM、Depth Anything v2、PIDINet 与 DINOv2 pseudo targets；当前 continuous thoughts 尚不能与 free-form text reasoning 自由交错，最佳配置的作者 timing analysis 又显示相对 baseline 约 +136% 时间成本（Appendix Fig. 14, p. 17）。",
+    "motivationZh": "Text-only CoT 会迫使模型把 dense geometry、layout 与 appearance 全部压缩成离散语言，限制精细视觉推理。论文希望在同一生成序列中保留紧凑但高带宽的 continuous perceptual state。",
+    "methodZh": "VLM 在 reasoning sequence 中预测 segmentation、depth、edge 与 DINO 类型的 continuous token slots；projection/cross-attention 将不同 tokens 映射到对应 frozen visual-expert decoder 或 feature space，并以 mask、depth、edge reconstruction 与 feature MSE 对齐。四阶段 curriculum 依次训练 token comprehension、generation、reasoning，以及随机 drop token types 的 efficient reasoning；inference 时 tokens 留在 latent space，只有解释时才可选 decode。",
+    "experimentsZh": "主模型为 Qwen2.5-VL-7B，另在 LLaVA-v1.5-13B 上测试 transfer；训练约 774.6K rows，评测十余项 vision-centric 与八项 non-vision-centric benchmarks。作者报告 LLaVA transfer 中 CoVT-depth 相对 Aurora-depth 在 BLINK visual depth +12.9、CoVT-seg 相对 Aurora-count 在 BLINK count +26.6（Table 3, p. 7），八项 non-vision-centric average 由 66.2 提至 67.4（Fig. 7, p. 9）。Tailored decoder alignment 与完整四阶段 curriculum 均在作者 ablation 中优于相应简化版本（Table 5, p. 8；Appendix Table 7, p. 17）。",
+    "insightZh": "Continuous visual thought 更准确的理解是把 expert perception 压缩进 autoregressive reasoning state，而不是获得了人类可读的新 CoT。它的价值取决于 token semantics、容量和调用时机是否能由任务反馈进一步学习，而不是不断增加固定 expert types。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

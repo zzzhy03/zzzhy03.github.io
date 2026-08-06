@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.04955",
+  "slug": "towards-valid-brep-generation",
+  "title": "Towards Valid B-Rep Generation: Training-Free Wireframe Anomaly Detection and Repair",
+  "authors": [
+    "Jingyu Wu",
+    "Youcheng Cai",
+    "Tengyu Luo",
+    "Ligang Liu"
+  ],
+  "publishedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.04955"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.CV"],
+  "topicIds": ["3d-generation", "fabrication"],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "B-Rep generation",
+    "wireframe anomaly detection",
+    "training-free repair",
+    "CAD validity",
+    "test-time compute",
+    "OCCT"
+  ],
+  "facets": {
+    "task": ["generation", "editing"],
+    "content-scope": ["object", "fabricatable-object"],
+    "representation": ["cad-brep-parametric"],
+    "conditioning": ["unconditional", "partial-3d"],
+    "method": ["autoregressive", "diffusion", "llm-vlm-guided"],
+    "prior-data": ["native-3d"]
+  },
+  "abstract": "Multi-stage boundary representation (B-Rep) generation leverages intermediate wireframes to synthesize CAD models. However, geometric and topological risks in these wireframes -- such as self-intersections, edge collapses, and disconnected vertices -- can propagate to invalid final B-Reps. Mitigating such failures by retraining large generative models is computationally prohibitive. We propose Wireframe Detection and Repair (WDR), a training-free framework that intervenes at the intermediate wireframe stage to improve downstream B-Rep validity. WDR features a Geometric-Topology Anomaly Detector (GTAD) that combines parallel VLM-based coarse screening with geometric and topological detectors to predict downstream invalidity risk and route generation to dedicated branches. An Energy-Guided Geometric-Topology Repair (EGGTR) module then performs detector-triggered guided regeneration through geometry and topology branches. By scaling test-time computation via Energy-Guided Resampling and training-free guidance for diffusion models, WDR can be integrated into autoregressive and diffusion pipelines without retraining. Extensive experiments demonstrate consistent improvements in kernel-checked validity while largely retaining the measured diversity and distributional quality of synthesized CAD models. The code will be made publicly available upon acceptance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04955v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04955v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv v1 全文整理；作者将其标注为 AAAI 2027 submission，代码仅承诺 upon acceptance 公开，当前未加入 Code link。",
+    "ideaZh": "不重训 CAD generator，而是在 multi-stage B-Rep pipeline 暴露出的 intermediate wireframe 上检测几何与拓扑风险，只把高风险样本路由到 guided regeneration。",
+    "methodFlow": [
+      "Generate Intermediate Wireframe",
+      "VLM + Geometry + Topology Risk Detection",
+      "Detector-triggered Branch Routing",
+      "Energy-guided Resampling / Diffusion Guidance",
+      "Geometry Generation + OCCT Validation"
+    ],
+    "whyRelevantZh": "它直接服务于 3D CAD generation，也对应 LEGO 与 fabrication 中常见的结构问题：视觉上合理并不代表拓扑闭合或 CAD kernel 可构造。更重要的是，它提供了在可检查中间表示上加入 verifier-and-repair loop 的通用范式。",
+    "evidenceZh": "最强证据是跨 generator 的一致 paired improvement：作者报告在 DeepCAD 上，DTGBrepGen、Stitch-A-Shape、BrepForge 的 kernel-valid 比例分别由 79.5/84.2/85.3 提升至 95.6/97.0/97.4；ABC 上由 68.1/56.6/75.4 提升至 83.9/83.5/86.3（Table 1，p. 6）。每个数据集 3,000 对样本的 matched-pair analysis 还报告 DeepCAD/ABC 净增益为 16.10/15.80 个百分点，并给出 bootstrap CI 与 McNemar tests（Table 10，p. 19）。以上均为作者报告结果。",
+    "caveatZh": "最弱证据在于工程可用性和外部泛化：论文中的 Valid 只表示通过 OCCT kernel check，不等于 manufacturable、满足公差或功能正确（Validity definition，p. 3；Limitations，pp. 19–20）。完整方法还由 0.683 s/sample 增至 3.351 s/sample，约 4.9× latency（Table 6，p. 16），并依赖外部 VLM；代码尚未公开。",
+    "motivationZh": "Multi-stage B-Rep generators 会把 wireframe 的 self-intersection、edge collapse 或 disconnected vertices 传播到最终 solid。重新训练大型 generator 成本高，而且只在最终 B-Rep 阶段拒绝失败样本，无法利用中间结构指出应该修改哪里。",
+    "methodZh": "GTAD 并行组合通用 VLM coarse screening、基于 tangent-point 的 geometry energy 与四类 topology checks，预测 downstream invalidity risk。EGGTR 再按风险类型路由：autoregressive generator 对局部 K=4 candidates 进行 energy-guided reranking，diffusion generator 使用 training-free guidance，修复后的 wireframe 继续交给原 geometry generator 与 OCCT 构造 B-Rep。",
+    "experimentsZh": "作者在 DeepCAD、ABC、Furniture 和 3,000 个 ABC point-cloud conditions 上测试 DTGBrepGen、Stitch-A-Shape 与 BrepForge，覆盖 unconditional、class-conditioned 和 reconstruction settings。完整 detector 的作者报告 F1 为 81.97，高于 VLM/geometry/topology 单路的 71.30/65.40/74.75（Table 4，p. 7）；point-cloud-conditioned BrepForge 的 Valid 由 87.1 升至 89.3，同时 CD 0.93→0.87、EMD 2.45→2.19、F-score 0.91→0.94（Table 3，p. 6）。Ablation、routing、K sweep 与 compute table 较完整，但只覆盖显式 wireframe 的 multi-stage pipelines。",
+    "insightZh": "对 structured generation，最值得迁移的是先暴露一个可验证的中间表示，再用检测结果决定是否以及如何增加 test-time compute。对 LEGO assembly、parametric design 或其他 fabrication pipeline，也应把 kernel validity 视为必要的前置约束，而不是最终制造质量的代理。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

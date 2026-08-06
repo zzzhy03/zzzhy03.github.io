@@ -1,0 +1,213 @@
+.picker {
+  position: relative;
+  display: flex;
+  min-width: 168px;
+  align-self: stretch;
+}
+
+.picker .trigger {
+  display: grid;
+  width: 100%;
+  min-height: 42px;
+  place-items: center;
+  padding: 0 18px;
+  border: 0;
+  border-right: 1px solid var(--radar-line, #d7d8d1);
+  border-left: 1px solid var(--radar-line, #d7d8d1);
+  border-radius: 0;
+  background: transparent;
+  color: var(--radar-ink, #18201f);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.84rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 680;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.picker .trigger:hover:not(:disabled),
+.picker .trigger:focus-visible {
+  background: var(--radar-accent-soft, #dcebe5);
+}
+
+.picker .trigger:focus-visible,
+.picker .monthButton:focus-visible,
+.picker .day:focus-visible {
+  outline: 2px solid var(--radar-accent, #176b62);
+  outline-offset: -3px;
+}
+
+.picker .trigger:disabled {
+  cursor: wait;
+  opacity: 0.48;
+}
+
+.popover {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 12px);
+  left: 50%;
+  width: min(322px, calc(100vw - 32px));
+  padding: 16px;
+  transform: translateX(-50%);
+  border: 1px solid var(--radar-line-strong, #bfc4bd);
+  border-radius: 16px;
+  background: var(--radar-paper, #fbfaf6);
+  box-shadow: 0 22px 68px rgba(26, 45, 41, 0.2), 0 3px 12px rgba(26, 45, 41, 0.08);
+  animation: calendar-enter 150ms ease-out;
+}
+
+.popover::before {
+  position: absolute;
+  top: -6px;
+  left: calc(50% - 6px);
+  width: 11px;
+  height: 11px;
+  transform: rotate(45deg);
+  border-top: 1px solid var(--radar-line-strong, #bfc4bd);
+  border-left: 1px solid var(--radar-line-strong, #bfc4bd);
+  background: var(--radar-paper, #fbfaf6);
+  content: "";
+}
+
+.monthHeader {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.monthHeader h2 {
+  margin: 0;
+  color: var(--radar-ink, #18201f);
+  font-family: var(--serif, Georgia, serif);
+  font-size: 1rem;
+  font-weight: 680;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+.picker .monthButton {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--radar-line, #d7d8d1);
+  border-radius: 9px;
+  background: #f4f3ed;
+  color: var(--radar-ink, #18201f);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.picker .monthButton:hover:not(:disabled) {
+  border-color: var(--radar-line-strong, #bfc4bd);
+  background: var(--radar-accent-soft, #dcebe5);
+}
+
+.picker .monthButton:disabled {
+  cursor: default;
+  opacity: 0.28;
+}
+
+.weekdays,
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.weekdays {
+  margin-bottom: 6px;
+}
+
+.weekdays span {
+  color: var(--radar-muted, #68706d);
+  font-size: 0.66rem;
+  font-weight: 750;
+  line-height: 24px;
+  text-align: center;
+}
+
+.emptyDay,
+.picker .day {
+  aspect-ratio: 1;
+}
+
+.picker .day {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: #f1f0eb;
+  color: #a9aeaa;
+  cursor: default;
+  font: inherit;
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 580;
+  line-height: 1;
+  opacity: 1;
+}
+
+.picker .availableDay {
+  border-color: #234e48;
+  background: #284f49;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 760;
+}
+
+.picker .availableDay:hover {
+  border-color: #143d37;
+  background: #176b62;
+  transform: translateY(-1px);
+}
+
+.picker .selectedDay {
+  border-color: #102e2a;
+  background: #102e2a;
+  box-shadow: 0 0 0 2px var(--radar-paper, #fbfaf6), 0 0 0 4px #398b7e;
+}
+
+@keyframes calendar-enter {
+  from {
+    transform: translate(-50%, -5px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .picker {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .popover {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover {
+    animation: none;
+  }
+
+  .picker .availableDay:hover {
+    transform: none;
+  }
+}

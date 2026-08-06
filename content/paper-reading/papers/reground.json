@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.04385",
+  "slug": "reground",
+  "title": "ReGround: Restoring Visual Grounding in Multi-Step Reasoning through Self-Diagnosis and Visual Re-Examination",
+  "authors": [
+    "Lei Peng",
+    "Shuai Lv",
+    "Wei Hu"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "ACM Multimedia 2026",
+  "identifiers": {
+    "arxiv": "2608.04385"
+  },
+  "venueIds": ["acm-mm"],
+  "publicationType": "peer-reviewed",
+  "categories": ["cs.CV"],
+  "topicIds": ["vlm-mllm"],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual re-grounding",
+    "self-diagnosis",
+    "image re-injection",
+    "multi-step reasoning",
+    "selective visual re-examination"
+  ],
+  "facets": {
+    "task": ["reasoning"],
+    "conditioning": ["multimodal"],
+    "method": ["llm-vlm-guided", "reinforcement-learning"]
+  },
+  "abstract": "Vision-Language Models (VLMs) often lose visual grounding during multi-step reasoning: as reasoning chains grow longer, later inference steps rely increasingly on language priors rather than image evidence. We identify a consistent benchmark-level signature associated with this degradation: across 2,510 re-examined samples from four benchmarks, attention entropy over image tokens typically decreases during Round 1 and rises again after image re-injection. However, we find that effective visual re-examination requires two complementary ingredients: image re-injection and targeted self-diagnosis. Without targeted diagnosis, re-examination can even hurt performance, whereas accurate self-diagnosis yields substantial gains -- a swing of several points on key benchmarks, indicating that diagnostic quality is a key factor in whether re-examination helps or hurts in our setting. We present ReGround, a two-stage framework that teaches VLMs to self-diagnose grounding failures and selectively re-examine visual evidence, without architectural modifications or external tools. Through capability bootstrapping, a stronger variant from the same model family provides diagnostic scaffolding only during data construction, while the policy model learns to diagnose autonomously at inference time and retains most of the assisted gains. Experiments on eight benchmarks across two VLM backbones demonstrate consistent gains, especially on visually intensive multi-step reasoning tasks, while incurring only modest inference overhead relative to tool-augmented baselines. Project page: https://sespoir.github.io/reground-page/ . Code: https://github.com/sespoir/ReGround .",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04385v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04385v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/sespoir/ReGround"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 ACM Multimedia 2026 对应的 arXiv 2608.04385v1 全文整理；Code URL 使用作者在 PDF 中印出的公开仓库。",
+    "ideaZh": "让 VLM 先生成针对具体 grounding failure 的 self-diagnosis，再重新注入同一图像；同时用 SFT+GRPO 学会何时复查，避免 generic second-guessing 破坏正确答案。",
+    "methodFlow": [
+      "Round-1 Visual Reasoning",
+      "Correctness / Grounding / Verification Routing",
+      "Targeted Self-diagnosis Cue",
+      "Same-image Re-injection",
+      "Round-2 Answer Revision",
+      "SFT + Trigger-calibrated GRPO"
+    ],
+    "whyRelevantZh": "它属于 VLM/MLLM long-horizon grounding 与 self-correction，也可迁移到 visual-design agent 的 render-feedback loop：复查动作需要具体 diagnosis，并且必须学会何时不要破坏已经正确的方案。",
+    "evidenceZh": "作者在固定 trigger positions 的 ablation 中报告，generic cue 使 MathVista/HallusionBench 相对 no-ReGround 分别下降 0.8/2.1 points，targeted cue 则分别提升 3.8/6.8（Table 5, p. 7）；visual Round-2 SFT 在三项任务上也明显优于 text-only Round-2（Table 3, p. 7）。",
+    "caveatZh": "作者报告部署平均消耗 1.62× tokens、1.76× latency（Table 2, p. 6），训练约需 1,920 A100-GPU-hours 的 GRPO；training-data routing 与 cue generation 依赖同 family 72B teacher，整图 re-injection 也没有新增 fine-grained localization 能力。",
+    "motivationZh": "VLM 在长 reasoning chain 中可能逐步失去 visual grounding，但无条件地再看一遍图像会触发 harmful second-guessing。有效复查需要同时解决两个问题：到底是否应该复查，以及应该带着什么具体疑点复查。",
+    "methodZh": "Stage 1 先由 base policy 产生 Round 1，再按 correctness、grounding 与 stochastic verification 三步 routing 构造 No-ReGround 或 re-examination trajectories；Qwen2.5-VL-72B 仅在数据阶段提供 targeted cue，同一 image 在新 dialogue turn 中重新编码并生成 Round 2。Stage 2 以四象限式 GRPO reward 区分复查/不复查与正确/错误，训练较小 policy 自主生成 <reground> cue 并校准 trigger。",
+    "experimentsZh": "作者在 Qwen2.5-VL-7B 与 Qwen3-VL-8B、八个 benchmarks 上测试。Qwen2.5-VL-7B 相对 base 在 MathVista、MathVision、MathVerse、HallusionBench 分别 +3.8/+2.8/+4.5/+6.8 points（Table 1, p. 6）；Qwen3-VL-8B 未重新调参时八项均提升 1.1–3.4 points。作者还报告 2,510 个 triggered samples 中 98.0% 在 Round 1 attention entropy 下降、94.4% 在 re-injection 后恢复，但这些 attention/SAS 结果只是 mechanism proxy（Sec. 4.4, p. 8；Appendix Table 11, p. 14）。",
+    "insightZh": "Visual retry 的核心不是重复输入，而是 diagnosis-conditioned retry policy：先形成可检验的疑点，再取回证据，并用 negative examples 学会 restraint。这个原则比整图 re-injection 本身更适合迁移到 render-and-revise design agents。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

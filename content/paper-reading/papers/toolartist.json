@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2608.04436",
+  "slug": "toolartist",
+  "title": "ToolArtist: Tool-Using Unified Multimodal Models for Agentic Image Generation",
+  "authors": [
+    "Jiahao Zhao",
+    "Xiaomin Yu",
+    "Zhongxiang Sun",
+    "Fengwei Teng",
+    "Chengwei Qin",
+    "Xiaobin Hu",
+    "Jun Xu",
+    "Shuicheng Yan"
+  ],
+  "publishedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.04436"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.CV"],
+  "topicIds": ["visual-design-agents", "image-generation", "vlm-mllm"],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "agentic image generation",
+    "unified multimodal model",
+    "tool use",
+    "web search",
+    "native image generation",
+    "RAD-GRPO"
+  ],
+  "facets": {
+    "task": ["generation", "reasoning", "tool-use"],
+    "content-scope": ["2d-artifact"],
+    "representation": ["raster-image"],
+    "conditioning": ["text", "multimodal"],
+    "method": ["autoregressive", "llm-vlm-guided", "reinforcement-learning"],
+    "prior-data": ["2d-prior", "synthetic-data"],
+    "output-property": ["controllable"]
+  },
+  "abstract": "Text-to-image (T2I) models can produce visually compelling images, yet they remain limited on open-world tasks that require complex semantic understanding, multi-step reasoning, and the integration of external world knowledge. Existing efforts introduce agent capabilities into image generation, but they either prescribe a fixed workflow or place only a subset of the open-world image generation process under agent control. Consequently, reasoning, tool invocation, and image generation are not coordinated by a single policy. We propose ToolArtist, a fully agentic image generation model obtained by post-training a Unified Multimodal Model (UMM). ToolArtist dynamically orchestrates reasoning, external tool use, and native image generation within one unified policy. During Supervised Fine-Tuning (SFT), we equip a teacher agent with search tools alongside an image-generation tool. We then convert the collected trajectories into a UMM compatible format, where the image-generation tool is concealed while the resulting generated images are retained. During Reinforcement Learning (RL), we develop an agentic RL infrastructure for UMMs and introduce Reason-Act-Draw GRPO (RAD-GRPO), which uses complementary intent and quality rewards to jointly optimize the model. Experiments show that placing the entire open-world image-generation process under an agent policy consistently outperforms approaches with fixed pipelines or only partially agent-controlled components. We release the training data and the complete post-training infrastructure.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04436v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04436v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/bubble65/EMU-Agentic-PostTrain"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv v1 全文整理；代码与数据仓库 URL 印在论文首页，故作为 Code 链接保留。",
+    "ideaZh": "把 reasoning、TextSearch、ImageSearch 与 native image generation 都变成同一个 unified multimodal policy 可自主选择的 action；先转换 teacher trajectories 做 SFT，再用 RAD-GRPO 联合奖励 tool intent 与最终图像质量。",
+    "methodFlow": [
+      "Teacher Reasoning + Text / Image Search",
+      "External Draw during Data Collection",
+      "Convert to Native UMM Visual Tokens",
+      "Trajectory SFT",
+      "RAD-GRPO Post-training",
+      "Same-policy Search, Draw, and Revision"
+    ],
+    "whyRelevantZh": "它直接对应 Visual Design Agents：agent 不只是生成一段 prompt，而是在图像生成过程中主动搜索文本与视觉证据、决定何时绘制并继续修订；同时给出了把 external visual teacher trajectories 转成 native UMM generation policy 的训练接口。",
+    "evidenceZh": "作者报告使用 7,132 条 SFT trajectories，平均每条约 20.5k tokens 与 4 次 tool calls（Sec. 1, p. 3; App. A.1, p. 12）。ToolArtist 在 WISE 的 overall 为 0.79，Unify-Agent 与 GenSearcher-Qwen-Image 均为 0.77，而 Nano Banana / Pro 为 0.89 / 0.87（Table 1, p. 9）；WorldGenBench-Humanities average 为 22.10，两个开源 agentic baselines 为 15.58 / 13.66，Nano Banana-Pro / Nano Banana 为 28.62 / 29.67（Table 1, p. 9）。",
+    "caveatZh": "作者没有独立 limitations section。审阅风险是：缺少 SFT-only vs RL、tool/no-tool、fixed workflow、external-vs-native draw 与 revision-loop 等核心 ablation，因此无法把增益归因于 same-policy autonomy；评估主要依赖 model-based judges；WorldGen 正文引用 standalone Qwen-Image 21.76，但可见主表没有对应 row；web / reference-image 的许可、隐私、prompt injection 和 misinformation 风险也未被系统审计（Secs. 4–5, Tables 1–2, pp. 9–10; App. A.2, p. 12）。",
+    "motivationZh": "知识密集型 image generation 不只需要画面质量，还需要查找实体、文化与地理事实，并在生成失败后决定是否继续检索或修订。既有方案常把 search 和 generation 固定在 pipeline 中，或让 agent 只负责 prompt、把 draw 留给外部黑箱，导致 reasoning、tool use 与 visual generation 不由同一 policy 协调。",
+    "methodZh": "Teacher agent 在 rollout 中交替使用 Google-backed TextSearch、ImageSearch 与 external Gemini image generator。Trajectory converter 隐藏 external draw tool call，把结果保留成 caption + image token spans，使 Emu3.5 student 学到 native visual generation（Fig. 3, p. 6）。SFT 学习完整 reasoning / search / draw trajectory；RAD-GRPO 再以 intent reward、image-quality reward 及 format / draw / length auxiliaries post-train。部署时同一 policy 自主选择继续搜索、原生绘制或修订（Fig. 2, p. 3）。",
+    "experimentsZh": "WISE 含 1,000 个、25 subdomains 的 knowledge-intensive prompts，WorldGenBench-Humanities 含 732 prompts、244 regions；比较 proprietary generators、通用 T2I、UMMs 与 agentic baselines。Source-aware search summary ablation 将 WISE overall 从 0.79 降至 0.61，Biology 从 0.75 降至 0.25（Table 2, p. 10），说明 provenance/context 有用，但不是对 fully-agentic claim 的充分验证。Socotra selected case 得分 0.625，两个 baselines 为 0.000 / 0.250，同时本方法仍漏掉 3/8 checklist points（Fig. 5 and Table 3, p. 11）；附录明确只展示本方法胜过两个 baseline 的 top-ranked examples，存在 selection bias。",
+    "insightZh": "关键范式变化是把 image generation 从 agent 外部的末端工具提升为与 search 同级的 native action；trajectory conversion 则桥接了 external teacher generator 与 native UMM student。系统组合值得精读，但当前证据只能说明整套 post-training system 有竞争力，尚不能证明收益来自 fully agentic autonomy 本身。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

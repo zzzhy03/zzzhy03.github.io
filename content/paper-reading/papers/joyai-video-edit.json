@@ -1,0 +1,96 @@
+{
+  "id": "arxiv:2608.03974",
+  "slug": "joyai-video-edit",
+  "title": "JoyAI-Video-Edit: Real-Time Open-Ended Video Editing with Autoregressive Diffusion",
+  "authors": [
+    "Yicheng Xiao",
+    "Wenxun Dai",
+    "Xinran Qin",
+    "Lin Song",
+    "Maoquan Zhang",
+    "Hang Xu",
+    "Yukang Chen",
+    "Yitong Li",
+    "Guohui Zhang",
+    "Yuan Zhang",
+    "Xuying Zhang",
+    "Tommy Zhang",
+    "Jianlong Yuan",
+    "Peihao Li",
+    "Shuai Lu",
+    "Siming Fu",
+    "Chuyang Zhao",
+    "Xin Han",
+    "Jie Huang",
+    "Wenbo Li",
+    "Guoqing Ma",
+    "Wei Huang",
+    "Xiaojuan Qi",
+    "Haoyang Huang",
+    "Nan Duan"
+  ],
+  "publishedAt": "2026-08-04",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.03974"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.CV"],
+  "topicIds": ["video-generation"],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video editing",
+    "autoregressive diffusion",
+    "streaming generation",
+    "Source-Anchored DMD",
+    "long-horizon distillation",
+    "real-time video"
+  ],
+  "facets": {
+    "task": ["editing", "generation"],
+    "content-scope": ["scene"],
+    "representation": ["raster-image"],
+    "conditioning": ["video", "single-image", "text", "multimodal"],
+    "method": ["diffusion", "autoregressive"],
+    "prior-data": ["video-prior"],
+    "output-property": ["controllable", "efficient"]
+  },
+  "abstract": "Real-time video editing requires low-latency causal generation with bounded computational resources while preserving source fidelity and long-term temporal consistency. We present JoyAI-Video-Edit, a 16B-parameter autoregressive diffusion framework for real-time, open-ended video editing without access to future frames or a predefined video duration. Our method combines chunk-wise autoregressive adaptation, Source-Anchored Distribution Matching Distillation (SA-DMD), and Long-Horizon Autoregressive Distillation to reduce train--inference mismatch, preserve source fidelity during two-step generation, and mitigate accumulated temporal drift. Extensive automatic and human evaluations show that JoyAI-Video-Edit substantially outperforms existing streaming editors and remains competitive with strong offline systems on both short and long videos. The complete system achieves end-to-end 720p video editing at approximately 30 FPS on a single Nvidia B200 GPU. Code is available at https://github.com/jd-opensource/JoyAI-Video-Edit.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.03974v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.03974v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/jd-opensource/JoyAI-Video-Edit"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv v1 全文整理；代码 URL 同时印在论文 abstract 与首页，故作为 Code 链接保留。",
+    "ideaZh": "把大型 offline video editor 改造成不访问未来帧、未知总时长也能持续工作的 causal editor：固定历史窗口约束计算，Source-Anchored DMD 保持两步生成的源视频一致性，long-horizon distillation 直接训练误差累积后的状态。",
+    "methodFlow": [
+      "Initialize from a Bidirectional Video Editor",
+      "Chunk-wise Causal Attention + Bounded History",
+      "Resampling Forcing",
+      "Source-Anchored Two-step DMD",
+      "Long-horizon Autoregressive Distillation",
+      "FP8 + KV Cache + Pipelined VAE Deployment"
+    ],
+    "whyRelevantZh": "它是 Video Generation / Editing 的重要系统进展。核心价值在 causal state、source anchoring 与 long-horizon training，而不仅是速度 headline；它也让视频生成器更接近可以持续接受视觉反馈的实时设计工具。",
+    "evidenceZh": "作者报告完整 720p pipeline 在单张 B200 上处理 81 帧需 2.68s，即 30.19 FPS（Table 4, p. 12）。LongV2VBench 上 baseline overall 为 2.81，单加 SA-DMD 为 3.23、单加 long-horizon autoregressive distillation 为 3.06，两者同时为 3.30（Table 5, pp. 12–13）。短视频人工偏好中，它对四个 streaming baselines 获得 81%–90% 票，但对 Seedance 2.0 与 Kling-3.0 Omni 仅为 34% / 35%（Fig. 9, pp. 11–12）。",
+    "caveatZh": "作者没有独立 limitations section。审阅风险包括：foundation curriculum 使用数十亿级样本与 16B backbone；实时数字依赖 B200、FP8、编译和定制 VAE pipeline，不能外推到普通 GPU；所谓 open-ended 主要由有界架构与约一分钟的 229-item LongV2VBench 支持，尚无小时级 drift stress test；长视频评估主要依赖 Gemini，训练数据许可与滥用风险也未充分讨论（Secs. 5–7, pp. 8–13）。",
+    "motivationZh": "Offline video editor 可以看到完整未来帧并对整段视频联合处理，不适合直播式、时长未知的持续编辑。简单把生成改成 autoregressive chunks 又会遭遇 teacher-forcing mismatch、低步数蒸馏造成的 source drift，以及随着 rollout 变长不断积累的 identity / color / motion error。",
+    "methodZh": "系统以 MLLM condition encoder、causal VAE 与 MM-DiT 为基础，把视频划成 8-frame chunks：chunk 内双向 attention，chunk 间 causal attention，并缓存 first chunk 与固定 sliding window，使每步状态有界（Sec. 4.1 and Fig. 3, pp. 5–7）。Resampling forcing 让训练 history 接近模型自己的输出；SA-DMD 在 teacher score 中同时加入 text-free 与 source-free prediction，把 text alignment 和 source-fidelity guidance 蒸馏进两步 generator（Eq. 3, p. 7）。Segmented long rollout 则在有限显存下训练累积误差状态。",
+    "experimentsZh": "短视频使用 OpenVE-Bench，长视频使用作者自建的 229-item、五类一分钟 LongV2VBench，并比较 StreamDiffusionV2、SANA-Streaming、LiveEdit、XMax-X2.0 及多种 offline / commercial editors。作者报告 OpenVE-Bench overall 为 3.60（Table 2, p. 11）；LongV2VBench overall 为 3.30、速度 30.19 FPS，XMax-X2.0 为 1.71、20.90 FPS，但两者分辨率不同（Table 3, p. 11）。SA-DMD / long-horizon training 的 2×2 ablation 支持互补性；resampling forcing、first-chunk sink、window size 与 FP8 的独立质量代价未被拆分。",
+    "insightZh": "这是高完成度的 streaming video system recipe，而非一个轻量单点算法。可迁移的结构是：固定状态使成本与时长解耦，用 source-anchored teacher signal 抵消极低步数生成的漂移，再让 student 在自己会访问到的 long-horizon states 上训练。代码公开提升了可跟进性，但模型规模和硬件条件决定了复现门槛仍然很高。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

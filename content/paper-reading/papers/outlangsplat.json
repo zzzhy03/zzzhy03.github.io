@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.04560",
+  "slug": "outlangsplat",
+  "title": "OutLangSplat: 3D Language Gaussian Splatting for UAV Outdoor Scenes",
+  "authors": [
+    "Xia Yan",
+    "He Wu",
+    "Yanghui Xu",
+    "Zizhao Wu",
+    "Jiazhou Chen"
+  ],
+  "publishedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.04560"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.CV", "cs.GR"],
+  "topicIds": ["3d-segmentation"],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "open-vocabulary 3D segmentation",
+    "language Gaussian splatting",
+    "UAV outdoor scenes",
+    "2D-3D feature fusion",
+    "training-free aggregation"
+  ],
+  "facets": {
+    "task": ["segmentation"],
+    "content-scope": ["scene", "environment-world"],
+    "representation": ["3d-gaussian", "point-cloud"],
+    "conditioning": ["text", "multi-view"],
+    "method": ["llm-vlm-guided", "hybrid-method"],
+    "prior-data": ["2d-prior", "multi-view-prior", "native-3d"]
+  },
+  "abstract": "3D Language Gaussian Splatting embeds open-vocabulary language features into 3D Gaussian Splatting, providing an efficient explicit representation for text-driven 3D scene understanding. However, existing methods are limited to indoor or small-scale scenes, and tend to fail in Unmanned Aerial Vehicle (UAV) outdoor scenes, where severe occlusions and long distance viewpoints often lead to incorrect semantic activations and missing target responses. In this paper, we present OutLangSplat which adapts language Gaussian representations to UAV outdoor scenes by improving feature representation and aggregation reliability. For the feature representation, a 2D-3D dual-branch representation with region-based alignment and fusion is designed to improve spatial consistency, reducing incomplete target responses and background misactivations. For the feature aggregation, we introduce a training-free contribution and consistency-aware Gaussian feature aggregation strategy that leverages pixel contribution reliability and cross-view semantic consistency to suppress unreliable responses from noisy viewpoints. A new dataset is provided by manually annotating various objects on four real-world public UAV outdoor scene datasets. To the best of our knowledge, it is the first accessible dataset of open-vocabulary 3D scene understanding for UAV outdoor scenes. Quantitative evaluations and ablation studies demonstrate that OutLangSplat outperforms SOTA methods on both open-vocabulary semantic segmentation and instance localization tasks. The datasets and codes will be open-sourced.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04560v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04560v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv v1 全文整理；dataset 与 code 均仅承诺未来公开，当前未加入 Code link。",
+    "ideaZh": "把 UAV outdoor 3DGS 的 open-vocabulary segmentation 拆成 2D semantic / 3D structural region fusion，以及按真实 Gaussian contribution 与跨视角一致性进行的 training-free feature aggregation。",
+    "methodFlow": [
+      "UAV Multi-view Images + Reconstructed 3DGS",
+      "SAM Regions + Remote-sensing VLM Features",
+      "3D Structural Feature Extraction",
+      "Region-level 2D–3D Fusion",
+      "Contribution + Consistency-aware Aggregation",
+      "Text-query Segmentation / Localization"
+    ],
+    "whyRelevantZh": "它属于选择性跟踪的 3D segmentation / open-vocabulary understanding。相比用户目前更近的 object-level point cloud 工作，UAV urban-scale 3DGS 较远；值得保留的是 2D semantics + 3D structure 以及 observation reliability aggregation，而不是完整工程细节。",
+    "evidenceZh": "最强证据是主结果与模块 ablation 同向：作者报告 overall Loc@40/50/60 为 90.9/88.8/86.3，所测最强 baseline LangSplat 为 87.7/85.6/83.4（Table 2，p. 6）；四个场景的 mIoU 为 68.3/72.9/82.9/72.4，相应最强 baseline 为 45.7/51.4/70.3/58.9（Table 3，p. 6）。2D–3D fusion 相比去掉 3D branch 为 68.31 vs. 63.90 mIoU，完整 aggregation 相比 projection 为 68.31 vs. 65.44（Tables 6–7，p. 7）。以上均为作者报告结果。",
+    "caveatZh": "最弱证据是 generalization：全部数字来自作者在四个 UAV scenes 上新标注的 660 regions，没有独立 held-out split、cross-scene protocol、置信区间或标准 indoor/object-level benchmark（Dataset setup，Table 1，p. 5）。Baseline 是否使用同等级 remote-sensing encoders 与调参预算也未充分说明，代码和数据尚未公开。",
+    "motivationZh": "Indoor/small-scale language Gaussian methods直接用于 UAV scenes 时，会受长距离、遮挡、boundary mixing 与 noisy viewpoints 影响，产生背景误激活或漏掉目标。逐像素把 2D VLM features lift 到 Gaussians，也没有利用可帮助分边界的 3D local structure。",
+    "methodZh": "方法以 SAM regions 聚合 RemoteCLIP 与 RS5M 的 2D semantic features，并对 opacity-filtered、voxel-downsampled Gaussian cloud 使用 SegContrast encoder 提取 3D structural features，随后在 region level 对齐融合。Aggregation 选择覆盖 90% pixel contribution 的 adaptive Top-K Gaussians，以 inverse-Simpson dispersion 估计 reliability，再用 cross-view feature distance 过滤不一致观察。",
+    "experimentsZh": "作者从 InstanceBuilding 与 UrbanScene3D 选择 Buildings1、Buildings2、Polytech、Campus，人工标注 660 target regions，与 LangSplat、LUDVIG、Lang3D-XL 比较 localization、mIoU 和 mAcc。类别 IoU 与 feature/aggregation ablations 支持主要模块，但 Polytech 的 mAcc 93.9 低于 LangSplat 96.2（Table 3，p. 6），而 fusion weights 似乎在同一实验集合上选择；论文也没有量化 runtime/memory。",
+    "insightZh": "Language feature lifting 不应把每个 view 当成等可靠观察：rendering contribution、feature concentration 与跨视角一致性都可以成为聚合权重。这个思路可以迁移到 open-vocabulary object segmentation，但目前不能把 UAV self-benchmark 的优势直接外推到通用 3D understanding。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

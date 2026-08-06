@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2603.06140",
+  "slug": "place-it-r1",
+  "title": "Place-it-R1: Unlocking Environment-aware Reasoning Potential of MLLM for Video Object Insertion",
+  "authors": [
+    "Bohai Gu",
+    "Taiyi Wu",
+    "Dazhao Du",
+    "Jian Liu",
+    "Shuai Yang",
+    "Xiaotong Zhao",
+    "Alan Zhao",
+    "Song Guo"
+  ],
+  "publishedAt": "2026-03-06",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2603.06140"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.AI", "cs.CV"],
+  "topicIds": ["video-generation", "visual-design-agents"],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video object insertion",
+    "environment-aware reasoning",
+    "MLLM",
+    "Spatial DPO",
+    "physical plausibility",
+    "trajectory conditioning"
+  ],
+  "facets": {
+    "task": ["editing", "reasoning"],
+    "content-scope": ["object", "scene"],
+    "representation": ["raster-image"],
+    "conditioning": ["video", "single-image", "text", "multimodal"],
+    "method": ["diffusion", "llm-vlm-guided", "reinforcement-learning"],
+    "prior-data": ["video-prior"],
+    "output-property": ["controllable", "physically-plausible"]
+  },
+  "abstract": "Video object insertion is fundamental to video editing, yet existing diffusion methods often produce visually plausible but physically inconsistent results. We present Place-it-R1, an end-to-end framework for physically plausible video object insertion driven by environment-aware MLLM reasoning. Rather than treating reasoning as a generic text prompt, Place-it-R1 uses the MLLM to analyze the target environment, infer object-scene interactions, and determine where an insertion is physically valid. The resulting reasoning is translated into two complementary forms of guidance for video diffusion: semantic guidance that describes the intended physical interaction and spatial guidance that provides a valid insertion region in each frame. To further align generation with local physical realism, we introduce Spatial Direct Preference Optimization, which leverages an MLLM to rank generated candidates, and introduces a region-aware preference objective that explicitly localizes physical-violation penalties to the inserted-object region. Place-it-R1 further offers flexible and standard modes to trade off environment adaptation and scene preservation. Extensive experiments show that Place-it-R1 produces more physically coherent and visually natural insertions than state-of-the-art methods and achieves competitive results against commercial systems.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.06140v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.06140v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv v2 全文整理；正文未给出可核验的公开代码仓库，因此仅保留精确版本的论文链接。",
+    "ideaZh": "让 MLLM 先推断物体与环境的物理关系，再把 reasoning 同时变成可注入 video diffusion 的连续语义特征和逐帧 insertion mask；Spatial DPO 进一步把 preference gradient 聚焦到插入区域。",
+    "methodFlow": [
+      "Source Video + Reference Object + Edit Instruction",
+      "Analysis–Revision–Planning Reasoning",
+      "CoT Feature + Trajectory Mask Conditioning",
+      "MLLM-ranked Preference Pairs",
+      "Global DPO + Region-aware Local DPO"
+    ],
+    "whyRelevantZh": "它处在 Video Generation / Editing 与 Visual Design Agents 的交叉点，重点是 agent reasoning 如何通过可执行的 semantic / spatial interface 真正控制生成过程，而不是停留在一段泛化 prompt。",
+    "evidenceZh": "作者报告 full model 在 FlexInsert 的 PC / PR 为 4.17 / 0.86，去掉 CoT 后为 3.92 / 0.67、去掉 DPO 后为 4.09 / 0.75（Table 2, p. 6）；flexible mode 的 PC / PR / PP 为 4.17 / 0.86 / 7.93，VACE + trajectory 为 4.03 / 0.67 / 5.21（Table 1, p. 6）。对 500 个 preference pairs 重新标注时，MLLM 排名与 10 名人工标注者多数票的一致率为 95.3%（Preference Data Quality, p. 7）。",
+    "caveatZh": "作者没有独立 limitations section。审阅风险包括：三套 benchmark 规模约为 100、100、20，physics 判断主要依赖 Gemini / VideoPhy；flexible mode 可通过添加支撑结构或改变背景提高 plausibility，却未必忠实保持原场景；preference judge 与最终 evaluator 都依赖 MLLM；训练还包含 500K iterations 和 32 张 H20，迁移成本不轻（Evaluation Setup and Tables 1–2, pp. 5–6; Training Details, p. 5）。",
+    "motivationZh": "现有 video insertion 往往只把 object、source video 与 edit prompt 交给 diffusion model，模型即使生成了视觉上自然的结果，也可能忽略接触关系、支撑条件和时序运动。Place-it-R1 试图让 MLLM 先解释“放在哪里、为什么物理上成立”，再把这种 reasoning 转成生成器可以执行的双通道约束。",
+    "methodZh": "QwenVL3-8B 以 Analysis–Revision–Planning 过程分析 object–scene interaction，并输出逐帧 bounding-box trajectory。Connector 将连续 CoT tokens 注入 WAN-1.3B 的语义 condition，binary masks 则经 VACE control adapter 提供 spatial condition。训练阶段为每个输入生成多个候选，由 MLLM 按 scale、photometric consistency 与 physical plausibility 排序，再将全局 DPO 与仅在 insertion mask 内计算的 local DPO 合并（Sec. 3.1 and Fig. 2, pp. 3–4; Eqs. 1–4, p. 4）。Standard mode 尽量保持原场景，flexible mode 允许生成支撑物或调整环境。",
+    "experimentsZh": "作者在 UNIC、FlexInsert 与 HumanSync 上比较 VACE、AnyV2V、Pika、Kling 等系统。Standard / flexible mode 在 UNIC 的作者报告 PP 为 6.21 / 6.63，表中 Pika 与 Kling 为 6.11 / 5.93（Table 1, p. 6）。w/o CoT、w/o DPO、T5 text 替代 CoT 与 local/global DPO 权重消融支持双通道 reasoning 和局部 preference objective 有贡献（Tables 2–3, p. 6），但没有拆分三个 reasoning 阶段，也未验证更换 MLLM 或 video backbone 后是否成立。商业系统的版本、输入能力与分辨率并不完全可比。",
+    "insightZh": "最值得迁移的是 reasoning-to-generation interface：连续特征表达意图，显式 trajectory / region 负责空间执行，局部 preference loss 再修正执行误差。单独的 CoT、mask control 和 DPO 都不是新范式，但这种组合可成为 visual design agent 控制生成器的通用模板；阅读时应把它视为有潜力的接口设计，而不是已被广泛验证的物理模型。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

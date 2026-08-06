@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "status": "fixture",
+  "reviewedAt": "2026-08-06",
+  "attentionPolicies": {
+    "continuous": {
+      "labelZh": "主要方向 · 持续关注",
+      "gateZh": "方向必须是主要贡献，并达到有意义的方法、表示、数据或能力推进。",
+      "allowIncremental": false,
+      "venueRole": "ranking-signal"
+    },
+    "focused": {
+      "labelZh": "窄范围 · 定向关注",
+      "gateZh": "只收直接命中窄任务或具有明显基础作用的通用表示。",
+      "allowIncremental": false,
+      "venueRole": "ranking-signal"
+    },
+    "landmark-or-transfer": {
+      "labelZh": "广域雷达 · 重大进展或直接迁移",
+      "gateZh": "只收领域级变化，或能直接迁移到核心方向的工作。",
+      "allowIncremental": false,
+      "venueRole": "strong-prior"
+    }
+  },
+  "directions": [
+    {
+      "id": "2d-design",
+      "labelZh": "2D Design",
+      "labelEn": "2D Design",
+      "attentionPolicy": "continuous",
+      "descriptionZh": "结构化、可编辑的 2D 表示与生成。",
+      "search": {
+        "hardNegativeSignals": ["raster-only image generation"],
+        "conditionalNegativeSignals": ["vectorization benchmark"]
+      },
+      "includeWhenZh": ["SVG、stroke、layer 或 editable structure 是主要贡献。"],
+      "excludeWhenZh": ["纯 raster image generation。"],
+      "crossTopicHints": [{ "topicId": "image-generation", "whenZh": "同时推进 raster prior。" }]
+    },
+    {
+      "id": "image-generation",
+      "labelZh": "Image Generation",
+      "labelEn": "Image Generation",
+      "attentionPolicy": "landmark-or-transfer",
+      "descriptionZh": "Raster image generation 的重大变化或直接迁移。",
+      "search": {
+        "hardNegativeSignals": ["image restoration"],
+        "conditionalNegativeSignals": ["domain-specific generation"]
+      },
+      "includeWhenZh": ["重大模型或对结构化设计有直接迁移。"],
+      "excludeWhenZh": ["普通小幅 benchmark 提升。"],
+      "crossTopicHints": [{ "topicId": "2d-design", "whenZh": "输出是结构化可编辑表示。" }]
+    },
+    {
+      "id": "video-generation",
+      "labelZh": "Video Generation",
+      "labelEn": "Video Generation",
+      "attentionPolicy": "landmark-or-transfer",
+      "descriptionZh": "Video generation 的重大变化或直接迁移。",
+      "search": {
+        "hardNegativeSignals": ["video restoration", "video super-resolution"],
+        "conditionalNegativeSignals": []
+      },
+      "includeWhenZh": ["生成范式或能力边界的重要变化。"],
+      "excludeWhenZh": ["传统 restoration。"],
+      "crossTopicHints": []
+    },
+    {
+      "id": "3d-segmentation",
+      "labelZh": "3D Segmentation",
+      "labelEn": "3D Segmentation",
+      "attentionPolicy": "focused",
+      "descriptionZh": "3D semantic、instance、part 或 promptable segmentation。",
+      "search": {
+        "hardNegativeSignals": ["generic autonomous driving detection"],
+        "conditionalNegativeSignals": ["point cloud encoder"]
+      },
+      "includeWhenZh": ["直接推进 segmentation 或 part representation。"],
+      "excludeWhenZh": ["与 segmentation 无关的通用 encoder。"],
+      "crossTopicHints": []
+    }
+  ],
+  "tagTaxonomy": {
+    "displayPolicyZh": "Fixture controlled facets.",
+    "dimensions": [
+      {
+        "id": "task",
+        "labelZh": "Task",
+        "values": [
+          { "id": "generation", "label": "Generation" },
+          { "id": "segmentation", "label": "Segmentation" }
+        ]
+      },
+      {
+        "id": "representation",
+        "labelZh": "Representation",
+        "values": [
+          { "id": "svg-vector", "label": "SVG / Vector" },
+          { "id": "point-cloud", "label": "Point Cloud" }
+        ]
+      },
+      {
+        "id": "output-property",
+        "labelZh": "Output Property",
+        "values": [{ "id": "editable", "label": "Editable" }]
+      }
+    ]
+  },
+  "routingRules": [
+    {
+      "id": "structured-vs-raster-2d",
+      "ruleZh": "结构化、可编辑输出归 2D Design；纯 raster 输出归 Image Generation。"
+    }
+  ],
+  "globalExclusions": [
+    {
+      "id": "restoration",
+      "labelZh": "Image / Video Restoration",
+      "signals": ["image restoration", "video restoration", "super-resolution"]
+    }
+  ]
+}

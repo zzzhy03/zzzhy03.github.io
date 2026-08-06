@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2608.05000",
+  "slug": "physics-of-multimodal-pretraining",
+  "title": "Towards Physics of Multimodal Pretraining: Knowledge Flow, Modality Synergy, Early Unification, and Recipes",
+  "authors": [
+    "Junlin Han",
+    "Shengbang Tong",
+    "David Fan",
+    "Minghao Chen",
+    "Philip Torr",
+    "Filippos Kokkinos",
+    "Mike Lewis"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05000"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.CV", "cs.LG", "cs.MM"],
+  "topicIds": ["vlm-mllm", "image-generation"],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "multimodal pretraining",
+    "knowledge flow",
+    "modality synergy",
+    "early unification",
+    "unified understanding and generation",
+    "mixture of experts"
+  ],
+  "facets": {
+    "task": ["generation", "representation-learning"],
+    "content-scope": ["2d-artifact"],
+    "representation": ["raster-image", "hybrid-representation"],
+    "conditioning": ["multimodal"],
+    "method": ["hybrid-method"]
+  },
+  "abstract": "Vision offers a critical axis for advancing foundation models, driving a shift towards natively unified multimodal pretraining. Despite this momentum, the design space and the fundamental mechanisms of how modalities interact during unified training remain underexplored. We provide empirical clarity through a systematic exploration of multimodal pretraining. Our controlled experiments on both synthetic and large-scale real-world datasets yield four key insights into the physics of multimodal pretraining: (i) Knowledge Flow: We disentangle how language, visual understanding, and visual generation transfer knowledge across modalities, revealing distinct patterns of influence and asymmetry; (ii) Synergy vs. Competition: We show that data \"complexity\" largely determines whether modalities are synergistic, identify architectural choices that promote synergy: such as shared attention and normalization with modality-specific feed-forward layers, and find that these behaviors generalize across different visual tokenizer designs; (iii) Early Unification: Unifying modalities from the very early stages and training them jointly is shown to be more effective than late alignment or sequential training. This process uncovers a vision laziness phenomenon, where delayed integration leads models to rely on language priors; (iv) Recipes: We derive efficient pretraining recipes that achieve strong generative performance using only 5% of the compute budget. These core findings are subsequently validated at scale by training multiple 13.5B MoE models on 2T tokens. We hope this study provides a principled foundation for understanding and scaling multimodal pretraining.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05000v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05000v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.05000v1 全文整理；论文未在 PDF 中提供可用的公开代码 URL。",
+    "ideaZh": "用从 100B 到 2T tokens 的受控实验，把 unified multimodal pretraining 拆成 knowledge flow、synergy/competition、early unification 与 data-mixture recipe 四组可检验规律。",
+    "methodFlow": [
+      "Cross-modality Knowledge-flow Sweeps",
+      "CLEVR Concept-removal Transfer Tests",
+      "Parameter-sharing and Complexity Sweeps",
+      "Early-vs-late Unification Experiments",
+      "Vision-laziness Readouts",
+      "13.5B MoE / 2T-token Scaling Validation"
+    ],
+    "whyRelevantZh": "它同时覆盖 VLM/MLLM 与 raster image generation 的 unified pretraining，并给出 data mixture、parameter sharing 和 vision 接入时点三类可直接影响未来模型设计的经验规则。",
+    "evidenceZh": "作者报告 13.5B MoE 的 L70/U25/G5 recipe 相对 L50/U25/G25 使 language accuracy +1.45、visual-understanding average +1.66、DPG +0.013、GenEval +0.015，但 diffusion loss 变差 0.011（Table 2, pp. 21–22）；shared attention/norm + modality-specific FFN 在受控实验中表现最佳（Fig. 9, pp. 14–15）。",
+    "caveatZh": "所有 controlled experiments 固定 seed 0，真实世界数据主体 SSTK 不公开；论文只实证 text 与 static images，若干所谓机制仍由 activation/attention proxy 支持，因此不能把四条经验规律直接视为跨规模、跨 modality 的普适定律。",
+    "motivationZh": "Unified multimodal models 同时承担 language、visual understanding 与 visual generation，但不同任务之间究竟迁移知识还是争夺容量、应该共享哪些参数、vision 何时接入训练，长期缺少系统的 controlled evidence。",
+    "methodZh": "作者先在 1.5B Llama-3-like 与 2.3B split-FFN models 上控制 data ratio、tokenizer、task complexity、parameter sharing、vision 接入时间和 sequential order；再用扩展 CLEVR 删除指定 concept，区分 zero-shot transfer 与后续 recovery；最后用 activation、wrapper embedding、visual FFN 与 attention readouts分析 vision laziness，并在多个 13.5B MoE、2T-token runs 上验证非对称 mixture、MoE 与 early unification。",
+    "experimentsZh": "受控实验覆盖 100B–1T tokens、四种 visual tokenizer、五种 parameter-sharing pattern、五个 unification time 与六种 sequential order；scaling runs 为 13.5B MoE（每 token 激活 1.5B parameters）训练 2T tokens。作者报告 split-FFN 相对 unimodal controls 同时改善 language PPL 0.211 与 visual diffusion loss 0.0168，而 fully dense 两侧都退化（Fig. 9, pp. 14–15）；joint training 几乎全面超过六种 sequential order，12.5% replay 仍未追平（Fig. 12, pp. 17–18）。",
+    "insightZh": "最值得迁移的不是某个单一比例，而是三条设计顺序：先测知识流方向，再按容量竞争决定 FFN 是否分开，最后尽早让 vision 进入共享 attention/norm。Generation data 占比可以很低，但 alignment metrics、diffusion loss 与 FID 必须分开观察。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

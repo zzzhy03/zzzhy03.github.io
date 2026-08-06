@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2608.03971",
+  "slug": "uniworld-design",
+  "title": "UniWorld-Design: From Pixel Generation to Layer-Native Design",
+  "authors": [
+    "Zongjian Li",
+    "Zhiyuan Yan",
+    "Chenxu Bai",
+    "Chen Chen",
+    "Haoxiang Sun",
+    "Shaodong Wang",
+    "Feize Wu",
+    "Shenghai Yuan",
+    "Bin Lin",
+    "Zheyuan Liu",
+    "Yuwei Niu",
+    "Li Yuan"
+  ],
+  "publishedAt": "2026-08-04",
+  "collectedAt": "2026-08-06",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.03971"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": ["cs.CV"],
+  "topicIds": ["2d-design", "image-generation", "visual-design-agents"],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "layer-native design",
+    "RGBA generation",
+    "image decomposition",
+    "semantic layers",
+    "editable image generation",
+    "Layer-Instruction-Binding MMDiT"
+  ],
+  "facets": {
+    "task": ["generation", "editing", "decomposition"],
+    "content-scope": ["2d-artifact"],
+    "representation": ["raster-image", "layered-2d"],
+    "conditioning": ["text", "single-image", "multimodal"],
+    "method": ["diffusion"],
+    "prior-data": ["2d-prior"],
+    "output-property": ["controllable", "editable", "efficient"]
+  },
+  "abstract": "We introduce UniWorld-Design, a framework that redefines image generation from flat pixel synthesis to structured visual composition, with semantic RGBA layers as the atomic units of generation, understanding, and editing. Our key insight is that pixels define how an image is rendered, whereas layers define how an image is created, understood, and edited. Just as human designers create and manipulate visual content through layers rather than raw pixels, UniWorld-Design equips multimodal generative models with a layer-native design space. UniWorld-Design comprises two models. The Text-to-RGBA (T2RGBA) model generates standalone RGBA assets directly from text. The Image-to-Layer (I2L) model conditions on a finished image, a global instruction and per-layer prompts, and jointly produces ordered, complete semantic RGBA layers. Its instruction interface supports top-level decomposition, recursive decomposition and targeted extraction, making layering an instruction-addressable operation for agentic editing. Because I2L learns complete semantic objects rather than visible-pixel partitions, its layers stay usable when moved or removed. On the Crello benchmark, I2L reduces per-layer RGB L1 error by 37% and achieves a 34% relative improvement in Alpha Soft IoU over Qwen-Image-Layered. Separately, T2RGBA achieves the highest CLIP Score, outperforming LayerDiffuse and OmniAlpha.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.03971v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.03971v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv v1 全文整理；PDF 只给出 project website，没有印出代码仓库或 release commitment，因此不显示 Code 链接。",
+    "ideaZh": "把 semantic RGBA layer 直接作为 generation、understanding 与 editing 的原子单元：T2RGBA 生成透明资产，I2L 则按全局和逐层指令把 finished image 联合拆成有顺序、保留遮挡内容的完整对象层。",
+    "methodFlow": [
+      "Build Semantic Layer Trees from Designer PSDs",
+      "Bind Global + Per-layer Instructions",
+      "Jointly Generate Ordered Complete RGBA Layers",
+      "Top-level / Targeted / Recursive Decomposition",
+      "Generate Standalone Assets with T2RGBA",
+      "Distill Both Models to Eight-step Inference"
+    ],
+    "whyRelevantZh": "它非常贴近 2D Design 主线：输出不再只是最终 raster，而是可移动、删除、重排和递归分解的 structured visual state。它也可作为 Visual Design Agent 的底层 tool/interface，但论文尚未真正验证 agent 闭环。",
+    "evidenceZh": "作者报告 I2L 的 per-layer RGB L1 为 0.1264±0.0980、Alpha Soft IoU 为 0.7325±0.1622，Qwen-Image-Layered 为 0.2014±0.0937、0.5454±0.1577（Table 1, p. 9）；blank layers 从 0.35 降至 0.13、bad-layer rate 从 42.3% 降至 33.0%（Table 2, p. 9）。但 VLM rubric 的 alpha cleanliness 为 2.90±1.11，低于 baseline 的 3.33±1.59（Table 3, p. 10）。T2RGBA 仅在 CLIP 以 33.03±5.29 领先，OmniAlpha 在 FID、Alpha MSE、SAD 与 LPIPS 上更好（Table 4, p. 14）。",
+    "caveatZh": "作者承认 fine alpha boundaries 较差、dense typography 尤其 Chinese text 不稳定，而且 layer insertion / replacement、layout-constrained composition 与 interactive multi-turn editing 仍是未来工作（Limitations, p. 15）。审阅风险还包括：PSD corpus 与 internal T2RGBA test set 的规模、来源和许可未披露；I2L 只有一个 direct baseline；proprietary VLM judge 缺少人类一致性分析；核心 layer binding、3D RoPE、complete-object supervision 和 distillation 均无独立 ablation；recursive extraction 与 agent interface 主要是 qualitative demonstration（Secs. 4–5, pp. 9–15）。",
+    "motivationZh": "Flat image generation 优化最终像素，却没有保留设计者实际操作的对象边界、层序、遮挡内容和编辑语义。Mask 或 visible-pixel partition 即使能分割画面，移动或删除上层对象后也会暴露空洞。UniWorld-Design 因此把完整 RGBA object layer 作为模型直接生成和理解的 state。",
+    "methodZh": "I2L 接收 finished RGB image、global task instruction 与多个 per-layer prompts。Layer-Instruction-Binding MMDiT 用 attention mask 把每个 prompt 绑定到对应 image queries，并以 layer-indexed 3D RoPE 标记层序（Fig. 3, pp. 5–6）；training targets 来自 designer-authored PSD，VLM 只辅助 grouping，像素及被遮挡内容仍来自原 PSD（Fig. 4, pp. 6–7）。同一 interface 支持 top-level decomposition、target extraction 和对返回层递归分解。独立 T2RGBA model 从 text 生成 transparent assets；RGBA VAE adaptation、progressive adversarial distillation 与 DiffusionNFT 将两者压缩到 8-step inference。",
+    "experimentsZh": "I2L 在 512 个 fixed-seed Crello designs 上与 Qwen-Image-Layered 比较四层 decomposition，使用 LayerD alignment、Stable-Layers metrics 与 GPT-5.6-terra rubric；T2RGBA 在 internal 512 prompts 上与 LayerDiffuse、OmniAlpha 比较，其中 paired metrics 使用 479 个有 source layers 的样本（Sec. 4, pp. 9–14）。结果支持 end-to-end layer-native system，但 LayerD 可 merge adjacent layers，可能放宽 granularity mismatch；论文也没有与更多 Photoshop-style decomposition systems 或真实 design-agent pipelines 比较，无法隔离各个 architecture / supervision component 的作用。",
+    "insightZh": "真正的贡献是把 layer 从后处理结果提升为 generative state：每层是完整、可独立操作且可继续分解的对象，而不是当前画面里可见像素的切片。这个表示很适合作为 2D design agent 的中间语言；但 agentic editing 目前仍是接口愿景，方向价值高于现阶段的系统证据成熟度。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
