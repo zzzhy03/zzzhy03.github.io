@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2608.05478",
+  "slug": "genga",
+  "title": "GenGA: Editable and Data-Grounded Graphical Abstract Generation for Academic Papers",
+  "authors": [
+    "Takuro Kawada",
+    "Shunsuke Kitada",
+    "Hitoshi Iyatomi"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.05478"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.GR",
+    "cs.HC",
+    "cs.LG",
+    "cs.MM"
+  ],
+  "topicIds": [
+    "2d-design",
+    "image-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "graphical abstract",
+    "editable SVG",
+    "asset-grounded generation",
+    "vector graphics",
+    "VLM review loop"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "svg-vector",
+      "layered-2d"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "retrieval-composition",
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "editable",
+      "controllable"
+    ]
+  },
+  "abstract": "Graphical Abstracts (GAs) visually summarize the key findings of academic papers, playing a crucial role in facilitating the understanding of research content. Recently, advancements in vision-language models and image generation models have enabled the automatic generation of scientific figures based on paper content. However, most conventional methods output the generated results as raster graphics, making post-editing (e.g., text modification and layout changes) highly difficult. This poses a significant challenge, as they are unsuitable for the iterative figure revision process inherent in paper writing and peer review. To tackle these challenges, we define the novel task of generating editable GAs from paper content and propose GenGA, a new GA generation framework that directly produces figures in vector format. By generating figures as a collection of vector elements with a hierarchical structure, GenGA produces outputs that can be seamlessly imported into existing drawing tools for intuitive, element-level editing. Furthermore, we introduce the Structural Independence Coefficient (SIC), a metric that quantifies the editing simplicity of a figure based on the degree to which local modifications propagate to other elements. Experimental results show that GenGA achieves superior editing simplicity compared to conventional methods, and even surpasses human-authored GAs in conciseness and semantic alignment. We also validate SIC as an effective metric correlated with manual editing costs. This study fundamentally redefines GA generation as an editable vector graphic generation problem grounded in the practical workflows of researchers, significantly promoting effective scientific communication.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05478v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05478v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.05478v1 全文整理；PDF 未提供 project page 或 code repository URL。",
+    "ideaZh": "把 graphical abstract generation 从一次性 raster 改写为 vector-first、asset-grounded 的 hierarchical SVG generation，让真实图表以 placeholders 注入，并保留 element-level editing。",
+    "methodFlow": [
+      "Retrieve Similar Graphical Abstract",
+      "Vectorize Reference Layout",
+      "Insert Author Asset Placeholders",
+      "Generate Hierarchical SVG",
+      "VLM Review and Revision"
+    ],
+    "whyRelevantZh": "它几乎正对 2D Design 与 Visual Design Agents：生成目标不再只是视觉相似，而是可继续编辑、可插入真实 data assets 的结构化设计文件。",
+    "evidenceZh": "作者在 2,053-paper CS test set 上报告 Gemini-GenGA 的 SIC 0.943、CLIP-S 0.269；15 人编辑实验中 SIC 与 task success 的相关系数为 0.950、与 editing time 为 -0.967；300 次 2AFC 中 win rate 0.767、publishable rate 0.667（Table 2–3, pp. 6–8）。",
+    "caveatZh": "SIC 对 raster 与 vector 使用不同 node/edge construction，可能奖励缺少有用 constraints 的碎片化 SVG；测试 assets 又从目标 author-created GA 抽取并人工修正，因此“超过人工、可直接发表”不能按 headline 直接接受。",
+    "motivationZh": "现有 scientific-figure generators 多输出难以局部修改的 raster，而论文写作与审稿需要反复改文字、布局和真实实验图；post-hoc vectorization 也无法可靠恢复层级与资产语义。",
+    "methodZh": "LongCLIP 从独立池检索 raster GA，VLM 将其转换成带 placeholders 的 SVG structure；generator 根据 paper text、references 和作者 assets 输出 nested groups 与 geometry policies，再由 reviewer VLM 查看 rasterized result，最多四轮修改 semantic alignment、layout 与 readability。",
+    "experimentsZh": "实验覆盖 SciGA-145k 的 2,053 篇 CS papers，并与 raster generation、post-hoc vectorization、hybrid methods 与 human-authored GAs 比较；另有 manual edit logs、pairwise preference 和 pipeline ablation。reference 与 review loop 改善内容和可读性，但 full pipeline 的 SIC 不是最高，且 generators/evaluators 共用 GPT/Gemini families。",
+    "insightZh": "可编辑生成不能只看 element 是否独立：真正有用的 SVG 还要保留语义 grouping、alignment constraints 与真实 data assets。GenGA 的 task framing 很重要，而 SIC 更像需要进一步校准的第一版 proxy。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "id": "arxiv:2608.05248",
+  "slug": "worldclaw",
+  "title": "WorldClaw: Agentic 3D Open-World Generation at Scale",
+  "authors": [
+    "Chunchao Guo",
+    "Jinpeng Li",
+    "Yang Li",
+    "Zilong Huang"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05248"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "open-world generation",
+    "agentic 3D pipeline",
+    "procedural terrain",
+    "editable scene assets",
+    "render-inspect-edit loop"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition",
+      "editing"
+    ],
+    "content-scope": [
+      "scene",
+      "environment-world"
+    ],
+    "representation": [
+      "mesh",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "editable",
+      "asset-ready"
+    ]
+  },
+  "abstract": "Generating large-scale, freely explorable 3D worlds from open-ended text remains challenging because a system must jointly maintain global spatial coherence, rich local content, and explicit assets suitable for downstream editing and reuse. We present WorldClaw, a fully agentic, coarse-to-fine framework for open-world 3D scene generation. Planning agents translate a text prompt into a structured specification of regions, terrain, assets, materials, and spatial relations. WorldClaw then builds a globally coherent terrain foundation from semantic layouts, reusable assets, generative or procedural materials, and a region-aware height field. For detail-demanding regions, it generates terrain-conditioned compositions, reconstructs editable textured meshes, and recovers their placement on the terrain; render-based agents further refine terrain, objects, appearance, and contacts. Across diverse open-world prompts, WorldClaw produces large-scale scenes with coherent spatial organization, visually compelling local content, and editable instance-level assets while preserving a consistent global terrain structure.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05248v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05248v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://tencent-hunyuan.github.io/Hunyuan3D-WorldClaw"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.05248v1 全文整理；论文 PDF 明确提供 project page，截至本次审阅未提供可核实的 WorldClaw 代码仓库 URL。",
+    "ideaZh": "WorldClaw 用 coarse-to-fine agent pipeline 先建立连续 global terrain，再只对高细节区域生成 2D compositions、重建独立 textured meshes 并恢复地形 placement，最后通过 render-inspect-edit loops 修正 terrain、objects 与 contacts。",
+    "methodFlow": [
+      "Open-ended prompt 扩为 structured scene specification",
+      "Semantic layout 驱动 region-aware procedural terrain",
+      "生成/程序化 materials 与 terrain asset scattering",
+      "Terrain-conditioned regional 2D composition generation",
+      "Instance segmentation、3D reconstruction 与 ray-based placement",
+      "Render-inspect-edit loops 修 terrain、objects 与 contacts"
+    ],
+    "whyRelevantZh": "这是核心 3D Generation 与 Visual Design Agents 的直接交集：agent 规划并调用 Blender、vision 与 3D tools，观察 renders 后迭代修改 world；explicit editable meshes、terrain materials 与 object placement 也与 computational design 直接相关。",
+    "evidenceZh": "论文用四个主案例展示 global/regional/walk views 及 instance/depth/normal renders（Figs. 4-7, pp. 13-17），并与 SynCity、Marble、MajutsuCity、WorldGen、GPT-5.6 Sol 做同主题 qualitative comparison（Fig. 8, pp. 17-19）。这些只支持系统可生成所示案例，不构成 quantitative SOTA evidence。",
+    "caveatZh": "全文没有 quantitative metrics、user study、ablation 或 statistical evidence；baseline prompts 与展示 views 均经过适配/选择。系统依赖 proprietary/recent models 和 4 H20，未报告完整 runtime、API/GPU cost、iteration/failure rates，也没有公开可核实的完整 orchestration code。",
+    "motivationZh": "Large-scale text-to-3D world 必须同时维护 global spatial coherence、局部内容密度与 downstream editability；只生成单个 latent scene 或彼此独立的 local views 很难兼顾连续 terrain 和可复用 instance assets。",
+    "methodZh": "Planning agents 先生成 shared scene specification；global stage 用 semantic regions、base elevation、multi-scale noise、geomorphic operators 与 materials 构造连续 terrain。Regional stage 以 terrain render 条件生成 composition images，分割并重建独立 meshes，通过 camera-ray correspondence 恢复 placement，再由 agents 重渲染并修 scale、pose、floating 与 penetration。",
+    "experimentsZh": "作者以 Claude Opus 4.8、GPT-Image-2、SAM3、SAM3D、Hunyuan3D 与 Blender 5.1.1 生成四类 open worlds，并提供多个 appendix cases 和一组 qualitative baseline comparison。结果展示了 explicit scene components 与 terrain variation，但没有 matched scene budgets、geometry quality、prompt alignment、edit success、runtime 或消融。",
+    "insightZh": "可迁移的系统结构是把 global terrain foundation 与 selective regional asset generation 解耦：共享规格维持全局一致性，局部 composition/reconstruction 负责内容密度，而 render feedback 只修改相关区域并保留 explicit editability。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "early"
+  }
+}

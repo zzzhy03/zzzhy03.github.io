@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2608.05249",
+  "slug": "prism-rubric",
+  "title": "PRISM: Priority-aware Rubric Internalization via Structured Multimodal Data Synthesis",
+  "authors": [
+    "Xiaomin He",
+    "Dongling Xiao",
+    "Jiahao Xie",
+    "Ruiqi Lu",
+    "Qianle Wang",
+    "Zhongbin Guo",
+    "Wanxuan Sun"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.05249"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "multimodal instruction following",
+    "priority-aware rubric",
+    "structured data synthesis",
+    "constraint verification",
+    "MLLM"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "abstract": "Real-world multimodal instructions often bundle multiple requirements with unequal importance, yet most multimodal training data still reduce instruction following to answering one self-contained question. We study this gap through \\textbf{rubric comprehension}, which casts the model not as a generator measured against rubrics but as an \\textbf{executor} that follows them: given an image and a typed, prioritized rubric, the model must verify each rule before producing an overall judgment. To support this setting, we propose \\textbf{PRISM}, a four-stage data synthesis framework that produces persona--task pairs, prefix-guided rule sets, quality-filtered rubrics, and structured verification traces. We further introduce \\textbf{PRISM-Eval}, whose Loose and Strict metrics use deterministic matching against fixed labels and therefore require no inference-time judge model. With only 10K synthesized samples, PRISM lifts Qwen3-VL-4B from 9.5\\% to 30.1\\% Strict accuracy on PRISM-Eval while preserving average performance on general benchmarks, and the gains transfer to four additional open-source MLLMs across dense and MoE architectures, suggesting that structured rubric supervision is a scalable path toward multi-rule, priority-aware multimodal instruction following.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05249v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05249v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.05249v1 全文整理；PDF 未提供 dataset、checkpoint 或 code repository URL。",
+    "ideaZh": "把 rubric 从 evaluator side 移进模型输入与 supervision：MLLM 先做 visual grounding，再逐条检查 typed、prioritized constraints，最后按 priority 汇总 verdict。",
+    "methodFlow": [
+      "Synthesize Persona and Task",
+      "Generate Typed Priority Rules",
+      "Filter Rubric Quality",
+      "Create Rule-Level Verification Trace",
+      "Structured Multimodal SFT",
+      "Deterministic Loose / Strict Eval"
+    ],
+    "whyRelevantZh": "priority-aware constraint decomposition 可迁移到 Visual Design Agents 的生成前需求理解与生成后逐项 verification；但本文验证的是 executor-side judgment，而不是 constrained visual generation 本身。",
+    "evidenceZh": "作者报告只用 10K samples，Qwen3-VL-4B 的 PRISM-Eval Strict 从 9.5% 提至 30.1%，Loose 从 36.7% 提至 71.1%；去掉 priority 后 Strict 降到 23.6%，随机打乱 rule order 则保持 30.3%（Tables 3–4, pp. 10–11）。",
+    "caveatZh": "train/eval 共享 synthesis models、taxonomy、aggregation policy 与 output style；10K baselines 未按 token/FLOP 对齐，line-based 新 schema 上的增益也明显缩小。模型会判断 constraints，不代表能生成满足 constraints 的设计。",
+    "motivationZh": "现实 multimodal instructions 往往包含多个重要性不同的要求，而传统单问单答数据既不监督逐条检查，也无法区分 critical veto 与 optional preference。",
+    "methodZh": "系统先从 Cambrian image 推导 persona/task，再生成五类、三级 priority rules，经 specificity、reasonableness、completeness、coherence 过滤后，构造 visual grounding、rule-by-rule Pass/Fail 与 priority-aware verdict 的 structured traces，用于 full-parameter SFT。",
+    "experimentsZh": "作者在五种 learner backbones 上比较五类 synthetic instruction data，另测试 10K–80K scaling、human-adjudicated subset、priority/order ablation、output-schema transfer、few-shot 与 sequential inference。跨 backbone 的 in-domain gains 稳定，一般 benchmarks 基本保持，但真实专业 rubrics 与 matched-token controls 仍缺失。",
+    "insightZh": "复杂 instruction following 的瓶颈可能不是记住更多 rules，而是学会显式保存 rule identity、priority 和 evidence，再做可诊断 aggregation；priority label 的作用显著高于表面顺序。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

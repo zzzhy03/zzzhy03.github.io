@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2608.03632",
+  "slug": "sa-opd",
+  "title": "When Teachers Mislead: Spurious-Signal-Aware On-Policy Distillation",
+  "authors": [
+    "Yinuo Jiang",
+    "Yongjie Ye",
+    "Zhou Tao",
+    "Xiang Zhuang",
+    "Qiang Zhang",
+    "Huajun Chen",
+    "Tiankai Li"
+  ],
+  "publishedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.03632"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "on-policy distillation",
+    "spurious supervision",
+    "input groundedness",
+    "token filtering",
+    "vision-language models",
+    "teacher-student distillation"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "hybrid-method"
+    ]
+  },
+  "abstract": "On-Policy distillation (OPD) transfers teacher capabilities by supervising student-sampled trajectories with dense token-level teacher signals. Recent selective OPD methods improve this process by prioritizing signals that are confident, informative, or learnable. However, the assumptions overlook a fundamental failure mode of language models: their token-level judgments can be driven by input-agnostic language priors, formatting conventions, or stereotyped reasoning templates rather than task-specific evidence. We refer to such optimization-relevant but weakly input-grounded supervision as spurious signals in OPD, which may produce large gradients while contributing little task-improving direction. To mitigate this issue, we propose SA-OPD, a Spurious-Signal-Aware On-Policy Distillation framework that identifies and filters misleading token-level supervision based on input-groundedness and optimization impact. SA-OPD introduces a lightweight input-groundedness proxy estimating whether a token-level distillation signal truly depends on the input. It then filters only tokens that simultaneously exhibit low input-groundedness and extreme distillation divergence, thereby removing high-impact spurious updates and achieving fine-grained OPD optimization. Extensive experiments on both large language model (LLM) and vision-language model (VLM) settings demonstrate that SA-OPD consistently outperforms Vanilla OPD and competitive selective methods. These results establish input-groundedness as a key dimension for OPD supervision selection and offer a simple, effective strategy for mitigating spurious updates.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.03632v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.03632v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/jjjyinuo/SA-OPD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.03632v1 全文整理；Paper URL 精确指向本次审阅版本。PDF 首页明确打印 https://github.com/jjjyinuo/SA-OPD，因此添加 Code 链接。",
+    "ideaZh": "在同一 student rollout 上比较 full-input 与 no-prompt teacher-student divergence，用 absolute gap 近似 input-groundedness，再过滤“grounding gap 小但 optimization impact 大”的 tokens。",
+    "methodFlow": [
+      "由当前 student policy 生成 on-policy response trajectory",
+      "在完整 image/prompt 与同一 response prefix 下计算 teacher-student token divergence",
+      "移除原始输入但保留 response prefix，再计算 residual no-prompt divergence",
+      "用两种 divergence 的 absolute difference 作为 input-grounding gap proxy",
+      "取 grounding gap 最低 tokens 与 |full divergence| 最高 tokens 的交集",
+      "动态调整 selection ratios 约束 filtered loss-mass，剩余 tokens 执行 reverse-KL OPD"
+    ],
+    "whyRelevantZh": "该工作直接涉及 VLM/MLLM post-training efficiency 与 supervision quality，尤其适合理解 multimodal teacher distillation 中 language priors 如何压过 visual grounding。它不是 visual generation 方法，但对构建更可靠的小型视觉语言模型有技术参考价值。",
+    "evidenceZh": "主 VLM pair 上，SA-OPD 的 understanding/reasoning average 为 54.0/63.5，Vanilla OPD 为 50.5/60.4（Table 1, p. 6）；LLM math average 从 OPD 28.5 提升到 30.4（Table 2, p. 6）；matched-ratio ablation 中 Geo3K/MathVista 从 base 67.2/69.0 提升到完整方法 72.2/72.1（Table 4, p. 7）；三组训练的额外时间开销为 2.64%–7.53%（Table 8, p. 16）。",
+    "caveatZh": "论文没有独立 Limitations section。No-prompt residual 衡量 prompt removal 后 divergence 是否变化，并不等价于 supervision 是否真正 spurious；移除 image/prompt 却保留 response prefix 还会产生 distribution shift。Filtered-token statistics 没有 human ground truth 或 causal validation。所有 teacher/student 都来自 Qwen family，任务集中在 visual/math benchmarks，也没有 multiple seeds、uncertainty 或更广 model-family 验证。",
+    "motivationZh": "Dense OPD 默认 teacher 的 token-level judgment 都值得模仿，但一些高幅度 signals 实际来自 input-agnostic language priors、格式习惯或重复 reasoning templates，可能产生大梯度却不改善当前任务。",
+    "methodZh": "标准 reverse-KL OPD 在 student 自己 roll out 的 states 上密集模仿 teacher。SA-OPD 保留这一框架，但为每个 token 再执行一个移除原始 prompt/image、保留相同 response prefix 的 residual pass：如果 teacher-student divergence 几乎不变，作者将该 supervision 视为更可能来自 language prior、format convention 或 repeated template，而不是当前输入。方法取 low absolute input-grounding gap 与 high absolute full divergence 的交集，并动态调 selection ratios，使 filtered loss-mass ratio 不超过阈值。结果覆盖 VLM visual understanding/reasoning 与 LLM math reasoning，增益一致但规模有限。",
+    "experimentsZh": "VLM 主实验使用 Qwen3.5-35B-A3B teacher→Qwen3.5-2B student，LLM 主实验使用 Qwen3-4B-Instruct→Qwen3-1.7B，并补两组不同 scale 的 Qwen-family pairs；比较 OPD、ExOPD、TIP、FiRe-OPD。主 VLM averages 相比 OPD 提升 3.5/3.1 points，LLM math average 提升 1.9 points。Matched-ratio ablation 支持 groundedness 与 impact 两轴交集，β sensitivity、training dynamics 与 token categories 补充机制观察；仍缺少真实 groundedness labels、不同 residual constructions、跨 model family 和 seed variance。",
+    "insightZh": "最有价值的贡献是把 OPD selection 从 confidence/entropy/divergence 扩展到 input dependence，并用无需训练模块的 counterfactual-style pass 实现。方法轻量、VLM/LLM 与消融结果一致，且 code 已公开；但 groundedness 仍是未经独立标注验证的 proxy，因此建议略读。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2510.17568",
+  "slug": "page-4d",
+  "title": "PAGE-4D: Disentangled pose and geometry estimation for vggt-4d perception",
+  "authors": [
+    "Kaichen Zhou",
+    "Yuhan Wang",
+    "Grace Chen",
+    "Xinhai Chang",
+    "Gaspard Beaudouin",
+    "Fangneng Zhan",
+    "Paul Pu Liang",
+    "Mengyu Wang"
+  ],
+  "publishedAt": "2025-10-20",
+  "updatedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v8",
+  "identifiers": {
+    "arxiv": "2510.17568"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "dynamic scene reconstruction",
+    "VGGT",
+    "4D perception",
+    "camera pose estimation",
+    "point-map reconstruction",
+    "dynamics-aware attention"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "prior-data": [
+      "video-prior",
+      "native-3d"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Recent 3D feed-forward models, such as the Visual Geometry Grounded Transformer (VGGT), have shown strong capability in inferring 3D attributes of static scenes. However, since they are typically trained on static datasets, these models often struggle in real-world scenarios involving complex dynamic elements, such as moving humans or deformable objects like umbrellas. To address this limitation, we introduce PAGE-4D, a feedforward model that extends VGGT to dynamic scenes, enabling camera pose estimation, depth prediction and point cloud reconstruction - all without post-processing. A central challenge in multitask 4D reconstruction is the inherent conflict between tasks: accurate camera pose estimation requires suppressing dynamic regions, while geometry reconstruction requires modeling them. To resolve this tension, we propose a dynamics aware aggregator that disentangles static and dynamic information by predicting a dynamics-aware mask - suppressing motion cues for pose estimation while amplifying them for geometry reconstruction. Extensive experiments show that PAGE-4D consistently outperforms the original VGGT in dynamic scenarios, achieving superior results in camera pose estimation, monocular and video depth estimation, and dense point map reconstruction. Necessary code and additional demos are available at Link: https://page4d.github.io/, including both the training-and-inference masking variant and the training-only masking variant (= VGGT architecture at inference). Keywords: VGGT-4D, 4D Perception, Dynamic Scene Reconstruction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2510.17568v8",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2510.17568v8"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2510.17568v8 全文整理；Paper URL 精确指向本次审阅版本。PDF 声称 code available，但只打印占位符“Link”，因此按 promised/null 处理且不添加 Code 链接。",
+    "ideaZh": "把 dynamic pixels 从统一 nuisance 改写成 task-dependent signal：对 camera pose 抑制它们，对 depth 与 point-map reconstruction 保留它们。",
+    "methodFlow": [
+      "将多帧 RGB 经 VGGT/DINO-style encoder 编成 camera、register 与 patch tokens",
+      "前段 Global/Frame Attention 聚合初步时空特征",
+      "mask predictor 从 patch tokens 无显式 motion labels 地预测 dynamic regions",
+      "对 camera/register queries 施加 mask attention，抑制 dynamic keys 对 pose 的干扰",
+      "对 depth/point-map patch queries 保留 dynamic cues，分别进入对应 DPT heads",
+      "只更新中间 10 个 global-attention layers，以 camera/depth/point-map multitask losses fine-tune"
+    ],
+    "whyRelevantZh": "它正面推进 3D reconstruction 中最值得持续关注的 dynamic/4D branch：不是单独做 generic segmentation，而是让 moving-region understanding 服务于 camera pose、depth 与 dense point-map 的统一恢复，也代表 VGGT-style feed-forward foundation models 向真实动态视频扩展的方向。",
+    "evidenceZh": "作者报告 Sintel scale-aligned video depth 的 Abs Rel/δ<1.25 从 VGGT 0.484/0.553 改善到 0.357/0.699，FPS 同为 43.2（Table 1, p. 8）；TUM camera pose 的 ATE/RPEtrans/RPErot 为 0.016/0.011/0.323（Table 2, p. 8）；DyCheck point-map 的 Accuracy mean/median 从 VGGT 1.051/1.016 降至 0.403/0.284，Completion mean/median 从 1.594/1.393 降至 1.222/0.728（Table 3, p. 9）；同数据 ablation 中 mask attention 在三个 video-depth datasets 均优于 middle-layer-only VGGT（Table 5, p. 10）。",
+    "caveatZh": "论文没有独立 Limitations section。核心 mask ablation 只报告 video depth，没有同时量化 pose–geometry trade-off；learned mask 只有定性图，没有 motion segmentation ground-truth evaluation。训练含占 sampling ratio 20% 的 2K-scene internal dataset，正文约 2.39M sampled sequences 与 Table 8 约 2.63M frame 总数口径不一致，也未报告 steps、batch size、GPU count 或 seed variance。论文多次提及 tracking，但实际没有加入 point-tracking head。",
+    "motivationZh": "Static feed-forward 3D models 在动态视频中面临内在冲突：object motion 会破坏 camera pose 所依赖的 rigid epipolar constraint，却同时提供恢复 moving geometry 所需的信息。",
+    "methodZh": "该工作把 static feed-forward foundation model VGGT 适配到 monocular dynamic scenes，同时输出 camera parameters、depth 和 3D point maps。作者在 aggregator 中插入可微 mask predictor，通过 task-specific attention 只屏蔽 camera/register queries 对 dynamic keys 的访问，而不屏蔽 geometry queries。模型冻结其余 backbone/decoders，仅更新约 30% 参数，并提供 mask 只在训练期使用的 variant，使 inference architecture 可退化回原 VGGT。多任务 benchmark 表明它对 VGGT 有稳定增益，但论文没有真正实现 point tracking，且对 learned mask 的定量正确性与跨任务 component attribution 仍不足。",
+    "experimentsZh": "评测覆盖 Sintel、Bonn、DyCheck 的 video/monocular depth，Sintel/TUM camera pose，DyCheck point maps，以及用预测 geometry 初始化 4DGS 后在 Nerfie 做 novel-view synthesis；比较 DUSt3R、MASt3R、MonST3R、CUT3R、Fast3R、FLARE、VGGT 与 DAS3R。PAGE-4D 对 VGGT 的 depth、pose、point-map 和 average rendering metrics 均有增益，但 Sintel 的部分 pose metrics 仍不及 optimization-based MonST3R，DyCheck Overall error 也不及 DAS3R。同数据 ablation 支持 middle-layer targeting 与 mask attention，却没有在 pose 和 point-map 上完整拆开组件贡献。",
+    "insightZh": "核心创新是在一个 VGGT aggregator 内对 pose tokens 与 geometry tokens 使用非对称 attention，并把 dynamic mask 变成可选的 training-time regularizer。任务直接相关、ICLR 2026 正式发表，多个 reconstruction tasks 上有一致增益，足以精读；但需要同时关注 internal data、mask 证据与 tracking claim 的边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

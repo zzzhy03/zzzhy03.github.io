@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2608.03733",
+  "slug": "failure-informed-image-self-augmentation",
+  "title": "Failure-Informed Image Self-Augmentation for Multimodal Large Language Model Self-Improvement",
+  "authors": [
+    "Chunyang Jiang",
+    "Pingping Zhang",
+    "Yuzhi Zhao",
+    "Wenao Ma",
+    "Zhijian Hou",
+    "Mengyang Wu",
+    "Yiyang Cai",
+    "Senkang Hu",
+    "Sitong Cheng",
+    "Chi-Min Chan",
+    "Wei Xue",
+    "Yike Guo"
+  ],
+  "publishedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.03733"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "failure-informed self-augmentation",
+    "multimodal self-improvement",
+    "answer-preserving image complication",
+    "synthetic VQA data",
+    "dual fidelity filtering",
+    "rollout self-examination"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "self-supervised",
+      "llm-vlm-guided"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "abstract": "Multimodal large language models (MLLMs) have achieved remarkable performance across vision-language tasks, but their progress depends heavily on large-scale, high-quality multimodal data that are costly to annotate. Self-augmentation offers a promising alternative by enabling models to expand their own training data without external supervision. However, existing MLLM self-augmentation methods are largely text-centric, while image augmentation remains underexplored and typically relies on generic or handcrafted transformations that are weakly aligned with the model's actual incapability. We propose Failure-informed Image Self-Augmentation (\\textbf{FISA}), a framework for MLLM self-improvement that constructs augmented images from the model's own failure cases. Our method generates visually challenging yet answer-preserving image complications, verifies their utility through self-examination, and applies dual fidelity filtering to avoid semantic distortion. Experiments on visual question answering benchmarks show that the proposed method consistently improves performance across both in-distribution and out-of-distribution settings. Further experiments validate the compatibility of FISA with existing textual self-augmentation approaches, the superior data efficiency of the synthesized samples over generic image augmentation baselines, and the practical effectiveness of the proposed filtering strategy.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.03733v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.03733v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.03733v1 全文整理；Paper URL 精确指向本次审阅版本。全文审阅未核验到公开 code repository，故不添加 Code 链接。",
+    "ideaZh": "从目标 MLLM 自己的 VQA failure case 出发，生成 answer-preserving 的视觉干扰样本，再用 failure utility 与双重 fidelity checks 筛选后 self-train。",
+    "methodFlow": [
+      "从 seed image-question-answer 构造 original caption",
+      "根据当前模型失败模式规划 answer-preserving visual complication",
+      "由 Z-Image-Turbo 根据 modified caption 合成图像",
+      "依次执行 failure utility、text fidelity 与 rollout image fidelity 检查",
+      "将保留样本与 seed data、self-explanations 混合",
+      "对目标 MLLM 做 full-parameter self-training"
+    ],
+    "whyRelevantZh": "FISA 属于 VLM/MLLM 的 multimodal data flywheel：它展示了模型如何从自身视觉失败中生成针对性训练样本，并把 utility 与 fidelity 分离验证。这个闭环可迁移到视觉设计与生成系统的数据改进，但当前证据仍限于 VQA，因此相关性为中等。",
+    "evidenceZh": "作者报告 Vanilla+FISA 相对 Vanilla 的六基准平均分提升为 Qwen +1.17、Gemma +0.57、LLaVA +1.36（Table 1, p. 4）；相同 augmentation volume 下，三个模型的 FISA 平均分均高于 Cap2Aug（Table 2, p. 5）。rollout-based image-fidelity filter 将 retained-set precision 从约 50% 提至 65% 以上，但该 precision 由 GPT-5.4 判定（Fig. 2, p. 5）。",
+    "caveatZh": "绝对提升较小，加入 Self-Instruct 后边际增益只剩 0.13/0.46/0.41；过滤质量由 GPT-5.4 而非成规模人工标注判定。seed data 与评估同时涉及 A-OKVQA、SEEDBench，而主文未充分说明 split/去重边界；合成结果也只验证固定的 Z-Image-Turbo 与 VQA setting。",
+    "motivationZh": "既有 MLLM self-augmentation 多集中于文本，image-side augmentation 往往使用与模型真实能力缺口无关的通用 crop、rotate 或 caption-to-image 变换，因此难以持续生成最有训练价值的视觉失败样本。",
+    "methodZh": "FISA 先让目标模型根据 seed image、question 与 answer 写出 original caption、保持答案不变但增加难度的 reasoning，以及 modified caption，再交给 Z-Image-Turbo 生成图像。候选必须让目标模型失败、其 modified caption 仍可推出原答案，并在多次图像问答 rollout 中至少一次恢复原答案，才与 seed data 和 self-explanation 一起进入 full-parameter SFT。",
+    "experimentsZh": "seed data 从 SEEDBench 与 A-OKVQA 各取 1,500 条，评估覆盖 A-OKVQA、SEEDBench、AI2D、MME、MMStar、MMBench；模型为 Qwen3-VL-2B、Gemma3-4B、LLaVA1.5-7B。六基准平均分从 69.33/70.02/57.02 提至 70.50/70.59/58.38（Table 1, p. 4），相同数据量下也高于 Cap2Aug（Table 2, p. 5）。消融覆盖 failure-oriented complication、image-fidelity filtering、rollout 数与 threshold，但没有与外部 teacher、人工精选 difficult set 或非 VQA tasks 做统一成本对比。",
+    "insightZh": "真正可复用的点不是某种新的图像变换，而是把“能暴露模型失败”和“仍保持原监督语义”拆成两个独立筛选条件，形成 failure-driven synthetic-data loop。建议略读 Fig. 1、Table 1 和 rollout trade-off；它是实用的数据选择推进，但现有小幅增益与自动 judge 证据不足以支持通用 MLLM 新范式。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

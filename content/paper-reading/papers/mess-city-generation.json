@@ -1,0 +1,104 @@
+{
+  "id": "arxiv:2508.15169",
+  "slug": "mess-city-generation",
+  "title": "MeSS: City Mesh-Guided Outdoor Scene Generation with Cross-View Consistent Diffusion",
+  "authors": [
+    "Xuyang Chen",
+    "Zhijun Zhai",
+    "Kaixuan Zhou",
+    "Zengmao Wang",
+    "Jianan He",
+    "Dong Wang",
+    "Yanfeng Zhang",
+    "mingwei Sun",
+    "Rüdiger Westermann",
+    "Konrad Schindler",
+    "Liqiu Meng"
+  ],
+  "publishedAt": "2025-08-21",
+  "updatedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv v4",
+  "identifiers": {
+    "arxiv": "2508.15169"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "city-scale scene generation",
+    "mesh-conditioned diffusion",
+    "cross-view consistency",
+    "3D Gaussian Splatting",
+    "outdoor world generation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene",
+      "environment-world"
+    ],
+    "representation": [
+      "mesh",
+      "3d-gaussian",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "partial-3d"
+    ],
+    "method": [
+      "diffusion",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "controllable",
+      "asset-ready"
+    ]
+  },
+  "abstract": "Mesh models have become increasingly accessible for numerous cities; however, the lack of realistic textures restricts their application in virtual urban navigation and autonomous driving. To address this, this paper proposes MeSS (Meshbased Scene Synthesis) for generating high-quality, styleconsistent outdoor scenes with city mesh models serving as the geometric prior. While image and video diffusion models can leverage spatial layouts (such as depth maps or HD maps) as control conditions to generate street-level perspective views, they are not directly applicable to 3D scene generation. Video diffusion models excel at synthesizing consistent view sequences that depict scenes but often struggle to adhere to predefined camera paths or align accurately with rendered control videos. In contrast, image diffusion models, though unable to guarantee cross-view visual consistency, can produce more geometry-aligned results when combined with ControlNet. Building on this insight, our approach enhances image diffusion models by improving cross-view consistency. The pipeline comprises three key stages: first, we generate geometrically consistent sparse views using Cascaded Outpainting ControlNets; second, we propagate denser intermediate views via a component dubbed AGInpaint; and third, we globally eliminate visual inconsistencies (e.g., varying exposure) using the GCAlign module. Concurrently with generation, a 3D Gaussian Splatting (3DGS) scene is reconstructed by initializing Gaussian balls on the mesh surface. Our method outperforms existing approaches in both geometric alignment and generation quality. Once synthesized, the scene can be rendered in diverse styles through relighting and style transfer techniques. project page: https://albertchen98.github.io/mess/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2508.15169v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2508.15169v4"
+    },
+    {
+      "label": "Project",
+      "href": "https://albertchen98.github.io/mess/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2508.15169v4 全文整理；项目页来自原始 arXiv abstract，PDF 未提供 code repository。",
+    "ideaZh": "以 city mesh 作为 metric geometry prior：先用 image diffusion 生成服从 mesh controls 的 sparse views 并落成 Gaussian surfels，再通过 intermediate-view inpainting 与 global alignment 把它扩展为 cross-view-consistent、可重渲染的城市 3DGS。",
+    "methodFlow": [
+      "Render Mesh Control Signals",
+      "Cascaded Key-View Outpainting",
+      "Initialize Mesh-Anchored Gaussian Surfels",
+      "Render Intermediate Views",
+      "AGInpaint + Field Densification",
+      "GCAlign Cross-View Appearance"
+    ],
+    "whyRelevantZh": "它直接属于 3D scene generation：把容易获得但缺少真实纹理的 city mesh 转成可生成 appearance、可沿指定 path 重渲染的 3D asset，也连接 Video Generation 的长程一致性问题。",
+    "evidenceZh": "作者报告 200 m sequences 上 LPIPS/FID/KID 为 0.348/28.17/0.016，VistaDream 为 0.508/72.44/0.073；12 条 matched trajectories 上 MEt3R/KPM/PSNR 为 0.129/1382/13.92，优于 VistaDream 的 0.155/1310/12.49（Table 1, p. 10；Table 4, p. 15）。",
+    "caveatZh": "训练和主要定量均来自 UE5 City Sample；真实 LoD3 只做一个 mesh 的定性迁移且仍带 UE5 texture prior。200 m 场景在 RTX PRO 6000 上约需 20 min 10 s，GCAlign 还以轻微 blur 换取 seam consistency。",
+    "motivationZh": "video diffusion 能保持序列外观却不稳定服从精确 camera path 与 mesh controls；独立 image diffusion 更容易 geometry alignment，却会跨视角漂移，单纯 city mesh 又缺少可用纹理。",
+    "methodZh": "系统从 mesh 渲染 depth、semantic、normal controls，用 CtrlNet-S 与 reference-conditioned CtrlNet-N 生成 sparse key frames，再按 metric depth 初始化 Gaussian surfels。当前 field 渲染出的 intermediate views 经 AGInpaint 修补 low-opacity silhouettes 并持续 densify，GCAlign 最后协调 exposure seams。",
+    "experimentsZh": "作者用两座 UE5 cities 的 16K frames 训练 SD1.5 ControlNets，沿 200 m paths 与 WonderWorld/VistaDream 做 matched comparison，并引用 StreetScapes/CityDreamer4D 作 paradigm references；另有 12 trajectories 的 surface/novel-view metrics、三模块消融、compute audit 与 TUM2Twin real LoD3 zero-shot qualitative test。",
+    "insightZh": "关键不是让更大的 video model直接记住城市，而是利用 image diffusion 对显式 controls 的服从性，并让一个不断更新的 3D field 充当跨视角 memory；生成与 reconstruction 因而在同一 loop 中交替。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

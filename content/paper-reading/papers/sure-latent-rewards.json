@@ -1,0 +1,93 @@
+{
+  "id": "arxiv:2608.06125",
+  "slug": "sure-latent-rewards",
+  "title": "Sample-Adaptive Latent Rewards for Uncertainty-Guided Diffusion Post-Training",
+  "authors": [
+    "Rui Li",
+    "Yuanzhi Liang",
+    "Ke Hao",
+    "Ziqiao Weng",
+    "Haibin Huang",
+    "Chi Zhang",
+    "XueLong Li"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.06125"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "latent reward model",
+    "diffusion post-training",
+    "uncertainty estimation",
+    "preference alignment",
+    "image generation",
+    "video generation",
+    "dense reward"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "diffusion",
+      "reinforcement-learning",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Latent reward models can supervise visual diffusion models without decoding intermediate states into pixel space. This makes alignment with human preferences more efficient. However, existing latent reward models output only scalar scores. They do not estimate the uncertainty of each prediction. The generator therefore cannot determine which feedback is reliable. This can drive optimization in the wrong direction and lead to reward hacking. We propose \\textsc{SURE}, a unified latent-space framework for image and video diffusion models. It learns reward distributions and directly uses their reliability to guide dense post-training. First, we propose sample-adaptive latent reward model (\\textsc{SURE-LRM}). It predicts a Gaussian utility for each noisy latent. Its mean predicts the reward score. Its variance reflect the uncertainty of prediction without human annotation. The learned distribution then guides post-training through uncertainty-guided reward feedback learning (\\textsc{SURE-REFL}). This method provides uncertainty-guided dense feedback along the denoising trajectory. At selected transitions, \\textsc{SURE-REFL} queries the frozen \\textsc{SURE-LRM}. It converts detached variance into reliability weights for samples at the same transition. Each weighted reward is backpropagated only through its local transition. The entire process remains in latent space and requires neither pixel-space decoding nor the full denoising graph. Experiments show that \\textsc{SURE-LRM} improves preference prediction over strong baselines. \\textsc{SURE-REFL} achieves the sota performance among various metrics and further improves optimization stability. It also achieves the highest VBench quality, semantic, and total scores among the evaluated methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.06125v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.06125v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.06125v1 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "让 latent reward model 输出 sample-dependent Gaussian utility，并把 detached inverse uncertainty 转成同一 denoising transition 内的 bounded reliability weight，降低不可靠 dense feedback 对 image/video diffusion post-training 的干扰。",
+    "methodFlow": [
+      "Noisy image/video latent + prompt + timestep",
+      "SURE-LRM 预测 mean reward 与 residual variance",
+      "与 noise prior 合成 predictive uncertainty",
+      "在 selected transition 查询 frozen reward",
+      "同 transition 内归一化并截断 reliability",
+      "Local reward gradient 更新 diffusion generator"
+    ],
+    "whyRelevantZh": "它不是新的生成 backbone，而是可迁移到 image/video diffusion 的 post-training primitive；对未来用 preference/reward 优化 structured 2D、3D prior 或视觉设计模型有直接方法参考。",
+    "evidenceZh": "作者报告 SURE-LRM 在 SD3.5 上四个 image preference benchmarks 平均 73.54，matched DiNa-LRM 为 71.49（Table 1, p. 5）；作者报告保留最低 predicted-variance 的 50% pairs 后 pair accuracy 从 79.40% 增至 90.10%，error AUROC 为 0.6941；该诊断使用训练分布中的 pairs（Table 2 and Sec. 4.2, p. 5）；作者报告 SURE-REFL 的 VBench quality/semantic/total 为 0.8548/0.7596/0.8357（Table 5, p. 7）。",
+    "caveatZh": "作者限制：需要进一步研究 distribution shift 下的 uncertainty calibration；需要把 video evaluation 扩展到更多 domain。审阅风险：Table 2 明确把 calibration 证据视为 in-distribution diagnostic，而不是 held-out calibration；variance 可能只学习 ranking difficulty proxy；Image gains 多为自动 reward metrics 的小幅变化，video 只用 Wan2.2 与 VBench，缺少充分 human preference evaluation；PDF 未提供代码 URL，训练数据、checkpoint 和 compute 细节主要指向未随主文呈现的 supplementary material。",
+    "motivationZh": "Scalar latent rewards 虽避免中间 latent 解码，却不知道每个预测是否可靠；生成器可能沿高不确定但高分的方向优化，造成不稳定更新和 reward hacking。",
+    "methodZh": "SURE 包含 SURE-LRM 与 SURE-REFL。前者在 noise prior 上学习 residual variance，以 heteroscedastic pairwise preference likelihood、variance regularizer、margin 和 anchor 训练；后者冻结 reward model，在选定 denoising transitions 查询 mean/variance，只让 reward gradient 回传本地 transition，并按同 timestep batch 中的相对 reliability 加权。论文在 image preference、image post-training 与 Wan2.2 video post-training 上验证，显示稳定性和自动指标增益。",
+    "experimentsZh": "Reward model 在 ImageReward、HPD v2/v3、GenAI-Bench 与两个 video preference sets 上评测；image post-training 使用 SD3.5-Medium、Z-Image-Turbo、FLUX.1-dev，video 使用 Wan2.2-14B-T2V，结果报告三 seeds 均值。关键结果：SURE-LRM 在 SD3.5 的四个 image preference benchmarks 平均 73.54，matched DiNa-LRM 为 71.49；保留最低 predicted-variance 的 50% pairs 后，pair accuracy 从 79.40% 升到 90.10%，但该诊断来自训练分布；SURE-REFL 的 VBench total 为 0.8357。基线覆盖：reward prediction 覆盖 CLIP/VLM/diffusion-native rewards，post-training 也包含主要 RL/latent-feedback methods；不过各 family 的 backbone/data 不完全匹配，video 只验证一个 Wan backbone 和一个 VBench protocol。消融：移除 Lvar 后平均分从 73.54 降到 68.72，支持防 variance inflation 的必要性；matched-transition normalization、cap/β 与 distribution-shift calibration 尚未被直接验证。",
+    "insightZh": "相对只输出 scalar 的 latent reward 或只按 timestep 建模 uncertainty，SURE 把 candidate-specific variance 显式保留到 generator optimization，并用 detached、bounded、matched-transition weighting 避免 uncertainty head 自行操纵梯度；这是跨 image/video 共用的局部 credit-weighting 规则。方法有清晰技术点且跨 image/video，但效果规模、calibration 与 human evaluation 仍有限，适合略读核心公式、Table 1/5 与风险，而不是作为重大 generation paradigm 精读。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

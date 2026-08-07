@@ -1,0 +1,102 @@
+{
+  "id": "arxiv:2608.04575",
+  "slug": "physmind",
+  "title": "PhysMind: From Video to Executable Worlds for Training-Free Physical Reasoning",
+  "authors": [
+    "Chen Yang",
+    "Shenxiang Zeng",
+    "Haoyang Zhao",
+    "Zhouyuan Xu",
+    "Youquan He",
+    "Haoyu Li",
+    "Mingyi Deng",
+    "Jiansheng Fan",
+    "Chen Wang"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.04575"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "physical reasoning",
+    "executable world",
+    "video-to-3D reconstruction",
+    "system identification",
+    "counterfactual reasoning"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "mesh",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "video",
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "editable",
+      "physically-plausible"
+    ]
+  },
+  "abstract": "Reliable physical reasoning from video requires understanding how objects move, interact, and respond to interventions. Existing vision-language models (VLMs) often struggle to interpret these dynamics and reason reliably about future and counterfactual outcomes. We introduce PhysMind, a training-free agentic framework that constructs one reusable, question-agnostic executable world per video. PhysMind recovers a temporally consistent dynamic scene through object segmentation, mesh reconstruction, and 6D pose tracking, then fits analytic continuous-time dynamics and latent physical parameters without unrolling a time-stepped simulator. Given a question, it inspects, continues, or edits the world and answers from the resulting trajectories and interactions. Relative to direct chain-of-thought (CoT) reasoning with the same VLM, PhysMind improves accuracy by 38.23 points on CLEVRER and 8.08 points on Physion++. On counterfactual questions, it exceeds the strongest evaluated VLM baseline, GPT-5.5, by 19.25 points.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04575v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04575v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://physmind.github.io/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.04575v1 全文整理；arXiv metadata 提供 project page，截至本次审阅未提供可用的公开代码 URL。",
+    "ideaZh": "PhysMind 先把每个视频一次性重建为 question-agnostic executable world，再针对问题调用 inspect、continue 或 remove-object rollout，让 VLM 从显式 trajectories、contacts 与 interventions 作答，而不是只靠 video CoT 猜测 physics。",
+    "methodFlow": [
+      "整段 video 做 object segmentation/tracking",
+      "Depth/intrinsics + masks 重建 conditioned meshes",
+      "FoundationPose 与 scene constraints 对齐 6D trajectories",
+      "拟合 analytic continuous-time dynamics 与 latent parameters",
+      "Question-conditioned inspect/continue/remove rollout",
+      "VLM 从 structured execution artifacts 生成答案"
+    ],
+    "whyRelevantZh": "它连接 VLM spatial/physical reasoning 与 3D reconstruction，重点是以显式、可执行、可编辑 intermediate world 替代 opaque video CoT。这类 representation interface 对 3D design agents、world generation 与可验证 spatial reasoning 都有直接迁移价值。",
+    "evidenceZh": "CLEVRER overall per-question 为 72.55%，同 backbone CoT 为 34.32%，GPT-5.5 为 67.24%；counterfactual 分别为 70.58%、16.63% 与 51.33%（Table 1, p. 4）。100-scene ablation 中，fixed-step integration 与 trajectory-only answering 分别把 overall 从 73.10% 降到 30.80% 和 40.54%（Fig. 4, pp. 6-7）。",
+    "caveatZh": "CLEVRER/Physion++ 主要是 synthetic rigid-body scenes；analytic backend 只覆盖 ballistic flight、Coulomb planar motion 与 pairwise impulses，counterfactual edit 也仅支持 remove_object。系统依赖多种 foundation tools，报告的 per-question API cost没有包含完整 reconstruction 与 optimization compute。",
+    "motivationZh": "End-to-end VLM reasoning 把 perception、dynamics inference 与 counterfactual simulation混在文字 chain-of-thought 中，难以复用同一场景、验证中间状态或定位错误。PhysMind 将这些环节外化成一份可执行世界。",
+    "methodZh": "系统用 persistent segmentation、metric depth、canonical mesh reconstruction 与双向 6D pose tracking 恢复 dynamic scene，再拟合 piecewise analytic continuous-time dynamics、friction、mass ratios 与 restitution。问题出现后才 grounding 到 object IDs，并调用 state/contact inspection、continuation 或 remove-object edit，把 execution artifacts 交给 answering VLM。",
+    "experimentsZh": "作者在 CLEVRER 的 1,000 scenes/4,280 questions 与 Physion++ 五类 384 trials 上，比较多个 proprietary/open VLM、training-based video reasoning 和 training-free agents。结果、component ablation、backbone replacement 与 117-case error attribution 支持 executable-world interface；但缺少真实世界、articulated/deformable objects 和 matched video-to-simulator comparison。",
+    "insightZh": "更有价值的不是单个 perception module，而是把 scene state 做成可复用、question-agnostic、可编辑的 execution interface。这样 prediction 与 counterfactual 共用同一世界，失败也能追溯到 perception、pose、dynamics 或 precision，而不是只得到一个错误答案。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

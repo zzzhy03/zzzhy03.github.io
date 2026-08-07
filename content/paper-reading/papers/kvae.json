@@ -1,0 +1,104 @@
+{
+  "id": "arxiv:2608.05798",
+  "slug": "kvae",
+  "title": "KVAE: Family of Tokenizers for Multimodal Generative Models",
+  "authors": [
+    "Andrey Shutkin",
+    "Denis Parkhomenko",
+    "Ivan Kirillov",
+    "Kirill Chernyshev",
+    "Kirill Malakhov",
+    "Ilia Vasiliev",
+    "Ilia Trushkin",
+    "Valeriya Kobenko",
+    "David Chikovani",
+    "Alexander Ivanov",
+    "Azat Saginbaev",
+    "Egor Silvestrov",
+    "Ivan Mikheev",
+    "Konstantin Zakharov"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05798"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG",
+    "cs.SD"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "multimodal tokenizer",
+    "video VAE",
+    "image VAE",
+    "audio tokenizer",
+    "latent diffusion",
+    "tokenizer swap",
+    "correlation decay slope"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning",
+      "generation"
+    ],
+    "representation": [
+      "raster-image",
+      "hybrid-representation"
+    ],
+    "method": [
+      "vae-gan",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "video-prior"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Latent diffusion modeling (LDM), a prominent paradigm, utilizes tokenizers to map input signal to compressed representation. This dependency positions tokenizer as an integral part of generation process itself, since it affects learning speed, quality of synthesized samples and lay foundation for later applications. This report presents series of KVAE tokenizers for audio, image and video, all designed for subsequent text-conditioned generation: KVAE-Audio, a continuous full-band 48 kHz tokenizer with a 50 Hz latent of 64 channels; KVAE-3D -- two causal video tokenizers for 4x16x16 and 4x8x8 compression; KVAE-2D, an image model, compressing input by factor of 8 with 32 channels. We demonstrate that reconstruction (PSNR, LPIPS, PESQ, etc.) and generation results on objective (Frechet Distance, CLIP score, CLAP score, etc.) and subjective (side-by-side evaluation) metrics matches or surpasses frontier opensource tokenizers, such as VAEs from Wan-2.2, HunyuanVideo-1.5, FLUX.2, MovieGen, StableAudio and MMAudio. Considering difficulty of development, we share with community training details, model selection method and ablation on design choices. The code is publicly available at https://github.com/kandinskylab/kvae and https://github.com/kandinskylab/kvae-audio.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05798v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05798v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kandinskylab/kvae"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.05798v1 全文整理；Paper URL 精确指向本次审阅版本；Code 链接仅保留全文审阅已核验为 available 的公开仓库。",
+    "ideaZh": "把 image、video 与 audio tokenizer 的选择从 reconstruction 指标推进到固定 downstream generator 的 tokenizer-swap：压缩率、latent channels、sequence length 和 generator capacity 必须联合评估。",
+    "methodFlow": [
+      "将 image/video/audio 编码为压缩连续 latent",
+      "按模态设置 causal Conv、compression factor、channels 与 normalization",
+      "分阶段优化 reconstruction、perceptual、adversarial 与 decoder objectives",
+      "用 frozen-tokenizer diagnostics 与 reconstruction 初筛 candidates",
+      "固定 downstream generator 做 tokenizer swap",
+      "以 generation metrics 和 side-by-side preference 决定最终 tokenizer"
+    ],
+    "whyRelevantZh": "tokenizer 是 image/video latent generation 的关键 representation layer；这篇工作同时提供 video/image/audio released models、controlled swap protocol 和跨模态 design trade-off，对 generation foundation method 有直接参考。",
+    "evidenceZh": "作者报告 KVAE-4×16×16 相对 HunyuanVideo-1.5 的 121-frame video pairwise prompt/visual/semantic preference 为 0.56/0.54/0.55（Fig. 5, p. 8）；作者报告 KVAE-2D-2.0 在 OmniDoc-TokenBench 的 PSNR/SSIM/NED 为 28.05/0.957/0.976，高于列出的 FLUX baselines，但 LPIPS 不是最好（Table 2, p. 8）；作者报告 KVAE-Audio 在 AudioCaps fixed-generator swap 的 CLAP 0.344、CE 3.982、PQ 6.242 和三项 FAD 均优于列出 baselines（Table 4(a), p. 16）。",
+    "caveatZh": "作者限制：CDS 的高相关性是 in-sample association，不建立 out-of-sample prediction；64-channel audio optimum 只适用于当前 0.6B generator scale，可能随 model capacity 改变；audio FAD backbones 对 16 kHz 以上频带不敏感，model-based aesthetics 也不是独立人类偏好证据。审阅风险：报告把三套差异较大的 tokenizers 放在同一论文，视觉 architecture 细节和绝对 generation scores 不如 audio protocol 完整；video evidence 主要来自一个 Kandinsky training stack，缺少跨 generator architecture 的复验；若干 visual diagnostics/ablations 基于 internal dataset，外部复现边界较强；人评未给 annotator count、agreement、置信区间或 multi-seed training variance。",
+    "motivationZh": "Latent generative model 的 tokenizer 会同时决定信息损失、token budget、训练速度与 downstream sample quality，仅用 PSNR/LPIPS 等重建指标筛选常会选错最终生成表示。",
+    "methodZh": "视觉分支用 attention-free causal Conv3D、spatial RMSNorm、分阶段 L1/LPIPS/KL/GAN/EQ loss 与 decoder fine-tuning，训练于 10M images 和 2M videos；KVAE-2D 还探索 latent Correlation Decay Slope 与 downstream subjective quality 的相关性。KVAE-Audio 是 166.9M waveform autoencoder，48 kHz 输入映射到 50 Hz、64-channel latent，并在 reconstruction、controlled fixed-generator swap 与人类 pairwise preference 上对比 MMAudio、MovieGen DAC-VAE、SAME-L。报告跨模态实验较完整，但三类 tokenizer 的 architecture 和 evidence 并不完全统一。",
+    "experimentsZh": "video/image 分支使用 2B CrossDiT/Kandinsky-5 stack，在相同 data、captions 与 hyperparameters 下替换 tokenizer；audio 分支用固定 0.6B DiT，并在统一重采样协议下比较 reconstruction 与 generation。关键结果：KVAE-4×16×16 相对 HunyuanVideo-1.5 的 video pairwise prompt/visual/semantic preference 为 0.56/0.54/0.55；KVAE-2D-2.0 在 OmniDoc-TokenBench 的 PSNR/SSIM/NED 为 28.05/0.957/0.976；KVAE-Audio 的 CLAP 为 0.344，且三项 FAD 均优于列出的 baselines。基线覆盖：包括 Wan-2.2、HunyuanVideo-1.5、FLUX.2、MMAudio、MovieGen DAC-VAE 和 SAME-L，并尝试固定 downstream stack；audio 协议最可控，视觉结论仍绑定 Kandinsky architecture/data。消融：视觉分支比较 normalization、decoder asymmetry 与 latent channels，audio 分支比较 channel count、attention、perceptual loss 与 decoder fine-tuning；仍缺跨多个 downstream generators 的 tokenizer swap、multi-seed/error bars 和 CDS held-out prediction。",
+    "insightZh": "贡献更像一套跨模态工程研究与公开 tokenizer family，而非统一新理论。真正有迁移价值的是 controlled tokenizer-swap 和“用 generation 而非 reconstruction 作最终选择”的方法论；CDS 提供便宜 proxy，但目前只是 n=14 的 in-sample correlation 和一条 training trajectory，尚不能当通用 diffusability law。建议精读 controlled tokenizer-swap、compression/channel trade-off 与 CDS 的适用边界；它的价值是把 tokenizer selection 从 reconstruction 指标推向 downstream generation evidence，但不应把单一 stack 与 in-sample CDS 相关性概括成普适定律。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

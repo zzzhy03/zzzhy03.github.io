@@ -1,0 +1,101 @@
+{
+  "id": "arxiv:2608.05663",
+  "slug": "vorch-streamer",
+  "title": "Vorch-Streamer: Extending Human Audio-Visual Generation to Real-Time Long-Form Streaming",
+  "authors": [
+    "Menglin Han",
+    "Yang Ding",
+    "Yulei Lu",
+    "Haoran Yu",
+    "Xin Ma",
+    "Junyi Chen",
+    "Zhangkai Ni",
+    "Lin Ma",
+    "Yaohui Wang"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05663"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.SD"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "streaming audio-video generation",
+    "long-form avatar",
+    "self forcing",
+    "distribution matching distillation",
+    "speech planning",
+    "causal diffusion"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "human-avatar"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text",
+      "multimodal"
+    ],
+    "method": [
+      "diffusion",
+      "autoregressive",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "video-prior",
+      "synthetic-data"
+    ],
+    "output-property": [
+      "animation-ready",
+      "controllable",
+      "efficient"
+    ]
+  },
+  "abstract": "Real-time long-form avatar audio--video generation requires causal, continuous synthesis while maintaining audiovisual synchronization and visual consistency. Adapting a pretrained bidirectional model to this setting presents two key dilemmas. First, autoregressively reusing generated blocks as context creates exposure bias, causing errors and visual drift to accumulate over long rollouts. Second, a global speech utterance does not indicates a causal generator which portion should be spoken next when only limited local audio--video context is available. We present \\textbf{Vorch-Streamer}, a post-training framework that addresses these challenges and enables real-time long-form Text-to-Audio-Video (T2AV) streaming. We construct a synthetic corpus of 80K avatar clips spanning 12--21 seconds and first train a causal generator with mixed Teacher Forcing and Diffusion Forcing. We then apply long-horizon Self Forcing with DMD distillation, exposing the model to its own rollout distribution while preserving the quality of the pretrained bidirectional teacher. To explicitly control speech progression, an external language model predicts discrete 25-Hz speech-planning tokens, whose continuous features condition the audio diffusion branch and align each causal block with the content it should speak. With bounded causal context and four-step denoising, Vorch-Streamer jointly generates audio and video from text at 27.12 FPS, exceeding the 24-FPS real-time playback rate while maintaining competitive audio--lip synchronization and strong identity preservation over long-form generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05663v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05663v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.05663v1 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "将 bidirectional audio-video foundation model 后训练为 1-second block causal streamer：mixed forcing 建立 causal base，full-horizon self-forcing + DMD 对齐 rollout，25 Hz speech-plan tokens控制每个 block 应说的内容。",
+    "methodFlow": [
+      "LTX2.3 生成 80K synthetic avatar audio-video clips",
+      "按约 1 秒同步切分 video/audio latent blocks",
+      "Mixed Teacher/Diffusion Forcing 训练 causal block generator",
+      "Full-horizon self rollout + real/fake score DMD 做分布对齐",
+      "LLM 将 utterance 转为 25 Hz block-aligned speech-plan tokens",
+      "3 persistent + 1 recent KV context、四步 denoise 实时流式输出"
+    ],
+    "whyRelevantZh": "尽管对象是 avatar，这篇工作实质推进 causal long-form video generation、audio-video joint generation、exposure-bias correction 与 real-time deployment，跨过了 talking-head 子领域的严格关注门槛。",
+    "evidenceZh": "作者报告 27.12 FPS、Sync-C/D 6.62/8.95、WER 7.92%，offline LTX2.3 为 1.83 FPS、6.80/7.96、7.59%（Table 1, p. 9）；作者报告完整 rollout 的 Human Identity 0.9996、Drift 0.0286、ArcFace 0.7534；FVD 549.99 并非最好（Table 2, p. 10）；final 10-second window 相对 initial window 的 Sync-C 仅-0.49%、Dynamic +10%、Identity +0.06%（Table 3, p. 10）。",
+    "caveatZh": "审阅风险：论文没有独立 Limitations section，也未披露 held-out benchmark 的样本数与 prompt details，统计稳定性无法判断；任务只覆盖 human/avatar T2AV；对 general scenes、multi-speaker、camera cuts 或非 speech audio 的迁移未验证；80K clips 来自同一 LTX2.3 foundation model，可能继承其 identity/style bias，并不等同真实 long-form data；训练使用64/32 H200，且系统为22.8B；实时性建立在单 H200 高端部署环境，未报告 memory 或 commodity hardware；PDF 只有 project page URL，没有打印 code repository。",
+    "motivationZh": "长时 causal T2AV 同时受 exposure bias 和 speech progression ambiguity 影响：模型不断复用自己的历史会累积 drift，而全局 utterance 又不能告诉有限上下文的当前 block 应生成哪一段语音。",
+    "methodZh": "模型保留 block 内 bidirectional attention、block 间 causal attention，并以 persistent prefix + recent block 的 bounded KV cache 保持常数内存。Stage 2 将 clean 与 corrupted histories 混合，Stage 3 让 student 自己 roll out 12-21 秒并用 frozen bidirectional real-score 与 trainable fake-score 构造 DMD update；Fun-CosyVoice planner 把完整 utterance 转成与 audio latents 对齐的 25 Hz units，通过 gated cross-attention 注入 audio branch。实验与 native T2AV、30-second streaming baselines 及较容易的 TIA2V references 比较，速度、speech progression 与 long stability 较强。",
+    "experimentsZh": "模型从 22B LTX2.3 初始化，使用 80K 个 12–21 秒 synthetic clips；Stage 2 在 64 张 H200 上训练 6K steps，Stage 3 在 32 张 H200 上训练 1K iterations，推理使用单张 H200。held-out benchmark 覆盖多身份、语言、风格、背景与约两分钟 utterances。关键结果：系统达到 27.12 FPS，Sync-C/D 为 6.62/8.95、WER 为 7.92%；完整 rollout 的 Human Identity 为 0.9996、Drift 为 0.0286，但 FVD 549.99 并非最佳。基线覆盖：论文区分 native T2AV 与带 target audio/first frame 的 TIA2V references；不过 OmniForcing/Hallo-Live 只运行 30 秒，不同 baseline durations 及未披露的 case count、prompt list 和人评限制了比较。消融：speech conditions、Stage 2/3、self-forcing horizon 与 context window 支持 planner 和 full-horizon design；仍缺 data source、TF/DF ratio、DMD teacher、denoising steps、multi-seed 与 non-avatar domain 对照。",
+    "insightZh": "单个组件来自 causal forcing、self forcing/DMD、speech planning 与 KV cache，但论文把三者组合成原生 text-to-audio-video real-time long-form system，并明确解决 global transcript 在 causal block 中缺乏进度信号的问题。创新更偏系统整合；核心 speech planner 与 full-horizon training 都有定量 ablation，而 foundation model/data scale 也占重要作用。建议精读三个系统边界：causal forcing、full-horizon self forcing、speech planning。实验证据和 ablations 足以进入日报，但 benchmark 规模、avatar-only scope 与高算力成本必须一起呈现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

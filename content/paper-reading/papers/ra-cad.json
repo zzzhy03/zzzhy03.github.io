@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2608.05714",
+  "slug": "ra-cad",
+  "title": "RA-CAD: Learning Post-Execution Critique for State-Aware Text-to-CAD Generation",
+  "authors": [
+    "Shuhao Yan",
+    "Changhao He",
+    "Xi Peng",
+    "Peng Hu"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05714"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "text-to-CAD",
+    "visual design agent",
+    "post-execution critique",
+    "CAD code generation",
+    "GRPO",
+    "generate-execute-rewrite"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "reasoning",
+      "tool-use"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "cad-brep-parametric",
+      "discrete-program"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "autoregressive",
+      "program-synthesis",
+      "reinforcement-learning",
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "controllable",
+      "editable",
+      "asset-ready"
+    ]
+  },
+  "abstract": "Text-to-CAD generation translates natural-language design intent into editable and executable parametric computer-aided design (CAD) codes, reducing the expertise and effort required for manual modeling. Existing methods incorporate fixed, externally supplied, prompt-induced, or separately optimized critique mechanisms to optimize the generation process, but they do not necessarily optimize how feedback is interpreted and translated into effective corrective actions throughout the generation process. To bridge this feedback-utilization gap, we present RA-CAD (ReAct Agent for CAD), a state-aware agent that interacts with the CAD environment through a Generate--Execute--Critique--Rewrite loop. At each iteration, RA-CAD executes the current code and observes its outcome. Conditioned on the design instruction, current code, and execution feedback, the agent then generates an explicit post-execution critique as an intermediate policy action. This critique either validates the current result for termination or provides revision-oriented guidance that conditions the next rewrite. CAD Code Bootstrapping (CCB) first establishes fundamental parametric CAD coding capabilities through supervised fine-tuning. Feedback-Driven Agent Optimization (FAO) subsequently applies trajectory-level Group Relative Policy Optimization to both policy-generated code and critique sequences, assigning terminal F1 and Chamfer Distance rewards to the complete interaction trajectory. This formulation makes critique an outcome-aligned, learnable policy decision rather than an unoptimized auxiliary output. Experiments on CADFusion and Text2CAD show that RA-CAD achieves state-of-the-art execution validity and geometric quality compared with existing methods and strong proprietary language models, demonstrating the effectiveness of the proposed state-aware text-to-CAD agent.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05714v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05714v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.05714v1 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "把 text-to-CAD 建模为 Generate–Execute–Critique–Rewrite 闭环，并将 critique 设为与 CAD code 同一 policy 产生、由 terminal geometry outcome 优化的显式 action。",
+    "methodFlow": [
+      "Natural-language design intent 输入 Llama CAD policy",
+      "Generate 当前 sketch-and-extrude CAD code",
+      "CAD executor 返回 validity 与 diagnostic feedback",
+      "Critique action 决定接受或生成 revision guidance",
+      "Rewrite 后再次执行，直至接受或达到轮数上限",
+      "以 terminal topology F1 + Chamfer reward 对完整 trajectory 做 GRPO"
+    ],
+    "whyRelevantZh": "它正是用户关注的 visual-design agent：模型实际生成 editable CAD artifact、调用 executor、观察状态并迭代修正，同时也直接属于 3D/CAD generation。",
+    "evidenceZh": "作者报告 CADFusion 上 Avg F1 85.30、Avg CD 35.44、IR 6.20；CADFusion baseline 为 83.59、42.08、21.98（Table 1(a), p. 6）；作者报告 Text2CAD 上 Avg F1 77.51、Avg CD 38.86、IR 9.44；CADFusion baseline 为 76.69、49.78、21.85（Table 1(b), p. 6）；作者报告在 CADFusion component ablation 中加入 critique 后 IR 从 11.46 降到 6.20，Avg CD 从 44.24 降到 35.44（Table 3, p. 7）。",
+    "caveatZh": "作者限制：仅接收自然语言，尚不支持 image、sketch 或 point-cloud visual conditioning；code space 只覆盖 line/arc/circle、add/cut/intersect 的 sketch-and-extrude DSL 与 6-bit quantized parameters；uncommon industrial operations、continuous precision 与更广 execution environments 未验证。审阅风险：terminal reward 没有直接评价 critique 是否正确，policy 可能学到有用 rewrite pattern 而非可靠的显式 diagnosis；ground-truth sequence 与 geometry reward 在每条 training trajectory 可用，和真实无 GT 的 interactive design setting 存在差距；没有报告 per-round success curve、平均轮数、token/latency cost 或 multi-seed variance；论文没有打印 code/project repository URL，暂不能核验实现。",
+    "motivationZh": "一次性 CAD code generation 容易产生 invalid programs；固定或外部 critique 即使指出错误，也没有直接训练 agent 如何把 execution feedback 转换成有效 rewrite。",
+    "methodZh": "模型状态包含 design description、当前 code、executor result 与 critique。每轮先生成或 rewrite code，环境执行并返回错误，policy 再输出接受或修订建议；终止后以 sketch token F1 与可执行 geometry Chamfer reward 共同评价整条 trajectory，因此 critique tokens 通过 outcome reward 被隐式优化。实验使用 Llama-3-8B、CADFusion/Text2CAD，经 CCB SFT 和 FAO GRPO 两阶段训练；主表、proprietary-LLM 对比和 component ablation 都支持 executability 与 geometry 改善，但 critique 本身的正确率、per-round convergence 和更广 CAD operation 未评估。",
+    "experimentsZh": "CADFusion 约 20K、Text2CAD 约 60K samples，采用 90/5/5 split；base 为 Meta-Llama-3-8B-Instruct。CCB 用 LoRA SFT 训练 9 epochs，FAO 每个 prompt 采样 8 条 trajectories，并在两张 RTX 4090 上做一轮 GRPO。关键结果：在两个 task-specific datasets 上，RA-CAD 相对 CADFusion 都提高 F1、降低 Chamfer distance 与 invalid ratio；CADFusion component ablation 中，加入 critique 后 IR 从 11.46 降到 6.20，Avg CD 从 44.24 降到 35.44。基线覆盖：包含 Text2CAD、CADFusion 和多个 proprietary general LLM；真正公平的主比较是使用相同 DSL/evaluation 的 task-specific methods，8-shot proprietary LLM 主要说明 domain gap。消融：CCB、GRPO 与 critique 的拆分支持两阶段训练和 explicit critique 的增量作用；仍缺 fixed/external critique、execution-only retry、相同 token budget/turn count、reward component、trajectory length 与 critique accuracy 对照，不能完全隔离 critique-learning 本身。",
+    "insightZh": "核心新意是把 post-execution critique factorize 成与 code proposal/rewrite 同一 policy 内的显式、可优化 action，并以 terminal CAD outcome 对整条 multi-turn trajectory credit assignment。相比 external visual reviewer 或只对 final code 做 RL，它更接近真正的 artifact-grounded design agent；不过 reward 并不直接监督 critique factuality，提升可能同时来自迭代执行和 GRPO。建议精读 agent formulation、reward boundary 与 Table 3；它比泛化聊天 agent 更贴近 visual design workflow，且有直接 ablation 支持，但应把 DSL/ground-truth reward 限制视为研究原型边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

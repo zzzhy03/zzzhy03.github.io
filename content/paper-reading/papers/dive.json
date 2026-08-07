@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2608.04496",
+  "slug": "dive",
+  "title": "DIVE: Dynamic Iterative Visual Evidence Construction for Efficient Vision-Language Models",
+  "authors": [
+    "Chen Zhong",
+    "Xiao An",
+    "Zijie Wang",
+    "Jiepan Li",
+    "Guangyi Yang",
+    "Wei He"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.04496"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual token pruning",
+    "dynamic evidence construction",
+    "residual selection",
+    "vision-language models",
+    "inference efficiency"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "conditioning": [
+      "single-image",
+      "video",
+      "multimodal"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Visual inputs in vision-language models (VLMs) are often encoded into substantially longer token sequences than text, making visual tokens a major bottleneck for efficient inference. Abundant recent methods address this bottleneck by scoring token importance and pruning low-scoring tokens in a single pass. However, one-shot scoring is insufficient because a token's prompt-relevant usefulness depends on the evidence already retained. Motivated by this insight, we introduce DIVE (Dynamic Iterative Visual Evidence Construction), a training-free framework that recasts visual-token pruning as dynamic evidence construction. DIVE repeatedly selects the remaining token with the highest residual-conditioned score, updates the visual and prompt residuals to discount the evidence already explained, and re-evaluates the remaining tokens. This select-update-re-evaluate process builds a retained set of complementary, prompt-relevant evidence. Experiments across eight image-understanding benchmarks show that DIVE consistently preserves performance across token budgets. With an 88.9% reduction in visual tokens, DIVE retains 98.2% of the uncompressed model's average performance. Code is available at https://github.com/Zhong-Chenchen/DIVE.git.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04496v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04496v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Zhong-Chenchen/DIVE.git"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.04496v1 全文整理；论文 abstract 与 PDF 明确提供公开代码 URL。",
+    "ideaZh": "DIVE 把 visual-token pruning 从一次性 top-K 改成 select-update-re-evaluate：每选一个 token，就从 visual 与 prompt residuals 中扣掉已解释的 component，再重算剩余 tokens，使保留集合覆盖互补而非重复的 visual evidence。",
+    "methodFlow": [
+      "Early LLM layer 提取 visual 与 prompt representations",
+      "初始化 visual/query residual states",
+      "按 residual energy x prompt alignment 选择一个 token",
+      "从两类 residuals 扣除 selected positive component",
+      "重新计算所有 remaining token scores",
+      "恢复原顺序后以 compressed sequence 继续 frozen VLM"
+    ],
+    "whyRelevantZh": "DIVE 属于 VLM/MLLM token representation 与 inference efficiency 的持续进展，覆盖 image/video 并提供较完整 runtime evidence。它不直接推进 2D/3D generation，但有助于判断视觉 token budget 如何影响 multimodal reasoning。",
+    "evidenceZh": "LLaVA-1.5-7B 从 576 减到 64 visual tokens 时保留 98.21% average performance，VisionZip/PruneSID 为 94.67%/95.17%（Table 1, p. 4）；POPE 上 total runtime 从 32:11 降到 19:07，F1 仅从 85.9 到 85.7（Table 5, p. 6）。",
+    "caveatZh": "DIVE 需要访问 intermediate hidden states，因此不能直接用于 API-only models。Iterative greedy selection 会增加局部开销；现有任务主要是 conventional VQA/perception/OCR，尚未证明 aggressive compression 对细粒度 design、spatial editing 或 rare evidence 安全。",
+    "motivationZh": "One-shot token ranking 假设每个 token 的 usefulness 独立且固定，但 visual evidence 的边际价值取决于已经保留了什么；固定 top-K 容易反复保留同一信息并遗漏互补区域。",
+    "methodZh": "DIVE 在 early LLM layer 维护 visual/query residual states，每轮以 residual energy 乘 prompt alignment 选择 token，再从两类 residuals 扣除 selected positive projection 并重新评分。最终恢复 selected original tokens 的输入顺序，让 frozen VLM 继续推理。",
+    "experimentsZh": "作者覆盖 LLaVA-1.5、LLaVA-NeXT、Qwen2-VL 与 video-capable architectures，在八个 image benchmarks 及 MVBench/VideoMME 上匹配 token budgets 比较多类 pruning baselines；同时报告 runtime、memory、KV cache、feedback frequency 与 component ablations。跨模型结果稳定，但高分辨率模型在极限压缩下仍有明显 absolute degradation。",
+    "insightZh": "Token utility 应被建模为相对已选 evidence set 的边际贡献，而非一个静态分数。共享 residual update 将 prompt relevance 与 coverage 放进同一个 greedy interface，是比单次 importance ranking 更一般的选择原则。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

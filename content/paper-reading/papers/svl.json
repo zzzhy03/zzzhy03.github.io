@@ -1,0 +1,103 @@
+{
+  "id": "arxiv:2505.17674",
+  "slug": "svl",
+  "title": "SVL: Empowering Spiking Neural Networks for Efficient 3D Open-World Understanding",
+  "authors": [
+    "Xuerui Qiu",
+    "Peixi Wu",
+    "Yaozhi Wen",
+    "Shaowei Gu",
+    "Yuqi Pan",
+    "Xinhao Luo",
+    "Bo XU",
+    "Guoqi Li"
+  ],
+  "publishedAt": "2025-05-23",
+  "updatedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "ICML 2026 Spotlight · arXiv v3",
+  "identifiers": {
+    "arxiv": "2505.17674"
+  },
+  "venueIds": [
+    "icml"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "spiking neural network",
+    "3D vision-language pretraining",
+    "open-world 3D understanding",
+    "multi-scale triple alignment",
+    "re-parameterizable vision-language integration",
+    "spike-driven PointFormer"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning",
+      "segmentation",
+      "reasoning"
+    ],
+    "content-scope": [
+      "object",
+      "scene"
+    ],
+    "representation": [
+      "point-cloud",
+      "voxel-triplane"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "self-supervised",
+      "feed-forward"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Spiking Neural Networks (SNNs) provide an energy-efficient way to extract 3D spatio-temporal features. However, existing SNNs still exhibit a significant performance gap compared to Artificial Neural Networks (ANNs) due to inadequate pre-training strategies. These limitations manifest as restricted generalization ability, task specificity, and a lack of multimodal understanding, particularly in challenging tasks such as multimodal question answering and zero-shot 3D classification. To overcome these challenges, we propose a Spike-based Vision-Language (SVL) pretraining framework that empowers SNNs with open-world 3D understanding while maintaining spike-driven efficiency. SVL introduces two key components: (i) Multi-scale Triple Alignment (MTA) for label-free triplet-based contrastive learning across 3D, image, and text modalities, and (ii) Re-parameterizable Vision-Language Integration (Rep-VLI) to enable lightweight inference without relying on large text encoders. Extensive experiments show that SVL achieves a top-1 accuracy of 85.4% in zero-shot 3D classification, surpassing advanced ANN models, and consistently outperforms prior SNNs on downstream tasks, including 3D classification (+6.1%), DVS action recognition (+2.1%), 3D detection (+1.1%), and 3D segmentation (+2.1%) with remarkable efficiency. Moreover, SVL enables SNNs to perform open-world 3D question answering, sometimes outperforming ANNs. To the best of our knowledge, SVL represents the first scalable, generalizable, and hardware-friendly paradigm for 3D open-world understanding, effectively bridging the gap between SNNs and ANNs in complex open-world understanding tasks. Code is available https://github.com/bollossom/SVL.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2505.17674v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2505.17674v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/bollossom/SVL"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 ICML 2026 Spotlight 对应的 arXiv 2505.17674v3 全文整理；Paper URL 精确指向本次审阅版本，Code URL 使用全文审阅核验为 available 的公开仓库。",
+    "ideaZh": "用 Multi-scale Triple Alignment 将 3D spike features 与 image/text 表征对齐，再以 Rep-VLI 把离线 text embedding 重参数化成推理期轻量权重，得到高效的 open-world 3D SNN。",
+    "methodFlow": [
+      "将 3D point/voxel 输入编码成 temporal spike features",
+      "用冻结的 image encoder 与 text encoder 构造对应语义表征",
+      "通过 Multi-scale Triple Alignment 对齐 3D-image-text",
+      "用 Rep-VLI 将 text embeddings 重参数化为轻量推理权重",
+      "将预训练 encoder 接入 Spike-driven PointFormer 或下游 heads",
+      "执行 zero-shot、segmentation、detection、temporal understanding 或 3D-language tasks"
+    ],
+    "whyRelevantZh": "用户的 3D understanding 关注点包括 3D segmentation 与 point-cloud encoding；SVL 更接近后者，并在 SemanticKITTI/Synthia 4D 给出 segmentation transfer。它不是需要持续跟踪的通用 VLM 大范式，但作为高效 3D representation 与 multimodal pretraining 案例具有中等相关性。",
+    "evidenceZh": "E-3DSNN-H+SVL 在 ModelNet40/Objaverse-LVIS zero-shot 达到 85.4%/47.0%（Table 1, p. 6）；SemanticKITTI mIoU 从 68.5 提至 69.7、KITTI detection AP-E 从 89.6 提至 90.7（Table 4, p. 7）；三帧 Synthia 4D segmentation 达到 80.05 mIoU，略高于 same-structure ANN 的 79.54（Table 9, p. 15）。",
+    "caveatZh": "最强配置依赖 OpenCLIP ViT-bigG 的离线预计算，encoder-scale 消融显示 teacher 规模贡献明显；0.79mJ 等能耗来自 45nm MAC/AC 与 firing-rate 模型，不是 neuromorphic hardware 的端到端实测。与当前主线最相关的 segmentation/detection 增益约 1.1–2.1 点，3D QA 也主要是 qualitative evidence。",
+    "motivationZh": "SNN 具备稀疏事件计算的潜在效率，但既有 3D SNN 缺少能同时支持 generalization、multimodal semantics 与多任务迁移的预训练策略，导致与 ANN 的性能差距明显。",
+    "methodZh": "SVL 冻结 image/text encoders，把同一 3D object 的 spike point/voxel representation 与 image、text embedding 做 semantic 与 fine-grained triple alignment。Rep-VLI 再把 text embeddings 转为可重参数化权重，使 zero-shot inference 不再携带大 text encoder；3D spike-driven self-attention 则用 sparse accumulation 替代 dense interaction，并把 encoder 接入 classification、detection、segmentation 与 language heads。",
+    "experimentsZh": "评估覆盖 ModelNet40、Objaverse-LVIS、ScanObjectNN、KITTI、SemanticKITTI、DVS Action/Gesture、Synthia 4D、3D captioning 与示例式 3D QA。作者报告 ModelNet40 zero-shot 85.4%、SemanticKITTI 69.7 mIoU、三帧 Synthia 4D 80.05 mIoU，并在 MTA loss、timestep/firing bits、voxel size、point density 与 CLIP scale 上消融。baseline 覆盖 PointCLIP、OpenShape、ULIP/ULIP-2、多种 ANN/SNN，但 backbone、预训练数据、language component 与 energy accounting 并不完全一致。",
+    "insightZh": "论文的主要价值是证明 CLIP/ULIP-style 3D-image-text alignment 可以被系统地移植到 SNN，并通过 re-parameterization 保留推理期轻量性，而不是提出新的 segmentation paradigm。建议略读 Fig. 1、Tables 1/4/9 与 energy accounting；广泛 benchmark 和公开代码值得收录，但 SNN 的专门性与理论能耗边界不要求精读。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

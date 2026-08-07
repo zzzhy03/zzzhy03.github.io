@@ -65,9 +65,11 @@ limitations. Both files say that model screening and summary generation have not
 The arXiv adapter is implemented against its Atom API. It combines all query families for one
 research direction into one provider query, sorts by `lastUpdatedDate`, paginates until it crosses
 the window boundary, and filters `publishedAt OR updatedAt` locally. Requests use a single serial
-connection with an enforced delay of at least 3100 ms across every topic and page. Reaching the
-per-topic safety cap before crossing the window makes the source `partial`, which prevents a state
-advance.
+connection with an enforced delay of at least 3100 ms across every topic, page, and retry attempt.
+HTTP 429, 5xx responses, and an explicit allowlist of transient network failures receive at most
+three attempts; ordinary 4xx responses fail immediately. Per-attempt outcomes and retry counts are
+kept in the manifest. Reaching the per-topic safety cap or exhausting a retry before crossing the
+window makes the source `partial`, which prevents a state advance.
 
 OpenReview, official venue proceedings, and official technical reports have separate adapter
 interfaces but are `not-configured`. Their status is visible in every default manifest instead of
@@ -249,7 +251,11 @@ npm run validate:paper-fulltext -- \
 
 `all-full-text` is the normal daily policy. A narrower selection such as `high-deep` is allowed
 only when the remaining candidates are written to the explicit run-scoped backlog. The pipeline
-controller enforces that closure. `npm run summarize:paper-fulltext -- --run-dir <run>` writes a
+controller enforces that closure. A run with zero selected full-text candidates, or an
+`all-full-text` run with every selected candidate reviewed, closes with an inline empty backlog in
+its receipt and does not create a placeholder `backlog.json`. The controller derives a zero count
+from validated screening; standalone full-text, summary, and promotion commands require an explicit
+`--expected-count 0` after screening validation. `npm run summarize:paper-fulltext -- --run-dir <run>` writes a
 local editorial summary after the same checks pass; it does not infer promotion or publication.
 
 ## Deliberately deferred

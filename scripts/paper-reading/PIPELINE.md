@@ -82,8 +82,11 @@ npm run pipeline:papers -- status \
 3. 论文在 `publishedAt` 或 `updatedAt` 落入窗口时均保留；随后用 DOI、versionless arXiv
    ID、OpenReview forum ID、title+first-author+year 去重。
 4. retrieval topic 只表示“哪条 query 找到了它”，不能直接当作最终相关性。
-5. 任一已启用 live source 为 `partial` 或 `failed` 时停止，不推进 watermark。
-6. Discovery 文件一经写出不可覆盖；确需重新抓取时使用新的 run ID，并保留失败 run 的
+5. arXiv 的单个分页请求对 HTTP 429、5xx 和明确的瞬时网络错误最多尝试 3 次；所有 attempt
+   仍经过同一个全局串行限速器，起始时间至少间隔 3100 ms。manifest 必须记录 attempt、retry
+   和最终错误，普通 4xx 不重试。
+6. 任一已启用 live source 在重试耗尽后为 `partial` 或 `failed` 时停止，不推进 watermark。
+7. Discovery 文件一经写出不可覆盖；确需重新抓取时使用新的 run ID，并保留失败 run 的
    manifest 解释原因。
 
 ```sh
@@ -148,6 +151,12 @@ npm run pipeline:papers -- backlog \
 
 Backlog 表示“本轮未完成全文判断，未来继续”，不是 reject、已读或相关性低。以后可以由
 专门的 seed paper / follow-up 机制消费，但当前不会自动改变 canonical content。
+
+若 screening 没有产生任何 `full-text-review`，或 `all-full-text` 已经全部审完，则 full-text
+与 backlog 都可合法地以 0 项闭环，不需要伪造空 `backlog.json`。对应 receipt 只记录
+`backlog.candidateIds: []`；非空 backlog 仍必须同时记录文件路径和 SHA-256。pipeline
+controller 会从已验证 screening 自动确认 0 项；若单独运行 full-text、summary 或 promotion
+validator，则显式传入 `--expected-count 0`，并仍先完成 screening validation。
 
 ### 4. Editorial compression 与视觉内容
 

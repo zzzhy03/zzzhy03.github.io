@@ -173,20 +173,43 @@ function collectExpectedPaperIds(root, screeningRunDirectory, selection, errors)
   const runDirectory = resolveFrom(root, screeningRunDirectory);
   const candidatesPath = path.join(runDirectory, "candidates.json");
   const reviewsDirectory = path.join(runDirectory, "screening", "reviews");
-  if (!existsSync(candidatesPath) || !existsSync(reviewsDirectory)) {
-    errors.push(`${runDirectory} must contain candidates.json and screening/reviews/.`);
+  if (!existsSync(candidatesPath)) {
+    errors.push(`${runDirectory} must contain candidates.json.`);
     return { expectedByPaperId: new Map(), runId: null };
   }
 
   const candidatePayload = readJson(candidatesPath);
   const candidates = candidatePayload.candidates ?? [];
+  const screeningManifestPath = path.join(
+    runDirectory,
+    "screening",
+    "screening-manifest.json",
+  );
+  const screeningManifest = existsSync(screeningManifestPath)
+    ? readJson(screeningManifestPath)
+    : null;
+  const emptyScreening =
+    candidates.length === 0 &&
+    screeningManifest?.runId === candidatePayload.runId &&
+    screeningManifest?.counts?.candidates === 0 &&
+    Array.isArray(screeningManifest?.batches) &&
+    screeningManifest.batches.length === 0;
+  if (!existsSync(reviewsDirectory) && !emptyScreening) {
+    errors.push(`${runDirectory} must contain screening/reviews/.`);
+    return {
+      expectedByPaperId: new Map(),
+      runId: candidatePayload.runId ?? null,
+    };
+  }
   const candidateById = new Map(
     candidates.map((candidate) => [candidate.discoveryId ?? candidate.candidateId, candidate]),
   );
   const expectedByPaperId = new Map();
-  const reviewFiles = readdirSync(reviewsDirectory)
-    .filter((name) => name.endsWith(".review.json"))
-    .sort();
+  const reviewFiles = existsSync(reviewsDirectory)
+    ? readdirSync(reviewsDirectory)
+        .filter((name) => name.endsWith(".review.json"))
+        .sort()
+    : [];
 
   for (const reviewFile of reviewFiles) {
     const review = readJson(path.join(reviewsDirectory, reviewFile));
@@ -413,15 +436,35 @@ export function validateFulltextReviews(options) {
   const root = path.resolve(options.root ?? process.cwd());
   const reviewDirectory = resolveFrom(root, options.reviewDirectory);
   const researchConfigPath = resolveFrom(root, options.researchConfig);
-  if (!existsSync(reviewDirectory)) errors.push(`Review directory does not exist: ${reviewDirectory}.`);
   if (!existsSync(researchConfigPath)) errors.push(`Research config does not exist: ${researchConfigPath}.`);
   if (errors.length) return { errors, reviews: [], counts: {} };
 
+  let expectedByPaperId = null;
+  let expectedRunId = null;
+  if (options.screeningRunDirectory) {
+    const expected = collectExpectedPaperIds(
+      root,
+      options.screeningRunDirectory,
+      options.selection,
+      errors,
+    );
+    expectedByPaperId = expected.expectedByPaperId;
+    expectedRunId = expected.runId;
+  }
+  const reviewDirectoryExists = existsSync(reviewDirectory);
+  const missingReviewDirectoryAllowed = options.expectedCount === 0;
+  if (!reviewDirectoryExists && !missingReviewDirectoryAllowed) {
+    errors.push(`Review directory does not exist: ${reviewDirectory}.`);
+  }
+  if (errors.length) return { errors, reviews: [], counts: {} };
+
   const topicIds = configuredTopicIds(readJson(researchConfigPath));
-  const reviewFiles = readdirSync(reviewDirectory)
-    .filter((name) => name.endsWith(".json") && name !== "summary.json")
-    .sort()
-    .map((name) => path.join(reviewDirectory, name));
+  const reviewFiles = reviewDirectoryExists
+    ? readdirSync(reviewDirectory)
+        .filter((name) => name.endsWith(".json") && name !== "summary.json")
+        .sort()
+        .map((name) => path.join(reviewDirectory, name))
+    : [];
   if (options.expectedCount !== undefined && reviewFiles.length !== options.expectedCount) {
     errors.push(`Expected ${options.expectedCount} review documents, found ${reviewFiles.length}.`);
   }
@@ -448,15 +491,7 @@ export function validateFulltextReviews(options) {
     }
   }
 
-  let expectedByPaperId = null;
-  if (options.screeningRunDirectory) {
-    const expected = collectExpectedPaperIds(
-      root,
-      options.screeningRunDirectory,
-      options.selection,
-      errors,
-    );
-    expectedByPaperId = expected.expectedByPaperId;
+  if (expectedByPaperId) {
     for (const [expectedId, candidateId] of expectedByPaperId) {
       const metadata = reviewMetadataByPaperId.get(expectedId);
       if (!metadata) {
@@ -468,9 +503,9 @@ export function validateFulltextReviews(options) {
           `Full-text review '${expectedId}' belongs to '${metadata.candidateId}', expected '${candidateId}'.`,
         );
       }
-      if (expected.runId && metadata.runId !== expected.runId) {
+      if (expectedRunId && metadata.runId !== expectedRunId) {
         errors.push(
-          `Full-text review '${expectedId}' belongs to run '${metadata.runId}', expected '${expected.runId}'.`,
+          `Full-text review '${expectedId}' belongs to run '${metadata.runId}', expected '${expectedRunId}'.`,
         );
       }
     }

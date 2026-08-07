@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2608.04887",
+  "slug": "step-opd",
+  "title": "STEP-OPD: Rethinking Output Targets and Internal Dynamics in On-Policy Distillation for Diffusion Models",
+  "authors": [
+    "Qingyan Wei",
+    "Guangzhao Li",
+    "Xiaobing Tu",
+    "Yinggui Wang",
+    "Xiantao Zhang",
+    "Jinkui Ren",
+    "Xiaohong Liu",
+    "Linfeng Zhang"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.04887"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "on-policy distillation",
+    "diffusion models",
+    "output extrapolation",
+    "representation change alignment",
+    "multi-teacher consolidation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "diffusion"
+    ]
+  },
+  "abstract": "On-policy distillation (OPD) has become an effective approach for consolidating multiple task-specialized image generation models into a single student. However, existing OPD methods optimize the student mainly to match the teacher's output velocity, making the teacher the upper limit of the optimization objective. While output-level supervision alone leaves the student's blockwise representation evolution underconstrained, which weakens the transfer of capabilities that must be progressively developed across layers. We propose STEP-OPD, an on-policy distillation framework for image generation that extends the student's learning target beyond the teacher and introduces explicit constraints on its internal representation evolution. Instead of treating the teacher as the final target, we use the velocity difference between each task-specific teacher and the shared base model as a direction for further learning and add a scaled version of this difference to the teacher velocity. In addition, we align the direction and magnitude of representation changes between the student and teacher, enabling the student to learn how representations are progressively transformed across network blocks. Experiments on compositional alignment, text rendering, and human preference show that our method consistently improves Standard OPD methods. In particular, it increases the GenEval score of DiffusionOPD from 0.927 to 0.961, while also improving OCR and all preference-based metrics. The resulting unified student surpasses the corresponding single-task teachers across all three capability groups, showing that output extrapolation enables beyond-teacher learning. And representation change alignment provides complementary guidance for the student's internal transformations.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04887v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04887v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://stepopd.github.io"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.04887v1 全文整理；论文 PDF 提供 project page，但截至本次审阅未提供可用的公开代码 URL。",
+    "ideaZh": "STEP-OPD 将 teacher-base velocity difference 外推为 beyond-teacher target，并对齐 student 与 teacher 在相邻 Transformer blocks 间的 representation-change direction 和 magnitude。",
+    "methodFlow": [
+      "Student 生成 on-policy denoising trajectory",
+      "按 OPD query rule 选择 latent state 与 task teacher",
+      "Teacher-base velocity delta 构造 extrapolated output target",
+      "Student 匹配 beyond-teacher velocity",
+      "相邻 blocks 的 change direction/magnitude 对齐 teacher",
+      "Output + representation losses 联合更新 LoRA student"
+    ],
+    "whyRelevantZh": "它属于 Image Generation post-training 与 multi-capability consolidation，能帮助判断 OPD 如何从 teacher imitation 转向 local beyond-teacher targets；但与 2D structured design、3D generation 或 fabrication 没有直接连接。",
+    "evidenceZh": "DiffusionOPD + STEP-OPD 的 GenEval/OCR 为 0.961/0.946，对原 DiffusionOPD 的 0.927/0.941（Table 1, p. 5）；RCA-only 与 OE-only 分别将 GenEval 提到 0.959/0.957，组合为 0.961（Table 2, p. 6）。",
+    "caveatZh": "全部主实验只覆盖 SD3.5-M、512×512 与三个 capability groups，没有 human paired preference、multi-seed variance 或跨 backbone 验证。最佳 extrapolation coefficient 明显 task-specific，方法可能把成本转移到 alpha tuning。",
+    "motivationZh": "Standard OPD 只匹配 teacher output velocity，把 teacher 当作性能上限，同时没有约束 capability 在网络 blocks 中如何逐层形成；因此 unified student 可能只模仿终点而不能完整吸收内部变换。",
+    "methodZh": "Output Extrapolation 把 task teacher 相对 shared base 的 velocity delta 乘 task-specific alpha 后加回 teacher target。Representation Change Alignment 不匹配 absolute hidden states，而匹配相邻 blocks 的 hidden-change direction 与 RMS magnitude；两项 losses 可接入 DanceOPD 或 DiffusionOPD。",
+    "experimentsZh": "作者以 SD3.5-M 构造 compositional alignment、text rendering 与 preference teachers，训练 LoRA unified student，并比较 Flow-GRPO、DiffusionNFT、DanceOPD、DiffusionOPD 与单任务 teachers。结果在 GenEval、OCR 和四项 automatic preference metrics 上一致改善，并含组件消融与 alpha sensitivity；但覆盖范围仍为单一模型家族。",
+    "insightZh": "值得记住的是两种 distillation target：输出端可沿 teacher 相对 base 的改进方向做局部外推，内部则可监督 representation 的变化过程而非静态 states；但这种 beyond-teacher direction 只在小 neighborhood 内可靠。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

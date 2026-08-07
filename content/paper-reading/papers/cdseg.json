@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2608.05482",
+  "slug": "cdseg",
+  "title": "CDSeg: A Renderable Gaussian Carrier for Image-to-3D Label Transfer",
+  "authors": [
+    "Wentao Sun",
+    "Yiping Chen",
+    "Zhengsen Xu",
+    "Jonathan Li",
+    "John S. Zelek"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05482"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3D segmentation",
+    "Gaussian splatting",
+    "label transfer",
+    "multi-view masks",
+    "point cloud labeling",
+    "renderable carrier"
+  ],
+  "facets": {
+    "task": [
+      "segmentation"
+    ],
+    "content-scope": [
+      "object",
+      "scene"
+    ],
+    "representation": [
+      "3d-gaussian",
+      "point-cloud"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "method": [
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "2d-prior"
+    ],
+    "output-property": [
+      "part-aware"
+    ]
+  },
+  "abstract": "Modern image models provide strong cues about \\emph{what} should be segmented in each view, but their masks do not by themselves determine \\emph{where} those labels should persist in 3D. We present Cross-Domain Segmentation via Gaussian Splatting (CDSeg), a label-transfer interface that requires no task-specific 3D segmentation training and uses Gaussian primitives as a renderable label carrier. An external mask source supplies the labels, while renderer-derived visibility determines which 3D primitives receive them. The carrier is instantiated either by completing each input point into one Gaussian, preserving its index, or by reusing the native primitives of an optimized Gaussian scene. CDSeg records pixel--primitive associations during rendering and fuses multi-view masks through voting and a local filter. The resulting labels can be returned to the original points, retained on the native Gaussian scene, or rendered into other views. CDSeg covers promptable, automatic instance, semantic, and LiDAR settings and processes scenes with millions of primitives in seconds. It obtains 92.35\\% mIoU on DesktopObjects-360, 95.89\\% on NeRDS-360, and 65.77\\% on the full ScanNet-v2 validation split using the provided 2D semantic annotations. CDSeg thereby provides one interface for reusing 2D masks across point clouds, Gaussian scenes, and image views without a task-specific 3D segmentation network.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05482v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05482v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.05482v1 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "把 Gaussian renderer 当作 image-to-3D label carrier：记录像素 ray 上可见 primitives，将多视图 SAM/YOLO/semantic masks 投票到 Gaussians，再把标签保留在 scene 或复制回原 point indices。",
+    "methodFlow": [
+      "选择 carrier：每个 input point 完成一个 Gaussian，或载入已有 optimized Gaussian scene",
+      "从 SAM2、YOLOv11 或数据集 annotation 获得各 calibrated view 的 masks",
+      "render 时按 projected support、depth order 与 transmittance threshold 记录 pixel–primitive association",
+      "跨 views 对每个 primitive 累积 label votes，并用 kNN majority filter 去除孤立 disagreement",
+      "将标签复制回原 point indices、保留在 Gaussian scene，或从新视角渲染 label map"
+    ],
+    "whyRelevantZh": "它正好落在用户实际做过的 3D segmentation/point-cloud encoding 范围内，同时连接 Gaussian representation 与 2D foundation masks；更值得记住的是“把 renderer 当 label transport interface”的系统设计，而不是把 65.77/95.89 当作新的端到端 SOTA。",
+    "evidenceZh": "作者报告 DesktopObjects-360 上 CDSeg 92.35% mIoU、96.54% mAcc、95.62% mAcc-cls；projection+vote mIoU 更高，为 92.89%（Table 5, p. 6）；作者报告 NeRDS-360 上 CDSeg 95.89% mIoU、99.50% mAcc、99.86% mAcc-cls，优于相同 masks 的 projection controls（Table 6, p. 7）；作者报告 full ScanNet-v2 validation 上 65.77% global-confusion mIoU 与 73.37% oAcc，输入为 provided 2D annotations、没有 3D training（Table 7, p. 7; Appendix E, pp. 12–13）；作者报告 KITTI-360 十个静态窗口 aggregate mIoU 57.44%、precision 83.77%、recall 64.48%、F1 72.87%（Sec. 4.5, p. 7; Table S3, p. 13）；作者报告 300 masks 下 1M→7M primitives 的核心 runtime 为 2.23→3.74 s、GPU memory 5.94→10.40 GB；1M primitives 下 10→500 masks 为 0.21→3.30 s（Table 4, p. 6; Table S6, p. 15）。",
+    "caveatZh": "作者限制：只转移 input masks 中已有的 evidence；任何 view 都不可见的 surface 会保持 unlabeled；Mode II 假设已有 optimized Gaussian scene 和到 evaluation geometry 的 correspondence，scene 的 missing regions/distortion 会直接传递给 CDSeg；两种 mode 都继承输入 masks 与 carrier 的 coverage/quality，价值是 interoperability 而非 universal numerical superiority；Mode I 的 point-to-Gaussian conversion 仍需改进 finer texture preservation。审阅风险：headline runtime 排除了 2D mask inference、disk input 与 Mode II 的 30k-step Gaussian reconstruction，不能代表端到端 latency；ScanNet 使用 provided semantic annotations，NeRDS ground truth 由作者手工标注；强数字主要检验 lifting，而不是完整 3D understanding；DesktopObjects 上直接 projection 的 mIoU 反而略高，说明 Gaussian carrier 的主要收益是 representation/output flexibility，不是稳定 accuracy gain；KITTI 只选择 sequence 0 的十个静态窗口与 stationary vehicles，不能覆盖动态对象或完整 outdoor semantics；PDF 只给 project-page URL，没有直接的 CDSeg code repository URL，复现状态尚不明确。",
+    "motivationZh": "2D foundation masks 能说明每个 view 中分割什么，却不能独立决定标签在 3D 的持续位置；直接 projection 又难统一处理 visibility、occlusion、point clouds 与 native Gaussian scenes。",
+    "methodZh": "Mode I 为每个输入 point 构造一个 index-preserving Gaussian，不做 radiance-field optimization；Mode II 直接复用 optimized Gaussian primitives。两者都在 render pass 中按 transmittance threshold 记录 pixel–primitive visibility，把跨视角 mask labels 计票到 primitive，再做 k=3 neighborhood majority filter。作者用 DesktopObjects-360、NeRDS-360、ScanNet-v2 与 KITTI-360 展示 promptable instance、automatic instance、semantic-mask lifting 和 RGB-to-LiDAR transfer，并给出 view/primitive scaling。",
+    "experimentsZh": "Mode II 在六个 DesktopObjects-360 scenes 上使用 released Gaussians，并为十个 NeRDS-360 scenes 独立训练 2DGS；Mode I 在 full ScanNet-v2 validation 和十个 KITTI-360 stationary-vehicle windows 上保持 point indices。输入 masks 来自 SAM2、YOLOv11 或 provided semantic annotations，核心 runtime 只计 correspondence、voting 与 filtering。关键结果：DesktopObjects-360 的 mIoU 为 92.35%，略低于 projection+vote 的 92.89%；NeRDS-360 为 95.89%，full ScanNet-v2 为 65.77%，KITTI-360 aggregate F1 为 72.87%。300 masks 下，1M→7M primitives 的核心 runtime 从 2.23 增至 3.74 秒。基线覆盖：论文区分 point-based networks 与相同-mask projection controls，但前者预测内容、CDSeg 接收强 2D labels，输入成本并不相同；也未与 FlashSplat、LUDVIG、PointGS 做共同 protocol 的直接比较。消融：给出 1–206 views 的 coverage curve 以及 primitive/mask 数量的 time-memory scaling；仍缺 threshold、Gaussian construction、kNN filter、tracking error 与 association method 的系统消融。",
+    "insightZh": "贡献是把普通 projection-and-vote 与 Gaussian renderer 的 visibility/occlusion handling 统一成一个可渲染 label state，并同时支持 exact point-index output 与 native Gaussian output；它没有学习 correspondence、3D feature 或 segmentation model。相较 FlashSplat/LUDVIG/PointGS，方法更轻量，但论文主要给出功能定位，没有在共同 benchmark 上与这些 Gaussian label-transfer methods 做直接 numerical comparison。收录但建议略读：方法一张流程图即可理解，实验覆盖四种 transfer settings 和大规模 carrier，工程边界也交代得较诚实；创新是轻量接口而非新的 segmentation model，且在最简单 baseline 上没有普遍优势，没必要投入完整精读时间。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

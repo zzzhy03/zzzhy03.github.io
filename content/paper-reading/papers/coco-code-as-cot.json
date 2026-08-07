@@ -1,0 +1,106 @@
+{
+  "id": "arxiv:2603.08652",
+  "slug": "coco-code-as-cot",
+  "title": "CoCo: Code as CoT for Text-to-Image Preview and Rare Concept Generation",
+  "authors": [
+    "Haodong Li",
+    "Chunmei Qing",
+    "Huanyu Zhang",
+    "Dongzhi Jiang",
+    "Yihang Zou",
+    "Hongbo Peng",
+    "Dingming Li",
+    "Yuhong Dai",
+    "ZePeng Lin",
+    "Juanxi Tian",
+    "Yi Zhou",
+    "Siqi Dai",
+    "Jingwei Wu",
+    "Pheng-Ann Heng"
+  ],
+  "publishedAt": "2026-03-09",
+  "updatedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "ECCV 2026 · arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.08652"
+  },
+  "venueIds": [
+    "eccv"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "image-generation",
+    "2d-design"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Code-as-CoT",
+    "structured text-to-image",
+    "executable visual planning",
+    "text rendering",
+    "draft-guided refinement"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "raster-image",
+      "discrete-program"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "program-synthesis",
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "abstract": "Recent advancements in Unified Multimodal Models (UMMs) have significantly advanced text-to-image (T2I) generation, particularly through the integration of Chain-of-Thought (CoT) reasoning. However, existing CoT-based T2I methods largely rely on abstract natural-language planning, which lacks the precision required for complex spatial layouts, structured visual elements, and dense textual content. In this work, we propose CoCo (Code-as-CoT), a code-driven reasoning framework that represents the reasoning process as executable code, enabling explicit and verifiable intermediate planning for image generation. Given a text prompt, CoCo first generates executable code that specifies the structural layout of the scene. The code is then executed in a sandboxed environment to render a deterministic draft image. Subsequently, the model refines this draft through fine-grained image editing to produce the final high-fidelity result. To support this training paradigm, we construct CoCo-10K, a curated dataset containing structured draft-final image pairs designed to teach both structured draft construction and corrective visual refinement. Empirical evaluations on StructT2IBench, OneIG-Bench, and LongText-Bench show that CoCo achieves improvements of 68.83%, 54.8%, and 41.23%, respectively, over direct generation, while also outperforming other CoT-enhanced generation methods. These results demonstrate that executable code is an effective and reliable reasoning paradigm for precise, controllable, and structured text-to-image generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.08652v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.08652v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/micky-li-hd/CoCo"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2603.08652v2 全文整理；arXiv comments 标注 accepted to ECCV 2026，代码 URL 来自论文全文。",
+    "ideaZh": "把 executable code 放到 unified multimodal model 的 CoT 位置：代码既是可验证的 structured plan，也可执行成 deterministic visual scaffold，再由同一模型细化为最终图像。",
+    "methodFlow": [
+      "Text Prompt",
+      "Executable Layout Code",
+      "Sandbox Rendering",
+      "Deterministic Draft",
+      "Draft-Guided Editing",
+      "Final Raster Image"
+    ],
+    "whyRelevantZh": "它让 structured/programmatic 2D representation 成为 Image Generation 的显式中间层，直接连接 2D Design、diagram/text rendering 与可观察、可执行的生成过程。",
+    "evidenceZh": "作者报告 StructT2IBench overall 73.52%，高于表中 GPT-Image 的 49.58%；LongText-Bench 的 code compilation 为 320/320，而 off-the-shelf Bagel 为 29/320（Table 1, p. 11；Fig. 7, pp. 12–13）。",
+    "caveatZh": "CoCo-10K 的 code 与 refined targets 分别依赖 Gemini-3-Pro 和 Nano Banana，方法表示与 teacher-generated data 的贡献未完全分离；最终产物仍为 raster，并不会因为中间 code 可编辑就自动获得结构化最终资产。",
+    "motivationZh": "自然语言 CoT 难以精确规定复杂 layout、structured visual elements 与 dense text，且中间推理不容易执行或验证；直接生成也缺少可观察的结构草图。",
+    "methodZh": "模型先从 prompt 生成 layout code，在 sandbox 中执行得到 draft，再以 ViT/VAE 双路编码 draft，进入 image-editing branch 做 fine-grained refinement。CoCo-10K 同时提供 Text-Code 与 Text-Draft-Final supervision，覆盖 scientific diagrams、complex text 和 general editing。",
+    "experimentsZh": "作者在 Bagel 上分阶段训练，并在 StructT2IBench、OneIG-Bench 与 LongText-Bench 比较 closed/open generators、unified MLLMs 和 CoT baselines。结果显示 structured/text-intensive generation 和 code executability 均显著改善；但消融主要调整两类 supervision 的 mixture ratio，缺少 matched natural-language planner 或等数据替代表示对照。",
+    "insightZh": "代码的价值不是替代最终 renderer，而是同时承担 planning trace 与视觉 scaffold：生成过程因此获得可执行 checkpoint，模型还能继续用 learned visual prior 修复 code renderer 难以表达的外观细节。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

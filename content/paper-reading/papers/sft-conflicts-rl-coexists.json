@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2608.03573",
+  "slug": "sft-conflicts-rl-coexists",
+  "title": "SFT Conflicts, RL Coexists: A Theoretical and Empirical Analysis of Multi-Task Learning Paradigms for LLMs",
+  "authors": [
+    "Kejian Zhu",
+    "Zhuoran Jin",
+    "Shangqing Tu",
+    "Hongbang Yuan",
+    "Yushi Bai",
+    "Kang Liu",
+    "Juanzi Li",
+    "Jun Zhao"
+  ],
+  "publishedAt": "2026-08-04",
+  "updatedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.03573"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "multi-task post-training",
+    "reinforcement learning",
+    "gradient interference",
+    "parameter merging",
+    "Parallel-RL"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "method": [
+      "reinforcement-learning"
+    ]
+  },
+  "abstract": "Supervised Fine-Tuning (SFT) and Reinforcement Learning (RL) exhibit fundamentally different behaviors in enhancing multi-task reasoning for large language models (LLMs). Our preliminary experiments revealed a phenomenon: SFT suffers from severe task conflicts under multi-stage training, whereas RL enables stable coexistence across diverse tasks. Empirically, we trace this to the parameter level, observing that RL induces sparse and approximately orthogonal updates across tasks. We provide a theoretical explanation for this mechanism by analyzing multi-task gradient interference. Our results reveal a distinction: interference in SFT is norm-limited, scaling with the absolute gradient magnitude, whereas interference in RL is variance-limited, bounded by the gradient variance induced by advantage normalization and on-policy optimization. This small variance bound yields near-orthogonal optimization directions across tasks. Leveraging this insight, we propose Parallel-RL, a paradigm that decouples multi-task training, significantly improving efficiency and flexibility.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.03573v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.03573v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/GaryStack/Parallel-RL"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.03573v2 全文整理；PDF 标题包含“Paradigms”，代码 URL 来自 arXiv comments 与论文。",
+    "ideaZh": "多任务 SFT 的大而同向更新容易互相覆盖，而 on-policy RL 的 zero-sum normalized advantage 会消去共同 score direction，使不同 reasoning tasks 的 updates 更稀疏、近似正交；据此可先独立训练再 merge。",
+    "methodFlow": [
+      "Train Task-Specific SFT / RL",
+      "Measure Update Geometry",
+      "Analyze Advantage Cancellation",
+      "Select Compatible Tasks",
+      "Merge Independent RL Updates",
+      "Optional Post-Merge Adaptation"
+    ],
+    "whyRelevantZh": "它属于需要关注的 LLM post-training 范式：如果在更大模型与更多任务上成立，独立 RL + merge 会改变多能力训练的组织方式；但与视觉主线的关系是间接的。",
+    "evidenceZh": "作者报告 Adapted Parallel-RL 在 1.5B/7B full-parameter GRPO 上相对 base 的 average gains 为 +10.7/+8.0，并保留 103.2%/102.4% single-task gains；naive sum 只有 94.2%/95.1%。不兼容的 Game+Math、Game+Code 又分别让两个任务下降 4.0/6.0 与 3.3/4.9 points（Table 4, p. 7；Appendix D.1, p. 21）。",
+    "caveatZh": "理论依赖 bounded variance 与 weak residual coupling，t-SNE compatibility 也只是 heuristic；证据限于 1.5B/7B distilled reasoning models 和相对分离的任务，并且最强结果包含少量 post-merge adaptation。",
+    "motivationZh": "mixed-data 或 sequential multi-task SFT 容易产生 catastrophic interference，而 joint RL 的数据、调度与系统耦合又降低并行性；需要判断 task-specific updates 是否能安全组合。",
+    "methodZh": "作者比较 math、science、logic、code 的 SFT/RL update norm、active ratio、cosine 与 score distribution，用 GRPO/PPO 的 zero-sum advantage 分解 residual coupling；Parallel-RL 从同一 base 独立训练 policies，再用 sum、mean、TIES 或 SVD 合并 ΔW，并可用约 5% 数据适配。",
+    "experimentsZh": "实验覆盖 DeepSeek-R1-Distill-Qwen 1.5B/7B、六类 reasoning benchmarks、full/LoRA、GRPO/PPO、四种 merge rules 与冲突任务反例。趋势较完整，但未覆盖 frontier-scale、multimodal 或非 reasoning tasks，也缺 matched training compute 与成熟 multi-task routing/gradient-surgery baselines。",
+    "insightZh": "“RL coexists”不是普遍保证，而是由 advantage normalization 与 task residual geometry 共同决定的 conditional phenomenon；论文最有价值的部分恰是给出了明确失败任务对。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

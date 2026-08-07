@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2608.04010",
+  "slug": "parvl",
+  "title": "ParVL: Parallel Scaling and Expandable Compute Allocation for Multimodal LLMs",
+  "authors": [
+    "Yang Yang",
+    "Qinyu Zhao",
+    "Mouxiang Chen",
+    "Xiaohui Li",
+    "Lixin Gu",
+    "Wenhai Wang",
+    "Hongjie Zhang",
+    "Wenwei Zhang"
+  ],
+  "publishedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.04010"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "parallel vision-language scaling",
+    "expandable compute allocation",
+    "shared-backbone branches",
+    "KV prefix",
+    "token-wise aggregation",
+    "multimodal LLM"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning",
+      "reasoning"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "autoregressive"
+    ]
+  },
+  "abstract": "Existing scaling strategies for Multimodal Large Language Models (MLLMs) typically expand either model parameters or sequential inference computation, incurring substantial memory or latency overhead. More importantly, most existing methods fail to alter the rigid, fixed computation allocation between the Vision Transformer and the Large Language Model components, limiting task-specific optimization. To address this, we introduce the Parallel Vision-Language (ParVL) scaling framework for MLLMs, which scales parallel computation by reusing the existing ViT and LLM backbone parameters across multiple vision and language branches. This framework raises a central question: given a fixed backbone parameter budget, how should additional shared-backbone computation be allocated between the vision and language modalities? We instantiate each parallel computational stream with branch-specific prefix parameters over a shared backbone, and train the entire model end-to-end via full-parameter supervised fine-tuning on roughly 13B tokens. We systematically study the computation-allocation trade-off between the ViT encoder and LLM decoder. ParVL improves overall multimodal performance over same-recipe single-branch baselines, and the best evaluated vision--language allocation varies across tasks. Code is available at https://github.com/YangYangGirl/ParVL.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04010v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04010v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/YangYangGirl/ParVL"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.04010v1 全文整理；Paper URL 精确指向本次审阅版本，Code URL 使用全文审阅核验为 available 的公开仓库。",
+    "ideaZh": "让共享 ViT/LLM backbone 以带独立 KV prefix 的多条 vision/language branches 并行复用，再分别聚合 token states，把 MLLM scaling 变成可调的 Pv:Pl 算力分配问题。",
+    "methodFlow": [
+      "从 InternVL3.5 pretrained ViT/LLM backbone 初始化",
+      "为每个 vision 与 language branch 加入独立 K/V prefix",
+      "以共享 backbone 参数并行执行 Pv 个 ViT branches",
+      "token-wise 聚合 visual states 并经 connector 送入 language branches",
+      "并行执行 Pl 个 LLM branches 并聚合 hidden states",
+      "通过 full-parameter SFT 联合学习 backbone、prefix 与 aggregators"
+    ],
+    "whyRelevantZh": "ParVL 直接属于 VLM/MLLM architecture 与 scaling，提出 vision 和 language compute 可独立分配的新观察维度；这可能影响未来视觉设计与 3D multimodal model 的算力组织，但当前并未针对 design task，也没有形成已验证的通用 scaling law，因此相关性为中等。",
+    "evidenceZh": "same-recipe 九基准平均分在 1B 从 49.6 提至 50.5，在 2B 从 54.4 提至 54.7，在 8B 从 62.5 提至 63.0（Table 1, p. 5）。1B 4:4 只增加约 3.6% 参数，但 FLOPs 从 3243.03G 增至 11896.86G（Table S3, p. 11）；H200 上 batch=1 latency/memory 为 1.04×/1.23×，batch=8 则为 1.22×/2.12×（Table 4, p. 7）。",
+    "caveatZh": "1B 4:4 以约 3.67× FLOPs 换取 0.9 average point，2B/8B 增益只有 0.3/0.5，且缺少 compute-matched wider/deeper、MoE 或 ensemble baseline。所有质量配置仅单次训练，研究又局限于 InternVL3.5、1/20 SFT collection 与指定 H200 workload，尚不能推出跨 backbone 或真实 serving 的 scaling law。",
+    "motivationZh": "既有 MLLM scaling 通常增加参数或串行推理计算，同时把 ViT 与 LLM 的 compute ratio 固定在架构里，难以根据 OCR、数学或 general vision-language workload 分别分配额外算力。",
+    "methodZh": "ParVL 在共享 ViT 和 LLM 每层 attention 中加入 branch-specific K/V prefixes，使 Pv 个 vision branches 与 Pl 个 language branches 保持差异化表示并行执行。visual states 在 connector 前、language states 在 LM head 前分别由 token-wise MLP 聚合；模型通过 full-parameter SFT 联合训练 backbone、prefix 与 aggregators，并进一步测试 top-1 sparse router 和 Shared-KV 变体。",
+    "experimentsZh": "作者从 InternVL3.5 1B/2B/8B checkpoints 初始化，在约 13B tokens、4.6M instances 的 1/20 SFT collection 上训练，并评测 MMMU、MathVista、MathVision、LogicVista、WeMath、ChartQA、TextVQA、DocVQA、OCRBench。1B 扫描 Pv,Pl∈{1,2,4}，不同 General/Math/OCR tasks 的较优 allocation 不一致；learned top-1 router 得 50.2，接近 dense 4:4 的 50.5（Table 3, p. 7）。消融覆盖 prefix/LoRA、完整 allocation grid、router 与 Shared-KV，但没有多 seed 或严格 compute-matched architecture control。",
+    "insightZh": "有价值的观察是 MLLM 不只有参数量和串行 test-time compute 两条 scaling axis，vision/language branches 还可在共享参数下独立扩展；但“少参数”不等于“少计算”。建议略读 Fig. 2、Tables 1/4 与 FLOPs appendix，重点记住 task-dependent allocation 和 serving trade-off，而不是把小幅平均分提升视为成熟结论。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

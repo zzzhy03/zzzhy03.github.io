@@ -1,0 +1,97 @@
+{
+  "id": "arxiv:2604.13856",
+  "slug": "any3davatar",
+  "title": "Any3DAvatar: Fast and High-Quality Full-Head 3D Avatar Reconstruction from Single Portrait Image",
+  "authors": [
+    "Yujie Gao",
+    "Yao Xiao",
+    "Xiangnan Zhu",
+    "Ya Li",
+    "Yiyi Zhang",
+    "Liqing Zhang",
+    "Jianfu Zhang"
+  ],
+  "publishedAt": "2026-04-15",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2604.13856"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "single-image avatar reconstruction",
+    "3D Gaussian head",
+    "full-head reconstruction",
+    "endpoint denoising",
+    "feed-forward reconstruction",
+    "novel-view appearance"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "human-avatar"
+    ],
+    "representation": [
+      "3d-gaussian"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "diffusion",
+      "feed-forward",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "native-3d",
+      "multi-view-prior",
+      "synthetic-data"
+    ],
+    "output-property": [
+      "asset-ready",
+      "efficient"
+    ]
+  },
+  "abstract": "Reconstructing a complete 3D head from a single portrait remains challenging because existing methods still face a sharp quality-speed trade-off: high-fidelity pipelines often rely on multi-stage processing and per-subject optimization, while fast feed-forward models struggle with complete geometry and fine appearance details. To bridge this gap, we propose Any3DAvatar, a fast and high-quality method for single-image 3D Gaussian head avatar generation, whose fastest setting reconstructs a full head in under one second while preserving high-fidelity geometry and texture. First, we build AnyHead, a unified data suite that combines identity diversity, dense multi-view supervision, and realistic accessories, filling the main gaps of existing head data in coverage, full-head geometry, and complex appearance. Second, rather than sampling unstructured noise, we initialize from a Plücker-aware structured 3D Gaussian scaffold and perform one-step conditional denoising, formulating full-head reconstruction into a single forward pass while retaining high fidelity. Third, we introduce auxiliary view-conditioned appearance supervision on the same latent tokens alongside 3D Gaussian reconstruction, improving novel-view texture details at zero extra inference cost. Experiments show that Any3DAvatar outperforms prior single-image full-head reconstruction methods in rendering fidelity while remaining substantially faster.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.13856v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.13856v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2604.13856v2 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "把单张 portrait 到完整 3D Gaussian head 写成四个 canonical-view Gaussian tokens 的 1–5 步 conditional endpoint denoising，并用仅训练期存在的 view-conditioned VAE branch 补 novel-view texture。",
+    "methodFlow": [
+      "将 portrait 与相机 Plücker rays 编码为 image context tokens",
+      "为 front/left/right/back 四个 canonical views 构造并编码 Gaussian noise tokens",
+      "拼接两类 tokens，由 DiT 执行 endpoint denoising",
+      "训练时以 VAE image branch 和 Gaussian rendering branch联合监督",
+      "推理时移除 VAE branch，由 Gaussian decoder 输出完整 3D Gaussian head"
+    ],
+    "whyRelevantZh": "它直接属于 3D reconstruction，同时展示了 generative prior 与 faithful reconstruction 的边界：未观测侧由条件生成补全，适合作为 single-view full-head Gaussian reconstruction 的高效系统案例。",
+    "evidenceZh": "作者报告在 NeRSemble 上 LPIPS 0.2357、PSNR 16.6202、CSIM 0.8905；表中次优对应值为 0.3056、13.4421、0.8237（Table 1, p. 6）；作者报告最快一步配置耗时 0.64 秒，而表中最快 baseline FaceLift 为 13.15 秒（Table 2, p. 6）；作者报告在 AnyHead/NeRSemble 上 multi-view 2D IoU 分别为 0.9432/0.9060，均为 Table 9 最佳（Table 9, p. 15）。",
+    "caveatZh": "作者限制：作者明确指出 accessory-rich heads 的可用视角仍有限，在 challenging view changes 下限制质量和泛化；模型参数量仍较大，推理显存可达约 10 GB；当前数据只覆盖有限 facial expressions 和 head poses。审阅风险：论文称 reconstruction，但缺少 ground-truth 3D head representations，主要证据来自 rendered 2D similarity、identity embeddings 和 2D IoU，不能完全证明真实几何恢复；AnyHead 的 AI-generated subset 由既有 image-to-3D model 生产，可能继承 teacher artifacts；公共 benchmark 结果虽缓解这一风险，却未消除数据先验对 back-of-head hallucination 的影响；一步配置虽快，但一步到五步以及 direct regression 到 endpoint denoising 的量化差距很小，method component 的独立贡献弱于整体系统贡献。",
+    "motivationZh": "现有 full-head avatar pipeline 在高保真 multi-stage/per-subject optimization 与快速 feed-forward reconstruction 之间存在明显 trade-off，尤其难以同时恢复未观测侧几何、纹理和配饰。",
+    "methodZh": "输入 portrait 与 Plücker rays 分别编码为 context token 和四视角 Gaussian noise token，经共享 DiT 去噪后由 Gaussian decoder 直接输出 3D Gaussian point cloud；辅助 VAE decoder 只在训练时施加 view-conditioned appearance supervision。训练数据 AnyHead 混合近 1,000 个 AI-generated identities、79 个多表情 digital humans 与 accessory-rich heads。论文在 NeRSemble、Ava-256、AnyHead 和用户研究上比较多类 full-head baselines，并补充 same-data retraining 与非 full-head methods；速度优势非常明显，但五步相对一步的量化收益很小。",
+    "experimentsZh": "主评估使用 NeRSemble 与 Ava-256；由于缺少 ground-truth 3D heads，统一渲染多视角图像后测 LPIPS、PSNR、SSIM、identity cosine similarity 与 DreamSim，并由 32 名参与者给出 896 个用户评分。附录在 AnyHead 上做 AVAS/noise/step ablation，并用相同数据重训 FaceLift。关键结果：NeRSemble 上 LPIPS 0.2357、PSNR 16.6202、CSIM 0.8905，最快的一步配置耗时 0.64 秒；AnyHead/NeRSemble 的 multi-view 2D IoU 分别为 0.9432/0.9060。基线覆盖：主文比较六个 full-head systems，附录再加入五个非 full-head methods；覆盖面较好，但多数 baseline 无法统一训练，速度表也未分解硬件、预处理与输出规格差异。消融：比较 1/5/10/20/30 个 denoising steps、AVAS、noise initialization、one-step regression 与 endpoint denoising；Plücker ray embedding 对收敛必要，AVAS 改善 novel-view appearance，但五步相对一步的量化提升很小。",
+    "insightZh": "核心组合是把 single-image full-head reconstruction 写成对四视角 Gaussian tokens 的 few-step conditional endpoint denoising，并用只存在于训练期的 view-conditioned VAE branch 增强未观测侧外观。相比依赖预处理或 per-subject optimization 的 avatar pipeline，这带来数量级速度差；但从一步 regression 换成一步 endpoint denoising 的表格增益极小，实际价值更多来自端到端架构、数据和训练监督的整体设计。速度、公开测试集结果、baseline breadth 和明确方法图足以收录；但任务限于 human heads，几何证据仍主要是 rendered-view proxies，且关键去噪设计的增量不大，因此 accept-skim 而非精读。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -221,6 +221,240 @@ test("provider-only hits remain staged without becoming locally matched topics",
   );
 });
 
+test("arXiv retries transient HTTP and network failures with global spacing and audit provenance", async () => {
+  const fixtureXml = await readFile(fixtureFile, "utf8");
+  let currentTime = 100_000;
+  const requestStartedAt = [];
+  const sleepCalls = [];
+  let attempt = 0;
+  const fetchImpl = async () => {
+    attempt += 1;
+    requestStartedAt.push(currentTime);
+    if (attempt === 1) {
+      return {
+        ok: false,
+        status: 503,
+        statusText: "Service Unavailable",
+      };
+    }
+    if (attempt === 2) {
+      throw new TypeError("fetch failed", {
+        cause: Object.assign(new Error("socket closed"), { code: "ECONNRESET" }),
+      });
+    }
+    return {
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      text: async () => fixtureXml,
+    };
+  };
+
+  const result = await runDiscovery({
+    root: repositoryRoot,
+    since: "2026-08-04T00:00:00Z",
+    now: "2026-08-06T00:00:00Z",
+    sources: ["arxiv"],
+    topicIds: ["lego"],
+    fetchImpl,
+    sleepImpl: async (milliseconds) => {
+      sleepCalls.push(milliseconds);
+      currentTime += milliseconds;
+    },
+    clockImpl: () => currentTime,
+    runId: "transient-retry-success",
+    writeOutputs: false,
+  });
+
+  const source = result.manifest.sourceStatus[0];
+  const query = source.queries[0];
+  assert.equal(source.status, "checked");
+  assert.equal(source.requestCount, 3);
+  assert.equal(source.successfulRequestCount, 1);
+  assert.equal(source.retryCount, 2);
+  assert.equal(source.retryPolicy.maxAttemptsPerRequest, 3);
+  assert.deepEqual(requestStartedAt, [100_000, 103_100, 106_200]);
+  assert.deepEqual(sleepCalls, [1_000, 2_100, 2_000, 1_100]);
+  assert.equal(query.requests.length, 1);
+  assert.equal(query.requests[0].status, "succeeded");
+  assert.deepEqual(
+    query.requests[0].attempts.map((entry) => entry.outcome),
+    ["http-error", "network-error", "success"],
+  );
+  assert.equal(query.requests[0].attempts[0].httpStatus, 503);
+  assert.match(query.requests[0].attempts[1].error, /ECONNRESET/);
+});
+
+test("arXiv retries a transient response body failure before recording success", async () => {
+  const fixtureXml = await readFile(fixtureFile, "utf8");
+  let currentTime = 150_000;
+  const requestStartedAt = [];
+  const sleepCalls = [];
+  let attempt = 0;
+  const result = await runDiscovery({
+    root: repositoryRoot,
+    since: "2026-08-04T00:00:00Z",
+    now: "2026-08-06T00:00:00Z",
+    sources: ["arxiv"],
+    topicIds: ["lego"],
+    fetchImpl: async () => {
+      attempt += 1;
+      requestStartedAt.push(currentTime);
+      return {
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        text: async () => {
+          if (attempt === 1) {
+            throw new TypeError("terminated", {
+              cause: Object.assign(new Error("body timed out"), {
+                code: "UND_ERR_BODY_TIMEOUT",
+              }),
+            });
+          }
+          return fixtureXml;
+        },
+      };
+    },
+    sleepImpl: async (milliseconds) => {
+      sleepCalls.push(milliseconds);
+      currentTime += milliseconds;
+    },
+    clockImpl: () => currentTime,
+    runId: "transient-body-retry-success",
+    writeOutputs: false,
+  });
+
+  const source = result.manifest.sourceStatus[0];
+  const request = source.queries[0].requests[0];
+  assert.equal(source.status, "checked");
+  assert.equal(source.requestCount, 2);
+  assert.equal(source.successfulRequestCount, 1);
+  assert.equal(source.retryCount, 1);
+  assert.deepEqual(requestStartedAt, [150_000, 153_100]);
+  assert.deepEqual(sleepCalls, [1_000, 2_100]);
+  assert.deepEqual(
+    request.attempts.map((entry) => entry.outcome),
+    ["network-error", "success"],
+  );
+  assert.equal(request.attempts[0].stage, "body");
+  assert.match(request.attempts[0].error, /UND_ERR_BODY_TIMEOUT/);
+});
+
+test("arXiv keeps the serial request interval across query boundaries", async () => {
+  const emptyFeed = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+  <opensearch:totalResults>0</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <opensearch:itemsPerPage>100</opensearch:itemsPerPage>
+</feed>`;
+  let currentTime = 175_000;
+  const requestStartedAt = [];
+  const sleepCalls = [];
+  const result = await runDiscovery({
+    root: repositoryRoot,
+    since: "2026-08-04T00:00:00Z",
+    now: "2026-08-06T00:00:00Z",
+    sources: ["arxiv"],
+    topicIds: ["lego", "embroidery"],
+    fetchImpl: async () => {
+      requestStartedAt.push(currentTime);
+      return {
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        text: async () => emptyFeed,
+      };
+    },
+    sleepImpl: async (milliseconds) => {
+      sleepCalls.push(milliseconds);
+      currentTime += milliseconds;
+    },
+    clockImpl: () => currentTime,
+    runId: "global-query-spacing",
+    writeOutputs: false,
+  });
+
+  const source = result.manifest.sourceStatus[0];
+  assert.equal(source.queries.length, 2);
+  assert.equal(source.requestCount, 2);
+  assert.deepEqual(requestStartedAt, [175_000, 178_100]);
+  assert.deepEqual(sleepCalls, [3_100]);
+});
+
+test("arXiv stops after three retryable 429 responses and preserves the final error", async () => {
+  let currentTime = 200_000;
+  let requestCount = 0;
+  const result = await runDiscovery({
+    root: repositoryRoot,
+    since: "2026-08-04T00:00:00Z",
+    now: "2026-08-06T00:00:00Z",
+    sources: ["arxiv"],
+    topicIds: ["lego"],
+    fetchImpl: async () => {
+      requestCount += 1;
+      return {
+        ok: false,
+        status: 429,
+        statusText: "Too Many Requests",
+      };
+    },
+    sleepImpl: async (milliseconds) => {
+      currentTime += milliseconds;
+    },
+    clockImpl: () => currentTime,
+    runId: "retry-exhausted",
+    writeOutputs: false,
+  });
+
+  const source = result.manifest.sourceStatus[0];
+  const query = source.queries[0];
+  assert.equal(requestCount, 3);
+  assert.equal(source.status, "failed");
+  assert.equal(source.requestCount, 3);
+  assert.equal(source.successfulRequestCount, 0);
+  assert.equal(source.retryCount, 2);
+  assert.equal(query.status, "failed");
+  assert.equal(query.error, "HTTP 429 Too Many Requests");
+  assert.equal(query.requests[0].status, "failed");
+  assert.equal(query.requests[0].attempts.at(-1).nextRetryDelayMs, null);
+});
+
+test("arXiv does not retry non-retryable HTTP 4xx responses", async () => {
+  let requestCount = 0;
+  const sleepCalls = [];
+  const result = await runDiscovery({
+    root: repositoryRoot,
+    since: "2026-08-04T00:00:00Z",
+    now: "2026-08-06T00:00:00Z",
+    sources: ["arxiv"],
+    topicIds: ["lego"],
+    fetchImpl: async () => {
+      requestCount += 1;
+      return {
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+      };
+    },
+    sleepImpl: async (milliseconds) => sleepCalls.push(milliseconds),
+    clockImpl: () => 300_000,
+    runId: "non-retryable-request",
+    writeOutputs: false,
+  });
+
+  const source = result.manifest.sourceStatus[0];
+  const query = source.queries[0];
+  assert.equal(requestCount, 1);
+  assert.deepEqual(sleepCalls, []);
+  assert.equal(source.status, "failed");
+  assert.equal(source.requestCount, 1);
+  assert.equal(source.retryCount, 0);
+  assert.equal(query.error, "HTTP 400 Bad Request");
+  assert.equal(query.requests[0].attempts[0].retryable, false);
+});
+
 test("fixture runs cannot advance the successful live watermark", async () => {
   const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), "paper-reading-discovery-"));
   const stateFile = path.join(temporaryRoot, "state.json");

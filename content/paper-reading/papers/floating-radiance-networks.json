@@ -1,0 +1,100 @@
+{
+  "id": "arxiv:2608.05920",
+  "slug": "floating-radiance-networks",
+  "title": "Floating Radiance Networks",
+  "authors": [
+    "Krzysztof Byrski",
+    "Rafał Tobiasz",
+    "Grzegorz Wilczyński",
+    "Mikołaj Zieliński",
+    "Dawid Baran",
+    "Dominik Belter",
+    "Jacek Tabor",
+    "Przemysław Spurek"
+  ],
+  "publishedAt": "2026-08-06",
+  "updatedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.05920"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "neural scene representation",
+    "ray-traceable Gaussian",
+    "local radiance descriptor",
+    "novel-view synthesis",
+    "editable 3D asset"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "editing",
+      "texture-material"
+    ],
+    "content-scope": [
+      "scene",
+      "object"
+    ],
+    "representation": [
+      "3d-gaussian",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "method": [
+      "hybrid-method"
+    ],
+    "output-property": [
+      "editable",
+      "asset-ready"
+    ]
+  },
+  "abstract": "Recent advances in neural scene representations enable photorealistic novel-view synthesis, yet most methods remain tightly coupled to a single rendering paradigm, limiting their versatility and integration with conventional graphics workflows. We introduce Floating Radiance Networks (FlaRe), a neural scene representation combining explicit ray-traceable geometry with continuous neural radiance functions. A scene is represented by floating planar generalized Gaussian primitives, each carrying a compact latent descriptor of a local radiance field. A lightweight decoder shared across the scene maps this descriptor, local surface coordinates, and viewing direction to color and opacity. This formulation preserves the expressiveness of neural fields while providing an explicitly addressable structure that can be efficiently queried and manipulated. Hardware-accelerated primitive intersections enable interactive rendering and recursive ray-tracing, including reflections, refractions, transparency, and shadows. The same representation further supports primitive-level deformation, mesh extraction, and appearance stylization directly in its learned descriptor space. Experiments across standard reconstruction benchmarks demonstrate competitive rendering quality while using a compact set of primitives. Together, these results establish FlaRe as a versatile representation that brings high-fidelity neural rendering, ray-tracing, geometric manipulation, and appearance editing into a unified scene model. Source code is available online. Source code can be found at: https://github.com/KByrski/FlaRe",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05920v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05920v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/KByrski/FlaRe"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.05920v1 全文整理；代码 URL 来自原始 abstract 与论文。",
+    "ideaZh": "让 floating planar generalized Gaussian 同时承载显式、可 ray-trace 的 proxy geometry 和可连续查询的 local radiance descriptor，从而把 neural rendering 与传统 graphics operations 放进同一个 scene representation。",
+    "methodFlow": [
+      "Initialize Planar Gaussians",
+      "Hardware Ray–Proxy Intersection",
+      "Encode Local Coordinates + View",
+      "Decode RGB and Opacity",
+      "Generalized-Gaussian Compositing",
+      "Reuse for Editing / Ray Tracing / Mesh"
+    ],
+    "whyRelevantZh": "它位于 3D Reconstruction 与 editable 3D asset representation 的交界：重点不是单纯 geometry processing，而是让 learned reconstruction 直接进入常规 graphics pipeline。",
+    "evidenceZh": "作者报告 Mip-NeRF360 上 PSNR 28.93、SSIM 0.836、LPIPS 0.219、16.53 FPS、207 MB，但训练需 11h34m；Bonsai 的 matched 125,057 primitives 下 PSNR 33.51，高于 PUP-3DGS 的 30.52（Table 2, p. 5；Table 4, p. 11）。",
+    "caveatZh": "统一能力的大部分证据是精选视觉案例，mesh、style、deformation 与 secondary rays 缺少量化 fidelity/robustness；训练慢于多数 3DGS，测试 PSNR 又参与 hyperparameter tuning，存在 selection leakage 风险。",
+    "motivationZh": "NeRF/3DGS 通常绑定特定 renderer：neural fields 难直接操作，固定 SH Gaussians 又缺少连续 local radiance capacity；额外转换到 mesh 或 ray-tracing representation 会丢失一致性。",
+    "methodZh": "每个 primitive 保存 planar geometry、generalized-Gaussian shape 与 96-D descriptor。相机射线与 canonical polygon proxies 做硬件求交，local (u,v)、view direction 和 descriptor 经全场共享 decoder 产生 color/opacity，再由 kernel 调制并 compositing；同一 proxies/descriptors 可直接变形、提 mesh 或 stylize。",
+    "experimentsZh": "作者在 Mip-NeRF360、Tanks and Temples、Deep Blending、NeRF Synthetic 上比较 radiance fields、Gaussian 和 explicit neural fields，并展示 recursive ray tracing、style transfer、TSDF mesh、primitive reduction 与 LUT encoding ablation。重建 benchmark 覆盖广，但 graphics operations 多为定性，matched-hardware 公平性也有限。",
+    "insightZh": "一个可操作的 neural asset 不必在“显式 primitives”和“连续 neural field”之间二选一：把小型 radiance function 绑定到可寻址 proxy，就能在保持 rendering capacity 的同时保留 graphics semantics。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

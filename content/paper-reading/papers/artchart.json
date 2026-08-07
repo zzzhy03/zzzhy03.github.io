@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2607.16060",
+  "slug": "artchart",
+  "title": "ArtChart: Faithful Artistic Chart Generation with Integrated Text Rendering",
+  "authors": [
+    "Meijia Huang",
+    "Yingjie Yin",
+    "Shihao Wang",
+    "Chenguang Ma"
+  ],
+  "publishedAt": "2026-07-17",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.16060"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design",
+    "image-generation"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "artistic chart generation",
+    "structured 2D design",
+    "text rendering",
+    "chart ControlNet",
+    "multi-reward distillation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "diffusion",
+      "reinforcement-learning",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "abstract": "Artistic charts combine data visualization with expressive marks, textures, and typography, but they are difficult for image generators: an output is useful only when its stylization preserves chart geometry, exact in-image text, and the semantic binding between labels and marks. We introduce ArtChart, a framework for faithful artistic chart generation with integrated text rendering. Given a structured chart specification and an artistic prompt, ArtChart first renders a text-free grayscale layout that encodes the target chart geometry, then trains a chart-specific control module to preserve mathematical structure. To address the remaining text and layout errors, we further refine the generation policy through GRPO-based reinforcement learning with OCR-based text rewards, VLM-based layout rewards, and aesthetic rewards. A multi-expert distillation stage reconciles these objectives by distilling single-reward experts into one balanced generation policy. We also construct ArtChart-Bench, a bilingual 2K-prompt benchmark covering four chart types, controlled value distributions, diverse label/value formats, and 15 artistic styles, together with ArtChart-Eval, a six-axis evaluation protocol measuring mathematical logic, text accuracy, text layout, aesthetics, instruction following, and readability. Experiments on ArtChart-Bench show that ArtChart consistently outperforms prompt-only, image-editing, and generic ControlNet baselines, with the largest gains on mathematical fidelity and label-layout binding while maintaining competitive visual quality. These results suggest that artistic chart generation should be evaluated as reliable visual communication rather than as generic stylized image synthesis.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.16060v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.16060v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.16060v2 全文整理；论文承诺后续发布 benchmark 与 evaluation code，但 PDF 中没有可用的项目代码 URL。",
+    "ideaZh": "先用不含文字的 deterministic grayscale chart 固定数学 geometry，再分别优化 exact text、label-layout binding 与 aesthetics，最后将三个单奖励 experts 蒸馏成一个 generation policy。",
+    "methodFlow": [
+      "Structured Chart Specification",
+      "Text-Free Grayscale Geometry",
+      "Chart-Specific ControlNet",
+      "OCR / Layout / Aesthetic GRPO",
+      "Hard-Routed On-Policy Distillation",
+      "Faithful Artistic Chart"
+    ],
+    "whyRelevantZh": "它是典型的 structured 2D Design generation：最终虽为 raster image，但输入、intermediate condition、semantic text slots 与 evaluation 都围绕可检查的设计结构组织；先固定 geometry、再优化 content/style 的拆分也可迁移到 SVG、layered design 与 visual design agents。",
+    "evidenceZh": "作者报告 ArtChart 的 Math/Text/Layout 为 8.00/8.45/7.67，高于 open ControlNet baseline 的 7.48/8.05/5.17（Table 3, p. 6）；十人、80-prompt ranking 也在 Math、Text、Layout 与 Aesthetic 上给出最佳平均名次（Table 7, p. 7）。",
+    "caveatZh": "目前依赖显式 grayscale condition，只覆盖 one-dimensional categorical data 与 bar/hbar/pie/area；benchmark、training targets 与 OCR/VLM evaluator 均由同一工作建立，仍存在 teacher reproducibility、evaluator bias 和外部有效性问题。",
+    "motivationZh": "artistic chart 不是普通 stylized image：任何比例、digit、unit 或 label-mark association 出错都会破坏信息。单一 image generator 很难同时兼顾 mathematical structure、精确文字、semantic placement 与视觉风格。",
+    "methodZh": "输入 data specification 先由 Python code 渲染成 text-free grayscale geometry，chart ControlNet 只负责比例与顺序；冻结该结构分支后，DiT LoRA 通过 OCR edit-distance、VLM slot binding 与 aesthetic rewards 训练三个 Flow-GRPO experts，最后以 hard routing 和 dense velocity KL 做 on-policy distillation。",
+    "experimentsZh": "作者构建 English/Chinese 各 1K 的 ArtChart-Bench，覆盖四类 charts、15 styles 和受控 value/text formats；约 13K filtered triples 训练 ControlNet，10K+ prompt-condition pairs 训练 RL/OPD。组件消融支持各阶段分工，但 pie chart 的 Math/Layout/Readability 仅 6.82/6.94/6.05，复杂 geometry 与 placement 仍是明显短板。",
+    "insightZh": "对 2D generation 更重要的不是某个 reward 数值，而是职责分解：用 deterministic representation 承担不可妥协的结构，再让 learned generator 负责 expressive rendering；文字内容、文字位置和 style 也应是不同、可诊断的 alignment channels。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

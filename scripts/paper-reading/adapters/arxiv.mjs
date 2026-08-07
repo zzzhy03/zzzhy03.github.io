@@ -14,9 +14,65 @@ import { classifyWindowMatch } from "../lib/window.mjs";
 
 export const ARXIV_MIN_REQUEST_DELAY_MS = 3_100;
 export const ARXIV_API_ENDPOINT = "https://export.arxiv.org/api/query";
+export const ARXIV_MAX_REQUEST_ATTEMPTS = 3;
+export const ARXIV_RETRY_BASE_DELAY_MS = 1_000;
+
+const RETRYABLE_NETWORK_ERROR_CODES = new Set([
+  "EAI_AGAIN",
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "EHOSTDOWN",
+  "EHOSTUNREACH",
+  "ENETDOWN",
+  "ENETRESET",
+  "ENETUNREACH",
+  "EPIPE",
+  "ETIMEDOUT",
+  "UND_ERR_BODY_TIMEOUT",
+  "UND_ERR_CONNECT_TIMEOUT",
+  "UND_ERR_HEADERS_TIMEOUT",
+  "UND_ERR_SOCKET",
+]);
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function retryableHttpStatus(status) {
+  return status === 429 || (status >= 500 && status <= 599);
+}
+
+function networkErrorCode(error) {
+  const visited = new Set();
+  let current = error;
+  while (current && typeof current === "object" && !visited.has(current)) {
+    visited.add(current);
+    if (typeof current.code === "string") return current.code;
+    current = current.cause;
+  }
+  return null;
+}
+
+function retryableNetworkError(error) {
+  const code = networkErrorCode(error);
+  return Boolean(
+    (code && RETRYABLE_NETWORK_ERROR_CODES.has(code)) ||
+      (error instanceof Error && error.name === "TimeoutError"),
+  );
+}
+
+function describeNetworkError(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  const code = networkErrorCode(error);
+  return `Network error${code ? ` ${code}` : ""}: ${message}`;
+}
+
+function httpError(response) {
+  return `HTTP ${response.status} ${response.statusText}`.trim();
+}
+
+function retryDelayForAttempt(attempt) {
+  return ARXIV_RETRY_BASE_DELAY_MS * 2 ** (attempt - 1);
 }
 
 function arxivSourceId(entry) {
@@ -93,6 +149,9 @@ function queryStatusBase(query) {
     sortBy: "lastUpdatedDate",
     sortOrder: "descending",
     requestCount: 0,
+    successfulRequestCount: 0,
+    retryCount: 0,
+    requests: [],
     fetchedEntryCount: 0,
     inWindowEntryCount: 0,
     locallyMatchedInWindowEntryCount: 0,
@@ -171,6 +230,8 @@ export async function discoverArxiv({
   requestDelayMs = ARXIV_MIN_REQUEST_DELAY_MS,
   pageSize = 100,
   maxResultsPerTopic = 300,
+  sleepImpl = sleep,
+  clockImpl = Date.now,
 }) {
   const queries = compileArxivQueries(researchConfig, topicIds);
   if (!queries.length) {
@@ -194,20 +255,105 @@ export async function discoverArxiv({
   const directionById = new Map(
     researchConfig.directions.map((direction) => [direction.id, direction]),
   );
-  let lastRequestStartedAt = 0;
+  let lastRequestStartedAt = null;
 
   async function throttledFetch(url) {
-    const elapsed = Date.now() - lastRequestStartedAt;
-    if (lastRequestStartedAt && elapsed < effectiveDelayMs) {
-      await sleep(effectiveDelayMs - elapsed);
+    const elapsed = clockImpl() - lastRequestStartedAt;
+    if (lastRequestStartedAt !== null && elapsed < effectiveDelayMs) {
+      await sleepImpl(effectiveDelayMs - elapsed);
     }
-    lastRequestStartedAt = Date.now();
+    lastRequestStartedAt = clockImpl();
     return fetchImpl(url, {
       headers: {
         Accept: "application/atom+xml",
         "User-Agent": "paper-reading-radar/0.1 (+https://zzzhy03.github.io/)",
       },
     });
+  }
+
+  async function fetchPageWithRetry(url, queryStatus, start, requestSize) {
+    const request = {
+      start,
+      maxResults: requestSize,
+      status: "pending",
+      attempts: [],
+    };
+    queryStatus.requests.push(request);
+
+    async function handleNetworkFailure(error, attempt, stage) {
+      const retryable = retryableNetworkError(error);
+      const willRetry = retryable && attempt < ARXIV_MAX_REQUEST_ATTEMPTS;
+      const errorMessage = describeNetworkError(error);
+      const nextRetryDelayMs = willRetry ? retryDelayForAttempt(attempt) : null;
+      request.attempts.push({
+        attempt,
+        outcome: "network-error",
+        stage,
+        error: errorMessage,
+        retryable,
+        nextRetryDelayMs,
+      });
+      if (!willRetry) {
+        request.status = "failed";
+        request.error = errorMessage;
+        throw new Error(errorMessage, { cause: error });
+      }
+      queryStatus.retryCount += 1;
+      await sleepImpl(nextRetryDelayMs);
+    }
+
+    for (let attempt = 1; attempt <= ARXIV_MAX_REQUEST_ATTEMPTS; attempt += 1) {
+      queryStatus.requestCount += 1;
+      let response;
+      try {
+        response = await throttledFetch(url);
+      } catch (error) {
+        await handleNetworkFailure(error, attempt, "fetch");
+        continue;
+      }
+
+      if (!response.ok) {
+        const retryable = retryableHttpStatus(response.status);
+        const willRetry = retryable && attempt < ARXIV_MAX_REQUEST_ATTEMPTS;
+        const errorMessage = httpError(response);
+        const nextRetryDelayMs = willRetry ? retryDelayForAttempt(attempt) : null;
+        request.attempts.push({
+          attempt,
+          outcome: "http-error",
+          httpStatus: response.status,
+          error: errorMessage,
+          retryable,
+          nextRetryDelayMs,
+        });
+        if (!willRetry) {
+          request.status = "failed";
+          request.error = errorMessage;
+          throw new Error(errorMessage);
+        }
+        queryStatus.retryCount += 1;
+        await sleepImpl(nextRetryDelayMs);
+        continue;
+      }
+
+      let responseText;
+      try {
+        responseText = await response.text();
+      } catch (error) {
+        await handleNetworkFailure(error, attempt, "body");
+        continue;
+      }
+
+      queryStatus.successfulRequestCount += 1;
+      request.status = "succeeded";
+      request.attempts.push({
+        attempt,
+        outcome: "success",
+        httpStatus: response.status,
+      });
+      return responseText;
+    }
+
+    throw new Error("arXiv request retry loop ended unexpectedly.");
   }
 
   for (const query of queries) {
@@ -226,13 +372,14 @@ export async function discoverArxiv({
         url.searchParams.set("sortBy", "lastUpdatedDate");
         url.searchParams.set("sortOrder", "descending");
 
-        const response = await throttledFetch(url);
-        queryStatus.requestCount += 1;
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status} ${response.statusText}`.trim());
-        }
+        const responseText = await fetchPageWithRetry(
+          url,
+          queryStatus,
+          start,
+          requestSize,
+        );
 
-        const feed = parseArxivAtomFeed(await response.text());
+        const feed = parseArxivAtomFeed(responseText);
         queryStatus.totalResultsReported = feed.totalResults;
         queryStatus.fetchedEntryCount += feed.entries.length;
         for (const entry of feed.entries) {
@@ -291,7 +438,8 @@ export async function discoverArxiv({
         }
       }
     } catch (error) {
-      queryStatus.status = queryStatus.requestCount > 0 ? "partial" : "failed";
+      queryStatus.status =
+        queryStatus.successfulRequestCount > 0 ? "partial" : "failed";
       queryStatus.error = error instanceof Error ? error.message : String(error);
     }
   }
@@ -315,6 +463,11 @@ export async function discoverArxiv({
       live: true,
       endpoint: ARXIV_API_ENDPOINT,
       requestCount: queryStatuses.reduce((sum, query) => sum + query.requestCount, 0),
+      successfulRequestCount: queryStatuses.reduce(
+        (sum, query) => sum + query.successfulRequestCount,
+        0,
+      ),
+      retryCount: queryStatuses.reduce((sum, query) => sum + query.retryCount, 0),
       fetchedEntryCount: queryStatuses.reduce(
         (sum, query) => sum + query.fetchedEntryCount,
         0,
@@ -337,6 +490,16 @@ export async function discoverArxiv({
         minimumDelayMs: ARXIV_MIN_REQUEST_DELAY_MS,
         requestedDelayMs: requestDelayMs,
         effectiveDelayMs,
+      },
+      retryPolicy: {
+        maxAttemptsPerRequest: ARXIV_MAX_REQUEST_ATTEMPTS,
+        retryableHttpStatuses: [429, "500-599"],
+        retryableNetworkErrorCodes: [...RETRYABLE_NETWORK_ERROR_CODES].sort(),
+        backoff: {
+          strategy: "exponential",
+          baseDelayMs: ARXIV_RETRY_BASE_DELAY_MS,
+          maximumDelayMs: retryDelayForAttempt(ARXIV_MAX_REQUEST_ATTEMPTS - 1),
+        },
       },
       pagination: {
         pageSize: effectivePageSize,

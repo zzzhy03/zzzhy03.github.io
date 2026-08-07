@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2608.03660",
+  "slug": "rapo",
+  "title": "Taming the Implicit: Dual-Channel Risk-Aware Reinforcement Fine-Tuning for Continual Multimodal Post-Training",
+  "authors": [
+    "Yibei Liu",
+    "Jiajun Chen",
+    "Qianle Zhang",
+    "Tangyue Jin",
+    "Mengying Zhu",
+    "Meng Xi",
+    "Yangyang Wu"
+  ],
+  "publishedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.03660"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "continual multimodal post-training",
+    "reinforcement fine-tuning",
+    "catastrophic forgetting",
+    "risk-aware policy scaling",
+    "dynamic bucket sampling",
+    "MLLM-CL"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "reinforcement-learning"
+    ]
+  },
+  "abstract": "Reinforcement fine-tuning (RFT) is widely believed to inherently resist catastrophic forgetting in continual post-training of multimodal large language models. Under pronounced task distributional shifts, however, forgetting across representative RFT algorithms escalates sharply. This stems from the implicit reward-variance regularization inherent to RFT, which proves incapable of suppressing uncontrolled optimization risk. We propose Risk-Aware Policy Optimization (RAPO), the first dual-channel framework for explicit risk governance in continual RFT. On the policy channel, Risk-Aware Policy Scaling adaptively calibrates per-sample update magnitude via rollout reliability and Fisher-inspired local predictive sensitivity; on the data channel, Risk-Aware Dynamic Bucket Sampling reorganizes training batches through dynamic risk stratification, steering optimization toward informative yet stable samples. As a plug-and-play strategy requiring no cross-task memory, RAPO generalizes to any RFT algorithm without modification. On the public MLLM-CL benchmark, RAPO reduces final forgetting by 79.8% relative to its RLOO backbone while retaining new-task competitiveness.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.03660v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.03660v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.03660v1 全文整理；Paper URL 精确指向本次审阅版本。PDF 未打印可核验的 code repository 或 project URL，故不添加 Code 链接。",
+    "ideaZh": "把 continual multimodal RFT 的遗忘显式写成 sample-level optimization risk：R-Scale 控制每个样本的 update magnitude，R-Sample 控制它进入 batch 的频率。",
+    "methodFlow": [
+      "对当前任务每个样本生成多条 rollouts 并计算 response-level advantages",
+      "以 advantage variance 估计 rollout unreliability",
+      "以 token probability 的 p(1-p) 近似 Fisher sensitivity，并与 squared advantage 组合",
+      "R-Scale 用两类风险的倒数系数缩放 policy loss，KL regularization 保持不变",
+      "R-Sample 将风险与 format correctness 合并并动态分成 low/mid/high buckets",
+      "每个 batch 按 80/15/5 风险配比加 10% uniform exploration，周期更新分桶"
+    ],
+    "whyRelevantZh": "这篇工作属于 VLM/MLLM post-training 的重要相邻问题：当模型需要依次吸收视觉领域和能力数据时，如何在没有 replay memory 的条件下减少 RFT forgetting。它不是 visual design 的直接应用，但对持续更新多模态模型的训练机制有参考价值。",
+    "evidenceZh": "作者报告完整 MLLM-CL sequence 上 RAPO 的 FM/MFN/MAA/MFT 为 -1.32/59.38/55.46/60.05，RLOO 为 -6.53/56.11/55.07/61.21（Table 1, p. 5）；RS-to-OCR ablation 中，完整 RAPO 的 FM -1.13 优于 w/o R-Scale 的 -2.17 与 w/o R-Sample 的 -2.03（Table 2, p. 5）；task representation distance 与 matched forgetting 的 Pearson r=0.784, p=0.037，但移除 Math-RS outlier 后降为 r=0.179, p=0.735（Fig. 3, p. 6）。",
+    "caveatZh": "论文没有独立 Limitations section。主结果只有一个 3B MLLM、一个 benchmark、固定 task order，且未报告 multiple seeds 或 uncertainty；完整 component ablation 只到 OCR，遗漏优势最明显的 Math & Logic 和 GUI Agent；R-Sample 偏向 low-risk samples，可能牺牲 hard examples；plug-and-play 到任意 RFT method 的主张只在 RLOO objective 上得到验证；额外 rollout 与风险重估开销也未报告。",
+    "motivationZh": "Continual RFT 常被认为凭借隐式 reward-variance regularization 更抗遗忘，但在任务分布剧烈变化时，少数不稳定样本仍会产生高风险 updates，导致历史多模态能力快速退化。",
+    "methodZh": "论文研究 replay-free continual reinforcement fine-tuning：模型依次学习 Remote Sensing、Medical、Autonomous Driving、Science、Finance、OCR、Math & Logic、GUI Agent，每阶段只能访问当前 10K samples。RAPO 在 policy channel 中按每个样本的 rollout stability 和 local predictive sensitivity 缩放 policy loss、保持 KL 项不变；在 data channel 中把上述风险与 format-error penalty 合并后动态分桶，并偏向低风险样本。完整序列上 RAPO 的 retained performance 最佳，方法简单且无需跨任务 memory；但其 sample-risk proxy 主要通过 aggregate correlations 与定义一致性分析来支撑，尚未证明对单样本 future forgetting 的预测性。",
+    "experimentsZh": "基于 Qwen2.5-VL-3B-Instruct，在 MLLM-CL 的八阶段 sequence 上做 replay-free full-parameter fine-tuning，每阶段 10K samples；比较 sequential SFT、EWC、L2P、ReMax、GRPO、RLOO。作者报告 RAPO 的 FM/MFN 为 -1.32/59.38，RLOO 为 -6.53/56.11。双组件消融支持 R-Scale 与 R-Sample 都有贡献，但只运行到 OCR；所有证据来自同一 backbone、benchmark 与 task order，没有 seeds、confidence intervals、order permutation 或跨 RFT backbone 验证。",
+    "insightZh": "创新点不是新的 continual-learning memory，而是同时控制 update magnitude 与 update frequency，并保持 reward/objective 主体不变。主表增益明显、机制足够清楚，值得收录；但证据集中在单一 benchmark/backbone/order，关键消融不覆盖完整序列，所以建议略读而非精读。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

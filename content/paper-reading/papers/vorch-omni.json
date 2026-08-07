@@ -1,0 +1,121 @@
+{
+  "id": "arxiv:2608.05803",
+  "slug": "vorch-omni",
+  "title": "Vorch-Omni: Multi-Task Orchestration of Sight and Sound",
+  "authors": [
+    "Vorch Team",
+    "Xiaoyu Chen",
+    "Yang Ding",
+    "Cong Han",
+    "Menglin Han",
+    "Yuxin Hong",
+    "Jiebo Hou",
+    "Zequn Jie",
+    "Xiang Li",
+    "Jing Liu",
+    "Qi Liu",
+    "Yulei Lu",
+    "Siyuan Luo",
+    "Lin Ma",
+    "Xin Ma",
+    "Yinlong Qian",
+    "Peng Shi",
+    "Fang Wan",
+    "Siqi Wang",
+    "Yaohui Wang",
+    "Yaole Wang",
+    "Yidi Wu",
+    "Siqian Yang",
+    "Mingyu Yin",
+    "Haoran Yu",
+    "Gang Yue",
+    "Lisai Zhang",
+    "Yuting Zhang"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05803"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "unified audio-video generation",
+    "arbitrary condition-to-output",
+    "multi-task orchestration",
+    "reference conditioning",
+    "audio-video editing",
+    "flow matching"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing",
+      "completion"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text",
+      "single-image",
+      "video",
+      "multimodal"
+    ],
+    "method": [
+      "flow-matching",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "video-prior"
+    ],
+    "output-property": [
+      "controllable",
+      "editable"
+    ]
+  },
+  "abstract": "Recent advances in generative video modeling have enabled diverse generation, reference-based synthesis, extension, and editing, but existing approaches often rely on fragmented task-specific models. A general model must distinguish heterogeneous target, source, and reference signals to determine what to generate, preserve, or use as guidance, while reducing interference among tasks. Joint audio-visual generation further increases this challenge by introducing diverse conditioning and output configurations across modalities. We present Vorch-Omni, a unified multi-task framework for audio-visual synthesis based on an arbitrary-condition-to-arbitrary-output formulation. It flexibly treats video and audio signals as either conditioning inputs or generation targets. Token-level conditioning masks and task identifiers distinguish targets, source content, and references, while position types separate temporal context from independent conditions. To capture semantic and structural information, Vorch-Omni employs complementary visual conditioning pathways: a vision-language model interprets sampled frames with text instructions, and a video VAE encodes conditions into latent tokens for direct guidance. We further build a distributed data pipeline to curate diverse temporally aligned audio-visual clips, generate structured captions and metadata, and balance heterogeneous task distributions. Built on a single flow-matching diffusion transformer without task-specific architectural changes, Vorch-Omni supports over 10 tasks, including text-to-video, text-to-audio-video, image- and reference-conditioned generation, temporal extension, audio-driven generation, video transformation, and audio-visual editing. This unified framework provides a scalable foundation for general-purpose audio-visual generation and manipulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05803v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05803v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.05803v1 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "用 token-level target/condition masks、task IDs 与 position types，把 audio/video 的 source、reference、temporal context 和 output role 统一编码，让单一 flow-matching backbone 覆盖三十多种 generation、extension 与 editing 配置。",
+    "methodFlow": [
+      "将每个 video/audio signal 指定为 target 或 clean condition",
+      "用 conditioning mask、task ID 与 position type 编码生成角色和时间关系",
+      "VLM semantic path 与 video/audio VAE latent path 编码条件",
+      "单一 asymmetric dual-stream DiT 联合 denoise video/audio targets",
+      "只在 target tokens 上计算 flow-matching loss",
+      "按同一 task configuration 解码 video、audio 或两者"
+    ],
+    "whyRelevantZh": "它直接覆盖 video generation、editing、reference conditioning 与 joint audio-video foundation model，并提供一种可迁移的 structured condition-role interface；对跟踪通用 visual generation capability 很重要。",
+    "evidenceZh": "作者报告 81.4% aggregate dimension-level judgments 为 Same，关键正向 net win 是 audio prompt +7.1%、reference alignment +6.6% 与 audio-video sync +5.9%（Fig. 4 and Sec. 5.3, p. 12）；作者报告 audio-driven、animate-and-replace、video transform、video editing 的 task-level net win 分别为 +3.5%、+2.0%、+1.9%、+1.2%（Fig. 5 and Task-Level Analysis, p. 13）。",
+    "caveatZh": "作者限制：尚未解决 long-horizon consistency；fine-grained edit locality 仍有限；跨语言与 speaker 的 robust speech generation 仍是挑战。审阅风险：核心结果的大多数判断为 tie，整体优势并非全面；应把它理解为跨模态协调与 reference task 的增益，而非 general video quality leap；正文先称 benchmark 有 537 paired groups，后又称 527 groups；Fig. 4 的 overall net 标注 -0.3%，结果段却写 aggregate net -1.9%，存在内部报告不一致；缺少 interface component ablation，无法判断收益来自 role-aware representation 还是数据、backbone 与训练规模；PDF 只给 project page，没有打印可验证的 code repository URL。",
+    "motivationZh": "通用 audio-video model 必须在异构任务中明确哪些信号需要生成、保留或仅作参考；为每个任务另设模型或 adapter 会造成系统碎片化，也难以复用跨模态知识。",
+    "methodZh": "论文把 task specification 与 backbone computation 分离：四个列表描述 video/audio target 与 condition，token mask 决定是否加噪，task embedding 表示语义角色，position type 表示条件与目标的时间关系；VLM semantic path 与 VAE latent path共同保留 instruction semantics 和细节，audio/video streams 在 LTX-2.3 中逐层双向交互。训练端还给出可追踪的数据筛选、标注、task packing 与 weighted sampling 流程。实验主要是与 Wan 2.7 的专家 Good-Same-Bad 对比，说明统一模型在跨模态协调和 reference fidelity 上有优势，但整体视觉偏好并未领先。",
+    "experimentsZh": "模型从 LTX-2.3 audio-video backbone 初始化，以 24 FPS、最长 16 秒的视频 fine-tune 50K updates；专家人评覆盖 T2AV 与 reference-conditioned generation/manipulation，并使用 Wan 2.7 作为统一对手做 Good-Same-Bad 判断。关键结果：81.4% 的 aggregate dimension-level judgments 为 Same；较明确的正向 net win 集中在 audio prompt（+7.1%）、reference alignment（+6.6%）与 audio-video sync（+5.9%），task-level gains 最高为 audio-driven 的 +3.5%。基线覆盖：matched side-by-side human evaluation 使用一个强 commercial unified model，rubric 拆分细；但未与多种 open unified systems 做同协议比较，也没有 per-task sample count 或 inter-rater reliability。消融：主文未隔离 conditioning mask、task ID、position type、VLM semantic path、task rebalancing 或 joint audio-video interaction，因此无法区分 interface、data mixture 与 LTX-2.3 fine-tuning 的各自贡献。",
+    "insightZh": "新意不在发明新的 audio-video backbone，而在给 heterogeneous media roles 一个统一、token-level、跨模态的 assignment interface，并把 semantic role 与 temporal relation 分开编码；这比为 generation、extension、editing 或 reference task 各设 adapter 更可扩展。不过 LTX-2.3 backbone、VLM/VAE 双路径与多任务采样本身并非新范式，论文也尚未用消融隔离每个 role encoding 的贡献。建议精读 interface 和 evaluation boundary：统一 30 多种任务的表示方式具有方法价值，且人评清楚揭示收益集中在哪里；同时应保留整体未领先、数字内部不一致和缺少 component ablation 的证据边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

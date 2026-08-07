@@ -1,0 +1,93 @@
+{
+  "id": "arxiv:2608.05631",
+  "slug": "chronovision",
+  "title": "ChronoVision: Temporal Reasoning via Latent State Reconstruction",
+  "authors": [
+    "Yifan Shen",
+    "Jian Xu",
+    "Boyi Li",
+    "Yuner Zhang",
+    "Tianjiao Yu",
+    "Bingxuan Li",
+    "Houze Yang",
+    "Rushi Wang",
+    "Xu Cao"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05631"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "temporal visual reasoning",
+    "latent state reconstruction",
+    "multimodal reasoning",
+    "ROI attention",
+    "GRPO",
+    "visual chain of thought",
+    "Vbvr-VQA"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "representation-learning"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "video",
+      "multimodal"
+    ],
+    "method": [
+      "autoregressive",
+      "reinforcement-learning",
+      "llm-vlm-guided"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "abstract": "Multimodal large language models excel at passive perception but struggle with complex visual cognitive tasks requiring multi-step temporal reasoning. This degradation largely stems from the inherent ambiguity of language-based reasoning, which often fails to accurately articulate continuous visual transformations. To address this, we propose ChronoVision, a multimodal framework designed to align visual logic with latent imagery. During supervised fine-tuning, a Reconstructive Visual Head predicts the latent representation of the final transformed state, while an ROI Attention Locating module focuses the model on key visual evidence via semantic span queries. In post-training, we apply reinforcement learning with an implicit process grounding mechanism, guided by a composite reward function that evaluates outcome correctness, latent process alignment, and unsupervised visual focus. Furthermore, we introduce Vbvr-VQA, a novel dataset that evaluates temporal tracking by reformulating video reasoning into a strict image-ordering task. Experiments demonstrate that ChronoVision achieves state-of-the-art performance on Vbvr-VQA with 74.8% in-domain and 71.6% out-of-domain accuracy, alongside a strong 55.0% accuracy on IntPhys2, a highly challenging cross-domain benchmark.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05631v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05631v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.05631v1 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "在 MLLM reasoning 中加入 final-state latent reconstruction、ROI attention supervision 与 process-aware GRPO，让模型在严格的 shuffled-frame ordering task 中维持可干预、可探测的 visual state。",
+    "methodFlow": [
+      "从 VBVR videos 抽取初始帧与六个等间隔候选帧，构造成严格 ordering task",
+      "Qwen3.5-9B 编码 query、shuffled candidates 与 prompt，autoregressive 生成 reasoning 和顺序",
+      "RVH 从 candidate hidden states 预测 ground-truth final frame 的 unpooled visual latent",
+      "<LOCATE> spans 作为 query，对 ground-truth dynamic-region boxes 做 attention condensation",
+      "GRPO 联合 exact-answer、latent-grounding 与 unsupervised-focus rewards 做 post-training",
+      "推理时仅输入初始帧、候选帧与文本，输出完整 chronological permutation"
+    ],
+    "whyRelevantZh": "这是和 visual reasoning、MLLM post-training、latent visual thought 直接相关的工作；尤其值得关注它没有只靠 final accuracy 宣称机制，而是加入 perturbation、patching 与 probing。对 visual design agents 来说，内部表示连续 state evolution 的思路也可能迁移到多步生成/编辑验证。",
+    "evidenceZh": "Vbvr-VQA 为 73.2% overall、74.8% ID、71.6% OOD；Claude Opus 4.6 为 55.8/50.8/60.8（Table 1, p. 6）；完整模型相对 SFT w/o head 从 66.0% 提升至 73.2%；其中 RVH、ROI、RL 均在逐步设置中带来增益（Table 3, p. 8）；IntPhys2 overall 55.0% vs backbone 48.5%，Easy/Medium/Hard 为 62.5/54.8/53.0（Table 4, p. 8）；去掉 CoT 后 ID average 从 74.8% 降到 67.6%；错误 prefix 下 full model 为 63.2%，标准推理为 74.8%（Tables 7-8, p. 19）。",
+    "caveatZh": "作者限制：目前只在 moderate-scale 9B MLLM 与有限 training corpora 上验证，尚未测试更大 backbone 和更广数据；ROI Attention Locating 依赖 semantic locating cues 与 spatial bounding-box dense supervision，扩展性有限。审阅风险：Vbvr-VQA 的训练与测试虽使用不同 seeds/OOD generators，但都来自 VBVR synthetic ecosystem；跨真实世界分布的证据弱于 74.8/71.6 主数字；RVH 的目标是候选集中已经存在的 final frame latent，因此证明的是排序时利用 endpoint cue，而不是预测不可见未来；这两种能力需要严格区分；1M training rationales、semantic cues 与 boxes 由 GPT-5 生成，只人工检查 500 个训练样本；dense supervision 的成本和系统性 annotation bias 未量化；latent reward 对每一步取与任一 candidate 的最大 cosine similarity，可能奖励 candidate grounding 而非正确的 intermediate temporal progression；主 benchmark 只有 500 samples，未报告 repeated seeds、confidence intervals 或 human-vs-model calibration；PDF 只打印 project page，没有打印 code repository URL。",
+    "motivationZh": "纯文字 CoT 难以精确表达连续视觉变化，常把 temporal reasoning 退化为语言模式匹配；论文希望用 latent imagery 和局部视觉证据补足这一 text bottleneck。",
+    "methodZh": "Vbvr-VQA 将 synthetic videos 等分成六个时段，抽取每段末帧并随机打乱，要求模型输出完整 chronological permutation；训练/测试分别来自 VBVR-Dataset 与 VBVR-Bench-Data，测试含 250 ID 和 250 held-out-generator OOD samples。ChronoVision 在 SFT 中一边生成 CoT/顺序，一边由两层 MLP RVH 从 candidate visual hidden states 重建最终帧的 unpooled latent；ROI module 用 GPT-5 生成的 <LOCATE> cues 与 bounding boxes 做 attention condensation。随后 GRPO 同时优化 exact answer、逐句 latent-to-candidate alignment 和低熵 visual focus。",
+    "experimentsZh": "模型以 Qwen3.5-9B 为 backbone，在 8×H100 上用 1M 个 VBVR-derived samples 做三轮 SFT，再以 group size 8 做 GRPO。Vbvr-VQA 共 500 题，ID/OOD 各 250，并补充 MMMU、IntPhys2、Video-Holmes 与 LongVideo-Reason 等评测。关键结果：Vbvr-VQA overall/ID/OOD 为 73.2%/74.8%/71.6%，完整模型相对 SFT w/o head 从 66.0% 提升到 73.2%；IntPhys2 overall 从 backbone 的 48.5% 提升到 55.0%。去掉 CoT 或注入错误 prefix 都会显著降低准确率。基线覆盖：同时比较 Qwen/GLM 与 GPT/Gemini/Claude，并以 exact match 降低语言评分歧义；但 benchmark 仍来自同一 VBVR synthetic ecosystem，500-sample 规模没有 confidence intervals。消融：RVH、ROI、RL、三项 reward、CoT、latent noise/patch 与 linear probing 覆盖较完整；仍缺 unknown-future target、data scale curve、替代 supervision、multi-seed variance 和不同 backbone scale。",
+    "insightZh": "核心不是单独发明 CoT、ROI supervision 或 auxiliary latent prediction，而是把 final-state reconstruction 变成 visual-temporal reasoning 的训练中间变量，并用 process reward、causal intervention 与 probes 检查它是否真的参与决策。image-ordering benchmark 也把评价从单选变为 6! permutation exact match。方法组合具有清晰的新意，但“visual cognition”范围被 synthetic ordering task 限定，且 final frame 本身就在候选集中，不能直接等同于从过去预测未知未来。建议精读方法与机制验证，但阅读时把三个结论分开：自建 synthetic ordering 上的强性能、跨域 benchmark 的中等增益、以及 latent reconstruction 的因果证据。后两者比单个 SOTA 数字更值得吸收。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

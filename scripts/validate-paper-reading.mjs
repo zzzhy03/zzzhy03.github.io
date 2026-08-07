@@ -844,8 +844,18 @@ for (const { file, value: receipt } of runReceiptEntries) {
     `${context}.fulltext.backlog.candidateIds`,
     { allowEmpty: true },
   );
-  requireText(receipt.fulltext.backlog.file, `${context}.fulltext.backlog.file`);
-  requireSha256(receipt.fulltext.backlog.sha256, `${context}.fulltext.backlog.sha256`);
+  const backlogHasFile = Object.hasOwn(receipt.fulltext.backlog, "file");
+  const backlogHasHash = Object.hasOwn(receipt.fulltext.backlog, "sha256");
+  if (backlogHasFile !== backlogHasHash) {
+    fail(`${context}.fulltext.backlog must contain both file and sha256 or neither.`);
+  }
+  if (receipt.fulltext.backlog.candidateIds.length > 0 && !backlogHasFile) {
+    fail(`${context}.fulltext.backlog must reference an artifact when it is non-empty.`);
+  }
+  if (backlogHasFile) {
+    requireText(receipt.fulltext.backlog.file, `${context}.fulltext.backlog.file`);
+    requireSha256(receipt.fulltext.backlog.sha256, `${context}.fulltext.backlog.sha256`);
+  }
 
   requireArray(receipt.canonicalPapers, `${context}.canonicalPapers`);
   const digestPaperIds = new Set(readJson(digestFile).paperIds);

@@ -231,11 +231,40 @@ async function screeningStatus(root, runDirectory) {
   }
 }
 
-function fulltextStatus(root, runDirectory, selection) {
+function selectedFulltextDecisionCount(runDirectory, selection) {
+  return listJsonFiles(
+    path.join(runDirectory, "screening", "reviews"),
+    (name) => name.endsWith(".review.json"),
+  )
+    .flatMap((file) => readJson(file).decisions ?? [])
+    .filter((decision) => decision.decision === "full-text-review")
+    .filter(
+      (decision) =>
+        selection === "all-full-text" ||
+        (decision.preliminary?.relevance === "high" &&
+          decision.preliminary?.readingAction === "deep"),
+    ).length;
+}
+
+function fulltextStatus(root, runDirectory, selection, screeningState) {
   const reviewDirectory = path.join(runDirectory, "fulltext", "reviews");
   const reviewCount = listJsonFiles(reviewDirectory, (name) => name !== "summary.json").length;
   if (!reviewCount) {
-    return { state: "pending", reviewCount: 0, expectedCount: null, errors: [] };
+    const expectedCount =
+      screeningState === "complete"
+        ? selectedFulltextDecisionCount(runDirectory, selection)
+        : null;
+    if (expectedCount === 0) {
+      return {
+        state: "complete",
+        reviewCount: 0,
+        expectedCount: 0,
+        decisionCounts: {},
+        topicCounts: {},
+        errors: [],
+      };
+    }
+    return { state: "pending", reviewCount: 0, expectedCount, errors: [] };
   }
   const result = validateFulltextReviews({
     root,
@@ -328,7 +357,7 @@ function backlogStatus(runDirectory, closure) {
   };
 }
 
-function promotionStatus(root, runDirectory, digest) {
+function promotionStatus(root, runDirectory, digest, fulltext) {
   if (!digest) return { state: "not-checked", acceptedCount: null, errors: [] };
   const result = validatePromotion({
     root,
@@ -336,6 +365,8 @@ function promotionStatus(root, runDirectory, digest) {
     reviewDirectory: path.join(runDirectory, "fulltext", "reviews"),
     paperDirectory: "content/paper-reading/papers",
     digest,
+    allowMissingReviewDirectory:
+      fulltext.state === "complete" && fulltext.expectedCount === 0,
   });
   return {
     state: result.errors.length ? "invalid" : "complete",
@@ -345,7 +376,7 @@ function promotionStatus(root, runDirectory, digest) {
   };
 }
 
-function receiptStatus(root, runId, digest, runDirectory = null) {
+export function receiptStatus(root, runId, digest, runDirectory = null) {
   if (!digest) return { state: "not-checked", file: null, errors: [] };
   const digestPath = repositoryPath(root, digest);
   if (!existsSync(digestPath)) {
@@ -371,14 +402,40 @@ function receiptStatus(root, runId, digest, runDirectory = null) {
   if (receipt.digest?.sha256 !== sha256File(digestPath)) {
     errors.push("Run receipt digest hash no longer matches canonical content.");
   }
+  const receiptBacklog = receipt.fulltext?.backlog;
+  const backlogCandidateIds = Array.isArray(receiptBacklog?.candidateIds)
+    ? receiptBacklog.candidateIds
+    : null;
+  if (!backlogCandidateIds) {
+    errors.push("Run receipt full-text backlog must contain candidateIds.");
+  } else if (backlogCandidateIds.some((candidateId) => typeof candidateId !== "string")) {
+    errors.push("Run receipt full-text backlog candidateIds must be strings.");
+  }
+  const backlogHasFile = Boolean(receiptBacklog && Object.hasOwn(receiptBacklog, "file"));
+  const backlogHasHash = Boolean(receiptBacklog && Object.hasOwn(receiptBacklog, "sha256"));
+  if (backlogHasFile !== backlogHasHash) {
+    errors.push("Run receipt full-text backlog must record both file and sha256 or neither.");
+  }
+  if (backlogCandidateIds?.length && !backlogHasFile) {
+    errors.push("Run receipt non-empty full-text backlog must reference its hashed artifact.");
+  }
   if (runDirectory) {
+    if (backlogCandidateIds) {
+      const expectedBacklogIds = fulltextClosure(runDirectory)
+        .pending.map((item) => item.candidateId)
+        .sort();
+      const recordedBacklogIds = [...backlogCandidateIds].sort();
+      if (JSON.stringify(recordedBacklogIds) !== JSON.stringify(expectedBacklogIds)) {
+        errors.push("Run receipt backlog candidates no longer match full-text closure.");
+      }
+    }
     const recordedArtifacts = [
       receipt.discovery?.manifest,
       receipt.discovery?.candidateArtifact,
       receipt.screening?.manifest,
       ...(receipt.screening?.reviews ?? []),
       ...(receipt.fulltext?.reviews ?? []),
-      receipt.fulltext?.backlog,
+      ...(backlogHasFile || backlogHasHash ? [receiptBacklog] : []),
     ].filter(Boolean);
     for (const artifact of recordedArtifacts) {
       if (typeof artifact.file !== "string" || typeof artifact.sha256 !== "string") {
@@ -484,14 +541,14 @@ export async function getPipelineStatus({
   const resolvedRun = resolveRunDirectory(repositoryRoot, runDirectory);
   const discovery = discoveryStatus(resolvedRun);
   const screening = await screeningStatus(repositoryRoot, resolvedRun);
-  const fulltext = fulltextStatus(repositoryRoot, resolvedRun, selection);
+  const fulltext = fulltextStatus(repositoryRoot, resolvedRun, selection, screening.state);
   let closure = { fulltextCandidateCount: 0, reviewedCandidateCount: 0, pending: [] };
   let backlog = { state: "pending", count: 0, errors: [] };
   if (screening.state === "complete") {
     closure = fulltextClosure(resolvedRun);
     backlog = backlogStatus(resolvedRun, closure);
   }
-  const promotion = promotionStatus(repositoryRoot, resolvedRun, digest);
+  const promotion = promotionStatus(repositoryRoot, resolvedRun, digest, fulltext);
   const stateFile = path.join(
     repositoryRoot,
     "content",
@@ -654,8 +711,15 @@ function buildRunReceipt(root, runDirectory, digest, status) {
       ...hashedArtifact(root, file),
     };
   });
-  const backlogFile = path.join(runDirectory, "fulltext", "backlog.json");
-  const backlog = readJson(backlogFile);
+  let backlogRecord = { candidateIds: [] };
+  if (status.closure.backlogCandidateCount > 0) {
+    const backlogFile = path.join(runDirectory, "fulltext", "backlog.json");
+    const backlog = readJson(backlogFile);
+    backlogRecord = {
+      candidateIds: backlog.candidateIds,
+      ...hashedArtifact(root, backlogFile),
+    };
+  }
   const manifest = readJson(path.join(runDirectory, "manifest.json"));
   return {
     schemaVersion: 1,
@@ -683,10 +747,7 @@ function buildRunReceipt(root, runDirectory, digest, status) {
     fulltext: {
       decisions: status.stages.fulltext.decisionCounts,
       reviews: fulltextReviews,
-      backlog: {
-        candidateIds: backlog.candidateIds,
-        ...hashedArtifact(root, backlogFile),
-      },
+      backlog: backlogRecord,
     },
     digest: hashedArtifact(root, digestPath),
     canonicalPapers,
@@ -696,12 +757,15 @@ function buildRunReceipt(root, runDirectory, digest, status) {
     },
     watermark: {
       advancedByReceipt: false,
-      previousLastSuccessfulRunAt: status.watermark?.lastSuccessfulRunAt ?? null,
+      previousLastSuccessfulRunAt:
+        status.stages.discovery.window?.lastSuccessfulRunAt ??
+        status.watermark?.lastSuccessfulRunAt ??
+        null,
     },
   };
 }
 
-async function runReceipt(options, root, runDirectory) {
+export async function runReceipt(options, root, runDirectory) {
   const verification = await verifyPipeline({ ...options, root, runDirectory });
   const digestPath = repositoryPath(root, options.digest);
   const digest = readJson(digestPath);
@@ -735,7 +799,7 @@ async function runReceipt(options, root, runDirectory) {
   };
 }
 
-async function runFinalize(options, root, runDirectory) {
+export async function runFinalize(options, root, runDirectory) {
   const verification = await verifyPipeline({ ...options, root, runDirectory });
   const status = verification.status;
   const receipt = receiptStatus(root, status.runId, options.digest, runDirectory);

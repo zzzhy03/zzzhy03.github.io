@@ -1,0 +1,97 @@
+{
+  "id": "arxiv:2608.05879",
+  "slug": "holoworld",
+  "title": "To See a World in a Living Context: Unified Indoor-Outdoor Urban World Generation",
+  "authors": [
+    "Xiaobin Huang",
+    "Zilong Huang",
+    "Yang Luo",
+    "Hongchao Fan",
+    "Yiping Chen",
+    "Ting Han"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05879"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "urban world generation",
+    "indoor-outdoor correspondence",
+    "cross-scale living context",
+    "city-scale 3D generation",
+    "context-driven generation",
+    "agentic world building"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "environment-world"
+    ],
+    "representation": [
+      "mesh",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "autoregressive",
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "2d-prior"
+    ],
+    "output-property": [
+      "controllable",
+      "asset-ready"
+    ]
+  },
+  "abstract": "Text-driven 3D generation has advanced rapidly in creating large-scale outdoor environments and detailed indoor scenes, but these domains are usually synthesized independently, lacking the correspondence required for a coherent urban world. We present HoloWorld, a unified indoor-outdoor urban world generation framework built on a continuously updated cross-scale world context. Initializing from a user description, HoloWorld progressively represents and updates the diverse world information, from city-scale planning to individual buildings, allowing generated interiors to maintain explicit correspondence with their associated exterior buildings. Conditioned on the evolving context and previously generated neighboring blocks, HoloWorld autoregressively generates urban exteriors with consistent spatial organization and visual identity across blocks. The generated exterior representations are further grounded in 3D building instances and footprints, enabling building-specific indoor generation with geometry-constrained layouts and inherited appearance characteristics. To our knowledge, HoloWorld is the first framework to unify indoor and outdoor generation within a coherent 3D urban world. Extensive experiments demonstrate that HoloWorld achieves superior urban exterior generation performance, improving the average AQS score over the SOTA by 7.68\\% and obtaining the highest average RDR score, while maintaining strong building-level indoor-outdoor correspondence and cross-block continuity within a unified 3D urban world.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05879v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05879v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.05879v1 全文整理；Paper URL 精确指向本次审阅版本。全文审阅未核验到公开 code repository，故不添加 Code 链接。",
+    "ideaZh": "维护 world–block–building 三级持续演化的 context，并只把通过 stage-specific validation 的规划、图像和几何证据写回状态，用同一生成过程维持城市街区与建筑室内的对应关系。",
+    "methodFlow": [
+      "由文本 prompt 与 block grid 初始化 world-level context",
+      "规划城市功能与街区，并用阶段性 validation 更新 context",
+      "结合 world context、当前设计和相邻已生成街区，autoregressive 生成 block image",
+      "将 block image 转为 3D，并为建筑提取稳定 identity 与 footprint",
+      "融合 world/block/building 证据，生成受 footprint 约束的分层室内布局与资产",
+      "把通过验证的室外与室内结果组装为统一可浏览 urban world"
+    ],
+    "whyRelevantZh": "这篇工作直接落在 3D Generation，且把 city-scale asset、街区连续性、building identity 与 interior layout 放进同一 agentic generation process，和关注生成过程而非纯交互界面的研究取向高度吻合。它也为未来可编辑 3D design system 提供了清晰的 context/state abstraction，因此比一般城市渲染 demo 更值得跟进。",
+    "evidenceZh": "Exterior 四项平均 AQS 中，HoloWorld 的 GPT/Human 为 8.35/8.46，高于 MajutsuCity 的 7.75/7.79（Table 1, p. 5）；indoor-outdoor functional/visual/spatial 平均为 8.15/7.90，并报告 Shape IoU 0.997（Table 2, p. 5）。static world context 将平均 AQS 从 7.86/8.21 降至 4.53/5.54、Shape IoU 从 0.994 降至 0.670；移除 adjacent neighborhood context 也使 continuity AQS 从 8.25/7.75 降到 7.25/5.38（Tables 3–4, p. 7）。",
+    "caveatZh": "论文未报告确切城市、街区、建筑或评分样本数，也没有置信区间与 inter-rater agreement；AQS/RDR 依赖 GPT-5.5 和 20 位专家。系统由 GPT-5.4、GPT-Image-2、Meshy API 组成且无公开代码，indoor baseline 只有指标不完整的 TRELLIS；Shape IoU 又受显式 footprint constraint 帮助。目前只支持 3×3 blocks 与 single-floor interiors，缺少 vertical structure 和 physical validation。",
+    "motivationZh": "现有 text-driven 3D systems 往往分别生成大尺度 outdoor city 与 detailed indoor scene，导致室内布局、建筑身份、外观和 footprint 无法保持明确 correspondence，也难以让相邻街区共享稳定的世界状态。",
+    "methodZh": "HoloWorld 从文本和 block grid 初始化 world context，规划城市后按街区 autoregressive 生成 2D block image 并转为 3D；building identity、footprint、局部图像与 world/block states 再组成 building context，驱动受 footprint 约束的 room layout、家具与结构生成。task-specific projection 为每个阶段提取所需信息，候选只有通过 validation 才更新 living context，否则沿用旧状态。",
+    "experimentsZh": "所有 exterior 实验使用 3×3 block grid，与 CityCraft、SynCity、MajutsuCity 接收相同描述；indoor 以 TRELLIS 独立生成作为 baseline，评分来自 GPT-5.5 与 20 位 human experts。HoloWorld 在 exterior 与 indoor-outdoor AQS 上领先，并通过 dynamic-context 和 adjacent-neighborhood-context ablations 支持核心设计。论文没有披露确切样本规模，也没有逐层拆除 world/block/building context、validation gate、footprint constraint 或替换 proprietary backbones，因而难以隔离各组件贡献。",
+    "insightZh": "关键推进不是新的 3D backbone，而是把 indoor-outdoor correspondence 变成可持续更新的 cross-scale state，并用 validation-gated write-back 防止长流程生成中的错误扩散。这种 context protocol 对 city、scene、CAD 等复杂生成流程都值得迁移；建议精读 Fig. 2、Tables 1–4 与 context schema，同时把 proprietary stack、评测规模和 single-floor 限制视为结论边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

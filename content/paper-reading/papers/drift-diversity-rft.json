@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2601.12401",
+  "slug": "drift-diversity-rft",
+  "title": "Beyond the Dirac Delta: Mitigating Diversity Collapse in Reinforcement Fine-Tuning for Versatile Image Generation",
+  "authors": [
+    "Jinmei Liu",
+    "Haoru Li",
+    "Zhenhong Sun",
+    "Chaofeng Chen",
+    "Yatao Bian",
+    "Bo Wang",
+    "Daoyi Dong",
+    "Chunlin Chen",
+    "Zhi Wang"
+  ],
+  "publishedAt": "2026-01-18",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2601.12401"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "reinforcement fine-tuning",
+    "diversity collapse",
+    "diffusion models",
+    "potential-based reward shaping",
+    "on-policy RL"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "diffusion",
+      "reinforcement-learning"
+    ]
+  },
+  "abstract": "Reinforcement learning (RL) has emerged as a powerful paradigm for fine-tuning large-scale generative models, such as diffusion and flow models, to align with complex human preferences and user-specified tasks. A fundamental limitation remains \\textit{the curse of diversity collapse}, where the objective formulation and optimization landscape inherently collapse the policy to a Dirac delta distribution. To address this challenge, we propose \\textbf{DRIFT} (\\textbf{D}ive\\textbf{R}sity-\\textbf{I}ncentivized Reinforcement \\textbf{F}ine-\\textbf{T}uning for Versatile Image Generation), an innovative framework that systematically incentivizes output diversity throughout the on-policy fine-tuning process, reconciling strong task alignment with high generation diversity to enhance versatility essential for applications that demand diverse candidate generations. We approach the problem across three representative perspectives: i) \\textbf{sampling} a reward-concentrated subset that filters out reward outliers to prevent premature collapse; ii) \\textbf{prompting} with stochastic variations to expand the conditioning space, and iii) \\textbf{optimization} of the intra-group diversity with a potential-based reward shaping mechanism. Experimental results show that DRIFT achieves superior Pareto dominance regarding task alignment and generation diversity, yielding a $ 9.08\\%\\!\\sim\\! 43.46\\%$ increase in diversity at equivalent alignment levels and a $ 59.65\\% \\!\\sim\\! 65.86\\%$ increase in alignment at equivalent levels of diversity.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2601.12401v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2601.12401v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2601.12401v2 全文整理；截至本次审阅，论文 PDF 中未提供可用的公开代码 URL。",
+    "ideaZh": "DRIFT 从 sampling、prompting 与 optimization 三处同时抑制 image-generation RFT 的 diversity collapse：筛选 reward-concentrated samples、扰动 early-denoising prompt embedding，并以 potential-based intra-group diversity reward 更新 policy。",
+    "methodFlow": [
+      "每个 prompt on-policy 生成 2G candidates",
+      "Reward-concentrated sampling 选择局部一致的 G 个样本",
+      "Early denoising 注入 noise-conditioned prompt embedding",
+      "计算 intra-group output diversity potential",
+      "Primary/diversity rewards 分别标准化为 advantages",
+      "Clipped decoupled advantage 更新 diffusion policy"
+    ],
+    "whyRelevantZh": "用户持续关注 Image Generation 的重要 training paradigm。DRIFT 讨论的不是单一 prompt 或 narrow application，而是 RFT 普遍存在的 mode collapse；其 sampling、conditioning 与 reward design 也可能迁移到 2D Design 和 3D Generation 的 candidate-generation workflow。",
+    "evidenceZh": "作者报告 SDv1.5/PickScore 下 DRIFT 的 DreamSim diversity 与 normalized reward 为 0.5698/0.9187，而 GRPO 为 0.3804/0.5927（Table 1, p. 7）；四个 backbone-reward 组合均形成更有利的 reward-diversity frontier，但均为作者报告的 automatic metrics。",
+    "caveatZh": "没有 human preference 或 downstream design-coverage 验证；每个 prompt 先生成 2G samples，并额外计算 group diversity，但论文没有量化完整 wall-clock、显存与成本。理论 invariance 与 clipping、normalization 组合后的适用边界也需谨慎解读。",
+    "motivationZh": "On-policy reward optimization 容易把生成分布推向少数高分 modes；只追求 alignment 会削弱需要多候选探索的实际生成流程。论文试图在不放弃 primary reward 的前提下保留可用 diversity。",
+    "methodZh": "训练时先为每个 prompt 生成两倍候选，并用邻域累计距离去除 reward outliers；早期 denoising 对 prompt embedding 加更强噪声以扩展 conditioning space。随后把 clean-image intra-group dissimilarity写成 trajectory-level potential reward，将 primary 与 diversity advantages 分别标准化后，以 clipped decoupled objective 联合更新 diffusion policy。",
+    "experimentsZh": "作者在 Stable Diffusion v1.5 与 SD3.5-M、PickScore 与 HPSv2 两类 rewards 上，与 DDPO、GRPO、GRPO-KL、GARDO 等比较，并用 DreamSim、CLIP diversity、Generalized Recall、Vendi Score 与 normalized reward 构造 Pareto frontier。主结果和组件分析一致支持 diversity-alignment trade-off 改善，但没有更大模型、flow/video/3D generation 或人工评测。",
+    "insightZh": "最值得迁移的不是某个新的 backbone，而是把 diversity collapse 拆成三个可独立干预的训练环节，并以 Pareto frontier 而非单一 reward checkpoint 判断 RFT 是否真的保留了候选空间。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

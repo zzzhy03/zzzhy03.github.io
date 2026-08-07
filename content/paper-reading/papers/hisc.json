@@ -1,0 +1,93 @@
+{
+  "id": "arxiv:2608.04610",
+  "slug": "hisc",
+  "title": "HiSC: Hierarchical Spatial Clustering Token Compression for Efficient 3D Scene Understanding",
+  "authors": [
+    "Jiuhe Qu",
+    "Yingping Liang",
+    "Ying Fu"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "ACM MM 2026 · arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.04610"
+  },
+  "venueIds": [
+    "acm-mm"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "3D vision-language models",
+    "visual token compression",
+    "hierarchical spatial clustering",
+    "multi-view reasoning",
+    "training-free pruning"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "multi-view",
+      "multimodal"
+    ],
+    "method": [
+      "hybrid-method"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "3D vision-language models (3D VLMs) enable spatial reasoning over multi-view scenes but suffer from substantial token redundancy due to duplicated observations and large uninformative regions, leading to high computational cost. Although visual token compression has shown promise in accelerating 2D VLMs, it fails to capture the structured nature of 3D scenes and leads to incomplete spatial coverage and loss of fine-grained details. In this paper, we propose \\textbf{HiSC}, a training-free framework for hierarchical spatial clustering token compression in 3D VLMs. HiSC lifts token compression from token-level selection to cluster-level processing by organizing tokens into spatially grounded clusters using joint geometric and semantic cues. Specifically, we first introduce a \\textbf{spatial graph-based merging (SGraM) strategy} that models cross-view redundancy as spatial connectivity and consolidates physically consistent regions, effectively merging extremely similar redundant tokens prior to LLM inference. We then propose a \\textbf{spatial clustering-based pruning (SCluP) paradigm} within LLM inference, which performs hierarchical compression across clusters and within clusters, preserving object instance completeness while retaining fine-grained details for important regions. Extensive experiments on diverse 3D reasoning benchmarks show validate the effectiveness of HiSC, particularly under high visual token pruning ratios. Besides, HiSC achieves over 90\\% token reduction with minimal performance degradation. Code is accessible at https://github.com/elecreak/HiSC.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04610v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04610v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/elecreak/HiSC"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.04610v1 全文整理；arXiv metadata 标注 Accepted by ACM MM 2026，论文 abstract 明确提供公开代码 URL。",
+    "ideaZh": "HiSC 针对 multi-view 3D VLM 做两级 training-free compression：LLM 前按 geometry 与 semantics 合并跨视角重复 tokens，LLM 内再以 object-centric clusters 分配 budget 并逐层保留重要且互补的 tokens。",
+    "methodFlow": [
+      "Multi-view RGB-D patches 注入 3D coordinates",
+      "Geometry proximity 与 semantic similarity 共同建图",
+      "Connected components 聚合跨视角 redundant tokens",
+      "Semantic groups + spatial connectivity 形成 object clusters",
+      "按 cluster importance 分配至少一个 token 的 budget",
+      "LLM layers 内做 importance-diversity progressive pruning"
+    ],
+    "whyRelevantZh": "HiSC 位于 VLM/MLLM、3D representation 与 spatial reasoning 的交界，关注值得持续 follow 的 3D token encoding/understanding，而不是普通 2D VQA。其 cluster-based completeness 也可能迁移到 point-cloud encoding 或 design-scene reasoning。",
+    "evidenceZh": "Extreme compression 下，作者报告平均只保留 9.8% tokens、LLM inference 为 9.90 TFLOPs，同时保留 92.46% relative score；VisPruner 在相近预算为 89.43%（Table 1, p. 6）。90% compression 的消融也支持 cluster coverage 与两阶段设计互补（Tables 3-4, p. 8）。",
+    "caveatZh": "结果只来自一个 Video-3D-LLM 与 ScanNet-family indoor datasets；reported TFLOPs 只计算 LLM inference，未包含 back-projection、graph construction 与 layer-wise selection。对 depth/camera noise、dynamic scenes 和 cluster errors 的敏感性尚未测。",
+    "motivationZh": "Generic 2D token pruning 把 visual tokens 独立排序，容易重复保留同一 surface、遗漏不同 object instances；multi-view 3D inputs 的冗余具有空间连通与跨视角重复结构，需要显式维护 scene coverage。",
+    "methodZh": "SGraM 只连接同时满足 3D proximity 与 feature similarity 的 tokens，以 connected components 合并 physically consistent regions。SCluP 再以 semantic grouping 和 spatial connectivity 分离 instances，每个 cluster 至少保留一个 token，按 cluster importance 分配预算，并在 LLM layers 内结合 importance 与 geometric-semantic diversity 渐进压缩。",
+    "experimentsZh": "作者在 ScanRefer、Multi3DRefer、Scan2Cap、ScanQA 与 SQA3D 上，以约 50%/25%/10% token budgets 比较 FastV、VFlowOpt、VisPruner、BTP、VisionTrim 与 FastVGGT。三档 aggregate retention 与针对 graph、hierarchy、SGraM/SCluP 的消融均支持方法，但 architecture 和 domain coverage 单一。",
+    "insightZh": "关键不是再设计一个 global token score，而是将 minimum coverage constraint 放到 3D-connected clusters 上：先消除跨视角重复，再在 objects 之间与 object 内部分配信息预算。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

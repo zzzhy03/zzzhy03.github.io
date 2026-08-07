@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2605.21472",
+  "slug": "stream3d",
+  "title": "Stream3D: Sequential Multi-View 3D Generation via Evidential Memory",
+  "authors": [
+    "Kaichen Zhou",
+    "Zeyang Bai",
+    "Xinhai Chang",
+    "Mengyu Wang",
+    "Paul Liang",
+    "Fangneng Zhan"
+  ],
+  "publishedAt": "2026-05-20",
+  "updatedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v5",
+  "identifiers": {
+    "arxiv": "2605.21472"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "streaming 3D generation",
+    "evidential memory",
+    "multi-view generation",
+    "view-conditioned 3D generator",
+    "token-level view selection",
+    "bounded memory"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "video",
+      "multi-view"
+    ],
+    "method": [
+      "flow-matching",
+      "retrieval-composition",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "multi-view-prior"
+    ],
+    "output-property": [
+      "asset-ready"
+    ]
+  },
+  "abstract": "View-conditioned 3D generators such as SAM 3D, TRELLIS, and Hunyuan3D produce high-quality object reconstructions from a single view, but real-world visual observation often arrives as long monocular streams. Naively applying these generators to each streaming frame independently leads to severe temporal inconsistency in the generated results. To address this problem, we propose Stream3D, the first training-free streaming mechanism that turns a frozen view-conditioned 3D generator into a streaming generator with constant cross-chunk memory. Stream3D achieves this by maintaining a compact evidential memory, which selectively caches the most informative historical frames based on a proposed evidence score mechanism. As the stream progresses, the memory dynamically updates to retain a fixed number of informative frames, preventing the memory footprint from growing linearly with sequence length. This also prevents degradation over long sequences and keeps the underlying generator completely unchanged without retraining, architectural modifications, or auxiliary losses. Evaluated on both realistic and synthetic streaming benchmarks, Stream3D outperforms latent-transport baselines, including KV-cache reuse and flow-based feature editing, across both photometric and geometric metrics. More details can be found at: https://stream-3d.github.io/stream3d.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.21472v5",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.21472v5"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2605.21472v5 全文整理；Paper URL 精确指向本次审阅版本。PDF 只显示占位符“Link”，没有打印 code repository URL，故不添加 Code 链接。",
+    "ideaZh": "不跨 chunks 传递会漂移的 latent/KV state，而是为每个 3D query token 保存最有证据的 historical views，再由 tokens vote 出固定数量条件帧。",
+    "methodFlow": [
+      "把持续到来的 monocular frames 切成 overlapping chunks",
+      "以跨 chunk 固定的 noise prior 做 lightweight warmup pass 并读取 cross-attention",
+      "按 attention mass 相对值与 spatial concentration 为每个 query-token/view 计算 evidence score",
+      "逐 token 合并历史与新证据，只保留 top-D scores 及 frame indices",
+      "统计每个 frame 占据的 token-memory slots，选择 ownership 最高的 top-K views",
+      "用 evidence-weighted Multi-Diffusion/flow fusion 重新运行 frozen 3D generator 输出当前 asset"
+    ],
+    "whyRelevantZh": "它直接属于 3D generation，并把 object asset generation 从 single/fixed multi-view input 扩展到 sequential visual observations；token-level evidential memory、bounded conditioning bundle 与 frozen-generator adaptation 都是可迁移到 future 3D asset/robot observation pipelines 的机制。",
+    "evidenceZh": "作者报告 GSO 上 Stream3D(SAM3D) 的 CD/IoU/PFID/PSNR/LPIPS 为 0.048/0.775/40.641/16.145/0.139，原 SAM3D 为 0.094/0.664/71.263/14.178/0.178（Table 1, p. 7）；同一 SAM3D family 的 streaming comparison 中完整方法 CD/IoU 为 0.048/0.775，KV-cache 为 0.084/0.682，FlowEdit 为 0.090/0.668（Table 2, p. 9）；D=5 的 evidence table 为 480 KB，但完整方法在单 H100 上处理 100-frame sequence 需 1062 s、约 10.6 s/frame（Tables 4-5, p. 10）。",
+    "caveatZh": "作者明确指出方法受底层 pretrained generator 的单视图能力上限约束。审阅风险：evidence score 单调不下降并不保证最终 3D quality 单调改善；480 KB 不含仍被 memory 引用的 RGB、pose、depth cache；100-frame GSO/NAVI object-centric streams 不能充分支持真正 unbounded streaming；完整方法仅约 10.6 s/frame，并非 real time；评测还包含人工 rendered-view alignment audit，且未测试 Depth Anything 3 pose/depth error 的影响。",
+    "motivationZh": "Single/fixed-view 3D generators 无法持续利用长 monocular stream；逐帧独立生成缺乏一致性，而 KV/latent transport 会积累 alignment error、stale state 和随序列增长的 memory。",
+    "methodZh": "每个 chunk 先用固定 noise prior 做少量 warmup denoising，从指定 cross-attention layer 读取 query-to-view attention；evidence score 同时要求某一 view 获得高于 chunk average 的 attention mass，且 attention 在该 view 内空间集中。每个 query token 只保留 top-D score/frame-index pairs，随后按 frame 在所有 token slots 中的 ownership count 选出 top-K views，并用 per-token evidence weights 融合 frozen generator 的 multi-view flow velocities。方法避免学习或修改 backbone，并在 SAM3D 与 TRELLIS.2 上均有增益；不过它更准确地说是 bounded-view retrieval 加 repeated generation，而非快速 persistent 3D state update。",
+    "experimentsZh": "在 GSO scanned objects 与 NAVI object-centric view sequences 上评测 100-frame streams，主 backbone 为 SAM3D，另移植到 TRELLIS.2，并依赖 Depth Anything 3 估计 camera pose/depth。Baselines 覆盖 StreamVGGT、EscherNet+NeuS、single/multi-view generation、FlowEdit、KV-cache 及 random/visibility/VLM selection。Stream3D 在多数 geometry/appearance metrics 上明显改善，并用 stage、score、memory depth、bundle size 与 fusion ablations 支持设计；但没有 pose/depth noise robustness、chunk 设置、实际 retained-frame/cache footprint、seed variance 或更长主表序列。",
+    "insightZh": "Adaptive Evidential Memory 的价值在于保存可回溯到 observations 的 token-level evidence，而不是传递难以对齐的 generative states；这是一个清楚、training-free、跨 backbone 的 streaming 3D generation 范式。基于完整 ablation 值得精读，但 constant-memory 口径、速度、manual alignment 与 object-centric evaluation 必须同时保留。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

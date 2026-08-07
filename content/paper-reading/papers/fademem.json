@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2606.10671",
+  "slug": "fademem",
+  "title": "FadeMem: Distance-Aware Memory Consolidation for Autoregressive Video Diffusion",
+  "authors": [
+    "Yu Lu",
+    "Junjie Yang",
+    "Piotr Koniusz",
+    "YuXin Song",
+    "Yi Yang"
+  ],
+  "publishedAt": "2026-06-09",
+  "updatedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2606.10671"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "long video generation",
+    "KV cache",
+    "memory consolidation",
+    "autoregressive video diffusion",
+    "temporal hierarchy"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "diffusion",
+      "autoregressive"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Autoregressive video generators synthesize long videos by generating successive temporal segments, but their historical KV cache grows with video length. Existing bounded-cache methods reduce this cost with local windows, sink tokens, or compressed memory states, yet they usually assign fixed roles to different parts of the history. We propose FadeMem, a distance-aware KV memory consolidation mechanism that organizes historical KV blocks into a temporal hierarchy under a fixed cache budget. This design is motivated by frequency-dependent temporal decay: fine details decorrelate quickly, while coarse scene structure and identity remain useful over longer horizons. During generation, new history is inserted as fine-grained entries, while older adjacent entries are progressively merged under a power-law temporal allocation schedule, yielding a dense-near, sparse-far memory within one cache. Without architectural changes, FadeMem improves long-range consistency while largely preserving visual quality, and lightweight adaptation further enhances motion dynamics and visual fidelity. Using the same unified schedule under a fixed cache budget, FadeMem also remains effective over multi-minute and hour long video generation and reduces peak memory under a matched KV budget.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.10671v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.10671v2"
+    },
+    {
+      "label": "Project",
+      "href": "https://fademem.github.io/FadeMem_Webpage/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2606.10671v2 全文整理；项目页来自论文首页与 arXiv comments，未发现明确 code repository。",
+    "ideaZh": "在固定 KV budget 内，把 autoregressive video 的历史组织成随距离逐步变粗的 temporal hierarchy：近期细节密集保留，远期 history 通过相邻合并只保留 identity 与 scene structure。",
+    "methodFlow": [
+      "Insert New K/V Block",
+      "Protect Newest + First Anchor",
+      "Power-Law Distance Warp",
+      "Find Closest Adjacent Pair",
+      "Span-Weighted K/V Merge",
+      "Reindex RoPE + Repeat"
+    ],
+    "whyRelevantZh": "它直接优化 Video Generation 的生成过程：在不改 backbone 的情况下控制 long-horizon history cost，并把 temporal consistency、memory 与 throughput 的取舍变成一个清楚的 cache-allocation mechanism。",
+    "evidenceZh": "作者报告 60 秒、同为 15 KV slots 时 FadeMem-TF weighted average 80.93、fine-tuned 版 81.59；240 秒时 FadeMem 为 82.17，高于 LongLive 80.84 与 MemRoPE 80.67（Tables 1–2, p. 6）。同预算 peak memory 为 22.72 GiB，但 11.24 FPS 低于 LongLive 的 15.78 FPS（Table 3, p. 6）。",
+    "caveatZh": "主文对 60 秒和 240 秒有定量结果，但“hour-long”没有同等级质量表格；固定 schedule 对 abrupt transitions、fast motion 与频繁 semantic changes 不自适应，实验也主要限于单一 backbone。",
+    "motivationZh": "现有 bounded-cache 方法常把 local window、sink tokens 或 compressed memory 分配成固定角色，无法同时保留近期细节与远期结构；cache-all 又随视频长度线性增长。",
+    "methodZh": "每次加入新 K/V 后，FadeMem 用 u(d)=d^β 扭曲 temporal distance，合并 warped gap 最小的相邻条目，并按覆盖跨度平方根加权 K/V；newest entry 与 first frame 受保护，合并后重建 RoPE index，从而在固定 slots 内形成 dense-near、sparse-far memory。",
+    "experimentsZh": "作者先在 374 段视频上观察到 frequency-dependent temporal decay 的 power-law 拟合，再以 matched 15-slot budget 比较 sliding/local、sink/global、MemFlow、MemRoPE 与 LongLive。60 秒、240 秒结果同时报告 quality、dynamics、consistency，另有 peak memory/FPS、VLM stability、β、merge rule 和 anchor ablation。",
+    "insightZh": "最可迁移的并非某个专用 long-video module，而是把有限 cache 看作在线多尺度表示：history 的粒度随时间动态退火，同一机制可潜在迁移到其他 autoregressive visual generators。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

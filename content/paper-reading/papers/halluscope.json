@@ -1,0 +1,91 @@
+{
+  "id": "arxiv:2607.21105",
+  "slug": "halluscope",
+  "title": "HalluScope: Fine-grained Hallucination Diagnosis for Multimodal Large Language Models",
+  "authors": [
+    "Weilin Jin",
+    "Mingyu Wang",
+    "Wenbo Li",
+    "Haoyang Huang",
+    "Yifan Wu",
+    "Ying Li",
+    "Gang Huang",
+    "Zhonghai Wu"
+  ],
+  "publishedAt": "2026-07-23",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.21105"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "multimodal hallucination",
+    "fine-grained diagnosis",
+    "hallucination classification",
+    "span localization",
+    "diagnostic feedback",
+    "GRPO",
+    "HalluScope-30K"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "conditioning": [
+      "single-image",
+      "multimodal"
+    ],
+    "method": [
+      "reinforcement-learning",
+      "llm-vlm-guided"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "abstract": "Although Multimodal Large Language Models have achieved strong performance across a wide range of vision-language tasks, they still suffer from hallucinations, where model outputs become inconsistent with the visual content, textual context, or commonsense knowledge. Existing studies primarily address this problem through coarse-grained detection. However, these approaches often provide insufficient diagnostic information for understanding hallucination types and supporting downstream hallucination mitigation. To bridge this gap, we propose fine-grained hallucination diagnosis for MLLMs, a new unified task that jointly performs hallucination detection, classification, and interpretable explanation generation. We develop an automated data generation pipeline and construct HalluScope-30K, a large-scale diagnostic dataset covering eight sources and five task categories. Based on this dataset, we design a multi-granular joint reward function and train two diagnosis models, HalluScope-4B and HalluScope-8B, which achieve state-of-the-art performance on both the MHALO benchmark and our fine-grained hallucination classification benchmark. Notably, detection and classification are mutually beneficial under joint optimization. Furthermore, diagnosis-driven feedback experiments show that the fine-grained diagnostic explanations produced by our model effectively guide target models to correct their hallucinations, with full diagnosis substantially outperforming all baselines on both Qwen3-VL-8B-Instruct and LLaVA-1.5-7B. Our code, data, and models are available at https://github.com/wkinglin/HalluScope.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.21105v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.21105v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/wkinglin/HalluScope"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2607.21105v2 全文整理；Paper URL 精确指向本次审阅版本；Code 链接仅保留全文审阅已核验为 available 的公开仓库。",
+    "ideaZh": "把 MLLM hallucination 从二元检测扩展为 span localization、12 类归因和可执行解释，并用 count-aware detection reward 与 type reward 联合训练诊断模型。",
+    "methodFlow": [
+      "汇集 8 个视觉问答/推理数据源并生成 base-model responses",
+      "按正确性执行 hallucination injection 或真实错误 annotation",
+      "经 label normalization、text-quality judge 和 consistency verification 得到 HalluScope-30K",
+      "先 LoRA SFT，再以 detection/classification joint reward 进行 GRPO",
+      "输出 hallucinated spans、12 类标签与解释/纠正建议"
+    ],
+    "whyRelevantZh": "它属于 VLM/MLLM reliability 与 post-training：如果未来 visual design agent 需要根据 rendering feedback 自检，细粒度定位错误、归因类型并生成纠正建议的接口比二元 reward 更可迁移。",
+    "evidenceZh": "作者报告 HalluScope-8B 的 MHALO 平均 F1M/F1IoU 为 64.03/57.57，强于最强通用 baseline Gemini-3-Flash 的 59.32/48.58（Table 1, p. 6）；作者报告在 OOD HalLoc 上 HalluScope-8B overall E2E 为 71.0，高于 GPT-5.5 的 60.9 与 Gemini-3-Pro 的 61.3（Table 3, p. 6）；作者报告四轮完整诊断反馈后，Qwen3-VL-8B-Instruct/LLaVA-1.5-7B 的准确率分别达到 81.17%/50.34%（Fig. 3 and Sec. 5.4, pp. 7-8）。",
+    "caveatZh": "作者限制：Appendix A.4 明确指出 type distribution 严重不平衡，Query_Misunderstanding 极少，相关类型性能很低；Appendix F 报告 Calculation_Error 的 F1 仅 15.8、Query_Misunderstanding 的 F1 为 0.0，强 reasoning model 在数值验证上仍占优势；人工 explanation quality evaluation 只抽取 50 个案例；benchmark label audit 只抽取 100 个测试样本。审阅风险：正确回答的 hallucination 由 Gemini-3-Pro 注入，错误回答也由同一闭源模型标注，quality/semantic correctness 又依赖 LLM judge，可能把 judge 偏好固化为训练和评价标准；内部 classification benchmark 来自同一数据生成管线；即使严格去重，也不能等同于跨数据生产机制的泛化；多轮 feedback 的增益包含重复调用与额外计算，论文没有与等预算 search/verification 系统做完整成本匹配。",
+    "motivationZh": "Coarse hallucination detector 只能判断是否出错，无法说明错误位于哪里、属于哪类或怎样修正，因此很难直接驱动下游 MLLM self-correction。",
+    "methodZh": "论文汇集八个来源、五类任务，通过对正确回答注入 hallucination、对错误回答进行 annotation，再经 label normalization、LLM judge 与 consistency verification 构建 HalluScope-30K。模型先以 LoRA SFT 学习结构化诊断，再用同时约束格式、span 内容/数量和类型的 GRPO reward 优化。作者在 MHALO、内部分类 benchmark、OOD HalLoc 和多轮反馈实验中报告改进，说明细粒度诊断可同时服务检测与纠错；但其数据和评价链路存在同源及 judge 依赖。",
+    "experimentsZh": "HalluScope-30K 实际包含 27,666 个训练样本和 733 个测试样本；Qwen3-VL-4B/8B-Instruct 先 SFT 1 epoch，再做 250 steps GRPO。检测在 MHALO、分类在内部 benchmark 与 HalLoc、纠错在两个 target models 和 AMBER 上评估。关键结果：HalluScope-8B 的 MHALO F1M/F1IoU 为 64.03/57.57，Gemini-3-Flash 为 59.32/48.58；OOD HalLoc overall E2E 为 71.0，GPT-5.5/Gemini-3-Pro 为 60.9/61.3。四轮完整诊断反馈后，两个 target models 的准确率达到 81.17%/50.34%。基线覆盖：包含相同 Qwen bases、多种 proprietary models、HALODET 与四种 feedback granularity；外部 HalLoc/AMBER 增加 OOD 证据，但 explanation/mitigation 仍只验证两个 target-model families。消融：classification/detection rewards 互补，reward weight 与组合方式也有分析；这些结果仍不能消除 synthetic-label 与同源 benchmark 的影响。",
+    "insightZh": "真正的新意不是再做一个 hallucination detector，而是把 span detection、细粒度 type classification 与 natural-language correction suggestion 统一为一个诊断任务，并以 count-aware span reward 与 type reward 联合训练。相较论文列出的 HALODET 等方法，输出更适合直接反馈给目标 MLLM；不过 taxonomy 继承自 MHALO，数据生产仍大量依赖闭源 judge。方法、数据和跨 benchmark 结果足以支持收录，但它不是新的 multimodal foundation model，也不直接生成设计内容；最合适的是 accept-skim，保留统一诊断任务、joint reward 和反馈闭环这三个可迁移 idea，同时明确 synthetic/judge 依赖。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

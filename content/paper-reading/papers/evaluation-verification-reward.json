@@ -1,0 +1,94 @@
+{
+  "id": "arxiv:2607.29025",
+  "slug": "evaluation-verification-reward",
+  "title": "Evaluation-Verification Reward for Consistent Multi-Reference Image Editing",
+  "authors": [
+    "Yingmao Miao",
+    "Pengfei Zhang",
+    "Xiaochen Lv",
+    "Meng Yu",
+    "Lei Sun",
+    "Xiangxiang Chu",
+    "Chao Shen",
+    "Chenhao Lin"
+  ],
+  "publishedAt": "2026-07-31",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.29025"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "multi-reference image editing",
+    "evaluation-verification reward",
+    "MLLM verifier",
+    "visual evidence",
+    "reinforcement learning"
+  ],
+  "facets": {
+    "task": [
+      "editing"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "single-image",
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "reinforcement-learning"
+    ],
+    "output-property": [
+      "controllable",
+      "editable"
+    ]
+  },
+  "abstract": "While recent image editing models have made rapid progress, multi-reference editing remains challenging, particularly in maintaining visual consistency across references and ensuring overall visual harmony. Reinforcement learning has proven highly effective for text-to-image generation and single-image editing, but its extension to multi-reference editing is hindered by the absence of suitable reward models that capture multi-image relational constraints. Moreover, naively using multimodal large language models(MLLMs) as zero-shot evaluators faces a key tension between hallucination-prone long-form reasoning and the limited deductive power of short-form judgments. We address these issues with a Multi-dimensional Evaluation-Verification Reward(EVR). EVR decomposes evaluation into distinct visual criteria; for each criterion, an MLLM Evaluator generates multiple candidate hypotheses, and a Verifier grounds each claim in concrete visual evidence to accept or reject it, producing reliable and fine-grained reward signals. Together with a scalable data pipeline, our method enables RL fine-tuning of off-the-shelf editors without architectural changes. Extensive experiments show substantial gains over the base Qwen-Image-Edit, improving consistency and harmony to match or surpass NanoBanana.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.29025v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.29025v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.29025v2 全文整理；截至本次审阅，论文 PDF 中未提供可用的公开代码 URL。",
+    "ideaZh": "EVR 不让 MLLM 直接给 multi-reference edit 打一个总分，而是按五个视觉维度生成多条 hypotheses，再由 Verifier 回到 pixels 逐条验证，最后聚合为可用于 RL 的 reward。",
+    "methodFlow": [
+      "构造 aligned reference object + scene + instruction tuples",
+      "Qwen-Image-Edit on-policy 采样多个 edited candidates",
+      "MLLM Evaluator 按五维生成 K 条 rationale + score",
+      "Verifier 对照 pixels 验证每条 rationale",
+      "维度内过滤加权、维度间 geometric-mean 聚合",
+      "DiffusionNFT/LoRA 用 verified reward 更新 editor"
+    ],
+    "whyRelevantZh": "它直接属于 instruction-based image editing，并把 VLM feedback 设计成可迁移的 evaluation-verification loop。对 image、SVG 或 3D visual design agent，更有价值的是如何把 critique 拆成 claims、过滤 hallucinated feedback，再形成训练信号。",
+    "evidenceZh": "作者报告 Qwen-Image-Edit-2509 的 aggregate score 从 0.56 提升到 0.68，reference/instruction consistency 从 3.35/3.27 到 4.36/3.98（Table 1, p. 9）；reward-human alignment 从最好 comparison 的 0.659 提升到 0.707（Table 2, p. 11）。",
+    "caveatZh": "默认同一个 Qwen3-VL-8B 同时担任 Evaluator 与 Verifier，main table 又由 Qwen3.5-plus API 打分，存在 judge-family coupling。训练只覆盖 synthetic N=2；N≥5 的 noise、feature entanglement 与 incomplete denoising 仍明显，user study 的统计细节也不够透明。",
+    "motivationZh": "Multi-reference editing 同时要求 reference consistency、scene consistency、harmony、instruction following 与 image quality；单次 scalar judgment 容易遗漏关系约束，长 CoT 又可能产生没有 pixel evidence 的合理化。",
+    "methodZh": "系统先为五个 editing dimensions 分别生成多条 rationale 与 scores，Verifier 同看 references、instruction 和 output pixels，把证据不足的 claims 置零。维度内做 verified weighted average，维度间用 geometric mean 限制 reward hacking，再通过 DiffusionNFT 与 LoRA 更新原 editor。",
+    "experimentsZh": "作者用 10K synthetic N=2 triplets 训练 Qwen-Image-Edit，另测 1K held-out samples、300+ real-world OOD cases，并收集 6,768 次 user feedback。Ablation 显示去掉 dimension decomposition 会出现复制 background 的 reward hacking；Verifier 有较小但一致的增益。多数定量结果仍来自 MLLM judges。",
+    "insightZh": "可迁移的范式是将 visual reward 分成 hypothesis generation 与 evidence verification：允许 evaluator 展开判断，但只有能在 pixels 中被独立核验的 claim 才进入 reward。这个接口比单纯换更大的 judge 更可诊断。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

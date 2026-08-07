@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2605.29098",
+  "slug": "seeing-through-boxes",
+  "title": "Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals",
+  "authors": [
+    "Jiachen Lu",
+    "Hailan Shanbhag",
+    "Haitham Al Hassanieh"
+  ],
+  "publishedAt": "2026-05-27",
+  "updatedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2605.29098"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "non-line-of-sight reconstruction",
+    "radar imaging",
+    "RF neural field",
+    "signed distance field",
+    "LoS geometry prior",
+    "lensless rendering"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "implicit-sdf",
+      "mesh"
+    ],
+    "conditioning": [
+      "multi-view",
+      "multimodal"
+    ],
+    "method": [
+      "hybrid-method"
+    ],
+    "output-property": [
+      "physically-plausible"
+    ]
+  },
+  "abstract": "Reconstructing object geometry from radio frequency (RF) signals is fundamentally challenging due to the lensless imaging nature of RF sensing, which leads to low spatial resolution and high noise. Unlike light signals, RF signals can penetrate occlusions and thus capture information about hidden scenes. Existing Non-Line-of-Sight (NLoS) 3D neural reconstruction methods can recover coarse surfaces inside enclosed environments but often suffer from unstable optimization, noisy surface geometry, and surface ambiguity, failing to produce accurate zero-level sets from the signed distance field (SDF). These limitations largely stem from neglecting the role of Line-of-Sight (LoS) geometry outside the enclosed region, which provides valuable physical constraints for modeling signal propagation. In this paper, we introduce a Unified LoS and NLoS neural geometry reconstruction framework GeRaF 2.0 that leverages the outside LoS geometry to model and guide RF propagation from the LoS region into the NLoS region. By integrating visual LoS priors into the neural field formulation, GeRaF 2.0 achieves stable training and physically consistent reconstruction of both visible and hidden geometry, setting a new state-of-the-art in RF-based geometry reconstruction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.29098v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.29098v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2605.29098v2 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "把可见 box geometry 作为约束而不是干扰：vision SDF 先引导 radar neural field 的 ULoS transmittance，再用 primary-ray depth 将 RF relative SDF 的 zero level 对齐到物理表面。",
+    "methodFlow": [
+      "用多视角 camera/NeuS 重建可见 box 的 vision SDF",
+      "以 robot-scanned 77 GHz radar 构造多视角 lensless measurements",
+      "在 Stage 1 以 vision SDF 修正 ULoS transmittance，冻结 reflectivity network 初始化 RF SDF",
+      "在 Stage 2 联合训练 RF SDF 与 reflectivity，并用 primary-ray depth 执行 RSDF alignment",
+      "从统一 zero-level set 提取 box 与内部 object geometry"
+    ],
+    "whyRelevantZh": "它属于 3D Reconstruction 的特殊 sensing branch，展示了将可见 geometry prior 与不可见区域的 differentiable physics 联合建模；虽不贴近日常 image-to-3D pipeline，但对 multimodal reconstruction 边界很有代表性。",
+    "evidenceZh": "作者报告 Bunny 的 F1/CD 为 0.962/0.15 mm，而 matched filter 为 0.329/4.24 mm、GeRaF 为 0.822/0.28 mm（Table 1, p. 7）；作者报告 Chicken 的 F1/CD 为 0.941/0.14 mm，而 GeRaF 为 0.869/0.21 mm（Table 1, p. 7）；作者报告留出 0°、90°、180°、270° antenna planes 的 novel-view PSNR 分别为 26.56、27.85、29.44、26.96 dB（Fig. 11, p. 10）。",
+    "caveatZh": "作者限制：当前结果主要针对 metal objects；弱反射材料或多材料组合会产生更复杂、噪声更强的 RF interactions，需要调整 reflection/transmittance model；任何扫描中都没有反射回 radar 的 surface 无法由当前网络真实恢复，仍需更全面 scanning strategy；RF rendering 计算昂贵：作者报告 36 张 1 mm matched-filter images 每张约 40 分钟，完整 pipeline 与 GeRaF 同量级，约每 scene 32–48 小时。审阅风险：系统依赖 robot-arm synthetic-aperture acquisition、36 方位 camera/radar measurements 和 per-scene optimization，距离单次快速 reconstruction 仍很远；vision prior 包含 box 的精确 LoS geometry，因此结果不是 radar-only NLoS reconstruction；camera calibration/SDF error 的敏感性未做系统量化；样本规模只有少量 tabletop objects，几何与材料分布窄，不能据此推断复杂 real-world enclosure 的泛化。",
+    "motivationZh": "RF 可穿透遮挡却是 lensless、低分辨率且高噪声；忽略 box 外部可见几何会让 signal propagation 建模和 SDF zero-level optimization 都不稳定。",
+    "methodZh": "论文不再把遮挡 box 简单裁掉，而是把 LoS box 与 NLoS object 表示为 nested ULoS SDF：RF 中的正负号表示强/弱 interaction，而非传统 inside/outside。Stage 1 冻结 reflectivity network，用 vision-trained SDF 调整 lensless rendering 的 accumulated transmittance；Stage 2 联合训练，通过 primary-ray expected depth 将 RF relative SDF 的 zero level 对齐到视觉可见外表面。实物 mmWave 数据上的 mesh、F1、Chamfer distance 和多层遮挡示例均显示更稳定的 surface extraction，但 acquisition 和 per-scene optimization 成本很高。",
+    "experimentsZh": "TI AWR1843BOOST 77 GHz radar 安装在 Franka Research 3 上，以 synthetic aperture 扫描 36 个方位；camera/NeuS 提供 LoS SDF，Scaniverse mesh 用作 NLoS ground truth。每个 stage 训练 100,000 iterations，总计约 48 小时 H100。关键结果：Bunny 的 F1/CD 为 0.962/0.15 mm，GeRaF 为 0.822/0.28 mm；Chicken 的对应指标为 0.941/0.14 mm，四个 held-out antenna planes 的 novel-view PSNR 为 26.56–29.44 dB。基线覆盖：RF 部分比较 classical matched filter 与直接前作 GeRaF，并以 NeuS 可见光重建作为近似上界；仍缺其他 neural RF fields 的同 acquisition comparison，NeuS 也不是同传感条件下的公平 baseline。消融：覆盖 ULoS lensless rendering、RSDF weight、Stage 2 convergence、扫描 plane 数量与非 specular PLA object；结果支持核心组件和 measurement-density trade-off，但主要是单个 bunny 的定性 SDF slices，缺少跨对象数值汇总。",
+    "insightZh": "关键洞见是遮挡物的 LoS geometry 不是需要裁掉的干扰，而是约束 NLoS signal propagation 与 SDF gauge ambiguity 的物理先验。ULoS lensless rendering 解决 early optimization，RSDF alignment 把任意 relative zero level 锚定到视觉 SDF；这是针对 RF reconstruction 的实质性建模推进，而非通用 vision reconstruction backbone 更新。真实雷达实验、跨对象数值优势和明确物理建模足以收录；但 sensing setup、训练成本与材料范围都很专用，因此 accept-skim，不建议投入主线精读时间。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

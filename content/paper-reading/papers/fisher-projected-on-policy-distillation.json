@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2608.01263",
+  "slug": "fisher-projected-on-policy-distillation",
+  "title": "Distill What the Student Can See: Fisher-Projected On-Policy Distillation for Vision-Language Models",
+  "authors": [
+    "Leyan Xue",
+    "Feng Xiong",
+    "Mingjun Ma",
+    "Changqing Zhang"
+  ],
+  "publishedAt": "2026-08-02",
+  "updatedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2608.01263"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vision-language distillation",
+    "on-policy distillation",
+    "Fisher projection",
+    "student capacity",
+    "visual tangent space",
+    "reverse KL"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "representation-learning"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "single-image",
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "hybrid-method"
+    ]
+  },
+  "abstract": "On-policy distillation (OPD) samples trajectories from the current student policy and minimizes token-level divergence between student and teacher next-token distributions at prefixes along those trajectories. This aligns the distillation states with the student's own generation distribution. However, it still assumes that the complete teacher distribution is an appropriate target across student capacities. In vision--language reasoning, teacher corrections can depend on visual distinctions that a compact student cannot represent. Our target-scaling study shows that, as the target approaches the complete teacher distribution, the student realizes less of the prescribed shift and obtains worse downstream performance. We therefore propose \\emph{Fisher-Projected On-Policy Distillation} (FP-OPD), which distills only locally realizable teacher corrections. FP-OPD uses continuous visual perturbations to estimate the student's local visual tangent space and projects the centered teacher--student log-probability gap onto this space under the student's Fisher metric. The resulting capacity-aware target is optimized with full-vocabulary reverse KL on student trajectories, retaining the standard OPD framework. In 8B-to-2B distillation, FP-OPD improves all seven evaluated multimodal benchmarks. It raises the average score by 2.77 points over the pretrained student and by 1.60 points over standard OPD. These results demonstrate that locally realizable teacher corrections provide a more effective target for distilling compact vision--language models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.01263v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.01263v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.01263v2 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "用 continuous visual perturbation probes 估计 compact VLM 的 local output tangent space，再在 student Fisher metric 下只蒸馏 teacher correction 中当前可实现的分量。",
+    "methodFlow": [
+      "student 采样 on-policy trajectory 并固定 visited prefixes",
+      "teacher/student 计算 full-vocabulary log-probability gap",
+      "对 student visual embeddings 施加 K 个 continuous spatial probes",
+      "finite differences 构造 local output tangent directions",
+      "在 student Fisher metric 下投影 centered teacher gap",
+      "用 projected reachable target 做 full-vocabulary reverse-KL distillation"
+    ],
+    "whyRelevantZh": "它直接推进 VLM/MLLM post-training，并把 teacher capacity gap 表达成 student visual response geometry 的可实现性问题；这是一种可迁移到其他 multimodal distillation 的明确方法观念。",
+    "evidenceZh": "8B→2B 时作者报告 FP-OPD average 51.27，相对 base +2.77、standard OPD +1.60，并在七项全部提升（Table 1, p. 6）；32B→8B 时作者报告 sampled average 64.06 vs OPD 63.26；HallusionBench/MMStar 分别低 0.53/0.21（Tables 1-2, pp. 6-7）；Fisher projection 相对 Euclidean projection 的 average 为 51.27 vs 42.48（Table 3, p. 8）。",
+    "caveatZh": "作者限制：计划研究 adaptive tangent-space estimation；需要更高效的 projection strategy 以降低额外 forward-pass cost。审阅风险：四个 detached visual probes 给每个 prefix 增加额外 forwards，论文没有报告 wall-clock、memory 或吞吐成本；只使用 Qwen3-VL 与 Geo3K，且主要收益集中于 visual math；较大 32B→8B setting 在两项 general benchmarks 略退；fixed boundary bands 是很粗的 tangent approximation，尚无证据证明其 span 对应 student capacity 而非 regularization heuristic；v2 仍出现 Appendix ?? 占位引用，且未打印 code URL；复现信息尚不完整。",
+    "motivationZh": "Standard on-policy distillation 虽在 student 自己访问的 prefixes 上训练，仍把完整 teacher distribution 当作目标；若 teacher correction 依赖 student 无法表示的视觉区别，强行拟合反而会降低效果。",
+    "methodZh": "student 先生成 on-policy trajectories，teacher/student 在相同 prefixes 给出 full-vocabulary distributions。FP-OPD 将 teacher gap 做 Fisher-centered 表示，再对 visual embeddings 加 top/bottom/left/right band perturbations，通过 finite differences 得到 output response directions；ridge-stabilized Fisher Gram solve 得到 projected gap，形成 detached reachable target qR，最后仍用 reverse KL 更新 clean student。实验覆盖 8B→2B、GRPO-8B→2B 与 32B→8B，数学视觉任务增益较稳定，general multimodal 有时微降。",
+    "experimentsZh": "全部实验用 Geo3K 训练，覆盖 Qwen3-VL 2B/8B/32B 三种 teacher-student settings；训练两 epochs，每个 prompt 四个 rollouts，并使用四个固定 boundary-band probes。评估七个 visual math/general VLM benchmarks，默认报告 AVG@8。关键结果：8B→2B 时 FP-OPD average 为 51.27，相对 base +2.77、standard OPD +1.60；32B→8B 时 average 为 64.06，OPD 为 63.26。Fisher projection 的 51.27 明显高于 Euclidean projection 的 42.48。基线覆盖：有 base、direct GRPO 与 matched OPD，并跨 teacher scale/variant；但全部属于 Qwen3-VL family，训练数据也只有 Geo3K。消融：覆盖 finite-difference step、probe count、random/visual probes 和 Fisher/Euclidean metric；仍缺 no-projection target-strength matched control、真实 tangent-fidelity 诊断、multi-seed 与 extra-compute trade-off。",
+    "insightZh": "它不是简单缩小 teacher logits，而是依据 student 当前 visual pathway 的局部响应几何选择可实现 component，并让 projection metric 与 reverse-KL 的局部 Fisher geometry 一致。target-scaling motivation 和 Fisher-vs-Euclidean ablation 较有说服力；但固定边界 band 是否真正刻画 capacity，而非某种 regularization proxy，仍需更多模型/任务验证。建议精读 Fisher projection 与 Table 3：方法动机、公式与 ablation 相互对齐，属于值得跟进的 VLM distillation primitive；但部署价值要等 compute reporting 与跨 model/data validation。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

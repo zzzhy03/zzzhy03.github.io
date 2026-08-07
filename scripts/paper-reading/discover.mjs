@@ -148,6 +148,8 @@ async function runAdapter(sourceId, context) {
       requestDelayMs: context.requestDelayMs,
       pageSize: context.pageSize,
       maxResultsPerTopic: context.maxResultsPerTopic,
+      sleepImpl: context.sleepImpl,
+      clockImpl: context.clockImpl,
     });
   }
   if (sourceId === "openreview") return discoverOpenReview(context);
@@ -266,6 +268,8 @@ export async function runDiscovery(inputOptions = {}) {
     requestDelayMs: inputOptions.requestDelayMs,
     pageSize: inputOptions.pageSize,
     maxResultsPerTopic: inputOptions.maxResultsPerTopic,
+    sleepImpl: inputOptions.sleepImpl,
+    clockImpl: inputOptions.clockImpl,
   };
 
   for (const sourceId of sources) {

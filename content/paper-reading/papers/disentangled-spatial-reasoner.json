@@ -1,0 +1,91 @@
+{
+  "id": "arxiv:2608.05242",
+  "slug": "disentangled-spatial-reasoner",
+  "title": "Disentangling 3D Modeling from Spatial Reasoning",
+  "authors": [
+    "Haoze Sun",
+    "Jiequan Cui",
+    "Qingshan Xu",
+    "Richang Hong"
+  ],
+  "publishedAt": "2026-08-05",
+  "updatedAt": "2026-08-05",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.05242"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "spatial reasoning",
+    "structured 3D evidence",
+    "disentangled perception and reasoning",
+    "metric depth",
+    "LoRA LLM"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "single-image",
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "In this work, we explore an alternative paradigm for spatial reasoning by explicitly disentangling 3D perception from reasoning, rather than jointly acquiring implicit 3D perception and reasoning through large-scale training. Our key observation is that modern perception models excel at estimating continuous 3D geometry, whereas large language models (LLMs) are particularly effective at compositional and symbolic reasoning. Motivated by these complementary strengths, we propose the Disentangled Spatial Reasoner (DiSR), a simple yet effective framework that reconstructs the physical world into structured 3D evidence using off-the-shelf expert perception models and fine-tunes an LLM with LoRA to perform reasoning solely over this explicit geometric evidence. Without large-scale 3D VQA training or complex tool-use policies, DiSR achieves competitive performance on popular spatial reasoning benchmarks. Beyond its strong performance, DiSR offers improved interpretability, modularity, and computational efficiency, demonstrating that explicit separation of perception and reasoning is a scalable and effective alternative paradigm to end-to-end modeling for spatial intelligence.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05242v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.05242v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.05242v1 全文整理；截至本次审阅，论文 PDF 中未提供可用的公开代码 URL。",
+    "ideaZh": "不让 MLLM 从 RGB 中同时学习 3D perception 与 reasoning：冻结的专家先把场景重建为显式 object-centric 3D evidence，LoRA LLM 随后只在序列化证据上做 symbolic reasoning。",
+    "methodFlow": [
+      "RGB Image + Spatial Question",
+      "Persistent Object Slots",
+      "Grounding + Frozen 3D Experts",
+      "Gravity-Aligned 3D Evidence",
+      "Text Serialization",
+      "LoRA LLM Reasoning"
+    ],
+    "whyRelevantZh": "它连接 VLM/MLLM spatial reasoning 与 3D reconstruction，但重点不是扩张成泛化的 3D understanding 分类，而是把可检查的 3D representation 作为 reasoning interface；这种 modular intermediate state 对视觉设计 agent 和可编辑 3D workflow 也有迁移价值。",
+    "evidenceZh": "作者报告 DiSR-8B-LoRA 在 3DSRBench 得到 67.62 overall，高于 HiSpatial-3B 的 63.85，并使用 0.33M samples、单张 RTX 4080 SUPER 训练 59h（Table 1, p. 6）；但 CV-Bench-3D average 92.25，低于 base Qwen3-VL 的 92.67（Table 3, p. 6）。",
+    "caveatZh": "系统串联多个 frozen experts，未报告完整 inference latency 或模块替换敏感性；低分辨率与小目标会破坏 object-level 3D evidence。训练只报告 seed 42，而且跨方法资源比较并非 matched control。",
+    "motivationZh": "large-scale 3D VQA 将 perception 与 reasoning 混进 latent representation，训练昂贵且错误难以定位；agentic tool use 又需要复杂 orchestration。DiSR 试图用固定 evidence interface 让每个模块只承担擅长的职责。",
+    "methodZh": "question parser 先生成 persistent object slots；Qwen3-VL grounding、SAM、Metric3D、WildCamera、PerspectiveFields 与 OrientAnything 恢复 mask、metric depth、camera/gravity frame、center、extent、size 和 orientation。所有对象属性在共享坐标系中序列化成 text，LoRA-adapted LLM 不再读取 image，只回答 evidence-conditioned question。",
+    "experimentsZh": "作者评测 3DSRBench、SPAR-Bench、CV-Bench-3D、五个通用 multimodal benchmarks 和 COCO grounding subset。SPAR 的 Metric Avg. 达 49.37，但 Rel. Avg. 只有 40.25；用 ground-truth required 3D evidence 后 CV-Bench Depth/Distance 接近 100%，说明 reasoning module 可用，而主要错误来自 upstream evidence construction。",
+    "insightZh": "最值得精读的是 fixed evidence interface 与 intermediate-error substitution：它把“模型是否具备 spatial intelligence”拆成 parsing、grounding、3D construction 和 reasoning 四个可替换、可诊断环节，而非只靠 end-to-end score 猜测内部能力。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

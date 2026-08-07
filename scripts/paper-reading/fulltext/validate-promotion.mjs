@@ -24,6 +24,7 @@ function parseArguments(argv) {
     }
     else if (argument === "--papers-dir") options.paperDirectory = next();
     else if (argument === "--digest") options.digest = next();
+    else if (argument === "--expected-count") options.expectedCount = Number(next());
     else throw new Error(`Unknown argument: ${argument}`);
   }
   if (!options.help && !options.digest) {
@@ -31,6 +32,12 @@ function parseArguments(argv) {
   }
   if (!options.help && !options.runDirectory && !options.reviewDirectoryExplicit) {
     throw new Error("--run-dir <directory> is required.");
+  }
+  if (
+    options.expectedCount !== undefined &&
+    (!Number.isInteger(options.expectedCount) || options.expectedCount < 0)
+  ) {
+    throw new Error("--expected-count must be a non-negative integer.");
   }
   if (options.runDirectory) {
     if (options.reviewDirectoryExplicit) {
@@ -52,6 +59,7 @@ Options:
   --reviews-dir <directory>  Backward-compatible explicit review directory.
   --papers-dir <directory>   Default: content/paper-reading/papers.
   --digest <file>            Required canonical digest JSON.
+  --expected-count <number>  Require an exact accepted-review count; use 0 for a verified empty run.
   --help                     Show this help.
 
 This command is read-only. It joins accepted full-text reviews to canonical paper records and
@@ -76,13 +84,19 @@ export function validatePromotion(options) {
   const root = path.resolve(options.root ?? process.cwd());
   const resolveFromRoot = (value) => path.isAbsolute(value) ? value : path.resolve(root, value);
   const reviewDirectory = resolveFromRoot(options.reviewDirectory);
+  const runDirectory = options.runDirectory
+    ? resolveFromRoot(options.runDirectory)
+    : null;
   const paperDirectory = resolveFromRoot(options.paperDirectory);
   const digestPath = resolveFromRoot(options.digest);
-  const candidatesPath = options.runDirectory
-    ? path.join(resolveFromRoot(options.runDirectory), "candidates.json")
+  const candidatesPath = runDirectory
+    ? path.join(runDirectory, "candidates.json")
     : null;
   const errors = [];
-  if (!existsSync(reviewDirectory)) {
+  const reviewDirectoryExists = existsSync(reviewDirectory);
+  const missingReviewDirectoryAllowed =
+    options.allowMissingReviewDirectory || options.expectedCount === 0;
+  if (!reviewDirectoryExists && !missingReviewDirectoryAllowed) {
     errors.push(`Review directory does not exist: ${reviewDirectory}.`);
   }
   if (!existsSync(paperDirectory)) {
@@ -94,7 +108,9 @@ export function validatePromotion(options) {
   }
   if (errors.length) return { errors, acceptedCount: 0, digestDate: null };
 
-  const reviewEntries = readJsonDirectory(reviewDirectory, { exclude: ["summary.json"] });
+  const reviewEntries = reviewDirectoryExists
+    ? readJsonDirectory(reviewDirectory, { exclude: ["summary.json"] })
+    : [];
   const paperEntries = readJsonDirectory(paperDirectory);
   const digest = readJson(digestPath);
   const candidates = candidatesPath ? readJson(candidatesPath).candidates ?? [] : [];
@@ -108,6 +124,14 @@ export function validatePromotion(options) {
   const acceptedReviews = reviewEntries
     .map(({ value }) => value)
     .filter((review) => review.decision === "accept-deep" || review.decision === "accept-skim");
+  if (
+    options.expectedCount !== undefined &&
+    acceptedReviews.length !== options.expectedCount
+  ) {
+    errors.push(
+      `Expected ${options.expectedCount} accepted full-text reviews, found ${acceptedReviews.length}.`,
+    );
+  }
   const reviewsByPaperId = new Map(acceptedReviews.map((review) => [review.paperId, review]));
   const papersById = new Map(paperEntries.map(({ value }) => [value.id, value]));
   const digestPaperIds = new Set(digest.paperIds ?? []);

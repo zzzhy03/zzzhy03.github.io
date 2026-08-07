@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2608.06170",
+  "slug": "prior-sg",
+  "title": "Prior-SG: Task and Prior Driven Region Segmentation for Scene Graphs in Arbitrarily-Structured Environments",
+  "authors": [
+    "Giorgio Tonetti",
+    "Laurent Kneip",
+    "Abel Gawel",
+    "Marco Hutter"
+  ],
+  "publishedAt": "2026-08-06",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.06170"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3D scene graph",
+    "functional region segmentation",
+    "task-conditioned ontology",
+    "LLM prior graph",
+    "MRF",
+    "open-vocabulary mapping"
+  ],
+  "facets": {
+    "task": [
+      "segmentation",
+      "reasoning"
+    ],
+    "content-scope": [
+      "scene",
+      "environment-world"
+    ],
+    "representation": [
+      "point-cloud",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "hybrid-method"
+    ]
+  },
+  "abstract": "Hierarchical 3D scene graphs are a promising representation for high-level spatial reasoning in autonomous mobile platforms. However, existing extraction frameworks typically rely on purely local visual clustering or strict geometric heuristics, such as wall-separated rooms, which fail in open-plan or arbitrarily-structured environments. We propose Prior-SG, a task- and prior-driven framework that casts scene graph generation fundamentally as a probabilistic alignment problem. As the robot explores, it continuously aggregates an incoming RGB-D sensor stream into a physically grounded Instance Graph utilizing a multi-scale, open-vocabulary feature fusion strategy. The system then infers the high-level functional semantics of this map through a Maximum A Posteriori (MAP) estimate, guided by a Prior Graph-a logical expectation of the environment's structure and task-relevant vocabulary synthesized dynamically by a Large Language Model. By optimizing a Markov Random Field that fuses heterogeneous experts (visual, geometric, and discrete objects) with these topological priors, the system resolves local perceptual ambiguities. We validate this approach across diverse simulated residential datasets and large, open-plan real-world environments. Prior-SG achieves state-of-the-art semantic region segmentation accuracy compared to recent baselines, robustly delineates distant functional boundaries in the absence of physical walls, and uniquely provides zero-shot ontological flexibility, enabling the robot to entirely restructure its spatial partitioning based on a given high-level task.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.06170v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.06170v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.06170v1 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
+    "ideaZh": "将 observed 3D Instance Graph 与 LLM-generated task-conditioned Prior Graph 做 MAP alignment，以 visual、geometry、object 与 topology experts 的 MRF/graph cut 形成可按任务重组的 functional-region layer。",
+    "methodFlow": [
+      "RGB-D/odometry stream",
+      "Hydra places + lifted objects",
+      "Multi-scale open-vocabulary feature pyramid",
+      "LLM 生成 task-conditioned Prior Graph",
+      "MRF 融合 heterogeneous experts",
+      "Graph cut 得到 region layer"
+    ],
+    "whyRelevantZh": "它展示一种把 language-defined task ontology 注入 3D region segmentation 的可解释路线，对 open-vocabulary scene graph 与 spatial reasoning 有参考价值，但不是当前最贴近的 part/object segmentation。",
+    "evidenceZh": "作者报告 HM3D navigation semantic F1/mIoU 为 68.0/61.8，HM3D scan 为 69.4/62.7（Table I, p. 12）；作者报告 CODa semantic mIoU 43.8%，Clio 为 14.4%；内部 train station 为 57.9%，Clio 为 23.2%（Table I, p. 12）；加入 topological prior 后，HM3D navigation semantic F1 从 64.7% 提升到 67.2%；V+E+O 达 68.0%（Table II and Sec. VII-F, p. 13）。",
+    "caveatZh": "作者限制：每一步都对全部 observed places 重新做 global graph cut，尚未实现 fixed-compute incremental inference；当前 inference 只有单一 abstraction layer，city-scale hierarchy 会遇到组合复杂度；Prior Graph 是静态 expectation，尚不能由新观测动态更新。审阅风险：标准定量设置直接给定 ground-truth region vocabulary，因此“zero-shot ontological flexibility”主要由定性 case 支持；任务更接近 robotics functional-region mapping，而非用户更核心的 object/part/promptable 3D segmentation；迁移价值有限；系统依赖 GPT-5.4、CLIP 与多项 hand-set expert weights，公开代码和完整复现证据在 PDF 中未找到。",
+    "motivationZh": "Bottom-up visual clustering 和 wall/door heuristics 在 open-plan 或任意结构环境中无法稳定定义功能区域，也不能随机器人任务改变 ontology 和空间 partition。",
+    "methodZh": "系统从 RGB-D/odometry 增量构建 object/place Instance Graph，用 LLM 根据 environment 与 task 生成包含 regions、objects、attributes 和 adjacency 的 Prior Graph，再把视觉、几何、object 与 environment prior 写成 log-linear MRF，以 graph cuts 得到 region labels。实验覆盖 HM3D、TartanGround、CODa 和内部 train-station sequence；主要价值是开放空间中的 functional region partition，而不是常见 point-level semantic segmentation。",
+    "experimentsZh": "系统以 Hydra 构造 place backbone、以 CLIP ViT-H/14 编码视觉特征，并由 GPT-5.4 生成 Prior Graph；在 HM3D、TartanGround、CODa 与内部 train station 上评测 precision、recall、F1 和 mIoU，结果平均 10 次 LLM prior runs。关键结果：HM3D navigation/scan 的 semantic F1 为 68.0/69.4，CODa 与内部 train station 的 semantic mIoU 为 43.8%/57.9%；加入 topological prior 后，HM3D navigation F1 从 64.7% 提升到 67.2%。基线覆盖：重点比较 Clio 与 HOV-SG，并尽量统一 Hydra/CLIP backbone；大型 open-plan 数据只可对比 Clio，内部场景缺独立复现，也没有与更广泛 learned 3D segmentation models 统一对照。消融：expert toggles 显示 topology prior 稳定增益、object expert 对 HM3D 有用；geometric expert 的收益依场景变化，feature pyramid 与 crop/encoder/radius sensitivity 也表明参数选择重要。",
+    "insightZh": "相对 bottom-up clustering 或 wall/door heuristic，核心新意是显式拆分 physical Instance Graph 与 task-conditioned probabilistic Prior Graph，并用可插拔 experts 的全局 MAP inference 解决无实体墙边界的 functional segmentation；LLM 主要生成 ontology/prior，不直接预测 mask。方法与跨场景结果足以进入库，但因任务偏 robotics region mapping、zero-shot quantitative evidence 边界明显，建议略读方法图、Table I 和 limitations，而非投入完整精读。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2502.08834",
+  "slug": "rex-reversible-solver",
+  "title": "Rex: A Family of Reversible Exponential (Stochastic) Runge-Kutta Solvers",
+  "authors": [
+    "Zander W. Blasingame",
+    "Chen Liu"
+  ],
+  "publishedAt": "2025-02-12",
+  "updatedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "ICML 2026 Oral · arXiv v5",
+  "identifiers": {
+    "arxiv": "2502.08834"
+  },
+  "venueIds": [
+    "icml"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.AI",
+    "cs.LG",
+    "stat.ML"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "reversible diffusion solver",
+    "Runge-Kutta",
+    "diffusion ODE/SDE",
+    "exact inversion",
+    "image editing"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Deep generative models based on neural differential equations have become state-of-the-art for many generation tasks. These models rely on ODE/SDE solvers that integrate from a prior distribution to the data distribution; in many applications it is also highly desirable to integrate in the inverse direction. Standard solvers, however, accumulate discretization errors that prohibit exact inversion, an inaccuracy that is unacceptable in precision-critical applications. Existing inversion methods suffer from poor stability and low order of convergence, and are strictly limited to the ODE setting. In this work, we propose Rex, a family of reversible exponential (stochastic) Runge-Kutta solvers obtained by applying Lawson methods to convert any explicit (stochastic) Runge-Kutta scheme into an algebraically reversible one for both diffusion ODEs and SDEs. Beyond a rigorous theoretical analysis -- establishing arbitrary-order convergence and a non-zero region of linear stability -- we empirically demonstrate that Rex achieves near-machine-precision reconstruction and improves Boltzmann sampling with flow models as well as image generation and editing with diffusion models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2502.08834v5",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2502.08834v5"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/zblasingame/Rex-solver"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2502.08834v5 全文整理；论文 PDF 提供公开代码 URL，且正文标注为 ICML 2026 proceedings paper。",
+    "ideaZh": "用 Lawson transform 将任意 explicit ODE/SDE Runge–Kutta scheme 变成适配 diffusion dynamics 的 Princeps，再套入闭式可逆的 two-state coupling，从而得到同时支持 generation 与 exact inversion 的 solver family。",
+    "methodFlow": [
+      "Explicit ODE/SDE Runge–Kutta Scheme",
+      "Lawson Transform",
+      "Princeps Exponential Scheme",
+      "Two-State Reversible Coupling",
+      "Closed-Form Forward / Backward Rex",
+      "Generation / Editing / Likelihood"
+    ],
+    "whyRelevantZh": "它直接改变 diffusion image generation/editing 的 inverse interface，并可迁移到 flow matching、reward backpropagation 和需要保持 bijectivity 的生成设计流程；理论统一性与跨 ODE/SDE 覆盖达到 landmark-or-transfer 门槛。",
+    "evidenceZh": "作者报告 Stable Diffusion v1.5 的 FP32 latent round-trip MSE 在 10/20/50 steps 为 3.77e-9/1.98e-9/8.85e-10（Table 4, p. 63）；SD1.5 editing 中 Rex-Dopri5 的 LPIPS 为 0.107，DDIM/O-BELM 为 0.214/0.140（Table 7, p. 65）。这些均为作者报告。",
+    "caveatZh": "algebraic reversibility 不等于所有 finite-precision setting 都稳定：Appendix H.8 报告 data-prediction latent variance 约 1e7，SDE data-prediction 甚至 overflow；图像实验也主要限于 SD1.5、CelebA-HQ 与 automatic metrics。",
+    "motivationZh": "普通 solver 正向采样后再反向积分会累积 discretization error，限制 real-image editing、accurate likelihood 与 differentiable reward；既有 exact-inversion schemes 又常受低阶、稳定域差或只支持 ODE 限制。",
+    "methodZh": "Rex 先把 diffusion ODE/SDE 的 semi-linear structure 经 exponential Lawson change of variables 转成 Princeps scheme，再用 McCallum–Foster-style auxiliary state 与 coupling parameter 构造可闭式互逆的 forward/backward steps。ODE 版本继承 underlying RK order、支持 adaptive steps；SDE 版本用可重建 Brownian increments 保持 stochastic trajectory consistency。",
+    "experimentsZh": "作者在 100 张 pix2pix real images 上测 finite-precision reconstruction，在 CelebA-HQ DDPM 上生成 10,000 samples，在 1,000 条 COCO captions 上测 SD1.5 conditional generation，并完成 InstructPix2Pix round-trip editing 与 tri-alanine Boltzmann sampling。Rex 在 inversion error 上明显领先，并在 editing preservation 与 preference metrics 上匹配或超过所测 reversible baselines；higher-order RK4 在 low-step image sampling 并不总优于 Euler。",
+    "insightZh": "最可迁移的观点不是“再造一个快 sampler”，而是把 solver 的可逆性当作 generation system 的一等接口：同一个 transformation 可覆盖 DDIM、DPM-Solver families、SEEDS-1 与 gDDIM，并把 sampling、editing、likelihood 和 gradient workflow 连接起来。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

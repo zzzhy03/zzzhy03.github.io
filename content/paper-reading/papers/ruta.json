@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2608.04132",
+  "slug": "ruta",
+  "title": "RUTA: Principled Visual Token Allocation via Rate-Utility Optimization",
+  "authors": [
+    "Jian Zou",
+    "Xiaoyu Xu",
+    "Zhihua Wang",
+    "Yilin Wang",
+    "Balu Adsumilli",
+    "Kede Ma"
+  ],
+  "publishedAt": "2026-08-04",
+  "collectedAt": "2026-08-07",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.04132"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual token allocation",
+    "rate-utility optimization",
+    "token reduction",
+    "vision-language model",
+    "query-conditioned pruning",
+    "adaptive token budget"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "single-image",
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "High-resolution images and long videos provide vision-language models with rich context for multimodal reasoning and fine-grained perception, but the resulting long visual token sequences make large language model-side computation and memory costly. Existing visual token reducers often operate at prescribed rates, while recent methods adapt token counts across inputs using method-specific learned thresholds or importance predictors. We introduce RUTA, a principled Rate-Utility Token Allocation method that performs pre-LLM reduction by jointly learning which tokens to retain and how many to allocate to each image-query pair. RUTA constructs query-conditioned candidate tokens and predicts a retention probability for each candidate. During training, these probabilities parameterize independent Bernoulli gates, while their sum provides a differentiable training-time estimate of the token count for each pair. Retained tokens serve as anchors that aggregate information from non-retained tokens according to semantic affinity and spatial proximity. RUTA is optimized with a penalized rate-utility objective that balances downstream task loss against expected token usage. Averaged across five benchmarks and measured relative to each backbone's full-token baseline, RUTA uses only $2.0\\%$ and $4.2\\%$ of visual tokens while preserving $88.2\\%$ and $94.4\\%$ of task performance on LLaVA-NeXT-7B and Qwen3-VL-8B, respectively.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.04132v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.04132v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Multimedia-Analytics-Laboratory/RUTA"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 2608.04132v1 全文整理；Paper URL 精确指向本次审阅版本；Code 链接仅保留全文审阅已核验为 available 的公开仓库。",
+    "ideaZh": "以 task loss 与 expected visual-token count 的 rate-utility objective 联合学习 localization、retention 和 merging，让不同 image-query pairs 根据 evidence demand 自动获得不同 token budgets。",
+    "methodFlow": [
+      "从 query 解析可视觉 grounding 的 noun phrases/attributes",
+      "用 open-vocabulary localizer 得到 enclosing ROI，并重编码为 candidate visual tokens",
+      "以 query-conditioned MLP 预测逐 token retention probabilities",
+      "训练时 Bernoulli gates + straight-through estimator，推理时按 expected rate 自适应 top-K",
+      "将 non-anchor tokens 以 semantic-spatial weights 汇入 anchors，并优化 task loss + token-rate penalty"
+    ],
+    "whyRelevantZh": "它属于 VLM/MLLM efficiency 的 method-level update；对高分辨率 visual design input 或未来多图 agent，按 query demand 分配视觉容量比固定 token budget 更可迁移。",
+    "evidenceZh": "作者报告 LLaVA-NeXT-7B 在约 32–50 visual tokens 下 mean accuracy 64.42，相比 full-token 73.04；最强 reduced baseline SparseVLM 为 61.98（Table 1, p. 8）；作者报告 Qwen3-VL-8B 在约 29–70 visual tokens 下 mean accuracy 74.78，相比 full-token 79.22；最强 reduced baseline DivPrune 为 66.58（Table 1, p. 8）；作者报告 TextVQA 上将 rate coefficient 从 2×10^-6 提到 2×10^-5，使平均 token 数从 333.6 降至 69.3、accuracy 从 80.0% 降至 73.9%（Fig. 5(a), Sec. 4.3, p. 10）。",
+    "caveatZh": "作者限制：visual token count 是 model-relative efficiency proxy，未计 localizer/encoder overhead、end-to-end latency、KV-cache memory 或 hardware throughput；多个 grounding regions 相距很远时，single enclosing crop 可能覆盖大部分图像；极小或漏检 evidence 也会降低性能；每个 VLM 与 task dataset 需要额外训练，当前只验证 single-image VQA 和两个 backbones。审阅风险：Grounding DINO 本身为约 232M localizer，极低 token count 的 LLM-side 节省是否抵消额外视觉前处理，必须通过真实 latency/energy 测量才能确定；任务 supervision 可能让 reducer 学到 benchmark-specific shortcuts；VQA 的短答案准确率不能代表 open-ended multimodal generation、multi-image 或 video reasoning；独立 Bernoulli gates 的 straight-through estimator 与 expected-count-to-top-K conversion 存在 train/inference mismatch，论文未单独量化其影响。",
+    "motivationZh": "高分辨率图像会让 VLM 的 LLM-side computation、memory 和 KV cache 成本迅速增长；固定 token reduction rate 无法让简单问题少用、困难问题多用视觉容量。",
+    "methodZh": "RUTA 先从 query 抽取 visual phrases，用 Grounding DINO 得到一个 enclosing crop 并重新编码为候选 tokens；query-conditioned MLP 为每个 token 预测 retention probability，训练时独立 Bernoulli sampling、推理时按 expected count 做 adaptive top-K。未保留 tokens 并非直接丢弃，而是依据 learned semantic affinity 与 spatial proximity 汇入 anchors。统一 rate penalty 控制平均 budget，使不同样本按 evidence demand 分配不同容量；matched-rate 表格和 fixed/shuffled allocation 消融支持其低 token regime 优势。",
+    "experimentsZh": "在 LLaVA-NeXT-7B 与 Qwen3-VL-8B 上评估五个 VQA datasets；vision encoder、text embedding 与 LLM 冻结，只训练 localizer heads、retention MLP、merge projections 与 vision-language projector。每个 task 单独训练 2–4 epochs，并与七种 token reducers 做 matched-rate comparison。关键结果：LLaVA-NeXT 在约 32–50 visual tokens 下 mean accuracy 为 64.42，full-token 为 73.04、最强 reduced baseline 为 61.98；Qwen3-VL 在约 29–70 tokens 下为 74.78，full-token 为 79.22、最强 reduced baseline 为 66.58。基线覆盖：包含 training-free 和 training-based systems，并画出两个 backbones 的 rate-utility curves；匹配的是 token count 而非端到端 FLOPs/latency，且 RUTA 还有 localizer、crop encoding 与 merge overhead。消融：覆盖 rate coefficient、token budget、三种 localizers、random/full-image controls、allocation strategy 和 anchor merging；component ablation 主要限于 TextVQA/Qwen3-VL。",
+    "insightZh": "新意主要在把 pre-LLM token reduction 明确写成 rate-utility optimization：概率之和同时提供 sample-specific count 和可微 global rate，避免固定 per-sample budget；再与 query-conditioned crop 和 anchor aggregation 联合训练。各组件单独都接近已有 localization/pruning/merging 技术，但统一 objective 与 demand-aware token count 的实验分离做得清楚。matched-rate baseline、两个 backbones 和分离 rate assignment 的消融足以支撑核心主张，代码也已给出；但这是 VLM efficiency 的局部技术更新而非新范式，且真实系统收益未验证，因此 accept-skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
