@@ -1,0 +1,107 @@
+{
+  "id": "arxiv:2607.28609",
+  "slug": "osreward",
+  "title": "OSReward: Instituting Standardized Evaluation for Cross-Platform Computer-Use Reward Models",
+  "authors": [
+    "Qiushi Sun",
+    "Kanzhi Cheng",
+    "Yian Wang",
+    "Bowen Yang",
+    "Hang Yan",
+    "Liheng Chen",
+    "Fangzhi Xu",
+    "Zichen Ding",
+    "Nuo Chen",
+    "Jialin Cao",
+    "Xingdong Gong",
+    "Zehao Li",
+    "Kaiming Jin",
+    "Xinfeng Yuan",
+    "Zhoumianze Liu",
+    "Jingyang Gong",
+    "Zhangyue Yin",
+    "Jiahui Gao",
+    "Zhiyong Wu",
+    "Tianbao Xie",
+    "Jianbing Zhang",
+    "Ben Kao",
+    "Lingpeng Kong"
+  ],
+  "publishedAt": "2026-07-30",
+  "updatedAt": "2026-08-06",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv v2 · Work in progress",
+  "identifiers": {
+    "arxiv": "2607.28609"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "computer-use reward model",
+    "VLM judge",
+    "trajectory verification",
+    "leniency bias",
+    "OSReward-Hard",
+    "OS-Shepherd"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "tool-use"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "reinforcement-learning"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "abstract": "Computer-using agents (CUAs) are advancing rapidly across the digital world. A CUA trajectory records the agent's actions, states, and reasoning. Verifying whether it fulfilled the task instruction is central to CUA evaluation, data curation, and reinforcement learning. Neither human-written verifiers nor human annotators can provide such verification at scale, so the field increasingly turns to vision-language models (VLMs) as judges of CUA trajectories. But a fundamental question has long gone unexamined: are these VLM judges reliable enough? To study it systematically, we introduce OSReward, a realistic, high-quality benchmark that evaluates VLM judges on CUA trajectories. The trajectories come from diverse agent backbones executing human-verified instructions across platforms, and are then rigorously labeled with ground-truth verdicts through multi-stage human annotation. Building on it, we derive OSReward-Hard, a challenge set concentrating genuinely hard cases, and OSReward-Multi for fine-grained efficiency and alignment scoring. The most comprehensive evaluation of VLM judges to date finds even state-of-the-art models fall short of an ideal judge, sharing a systematic leniency bias that mislabels failed runs as successes. The few reliable enough to trust are too expensive to run at scale, while affordable open models trail far behind. To close this gap, we construct and release OS-Shepherd-100K, an open corpus of reasoning-annotated trajectory judgments for the CUA community. On it, we train OS-Shepherd (9B and 35B), open reward models that supply low-cost, stable, and reliable reward signals, matching commercial judges at 30-60x lower cost than the frontier. Extensive analyses further inform the design of reliable CUA reward at scale. Our code, benchmark, dataset, and model checkpoints are available at https://os-copilot.github.io/OSReward-Home/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.28609v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.28609v2"
+    },
+    {
+      "label": "Project",
+      "href": "https://os-copilot.github.io/OSReward-Home/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.28609v2 全文整理；PDF 提供 OSReward project page，但没有打印可直接核验的代码仓库 URL，故不添加 Code 链接。",
+    "ideaZh": "先用 human-gold computer-use trajectories 系统测量 VLM judges 的 false-success/leniency bias，再把 hard negatives 与跨模型高一致样本转成 reward-model training corpus，训练更重视失败召回的 open OS-Shepherd models。",
+    "methodFlow": [
+      "跨四个平台收集真实 CUA trajectories，并以多阶段人工标注得到 binary gold verdict",
+      "从完整集派生 hard challenge set 与带 alignment/efficiency labels 的 multi-axis subset",
+      "统一评测 27 个 VLM judges，并对 visual、text 与 runtime settings 做 perturbation analysis",
+      "从约 82K trajectories 生成约 321K multi-judge instances，保留跨模型高一致样本",
+      "在 96.6K reasoning-annotated samples 上训练 9B/35B OS-Shepherd，并用 RL 针对 false-success"
+    ],
+    "whyRelevantZh": "Visual Design Agents 同样依赖 VLM verifier、reward model 与自动数据筛选。论文关于 judge 可能跟随 narrative 而忽略 visual evidence、多个 judges 会共享偏差，以及 hard negatives 与 failure recall 比平均 accuracy 更关键的结论，可直接迁移到设计生成评测。",
+    "evidenceZh": "作者报告 27 个 judges 在 284 条 OSReward-Hard 上全部下降 20–43 个百分点，最高 accuracy 为 69.7%、mean judge 为 52%（Sec. 4.4, pp. 10–12）。去掉 thought/action text 平均下降 7.2 个点并翻转 22.7% verdicts，而 screenshot 配置的 aggregate 变化不足 0.5 个点（Secs. 5.1–5.2, p. 13）。OS-Shepherd-9B 的 full/hard balanced accuracy 为 86.3/61.9，base 为 79.4/55.9（Table 4, p. 17）。",
+    "caveatZh": "OS-Shepherd labels 仍来自可能具有相关偏差的 VLM ensemble，高一致性不等于 human correctness。fine-grained alignment/efficiency grading 的校准明显弱于 binary outcome judging；30–60× cost 是 API-equivalent estimate；computer-use trajectories 与 visual design workflows 也不能直接等同。",
+    "motivationZh": "大规模 computer-use agent evaluation、data curation 和 RL 需要自动 trajectory verifier，但人工规则与人工标注无法扩展，而 VLM judges 是否可靠、会以何种方式系统失败此前缺少统一的 human-gold 检验。",
+    "methodZh": "OSReward 以三人标注、meta-review 与 hard-case re-verification 建立 1,019 条跨平台 human-gold trajectories，并派生 284 条 hard cases 和 440 条带细粒度标签的成功轨迹。作者统一测试 27 个 VLM judges，分析输入、推理和 ensemble 设置；随后从约 82K trajectories、321K judge instances 中保留 high-agreement samples，形成 96.6K reasoning-annotated OS-Shepherd-100K，以 SFT 和针对 false-success 的 RL 训练 Qwen3.5 9B/35B reward models。",
+    "experimentsZh": "评测覆盖 Web、Windows、Ubuntu、Mobile、四类 agent families、27 个 closed/open VLM judges，并包含 hard set、multi-axis labels、input perturbations、ensembling 与 cost analysis。训练模型与同 family untuned bases 直接比较，并迁移到 OSWorld、WebArena 与 AndroidWorld；但外部结果只覆盖 final recipe，未单独拆分 SFT 与 RL，训练 label ensemble composition 和 reasoning annotations 的贡献也缺少独立消融。",
+    "insightZh": "multimodal judge 的高总体 accuracy 可能掩盖严重的 false-success bias；如果 verdict 主要跟随 action narrative 而非 screenshots，那么它还不是可靠的 visual verifier。构建 reward data 时应同时监控 failure recall、hard negatives 与跨 judge 的 correlated error。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

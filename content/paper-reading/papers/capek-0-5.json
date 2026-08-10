@@ -1,0 +1,93 @@
+{
+  "id": "arxiv:2608.06756",
+  "slug": "capek-0-5",
+  "title": "Capek 0.5: An Execution-Centric Vision-Language Model for Embodied Intelligence",
+  "authors": [
+    "Ying Chen",
+    "Weizhen Li",
+    "Zhe Hu",
+    "Zhenjiang Li",
+    "Rui Jiang",
+    "Zhifeng Gu",
+    "Lihuang Fang",
+    "Jiangping Liu",
+    "Lei Yi",
+    "Jie Chen"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.06756"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "execution-centric VLM",
+    "embodied intelligence",
+    "verifiable reinforcement learning",
+    "specialist consolidation",
+    "TIES merging",
+    "on-policy multi-teacher distillation"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "representation-learning"
+    ],
+    "content-scope": [
+      "scene",
+      "environment-world"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "reinforcement-learning",
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "abstract": "Vision-language models are increasingly serving as the reasoning core of embodied agents. Robot execution is inherently iterative: each action reshapes the scene and physical state, continually renewing what must be perceived, reasoned about, and verified. Meeting these demands requires complementary capabilities that differ in supervision signals, prediction formats, and verification criteria. Existing approaches typically develop these capabilities against isolated, task-specific objectives, leaving open how they should be organized and integrated around execution as a whole. We present Capek 0.5, an embodied vision-language model built around an execution-centric capability taxonomy. Rather than organizing training by datasets or tasks, the taxonomy groups embodied capabilities according to their functional roles throughout execution and comprises four capability families: Spatial Reasoning, Temporal Understanding, Action Guidance, and State Verification. Each capability is first acquired by a dedicated specialist through reinforcement learning with verifiable rewards from a shared backbone, and the specialists are then consolidated into a single inference-time model through weight-space merging followed by routed policy-space distillation. We instantiate Capek 0.5 at the 2B and 35B-A3B scales and evaluate it from three complementary perspectives: comprehensive benchmark suites including Capek-StateBench, a new benchmark for state verification; a controlled study of capability retention from specialists to the unified model; and closed-loop evaluation in simulated embodied environments. Capek 0.5 improves the large majority of matched benchmark rows over its initialization, retains all four specialized capabilities in one checkpoint with quantified losses, and transfers to closed-loop embodied task execution.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.06756v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.06756v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.06756v1 全文整理；截至本次审阅，论文未提供可核验的公开代码或 checkpoint URL。",
+    "ideaZh": "把 execution-centric visual skills 分为 Spatial Reasoning、Temporal Understanding、Action Guidance 与 State Verification：先用 verifiable GRPO 训练同源 specialists，再以 TIES task-vector merge 和 routed on-policy multi-teacher distillation 合并成单一 VLM。",
+    "methodFlow": [
+      "按 Spatial、Temporal、Action Guidance、State Verification 建立 capability taxonomy",
+      "对四类数据分别以 verifiable GRPO 训练 same-origin specialist VLMs",
+      "抽取 specialist task vectors，并用 TIES trim/resolve/merge 得到初始化",
+      "在 student on-policy rollouts 上按样本 routing 对应 teacher 并蒸馏",
+      "以单 checkpoint 覆盖 perception、reasoning、state 与 simulated execution"
+    ],
+    "whyRelevantZh": "它属于 VLM/MLLM post-training 的系统性工作，适合观察如何把 spatial、state、action 与 temporal capabilities 合并，而不为每个下游任务维护独立模型。它与 visual design agent 并非直接同一方向，相关性为 medium；可迁移点主要是能力分解、verifiable rewards 与 multi-skill consolidation。",
+    "evidenceZh": "作者报告 35B/2B 相对各自 Qwen base 分别在 34 个 matched rows 中提升 28/30 项（Tables 2–3, pp. 15–16）；TIES+MOPD 在八个 signature rows 中三项最佳、其余五项仍低于对应 specialist（Table 4, p. 17）。EmbodiedBench 的 EB-HAB average 从 46.0 提升至 63.0、EB-ALF 从 50.7 至 55.3，但 VIGIL 若干 diagnostics 回退（Tables 5–6, pp. 18–19）。",
+    "caveatZh": "316,736 是候选 data inventory，并非清楚的实际 training exposure；论文未汇总 specialist 与 consolidation 的总 tokens、GPU-hours 或 rollout cost。StateBench 与训练数据共享 BEHAVIOR-1K 环境体系，没有 multi-seed uncertainty，最终统一模型也未完全追平各 specialists，且尚未在 physical robot 验证。",
+    "motivationZh": "embodied execution 会持续改变环境状态，所需的 spatial、temporal、action 与 verification 能力具有不同 supervision 和输出格式；分别维护 task-specific specialists 又难以形成一个可部署的统一 reasoning core。",
+    "methodZh": "作者以 Qwen3.6-35B-A3B 和 Qwen3.5-2B 为底座，对四类能力分别使用 format-specific verifiable rewards 做 GRPO。随后对 specialist task vectors 做 TIES merge（裁掉底部 80%，scale=1），再让 student 在自身 prefixes 上接受按样本路由的 teacher supervision，以减轻简单 weight merging 的 interference。",
+    "experimentsZh": "评估覆盖 34 个 matched capability rows、八项 consolidation signature metrics、EmbodiedBench 各 300 episodes 与 VIGIL，并对 2B/35B、base、individual specialists、TIES 和 TIES+MOPD 做比较。证据支持 consolidation 有效但不完全；仍缺 trim ratio、routing、off-policy/on-policy、data-volume matching 与多随机种子的细分消融。",
+    "insightZh": "最值得精读的是 consolidation recipe，而不是又一组 embodied benchmark：task-vector merge 先提供多能力起点，student-distribution 上的 routed teacher signal 再修复 interference；与此同时，保留不完整和通用能力回退说明“统一而不损失”仍未解决。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

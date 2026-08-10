@@ -1,0 +1,97 @@
+{
+  "id": "arxiv:2608.06878",
+  "slug": "controlref",
+  "title": "ControlRef: Efficient Layout-Guided Multi-Instance Generation via Anchored 4D-RoPE",
+  "authors": [
+    "Yunkai Yang",
+    "Yudong Zhang",
+    "Xinying Chen",
+    "Haoyuan Liang",
+    "Yizhuo Niu",
+    "Jinshuai Cheng",
+    "Kunquan Zhang",
+    "Liziyue Fang",
+    "Weitao Wan",
+    "Runmin Dong"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.06878"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "2d-design"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "layout-guided generation",
+    "multi-reference generation",
+    "Anchored 4D-RoPE",
+    "instance-layout binding",
+    "controllable composition"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text",
+      "sketch-layout",
+      "multimodal"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "controllable",
+      "efficient"
+    ]
+  },
+  "abstract": "Layout-guided multi-instance generation is essential for controllable image synthesis in Multi-Modal Diffusion Transformers (MM-DiTs). However, integrating this capability into unified architectures remains challenging. Prior frameworks rely on redundant full-resolution canvas padding and Shifted-RoPE to manage multiple reference images. This mechanism drastically inflates computational overhead for sparse layouts and disrupts critical low-frequency RoPE features, creating a severe spatial-frequency compromise that blurs absolute spatial correspondence. To overcome these limitations, we propose ControlRef, a highly efficient and precise multi-instance synthesis framework. ControlRef utilizes a Unified Instance-Layout Control (UILC) attention mask to strictly decouple inter-instance semantic interactions and enforce precise regional binding. To further promote region-level spatial alignment, we introduce Anchored 4D-RoPE, a novel positional encoding mechanism that directly anchors tokens to their absolute geometric centers. By pre-aligning reference images to their corresponding bounding box resolutions, physically anchoring both layout and reference tokens to their absolute geometric centers, and stacking the references along the z-axis, Anchored 4D-RoPE natively preserves spatial priors and mitigates the spatial-frequency compromise without lossy shifting. Extensive experiments demonstrate that ControlRef achieves state-of-the-art visual fidelity and localization accuracy, while concurrently slashing inference latency by over 80% in sparse layouts and reducing memory overhead by 50% in dense scenarios.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.06878v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.06878v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.06878v1 全文整理；PDF 未提供可核实的 ControlRef 代码仓库 URL。",
+    "ideaZh": "ControlRef 用 UILC attention mask 隔离多张 reference 的语义交互，再用 Anchored 4D-RoPE 将 text、target、layout 与各 reference 映射到 (z,y,x,t)，把 reference/layout tokens 直接锚定到 bounding-box 的绝对位置，避免 full-canvas padding。",
+    "methodFlow": [
+      "输入 text、多个 reference images 与对应 bounding boxes",
+      "将 boxes 编成紧凑 layout tokens，并缩放 reference tokens",
+      "用 UILC mask 建立 reference-layout 绑定并隔离 instances",
+      "以 Anchored 4D-RoPE 注入 absolute geometry 与 reference index",
+      "在 FLUX.2 Klein 9B 上做 selective LoRA SFT",
+      "再用 Diffusion-DPO 抑制 collage shortcut 并生成融合图像"
+    ],
+    "whyRelevantZh": "Layout-guided multi-reference generation 与 Visual Design 的 controllable composition 直接相关；它把 reference identity、absolute layout 与多实例 attribute isolation 作为显式设计变量。Anchored positional encoding 也可能迁移到 structured 2D/3D generation 与 editing。",
+    "evidenceZh": "作者报告 LAMICBench++ overall AVG=64.72，略高于 ContextGen 64.66 与 Nano Banana 64.11，优势主要来自 identity metrics 而非所有维度（Table 1, p. 5）。在 ≥4-subject layout 下，相对 ContextGen 的 latency 从 2.60 s 降至 0.46 s、inference memory 从 1.66 GB 降至 0.75 GB，即作者报告 −82.3%/−54.8%（Table 2, p. 5）；no-mask AVG 为 62.24，all-block UILC 为 64.72（Table 4, p. 7）。",
+    "caveatZh": "作者报告 LAMICBench++ 仅含 160 cases，LayoutSAM-Eval 使用 1,000-sample subset；aggregate 领先幅度很小且由混合 metrics 平均得到。与 ContextGen 的 efficiency comparison 同时混合 9B 与 12B backbones、tokenization 与实现差异，虽同硬件/steps 仍不是 architecture-matched ablation；PDF 也未给代码。",
+    "motivationZh": "现有多 reference layout control 依赖 full-resolution padded canvases 与 Shifted-RoPE：稀疏 boxes 仍产生长序列，位置 shift 又破坏低频 RoPE features，使计算成本与 absolute spatial correspondence 同时受损。",
+    "methodZh": "ControlRef 将每个 box 编成紧凑 layout token，并把 reference VAE tokens 对齐到 box area；UILC mask 保留 denoising/text/layout 的必要交互，却阻断不同 reference instances 的 crosstalk。Anchored 4D-RoPE 用 z 区分 reference index、y/x 注入 box offsets、t 区分 modality/sequence，随后以 LoRA SFT 和 Diffusion-DPO 训练。",
+    "experimentsZh": "作者以 FLUX.2 Klein 9B 在 IMIG-100K 上训练 8,000 SFT 与 2,000 DPO steps，使用 LAMICBench++、LayoutSAM-Eval subset 和 COCO-MIG，比较 layout controllers、multi-instance systems、unified editing 与 commercial models。作者报告 LayoutSAM-Eval spatial/shape/color/texture 为 94.52/89.18/88.76/89.05（Table 3, p. 7）；但缺 human preference、subject-count scaling、cross-resolution 与完整 matched-backbone comparison。",
+    "insightZh": "把 reference identity 与 absolute layout 直接写入 attention geometry，可以同时减少 padding cost 与改善 instance binding；真正值得迁移的是“坐标系即控制接口”，而不仅是一种新的 positional-encoding 公式。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

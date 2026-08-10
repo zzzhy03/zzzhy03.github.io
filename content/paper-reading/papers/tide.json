@@ -1,0 +1,99 @@
+{
+  "id": "arxiv:2606.08260",
+  "slug": "tide",
+  "title": "TIDE: Task-Isolated Diffusion for Unified Video Editing and Generation",
+  "authors": [
+    "Qi Liu",
+    "Gang Yue",
+    "Mingyu Yin",
+    "Lisai Zhang",
+    "Yidi Wu",
+    "Yaole Wang",
+    "Yaohui Wang",
+    "Chang Yao",
+    "Jingyuan Chen",
+    "Lin Ma"
+  ],
+  "publishedAt": "2026-06-06",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2606.08260"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "unified video editing and generation",
+    "per-token task embeddings",
+    "multi-reference conditioning",
+    "dual-path conditioning",
+    "progressive multi-task training"
+  ],
+  "facets": {
+    "task": [
+      "editing",
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text",
+      "single-image",
+      "video",
+      "multimodal"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "prior-data": [
+      "video-prior"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "abstract": "Recent advances in Diffusion Transformers have driven rapid progress in video generation and editing, yet these capabilities are still handled by separate, task-specific models. Building a unified framework that supports diverse video tasks remains an open challenge: existing unified attempts either require dedicated auxiliary encoders or lack explicit mechanisms to distinguish heterogeneous conditioning tokens, struggling when the number and type of visual conditions vary across tasks. We propose TIDE, a unified framework that integrates instruction-based editing, reference-guided editing, and multi-reference generation. At its core, we introduce per-token task embeddings that assign each input token a task-specific identifier, enabling the model to explicitly disambiguate target, source, and reference tokens. To simultaneously capture high-level semantic understanding and fine-grained structural fidelity, we design a dual-path conditioning scheme that couples a vision-language model with a VAE latent path for complementary signals. We further devise a multi-task progressive training strategy that incrementally introduces tasks of increasing complexity, effectively harmonizing diverse objectives and enabling smooth generalization across heterogeneous task distributions. Extensive experiments on multiple video editing and generation benchmarks demonstrate that TIDE achieves state-of-the-art performance across all evaluated tasks. Our project page is available at https://LittleWork123.github.io/tide.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.08260v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.08260v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2606.08260v2 全文整理；PDF 只提供 project page，未提供可核实的代码仓库 URL。",
+    "ideaZh": "用 per-token task embeddings 显式区分 target、source 与 reference roles，再以 VLM semantic path 和 VAE latent detail path 统一 instruction editing、reference editing 与 multi-reference video generation。",
+    "methodFlow": [
+      "把 editing 与 reference generation 统一为 conditional video denoising",
+      "为 target、source 与各 reference latent tokens 添加 task embeddings",
+      "通过 frozen VLM cross-attention 注入语义与 instruction understanding",
+      "通过 VAE latent self-attention 保留 source motion 与视觉细节",
+      "以 progressive multi-task training 逐步加入更复杂的 reference composition"
+    ],
+    "whyRelevantZh": "Video Generation/Editing 是用户需要了解的重要主流方向；TIDE 把 generation 与 editing 作为同一建模问题，并明确处理 heterogeneous condition role binding，符合此前不必硬拆两类任务的分类判断。",
+    "evidenceZh": "作者报告 OpenVE average 为 2.91，高于 open-source VINO 2.60，但低于 closed Kling-O1 3.36（Table 2, p. 9）；OpenS2V total 为 62.62，VINO 为 59.31（Table 4, p. 11），RefVIE overall 为 3.89，VINO 为 3.53、Kling-O1 为 3.99（Table 5, p. 11）。移除 VLM path 后 TIDE-Bench 从 3.41 降至 1.98，但 progressive training 也让 OpenVE 从 2.99 降至 2.91（Table 8, p. 14）。",
+    "caveatZh": "TIDE-Bench 由作者提出且只有 56 source videos，部分结果依赖 Gemini judge；closed APIs 与 released models 的推理条件也不能完全统一。模型在三主体 compositional task 上为 3.92，低于 OmniVideo 4.03 与 RoPE-Pos 4.00，统一训练仍有 interference；主文没有完整汇总 14B DiT 的训练 compute。",
+    "motivationZh": "video editing 与 generation 长期由不同模型处理；统一模型在条件数量和类型变化时容易混淆 source、reference 与 target tokens，专用辅助 encoder 又增加架构复杂度。",
+    "methodZh": "TIDE 建立在 LTX-2.3 large DiT 与 frozen Gemma-3-12B VLM 上。learned per-token task IDs 绑定各条件角色；VLM cross-attention 传递 high-level semantics，VAE latent self-attention 保存 fine-grained details。训练从 instruction editing 开始，逐步加入 multi-reference editing 与 generation data。",
+    "experimentsZh": "作者报告 progressive stages 使用约 3K、7K 与 10K refined samples，以 50 denoising steps、1280×704 评估 OpenVE、TIDE-Bench、OpenS2V、RefVIE 与 IntelligentVBench。task embedding、RoPE alternatives、VLM/source paths 与 training stages 均有 ablation；仍缺 condition-count scaling、joint-vs-progressive matched data、不同 backbone 与完整 compute accounting。",
+    "insightZh": "统一生成/编辑模型可以用极轻量的 token-role identity 解决一部分 heterogeneous conditioning 混淆；但 role isolation 不等于 zero-shot extensibility，新任务仍需数据与训练，且多任务统一会带来可测的单项 trade-off。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

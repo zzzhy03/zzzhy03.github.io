@@ -1,0 +1,102 @@
+{
+  "id": "arxiv:2608.07417",
+  "slug": "i-seek-you-in-videos",
+  "title": "I Seek You in Videos: Identity-Conditioned Queries for Person-Centric Video Reasoning",
+  "authors": [
+    "Shibo Gao",
+    "Chongxiao Wang",
+    "Chenglong Huang",
+    "Jie Ma",
+    "Haolin Shi",
+    "Fei Ding",
+    "Jing Li",
+    "Qiang Lyu",
+    "Yangyang Liu",
+    "Yang Liu",
+    "Jun Liu",
+    "Linlin Huang",
+    "Peipei Yang"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "ACM Multimedia 2026",
+  "identifiers": {
+    "arxiv": "2608.07417"
+  },
+  "venueIds": [
+    "acm-mm"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "identity-conditioned video reasoning",
+    "person-centric video understanding",
+    "learnable identity queries",
+    "effective-shot reward",
+    "cross-shot tracking"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "representation-learning"
+    ],
+    "content-scope": [
+      "human-avatar"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "single-image",
+      "video",
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "reinforcement-learning"
+    ],
+    "prior-data": [
+      "video-prior",
+      "synthetic-data"
+    ]
+  },
+  "abstract": "Real-world video reasoning often involves multimodal, multi-source inputs, whereas existing video reasoning tasks typically assume a simplified video-text setting, limiting identity matching and person-centric reasoning. To bridge this gap, we introduce the Identity-conditioned Queries (ICQ) task, in which models are required to jointly associate and interpret an input video and a reference image of a person, and leverage this conditioning to address identity grounding, behavior understanding, and temporal reasoning, among other challenges. Building on ICQ, we present ISYV (I Seek You in Videos), a systematic solution comprising three components: (1) ISYV-Bench, a challenging evaluation benchmark with 1,377 real-world complex videos and 1,377 question-answer pairs, organized into six difficulty levels spanning capabilities from identity recognition to causal reasoning; (2) ISYV-75K, a large-scale training set of 75K high-quality samples constructed via automated annotation, multi-stage verification, and manual review; and (3) ISYV-Framework, containing an ICQ-oriented model and training strategy for learning to exploit informative video shots without additional shot-level annotations. Extensive experiments show that both mainstream closed-source and open-source MLLMs struggle on ISYV-Bench, especially in cross-domain identity matching and long-horizon tracking. ISYV-Model outperforms strong baselines and in some aspects approaches closed-source performance. Overall, ISYV provides a unified task definition, scalable datasets/benchmarks, and modeling insights for person-centric video reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.07417v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.07417v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 ACM Multimedia 2026 对应的 arXiv 2608.07417v1 全文整理；PDF 未提供可核实的代码仓库 URL。",
+    "ideaZh": "给 video reasoning 增加人物 reference image 作为 identity condition，用 learnable queries 压缩身份特征，再通过 SFT 与带 Effective Shot Reward 的 GRPO 学会选择支撑答案的镜头。",
+    "methodFlow": [
+      "输入 reference-person image、video frames 与 question",
+      "ICQ tokens 先 self-attend，再 cross-attend reference-image features",
+      "把压缩 identity queries 与 video/text tokens 一同输入 MLLM",
+      "用 SFT 学 reference description、candidate shots 与 answer format",
+      "以 GRPO 优化 answer/caption rewards，并用 ESR 选择有效镜头"
+    ],
+    "whyRelevantZh": "它属于 VLM/MLLM 与 video understanding 的交叉，identity-conditioned query 和 shot-selection reward 对多源视觉 agent 有方法价值；但任务聚焦人物追踪与影视理解，与用户核心 2D/3D design generation 不是直接主线。",
+    "evidenceZh": "作者报告 ISYV overall 为 57.01%，human 为 95.13%、Gemini-2.5-Pro 为 67.10%、base Qwen2.5-VL-7B image setting 为 24.76%（Table 3, p. 7）。但使用相同 RFT setup、保持普通 Qwen architecture 的 baseline 已达 54.22%，ICQ 的净差为 2.79 points。SFT 为 33.75%，加入 format+accuracy、caption 与 ESR 后依次达到 52.06%、55.44% 与 57.01%（Table 4, p. 8）。",
+    "caveatZh": "ISYV-75K 大量由 MLLMs 自动生成与复核，可能继承 teacher bias；film、TV 与 anime 数据的 licensing 和 identity privacy 也不够清楚。benchmark videos 平均约 50 秒、每视频仅一个 QA，不能代表 long-form memory；作者报告 social reasoning 为 37.22%，仍远低于 Gemini 的 80.56%。",
+    "motivationZh": "一般 video QA 只接收 video 与 text，不能表达“针对 reference image 中这个人”进行跨镜头身份匹配、行为理解与因果推理的现实多源查询。",
+    "methodZh": "ISYV-Bench 将 identity、behavior、temporal、social、shot memory 与 causal reasoning 分成六级任务。ICQ module 用 32 个 learnable queries cross-attend reference image features，再与 video/text tokens 一起进入 Qwen2.5-VL-7B；训练先 SFT 学结构化轨迹，再用 answer、caption 和 Effective Shot Reward 做 GRPO。",
+    "experimentsZh": "作者报告 benchmark 含 1,377 videos/QA pairs，训练集实际含 24,150 videos 与 74,578 QA pairs，标准测试采样 32 frames。比较覆盖 humans、open/closed MLLMs、text/image references 与同 recipe baseline，并对 rewards、query-token count 和 frame count 做 ablation；仍缺跨 backbone、长视频、多人物 scaling 与 synthetic-teacher holdout。",
+    "insightZh": "person-centric video reasoning 的主要提升来自 data 与 post-training，identity-query architecture 提供的是较小但可解释的增益；评估这类模块时，应把相对 raw base 的大幅提升拆成 training recipe 与 architecture 的净贡献。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

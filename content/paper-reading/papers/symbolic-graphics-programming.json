@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2509.05208",
+  "slug": "symbolic-graphics-programming",
+  "title": "Symbolic Graphics Programming with Large Language Models",
+  "authors": [
+    "Yamei Chen",
+    "Haoquan Zhang",
+    "Yangyi Huang",
+    "Zeju Qiu",
+    "Kaipeng Zhang",
+    "Yandong Wen",
+    "Weiyang Liu"
+  ],
+  "publishedAt": "2025-09-05",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "Transactions on Machine Learning Research",
+  "identifiers": {
+    "arxiv": "2509.05208"
+  },
+  "venueIds": [],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "2d-design",
+    "llm"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "symbolic graphics programming",
+    "SVG generation",
+    "render-feedback training",
+    "reinforcement learning with verifiable rewards",
+    "compositional graphics"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "vectorization"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "svg-vector",
+      "discrete-program"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "program-synthesis",
+      "reinforcement-learning",
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "controllable",
+      "editable"
+    ]
+  },
+  "abstract": "Large language models (LLMs) excel at program synthesis, yet their ability to produce symbolic graphics programs (SGPs) that render into precise visual content remains underexplored. We study symbolic graphics programming, where the goal is to generate an SGP from a natural-language description. This task also serves as a lens into how LLMs understand the visual world by prompting them to generate images rendered from SGPs. Among various SGPs, our paper sticks to scalable vector graphics (SVGs). We begin by examining the extent to which LLMs can generate SGPs. To this end, we introduce SGP-GenBench, a comprehensive benchmark covering object fidelity, scene fidelity, and compositionality (attribute binding, spatial relations, numeracy). On SGP-GenBench, we discover that frontier proprietary models substantially outperform open-source models, and performance correlates well with general coding capabilities. Motivated by this gap, we aim to improve LLMs' ability to generate SGPs. We propose a reinforcement learning (RL) with verifiable rewards approach, where a format-validity gate ensures renderable SVG, and a cross-modal reward aligns text and the rendered image via strong vision encoders (e.g., SigLIP for text-image and DINO for image-image). Applied to Qwen-2.5-7B, our method substantially improves SVG generation quality and semantics, achieving performance on par with frontier systems. We further analyze training dynamics, showing that RL induces (i) finer decomposition of objects into controllable primitives and (ii) contextual details that improve scene coherence. Our results demonstrate that symbolic graphics programming offers a precise and interpretable lens on cross-modal grounding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2509.05208v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2509.05208v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 Transactions on Machine Learning Research 对应的 arXiv 2509.05208v2 全文整理；PDF 未提供可核实的代码仓库 URL。",
+    "ideaZh": "把 SVG generation 建模为可执行的 symbolic graphics programming：LLM 生成 SVG，经 renderer、格式门与跨模态 reward 得到可验证反馈，再用 GRPO 优化 compositional graphics 能力。",
+    "methodFlow": [
+      "由文本提示生成可执行 SVG program，并以 CairoSVG 渲染",
+      "用 binary format gate 排除不可解析输出",
+      "以 SigLIP text-image reward 与可选 DINO image-image reward 评分",
+      "用 GRPO 更新 LLM，并在 SGP-GenBench 测 fidelity 与 compositionality",
+      "另用 symbolic relation checker 核验形式正确性"
+    ],
+    "whyRelevantZh": "它直接落在 2D Design 的 structured/vector generation 主线，也给出 LLM 生成可执行图形代码、render-feedback training 与 compositional verification 的完整闭环；对 SVG、Sketch 以及未来 design agent 的生成—观察—修正机制都具有直接参考价值。",
+    "evidenceZh": "作者报告 Qwen-2.5-7B 经 RL 后，VQA average 从 0.325 提升至 0.596，CLIP 从 0.184 提升至 0.272（Table 1, p. 10）；compositional average 从 8.8 提升至 60.8，但仍低于表中最好结果 84.8（Table 2, p. 11）。独立 formal checker 总分从 41.33 提升至 72.17，而 non-overlap 只有 14%（Table 13, p. 32）。",
+    "caveatZh": "训练 reward 与多数主指标仍依赖相近的视觉编码器，且没有 human study 或专业 SVG editing workflow evaluation。训练与 benchmark 主要覆盖 objects/scenes，未直接测 layers、paths、editability 或后续修改成本；附录中的 CadQuery transfer 也只有初步定性与有限指标，不能等同成熟 CAD generation 证据。",
+    "motivationZh": "LLM 虽擅长 program synthesis，但生成的图形代码是否可渲染、是否忠实表达属性、空间关系与数量，不能由代码合法性或像素相似度单独回答；开放模型与 frontier systems 在这一能力上仍有明显差距。",
+    "methodZh": "SGP-GenBench 分别评价 object/scene fidelity 与 attribute binding、spatial relation、numeracy。训练时 Qwen-2.5-7B 采样 SVG programs，经 CairoSVG 渲染后先通过格式门，再由 SigLIP 与可选 DINO 提供 differentiation-free rewards 并进入 GRPO；独立 symbolic checker 用于补充 perceptual metrics 未覆盖的关系正确性。",
+    "experimentsZh": "作者报告使用 COCO 与 MMSVG 各 47,513 个样本，共 95,026 个训练样本；主实验比较 proprietary/open models、base/instruction/RL variants、SigLIP/CLIP rewards、DINO 与 chain-of-thought。结果支持 RL 对视觉质量与 compositionality 的整体改善，但 formal non-overlap 仍是明确失败点，且没有 reward/evaluation encoder 完全解耦的对照。",
+    "insightZh": "Executable graphics 的关键不是只让代码能运行，而是把感知质量与 symbolic constraints 分开验证；render feedback 能推动分解与构图，但形式关系仍需独立 checker，不能被总体视觉分数掩盖。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

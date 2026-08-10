@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2608.06938",
+  "slug": "tact",
+  "title": "Debias in Text, Believe Your Eyes: Text-Anchored Cross-Modal Transfer for Visual Counter-Commonsense Reasoning",
+  "authors": [
+    "Chen Ling",
+    "Hanqian Li",
+    "Dongnan Liu",
+    "Keyu Qian",
+    "Jungang Li",
+    "Xinglong liu",
+    "Shiyi Wang",
+    "Xin Dong",
+    "Pengcheng Zhu",
+    "Wei Zhou",
+    "Linjian Mo",
+    "Nai Ding"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.06938"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "counter-commonsense reasoning",
+    "language-prior debiasing",
+    "text-to-vision transfer",
+    "shared decoder",
+    "evidence-grounded reasoning"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "abstract": "The visual reasoning ability of multimodal large language models (MLLMs) is crucial for downstream applications, particularly counter-commonsense reasoning, which requires models to reason beyond common assumptions. Recent studies mainly improve visual counter-commonsense reasoning by enhancing visual inputs, following the assumption that failures originate from insufficient visual grounding. However, our empirical analysis reveals that the bottleneck is not visual perception. MLLMs already capture the relevant visual evidence, and the correct answer exists in their decoding space. Instead, the shared language decoder resolves prior--evidence conflicts by favoring dominant language priors, especially for low-frequency factual scenarios. Motivated by this, we first propose a text-anchored data construction pipeline, whose core component, Fact-Frequency Distillation (FFD), estimates the prior strength of commonsense facts and distills verified counter-commonsense scenarios into a high-quality text corpus. Building upon this corpus, we introduce TACT, a text-anchored post-training framework that debiases the shared language decoder without requiring any visual training data. TACT routes evidence-following and prior-driven reasoning trajectories into different optimization stages, enabling the decoder to resolve prior--evidence conflicts. Across counter-commonsense visual benchmarks, TACT substantially improves visual reasoning while preserving general capabilities, demonstrating effective text-to-vision cross-modal transfer.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.06938v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.06938v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.06938v1 全文整理；PDF 未提供可核实的 TACT 代码仓库 URL。",
+    "ideaZh": "TACT 将 visual counter-commonsense failure 定位到 shared language decoder 的 prior preference，再只用 text-only counter-prior trajectories 对 decoder 做 LoRA SFT 与 DPO，使它在 prior 与 evidence 冲突时更倾向 evidence-consistent reasoning。",
+    "methodFlow": [
+      "用 pass@k、prior-lock@k 与 grounding probes 诊断冲突",
+      "建立 counter-commonsense taxonomy 并收集 default facts",
+      "估计 backbone prior strength 并验证 counter facts",
+      "生成 text-only TFV、MCQ 与 BCQ training instances",
+      "筛 on-policy faithful/prior pairs，并补 teacher trajectories",
+      "冻结 vision modules，只对 shared decoder 做 LoRA SFT 与 DPO"
+    ],
+    "whyRelevantZh": "它触及 VLM shared-decoder 的 cross-modal transfer：只改变语言侧决策策略，却能影响模型如何采纳 visual evidence。这对理解 MLLM failure mechanism 有价值，但与 visual design/generation 没有直接联系，属于外围 VLM reasoning 进展。",
+    "evidenceZh": "作者报告 Qwen3-VL-8B 的 average accuracy 从 66.8% 提至 80.4%，Macro-F1 从 64.3% 提至 76.2%，prior bias 从 31.5% 降至 18.2%（Table 1, p. 5）；在 MMBench-en/zh、HallusionBench、CDH-CS 与 VLind-CS 上，作者报告一般能力变化均在 −0.3 到 +0.3 points（Table 3, p. 6）。作者报告训练池包含 4,864 条 SFT trajectories 与 2,966 个 DPO pairs。",
+    "caveatZh": "Pass@k 能采到正确答案并不等于 perception 已解决。主结论只训练一个 Qwen3-VL-8B backbone，训练与三套主评测都围绕人为构造的 counter-commonsense conflicts；LLM-generated facts、captions、teacher trajectories 与 verification 还可能共享 judge/style bias，因此不能泛化为一般 evidence-grounded visual reasoning。",
+    "motivationZh": "已有方法常把 counter-commonsense error 归因于视觉 grounding 不足，但模型可能已经编码正确 evidence，只是在 shared decoder 中让高频 language prior 压过了低频视觉事实；继续增强视觉输入未必触及决策瓶颈。",
+    "methodZh": "TACT 从 Visual Genome、knowledge bases 和 LLM generation 建立事实 taxonomy，以 Factuality-Frequency Distillation 估计 target backbone 的 prior strength并筛选 counter facts；可 self-recover 样本形成 on-policy faithful/prior DPO pairs，其余由 teacher 补 SFT trajectories。训练冻结 vision encoder/projector，只更新 decoder LoRA。",
+    "experimentsZh": "作者在 CDH-Bench MC/QA、CAIT 与 VLind 上比较 general MLLMs 与 VCD、NoLan、MemVR、HA-DPO、POVID，并做 capability retention。作者报告 CDH-MC/CDH-QA/CAIT/VLind accuracy 相对 base 分别提升 12.6/14.3/17.0/10.4 points；full two-stage TACT 在三个汇总任务上的 accuracy 为 67.7/87.5/86.1，优于单独阶段。但缺少跨 backbone、真实分布偏移、数据 source mix 与 teacher dependence 的系统消融。",
+    "insightZh": "多模态模型的错误位置可能在共享 decoder 如何解决 prior–evidence conflict，而非视觉表征本身；如果瓶颈诊断成立，text-only post-training 也能通过共享参数产生 cross-modal behavior transfer。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

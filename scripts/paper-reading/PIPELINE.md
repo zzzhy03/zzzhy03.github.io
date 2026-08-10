@@ -159,6 +159,10 @@ npm run validate:paper-screening -- \
 5. review 必须记录 `runId`、`candidateId`、versioned arXiv ID、evidence locator、实验、限制、
    code status、相关性与阅读方式。
 6. 数字结论默认表述为作者报告，除非我们实际复现过。
+7. `possible-update` 必须和已归档精确版本比较 scientific delta。若变化仅为 arXiv
+   version stamp、日期、排版或不影响结论的 metadata，则全文决定记为 `reject`：这表示
+   “本次版本事件无可发布更新”，不是否定原论文。该 exact version 仍进入 decision ledger，
+   但不得更新 canonical Paper link，也不得重复进入当日 digest。
 
 ```sh
 npm run validate:paper-fulltext -- \
@@ -213,6 +217,8 @@ Method flow 和 AI concept image 是两类内容：flow 用结构化步骤表达
 3. 每个研究方向都有自己的 brief；没有新论文也要诚实说明；
 4. 新 paper 的 `collectedAt` 等于首次 digest 日期；已有 paper 更新时保留原 `collectedAt`；
 5. source coverage 必须如实显示尚未配置或失败的来源。
+6. existing paper 只有在 method、experiment、conclusion、code/venue 等发生可描述的实质变化时
+   才能再次出现在 digest；纯版本号、时间戳或排版更新不能作为日报事件。
 
 ```sh
 npm run validate:paper-promotion -- \

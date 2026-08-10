@@ -9,9 +9,9 @@
     "Richang Hong"
   ],
   "publishedAt": "2026-08-05",
-  "updatedAt": "2026-08-05",
+  "updatedAt": "2026-08-07",
   "collectedAt": "2026-08-07",
-  "venue": "arXiv preprint · v1",
+  "venue": "arXiv preprint · v2",
   "identifiers": {
     "arxiv": "2608.05242"
   },
@@ -31,7 +31,8 @@
     "structured 3D evidence",
     "disentangled perception and reasoning",
     "metric depth",
-    "LoRA LLM"
+    "LoRA LLM",
+    "targeted relational adapter"
   ],
   "facets": {
     "task": [
@@ -58,34 +59,33 @@
   },
   "abstract": "In this work, we explore an alternative paradigm for spatial reasoning by explicitly disentangling 3D perception from reasoning, rather than jointly acquiring implicit 3D perception and reasoning through large-scale training. Our key observation is that modern perception models excel at estimating continuous 3D geometry, whereas large language models (LLMs) are particularly effective at compositional and symbolic reasoning. Motivated by these complementary strengths, we propose the Disentangled Spatial Reasoner (DiSR), a simple yet effective framework that reconstructs the physical world into structured 3D evidence using off-the-shelf expert perception models and fine-tunes an LLM with LoRA to perform reasoning solely over this explicit geometric evidence. Without large-scale 3D VQA training or complex tool-use policies, DiSR achieves competitive performance on popular spatial reasoning benchmarks. Beyond its strong performance, DiSR offers improved interpretability, modularity, and computational efficiency, demonstrating that explicit separation of perception and reasoning is a scalable and effective alternative paradigm to end-to-end modeling for spatial intelligence.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2608.05242v1",
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05242v2",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2608.05242v1"
+      "href": "https://arxiv.org/abs/2608.05242v2"
     }
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 arXiv 2608.05242v1 全文整理；截至本次审阅，论文 PDF 中未提供可用的公开代码 URL。",
-    "ideaZh": "不让 MLLM 从 RGB 中同时学习 3D perception 与 reasoning：冻结的专家先把场景重建为显式 object-centric 3D evidence，LoRA LLM 随后只在序列化证据上做 symbolic reasoning。",
+    "sourceNote": "依据 arXiv 2608.05242v2 全文整理；v2 新增 targeted relational adapter 实验，截至本次审阅，论文未提供可核验的公开代码 URL。",
+    "ideaZh": "把 single-image spatial QA 拆为显式 3D modeling 与 text-only reasoning：多个视觉专家先生成 gravity-aligned object-centric evidence，LoRA LLM 再做推理；v2 进一步用少量 unseen-relation data 与 replay 训练 targeted adapter。",
     "methodFlow": [
-      "RGB Image + Spatial Question",
-      "Persistent Object Slots",
-      "Grounding + Frozen 3D Experts",
-      "Gravity-Aligned 3D Evidence",
-      "Text Serialization",
-      "LoRA LLM Reasoning"
+      "把 question 中涉及的 entities 解析为 persistent object slots",
+      "融合 grounding、segmentation、depth、camera 与 orientation experts 提取对象证据",
+      "将对象中心、尺寸、朝向等变换到 gravity-aligned 3D frame",
+      "把 structured 3D evidence 序列化为 text，交给 LoRA language reasoner",
+      "v2 对 unseen relational tasks 加少量 targeted data 与 replay 训练专门 adapter"
     ],
-    "whyRelevantZh": "它连接 VLM/MLLM spatial reasoning 与 3D reconstruction，但重点不是扩张成泛化的 3D understanding 分类，而是把可检查的 3D representation 作为 reasoning interface；这种 modular intermediate state 对视觉设计 agent 和可编辑 3D workflow 也有迁移价值。",
-    "evidenceZh": "作者报告 DiSR-8B-LoRA 在 3DSRBench 得到 67.62 overall，高于 HiSpatial-3B 的 63.85，并使用 0.33M samples、单张 RTX 4080 SUPER 训练 59h（Table 1, p. 6）；但 CV-Bench-3D average 92.25，低于 base Qwen3-VL 的 92.67（Table 3, p. 6）。",
-    "caveatZh": "系统串联多个 frozen experts，未报告完整 inference latency 或模块替换敏感性；低分辨率与小目标会破坏 object-level 3D evidence。训练只报告 seed 42，而且跨方法资源比较并非 matched control。",
-    "motivationZh": "large-scale 3D VQA 将 perception 与 reasoning 混进 latent representation，训练昂贵且错误难以定位；agentic tool use 又需要复杂 orchestration。DiSR 试图用固定 evidence interface 让每个模块只承担擅长的职责。",
-    "methodZh": "question parser 先生成 persistent object slots；Qwen3-VL grounding、SAM、Metric3D、WildCamera、PerspectiveFields 与 OrientAnything 恢复 mask、metric depth、camera/gravity frame、center、extent、size 和 orientation。所有对象属性在共享坐标系中序列化成 text，LoRA-adapted LLM 不再读取 image，只回答 evidence-conditioned question。",
-    "experimentsZh": "作者评测 3DSRBench、SPAR-Bench、CV-Bench-3D、五个通用 multimodal benchmarks 和 COCO grounding subset。SPAR 的 Metric Avg. 达 49.37，但 Rel. Avg. 只有 40.25；用 ground-truth required 3D evidence 后 CV-Bench Depth/Distance 接近 100%，说明 reasoning module 可用，而主要错误来自 upstream evidence construction。",
-    "insightZh": "最值得精读的是 fixed evidence interface 与 intermediate-error substitution：它把“模型是否具备 spatial intelligence”拆成 parsing、grounding、3D construction 和 reasoning 四个可替换、可诊断环节，而非只靠 end-to-end score 猜测内部能力。",
+    "whyRelevantZh": "它同时连接 VLM spatial reasoning 与窄义 3D reconstruction/representation：重点不是传统 dense geometry，而是怎样把 3D evidence 变成可审计、可由 LLM 使用的 structure；这种模块化接口也可迁移到 3D generation/editing agent 的 verification。",
+    "evidenceZh": "作者报告 base DiSR 在 3DSR overall 为 67.62、SPAR overall 为 46.33；v2 的 DiSR-8B-LoRA* 将 SPAR overall 提升至 57.56、relational average 从 40.25 提升至 68.30，但 3DSR overall 同时降至 65.81（Tables 1–2, pp. 6–7）。GT 3D evidence 下 tested reasoning 达到 100/100，说明当前主要瓶颈仍在 upstream evidence，而非证明 perception 已解决。",
+    "caveatZh": "v2 的提升来自 targeted task data，不是原版 zero-shot generalization 的全面进步，并伴随 3DSR regression。pipeline 依赖多个 frozen experts，却没有完整 latency、uncertainty propagation 或模块替换敏感性；只报告 seed 42，且主文称 2,000 条 adaptation data、附录明确为 2,816 条，存在表述不一致。",
+    "motivationZh": "end-to-end 3D VQA 将 perception 与 reasoning 混在 latent representation 中，训练昂贵且难定位错误；DiSR 用固定 evidence interface 把 upstream geometry 与 downstream symbolic reasoning 分开，而 v2 用 targeted adaptation 检验新的 relation schema 是否主要卡在 reasoner。",
+    "methodZh": "question parser 先生成 persistent object slots；Qwen3-VL grounding、SAM、Metric3D、WildCamera、PerspectiveFields 与 OrientAnything 恢复 mask、metric depth、camera/gravity frame、center、extent、size 和 orientation。属性被统一到 gravity-aligned frame 并序列化为 text，LoRA LLM 不再读取 image。v2 另以 2,816-example new-relation/replay mixture 训练 adapter。",
+    "experimentsZh": "原训练包含 112,157 parsing 与 216,000 reasoning examples；v2 targeted adapter 训练 10 epochs，并在 3DSR、SPAR、CV-Bench 与 GT intermediate evidence 上评估。SPAR relational gain 很大，但 3DSR regression 揭示 distribution trade-off；仍缺 new-data/replay ratio、epochs、relation family 的系统 sweep，以及 multi-seed 与端到端资源审计。",
+    "insightZh": "核心贡献仍是 fixed evidence interface 与 intermediate-error substitution：它把 spatial intelligence 拆成 parsing、grounding、3D construction 与 reasoning 四个可检查环节。v2 更进一步说明新 relation failure 可由少量 adapter 修复，但这种修复会改变原能力分布，因此应视为 narrow adaptation update。",
     "relevance": "high",
-    "readingAction": "deep",
+    "readingAction": "skim",
     "evidenceMaturity": "mixed"
   }
 }

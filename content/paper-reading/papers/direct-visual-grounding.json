@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2511.12738",
+  "slug": "direct-visual-grounding",
+  "title": "Direct Visual Grounding by Directing Attention of Visual Tokens",
+  "authors": [
+    "Parsa Esmaeilkhani",
+    "Longin Jan Latecki"
+  ],
+  "publishedAt": "2025-11-16",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2511.12738"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual grounding",
+    "vision-language models",
+    "attention supervision",
+    "KL Attention Loss",
+    "visual token routing",
+    "referring expression comprehension"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "single-image",
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "prior-data": [
+      "2d-prior"
+    ]
+  },
+  "abstract": "Vision Language Models (VLMs) mix visual tokens and text tokens. A puzzling issue is the fact that visual tokens most related to the query receive little to no attention in the final layers of the LLM module of VLMs from the answer tokens, where all tokens are treated equally, in particular, visual and language tokens in the LLM attention layers. This fact may result in wrong answers to visual questions, as our experimental results confirm. It appears that the standard next-token prediction (NTP) loss provides an insufficient signal for directing attention to visual tokens. We hypothesize that a more direct supervision of the attention of visual tokens to corresponding language tokens in the LLM module of VLMs will lead to improved performance on visual tasks. To demonstrate that this is indeed the case, we propose a novel loss function that directly supervises the attention of visual tokens. It directly grounds the answer language tokens in images by directing their attention to the relevant visual tokens. This is achieved by aligning the attention distribution of visual tokens to ground truth attention maps with KL divergence. The ground truth attention maps are obtained from task geometry in synthetic cases or from standard grounding annotations (e.g., bounding boxes or point annotations) in real images, and are used inside the LLM for attention supervision without requiring new labels. The obtained KL attention loss (KLAL) when combined with NTP encourages VLMs to attend to relevant visual tokens while generating answer tokens. This results in notable improvements across geometric tasks, pointing, and referring expression comprehension on both synthetic and real-world data, as demonstrated by our experiments. We also introduce a new dataset to evaluate the line tracing abilities of VLMs. Surprisingly, even commercial VLMs do not perform well on this task.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2511.12738v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2511.12738v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ParsaKhani/visual-grounding-datasets"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2511.12738v2 全文整理；Code 链接采用论文中可核验的公开仓库 URL。",
+    "ideaZh": "不再只用 next-token prediction 间接期待 VLM 看对位置，而是把 answer-token 到 visual-token 的 attention distribution 直接对齐到由几何、point 或 bounding box 标注构造的空间目标图。",
+    "methodFlow": [
+      "由 task geometry 或已有 point/box annotation 构造 visual-token target distribution",
+      "在 answer-token 位置提取各 LLM layer 的 visual attention，并对 heads 求平均",
+      "用 KL divergence 对齐 predicted attention 与 target map",
+      "联合优化 NTP + λ·KLAL，保持原 VLM architecture 与 inference path 不变",
+      "在 geometry、pointing、referring expression 与 cross-dataset transfer 上评估"
+    ],
+    "whyRelevantZh": "这是一种可迁移到 VLM/MLLM 与视觉生成、编辑 agent 的 grounding supervision：当决策需要绑定 canvas、object 或 region 时，可借已有结构标注约束内部 token routing。它比单一 benchmark trick 更接近模型机制层面的变化。",
+    "evidenceZh": "作者报告 Qwen2.5-VL-7B 的 line intersection accuracy 从 62.64 提升至 70.23、line tracing 从 53.82 至 62.21、Grid Patch 从 28.57 至 44.90、PixMo 从 26.28 至 35.77（Tables 1–2, p. 6）；RefCOCO 三个 split 仅提升 0.60–0.80 point，而 PixMo→Grid / Grid→PixMo transfer 从 11.16/16.05 提升至 19.29/21.98（Tables 3–4, p. 7）。",
+    "caveatZh": "方法复用已有 spatial annotation 或 synthetic geometry，并非 label-free grounding；attention alignment 与答案改善相关，但不构成 attention 因果解释。主要证据仍来自 synthetic/pointing tasks，未报告 multi-seed uncertainty，成熟 RefCOCO 上的绝对增益也不足 1 point。",
+    "motivationZh": "标准 NTP loss 只间接监督最终文字答案，未明确要求 answer tokens 把计算路由到真正相关的 visual tokens；后层 attention 因此可能忽视目标区域并产生错误答案。",
+    "methodZh": "作者从任务几何或 point/box annotations 构造归一化 target attention map，在每层 LLM 中提取 answer-token 对 visual-token 的 attention、对 heads 求平均，再用 KL divergence 约束 predicted distribution；KLAL 与 NTP 以默认 λ=1 联合训练，不新增 task head 或推理模块。",
+    "experimentsZh": "实验使用 LLaVA-v1.5-7B 与 Qwen2.5-VL-7B，覆盖 line intersection、新建 line tracing、Grid Patch、PixMo pointing、RefCOCO 与 cross-dataset transfer。两个 backbone 和多类任务方向一致；all-layer supervision 与 λ=1 在作者消融中最佳，但缺少 noisy/random target controls、更多 backbone、强 grounding head 及多随机种子比较。",
+    "insightZh": "最值得精读的是把已有空间监督直接施加到生成器内部 token routing，而非另设 grounding head；其适用边界也很明确：任务必须能提供可信的 target attention map，且更整齐的 attention 不能自动等同于可解释的因果机制。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

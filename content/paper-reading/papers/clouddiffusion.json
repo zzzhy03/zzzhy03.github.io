@@ -1,0 +1,98 @@
+{
+  "id": "arxiv:2606.16048",
+  "slug": "clouddiffusion",
+  "title": "CloudDiffusion: Diffusion-Based Scene Completion in the Point Cloud Domain",
+  "authors": [
+    "Chidera Agbasiere",
+    "Mikhail Sannikov",
+    "Faith Ogunwoye",
+    "Erik Shaikhiev",
+    "Alex Kozinov",
+    "Ilya Mikhalchuk",
+    "Iana Zhura",
+    "Dzmitry Tsetserukou"
+  ],
+  "publishedAt": "2026-06-14",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v3",
+  "identifiers": {
+    "arxiv": "2606.16048"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "LiDAR scene completion",
+    "point-cloud diffusion",
+    "single-step denoising",
+    "ground-truth refinement",
+    "Gaussian-token VAE"
+  ],
+  "facets": {
+    "task": [
+      "completion"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "partial-3d"
+    ],
+    "method": [
+      "diffusion",
+      "feed-forward"
+    ],
+    "prior-data": [
+      "native-3d"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Reconstructing dense 3D scenes from sparse LiDAR point clouds (LiDAR scene completion) is a fundamental challenge in autonomous driving, where diffusion models offer a promising solution. However, existing approaches rely on object-level autoencoders that collapse into unstable global representations at outdoor scale, and suffer from ground truth data corrupted by odometry drift that systematically degrades supervision quality. Furthermore, multi-step diffusion inference incurs prohibitive latency for real-time deployment. We present CloudDiffusion, addressing these issues with three independent components. First, a multi-token Gaussian VAE with cross-attention pooling provides stable scene-scale LiDAR compression as a standalone reconstruction module, avoiding the global-pooling and codebook-collapse failure modes of prior point-cloud autoencoders. Second, an anchor-based ICP ground truth refinement pipeline eliminates drift-induced noise from training supervision, reducing our single-step x0 diffusion teacher's squared Chamfer distance by approximately 16x on SemanticKITTI seq. 08 (0.396 to 0.024 m^2) with no model change (partly aided by the denser, more compact refined references). Third, the same teacher completes scenes in a single x0 step, operating directly in coordinate space, not in the VAE latent. It runs in near real time at 209ms/frame, 65-138x lower inference latency than iterative diffusion baselines. Our results indicate that data quality dominates model design in this regime, and suggest that multi-token latent spaces could serve as a stable first stage for future latent diffusion-based scene completion.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.16048v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.16048v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/A-C-Simon/sonata_ws"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2606.16048v3 全文整理；Code URL 使用作者在 PDF 中印出的公开仓库。",
+    "ideaZh": "在 point-cloud coordinates 中做 single-step scene completion，并把 compact Gaussian-token VAE、anchor-based ground-truth refinement 与 frozen-backbone coordinate denoiser作为三个独立组件研究。",
+    "methodFlow": [
+      "对齐 sparse LiDAR observation 与 completion reference，并构造 coordinate scaffold",
+      "用 Gaussian-token VAE 做独立的 scene-scale point-cloud representation",
+      "冻结 Point Transformer backbone，只训练轻量 coordinate denoiser",
+      "以 single-step x0 prediction 替代迭代 diffusion sampling",
+      "分别在 refined 与 standard references 下比较 accuracy 和 runtime"
+    ],
+    "whyRelevantZh": "它属于 broad 3D Generation/Completion，对 point-cloud coordinate models、single-step generation 与 supervision quality 有参考价值；尤其值得保留的是它通过 cross-evaluation 拆分 ground-truth refinement 与真正 model gain。",
+    "evidenceZh": "作者报告 matched refined-reference squared Chamfer 从 0.396 降至 0.024，但在固定 reference 的 cross-evaluation 中净模型改进只有 8.1%（p. 5）。CloudDiffusion 推理为 209 ms，同硬件 LiDiff 为 20.56 s、ScoreLiDAR 为 4.72 s，而非 diffusion 的 LiNeXt 为 167 ms；在 standard reference 下 linear Chamfer 为 0.496，弱于 LiDiff 0.434、ScoreLiDAR 0.406 与 LiNeXt 0.149（p. 5）。",
+    "caveatZh": "refined target 同时改变密度与对齐程度，不能把 matched-table 的约 16× 差异都归因于模型。VAE 只在 50 个 validation frames 上报告且尚未接入 diffusion pipeline；target-derived scaffold 的信息边界也需要更严格验证。作者明确说明完整 DDPM 训练不稳定，single-step formulation 限制 stochastic diversity。",
+    "motivationZh": "Outdoor LiDAR completion 同时面临 scene-scale point-cloud representation 不稳定、odometry drift 污染监督，以及多步 diffusion 推理过慢的问题，因此需要分别检查表示、数据与采样三类瓶颈。",
+    "methodZh": "Gaussian-token VAE 用 cross-attention pooling 将点云编码为 grid-like multi-token latents；anchor ICP pipeline 重新对齐并加密 completion targets。实际 completion model 不在 VAE latent 中工作，而是冻结 Point Transformer backbone、训练 8.9M-parameter denoiser直接预测 clean coordinates，并用 target-derived scaffold 形成输出坐标结构。",
+    "experimentsZh": "作者在 SemanticKITTI 上测试 VAE、reference refinement 与 completion，比较 LiDiff、ScoreLiDAR 和 LiNeXt，并尽量在 RTX 4090 上重新计时。作者报告 VAE squared Chamfer 为 0.120±0.026、推理 1.6 ms；但标准 reference 下 accuracy 不领先，且三部分尚未形成统一端到端系统。",
+    "insightZh": "这篇工作的首要结论不是 diffusion architecture 的突破，而是评价 target 的定义可能主导表面增益；对 completion 系统，模型、scaffold 与 ground-truth refinement 必须在同一 reference 下交叉核算。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

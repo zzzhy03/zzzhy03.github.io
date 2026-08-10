@@ -1,0 +1,107 @@
+{
+  "id": "arxiv:2608.07012",
+  "slug": "scenix",
+  "title": "Scenix: Sparse-View 3D Scene Reconstruction via Executable Scene Programs",
+  "authors": [
+    "Kai Li",
+    "Lutao Jiang",
+    "Zhenyang Li",
+    "Jiayu Dong",
+    "Jierui Zhang",
+    "Yingda Yin",
+    "Runze Zhang",
+    "Kai Yan",
+    "Xiaoyang Huang",
+    "Keyang Luo",
+    "Xin Wang",
+    "Xiangyu Zhao",
+    "Weikai Chen"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.07012"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "sparse-view reconstruction",
+    "executable scene programs",
+    "editable 3D scenes",
+    "asset grounding",
+    "closed-loop spatial refinement"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "mesh",
+      "discrete-program",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "method": [
+      "retrieval-composition",
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "native-3d",
+      "synthetic-data"
+    ],
+    "output-property": [
+      "editable",
+      "asset-ready"
+    ]
+  },
+  "abstract": "Synthesizing a structured and editable 3D indoor scene from a few uncalibrated RGB views requires more than generating high-quality individual assets: a system must infer the room structure, associate objects across incomplete observations, and recover a globally consistent spatial configuration. Previous methods mainly focus on 3D scene generation with text input or require continuous visual inputs with additional priors, \\ e.g., human-annotated masks or accurate 3D layouts, which makes these methods labor demanding and hard to apply in general cases. We present \\textsc{Scenix}, a sparse-view 3D scene reconstruction framework via executable scene programs, a structured representation that can be directly instantiated into editable 3D scenes. Given sparse views, \\textsc{Scenix} predicts executable scene programs through perception-grounded asset instantiation and closed-loop spatial refinement. % We present \\method, a framework that predicts an executable scene representation from sparse views and realizes it through perception-grounded asset instantiation and closed-loop spatial refinement. To support this task, we construct \\dataset, a dataset of approximately 110,000 synthetic and real indoor scenes with multiview imagery, room structures, object-centric descriptions, and metric spatial annotations. We further introduce observation-consistent supervision that aligns each target scene with the visual evidence available in its input views. Experiments on held-out \\textsc{XScene} scenes, real indoor images, and out-of-distribution SpatialGen cases evaluate structured scene prediction, object grounding, and spatial refinement.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.07012v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.07012v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.07012v1 全文整理；PDF 未提供可核实的 Scenix 代码仓库 URL。",
+    "ideaZh": "Scenix 不从 sparse uncalibrated RGB views 直接拟合 mesh 或 radiance field，而先让 LayoutVLM 生成包含 room、objects、尺寸、姿态和关系的 executable scene program，再 grounding assets 并通过 Critic-Editor-Verify loop 修正空间布局。",
+    "methodFlow": [
+      "输入少量未标定 indoor RGB views",
+      "LayoutVLM 生成 room、entities 与 relations 的 scene program",
+      "Asset Grounder 将程序实体与跨视图证据匹配并校正 inventory",
+      "为匹配实体检索或生成 open-vocabulary 3D assets",
+      "从 canonical views 渲染场景并定位 residual spatial errors",
+      "Editor 修改 pose/scale，Verifier 检查后导出 editable scene"
+    ],
+    "whyRelevantZh": "它位于 3D Reconstruction、3D Generation 与 Computational Design 的交界：目标既要解释输入，又输出可编辑的 programmatic scene 与可替换 assets。相较只产生 implicit field 或 single mesh，它更接近可继续设计和组合的 structured 3D content。",
+    "evidenceZh": "作者报告 XScene 含 110,179 cases、560,184 images（Fig. 3, p. 5）。在 OOD SpatialGen 上，full refinement 将 9B/4B 的 F1@5 从 0.244/0.234 提至 0.327/0.347，即相对提升 34.0%/48.3%（Table 4, p. 7）；single-view subset 上 9B 的 F1@5=0.355、recall=0.463、3D IoU=0.179，比较方法 F1@5 为 0.192–0.207（Table 5, p. 7）。",
+    "caveatZh": "XScene 规模主要来自 InfiniGen，真实 SUN RGB-D 部分是 single-view；作者报告 OOD 仅含 48 个 SpatialGen scenes，且 raw model 对 ground-truth mean 6.3 objects 预测 12.2/14.1 个，显示明显 inventory calibration 问题。比较 baselines 的输出目标并不等价，open-vocabulary assets 的 geometry、material 与 identity fidelity 也缺少独立量化。",
+    "motivationZh": "从少量未标定 RGB views 恢复室内 scene 不只需要单个 object assets，还要推断 room structure、跨视图实体对应与全局一致 placement；依赖 camera calibration、depth 或人工 masks/layouts 的方法难以用于一般输入。",
+    "methodZh": "LayoutVLM 一次性输出 observation-consistent room blueprint 与 serialized entities；Asset Grounder 匹配 visual evidence、删除 unsupported inventory、补检测对象并生成或检索 assets。系统从 canonical bird’s-eye views 渲染当前 scene，再用 bounded Critic-Editor-Verify loop 只修正 residual position、rotation 与 scale。",
+    "experimentsZh": "作者在 202 个 InfiniGen scenes、200 个 SUN RGB-D cases 与 48 个 SpatialGen OOD scenes 上评测 Qwen3.5-4B/9B LayoutVLM，指标覆盖 inventory precision/recall、center F1@5/10、matched 3D IoU 和 yaw error。作者报告 raw 9B 在 InfiniGen/SUN RGB-D/SpatialGen 的 F1@5 为 0.331/0.519/0.239；Asset Grounder 是主要增益，agent loop 继续改善 localization，但缺少 blueprint、asset generator 和 loop rounds 的细粒度消融。",
+    "insightZh": "把 reconstruction 的主表示换成 executable scene program，可先分离 structural induction 与 asset realization，再用渲染反馈做 bounded residual edits；这比端到端拟合单一几何表示更自然地支持 editability 与 object replacement。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

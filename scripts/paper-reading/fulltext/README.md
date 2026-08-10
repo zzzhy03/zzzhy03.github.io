@@ -71,6 +71,10 @@ The local review file uses this shape:
 
 Allowed decisions are `accept-deep`, `accept-skim`, `defer`, and `reject`. `defer` means a
 future version, code release, or stronger evidence is needed; it is not canonical acceptance.
+For a `possible-update`, `reject` may also mean that the exact new version was fully checked but
+contains no material scientific delta from the canonical version. This terminal observation belongs
+in the decision ledger, while the canonical record and daily digest remain unchanged; it does not
+reverse the earlier acceptance of the paper itself.
 Evidence support is `paper-method`, `paper-experiment`, or `reviewer-inference`. Accept decisions
 need at least three evidence items, one located result, and visual inspection of the first page,
 the main method figure, the main result table, and any explicit limitations page. Numerical

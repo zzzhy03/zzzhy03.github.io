@@ -1,0 +1,91 @@
+{
+  "id": "arxiv:2608.07144",
+  "slug": "instancesplat",
+  "title": "InstanceSplat: Instance-Aware Feed-Forward 3D Gaussian Splatting for Scene Understanding",
+  "authors": [
+    "Minchao Jiang",
+    "Xiaoxuan Ma",
+    "Shunyu Jia",
+    "Haoru Wang",
+    "Zhang Liang",
+    "Wentao Zhu"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.07144"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "instance-aware 3D Gaussian splatting",
+    "feed-forward scene understanding",
+    "cross-view instance consistency",
+    "open-vocabulary 3D segmentation",
+    "pose-free multi-view reconstruction"
+  ],
+  "facets": {
+    "task": [
+      "segmentation",
+      "reconstruction",
+      "representation-learning"
+    ],
+    "content-scope": [
+      "scene",
+      "object"
+    ],
+    "representation": [
+      "3d-gaussian"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "prior-data": [
+      "multi-view-prior"
+    ]
+  },
+  "abstract": "Feed-forward 3D Gaussian Splatting (3DGS) enables efficient and generalizable 3D reconstruction, but current feed-forward 3DGS methods for scene understanding remain largely category-oriented. In contrast, instance-aware 3DGS methods typically rely on per-scene optimization and often decouple reconstruction from instance and semantic learning, limiting reciprocal interactions among them. We present InstanceSplat, a unified feed-forward 3DGS framework for generalizable 3D reconstruction and instance-aware scene understanding from pose-free multi-view images. In a single forward pass, InstanceSplat constructs an instance-aware Gaussian representation that jointly encodes appearance, geometry, instance identity, and language-aligned semantics. Shared 3D Gaussians ground instance identities across views, producing renderable and cross-view-consistent instance features. To allow reconstruction and scene understanding to benefit from each other, we further design an instance-centric learning strategy that connects reconstruction, instance learning, and semantic learning through shared instance structure. Specifically, instance cues guide reconstruction, language-aligned semantics strengthen the discrimination of confusing same-category instances, and instance regions aggregate semantic evidence into coherent object-level predictions. Experiments on novel-view synthesis, instance segmentation, and open-vocabulary semantic understanding under varying input-view settings and on an unseen dataset demonstrate state-of-the-art performance, practical efficiency, and strong generalization.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.07144v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.07144v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.07144v1 全文整理；PDF 未提供可核实的代码仓库 URL。",
+    "ideaZh": "让一组 feed-forward 3D Gaussians 同时承载 appearance、geometry、compact instance embeddings 与 language-aligned semantics，再用 prototype、cross-view consistency 和 instance-centric coupling 联合优化 reconstruction 与 understanding。",
+    "methodFlow": [
+      "从 pose-free multi-view images 预测 cameras、geometry 与 shared Gaussians",
+      "为每个 Gaussian 联合预测 appearance、instance embedding 与 semantic feature",
+      "渲染 instance features 并做 prototype pull/push 与 cross-view consistency",
+      "用 instance boundaries 引导 RGB reconstruction，并分开 semantic hard negatives",
+      "在 instance 内聚合 semantics，输出 segmentation、language query 与 novel views"
+    ],
+    "whyRelevantZh": "它直接对应用户持续跟进的 3D Segmentation，并与 3D Reconstruction/3DGS 交叉；相比泛化的 3D understanding，它聚焦用户实际做过的 segmentation、scene encoding 与少视图 representation，相关性高。",
+    "evidenceZh": "作者报告 2-view indoor 3D semantic segmentation mIoU 为 65.23，C3G 为 46.14；16-view 为 64.60，LSeg/C3G 为 45.29/40.82（Table 1, p. 5）。在 unseen LERF scenes 上，8-view mIoU 为 63.22、耗时 2.75 s，OpenGaussian 为 26.23、55 min；但 16 views 时降至 53.85（p. 6）。完整 IGGT 的 T-mIoU/T-SR 为 64.03/51.04，冻结或移除 cross-view component 时为 61.99/45.15（Table 3, p. 6）。",
+    "caveatZh": "训练大量依赖 foundation-model pseudo labels，增益难完全归因于 instance-aware Gaussian architecture。open-vocabulary evidence 主要来自少量 LERF views 与 indoor ScanNet semantics；作者报告 LERF 从 8 增到 16 views 反而退化，说明 pose/feature alignment 较脆弱。clustering cost 还会随视图和 Gaussian 数量增长。",
+    "motivationZh": "feed-forward 3DGS 已能快速重建，但多为 category-oriented；instance-aware language Gaussians 又常依赖 per-scene optimization，并把 reconstruction、instance identity 与 semantics 分开学习，难以让它们互相约束。",
+    "methodZh": "VGGT-style backbone 从无需已知 pose 的多视图预测 cameras、depth/point maps 与 Gaussians，并附加 instance 和 semantic features。rendered instance embeddings 被拉向 prototypes、推离其他实例并保持 cross-view identity；instance boundaries、semantic hard negatives 与 instance-level aggregation进一步连接 RGB reconstruction 和 language-aligned understanding。",
+    "experimentsZh": "作者报告用 ScanNet++/ScanNet 的 1,565 scenes 与 RealEstate10K 的 5,137 scenes 训练约 21 小时，评估 ScanNet/ScanNet++ reconstruction/segmentation、unseen LERF language segmentation 与 tracking-style metrics。论文同时给 prototype/cross-view、instance coupling、boundary RGB 和 semantic aggregation ablations，但不同 baselines 的 pose、pseudo labels、training scenes 与 views 并不完全一致。",
+    "insightZh": "feed-forward 3D representation 可以把 instance identity 作为 reconstruction 与 semantics 的共享中介；但 view scaling 是否真正成立，取决于 pose 与 feature alignment，不能用单一少视图优势外推到大场景。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

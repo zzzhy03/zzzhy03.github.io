@@ -1,0 +1,104 @@
+{
+  "id": "arxiv:2608.06332",
+  "slug": "geniworld",
+  "title": "GeniWorld: A Generalizable Interactive World Model for Robotic Manipulation via Visual Actions",
+  "authors": [
+    "Chenghao Gu",
+    "Hanyang Yu",
+    "Jingbo Zhang",
+    "Haitao Lin",
+    "Wenyao Zhang",
+    "Jinghe Wang",
+    "Hanglei Jin",
+    "Shuzhao Xie",
+    "Jingyan Jiang",
+    "Zhi Wang"
+  ],
+  "publishedAt": "2026-08-06",
+  "updatedAt": "2026-08-06",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.06332"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "interactive world model",
+    "visual actions",
+    "robotic manipulation",
+    "spatially grounded control",
+    "autoregressive video prediction",
+    "synthetic trajectories"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "environment-world"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "video",
+      "multimodal"
+    ],
+    "method": [
+      "diffusion",
+      "flow-matching",
+      "autoregressive"
+    ],
+    "prior-data": [
+      "video-prior",
+      "synthetic-data"
+    ],
+    "output-property": [
+      "controllable",
+      "efficient"
+    ]
+  },
+  "abstract": "Generalist robot policies exhibit strong capabilities, but their robustness in complex and unseen environments remains limited. Scaling robot learning and evaluation in diverse real-world environments remains costly and challenging. Action-conditioned world models offer a promising alternative, but they often suffer from limited action controllability and poor generalization to out-of-distribution (OOD) scenarios. To this end, we present GeniWorld, an interactive world model for robots that generalizes robustly across unseen scenarios. Building on pretrained video generative models, we use URDF-based rendering to transform numerical actions into visual action representations, enabling spatially grounded action control. By explicitly decoupling embodiment kinematics from environmental dynamics, our model mitigates scene overfitting and facilitates modeling of robot-environment interactions. To achieve closed-loop control, we construct an autoregressive video prediction model integrated with high-frequency robot kinematic control, enabling interaction with both robot policies and human teleoperators. In our experiments, even when trained solely on limited fixed-scene data, our model achieves superior in-domain performance and robust zero-shot generalization to highly randomized, unseen environments. For downstream applications, GeniWorld serves as a scalable policy evaluator that remains reliable under environmental perturbations. Furthermore, even with limited real-world demonstrations, GeniWorld generates diverse manipulation trajectories within the world model, improving downstream policy performance and robustness in complex environments.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.06332v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.06332v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://chenghaogu.github.io/GeniWorld/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.06332v1 全文整理；PDF 提供 GeniWorld project page，但没有打印可直接核验的代码仓库 URL，故不添加 Code 链接。",
+    "ideaZh": "不直接把 robot joint vectors 输入 video model，而是用 URDF 与 forward kinematics 把动作渲染成 camera-aligned visual action frames，再与 video latents 空间对齐并联合生成未来 observations。",
+    "methodFlow": [
+      "用 URDF 与 forward kinematics 将 numerical robot actions 渲染为 camera-aligned visual actions",
+      "用 causal 3D VAE 分别编码 visual actions 与 observation video",
+      "沿 channel 维拼接 spatially aligned action 与 video latents",
+      "用 causal flow-matching video backbone 自回归预测 future observations",
+      "通过 KV cache 和逐步 action rendering 支持 policy 或 teleoperator closed-loop interaction"
+    ],
+    "whyRelevantZh": "它提供一种可迁移的 controllable video generation 接口：先把低维控制信号渲染成 spatially grounded visual condition，再生成结果。这对 design/video agents 的结构化控制与生成闭环有启发，但具体任务仍是 robotics。",
+    "evidenceZh": "作者报告 visual actions 在 RoboTwin Clean-to-Random 上取得 FID/FVD 13.08/20.15，numerical-action variant 为 40.91/53.69（Table I, p. 4）。采样从 50 步降至 5 步时，作者报告 FVD 仅退化约 2%，并在 H20 上达到约 8 Hz（pp. 5–6）。四个 real tasks 中，real-only、加入 spatial synthetic data、再加入 diverse synthetic data 的 overall policy success 分别为 40.8%、51.0% 和 69.0%（Fig. 9, p. 7; Table III, p. 13）。",
+    "caveatZh": "方法依赖准确 URDF、forward kinematics 与 camera calibration。真实实验只有四个 manipulation tasks、每项 25 demonstrations，且未报告置信区间；synthetic-data gain 同时混入外部 image editing、world-model rollout 与更多 trajectories，无法完全归因于 world model。",
+    "motivationZh": "action-conditioned world models 常因低维 numerical actions 与 image-space observations 缺少空间对齐而控制不稳，也容易记忆固定场景；真实世界中大规模收集多样环境数据又代价很高。",
+    "methodZh": "数值动作先经 robot URDF 和 forward kinematics 渲染成相机视角下、不含背景与对象的 dense visual motion。visual action 与 observation video 分别通过 causal 3D VAE，所得 latents 沿 channel 维拼接后进入 Wan2.2-based causal flow model；推理通过 KV cache 自回归预测未来 observations，并接受 robot policy 或 human teleoperator 的闭环控制。",
+    "experimentsZh": "RoboTwin2.0 实验覆盖 50 tasks、2,250 train 与 250 held-out clean episodes，并在只训练 clean scenes 后 zero-shot 测 250 random episodes。real-world 部分覆盖 Move Bowl、Fold Towel、Place Mug、Open Drawer，每项 25 demonstrations，并生成两组各 65 条 synthetic trajectories。action representation、conditioning 与 sampling steps 的消融较清楚，但缺少 calibration noise、unseen embodiment、history length，以及 external image editor 与 world-model contribution 的独立拆分。",
+    "insightZh": "把控制信号先渲染成与输出共享坐标系的视觉条件，可以减轻 video model 同时学习 embodiment kinematics 与 environment dynamics 的负担；但从 robot world model 到通用 visual generation interface 的迁移仍需跨 embodiment、跨任务和更严格的真实数据验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

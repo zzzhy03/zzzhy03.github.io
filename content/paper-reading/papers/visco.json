@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2607.12756",
+  "slug": "visco",
+  "title": "VisCo: Leveraging Large Language Models as Intrinsic Encoders for Visual Token Compression",
+  "authors": [
+    "Yupeng Zheng",
+    "Kai Zou",
+    "Bin Liu",
+    "Nenghai Yu"
+  ],
+  "publishedAt": "2026-07-14",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "ACM Multimedia 2026",
+  "identifiers": {
+    "arxiv": "2607.12756"
+  },
+  "venueIds": [
+    "acm-mm"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual token compression",
+    "intrinsic LLM encoder",
+    "hierarchical KV memory",
+    "memory tokens",
+    "multi-turn visual context"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Vision-language models (VLMs) process large numbers of visual tokens, resulting in substantial inference latency and memory overhead. This has motivated extensive research on visual token compression. While training-free strategies rely on heuristic metrics and suffer significant performance degradation under high compression ratios, many training-based methods introduce external compression modules that force the VLM backbone to adapt, incurring substantial retraining cost and compromising VLMs' priors. Effective visual token compression hinges on strong information encoding, a capability already present in pretrained VLMs but underutilized by existing approaches. Motivated by this, we propose VisCo, a training-efficient self-compression framework that reuses the pretrained VLM itself as an intrinsic compressor. VisCo is a parameter-sharing autoencoder that compresses visual information using a small set of memory tokens and transfers hierarchical information from encoding to decoding. Experiments show that VisCo surpasses prior methods across all evaluated compression ratios, with larger gains under more aggressive compression, and remains stable even in the extreme single-token setting. Moreover, when combined with the original visual tokens, the learned memory tokens can even improve the base model, suggesting that VisCo captures complementary representations beyond compression. Code is available at: \\href{https://github.com/Zyvpeng/VisCo}{\\textcolor{blue}",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.12756v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.12756v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Zyvpeng/VisCo"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 ACM Multimedia 2026 对应的 arXiv 2607.12756v2 全文整理；Code URL 使用作者在 PDF 中印出的公开仓库。",
+    "ideaZh": "让 frozen LLM 自身充当 visual-token encoder：少量 learnable memory tokens 汇聚完整视觉序列并逐层缓存 K/V，再由恢复为原始 base model 的 decoder 读取这份 hierarchical memory。",
+    "methodFlow": [
+      "在完整 visual sequence 后追加少量 learnable memory tokens",
+      "只给 encoder-side attention 的 Q/V 加 LoRA",
+      "逐层缓存 memory tokens 对应的 hierarchical key/value",
+      "移除 encoder LoRA，恢复 frozen base LLM 作为 decoder",
+      "把 memory K/V 写入 decoder cache，并在后续多轮问答中复用"
+    ],
+    "whyRelevantZh": "visual token compression 会直接影响 VLM/MLLM 以及未来 visual design agents 的长上下文、多轮观察与推理成本。VisCo 的 same-model encoding 与 hierarchical cache 比特定 saliency heuristic 更具方法复用价值。",
+    "evidenceZh": "作者报告 LLaVA-1.5 的 576 visual tokens 压到 32 后保留 91.8% aggregate performance，压到单 token 时保留 85.3%（Table 1, p. 4）；Qwen2-VL-2B 在 18 tokens 时保留 91.4%，VisionZip FT 为 76.1%（Table 2, p. 5）。在 2 tokens 时，HierKV 的 GQA/MMB/POPE 保留率为 84.9%/79.2%/97.8%，value passing 为 76.6%/74.4%/91.9%（pp. 6–7）。",
+    "caveatZh": "aggregate retention 会掩盖任务级退化：作者报告 VisCo+ 的 MMVet 从 42.5 降至 37.2。一次 compression 需要 63.7 ms，论文估计相对 FastV 约三轮对话后才收回成本，因此单轮短 query 未必划算；实验也缺 OCR-heavy、高分辨率、多图与 long-video stress tests。",
+    "motivationZh": "现有 token pruning 常靠固定 heuristic，训练式 compressor 又引入外部模块并迫使 VLM 适配；但 pretrained LLM 已具有信息编码能力，问题是如何把它转成少量、可由原 decoder 复用的视觉记忆。",
+    "methodZh": "VisCo 在同一 VLM 内构造 asymmetric autoencoder：encoder 端为 attention Q/V 加 LoRA，让末尾 memory tokens 通过 causal attention 汇聚视觉上下文，并保存每层 memory K/V；decoder 不带 LoRA，保持 base model 参数，通过 hierarchical KV injection 读取压缩记忆。",
+    "experimentsZh": "作者报告只用约 10% 的 LLaVA-665K first-turn data 训练一个 epoch，在 LLaVA-1.5-7B 与 Qwen2-VL-2B/7B 的六个 benchmarks 上比较 FastV、VisionZip 等 baselines。结果支持 extreme compression 与跨 backbone transfer，也通过 hierarchical/single-layer/value passing 和 token-count ablations 支撑设计；但部分重型 compressor 不能严格同 compute 比较。",
+    "insightZh": "视觉上下文压缩可以复用语言模型的层级表示能力，而不是只决定哪些输入 token 要删除；真正的系统收益取决于压缩记忆能被多少轮查询复用，因此应把一次性 encoding cost 与任务级回退一起衡量。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2608.07088",
+  "slug": "rora",
+  "title": "RoRA: Role-Oriented Regional Allocation for Visual Token Pruning in MLLMs",
+  "authors": [
+    "Qiyanhui Lu",
+    "Han Wu",
+    "Rongjian Xu",
+    "Tingzhang Luo",
+    "Cheng Fan",
+    "Xinghao Chen",
+    "Minjing Dong",
+    "Jufeng Yang",
+    "Jianyuan Guo"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.07088"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual token pruning",
+    "role-oriented allocation",
+    "Attention-Anchored Regions",
+    "training-free acceleration",
+    "multimodal inference efficiency"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Multimodal large language models (MLLMs) encode images as long visual token sequences, making prefilling and KV-cache storage expensive. Existing training-free pruning methods select tokens by importance, diversity, or spatial coverage, but treat retained tokens as interchangeable and do not explicitly track which object-related regions are already covered. We present RoRA, a training-free framework that casts visual token pruning as role-oriented regional evidence allocation. Given a fixed budget, RoRA partitions tokens into a protected semantic core, complementary context, and fine-grained detail. It first calibrates text-conditioned attention with a positional prior and a prompt-calibrated object prior, then builds Attention-Anchored Regions (AARs) from high-confidence anchors as lightweight proxies for covered object support. Context is explored mainly outside AARs, while a small AAR-guided budget restores local detail; pairwise similarity is used only for context-stage redundancy filtering. Under matched budgets, RoRA consistently outperforms strong training-free baselines across LLaVA and Qwen-VL families, retaining most of the unpruned accuracy even at aggressive pruning ratios, e.g., 96.5% of full performance at 88.9% pruning on LLaVA-1.5, and improving over D2Pruner by about 5% on Qwen3-VL at 75-90% pruning. At a 66.7% pruning ratio, RoRA requires only 0.7 ms for token selection and reduces end-to-end inference time by 24.6%, corresponding to a 1.33x speedup over unpruned inference on an NVIDIA H800.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.07088v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.07088v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/LukieLuu/RoRA"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.07088v1 全文整理；论文 PDF 提供可核实的 RoRA 代码仓库。",
+    "ideaZh": "RoRA 不用一个 importance score 统一排名所有 visual tokens，而是在固定预算中分配三种 evidence roles：保护 text-conditioned semantic core、覆盖核心区域外的 complementary context，再在 Attention-Anchored Regions 内补少量 fine detail。",
+    "methodFlow": [
+      "校准 text-conditioned attention，并加入 object-aware spatial prior",
+      "选择 protected semantic-core tokens",
+      "以 core tokens 构造 Attention-Anchored Regions",
+      "将主要剩余预算分配给 AAR 外的 complementary context",
+      "在 AAR 内按局部 detail score 补少量 tokens",
+      "以固定 token budget 继续 LLM inference"
+    ],
+    "whyRelevantZh": "Visual-token efficiency 直接影响高分辨率、多图与设计类 MLLM 的可用性；“先保护核心、再补上下文、最后修细节”的 role-oriented allocation 也提供一种可迁移的 visual evidence budget 视角。但它不改变 foundation model 的能力边界，属于有实证的效率迭代。",
+    "evidenceZh": "作者报告 LLaVA-1.5 保留 192/128/64 tokens 时维持 99.8%/99.1%/96.5% 的 unpruned normalized average（Table 1, pp. 4–6）；Qwen3-VL 在保留 25%/10% tokens 时为 98.0%/87.9%，相对 D2 Pruner 高 5.4/5.3 points（Table 2, p. 6）。LLaVA-1.5/POPE 的 selector 约 0.6–0.7 ms，66.7% pruning 时完整评测用时由 7:35 降至 5:43（Table 3, p. 6）。",
+    "caveatZh": "作者报告 object-aware prior 仅以 1,000 张 GQA images 校准，其对 document、design canvas 或非自然图像的泛化未单独验证。Detail/context 的消融增益较小，主要收益来自 protected core；最显著的 speedup 又来自短回答或 max-new-tokens=1 的 prefill-dominated setting，不能直接外推到长文本 decoding。",
+    "motivationZh": "Importance-only pruning 将 retained tokens 视为可互换，无法判断哪些 object regions 已被核心证据覆盖，也容易在 aggressive pruning 下同时丢掉 context coverage 与局部 detail。",
+    "methodZh": "RoRA 用去位置偏置的 text-conditioned attention 和 prompt-calibrated object prior 形成 core score，以高置信 core tokens 建立 AAR；主要剩余预算搜索 AAR 外 context，并只在此阶段用相似度过滤 redundancy，最后以 attention、feature magnitude 与 local contrast 在 AAR 内修复细节。方法 training-free，插在 early LLM layer。",
+    "experimentsZh": "作者在 LLaVA-1.5、LLaVA-NeXT、Qwen2.5-VL、Qwen3-VL 及多类 VQA、grounding、reasoning benchmarks 上做 matched-budget comparison，并在 H800 与 RTX PRO 6000 实测 latency。作者报告 LLaVA-1.5 在 66.7%/90% pruning 下完整 POPE 用时为 5:43/5:22，unpruned 为 7:35，accuracy retention 为 98.4%/92.5%；但不同 backbone/pruning ratio 仍使用不同固定配置。",
+    "insightZh": "Token selection 不必寻找唯一的全局排序；先明确 retained tokens 分别承担 semantic anchor、coverage 与 detail 三种角色，能在相同预算下更稳定地组织视觉证据。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

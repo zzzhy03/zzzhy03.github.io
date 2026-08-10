@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2608.07193",
+  "slug": "autoprune",
+  "title": "An AI4AI Framework for Visual Token Pruning",
+  "authors": [
+    "Zhen Liu",
+    "Wenli Huang",
+    "Wei Song",
+    "Yuhan Liu",
+    "Zhiqin Yang",
+    "Jingwen Fu"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.07193"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual token pruning",
+    "LLM algorithm design",
+    "domain-specific language",
+    "offline policy synthesis",
+    "residual search"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "representation": [
+      "hybrid-representation",
+      "discrete-program"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "program-synthesis"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Visual-token pruning can substantially reduce the inference cost of multimodal large language models (MLLMs), yet existing methods largely rely on fixed, handcrafted heuristics and costly expert trial and error. As pruning objectives, budgets, and model architectures diversify, manually navigating the expanding design space becomes increasingly difficult. This paper aims to build an AI4AI framework for visual-token pruning by addressing a natural question: Can large language models automatically design effective visual-token reduction algorithms? Although LLMs possess broad algorithmic knowledge and strong reasoning capabilities, translating such general knowledge into effective solutions for a specialized task remains nontrivial. We argue that the key lies in designing an appropriate search-state representation that connects the internal knowledge of LLMs with the structural requirements and constraints of visual-token pruning. Based on this insight, we propose AutoPrune, a training-free framework for LLM-driven visual-token pruning policy design. At its core, AutoPrune introduces a Token Pruning Domain-Specific Language (TPDSL) comprising 131 reusable atoms for budget control, token scoring, selection constraints, and token reassembly. A key property of TPDSL is that it represents each search state as a residual modification of a strong base policy. This residual formulation narrows the search space and directs the LLM's attention toward the policy components that are most consequential for performance. Experiments on 14 multimodal benchmarks and three MLLM backbones demonstrate the effectiveness, efficiency, and transferability of AutoPrune. Even when removing 94.4% of visual tokens, AutoPrune preserves more than 99% of full-token performance while reducing FLOPs by 9.9x and prefill latency by 6.4x.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.07193v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.07193v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.07193v1 全文整理；PDF 未提供可核实的代码仓库 URL。",
+    "ideaZh": "用受约束的 TPDSL 表达 visual-token pruning policy，让 LLM 在离线 evaluator loop 中提出并验证相对强 base policy 的 residual program；部署时只执行固化的 deterministic policy，不再调用 LLM。",
+    "methodFlow": [
+      "以 TPDSL 表达 token budget、score、constraint 与 reassembly primitives",
+      "从强 base policy 出发，由 LLM 提出 residual program",
+      "自动检查 syntax、shape、budget 与 safety constraints",
+      "在 evaluator benchmark 上运行候选并反馈下一轮搜索",
+      "选出最佳 program 后固化为 inference-time pruning policy"
+    ],
+    "whyRelevantZh": "它既属于 VLM/MLLM efficiency，也展示了一个可迁移的 AI4AI pattern：让 LLM 在受约束、可验证空间内离线搜索算法，而不是把 agent 留在实时 loop 中。这一架构也可能用于视觉生成系统的 loss、sampling 或 compression policy design。",
+    "evidenceZh": "作者报告在 94.4% visual-token reduction 下，LLaVA-1.5 与 LLaVA-NeXT 分别保留 99.7% 与 99.9% aggregate performance，CDPruner 对应为 94.3% 与 96.0%（Table 1, p. 5）；LLaVA-NeXT 的 320-token setting 获得 9.9× FLOPs reduction 与 6.4× prefill speedup。最终 residual 保留 CDPruner 的 30/32 tokens，只替换最多 2 个 tokens（p. 5）。",
+    "caveatZh": "policy 在 MME 上搜索与选择，缺少明确 held-out evaluator ledger；normalized aggregate 还可能掩盖单项退化，例如 Qwen2.5-VL 的 128/32-token MME 都低于 CDPruner（p. 6）。alternative strategies 由作者重实现，而最终 policy 只做极小 token swap，尚不能证明发现了可广泛迁移的新 pruning principle。",
+    "motivationZh": "visual-token pruning 的目标、预算与 backbone 持续变化，固定 handcrafted heuristic 难以覆盖扩大的设计空间；直接让 LLM 自由写算法又难以保证可执行性、预算与结构安全。",
+    "methodZh": "TPDSL 包含 131 个用于 budget control、token scoring、selection constraints 与 reassembly 的 atoms。Qwen-Plus 以 base policy 为锚提出 residual modifications，每个候选经静态验证后在 evaluator 上得到反馈；搜索完成后部署最终 DSL program，因此 runtime compute 与 base pruner 基本相同。",
+    "experimentsZh": "作者在 LLaVA-1.5-7B 与 MME 上进行 10 rounds、每轮 5 个 candidates 的搜索，随后把 final policy 测到 LLaVA-NeXT、Qwen2.5-VL 与 14 个 benchmarks。anchor、swap quota 与 search seeds 的 ablation 说明窄 residual space 是关键，但论文缺不同 proposer LLM、base pruners、random/local-search controls 和同等 evaluation calls 的非 LLM optimizer。",
+    "insightZh": "LLM algorithm search 的有效性很大程度来自人为设计的可执行 search-state representation；窄 residual DSL 能把搜索变成可验证的精细修正，但必须用 held-out evaluators 判断它是通用算法还是 benchmark-specific patch。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

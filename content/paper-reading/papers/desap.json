@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2604.11240",
+  "slug": "desap",
+  "title": "Decoupled Similarity for Task-Aware Token Pruning in Large Vision-Language Models",
+  "authors": [
+    "Kexin Ma",
+    "Jing Xiao",
+    "Chaofeng Chen",
+    "Geyong Min",
+    "Guibo Zhu",
+    "Jinqiao Wang",
+    "Liang Liao"
+  ],
+  "publishedAt": "2026-04-13",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "ACM Multimedia 2026",
+  "identifiers": {
+    "arxiv": "2604.11240"
+  },
+  "venueIds": [
+    "acm-mm"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual token pruning",
+    "decoupled similarity",
+    "task-aware compression",
+    "cross-modal alignment",
+    "inference efficiency"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "feed-forward",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Token pruning has emerged as an effective approach to reduce the substantial computational overhead of Large Vision-Language Models (LVLMs) by discarding less informative visual tokens while preserving performance. However, existing methods typically rely on individual attention sources from different LVLM components, resulting in incomplete and suboptimal pruning decisions due to biased attention distributions. To address this problem, we propose DeSAP, a novel Decoupled Similarity-Aware Pruning method for precise, task-aware token pruning within the visual encoder. Specifically, DeSAP introduces a decoupled similarity to capture fine-grained cross-modal relevance between visual features and text tokens, providing explicit task-related guidance for pruning. By integrating decoupled similarity with visual saliency signals derived from visual attention, DeSAP performs token pruning under the guidance of both task-related and visual cues, enabling robust pruning even under aggressive pruning ratios. Extensive experiments across diverse benchmarks and architectures show that DeSAP consistently outperforms SOTA methods in both accuracy and efficiency. On LLaVA-1.5-7B, DeSAP achieves a 10 times FLOPs reduction and a 2.3 times prefill speedup by retaining only 11.1% of visual tokens, while maintaining 98.1% of the original performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.11240v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.11240v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 ACM Multimedia 2026 camera-ready 对应的 arXiv 2604.11240v2 全文整理；PDF 未提供可核实的 DeSAP 代码仓库 URL。",
+    "ideaZh": "DeSAP 在 visual encoder 侧把最后一层 hidden state 拆成 residual 与 projected self-attention component，用后者和 text tokens 计算 decoupled cross-modal similarity，再与 global visual saliency 联合选 token，并把 discarded tokens merge 回保留项。",
+    "methodFlow": [
+      "分离 visual encoder 最后一层的 residual 与 self-attention component",
+      "用 decoupled features 与 text embeddings 计算 cross-modal similarity",
+      "聚合得到 task-relevant visual-token score",
+      "从 visual attention 构造 global saliency score",
+      "在固定预算中联合选择 task-relevant 与 salient tokens",
+      "将 discarded tokens merge 到最相似 retained tokens 后送入 LLM"
+    ],
+    "whyRelevantZh": "高分辨率、多图与视频 VLM 的 visual-token cost 是持续问题；DeSAP 展示如何在进入 LLM 前注入 query-aware evidence selection，对 design assistant 处理大画布或多 reference images 也可能有迁移价值。但它属于 efficiency layer，不改变 generation/understanding 的主能力。",
+    "evidenceZh": "作者报告 LLaVA-1.5 只保留 64/576 visual tokens 时 normalized average 为 98.1%，比第二名 HoloV 高约 2.3 points（Table 1, p. 7）；在同一 POPE setting，FLOPs 从 3.82T 降至 0.42T，prefill 从 52 ms 降至 22 ms，完整评测用时从 42:20 降至 26:35，即作者报告 9.1×、2.3×、1.6× 三种不同层面的加速（Table 6, p. 8）。",
+    "caveatZh": "Headline 的 9.1× FLOPs reduction 最终只对应 1.6× overall evaluation speedup。方法依赖 query semantics；开放式 captioning、含糊 design instruction 或长文本时可能更依赖 [CLS] saliency，且 text length 会增加 similarity cost。论文没有 repeated-run uncertainty，也未公开 DeSAP repository。",
+    "motivationZh": "现有 pruning 常依赖单一 [CLS] attention、LLM cross-attention 或 vanilla visual-text similarity；这些信号分别偏 global semantics、带位置偏置，或被 residual activation 主导，难以在 visual encoder 内同时保留 task relevance 与 global content。",
+    "methodZh": "DeSAP 从视觉编码器最后层提取 projected self-attention output，构造 weighted bidirectional token similarity 与 fine-grained cross-modal alignment score；它再与 [CLS] 或替代 attention 的 visual saliency 分支按预算联合选择 tokens，并按 similarity 将丢弃项平均 merge 到 retained tokens。",
+    "experimentsZh": "作者在 LLaVA-1.5、LLaVA-NeXT、Qwen2.5-VL 与 Video-LLaVA 上覆盖 image/video QA 和 reasoning benchmarks，比较 FastV、SparseVLM、PyramidDrop、VisionZip、LLaVA-PruMerge、FlowCut、HoloV 等 training-free methods。作者报告 LLaVA-NeXT 每图保留 320 tokens 时维持约 98.0% full-model average，并在 8 个 benchmarks 中 7 个排名第一；Qwen2.5-VL 三档 normalized averages 为 90.1%/93.7%/96.6。仍缺 dynamic budget、multi-image context 与 long-form generation latency 分析。",
+    "insightZh": "Task-aware token selection 的关键可能不是再换一种 attention source，而是去掉 residual/global bias 后显式融合 query relevance 与 global saliency；同时应始终把 theoretical FLOPs、prefill latency 与 end-to-end latency 分开报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

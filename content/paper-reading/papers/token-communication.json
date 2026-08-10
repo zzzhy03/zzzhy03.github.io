@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2608.07279",
+  "slug": "token-communication",
+  "title": "Token Communication for Multimodal Large Language Model",
+  "authors": [
+    "Jingkai Ying",
+    "Zhijin Qin",
+    "Yuan Shen",
+    "Khaled B. Letaief"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.07279"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "eess.SP"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "token communication",
+    "visual token compression",
+    "neural image codec",
+    "intermediate feature injection",
+    "edge MLLM"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning"
+    ],
+    "representation": [
+      "raster-image",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "feed-forward",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "With the broad success of the Transformer architecture, token is becoming a new basic information processing unit. This trend is especially evident in multimodal large language models (MLLMs), where both visual and textual information are represented and processed as tokens. With the rapid deployment of MLLMs, the efficient transmission of tokens has become increasingly important. This paper investigates how to reduce the amount of transmitted data during interactions with MLLMs while preserving their multimodal understanding performance. To address this problem, we propose a token communication framework tailored to MLLMs. In the proposed framework, a neural codec is integrated into the vision tokenizer to control the number of transmitted bits. At the receiver, the decoded latents are processed through two paths. The decoder reconstructs image as a reconstruction prior, while the adapter converts latents into visual tokens and injects them into an intermediate layer of the vision tokenizer. To make the injected tokens suitable for MLLMs, we further design a two-stage visual-language semantic alignment training scheme. The adapter is first warmed up by a distillation loss and then aligned with textual semantics through an alignment loss. An adaptive adapter is also introduced through feature-wise linear modulation, allowing one adapter to support multiple codec rates. Extensive simulations on various MLLM benchmarks show that, under the same amount of transmitted data, the proposed scheme achieves better task performance than other image processing schemes for MLLMs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.07279v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.07279v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.07279v1 全文整理；PDF 未提供可核实的代码仓库 URL。",
+    "ideaZh": "把 image communication 的目标从高质量像素重建改为低 bitrate 下保留 MLLM task utility：接收端把 decoded codec latents 通过轻量 adapter 注入 vision tokenizer 中间层，并用 feature distillation 与 visual-language alignment 训练。",
+    "methodFlow": [
+      "发送端将 image/video 压缩为 quantized bitstream",
+      "接收端解码 latent，并保留 image reconstruction prior path",
+      "adapter 将 latents 映射为 vision tokenizer 的 intermediate semantic tokens",
+      "先做 visual-feature distillation，再做 SigLIP semantic alignment",
+      "以 QP-conditioned FiLM 让同一 adapter 覆盖多个 bitrates"
+    ],
+    "whyRelevantZh": "它属于 VLM/MLLM 的 efficient visual representation 与 deployment 方向，对 visual token compression、edge-agent perception 与 representation bottleneck 有可迁移价值；但与用户核心 design/generation 工作只属技术外围。",
+    "evidenceZh": "作者报告相对 ELIC reconstruction baseline，MME、POPE、SeedBench 与 COCO Caption 的 BD-rate 分别为 −45.33%、−31.91%、−12.42% 与 −46.75%（Table I, p. 12）。adapter 为 18.19M/20.85M parameters，接收端 token path 为 190.93 ms，reconstruction path 为 193.05 ms（Table II, p. 12）；低 bitrate 曲线在四项任务上整体优于 reconstruction-first 与作者重实现的 Bridge baseline（Fig. 5, p. 10）。",
+    "caveatZh": "adapter 主要由 ImageNet class labels/templates 对齐，评测也偏基础 perception/caption，不能证明对 OCR、高分辨率、多图或开放式 reasoning 同样有效。原 Bridge training 在 Qwen3-VL 上不收敛，比较使用作者改造后的重实现；A100 上 256×256 latency 与 perfect-CSI wireless simulation 也不能直接外推到真实 edge network。",
+    "motivationZh": "传统 image communication 以重建质量为目标，但 MLLM receiver 实际需要的是足够完成任务的语义表示；在带宽受限场景，先恢复 pixels 再推理可能浪费比特与计算。",
+    "methodZh": "neural codec 在发送端量化并 entropy-code image latents；接收端一条路径重建 image prior，另一条 adapter 路径将 latents 注入 frozen MLLM vision tokenizer 的中间层。adapter 先匹配原图 visual features，再用 SigLIP objective 对齐 class-text semantics；FiLM 以 codec QP 调节特征，支持可变码率。",
+    "experimentsZh": "codec 训练使用 ImageNet、DIV2K 与 Flickr2K crops，测试覆盖 Qwen3-VL-8B/32B 的 MME、POPE、SeedBench、COCO Caption，并延伸到 image/video codecs。ablation 表明移除 SigLIP stage 时训练不收敛、移除 reconstruction support 会明显退化；仍缺 injection layer、label richness、joint codec training 与真实网络 traces 的系统比较。",
+    "insightZh": "视觉通信可以围绕下游模型的内部 token space 而非像素重建设计；但 compression gain 是否成立，必须和 semantic supervision 的覆盖范围、baseline reproduction 以及完整网络预算一并报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

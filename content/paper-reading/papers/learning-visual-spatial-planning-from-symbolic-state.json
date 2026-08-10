@@ -1,0 +1,97 @@
+{
+  "id": "arxiv:2606.06076",
+  "slug": "learning-visual-spatial-planning-from-symbolic-state",
+  "title": "Learning Visual Spatial Planning from Symbolic State via Modality-Gap-Aware Self-Distillation",
+  "authors": [
+    "Haocheng Luo",
+    "Jiahui Liu",
+    "Ruicheng Zhang",
+    "Zhizhou Zhong",
+    "Jiaqi Huang",
+    "Zunnan Xu",
+    "Quan Shi",
+    "Jun Zhou",
+    "Shuiyang Mao",
+    "Wei Liu",
+    "Xiu Li"
+  ],
+  "publishedAt": "2026-06-04",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v3",
+  "identifiers": {
+    "arxiv": "2606.06076"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual spatial planning",
+    "privileged symbolic state",
+    "on-policy self-distillation",
+    "modality gap",
+    "multimodal reasoning"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "representation": [
+      "discrete-program"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "self-supervised",
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "abstract": "While Vision-Language Models excel at general multimodal understanding, they still struggle with visual spatial planning. We attribute this limitation to a perception--reasoning modality gap. Visual planning requires models to infer latent state structures from pixels and then reason over the recovered structure to produce valid actions, whereas symbolic planning directly leverages explicit representation. This discrepancy introduces two sequential bottlenecks: visual state recovery at the perception stage and multi-step planning at the reasoning stage. To address this, we propose MGSD, a two-stage modality-gap-aware self-distillation framework. First, a cold-start grounding stage establishes reliable visual state recovery before on-policy training. Second, a symbol-guided on-policy self-distillation stage transfers the privileged teacher's planning behavior to the student through token-level supervision on student-generated prefixes. Crucially, symbolic information is used only during training, while inference relies exclusively on visual inputs. Experiments on visual planning benchmarks show that MGSD consistently improves performance across different model scales, raising the macro average by 19.3% and 18.4%, respectively. The resulting models substantially reduce the gap to the upper bounds obtained with symbolic inputs. Ablation studies and diagnostic analyses further confirm that the gains arise from improvements in both visual state recovery and optimal-path reasoning. These results demonstrate that MGSD strengthens not only the recovery of actionable states from visual observations but also the ability to plan over the inferred structures. Code is available at https://github.com/Oranger-l/MGSD.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.06076v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.06076v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Oranger-l/MGSD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2606.06076v3 全文整理；论文 PDF 提供可核实的 MGSD 代码仓库。",
+    "ideaZh": "MGSD 用 symbolic state 和 reference plan 训练 privileged text teacher，却在部署时只保留看图的 VLM student：先用 perception-oriented SFT 学会恢复 task state，再在 student 自己生成的 rollout 上做 symbol-guided on-policy self-distillation。",
+    "methodFlow": [
+      "从 simulator 生成 visual observation、symbolic state 与 executable reference plan",
+      "用 perception-oriented SFT 让 VLM 恢复 task-relevant state",
+      "student 从图像和问题采样 on-policy reasoning/action rollout",
+      "privileged teacher 读取 symbolic state、reference plan 与同一 prefix",
+      "逐 token 蒸馏 teacher distribution 到 visual student",
+      "推理时移除 teacher 与 symbolic input，只由 student 看图规划"
+    ],
+    "whyRelevantZh": "它直接推进 VLM visual spatial reasoning/planning，并给出可迁移训练范式：将 simulator 或程序系统中的 exact state 作为 privileged teacher context，而不让部署模型依赖 symbolic input。这与 structured design state、scene program 或 fabrication constraints 的监督方式有明确联系。",
+    "evidenceZh": "作者报告 Qwen3-VL-4B/8B 的三类 visual-planning macro success 从 11.2/17.2 提至 30.5/35.6，即提升 19.3/18.4 个百分点（Table 1, p. 5）；完整 MGSD accuracy 为 30.5，优于 direct SFT 18.2、GRPO 16.2 与 cold-start 17.7，去掉 symbolic state 后回落至 11.2（Table 2, p. 6）。",
+    "caveatZh": "证据来自 FrozenLake、Maze、MiniBehaviour 三类可程序化环境，均能取得可靠 symbolic state 和 discrete transition rules；自然图像、连续动作、noisy symbols、跨 teacher architecture 与真实 embodied planning 都未验证。主指标虽有 policy-gap diagnostics 辅助，仍不能证明自然语言 intermediate reasoning 本身忠实。",
+    "motivationZh": "Visual planning 同时包含从 pixels 恢复 latent state 与在该 state 上执行 multi-step planning 两个瓶颈；直接以 action outcome 监督很难区分 perception error 和 reasoning error，也无法充分利用 simulator 已知的精确结构。",
+    "methodZh": "Cold-start 阶段以 image-to-state SFT 建立 grounding；随后 student 从图像生成当前策略 prefix，冻结的 text teacher 读取 privileged symbolic state、问题与 reference plan，在同一 prefix 上提供 token-level KL supervision。symbolic input 只在训练出现，部署时 teacher 被完全移除。",
+    "experimentsZh": "作者在三个 visual planning environments、多种 difficulty 与 Qwen3-VL-4B/8B 上评测，并比较 base、symbolic-input upper bound、direct SFT、GRPO 及多个 prompt-only models。作者报告 full MGSD 的 accuracy/optimal-path accuracy 为 30.5/26.6；去掉 cold start、reference plan、symbolic state 后 accuracy 分别为 16.8、21.3、11.2（Table 2, p. 6）。作者报告训练使用每个环境 6,000 instances 与 8 张 H200，尚缺 open-world 和跨模型族验证。",
+    "insightZh": "可复用的关键不是把 symbolic state 直接塞给推理模型，而是让 privileged teacher 在 student 实际到达的 on-policy prefixes 上提供 dense planning signal；这同时缩小 perception 与 planning 两段 gap，又保持部署接口纯视觉。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

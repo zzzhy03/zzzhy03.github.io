@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2602.09016",
+  "slug": "raster2seq",
+  "title": "Raster2Seq: Polygon Sequence Generation for Floorplan Reconstruction",
+  "authors": [
+    "Hao Phung",
+    "Hadar Averbuch-Elor"
+  ],
+  "publishedAt": "2026-02-09",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "ACM SIGGRAPH 2026 · arXiv v3",
+  "identifiers": {
+    "arxiv": "2602.09016"
+  },
+  "venueIds": [
+    "siggraph"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "floorplan reconstruction",
+    "raster-to-vector",
+    "polygon sequence",
+    "structured 2D design",
+    "anchor-guided decoding",
+    "semantic floorplans"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "vectorization"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "raster-image",
+      "discrete-program"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "autoregressive"
+    ],
+    "output-property": [
+      "editable"
+    ]
+  },
+  "abstract": "Reconstructing a structured vector-graphics representation from a rasterized floorplan image is typically an important prerequisite for computational tasks involving floorplans such as automated understanding or CAD workflows. However, existing techniques struggle in faithfully generating the structure and semantics conveyed by complex floorplans that depict large indoor spaces with many rooms and a varying numbers of polygon corners. To this end, we propose Raster2Seq, framing floorplan reconstruction as a sequence-to-sequence task in which floorplan elements--such as rooms, windows, and doors--are represented as labeled polygon sequences that jointly encode geometry and semantics. Our approach introduces an autoregressive decoder that learns to predict the next corner conditioned on image features and previously generated corners using guidance from learnable anchors. These anchors represent spatial coordinates in image space, hence allowing for effectively directing the attention mechanism to focus on informative image regions. By embracing the autoregressive mechanism, our method offers flexibility in the output format, enabling for efficiently handling complex floorplans with numerous rooms and diverse polygon structures. Our method achieves state-of-the-art performance on standard benchmarks such as Structure3D, CubiCasa5K, and Raster2Graph, while also demonstrating strong generalization to more challenging datasets like WAFFLE, which contain diverse room structures and complex geometric variations.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2602.09016v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2602.09016v3"
+    },
+    {
+      "label": "Project",
+      "href": "https://cornell-vailab.github.io/Raster2Seq/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2602.09016v3 全文整理；论文首页提供 Project URL，但未提供可核验的公开代码仓库，故不添加 Code 链接。",
+    "ideaZh": "把 floorplan reconstruction 直接写成带 room、window、door semantics 的 variable-length polygon-token sequence；autoregressive decoder 连续回归 corners，同时预测 token type 与 semantic label。",
+    "methodFlow": [
+      "用 ResNet-50 与 Transformer 从 raster floorplan 提取 multi-scale visual features",
+      "把 rooms、windows、doors 编码成 BOS/corners/SEP/EOS 的 labeled polygon sequence",
+      "autoregressive decoder 融合 masked token history 与 image context",
+      "learnable anchors 引导 deformable attention，并回归 corner residual、token type 与 label",
+      "按 left-to-right polygon order 训练并输出可编辑 vector structure"
+    ],
+    "whyRelevantZh": "论文与 2D Design 的 structured/vector representation、raster-to-editable artifact 和 layout semantics 直接相连；它也展示了传统 geometry decoder 与 VLM constraint correction 如何分工，是核心方向中的高相关工作。",
+    "evidenceZh": "作者报告 Structured3D-B 的 Room/Corner/Angle 为 99.6/98.3/92.7；CubiCasa5K 为 88.7/59.4/37.4，高于 RoomFormer 的 83.5/55.5/34.1（Tables 1–2, p. 5）。约 100 张 WAFFLE 上 zero-shot IoU 为 73.9，但单 A6000 inference 为 0.52 s/image，明显慢于作者表中 RoomFormer 的 0.04 s（Table 4, p. 5; efficiency analysis, p. 17）。",
+    "caveatZh": "autoregressive polygon sequence 没有硬拓扑、adjacency、Manhattan 或 non-intersection guarantees，window/door 仍可能穿入 room interior；CubiCasa window-door semantic 未超过最强列示 baseline。Gemini refinement 只评估 30 samples，并在改善 corner/angle 时损伤 room/semantic metrics；3D 应用也仅为定性展示。",
+    "motivationZh": "现有 set prediction 或多阶段 graph pipeline 容易受固定 query budget、复杂后处理和高复杂度 floorplan 限制，也难在同一输出中同时保留 variable-length geometry 与细粒度 semantics。",
+    "methodZh": "输入先经 ResNet-50 与 Transformer 编码；输出以 BOS、polygon corners、SEP、EOS 串联 rooms/windows/doors。masked autoregressive decoder 通过 FeatFusion 结合 image context，并以 learnable anchors 为中心做 deformable attention，联合优化连续坐标 L1、token 与 semantic cross entropy。",
+    "experimentsZh": "作者在 Structured3D-B、CubiCasa5K、Raster2Graph 和小规模 WAFFLE cross-domain set 上比较 RoomFormer、Raster2Graph、FRI-Net 等方法。FeatFusion、learnable anchors 与 polygon ordering 均有增量消融；但缺少 topology constraints、sequence-length error accumulation、room-count stratification，以及可复现的大样本 VLM refinement 评估。",
+    "insightZh": "核心价值是把 floorplan geometry 与 semantics 统一为一个没有固定 query 数量的可编辑序列；主模型证据较完整，但应把 30-sample Gemini appendix 和 qualitative 3D extrusion 与正式 reconstruction 结果分开看。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

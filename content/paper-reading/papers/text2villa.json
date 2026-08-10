@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2607.17145",
+  "slug": "text2villa",
+  "title": "Text2Villa: Hierarchical Generation of 3D Indoor Environments with Physics-Aware Analysis-by-Synthesis",
+  "authors": [
+    "Xiang Tang",
+    "Ruotong Li",
+    "Xiaopeng Fan"
+  ],
+  "publishedAt": "2026-07-19",
+  "updatedAt": "2026-08-07",
+  "collectedAt": "2026-08-10",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.17145"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "text-to-3D indoor generation",
+    "multi-story layout",
+    "affordance scene graph",
+    "physics-aware analysis-by-synthesis",
+    "visual design agent"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "scene",
+      "environment-world"
+    ],
+    "representation": [
+      "mesh",
+      "discrete-program",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "text",
+      "multimodal"
+    ],
+    "method": [
+      "retrieval-composition",
+      "llm-vlm-guided",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "controllable",
+      "editable",
+      "asset-ready",
+      "physically-plausible"
+    ]
+  },
+  "abstract": "Generating 3D indoor scenes from natural language holds tremendous potential, yet existing methods predominantly fail to generate multi-room structures with vertical connectivity and arbitrary polygonal boundaries. Furthermore, they lack a deep grounding in continuous 3D physical laws, leading to severe geometric penetrations and floating artifacts. In this work, we propose Text2Villa, a novel hierarchical generative framework. At the macro level, we construct a multi-story dataset to fine-tune an autoregressive layout generator, ensuring the direct parsing of text into 3D building foundations featuring polygonal boundaries and multi-story connectivity. To enforce physical laws during micro-level asset arrangement, we introduce the Affordance-driven Physical-Semantic Scene Graph (A-PSSG) to explicitly abstract physical affordances (such as support surfaces and containment cavities) into node attributes, establishing strict geometric and semantic edge constraints. Guided by the A-PSSG, we formulate scene instantiation as a constrained closed-loop optimization problem following the analysis-by-synthesis paradigm. By integrating an underlying geometric collision detection engine with the high-level semantic reasoning of multimodal large language models (MLLMs), our heuristic solver dynamically executes physics-aware actions under the observation-evaluation-modification mechanism to effectively resolve mesh collisions, floating artifacts, and fine-grained cavity containment failures. Extensive experiments demonstrate that Text2Villa outperforms previous methods across various metrics, robustly generating high-fidelity and physically plausible villa-level 3D environments from text, thereby providing a reliable and interactive 3D content foundation for downstream applications.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.17145v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.17145v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.17145v2 全文整理；PDF 未提供可核实的代码仓库 URL。",
+    "ideaZh": "把 text-to-3D indoor generation 分成 macro architecture 与 micro asset instantiation：先生成 irregular polygon、多楼层结构，再由显式 affordance graph、physics engine 和 MLLM 在 analysis-by-synthesis loop 中修正摆放。",
+    "methodFlow": [
+      "用 finetuned LLM 将 villa prompt 解析为多楼层 architecture JSON",
+      "检索 indoor assets 并标注 orientation、support surfaces 与 cavities",
+      "构建 A-PSSG，写入 semantic relations 与 physical constraints",
+      "由 physics engine 检查 collision、floating、support 与 containment",
+      "MLLM 根据多视图反馈增删 assets 或更新 pose/scale，直至 energy 收敛"
+    ],
+    "whyRelevantZh": "它直接属于 3D Generation 的 scene/indoor design 子线，也高度贴近用户关心的 generation process 与 Visual Design Agents：agent 通过观察渲染与物理反馈修改生成结果，而不是只提供交互界面。",
+    "evidenceZh": "作者报告 multi-story layout 的 RR/FSR/VCR 为 98.9%/98.2%/97.3%（Table 1, p. 8）。九类房间平均 CR、FR、OBR 均为 0，CSR 为 97.6、Gemini Score 为 8.8，但每种 layout/room type 只平均三个 scenes（Table 3, p. 10）；移除 A-PSSG 后 CR/FR 升至 36.3/22.7、CSR 降至 0（Table 4, p. 11）。作者还报告单房间约 15 分钟、约 15-room villa 约 225 分钟（p. 20）。",
+    "caveatZh": "零 collision/floating 只针对有限 rigid-body checks，不等于完整 building-code、kinematic 或 human-usability validity；solver 还会通过删除困难物体解决 deadlock，可能违背 prompt 数量。quantitative evaluation 每类仅三个 scenes，custom metrics 与 Gemini judge 的方差不可见，系统又依赖 GPT-4o 与有限 asset database。",
+    "motivationZh": "现有 text-to-3D indoor systems 常局限于单层矩形布局，并在资产放置时缺少 support、containment 与 collision 等连续物理约束，因此难以生成多楼层、任意 polygon boundaries 且可用的室内环境。",
+    "methodZh": "macro model 用 1,000 个 text-to-architecture JSON pairs 对 Qwen3.5-9B 做 LoRA fine-tuning，输出 rooms、polygon footprints 与 stair connectivity。micro stage 从 Objaverse、3D-FUTURE 与 Infinigen 检索 assets，以 A-PSSG 显式表示 support/cavity affordances，再让 GPT-4o 结合 PyBullet、Trimesh 与多视图 render feedback 执行 observation—evaluation—modification。",
+    "experimentsZh": "论文分别比较 Holodeck、SceneFoundry、MANSION、LayoutVLM 与 SceneWeaver，并报告 macro parsing、physics/semantic metrics、主要模块 ablation 和 20 人、10 scenes、600 votes 的 human study。结果支持 A-PSSG、physics engine 与 MLLM feedback 各有作用，但缺不同 MLLM、asset quality、solver iterations、random seeds 与统一 asset pool 下的公平控制。",
+    "insightZh": "3D design agent 的关键不是让 MLLM 自由修改场景，而是用显式 affordance graph 把 support、containment 与 semantic relations转成可观测、可执行的约束；不过物理有效性的口径必须与实际检查集合严格对应。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "early"
+  }
+}
