@@ -5,6 +5,14 @@ import process from "node:process";
 import { pathToFileURL } from "node:url";
 
 import {
+  buildExactDecisionIdentity,
+  candidateEvidenceFingerprint,
+  DECISION_LEDGER_SNAPSHOT_KIND,
+  sha256Value,
+  validatePolicyDescriptor,
+  verifyLedgerSnapshotMatch,
+} from "../decision-ledger.mjs";
+import {
   ATTENTION_GATE_OUTCOMES,
   DECISIONS,
   DOWNSTREAM_CLAIM_SCOPES,
@@ -37,6 +45,14 @@ const sets = {
   downstreamClaimScopes: new Set(DOWNSTREAM_CLAIM_SCOPES),
   reasonCodes: new Set(REASON_CODES),
 };
+
+const reusableLedgerOutcomes = new Set([
+  "screening-reject",
+  "accepted-deep",
+  "accepted-skim",
+  "fulltext-reject",
+  "administrative-already-canonical",
+]);
 
 export function parseArguments(argv) {
   const options = { reviewFiles: [] };
@@ -73,8 +89,8 @@ Options:
   --review <file>             Validate an explicit review file; repeat for each batch.
   --help                      Show this help.
 
-The validator is read-only. It requires one review document per batch and exactly one
-contract-valid decision for every discovery candidate.`;
+The validator is read-only. It requires one review document per batch and proves that
+reviewed candidates plus receipt-backed ledger skips exactly cover discovery.`;
 }
 
 function resolveFrom(root, value) {
@@ -560,6 +576,213 @@ async function loadBatchInputs(runDirectory, manifest, errors) {
   return { batches, allCandidateIds };
 }
 
+async function validateDiscoveryAccounting({
+  root,
+  runDirectory,
+  manifest,
+  reviewedCandidateIds,
+  errors,
+}) {
+  const candidateSource = manifest.sourceInputs?.candidates;
+  if (!candidateSource?.file) {
+    return {
+      discoveredCandidateCount: reviewedCandidateIds.size,
+      ledgerSkippedCandidateCount: 0,
+    };
+  }
+  const candidateFile = resolveFrom(runDirectory, candidateSource.file);
+  if (!(await pathExists(candidateFile))) {
+    errors.push(`screening manifest source candidates do not exist: ${candidateFile}.`);
+    return {
+      discoveredCandidateCount: reviewedCandidateIds.size,
+      ledgerSkippedCandidateCount: 0,
+    };
+  }
+  if (candidateSource.sha256 && (await sha256File(candidateFile)) !== candidateSource.sha256) {
+    errors.push("screening manifest source candidates hash no longer matches.");
+  }
+  const payload = await readJson(candidateFile);
+  const discovered = Array.isArray(payload.candidates) ? payload.candidates : [];
+  if (!Array.isArray(payload.candidates)) {
+    errors.push("screening source candidates artifact must contain a candidates array.");
+  }
+  const candidateById = new Map();
+  for (const candidate of discovered) {
+    if (!candidate?.discoveryId || candidateById.has(candidate.discoveryId)) {
+      errors.push("screening source candidates contain a missing or duplicate discoveryId.");
+      continue;
+    }
+    candidateById.set(candidate.discoveryId, candidate);
+  }
+
+  const accounting = manifest.accounting;
+  if (!accounting) {
+    for (const candidateId of candidateById.keys()) {
+      if (!reviewedCandidateIds.has(candidateId)) {
+        errors.push(`Discovery candidate '${candidateId}' is missing from prepared batches.`);
+      }
+    }
+    for (const candidateId of reviewedCandidateIds) {
+      if (!candidateById.has(candidateId)) {
+        errors.push(`Prepared candidate '${candidateId}' is absent from discovery.`);
+      }
+    }
+    return {
+      discoveredCandidateCount: candidateById.size,
+      ledgerSkippedCandidateCount: 0,
+    };
+  }
+
+  if (accounting.policy !== "screened-plus-ledger-skipped-equals-discovered") {
+    errors.push("screening manifest has an unsupported candidate accounting policy.");
+  }
+  if (!Array.isArray(accounting.ledgerSkippedCandidates)) {
+    errors.push("screening manifest ledgerSkippedCandidates must be an array.");
+  }
+  const skipped = accounting.ledgerSkippedCandidates ?? [];
+  const skippedIds = new Set();
+  for (const entry of skipped) {
+    if (!entry?.candidateId || skippedIds.has(entry.candidateId)) {
+      errors.push("ledger-skipped candidate IDs must be unique and non-empty.");
+      continue;
+    }
+    skippedIds.add(entry.candidateId);
+    if (reviewedCandidateIds.has(entry.candidateId)) {
+      errors.push(`Candidate '${entry.candidateId}' is both reviewed and ledger-skipped.`);
+    }
+    const candidate = candidateById.get(entry.candidateId);
+    if (!candidate) {
+      errors.push(`Ledger-skipped candidate '${entry.candidateId}' is absent from discovery.`);
+      continue;
+    }
+    const exact = buildExactDecisionIdentity(candidate);
+    if (!exact.identity || exact.identity.artifactKey !== entry.artifactKey) {
+      errors.push(`Ledger skip '${entry.candidateId}' does not match its exact arXiv version.`);
+    }
+    if (candidateEvidenceFingerprint(candidate) !== entry.candidateEvidenceFingerprint) {
+      errors.push(`Ledger skip '${entry.candidateId}' does not match candidate evidence.`);
+    }
+    if (entry.policyFingerprint !== accounting.policyFingerprint) {
+      errors.push(`Ledger skip '${entry.candidateId}' has a different policy fingerprint.`);
+    }
+    if (entry.skipMode !== "terminal" || !reusableLedgerOutcomes.has(entry.outcome)) {
+      errors.push(`Ledger skip '${entry.candidateId}' is not a reusable terminal outcome.`);
+    }
+    if (
+      typeof entry.observationId !== "string" ||
+      typeof entry.runId !== "string" ||
+      typeof entry.sourceCandidateId !== "string" ||
+      typeof entry.sourceImport?.delta?.file !== "string" ||
+      typeof entry.sourceImport?.delta?.sha256 !== "string" ||
+      typeof entry.sourceImport?.receipt?.file !== "string" ||
+      typeof entry.sourceImport?.receipt?.sha256 !== "string"
+    ) {
+      errors.push(`Ledger skip '${entry.candidateId}' lacks receipt-backed provenance.`);
+    } else {
+      const proof = verifyLedgerSnapshotMatch({ entry, root });
+      for (const proofError of proof.errors) errors.push(proofError);
+    }
+  }
+  for (const candidateId of candidateById.keys()) {
+    if (!reviewedCandidateIds.has(candidateId) && !skippedIds.has(candidateId)) {
+      errors.push(`Discovery candidate '${candidateId}' is neither reviewed nor ledger-skipped.`);
+    }
+  }
+  for (const candidateId of reviewedCandidateIds) {
+    if (!candidateById.has(candidateId)) {
+      errors.push(`Prepared candidate '${candidateId}' is absent from discovery.`);
+    }
+  }
+
+  const snapshotSource = manifest.sourceInputs?.decisionLedgerSnapshot;
+  if (!snapshotSource?.file || !snapshotSource.sha256) {
+    errors.push("ledger-aware screening must pin an immutable decision-ledger snapshot.");
+  } else {
+    const snapshotFile = resolveFrom(runDirectory, snapshotSource.file);
+    if (!(await pathExists(snapshotFile))) {
+      errors.push(`decision-ledger snapshot does not exist: ${snapshotFile}.`);
+    } else {
+      if ((await sha256File(snapshotFile)) !== snapshotSource.sha256) {
+        errors.push("decision-ledger snapshot hash no longer matches the manifest.");
+      }
+      const snapshot = await readJson(snapshotFile);
+      if (snapshot.kind !== DECISION_LEDGER_SNAPSHOT_KIND) {
+        errors.push("decision-ledger snapshot has an unsupported kind.");
+      }
+      if (snapshot.policy?.fingerprint !== accounting.policyFingerprint) {
+        errors.push("decision-ledger snapshot policy does not match candidate accounting.");
+      }
+      if (
+        Boolean(snapshot.override?.ignoreDecisionLedger) !==
+        Boolean(accounting.decisionLedgerBypassed)
+      ) {
+        errors.push("decision-ledger bypass flag differs between snapshot and manifest.");
+      }
+      if (accounting.decisionLedgerBypassed && skipped.length) {
+        errors.push("a decision-ledger bypass run cannot contain ledger skips.");
+      }
+      if (JSON.stringify(snapshot.matches ?? []) !== JSON.stringify(skipped)) {
+        errors.push("decision-ledger snapshot matches do not equal manifest ledger skips.");
+      }
+      const snapshotMissIds = (snapshot.misses ?? [])
+        .map((entry) => entry.candidateId)
+        .sort();
+      const reviewedIds = [...reviewedCandidateIds].sort();
+      if (JSON.stringify(snapshotMissIds) !== JSON.stringify(reviewedIds)) {
+        errors.push("decision-ledger snapshot misses do not equal reviewed candidates.");
+      }
+    }
+  }
+  const discoverySource = manifest.sourceInputs?.discoveryManifest;
+  if (!discoverySource?.file || !discoverySource.sha256) {
+    errors.push("ledger-aware screening must pin its discovery manifest.");
+  } else {
+    const discoveryFile = resolveFrom(runDirectory, discoverySource.file);
+    if (!(await pathExists(discoveryFile))) {
+      errors.push(`screening source discovery manifest does not exist: ${discoveryFile}.`);
+    } else {
+      if ((await sha256File(discoveryFile)) !== discoverySource.sha256) {
+        errors.push("screening source discovery manifest hash no longer matches.");
+      }
+      try {
+        const discoveryManifest = await readJson(discoveryFile);
+        const policy = validatePolicyDescriptor(accounting.policyDescriptor);
+        if (policy.fingerprint !== accounting.policyFingerprint) {
+          errors.push("screening accounting policy descriptor has another fingerprint.");
+        }
+        if (
+          policy.researchConfigSha256 !== manifest.sourceInputs?.researchConfig?.sha256 ||
+          policy.researchConfigStatus !== manifest.sourceInputs?.researchConfig?.status ||
+          policy.venueRegistrySha256 !== manifest.sourceInputs?.venueRegistry?.sha256 ||
+          policy.venueRegistryStatus !== manifest.sourceInputs?.venueRegistry?.status
+        ) {
+          errors.push("screening accounting policy differs from recorded configuration.");
+        }
+        if (policy.screeningContractSha256 !== sha256Value(manifest.reviewContract)) {
+          errors.push("screening accounting policy differs from the review contract.");
+        }
+        const recordedTopics = [...(discoveryManifest.configuration?.selectedTopicIds ?? [])]
+          .sort();
+        if (JSON.stringify(policy.selectedTopicIds) !== JSON.stringify(recordedTopics)) {
+          errors.push("screening accounting policy differs from selected discovery topics.");
+        }
+      } catch (error) {
+        errors.push(`screening accounting policy is invalid: ${error.message}`);
+      }
+    }
+  }
+  if (manifest.counts?.discoveredCandidates !== candidateById.size) {
+    errors.push("screening manifest discovered candidate count is incorrect.");
+  }
+  if (manifest.counts?.ledgerSkippedCandidates !== skippedIds.size) {
+    errors.push("screening manifest ledger-skipped candidate count is incorrect.");
+  }
+  return {
+    discoveredCandidateCount: candidateById.size,
+    ledgerSkippedCandidateCount: skippedIds.size,
+  };
+}
+
 function buildPolicyIndexes(batches, errors) {
   const topicById = new Map();
   const facetValuesByDimension = new Map();
@@ -635,6 +858,13 @@ export async function validateScreeningReviews(inputOptions = {}) {
       `screening manifest expects ${manifest.counts?.candidates} candidates but prepared batches contain ${allCandidateIds.size}.`,
     );
   }
+  const accounting = await validateDiscoveryAccounting({
+    root,
+    runDirectory,
+    manifest,
+    reviewedCandidateIds: allCandidateIds,
+    errors,
+  });
   const { topicById, facetValuesByDimension } = buildPolicyIndexes(batches, errors);
   const reviewFiles = await resolveReviewFiles({
     root,
@@ -757,9 +987,12 @@ export async function validateScreeningReviews(inputOptions = {}) {
     batchCount: batches.size,
     reviewFileCount: reviewFiles.length,
     candidateCount: allCandidateIds.size,
+    discoveredCandidateCount: accounting.discoveredCandidateCount,
+    ledgerSkippedCandidateCount: accounting.ledgerSkippedCandidateCount,
     decisionCounts,
     guarantees: {
       everyCandidateExactlyOnce: true,
+      everyDiscoveryCandidateAccountedFor: true,
       canonicalPapersWritten: false,
       digestsWritten: false,
       sitePublished: false,
@@ -775,7 +1008,7 @@ async function main() {
   }
   const result = await validateScreeningReviews(options);
   console.log(
-    `[paper-reading] valid screening review: ${result.candidateCount} candidates, ${result.batchCount} batches`,
+    `[paper-reading] valid screening review: ${result.candidateCount} reviewed, ${result.ledgerSkippedCandidateCount} ledger-skipped, ${result.batchCount} batches`,
   );
   console.log(
     `[paper-reading] decisions: ${Object.entries(result.decisionCounts)

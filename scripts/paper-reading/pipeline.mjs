@@ -14,6 +14,16 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+import {
+  buildDecisionLedgerDelta,
+  canonicalJson,
+  DEFAULT_DECISION_LEDGER_FILE,
+  mergeDecisionLedger,
+  LEGACY_DECISION_LEDGER_RUN_IDS,
+  readDecisionLedgerSync,
+  validateDecisionLedgerDelta,
+  verifyDecisionLedgerImports,
+} from "./decision-ledger.mjs";
 import { validateFulltextReviews } from "./fulltext/validate.mjs";
 import { validatePromotion } from "./fulltext/validate-promotion.mjs";
 import { writeJsonAtomic } from "./lib/io.mjs";
@@ -45,7 +55,7 @@ function parseArguments(argv) {
     else if (argument === "--apply") options.apply = true;
     else throw new Error(`Unknown argument: ${argument}`);
   }
-  if (!new Set(["status", "verify", "backlog", "receipt", "finalize", "cleanup"]).has(options.command)) {
+  if (!new Set(["status", "verify", "backlog", "receipt", "ledger", "finalize", "cleanup"]).has(options.command)) {
     throw new Error(`Unknown command '${options.command}'.`);
   }
   if (options.help) return options;
@@ -53,11 +63,11 @@ function parseArguments(argv) {
   if (!selections.has(options.selection)) {
     throw new Error("--selection must be 'all-full-text' or 'high-deep'.");
   }
-  if (new Set(["verify", "receipt", "finalize"]).has(options.command) && !options.digest) {
+  if (new Set(["verify", "receipt", "ledger", "finalize"]).has(options.command) && !options.digest) {
     throw new Error(`${options.command} requires --digest <content digest JSON>.`);
   }
-  if (options.apply && !new Set(["backlog", "receipt", "finalize", "cleanup"]).has(options.command)) {
-    throw new Error("--apply is only valid for backlog, receipt, finalize or cleanup.");
+  if (options.apply && !new Set(["backlog", "receipt", "ledger", "finalize", "cleanup"]).has(options.command)) {
+    throw new Error("--apply is only valid for backlog, receipt, ledger, finalize or cleanup.");
   }
   return options;
 }
@@ -70,6 +80,7 @@ Usage:
   npm run pipeline:papers -- backlog --run-dir <run> --selection high-deep [--apply] [--json]
   npm run pipeline:papers -- verify  --run-dir <run> --selection <mode> --digest <file> [--json]
   npm run pipeline:papers -- receipt --run-dir <run> --selection <mode> --digest <file> [--apply] [--json]
+  npm run pipeline:papers -- ledger --run-dir <run> --selection <mode> --digest <file> [--apply] [--json]
   npm run pipeline:papers -- finalize --run-dir <run> --selection <mode> --digest <file> [--apply] [--json]
   npm run pipeline:papers -- cleanup --run-dir <run> --selection <mode> [--digest <file>] [--apply] [--json]
 
@@ -78,12 +89,13 @@ Commands:
   backlog   Record screened full-text candidates intentionally deferred by this run's selection.
   verify    Run every read-only gate through canonical content validation.
   receipt   Build a compact, checked-in audit receipt; --apply writes it after verification.
-  finalize  Advance the discovery watermark from the verified run manifest; dry-run by default.
+  ledger    Build/import the run's immutable decision delta after receipt verification.
+  finalize  Merge verified decisions, then advance the discovery watermark; dry-run by default.
   cleanup   Plan deletion of <run>/fulltext/work; --apply performs the checked deletion.
 
 Defaults and safety:
   --selection defaults to all-full-text. high-deep is allowed only with an explicit backlog.
-  backlog, receipt, finalize and cleanup are dry-runs unless --apply is present.
+  backlog, receipt, ledger, finalize and cleanup are dry-runs unless --apply is present.
   A run must be one direct child of local-assets/paper-reading/runs; symlinks are rejected.
   Source PDFs, reviews, manifests, canonical content, digests and publication state are never
   cleanup targets. This tool does not call a model, promote content, commit, push, or publish.`;
@@ -217,6 +229,8 @@ async function screeningStatus(root, runDirectory) {
       batchCount: result.batchCount,
       reviewCount: result.reviewFileCount,
       candidateCount: result.candidateCount,
+      discoveredCandidateCount: result.discoveredCandidateCount,
+      ledgerSkippedCandidateCount: result.ledgerSkippedCandidateCount,
       decisionCounts: result.decisionCounts,
       errors: [],
     };
@@ -226,6 +240,8 @@ async function screeningStatus(root, runDirectory) {
       batchCount: manifest.counts?.batches ?? 0,
       reviewCount,
       candidateCount: manifest.counts?.candidates ?? null,
+      discoveredCandidateCount: manifest.counts?.discoveredCandidates ?? null,
+      ledgerSkippedCandidateCount: manifest.counts?.ledgerSkippedCandidates ?? 0,
       errors: [error.message],
     };
   }
@@ -433,9 +449,11 @@ export function receiptStatus(root, runId, digest, runDirectory = null) {
       receipt.discovery?.manifest,
       receipt.discovery?.candidateArtifact,
       receipt.screening?.manifest,
+      receipt.screening?.decisionLedgerSnapshot,
       ...(receipt.screening?.reviews ?? []),
       ...(receipt.fulltext?.reviews ?? []),
       ...(backlogHasFile || backlogHasHash ? [receiptBacklog] : []),
+      receipt.decisionLedger?.delta,
     ].filter(Boolean);
     for (const artifact of recordedArtifacts) {
       if (typeof artifact.file !== "string" || typeof artifact.sha256 !== "string") {
@@ -452,6 +470,19 @@ export function receiptStatus(root, runId, digest, runDirectory = null) {
         errors.push(`Run receipt artifact hash changed: ${artifact.file}.`);
       }
     }
+    if (receipt.decisionLedger?.delta) {
+      const deltaFile = repositoryPath(root, receipt.decisionLedger.delta.file);
+      if (existsSync(deltaFile)) {
+        try {
+          const delta = validateDecisionLedgerDelta(readJson(deltaFile));
+          if (delta.runId !== runId) {
+            errors.push("Run receipt decision-ledger delta belongs to another run.");
+          }
+        } catch (error) {
+          errors.push(`Run receipt decision-ledger delta is invalid: ${error.message}`);
+        }
+      }
+    }
   }
   return {
     state: errors.length ? "invalid" : "complete",
@@ -460,8 +491,40 @@ export function receiptStatus(root, runId, digest, runDirectory = null) {
   };
 }
 
-function finalizationStatus(discovery, receipt, watermark) {
-  if (receipt.state !== "complete") return { state: "pending", errors: [] };
+function decisionLedgerStatus(root, runId, receipt) {
+  const ledgerFile = path.join(root, DEFAULT_DECISION_LEDGER_FILE);
+  if (receipt.state !== "complete") {
+    return { state: "pending", file: ledgerFile, errors: [] };
+  }
+  if (!existsSync(ledgerFile)) {
+    return { state: "required", file: ledgerFile, errors: [] };
+  }
+  try {
+    const ledger = readDecisionLedgerSync(ledgerFile);
+    const imported = ledger.imports.find((entry) => entry.runId === runId);
+    if (!imported) return { state: "required", file: ledgerFile, errors: [] };
+    const proof = verifyDecisionLedgerImports({ ledger, root, runIds: new Set([runId]) }).find(
+      (entry) => entry.runId === runId,
+    );
+    const errors = [...(proof?.errors ?? ["Decision ledger import proof is missing."])];
+    if (!receipt.file || imported.receipt?.sha256 !== sha256File(receipt.file)) {
+      errors.push("Decision ledger import no longer matches the verified run receipt.");
+    }
+    return {
+      state: errors.length ? "invalid" : "complete",
+      file: ledgerFile,
+      observationCount: imported.observationCount,
+      errors,
+    };
+  } catch (error) {
+    return { state: "invalid", file: ledgerFile, errors: [error.message] };
+  }
+}
+
+function finalizationStatus(discovery, receipt, decisionLedger, watermark) {
+  if (receipt.state !== "complete" || decisionLedger.state !== "complete") {
+    return { state: "pending", errors: [] };
+  }
   if (
     watermark?.lastRunId === discovery.runId &&
     watermark?.lastSuccessfulRunAt === discovery.window?.end
@@ -527,6 +590,7 @@ function nextStep(stages, digest) {
   if (!digest) return "promote-validated-reviews-and-pass-the-digest-path";
   if (stages.promotion.state !== "complete") return "repair-canonical-promotion-or-digest";
   if (stages.receipt.state !== "complete") return "verify-and-write-the-run-receipt";
+  if (stages.decisionLedger.state !== "complete") return "merge-verified-decisions-into-ledger";
   if (stages.finalization.state !== "complete") return "finalize-the-verified-run-watermark";
   return "publish-separately-then-resume-the-next-run";
 }
@@ -563,8 +627,22 @@ export async function getPipelineStatus({
     digest,
     resolvedRun,
   );
-  const finalization = finalizationStatus(discovery, receipt, watermark);
-  const stages = { discovery, screening, fulltext, backlog, promotion, receipt, finalization };
+  const decisionLedger = decisionLedgerStatus(
+    repositoryRoot,
+    discovery.runId ?? path.basename(resolvedRun),
+    receipt,
+  );
+  const finalization = finalizationStatus(discovery, receipt, decisionLedger, watermark);
+  const stages = {
+    discovery,
+    screening,
+    fulltext,
+    backlog,
+    promotion,
+    receipt,
+    decisionLedger,
+    finalization,
+  };
   return {
     schemaVersion: 1,
     runId: discovery.runId ?? path.basename(resolvedRun),
@@ -683,7 +761,45 @@ function hashedArtifact(root, file) {
   };
 }
 
-function buildRunReceipt(root, runDirectory, digest, status) {
+function sha256JsonPayload(value) {
+  return createHash("sha256")
+    .update(`${JSON.stringify(value, null, 2)}\n`)
+    .digest("hex");
+}
+
+async function ensureDecisionLedgerDelta({
+  root,
+  runDirectory,
+  apply,
+  verifyAgainstRun = false,
+}) {
+  const output = path.join(runDirectory, "decision-ledger", "delta.json");
+  let payload;
+  let alreadyRecorded = false;
+  if (existsSync(output)) {
+    payload = validateDecisionLedgerDelta(readJson(output));
+    if (verifyAgainstRun) {
+      const expected = buildDecisionLedgerDelta({ root, runDirectory });
+      if (canonicalJson(payload) !== canonicalJson(expected)) {
+        throw new Error(
+          "Unreceipted decision-ledger delta differs from current verified run artifacts.",
+        );
+      }
+    }
+    alreadyRecorded = true;
+  } else {
+    payload = buildDecisionLedgerDelta({ root, runDirectory });
+    if (apply) await writeJsonAtomic(output, payload);
+  }
+  return {
+    output,
+    payload,
+    sha256: existsSync(output) ? sha256File(output) : sha256JsonPayload(payload),
+    alreadyRecorded,
+  };
+}
+
+function buildRunReceipt(root, runDirectory, digest, status, deltaFile = null) {
   const digestPath = repositoryPath(root, digest);
   const digestValue = readJson(digestPath);
   const canonicalDirectory = path.join(root, "content", "paper-reading", "papers");
@@ -721,6 +837,13 @@ function buildRunReceipt(root, runDirectory, digest, status) {
     };
   }
   const manifest = readJson(path.join(runDirectory, "manifest.json"));
+  const screeningManifest = readJson(
+    path.join(runDirectory, "screening", "screening-manifest.json"),
+  );
+  const snapshotRecord = screeningManifest.sourceInputs?.decisionLedgerSnapshot;
+  const snapshotFile = snapshotRecord?.file
+    ? repositoryPath(runDirectory, snapshotRecord.file)
+    : null;
   return {
     schemaVersion: 1,
     kind: "paper-reading-run-receipt",
@@ -737,11 +860,19 @@ function buildRunReceipt(root, runDirectory, digest, status) {
       candidateArtifact: hashedArtifact(root, path.join(runDirectory, "candidates.json")),
     },
     screening: {
+      discoveredCandidates:
+        status.stages.screening.discoveredCandidateCount ??
+        status.stages.discovery.candidateCount,
+      reviewedCandidates: status.stages.screening.candidateCount,
+      ledgerSkippedCandidates: status.stages.screening.ledgerSkippedCandidateCount ?? 0,
       decisions: status.stages.screening.decisionCounts,
       manifest: hashedArtifact(
         root,
         path.join(runDirectory, "screening", "screening-manifest.json"),
       ),
+      ...(snapshotFile && existsSync(snapshotFile)
+        ? { decisionLedgerSnapshot: hashedArtifact(root, snapshotFile) }
+        : {}),
       reviews: screeningReviews,
     },
     fulltext: {
@@ -751,6 +882,14 @@ function buildRunReceipt(root, runDirectory, digest, status) {
     },
     digest: hashedArtifact(root, digestPath),
     canonicalPapers,
+    ...(deltaFile
+      ? {
+          decisionLedger: {
+            aggregateIsMutableAndNotReceiptPinned: true,
+            delta: hashedArtifact(root, deltaFile),
+          },
+        }
+      : {}),
     publication: {
       handledSeparately: true,
       recordedAsPublished: false,
@@ -786,7 +925,19 @@ export async function runReceipt(options, root, runDirectory) {
       alreadyRecorded: true,
     };
   }
-  const payload = buildRunReceipt(root, runDirectory, options.digest, verification.status);
+  const delta = await ensureDecisionLedgerDelta({
+    root,
+    runDirectory,
+    apply: Boolean(options.apply),
+    verifyAgainstRun: true,
+  });
+  const payload = buildRunReceipt(
+    root,
+    runDirectory,
+    options.digest,
+    verification.status,
+    options.apply || delta.alreadyRecorded ? delta.output : null,
+  );
   if (options.apply) await writeJsonAtomic(output, payload);
   return {
     dryRun: !options.apply,
@@ -795,8 +946,96 @@ export async function runReceipt(options, root, runDirectory) {
     screeningReviewCount: payload.screening.reviews.length,
     fulltextReviewCount: payload.fulltext.reviews.length,
     backlogCount: payload.fulltext.backlog.candidateIds.length,
+    decisionLedgerObservationCount: delta.payload.counts.observations,
+    decisionLedgerDelta: displayPath(root, delta.output),
     alreadyRecorded: false,
   };
+}
+
+async function mergeVerifiedRunDecisions({
+  options,
+  root,
+  runDirectory,
+  verification,
+  receipt,
+}) {
+  const receiptValue = readJson(receipt.file);
+  const delta = await ensureDecisionLedgerDelta({
+    root,
+    runDirectory,
+    apply: Boolean(options.apply),
+    verifyAgainstRun: !receiptValue.decisionLedger?.delta,
+  });
+  if (
+    !receiptValue.decisionLedger?.delta &&
+    !LEGACY_DECISION_LEDGER_RUN_IDS.has(verification.status.runId)
+  ) {
+    throw new Error(
+      "This non-legacy run receipt does not pin a decision-ledger delta; refusing import.",
+    );
+  }
+  if (receiptValue.decisionLedger?.delta) {
+    const pinnedDelta = receiptValue.decisionLedger.delta;
+    if (
+      repositoryPath(root, pinnedDelta.file) !== delta.output ||
+      pinnedDelta.sha256 !== delta.sha256
+    ) {
+      throw new Error("Verified receipt pins a different decision-ledger delta.");
+    }
+  }
+  const ledgerFile = path.join(root, DEFAULT_DECISION_LEDGER_FILE);
+  const current = readDecisionLedgerSync(ledgerFile);
+  const next = mergeDecisionLedger({
+    ledger: current,
+    delta: delta.payload,
+    deltaArtifact: {
+      file: displayPath(root, delta.output),
+      sha256: delta.sha256,
+    },
+    receiptArtifact: hashedArtifact(root, receipt.file),
+  });
+  const alreadyImported = canonicalJson(current) === canonicalJson(next);
+  if (options.apply && !alreadyImported) {
+    if (!existsSync(delta.output)) {
+      throw new Error("Decision-ledger delta must be written before aggregate merge.");
+    }
+    await writeJsonAtomic(ledgerFile, next);
+    const written = readDecisionLedgerSync(ledgerFile);
+    if (canonicalJson(written) !== canonicalJson(next)) {
+      throw new Error("Decision ledger failed post-write verification.");
+    }
+  }
+  return {
+    dryRun: !options.apply,
+    ledgerFile: displayPath(root, ledgerFile),
+    deltaFile: displayPath(root, delta.output),
+    receiptFile: displayPath(root, receipt.file),
+    runId: verification.status.runId,
+    observationCount: delta.payload.counts.observations,
+    terminalObservationCount: delta.payload.counts.terminal,
+    alreadyImported,
+    summary: next.summary,
+  };
+}
+
+export async function runLedger(options, root, runDirectory) {
+  const verification = await verifyPipeline({ ...options, root, runDirectory });
+  const receipt = receiptStatus(
+    root,
+    verification.status.runId,
+    options.digest,
+    runDirectory,
+  );
+  if (receipt.state !== "complete") {
+    throw new Error("A valid checked-in run receipt is required before ledger import.");
+  }
+  return mergeVerifiedRunDecisions({
+    options,
+    root,
+    runDirectory,
+    verification,
+    receipt,
+  });
 }
 
 export async function runFinalize(options, root, runDirectory) {
@@ -826,6 +1065,13 @@ export async function runFinalize(options, root, runDirectory) {
   ) {
     throw new Error("Refusing to move the discovery watermark backwards from a newer run.");
   }
+  const ledger = await mergeVerifiedRunDecisions({
+    options,
+    root,
+    runDirectory,
+    verification,
+    receipt,
+  });
   const next = {
     ...current,
     schemaVersion: 1,
@@ -840,6 +1086,7 @@ export async function runFinalize(options, root, runDirectory) {
       "watermark 只在 screening、全文审阅/backlog、promotion、canonical schema 与 run receipt 全部验证后推进；发布仍是独立授权步骤。",
   };
   const alreadyFinalized =
+    ledger.alreadyImported &&
     current.lastSuccessfulRunAt === next.lastSuccessfulRunAt &&
     current.lastRunId === next.lastRunId &&
     current.lastReceiptPath === next.lastReceiptPath;
@@ -847,6 +1094,7 @@ export async function runFinalize(options, root, runDirectory) {
   return {
     dryRun: !options.apply,
     stateFile: displayPath(root, stateFile),
+    decisionLedger: ledger,
     alreadyFinalized,
     before: {
       lastSuccessfulRunAt: current.lastSuccessfulRunAt ?? null,
@@ -884,7 +1132,12 @@ function printStatus(status) {
   process.stdout.write(`[paper-reading] run ${status.runId}\n`);
   for (const [name, stage] of Object.entries(status.stages)) {
     const count =
-      stage.candidateCount ?? stage.reviewCount ?? stage.acceptedCount ?? stage.count ?? null;
+      stage.candidateCount ??
+      stage.reviewCount ??
+      stage.observationCount ??
+      stage.acceptedCount ??
+      stage.count ??
+      null;
     process.stdout.write(
       `[paper-reading] ${name}: ${stage.state}${count === null ? "" : ` (${count})`}\n`,
     );
@@ -913,6 +1166,7 @@ async function main() {
   if (options.command === "verify") result = await verifyPipeline({ ...options, root, runDirectory });
   else if (options.command === "backlog") result = await runBacklog(options, root, runDirectory);
   else if (options.command === "receipt") result = await runReceipt(options, root, runDirectory);
+  else if (options.command === "ledger") result = await runLedger(options, root, runDirectory);
   else if (options.command === "finalize") result = await runFinalize(options, root, runDirectory);
   else result = await runCleanup(options, root, runDirectory);
   if (options.json) process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

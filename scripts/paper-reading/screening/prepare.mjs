@@ -4,6 +4,13 @@ import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
+import {
+  buildCanonicalExactVersionIndex,
+  buildDecisionLedgerSnapshot,
+  buildPolicyDescriptor,
+  DEFAULT_DECISION_LEDGER_FILE,
+  readDecisionLedgerSync,
+} from "../decision-ledger.mjs";
 import { buildReviewContract, SCREENING_SCHEMA_VERSION } from "./contract.mjs";
 import {
   pathExists,
@@ -39,10 +46,14 @@ export function parseArguments(argv) {
     else if (argument === "--output-dir") options.outputDirectory = next();
     else if (argument === "--research-config") options.researchConfigFile = next();
     else if (argument === "--venue-registry") options.venueRegistryFile = next();
+    else if (argument === "--decision-ledger") options.decisionLedgerFile = next();
     else if (argument === "--batch-size") {
       options.batchSize = parsePositiveInteger(next(), "--batch-size");
     } else if (argument === "--now") options.now = next();
     else if (argument === "--force") options.force = true;
+    else if (argument === "--ignore-decision-ledger") {
+      options.ignoreDecisionLedger = true;
+    }
     else throw new Error(`Unknown argument: ${argument}`);
   }
 
@@ -60,13 +71,16 @@ Options:
   --output-dir <directory>    Default: <run-dir>/screening.
   --research-config <file>    Default: path recorded by discovery, then content config.
   --venue-registry <file>     Default: path recorded by discovery, then venue registry.
-  --batch-size <number>       Operational batch size only; no candidates are dropped (default: 12).
+  --decision-ledger <file>    Default: content/paper-reading/state/decision-ledger.json.
+  --batch-size <number>       Batch size after receipt-backed exact-version reuse (default: 12).
   --now <ISO timestamp>       Deterministic generation time for tests or audited reruns.
   --force                     Replace an existing screening manifest and batch inputs.
+  --ignore-decision-ledger    Force every discovery candidate into this run's batches.
   --help                      Show this help.
 
-The command does not call a model, create decisions, write canonical papers or digests,
-run a site build, or publish anything.`;
+Discovery candidates remain intact. Receipt-backed exact-version decisions are accounted for
+in an immutable run snapshot; only ledger misses enter batches. The command does not call a
+model, create decisions, write canonical papers or digests, build the site, or publish.`;
 }
 
 function requireObject(value, label) {
@@ -298,6 +312,7 @@ export async function prepareScreening(inputOptions = {}) {
     inputOptions.outputDirectory ?? path.join(runDirectory, "screening"),
   );
   const screeningManifestFile = path.join(outputDirectory, "screening-manifest.json");
+  const ledgerSnapshotFile = path.join(outputDirectory, "decision-ledger-input.json");
   if (!inputOptions.force && (await pathExists(screeningManifestFile))) {
     throw new Error(
       `Screening manifest already exists at ${screeningManifestFile}; use --force to regenerate inputs.`,
@@ -305,14 +320,50 @@ export async function prepareScreening(inputOptions = {}) {
   }
 
   const contract = buildReviewContract();
+  const [researchConfigSha256, venueRegistrySha256] = await Promise.all([
+    sha256File(researchConfigFile),
+    sha256File(venueRegistryFile),
+  ]);
+  const policy = buildPolicyDescriptor({
+    researchConfigSha256,
+    researchConfigStatus: researchConfig.status,
+    venueRegistrySha256,
+    venueRegistryStatus: venueRegistry.status,
+    selectedTopicIds:
+      discoveryManifest.configuration?.selectedTopicIds ??
+      researchConfig.directions.map((direction) => direction.id),
+    reviewContract: contract,
+  });
+  const decisionLedgerFile = path.resolve(
+    root,
+    inputOptions.decisionLedgerFile ?? DEFAULT_DECISION_LEDGER_FILE,
+  );
+  const decisionLedger = readDecisionLedgerSync(decisionLedgerFile);
+  const canonicalExactVersions = buildCanonicalExactVersionIndex(
+    path.join(root, "content", "paper-reading", "papers"),
+  );
+  const ledgerSnapshot = buildDecisionLedgerSnapshot({
+    ledger: decisionLedger,
+    ledgerFile: decisionLedgerFile,
+    policy,
+    candidates: candidatePayload.candidates,
+    canonicalExactVersions,
+    generatedAt: now,
+    root,
+    ignoreLedger: Boolean(inputOptions.ignoreDecisionLedger),
+  });
+  await writeJsonAtomic(ledgerSnapshotFile, ledgerSnapshot);
+  const ledgerSkippedIds = new Set(
+    ledgerSnapshot.matches.map((match) => match.candidateId),
+  );
   const policyContext = buildPolicyContext(researchConfig, venueRegistry);
   const directionById = new Map(
     researchConfig.directions.map((direction) => [direction.id, direction]),
   );
   const venueById = new Map(venueRegistry.venues.map((venue) => [venue.id, venue]));
-  const enrichedCandidates = candidatePayload.candidates.map((candidate) =>
-    withScreeningContext(candidate, directionById, venueById),
-  );
+  const enrichedCandidates = candidatePayload.candidates
+    .filter((candidate) => !ledgerSkippedIds.has(candidate.discoveryId))
+    .map((candidate) => withScreeningContext(candidate, directionById, venueById));
   const candidateBatches = chunk(enrichedCandidates, batchSize);
   const batchRecords = [];
 
@@ -357,9 +408,9 @@ export async function prepareScreening(inputOptions = {}) {
     generatedAt: now,
     stage: "screening-input-only",
     noticeZh:
-      "这些文件只定义 AI 或人工初筛的输入与输出契约；尚未运行 reviewer，也没有论文被正式收录。",
+      "这些文件定义 AI 或人工初筛的输入与输出契约，并记录由既有 verified receipt 支持的 exact-version 跳过项；尚未运行本轮 reviewer，也没有新论文被正式收录。",
     guarantees: {
-      allDiscoveryCandidatesIncluded: true,
+      allDiscoveryCandidatesAccountedFor: true,
       modelCalled: false,
       reviewerDecisionsGenerated: false,
       canonicalPapersWritten: false,
@@ -378,22 +429,35 @@ export async function prepareScreening(inputOptions = {}) {
       },
       researchConfig: {
         file: relativeTo(runDirectory, researchConfigFile),
-        sha256: await sha256File(researchConfigFile),
+        sha256: researchConfigSha256,
         status: researchConfig.status,
       },
       venueRegistry: {
         file: relativeTo(runDirectory, venueRegistryFile),
-        sha256: await sha256File(venueRegistryFile),
+        sha256: venueRegistrySha256,
         status: venueRegistry.status,
+      },
+      decisionLedgerSnapshot: {
+        file: relativeTo(runDirectory, ledgerSnapshotFile),
+        sha256: await sha256File(ledgerSnapshotFile),
       },
     },
     batching: {
       batchSize,
-      policy: "ordered-lossless-chunks",
+      policy: "ordered-lossless-ledger-miss-chunks",
       quotaApplied: false,
     },
+    accounting: {
+      policy: "screened-plus-ledger-skipped-equals-discovered",
+      policyFingerprint: policy.fingerprint,
+      policyDescriptor: policy,
+      decisionLedgerBypassed: Boolean(inputOptions.ignoreDecisionLedger),
+      ledgerSkippedCandidates: ledgerSnapshot.matches,
+    },
     counts: {
+      discoveredCandidates: candidatePayload.candidates.length,
       candidates: enrichedCandidates.length,
+      ledgerSkippedCandidates: ledgerSnapshot.matches.length,
       batches: batchRecords.length,
     },
     reviewContract: contract,
@@ -407,6 +471,8 @@ export async function prepareScreening(inputOptions = {}) {
     screeningManifestFile,
     screeningManifest,
     batchRecords,
+    ledgerSnapshotFile,
+    ledgerSnapshot,
   };
 }
 
@@ -418,7 +484,7 @@ async function main() {
   }
   const result = await prepareScreening(options);
   console.log(
-    `[paper-reading] prepared ${result.screeningManifest.counts.candidates} screening candidates in ${result.screeningManifest.counts.batches} batches`,
+    `[paper-reading] prepared ${result.screeningManifest.counts.candidates} screening candidates in ${result.screeningManifest.counts.batches} batches; reused ${result.screeningManifest.counts.ledgerSkippedCandidates} receipt-backed exact decisions`,
   );
   console.log(`[paper-reading] screening manifest: ${result.screeningManifestFile}`);
   console.log("[paper-reading] no model was called and no paper was accepted or published");

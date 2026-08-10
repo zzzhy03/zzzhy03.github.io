@@ -23,10 +23,12 @@ import {
   receiptStatus,
   resolveRunDirectory,
   runFinalize,
+  runLedger,
   runReceipt,
 } from "../../pipeline.mjs";
 import { validateFulltextReviews } from "../../fulltext/validate.mjs";
 import { validatePromotion } from "../../fulltext/validate-promotion.mjs";
+import { buildReviewContract } from "../../screening/contract.mjs";
 
 const temporaryRoots = [];
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
@@ -81,6 +83,23 @@ function createCompletedEmptyScreeningRun(root, runId = "run-001") {
     runId,
     batches: [],
     counts: { candidates: 0, batches: 0 },
+    sourceInputs: {
+      researchConfig: {
+        file: "content/paper-reading/research-config.json",
+        sha256: sha256File(
+          path.join(root, "content", "paper-reading", "research-config.json"),
+        ),
+        status: "active",
+      },
+      venueRegistry: {
+        file: "content/paper-reading/venue-registry.json",
+        sha256: sha256File(
+          path.join(root, "content", "paper-reading", "venue-registry.json"),
+        ),
+        status: "active",
+      },
+    },
+    reviewContract: buildReviewContract(),
   });
   return runDirectory;
 }
@@ -298,6 +317,10 @@ test("an all-full-text run with no selected papers completes receipt and finaliz
     lastSuccessfulRunAt: "2026-08-07T00:00:00.000Z",
     lastRunId: "run-001",
   });
+  const finalizedStatus = await getPipelineStatus({ root, runDirectory: run, digest });
+  assert.equal(finalizedStatus.stages.decisionLedger.state, "complete");
+  assert.equal(finalizedStatus.stages.receipt.state, "complete");
+  assert.equal(finalizedStatus.stages.finalization.state, "complete");
 });
 
 test("receipt validation binds a non-empty backlog artifact to the current closure", () => {
@@ -358,4 +381,30 @@ test("receipt validation binds a non-empty backlog artifact to the current closu
   const unhashed = receiptStatus(root, runId, digest, run);
   assert.equal(unhashed.state, "invalid");
   assert.match(unhashed.errors.join(" "), /must reference its hashed artifact/);
+});
+
+test("legacy receipt compatibility refuses a self-consistent but rebuilt delta", async () => {
+  const { root } = temporaryRepository();
+  copyCanonicalValidationFixture(root);
+  const run = createCompletedEmptyScreeningRun(
+    root,
+    "paper-reading-20260807-094202",
+  );
+  const digest = "content/paper-reading/digests/2026-08-07.json";
+  await runReceipt({ selection: "all-full-text", digest, apply: true }, root, run);
+
+  const receiptFile = path.join(root, "content", "paper-reading", "runs", "2026-08-07.json");
+  const receipt = JSON.parse(readFileSync(receiptFile, "utf8"));
+  delete receipt.decisionLedger;
+  writeJson(receiptFile, receipt);
+
+  const deltaFile = path.join(run, "decision-ledger", "delta.json");
+  const delta = JSON.parse(readFileSync(deltaFile, "utf8"));
+  delta.generatedAt = "2026-08-07T23:59:59.000Z";
+  writeJson(deltaFile, delta);
+
+  await assert.rejects(
+    () => runLedger({ selection: "all-full-text", digest, apply: true }, root, run),
+    /delta differs from current verified run artifacts/,
+  );
 });

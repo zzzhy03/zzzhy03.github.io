@@ -9,9 +9,14 @@ site build, commit, push, or publish.
 
 ## Window and state
 
-The checked-in state is `content/paper-reading/state/discovery-state.json`. Its initial
-`lastSuccessfulRunAt` is deliberately `null`; it does not pretend that discovery has already
-run. Bootstrap with an explicit timestamp:
+Checked-in state has two separate responsibilities:
+
+- `content/paper-reading/state/discovery-state.json` stores the successful discovery watermark;
+- `content/paper-reading/state/decision-ledger.json` stores receipt-backed decision observations
+  used to avoid repeating an identical review.
+
+The initial `lastSuccessfulRunAt` is deliberately `null`; it does not pretend that discovery has
+already run. Bootstrap with an explicit timestamp:
 
 ```sh
 npm run discover:papers -- --since 2026-08-06T00:00:00+08:00
@@ -71,6 +76,10 @@ three attempts; ordinary 4xx responses fail immediately. Per-attempt outcomes an
 kept in the manifest. Reaching the per-topic safety cap or exhausting a retry before crossing the
 window makes the source `partial`, which prevents a state advance.
 
+Discovery always writes the complete candidate set for the window. It does not consult the
+decision ledger to suppress provider results; exact decision reuse happens only when screening
+inputs are prepared, so every overlap-window candidate remains auditable.
+
 OpenReview, official venue proceedings, and official technical reports have separate adapter
 interfaces but are `not-configured`. Their status is visible in every default manifest instead of
 silently appearing as an empty search. Future implementations must preserve provider provenance:
@@ -88,6 +97,12 @@ Candidate and canonical records are matched in this order:
 
 The discovery layer never changes a canonical paper ID. A newer arXiv version, newly discovered
 DOI, or journal reference is staged as a possible update to the existing record.
+
+Canonical deduplication and decision reuse are related but different. The reusable decision key is
+an exact version such as `arxiv:2608.05131@v2`, not the versionless paper ID and not `candidateId`.
+Reuse additionally requires an identical candidate-evidence fingerprint and the same active policy
+fingerprint. A new version, changed abstract/metadata/source evidence, or changed policy therefore
+returns to screening even when the canonical paper ID is unchanged.
 
 ## Useful commands
 
@@ -124,7 +139,7 @@ Use `npm run discover:papers -- --help` for all safety caps and path overrides.
 
 Discovery can now be followed by a separate AI-or-human screening contract. Preparing the
 handoff reads only the discovery run's `candidates.json` and `manifest.json`, plus the reviewed
-research and venue configuration:
+research and venue configuration and the checked-in decision ledger:
 
 ```sh
 npm run prepare:paper-screening -- \
@@ -132,20 +147,38 @@ npm run prepare:paper-screening -- \
   --batch-size 12
 ```
 
-The batch size is operational only: every discovery candidate is included exactly once. By
-default the new files stay inside the same ignored local run directory:
+The batch size is operational only. Every discovery candidate is accounted for exactly once, but
+only ledger misses are included in reviewer batches. By default the new files stay inside the same
+ignored local run directory:
 
 ```text
 <run-dir>/screening/
   screening-manifest.json
+  decision-ledger-input.json   # immutable match/miss snapshot
   batches/
     batch-001.input.json
   reviews/
     batch-001.review.json  # supplied later by an AI or human reviewer
 ```
 
-Preparation does not call a model and does not create reviewer decisions. Each batch carries the
-attention-policy gates, routing rules, negative signals, controlled facet taxonomy, and venue
+Preparation computes a candidate-evidence fingerprint and an active policy fingerprint from the
+research config, venue registry, selected topics, screening contract, and full-text schema. A
+previous observation is reusable only when exact arXiv version, evidence fingerprint, and policy
+fingerprint all match, the prior outcome is terminal, and any required canonical exact version
+still exists. The referenced immutable delta and receipt must also still exist locally and pass
+their recorded hashes; missing proof fails safely by returning the candidate to screening. Both
+matches and misses are frozen in `decision-ledger-input.json`, whose hash is recorded by the
+screening manifest. A `draft` research config or venue registry never enables reuse.
+Resolution always considers the complete matching history first: a later non-terminal decision,
+or a terminal decision whose provenance no longer verifies, can never expose an older terminal
+decision as a fallback.
+
+To deliberately revisit every candidate in a new run without editing the ledger, pass
+`--ignore-decision-ledger` when preparing screening. The override is recorded in the snapshot and
+manifest; `--force` alone only regenerates files and does not bypass prior decisions.
+
+Preparation does not call a model and does not create new reviewer decisions. Each batch carries
+the attention-policy gates, routing rules, negative signals, controlled facet taxonomy, and venue
 policy needed for a reviewer to make a decision. In particular:
 
 - `retrievalTopicIds` are retrieval provenance, not final classification or relevance;
@@ -160,7 +193,8 @@ policy needed for a reviewer to make a decision. In particular:
 ### Reviewer output
 
 One review JSON is expected for each prepared batch. Its `decisions` array must contain exactly
-one entry for every candidate in that batch. The complete enums and required fields live in each
+one entry for every candidate in that batch; ledger matches have no new review file and remain
+accounted for by the immutable input snapshot. The complete enums and required fields live in each
 batch's `reviewContract`; the core shape is:
 
 ```json
@@ -221,9 +255,10 @@ npm run validate:paper-screening -- \
   --run-dir local-assets/paper-reading/runs/<run-id>
 ```
 
-The validator is read-only. It checks prepared-input hashes, batch ownership, topic and facet IDs,
-attention-policy consistency, decision-specific evidence boundaries, and that every candidate has
-exactly one decision. Passing validation still does not accept papers, write canonical records or
+The validator is read-only. It checks the ledger snapshot hash and ownership, prepared-input hashes,
+batch ownership, topic and facet IDs, attention-policy consistency, decision-specific evidence
+boundaries, and that every discovery candidate is accounted for by exactly one snapshot match or
+one new decision. Passing validation still does not accept papers, write canonical records or
 digests, build the site, or publish anything.
 
 Run its offline contract fixtures with:
@@ -258,6 +293,89 @@ from validated screening; standalone full-text, summary, and promotion commands 
 `--expected-count 0` after screening validation. `npm run summarize:paper-fulltext -- --run-dir <run>` writes a
 local editorial summary after the same checks pass; it does not infer promotion or publication.
 
+`screening-reject`, `accepted-deep`, `accepted-skim`, `fulltext-reject`, and a canonical-backed
+`administrative-already-canonical` observation are terminal for an identical exact-version,
+evidence, and active-policy tuple. `administrative-backlog`, `manual-review`, `defer`, and an
+abstract acceptance still awaiting promotion are non-terminal and are not automatically skipped
+on the next run.
+
+## Receipt, decision ledger, and finalization
+
+After promotion and all read-only gates pass, the normal command order is:
+
+```sh
+# Inspect, then write the receipt and its immutable run-scoped decision delta.
+npm run pipeline:papers -- receipt \
+  --run-dir local-assets/paper-reading/runs/<run-id> \
+  --selection all-full-text \
+  --digest content/paper-reading/digests/YYYY-MM-DD.json
+npm run pipeline:papers -- receipt \
+  --run-dir local-assets/paper-reading/runs/<run-id> \
+  --selection all-full-text \
+  --digest content/paper-reading/digests/YYYY-MM-DD.json \
+  --apply
+
+# Inspect, then import only that receipt-verified immutable delta.
+npm run pipeline:papers -- ledger \
+  --run-dir local-assets/paper-reading/runs/<run-id> \
+  --selection all-full-text \
+  --digest content/paper-reading/digests/YYYY-MM-DD.json
+npm run pipeline:papers -- ledger \
+  --run-dir local-assets/paper-reading/runs/<run-id> \
+  --selection all-full-text \
+  --digest content/paper-reading/digests/YYYY-MM-DD.json \
+  --apply
+
+# Finalize re-verifies/imports the ledger idempotently before advancing the watermark.
+npm run pipeline:papers -- finalize \
+  --run-dir local-assets/paper-reading/runs/<run-id> \
+  --selection all-full-text \
+  --digest content/paper-reading/digests/YYYY-MM-DD.json
+npm run pipeline:papers -- finalize \
+  --run-dir local-assets/paper-reading/runs/<run-id> \
+  --selection all-full-text \
+  --digest content/paper-reading/digests/YYYY-MM-DD.json \
+  --apply
+```
+
+`receipt --apply` creates `<run-dir>/decision-ledger/delta.json` and pins its SHA-256 in the
+checked-in receipt. `ledger` imports that immutable delta idempotently. `finalize` always performs
+the verified ledger merge first and writes `discovery-state.json` only after it succeeds; running
+the explicit `ledger` step beforehand is useful for inspecting the decision counts but is not a
+correctness dependency.
+
+### One-time legacy backfill
+
+The verified 2026-08-06 `high-deep` and 2026-08-07 `all-full-text` runs can be imported without
+re-running discovery or review. Run them oldest first, inspecting each dry-run before `--apply`:
+
+```sh
+npm run pipeline:papers -- ledger \
+  --run-dir local-assets/paper-reading/runs/live-dry-run-20260806-v2 \
+  --selection high-deep \
+  --digest content/paper-reading/digests/2026-08-06.json
+npm run pipeline:papers -- ledger \
+  --run-dir local-assets/paper-reading/runs/live-dry-run-20260806-v2 \
+  --selection high-deep \
+  --digest content/paper-reading/digests/2026-08-06.json \
+  --apply
+
+npm run pipeline:papers -- ledger \
+  --run-dir local-assets/paper-reading/runs/paper-reading-20260807-094202 \
+  --selection all-full-text \
+  --digest content/paper-reading/digests/2026-08-07.json
+npm run pipeline:papers -- ledger \
+  --run-dir local-assets/paper-reading/runs/paper-reading-20260807-094202 \
+  --selection all-full-text \
+  --digest content/paper-reading/digests/2026-08-07.json \
+  --apply
+```
+
+This is a compatibility path for receipts created before delta pinning. It derives each immutable
+delta only from the legacy receipt's still-verified run artifacts and records the receipt/delta
+hashes in the aggregate ledger. Do not finalize the older run or move the watermark backwards.
+New runs must use `receipt --apply` before ledger import.
+
 ## Deliberately deferred
 
 - automatically executing the AI/human screening and full-text reviewer (the contracts and
@@ -267,4 +385,6 @@ local editorial summary after the same checks pass; it does not infer promotion 
   validates reviewer-supplied canonical records and the digest);
 - OpenReview, proceedings, and official-report network implementations;
 - semantic/fuzzy duplicate review beyond exact normalized identity keys;
+- partitioning, compaction, and an indexed lookup for the aggregate decision ledger (the current
+  trial version keeps one checked-in JSON file and scans matching observations in memory);
 - Zotero, user-state sync, and publishing.
