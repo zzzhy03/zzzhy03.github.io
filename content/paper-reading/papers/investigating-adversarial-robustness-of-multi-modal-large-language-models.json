@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2606.03713",
+  "slug": "investigating-adversarial-robustness-of-multi-modal-large-language-models",
+  "title": "Investigating Adversarial Robustness of Multi-modal Large Language Models",
+  "authors": [
+    "Hashmat Shadab Malik",
+    "Muzammal Naseer",
+    "Salman Khan"
+  ],
+  "publishedAt": "2026-06-02",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2606.03713"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "llm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "investigating",
+    "adversarial",
+    "robustness",
+    "multi-modal",
+    "large",
+    "vlm-mllm",
+    "llm"
+  ],
+  "abstract": "Multi-modal Large Language Models (MLLMs) achieve strong performance on vision-language tasks, but incorporating visual inputs through a vision encoder (e.g., CLIP) substantially expands the attack surface, making these models vulnerable to visual adversarial perturbations. Prior defenses typically preserve compatibility with pretrained MLLMs by enforcing strict alignment to CLIP's original embedding space during adversarial fine-tuning; while practical, this constraint fundamentally limits achievable robustness. We present a systematic investigation of adversarial robustness in MLLMs. We first introduce a diagnostic CLIP-alignment protocol that predicts, prior to full MLLM training, which robust vision encoders will transfer effectively to the multimodal setting, revealing that large-scale multimodal adversarial pretraining, rather than unimodal scale alone, is the critical factor for strong robustness transfer. Integrating such encoders into MLLMs via end-to-end multimodal training yields average gains of 28 CIDEr points on captioning and 11.7% VQA accuracy under strong adversarial attacks compared to constrained plug-and-play baselines. We further show that adversarial training applied directly to a standard non-robust MLLM degrades both clean and adversarial performance, establishing robust visual representations as a strict prerequisite, while end-to-end adversarial training from a robust backbone delivers additional gains of 1.9 CIDEr points and 4.3% VQA accuracy. Beyond training-time defenses, lightweight test-time visual stochastic transformations serve as an effective black-box defense for non-robust MLLMs, elevating adversarial performance from near-zero to levels comparable with robust models. Finally, we show that our robust models substantially reduce toxic generation under white-box visual jailbreak attacks. Code and pretrained weights will be released publicly.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.03713v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.03713v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2606.03713v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "这篇系统研究指出，把 robust vision encoder 强行保持在原 CLIP embedding space 会限制 MLLM robustness；作者先用 alignment diagnostic 预测可迁移 encoder，再做端到端 multimodal training/AT，并用 test-time stochastic transforms 提供黑盒防御。作者报告强 attack 下相对 plug-and-play 平均 +28 CIDEr、+11.7 VQA accuracy points；覆盖攻击、hallucination 与 visual jailbreak 广，但训练成本与自适应攻击边界需保留。",
+    "methodFlow": [
+      "用 CLIP-alignment diagnostic 筛选 robust vision encoders",
+      "将优选 encoder 端到端接入 MLLM 训练",
+      "从 robust backbone 继续 multimodal adversarial training",
+      "黑盒场景对输入施加随机视觉变换",
+      "在 caption/VQA/hallucination/jailbreak 上评估"
+    ],
+    "whyRelevantZh": "直接关联 MLLM safety、visual adversarial robustness 与可靠部署。",
+    "evidenceZh": "alignment diagnostic 在完整 MLLM 训练前预测 robust encoder transfer。（Sec. 3 and Fig. 2, p. 5）；作者报告端到端 robust encoder training 在强攻击下相对 constrained baselines 平均提升 28 CIDEr、11.7 VQA points。（Table 1, p. 8）；作者报告从 robust backbone 做 AT 额外提升 1.9 CIDEr、4.3 VQA points。（Sec. 4.2 and Tables 4-5, pp. 10-12）",
+    "caveatZh": "作者限制：实验主要围绕 CLIP/LLaVA 架构和特定像素范数攻击。；作者限制：端到端 robust training 计算成本较高。；审阅风险：stochastic transforms 对知道防御分布的 adaptive attacker 可能减弱。；审阅风险：robust benchmark 增益不保证防御真实语义操纵或物理攻击。",
+    "motivationZh": "工作依次检查 robust encoder 的 CLIP compatibility、标准 LLaVA 训练、从 robust backbone 开始的 end-to-end adversarial training，以及无需改权重的 image stochastic transforms；同时评估 caption、VQA、POPE 与 toxic generation。",
+    "methodZh": "工作依次检查 robust encoder 的 CLIP compatibility、标准 LLaVA 训练、从 robust backbone 开始的 end-to-end adversarial training，以及无需改权重的 image stochastic transforms；同时评估 caption、VQA、POPE 与 toxic generation。 价值在于统一诊断、训练和 test-time 防御并证明 robust visual representation 是 AT 前提；不是单一新攻击或新 encoder。",
+    "experimentsZh": "在 LLaVA pipeline 中比较 CLIP、FARE、Sim-CLIP 与大规模 adversarially pretrained encoders；用 APGD/APGD-Ensemble、caption/VQA、POPE 和 white-box visual jailbreak 测 clean/robust performance。 作者报告：作者报告强攻击下相对 plug-and-play 平均 +28 CIDEr、+11.7 VQA accuracy points。（Table 1, p. 8）；作者报告 robust-backbone AT 进一步 +1.9 CIDEr、+4.3 VQA points。（Tables 4-5, pp. 10-12） Baseline boundary：攻击、encoder、训练和黑盒/白盒覆盖广；仍主要集中 LLaVA/CLIP-style 架构与有限 perturbation norms。 Ablation boundary：encoder source、alignment、AT stage、attack strength 和 stochastic transforms 均有对照；缺少对随机防御的 expectation-over-transformation 自适应攻击全覆盖。",
+    "insightZh": "价值在于统一诊断、训练和 test-time 防御并证明 robust visual representation 是 AT 前提；不是单一新攻击或新 encoder。 系统性和实验覆盖强，值得精读；发布内容必须区分作者报告与未做的 adaptive/physical threat validation。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

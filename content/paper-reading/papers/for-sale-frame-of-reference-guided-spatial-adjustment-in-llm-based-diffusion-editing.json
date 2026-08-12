@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2509.23452",
+  "slug": "for-sale-frame-of-reference-guided-spatial-adjustment-in-llm-based-diffusion-editing",
+  "title": "FoR-SALE: Frame of Reference-guided Spatial Adjustment in LLM-based Diffusion Editing",
+  "authors": [
+    "Tanawan Premsri",
+    "Parisa Kordjamshidi"
+  ],
+  "publishedAt": "2025-09-27",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2509.23452"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "for-sale",
+    "frame",
+    "reference-guided",
+    "spatial",
+    "adjustment",
+    "image-generation"
+  ],
+  "abstract": "Current text-to-image generation models, even state-of-the-art models, exhibit a significant performance gap when spatial expressions are described from non-camera perspectives. To address this limitation, we propose Frame of Reference-guided Spatial Adjustment in LLM-based Diffusion Editing (FoR-SALE), an extension of the Self-correcting LLM-controlled Diffusion (SLD). FoR-SALE first evaluates the alignment between a given text and an initially generated image, and then refines the image based on the expressed FoR in the spatial description. It employs vision modules to extract the spatial configuration of the generated image and simultaneously maps the spatial expression to a corresponding camera perspective. This unified perspective enables direct evaluation of alignment between language and vision. When misalignment is detected, the required editing operations are generated and applied. FoR-SALE introduces novel latent-space operations to adjust the facing direction and depth of generated images. We evaluate FoR-SALE on three benchmarks designed to assess spatial understanding with FoR: FoR-LMD, FoREST, and FoREST-G, with the latter providing diagnostic subsets covering multi-object scenes, expanded relation types, and naturalized prompts to test the generality of our framework. Our framework improves the performance of SOTA T2I models by up to 7.0 pp using only a single round of correction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2509.23452v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2509.23452v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/HLR/FoR-SALE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2509.23452v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/HLR/FoR-SALE）。",
+    "ideaZh": "FoR-SALE 先把 intrinsic/relative spatial expression 与图像对象统一到 camera frame，再由 MLLM 检查布局并用 latent translation、depth 与 facing-direction 操作单轮纠错。作者报告在 FoR-LMD、FoREST、FoREST-G 上相对强 T2I 最多提升 7.0 个百分点；价值在于把 frame of reference 明确变成生成—诊断—编辑闭环，但仍受 detector、LLM 空间推理和单轮局部编辑限制。",
+    "methodFlow": [
+      "T2I 模型生成初始图像",
+      "视觉模块抽取对象位置、朝向与深度",
+      "LLM 解析文本 FoR 并映射到 camera frame",
+      "对齐检查生成 translation/depth/facing edit plan",
+      "latent-space 单轮编辑并输出修正图像"
+    ],
+    "whyRelevantZh": "直接关联 controllable image generation、spatial editing 与 MLLM 作为生成控制器的闭环设计。",
+    "evidenceZh": "方法在语言与视觉两侧显式规范化 reference frame 后再决定编辑。（Sec. 3 and Fig. 2, p. 2）；作者报告单轮纠错在三套 FoR benchmark 上相对 SOTA T2I 最多提升 7.0pp。（Table 1, p. 8）；失败案例显示复杂构图和上游空间判断错误会直接传递到编辑结果。（Fig. 7 and discussion, p. 23）",
+    "caveatZh": "作者限制：上游 LLM 与视觉模块的 FoR/对象判断错误会限制最终修正。；作者限制：单轮局部空间调整难处理严重生成缺失和复杂多对象冲突。；审阅风险：自动 spatial metric 未必覆盖视觉自然度与对象身份保持。；审阅风险：框与深度启发式对遮挡和非刚体对象可能不稳。",
+    "motivationZh": "系统从初始 T2I 图像提取对象框、朝向与深度，将语言中的 deictic/intrinsic reference frame 规范化到相机视角，判断错位后生成移动、翻转朝向或深度调整操作，并在 diffusion latent 中执行。FoREST-G 增加多对象、扩展关系和自然语言子集。",
+    "methodZh": "系统从初始 T2I 图像提取对象框、朝向与深度，将语言中的 deictic/intrinsic reference frame 规范化到相机视角，判断错位后生成移动、翻转朝向或深度调整操作，并在 diffusion latent 中执行。FoREST-G 增加多对象、扩展关系和自然语言子集。 相对一般 self-correction，关键新意是显式 FoR normalization 与面向方向/深度的 latent operations，使 non-camera perspective 可被操作化；不是端到端训练的新生成 backbone。",
+    "experimentsZh": "在 FoR-LMD、FoREST 与扩展 FoREST-G 上测试多种 T2I backbone，按 spatial alignment 成功率比较原始生成、SLD 与 FoR-SALE，并分解关系和提示类型。 作者报告：作者报告 FoR-SALE 在所测设置中带来最高 7.0pp 的 spatial-alignment 提升。（Table 1, p. 8） Baseline boundary：覆盖原始 T2I 与 self-correction 基线及三个 benchmark；缺少多轮闭环、人工偏好与更广开放世界语言的充分对照。 Ablation boundary：分析 FoR mapping、不同编辑操作和诊断子集；仍需区分 detector、LLM parser 与 diffusion editor 各自的错误上限。",
+    "insightZh": "相对一般 self-correction，关键新意是显式 FoR normalization 与面向方向/深度的 latent operations，使 non-camera perspective 可被操作化；不是端到端训练的新生成 backbone。 方法边界清楚、诊断 benchmark 与 failure evidence 完整，值得精读并作为空间编辑 agent 的模块化参考。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

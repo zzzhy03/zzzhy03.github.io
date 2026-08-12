@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2607.04872",
+  "slug": "eventcot-event-centric-video-chain-of-thought-for-reasoning-temporal-localization",
+  "title": "EventCoT: Event-centric Video Chain-of-thought for Reasoning Temporal Localization",
+  "authors": [
+    "Youngkil Song",
+    "Yoonjae Baek",
+    "Dongwon Kim",
+    "Inho Kim",
+    "Dongkeun Kim",
+    "Suha Kwak"
+  ],
+  "publishedAt": "2026-07-06",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.04872"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "video-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "eventcot",
+    "event-centric",
+    "video",
+    "chain-of-thought",
+    "reasoning",
+    "vlm-mllm",
+    "video-generation"
+  ],
+  "abstract": "Reasoning temporal localization (RTL) requires a model to generate an answer that itself contains the time interval supporting it, coupling high-level reasoning with temporal grounding in a single response. To tackle this challenge, we propose the first event-centric video chain-of-thought framework, dubbed EventCoT. EventCoT first performs event-centric tokenization, converting the video into compact event tokens that enable efficient identification of question-relevant events. It then reasons within these events to generate the answer, grounding the time interval via embedding matching that aligns placeholder tokens with visual embeddings. EventCoT achieves state-of-the-art results on ActivityNet-RTL while using substantially fewer visual tokens than previous work, and attains strong zero-shot results on the grounded video question answering benchmark ReXTime. Our code will be released for research purposes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.04872v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.04872v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.04872v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "EventCoT 不把长视频均匀切帧后直接回归时间，而是先形成 event-centric tokens，再以问题相关性选择事件并生成带 temporal placeholder 的细粒度 CoT；作者报告在 ActivityNet-RTL 与 ReXTime 上提升 localization 与 reasoning quality，但固定事件数忽略时长差异，且位置与推理压在同一 placeholder 中会限制复杂时间关系。",
+    "methodFlow": [
+      "Video + temporal query",
+      "Event boundary detection",
+      "Event-centric tokenization",
+      "Query-relevant event selection",
+      "Fine-grained temporal CoT",
+      "Localized time span"
+    ],
+    "whyRelevantZh": "直接关联 video MLLM 的长上下文压缩、temporal grounding 与可审计 reasoning。",
+    "evidenceZh": "EventCoT 以事件而非均匀帧作为长视频 reasoning 的基本单元。（Sec. 3 and Fig. 2, p. 3）；系统先选择 query-relevant events，再用 location-aware placeholders 生成细粒度 temporal reasoning。（Secs. 3.2-3.4, pp. 4-6）；作者报告在 ActivityNet-RTL 和 ReXTime 上优于所列 temporal localization baselines，并在 GPT-based reasoning quality 评估中领先。（Tables 1-2, p. 7）",
+    "caveatZh": "作者限制：固定事件数忽略不同事件的持续时间，导致短事件过采样或长事件欠采样。；作者限制：单一 placeholder 同时承载 location 与 reasoning，复杂 temporal relationship 的表达能力受限。；审阅风险：部分质量评估依赖 LLM judge，可能偏好更长或更模板化的 reasoning，而非真正的 temporal causality。",
+    "motivationZh": "方法先用 scene cuts 和事件边界构造 event-level visual units，把事件内容、相对位置和 query 对齐成 compact tokens；随后筛选 query-relevant events，生成解释事件因果及时间范围的 reasoning chain，并解码 start/end。目标是让 temporal grounding 的证据单位从孤立帧变成有语义边界的事件。",
+    "methodZh": "方法先用 scene cuts 和事件边界构造 event-level visual units，把事件内容、相对位置和 query 对齐成 compact tokens；随后筛选 query-relevant events，生成解释事件因果及时间范围的 reasoning chain，并解码 start/end。目标是让 temporal grounding 的证据单位从孤立帧变成有语义边界的事件。 将 event segmentation、query-conditioned selection 与可解释 temporal CoT 联合起来，较 uniform visual tokens 更贴合事件结构；主要创新是 representation 与 reasoning interface，而非新的视频 backbone。",
+    "experimentsZh": "在 ActivityNet-RTL 做监督 temporal localization，在 ReXTime 做 zero-shot transfer；比较 visual-token budgets、事件划分与 embedding matching，并用 localization metrics 和 LLM-based reasoning quality 评价。 作者报告：作者报告 EventCoT 在 ActivityNet-RTL 的 mIoU 达到 52.3，并在 ReXTime 的 zero-shot localization 上取得表中最佳综合结果。（Tables 1-2, p. 7） Baseline boundary：覆盖 LITA 等 video temporal grounding systems、uniform segmentation 与 zero-shot baselines；但主要数据集仍是 trimmed/captioned web videos，真实长视频叙事和遮挡更复杂。 Ablation boundary：比较 uniform/event tokenization、相关事件选择和 embedding matching；仍缺事件边界错误传播、不同事件数与超长视频 compute 的充分敏感性分析。",
+    "insightZh": "将 event segmentation、query-conditioned selection 与可解释 temporal CoT 联合起来，较 uniform visual tokens 更贴合事件结构；主要创新是 representation 与 reasoning interface，而非新的视频 backbone。 方法链、跨数据集验证和明确 limitations 均较完整，建议精读；需避免把 LLM-judged reasoning score 当作因果解释已被验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

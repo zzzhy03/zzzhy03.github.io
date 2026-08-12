@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.08596",
+  "slug": "goal-oriented-navigation-instruction-generation-with-tour-video-priors",
+  "title": "Goal-oriented Navigation Instruction Generation with Tour Video Priors",
+  "authors": [
+    "Fangdi Li",
+    "Juncheng Liao",
+    "Changxu Cheng",
+    "Jiazhi Wang",
+    "Senda Chen",
+    "Tao Wang",
+    "Wuyue Zhao"
+  ],
+  "publishedAt": "2026-08-09",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.08596"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "goal-oriented",
+    "navigation",
+    "instruction",
+    "generation",
+    "tour",
+    "vlm-mllm",
+    "visual-design-agents"
+  ],
+  "abstract": "Navigation Instruction Generation (NIG) aims to produce step-by-step natural language instructions for navigation guidance. Existing studies primarily treat NIG as an auxiliary task for vision-andlanguage navigation (VLN), focusing on data augmentation or multi-task learning. However, generating navigation instructions from compact environmental priors requires meticulous spatial reasoning, especially when the target route does not simply follow the demonstrated tour, and remains challenging for current multimodal models. In this work, we introduce VideoNIG, a goal-oriented video-grounded NIG task that generates navigation instructions from ego-centric tour videos, an initial observation, and a textual or visual goal, without relying on intermediate representations such as graphs and maps. We instantiate VideoNIG in a controlled simulator benchmark with 60K tour videos across continuous indoor environments and 37K multimodal prompts with progressive difficulty levels. We further introduce a diagnostic evaluation protocol that combines text similarity, choice-based spatial consistency tests, and downstream navigation execution. To address this task, we propose a two-stage Curriculum Learning framework that decomposes the learning into foundational motion perception and long-horizon navigation reasoning. Specifically, we first employ Action Warmup for spatial action-view alignment, followed by Complexity Progression using trajectories with increasing exploratory difficulty. Extensive experiments show that existing MLLMs struggle with VideoNIG, while our approach significantly improves instruction quality across complementary diagnostic metrics. Finally, integrating VideoNIG-generated instructions with a VLN agent demonstrates the executability of this task formulation for end-to-end navigation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08596v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08596v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08596v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "VideoNIG 要求 MLLM 从室内 tour video 与 goal 生成可由导航 agent 执行的长程指令；论文构造 R2R-CE/RxR-CE tours、choice-based spatial evaluation 与 agent execution test，并用 action warmup+curriculum+GRPO 改善 Qwen3-VL，但 benchmark 主要由 simulator/生成路线构造，文本和 choice 分数与真实机器人安全执行仍有距离。",
+    "methodFlow": [
+      "Simulator tour + goal",
+      "Tour-video benchmark construction",
+      "Action-centric warmup",
+      "Complexity curriculum",
+      "GRPO instruction generation",
+      "Choice and agent-execution evaluation"
+    ],
+    "whyRelevantZh": "与 embodied VLM、spatial reasoning、agent instruction generation 和 executable evaluation 相关。",
+    "evidenceZh": "VideoNIG 以 tour video 为 prior，生成从当前视点到 goal 的长程自然语言导航指令。（Secs. 1-3 and Fig. 2, pp. 3-5）；choice evaluation 通过方向、实体和子路径扰动测试 spatio-temporal consistency，减少纯文本相似度捷径。（Sec. 3.4 and Fig. 4, p. 8）；作者报告 curriculum reference method 在 text/choice metrics 和 downstream navigation execution 上优于 Qwen3-VL baseline。（Tables 2-3, pp. 11-12）",
+    "caveatZh": "作者限制：论文没有独立 limitations section；分析显示视频越复杂，现有 MLLM 的 spatial grounding 越易碎片化。；审阅风险：生成指令在 simulator agent 上可执行，不等于在真实空间安全、无歧义或适配不同 embodiment。；审阅风险：选择题 distractors 和生成路线可能与训练模板共享结构，产生 benchmark shortcut。",
+    "motivationZh": "数据管线从 Habitat tours 采样不同长度、detour、turn 和 look-around patterns，生成视频与目标位置。训练先以 action-centric warmup 学方向/地标语言，再按 video complexity 做 curriculum SFT/GRPO。评价除 Rouge/SPICE 外，加入修改方向、实体与子路径的 multiple/orthogonal choices，并让 InternVLA/System2 执行生成指令。",
+    "methodZh": "数据管线从 Habitat tours 采样不同长度、detour、turn 和 look-around patterns，生成视频与目标位置。训练先以 action-centric warmup 学方向/地标语言，再按 video complexity 做 curriculum SFT/GRPO。评价除 Rouge/SPICE 外，加入修改方向、实体与子路径的 multiple/orthogonal choices，并让 InternVLA/System2 执行生成指令。 贡献主要是 executable VideoNIG task、tour complexity protocol 和 execution-aware evaluation；训练 recipe 本身是较常规的 warmup/curriculum/RL 组合。",
+    "experimentsZh": "在 R2R-CE/RxR-CE 构造的多种 tour types 上比较 proprietary/open MLLMs 与训练 variants；用 Rouge-L、SPICE、multiple/orthogonal-choice 和两类 navigation agents 的 execution success 评价。 作者报告：作者报告其 two-stage curriculum model 在 VideoNIG 的 text similarity、choice accuracy 与 downstream navigation execution 上整体优于未训练 Qwen3-VL-8B，并在复杂 tours 上保留更高初始目标对齐。（Tables 2-5, pp. 11-14） Baseline boundary：覆盖多个 MLLMs、tour complexities 和 agent execution，评价比单纯文本指标更完整；但 simulator-generated routes 和特定导航 agents 限制现实泛化。 Ablation boundary：比较 CoT、action warmup、curriculum 与 GRPO；缺少真实机器人、动态障碍、语言歧义和错误指令安全恢复。",
+    "insightZh": "贡献主要是 executable VideoNIG task、tour complexity protocol 和 execution-aware evaluation；训练 recipe 本身是较常规的 warmup/curriculum/RL 组合。 任务与评价设计值得略读，尤其是 execution-aware metric；方法本身和现实部署证据尚不足以深度推荐。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "early"
+  }
+}

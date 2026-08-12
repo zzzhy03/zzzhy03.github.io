@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.10057",
+  "slug": "lego-leveled-language-gaussian-splatting",
+  "title": "LEGO: Leveled Language Gaussian Splatting",
+  "authors": [
+    "Yuning Peng",
+    "Haiping Wang",
+    "Yuan Liu",
+    "Yipeng Lu",
+    "Zhen Dong",
+    "Bisheng Yang"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10057"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "lego",
+    "leveled",
+    "language",
+    "gaussian",
+    "splatting",
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "abstract": "We introduce LEGO for advanced open-vocabulary scene understanding. Beyond basic concept recognition, its core innovation lies in capturing the intrinsic semantic hierarchies within the scene, such as the \"flowerpot -> bouquet -> bud -> petal\" lineage. While foundation models like SAM can identify multi-granular structures in 2D, their partitions are strictly perspective-bound and lack cross-view consensus. LEGO self-adaptively re-grades volatile multi-view SAM granularities into a unified, 3D-consistent hierarchy. This provides precise supervision for the structurally coherent, multi-level segmentation of 3D scenes. By grounding these segments with CLIP embeddings, LEGO recovers open-vocabulary semantic logic across hierarchical levels. Furthermore, by incorporating spatial relationships, we elevate these segments into level-wise language scene graphs, effectively empowering Large Language Models to perform complex, context-aware spatial reasoning and precise visual grounding. Experimental results demonstrate that LEGO establishes new state-of-the-art performance across both promptable and open-vocabulary 3D segmentation benchmarks, exhibiting advanced hierarchical scene decomposition and context-aware spatial reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10057v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10057v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10057v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "LEGO（此处是 Leveled Language Gaussian Splatting）把多视图 SAM 粒度重排为 3D-consistent semantic hierarchy，再用 CLIP 与空间关系构造分层 language scene graph；作者报告 promptable 与 open-vocabulary 3D segmentation 均提升，但层级监督依赖 2D foundation-model masks，且“LEGO”并非积木研究。",
+    "methodFlow": [
+      "Multi-view images + SAM masks",
+      "Cross-view mask association",
+      "Adaptive granularity re-grading",
+      "Multi-level Gaussian feature learning",
+      "CLIP grounding + spatial relations",
+      "Hierarchical segments and scene graphs"
+    ],
+    "whyRelevantZh": "它直接命中 hierarchical/open-vocabulary 3D segmentation，并提供将 3D parts、relations 与 LLM reasoning 对接的结构化表示。",
+    "evidenceZh": "方法把多视图 SAM masks 关联并自适应重分级，以统一层级监督 Gaussian scene representation。（Sec. 3 and Fig. 2, p. 5）；同一组 3D-consistent segments 同时承载 promptable segmentation、open-vocabulary grounding 与 level-wise scene graphs。（Secs. 3.3-3.4, pp. 7-9）；作者报告在 NVOS、SPIn-NeRF 与 LERF-OVS 的 promptable/open-vocabulary 指标上达到或超过所列方法，并在层级查询中展示更一致的分解。（Tables 1-3, pp. 11-12）",
+    "caveatZh": "作者限制：方法依赖 SAM mask quality 与多视图可见性，错误的 2D partitions 可能传入 3D hierarchy。；审阅风险：层级语义与 scene graph 的优势主要由作者构造的协议和 qualitative cases 支撑，不能直接等价为通用 3D reasoning 能力。",
+    "motivationZh": "论文针对多视图 SAM partitions 视角不一致、固定粒度难覆盖 scene hierarchy 的问题，先对 masks 做跨视图关联与自适应 re-grading，再训练 multi-level Gaussian features，最后以 CLIP grounding 和 spatial relations 构建 level-wise scene graphs，供 LLM 做 context-aware spatial reasoning。实验覆盖 NVOS、SPIn-NeRF 与 LERF-OVS；价值在统一 segmentation hierarchy 与 language reasoning interface，而不是单一 open-vocabulary classifier。",
+    "methodZh": "论文针对多视图 SAM partitions 视角不一致、固定粒度难覆盖 scene hierarchy 的问题，先对 masks 做跨视图关联与自适应 re-grading，再训练 multi-level Gaussian features，最后以 CLIP grounding 和 spatial relations 构建 level-wise scene graphs，供 LLM 做 context-aware spatial reasoning。实验覆盖 NVOS、SPIn-NeRF 与 LERF-OVS；价值在统一 segmentation hierarchy 与 language reasoning interface，而不是单一 open-vocabulary classifier。 关键新意是把不稳定的 2D multi-granular masks 变成可共享的 3D hierarchy，并在同一 hierarchy 上连接 open-vocabulary semantics 与 language scene graph；各组件本身沿用 SAM、CLIP、Gaussian Splatting，但层级重标和跨层推理组合具有明确贡献。",
+    "experimentsZh": "在 NVOS、SPIn-NeRF 和 LERF-OVS 上比较 Gaussian/NeRF segmentation 与 language-field baselines，报告 mIoU 等定量结果，并给出层级 decomposition、grounding 和 scene-graph qualitative examples。 作者报告：作者报告在 NVOS、SPIn-NeRF 与 LERF-OVS 的 promptable/open-vocabulary 指标上达到或超过所列方法，并在层级查询中展示更一致的分解。（Tables 1-3, pp. 11-12） Baseline boundary：覆盖代表性的 promptable 3D segmentation 与 open-vocabulary language-field baselines；但不同系统的 2D proposal/backbone 与训练资源未完全匹配，层级 scene-graph 也缺少大规模独立定量评价。 Ablation boundary：消融跨视图关联、granularity re-grading 和 semantic/spatial components，能支持层级一致性来源；对 SAM/CLIP backbone、threshold 与复杂动态场景的敏感性仍不充分。",
+    "insightZh": "关键新意是把不稳定的 2D multi-granular masks 变成可共享的 3D hierarchy，并在同一 hierarchy 上连接 open-vocabulary semantics 与 language scene graph；各组件本身沿用 SAM、CLIP、Gaussian Splatting，但层级重标和跨层推理组合具有明确贡献。 建议精读 hierarchy construction、跨视图一致性和 scene-graph interface；收录时明确标题 LEGO 只是缩写，不能作为 brick-assembly 证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

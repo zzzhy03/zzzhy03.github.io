@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2608.09186",
+  "slug": "ragmesh-with-fame-g2e-long-form-text-driven-3d-face-generation-and-editing",
+  "title": "RAGMesh with FaME-G2E: Long-Form Text-Driven 3D Face Generation and Editing",
+  "authors": [
+    "Hao Li",
+    "Ju Dai",
+    "Feng Zhou",
+    "Mengting Shi",
+    "Haofei Wang",
+    "Zhen Song",
+    "Wei Zhou",
+    "Lei Li",
+    "Junjun Pan"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09186"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "ragmesh",
+    "fame-g2e",
+    "long-form",
+    "text-driven",
+    "face",
+    "3d-generation",
+    "vlm-mllm"
+  ],
+  "abstract": "Text-driven 3D face generation and editing remains challenging due to the difficulty of translating long-form descriptions into fine-grained facial geometry. Existing methods primarily align global textual semantics with facial structures but often struggle to capture subtle local deformations, such as eyebrow tension, cheek contraction, and asymmetric mouth motions, resulting in limited geometric fidelity and editing precision. To facilitate fine-grained text-driven facial modeling, we first construct FaME-G2E, a large-scale multimodal dataset containing detailed text--mesh annotations and paired text--blendshape samples for unified 3D facial generation and editing. Based on this dataset, we propose RAGMesh, a retrieval-augmented framework that leverages text-correlated geometric priors to improve high-fidelity facial synthesis and editing. Specifically, the Multi-Scale Retrieval Fusion (MSRF) module retrieves semantically consistent global and regional facial priors and fuses them in the blendshape space, suppressing conflicting local deformations while preserving coherent deformation patterns. Furthermore, we introduce Adaptive RAG-guided Supervision (AdaRAGS), a region-aware constraint that explicitly aligns textual semantics with corresponding facial regions, enhancing regional controllability and editing accuracy. Extensive experiments on FaME-G2E demonstrate that RAGMesh achieves superior performance over state-of-the-art methods in local geometric accuracy, text-guided controllability, regional editing precision, and inference efficiency. Video demo is available at https://youtu.be/Yr0_XkpWcNk, and the source code and dataset will be released upon paper acceptance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09186v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09186v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09186v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "RAGMesh 面向 long-form text 的 3D face generation/editing：FaME-G2E 提供 text–mesh 与 text–blendshape pairs，方法从数据库检索 global/local facial geometry，在 blendshape space 融合后以 text/geometry dual streams 和 region-aware supervision 精调输出。作者报告生成/编辑的 LVE、MRE、visual score 与自建 TIAS 均优于 listed baselines且推理约 2 秒；但方法只生成无纹理脸部 geometry，数据/代码承诺 acceptance 后发布，且指标与用户研究高度依赖自建协议。",
+    "methodFlow": [
+      "Long-Form Face Description + Optional Input Mesh",
+      "Global/Local Mesh Retrieval",
+      "Blendshape-Space Reference Fusion",
+      "Textual and Geometric Dual Streams",
+      "Region-Aware Semantic Supervision",
+      "Generated or Edited 3D Face Mesh"
+    ],
+    "whyRelevantZh": "它直接推进 text-conditioned 3D geometry generation/editing，并展示外部几何 prior 如何服务 region-level control，对可组合 3D asset generation 有明确迁移价值。",
+    "evidenceZh": "RAGMesh 使用 global/local semantic retrieval 与 dual-stream fusion 生成 mesh。（Sec. IV and Fig. 2, p. 5）；AdaRAGS 以 VLM-derived region mask 将 fine-grained text semantics 对齐到局部 facial geometry。（Sec. IV-F, p. 5）；作者报告 Ours 在 generation/editing 的 LVE 为 1.07/1.72，TIAS 为 8.31/8.59，time 2s。（Table III, p. 9）；消融显示 MSRF、AdaRAGS 与 text+geometric streams 均改善主指标。（Table IV, p. 9）",
+    "caveatZh": "作者限制：只建模 geometry，不显式建模 texture 或 appearance。；作者限制：generation/editing 分开训练限制参数共享和 cross-task consistency。；作者限制：无纹理 meshes 仍需 texture synthesis 才能进入完整数字资产 pipeline。；审阅风险：FaME-G2E、TIAS 与模型由同一工作提出，外部 benchmark 有限。；审阅风险：面部几何数据涉及 identity/biometric misuse 风险，论文伦理段落仅报告 human-subject approval。",
+    "motivationZh": "FaME-G2E 用 visual LLM 构建统一 3D face generation 与 editing data。RAGMesh 对 long-form description 做 global/local retrieval，将 reference meshes 融入 blendshape space；textual stream 用 BERT 与 transformer decoder，geometric stream编码 retrieved priors，multimodal fusion 后解码 mesh，AdaRAGS 对语义相关 facial regions 加强 mask-guided deformation supervision。实验比较 T2P、TADA、FaceG2E、ICE，并分析 retrieval fusion、text/geometric streams、OOD prompts 与 progressive editing。",
+    "methodZh": "FaME-G2E 用 visual LLM 构建统一 3D face generation 与 editing data。RAGMesh 对 long-form description 做 global/local retrieval，将 reference meshes 融入 blendshape space；textual stream 用 BERT 与 transformer decoder，geometric stream编码 retrieved priors，multimodal fusion 后解码 mesh，AdaRAGS 对语义相关 facial regions 加强 mask-guided deformation supervision。实验比较 T2P、TADA、FaceG2E、ICE，并分析 retrieval fusion、text/geometric streams、OOD prompts 与 progressive editing。 创新集中在 retrieval-augmented 3D geometry generation：不是仅检索示例，而是把 global/local priors 融入可控 blendshape space，并在 text-relevant region 施加 supervision；其价值偏任务系统与数据集，基础 transformer/quantized mesh表示来自已有组件。",
+    "experimentsZh": "在 FaME-G2E generation/editing tasks 上比较四类 text-to-3D face baselines，使用 LVE、MRE、visual score、TIAS、runtime；包含 module、retrieval fusion/input setting、OOD prompt/retrieval robustness、progressive editing 与 human study。 作者报告：作者报告 generation LVE/MRE/VS/TIAS 为 1.07/7.88/0.43/8.31，editing 为 1.72/3.41/0.21/8.59，推理 2 秒。（Table III, p. 9）；作者报告 random retrieval 将 generation LVE 从 1.07 恶化到 3.51，支持语义检索而非任意 prior 的作用。（Table IV, p. 9） Baseline boundary：覆盖 text-to-point/mesh/face generation 和 editing methods，但训练数据、mesh topology、render/evaluator 条件是否完全 matched 不够清楚；缺少通用 3D asset text editing 和非脸对象验证。 Ablation boundary：MSRF/AdaRAGS、四种 fusion、stream inputs、retrieval quality 与 OOD prompts 较完整；没有 dataset generation quality、VLM masks、retrieval bank size 和 identity/privacy effects 的系统消融。",
+    "insightZh": "创新集中在 retrieval-augmented 3D geometry generation：不是仅检索示例，而是把 global/local priors 融入可控 blendshape space，并在 text-relevant region 施加 supervision；其价值偏任务系统与数据集，基础 transformer/quantized mesh表示来自已有组件。 方向高度直接、方法与消融足够支持收录并建议精读；摘要式 SOTA 主张应限制在 FaME-G2E 和无纹理 facial geometry。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "early"
+  }
+}

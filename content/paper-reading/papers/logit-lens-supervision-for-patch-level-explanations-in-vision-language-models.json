@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2602.01530",
+  "slug": "logit-lens-supervision-for-patch-level-explanations-in-vision-language-models",
+  "title": "Logit Lens Supervision for Patch-Level Explanations in Vision-Language Models",
+  "authors": [
+    "Parsa Esmaeilkhani",
+    "Longin Jan Latecki"
+  ],
+  "publishedAt": "2026-02-02",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2602.01530"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "logit",
+    "lens",
+    "supervision",
+    "patch-level",
+    "explanations",
+    "vlm-mllm"
+  ],
+  "abstract": "Modern autoregressive Vision-Language Models (VLMs) can generate fluent answers while their visual-token representations become weakly tied to the image regions from which they originate. This limits patch-level explainability: a visual token should remain interpretable as the image patch it represents. We study this issue through Logit Lens maps, obtained by projecting each visual-token embedding through the LLM vocabulary head to measure how strongly each image patch is associated with a queried textual concept, such as \"cat\". We introduce Logit Lens Loss (LLL), a lightweight auxiliary objective that preserves localized visual semantics by directly aligning object-related visual tokens with the vocabulary concepts describing their image regions. LLL requires no architectural modification, mask decoder, or large-scale retraining. We evaluate LLL through both explanation quality and downstream performance. Across LLaVA-v1.5-7B and Qwen2.5-VL-7B, LLL yields sharper object confidence maps, improves grounding and hallucination metrics, transfers to zero-shot pointing, and preserves VQA performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2602.01530v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2602.01530v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2602.01530v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Logit Lens Loss 直接把 object-region visual tokens 对齐到对应 vocabulary concepts，使 VLM 自身 vocabulary head 可生成 patch-level confidence map，无需 mask decoder。作者报告 LLaVA 在 RefCOCO/+/g 的 cIoU 从 61.2/50.3/51.1 提至 67.8/58.6/60.2，并改善 POPE；解释来自模型内部表示很有吸引力，但 training masks、阈值/SAM 后处理和 faithfulness 仍是证据边界。",
+    "methodFlow": [
+      "将图像 region 与概念词配对",
+      "经 LLM vocabulary head 投影视觉 token",
+      "LLL 提升区域内目标词并抑制背景响应",
+      "与 next-token loss 联合微调",
+      "推理生成 Logit Lens heatmap 并可接 SAM"
+    ],
+    "whyRelevantZh": "直接关联 MLLM grounding、hallucination 与 patch-level interpretability，也可为视觉 agent 提供内部证据图。",
+    "evidenceZh": "LLL 对 visual-token vocabulary logits 施加局部概念监督，不增加 mask decoder。（Sec. 3 and Fig. 1, p. 2）；作者报告 LLaVA 的 RefCOCO/+/g cIoU 从 61.2/50.3/51.1 提至 67.8/58.6/60.2。（Table 1, p. 10）；作者报告 LLL 也改善 POPE 且保持 VQA，说明作用不只在解释图。（Tables 2-3, pp. 11-12）",
+    "caveatZh": "作者限制：训练仍依赖区域级 grounding annotations。；审阅风险：logit-lens 可读性不必然等价于对最终生成的因果贡献。；审阅风险：SAM 后处理会引入外部 segmentation prior，需与纯内生解释分开解读。",
+    "motivationZh": "方法以 region-text supervision 对目标区域内视觉 token 的词表投影施加辅助 loss，同时保留 next-token prediction；推理时查询概念词在每个 patch 的 logit 得到 heatmap，可直接阈值或送入 frozen SAM。",
+    "methodZh": "方法以 region-text supervision 对目标区域内视觉 token 的词表投影施加辅助 loss，同时保留 next-token prediction；推理时查询概念词在每个 patch 的 logit 得到 heatmap，可直接阈值或送入 frozen SAM。 将 vocabulary projection 既作为解释探针又作为训练目标，使解释无需额外 localization head；关键价值是 internal grounding 与 downstream grounding 的同一接口。",
+    "experimentsZh": "在 LLaVA-v1.5-7B 与 Qwen2.5-VL-7B 上用 RefCOCO supervision，评估 RES cIoU、POPE hallucination、zero-shot pointing 和 VQA，并比较 training-free heatmap 与 SAM 后处理。 作者报告：作者报告 LLaVA NTP+LLL 在 RefCOCO/+/g 为 67.8/58.6/60.2 cIoU，NTP 为 61.2/50.3/51.1。（Table 1, p. 10） Baseline boundary：覆盖两个 VLM、supervised 与 training-free grounding、SAM；缺少更大模型和 causal explanation baselines。 Ablation boundary：比较 NTP、LLL、SAM 与 transfer；还需 loss weight、负概念选择和跨词表 tokenizer 的更细分析。",
+    "insightZh": "将 vocabulary projection 既作为解释探针又作为训练目标，使解释无需额外 localization head；关键价值是 internal grounding 与 downstream grounding 的同一接口。 方法简洁且结果跨 explanation/downstream task，值得精读；摘要必须避免把 heatmap 直接称为因果解释。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "early"
+  }
+}

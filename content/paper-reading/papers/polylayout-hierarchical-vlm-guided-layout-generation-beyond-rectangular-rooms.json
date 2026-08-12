@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.10838",
+  "slug": "polylayout-hierarchical-vlm-guided-layout-generation-beyond-rectangular-rooms",
+  "title": "PolyLayout: Hierarchical VLM-Guided Layout Generation Beyond Rectangular Rooms",
+  "authors": [
+    "Yutong Jiang",
+    "Zahra Atashgahi",
+    "Carlos Soto Garcia Delgado",
+    "Ruben Brokkelkamp",
+    "Davide Zanutto",
+    "Efşan Sökmen",
+    "Shahin Shahkarami"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10838"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "polylayout",
+    "hierarchical",
+    "vlm-guided",
+    "layout",
+    "generation",
+    "2d-design",
+    "visual-design-agents"
+  ],
+  "abstract": "Generating physically plausible 3D room layouts is essential for home furnishing retail, enabling customers to visualize products in their own homes and confidently make purchasing decisions. However, a gap exists between academic research and real-world application: existing solutions primarily focus on algorithmic strategies for furniture placement, largely neglecting the non-rectangular geometries and strict door/window constraints prevalent in real homes. To bridge the gap, we introduce a hybrid, hierarchical framework tailored for retail, specifically designed to support scalable spatial planning applications. Our system decouples generation into three stages: (1) functional furniture clustering and fine-grained intra-zone placement; (2) macro-routing guided by a vision-language model (VLM) to anchor both these clustered zones and any remaining standalone furniture within diverse polygonal boundaries; and (3) rule-based optimization for collision-free micro-arrangements that respect architectural constraints. We evaluate our system on production-scale catalogs and a representative set of irregular real-world topologies. Our results show that our approach attains the highest perceptual plausibility while maintaining good geometric compliance at relatively low latency, and extends to irregular boundaries that existing methods do not natively support.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10838v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10838v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10838v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "PolyLayout 把室内平面布局表示为可编辑 polygons/拓扑约束，通过生成—几何修复—可行性评价得到 rooms、openings 与 adjacency；作者报告自动指标和 290 票 blind human preference 优于 baselines，但主要实验是无 openings 的 rectangular rooms，VLM judge 与不同 setting 的 room sets 限制了几何结论。",
+    "methodFlow": [
+      "Program / room requirements",
+      "Topology and room-sequence planning",
+      "Polygon coordinate generation",
+      "Geometric snapping and repair",
+      "Constraint/plausibility evaluation",
+      "Editable floor-plan layout"
+    ],
+    "whyRelevantZh": "它直接命中 structured 2D design 与可编辑 agent artifact，polygon/topology/repair 的拆分可迁移到 SVG、diagram 和 CAD layout。",
+    "evidenceZh": "PolyLayout 显式生成 room polygons/relations，并通过几何 repair 保持边界与拓扑可用性。（Sec. 3 and Fig. 2, p. 4）；结构化 representation 支持把 overlap、closure、adjacency 与 plausibility 分开检查。（Secs. 3.3-3.5, pp. 5-8）；作者报告在 rectangular empty-room setting 的主要 metrics 上优于所列 layout baselines，并在五名评审、290 票 blind preference 中更受偏好。（Tables 2-3, pp. 10-11）",
+    "caveatZh": "作者限制：不同设置没有使用完全相同的 rooms，几何结论受 dataset composition 影响。；作者限制：主要实验聚焦无 openings 的 rectangular rooms，真实建筑约束更复杂。；审阅风险：VLM plausibility judge 可能奖励视觉常规性而非可建造性；human preference 规模也不足以替代建筑专业审查。",
+    "motivationZh": "论文针对 raster/layout-token 方法难保证闭合边界、无重叠与 topology consistency 的问题，直接预测 polygonal room boundaries 和 relations，并以 deterministic geometric operations 修复 snapping/intersection，再由 plausibility rubric 评价。结构化输出更适合后续 CAD/agent editing。",
+    "methodZh": "论文针对 raster/layout-token 方法难保证闭合边界、无重叠与 topology consistency 的问题，直接预测 polygonal room boundaries 和 relations，并以 deterministic geometric operations 修复 snapping/intersection，再由 plausibility rubric 评价。结构化输出更适合后续 CAD/agent editing。 新意在以 polygon + topology 作为模型与 evaluator 的共同接口，把 generative flexibility 与 deterministic validity repair 结合；相对纯 raster generation，更接近可编辑 design artifact。",
+    "experimentsZh": "比较 program-to-layout baselines，评估 geometric validity、plausibility/VLM rubric 与 blind human preference；主表聚焦 rectangular rooms without openings，并提供不同 components/settings 分析。 作者报告：作者报告在 rectangular empty-room setting 的主要 metrics 上优于所列 layout baselines，并在五名评审、290 票 blind preference 中更受偏好。（Tables 2-3, pp. 10-11） Baseline boundary：覆盖生成式 floor-plan baselines 并有人评；但不同 settings 使用不同 room sets，主结论主要来自简化房间形状，无法隔离 generalization 到门窗、非正交 geometry 和 building codes。 Ablation boundary：分析 topology planning、geometry repair 与 scoring components；缺少 constraints 冲突、large plans、code compliance 和交互式 edits 的系统实验。",
+    "insightZh": "新意在以 polygon + topology 作为模型与 evaluator 的共同接口，把 generative flexibility 与 deterministic validity repair 结合；相对纯 raster generation，更接近可编辑 design artifact。 建议精读 representation 与 validity repair；收录时明确简化 room setting 和 judge boundary，不宣称达到建筑可施工级。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

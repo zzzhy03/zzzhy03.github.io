@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.10954",
+  "slug": "evidence-grounded-trustworthy-multimodal-reasoning-and-evaluation-benchmark-in-complex-urb",
+  "title": "Evidence-Grounded Trustworthy Multimodal Reasoning and Evaluation Benchmark in Complex Urban Scenes",
+  "authors": [
+    "Zhaoyang Wei",
+    "Bowen Jiang",
+    "Xumeng Han",
+    "Jiashu Li",
+    "Xuehui Yu",
+    "Yuling Liu",
+    "Guorong Li",
+    "Zhenjun Han",
+    "Jianbin Jiao"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10954"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "evidence-grounded",
+    "trustworthy",
+    "multimodal",
+    "reasoning",
+    "evaluation",
+    "vlm-mllm",
+    "visual-design-agents"
+  ],
+  "abstract": "While Multimodal Large Language Models (MLLMs) demonstrate impressive performance in benign scenarios, their cognitive reliability deteriorates significantly in complex scenes under adverse conditions. In these settings, models often rely on implicit inference without sufficient visual evidence, leading to a disconnect between perception and reasoning. Meanwhile, existing outcome-oriented benchmarks evaluate only final predictions and fail to diagnose failures in the underlying reasoning process. To address this gap, the authors propose AD2-Bench, which introduces a Hierarchical Visual Diagnosis framework that decomposes reasoning into a structured Chain of Evidence (CoE). This fine-grained diagnosis reveals that robust multimodal reasoning fundamentally depends on accurate evidence acquisition. Building on this perspective, the authors formulate reasoning from a probabilistic viewpoint and identify two primary causes of reasoning failure: Spatial Ambiguity, where models fail to distinguish target objects from background clutter, resulting in localization errors; and Semantic Uncertainty, where degraded visual features lead to incorrect semantic interpretation, resulting in understanding errors. To overcome these evidence deficiencies, they further propose Evidence-grounded Visual Reasoning (EGVOR), which replaces implicit reasoning with the explicit generation of Evidence Atoms - structured spatial-semantic triplets that enforce tight alignment between localization and semantic understanding. The model is trained through a hierarchical curriculum that progresses from reflective supervision construction to reinforcement learning, where reducing reasoning variance is explicitly rewarded. Extensive experiments demonstrate that EGVOR substantially improves reasoning stability under adverse conditions, providing a more robust framework for trustworthy multimodal cognition.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10954v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10954v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10954v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "AD2-Bench 把多模态 reasoning 评估从“答对”推进到 evidence-grounded verification，并提出 EGVOR 的 Locate—Verify—Reason 路线来降低 right-answer-for-wrong-reason；作者报告多 benchmark 和成本分析提升，但数据生成/过滤依赖 Gemini，judge calibration 又依赖 GPT-5.2，闭源 evaluator 可能形成循环偏差。",
+    "methodFlow": [
+      "Image + reasoning question",
+      "Evidence-region localization",
+      "Detail verification",
+      "Structured reasoning",
+      "Answer generation",
+      "Evidence-grounded scoring"
+    ],
+    "whyRelevantZh": "evidence-grounded multimodal reasoning 对可靠 visual/design agents 很关键，尤其适合作为过程级 eval 设计参考。",
+    "evidenceZh": "EGVOR 将回答过程拆成 Locate、Verify、Reason，并用证据级标注与评分惩罚错误理由。（Method overview and Fig. 3, p. 14）；AD2-Bench 除 answer score 外还评价 evidence localization/detail verification，识别 right answer for wrong reasons。（Benchmark protocol, pp. 10-18）；作者报告 EGVOR 在 reasoning tasks 相对 Qwen2.5-VL-7B 提升 17.6 个百分点，并在综合 benchmark 与 performance-to-cost comparisons 中领先所列 baselines。（Tables 6 and 10, pp. 18-22）",
+    "caveatZh": "作者限制：数据与 evaluator 依赖闭源 foundation models，复现性和潜在偏差受限。；审阅风险：训练模型和 judge 可能共享语言/视觉 priors，evidence-style 得分提升不必然代表真实因果 reasoning；需独立人评与异构 judge 复核。",
+    "motivationZh": "benchmark 为问题补充 evidence regions/details 和多维 scoring，检查模型是否定位正确视觉证据、验证细节并据此推理。EGVOR 显式先 locate 再 verify/reason，并以结构化 supervision 优化；论文同时报告 evaluator calibration、complex-scene filtering 和 performance-to-cost。",
+    "methodZh": "benchmark 为问题补充 evidence regions/details 和多维 scoring，检查模型是否定位正确视觉证据、验证细节并据此推理。EGVOR 显式先 locate 再 verify/reason，并以结构化 supervision 优化；论文同时报告 evaluator calibration、complex-scene filtering 和 performance-to-cost。 主要贡献是将 evidence correctness 纳入多模态 reasoning evaluation，并把定位—核验—推理变成可训练 pipeline；但 benchmark/evaluator 同样是论文贡献的一部分。",
+    "experimentsZh": "覆盖多类 perception/reasoning benchmarks，比较通用 MLLM、prompting/training variants 与 EGVOR；报告 localization/reasoning metrics、综合分、成本效率和 evaluator calibration。 作者报告：作者报告 EGVOR 在 reasoning tasks 相对 Qwen2.5-VL-7B 提升 17.6 个百分点，并在综合 benchmark 与 performance-to-cost comparisons 中领先所列 baselines。（Tables 6 and 10, pp. 18-22） Baseline boundary：模型覆盖广并提供成本视角；但数据 filtering 使用 Gemini-2.5、评价/校准使用 GPT-5.2，closed-model dependencies 使复现与偏差隔离较困难。 Ablation boundary：分析 locate/verify/reason components、filtering 与 scoring；仍缺少完全 human-only blinded audit、judge-family transfer 和 contamination evidence。",
+    "insightZh": "主要贡献是将 evidence correctness 纳入多模态 reasoning evaluation，并把定位—核验—推理变成可训练 pipeline；但 benchmark/evaluator 同样是论文贡献的一部分。 建议略读 benchmark schema、judge calibration 与 dependency disclosure；收录时突出闭源生成/评价链的证据边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

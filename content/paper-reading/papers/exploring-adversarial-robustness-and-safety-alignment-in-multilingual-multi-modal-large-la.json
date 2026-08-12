@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2606.03793",
+  "slug": "exploring-adversarial-robustness-and-safety-alignment-in-multilingual-multi-modal-large-la",
+  "title": "Exploring Adversarial Robustness and Safety Alignment in Multilingual Multi-Modal Large Language Models",
+  "authors": [
+    "Hashmat Shadab Malik",
+    "Muzammal Naseer",
+    "Salman Khan"
+  ],
+  "publishedAt": "2026-06-02",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2606.03793"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "exploring",
+    "adversarial",
+    "robustness",
+    "safety",
+    "alignment",
+    "vlm-mllm"
+  ],
+  "abstract": "Multimodal Large Language Models integrate visual perception into language reasoning, introducing a continuous attack surface susceptible to adversarial attacks. Prior work on MLLM robustness has focused largely on English-centric tasks, leaving multilingual behaviour unexplored. We address this gap through a systematic study of adversarial robustness and multimodal safety across 12 diverse languages, evaluating open-source MLLMs that acquire multilingual capability through instruction tuning. Gradient-based attacks reveal a transferable multilingual vulnerability: adversarial images optimized in one language continue to induce failure in others, demonstrating strong cross-lingual transferability. Multilingual safety further varies with how effectively a model retrieves or interprets harmful instructions. When harmful intent is issued through text, languages with stronger linguistic grounding more often elicit misuse-enabling responses, while weaker languages produce fewer unsafe outputs. When embedded in the image as typographic content, English scripts are reliably recognised and followed, whereas non-English scripts are rarely parsed by the vision encoder. Lower-resource languages may therefore appear safer, but this is an artefact of comprehension and visual-grounding failures rather than genuine alignment, a phenomenon we term safety-by-failure. In contrast, MLLMs that build multilingual capability throughout their training stages rather than only at instruction tuning, such as Qwen3-VL, exhibit genuine cross-lingual safety, maintaining active refusal across languages rather than masking comprehension failure. Shallow multilingual adaptation, such as fine-tuning on translated instruction data, may produce surface-level understanding that creates illusory safety in low-resource languages; deeper integration across training stages leads to genuine multilingual safety alignment.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.03793v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.03793v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2606.03793v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "论文跨 12 种类型多样语言研究 MLLM adversarial transfer 与 safety，提出 safety-by-failure：低资源语言/非英文脚本看似更安全，往往只是模型读不懂 harmful instruction。作者报告 image attacks 可跨语言迁移，而从训练各阶段获得 multilinguality 的 Qwen3-VL 更能主动拒绝；这是重要评测洞见，但模型、攻击和 harmful taxonomy 仍有限，代码仅承诺发布。",
+    "methodFlow": [
+      "将任务与 harmful prompts 翻译/适配到 12 种语言",
+      "在源语言优化 visual adversarial perturbation",
+      "跨目标语言评估任务失败 transfer",
+      "分别测试文字与图像文字的 harmful instructions",
+      "结合 comprehension 与 refusal 区分真实安全和 safety-by-failure"
+    ],
+    "whyRelevantZh": "直接关联 multilingual MLLM safety、adversarial robustness 与 evaluation validity。",
+    "evidenceZh": "评估覆盖 12 种语言，并区分 text-channel 与 typographic visual-channel harmful instructions。（Sec. 3 and Fig. 1, p. 4）；作者报告源语言优化的 adversarial images 在其他语言下仍可诱发失败，显示跨语言 transfer。（Fig. 1 and Tables 1-2, pp. 8-10）；作者报告低资源语言的低 harmful rate 常与低 comprehension 同时出现，而 Qwen3-VL 更常主动拒绝。（Sec. 5 and Figs. 4-6, pp. 12-14）",
+    "caveatZh": "作者限制：模型、攻击、任务和语言覆盖虽广仍不完备，主要使用梯度攻击。；作者限制：翻译 harmful prompts 可能不能保持完全等价的文化与语义强度。；审阅风险：refusal classifier 与 toxicity judge 的跨语言偏差可能混入结论。；审阅风险：低 comprehension 和真实对齐之间仍需人类多语种审计。",
+    "motivationZh": "研究分别把 harmful intent 放在 text channel 与图像 typography 中，测不同语言的理解、攻击成功和 refusal；同时用跨语言 gradient attacks 检查 transfer，并比较仅 instruction-tuned multilingual models 与全阶段 multilingual models。",
+    "methodZh": "研究分别把 harmful intent 放在 text channel 与图像 typography 中，测不同语言的理解、攻击成功和 refusal；同时用跨语言 gradient attacks 检查 transfer，并比较仅 instruction-tuned multilingual models 与全阶段 multilingual models。 最强贡献是把低攻击成功率分解为 comprehension failure 与 active refusal，避免把语言能力差误报为安全对齐；跨语言 visual attack transfer 提供互补风险证据。",
+    "experimentsZh": "评估代表性开源 MLLMs、12 语言、gradient-based visual attacks、文本/图像 harmful queries、refusal/comprehension 与 cross-lingual transfer。 作者报告：作者报告跨语言 visual attacks 广泛 transfer，且 apparent low-resource safety 与 comprehension failure 强相关。（Figs. 1, 4-6, pp. 8, 12-14） Baseline boundary：覆盖多个 multilingual strategies 与语言类型；闭源模型、语音、多轮和更广 red-team taxonomy 缺失。 Ablation boundary：语言、script、modality 与 training strategy 有分层；translation quality、文化语境和 adaptive attacks 仍需更强控制。",
+    "insightZh": "最强贡献是把低攻击成功率分解为 comprehension failure 与 active refusal，避免把语言能力差误报为安全对齐；跨语言 visual attack transfer 提供互补风险证据。 核心概念能纠正常见安全指标误读，值得精读；结论须限定于作者测试的语言、模型和 judge。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

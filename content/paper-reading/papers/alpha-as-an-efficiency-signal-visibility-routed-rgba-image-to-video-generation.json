@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.09355",
+  "slug": "alpha-as-an-efficiency-signal-visibility-routed-rgba-image-to-video-generation",
+  "title": "Alpha as an Efficiency Signal: Visibility-Routed RGBA Image-to-Video Generation",
+  "authors": [
+    "Zhe Li",
+    "Honghao Qiao",
+    "Zhixin Xu",
+    "Qijie Wang",
+    "Bo Peng",
+    "Dawei Li"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09355"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "alpha",
+    "efficiency",
+    "signal",
+    "visibility-routed",
+    "rgba",
+    "video-generation",
+    "image-generation"
+  ],
+  "abstract": "RGBA videos combine RGB appearance with an alpha channel, enabling animated assets to be applied across arbitrary backgrounds, which are heavily used in gaming industry. However, generating high-quality RGBA animations for games remains challenging for two reasons. First, most existing RGBA video datasets are dominated by photorealistic content, with limited coverage of game assets. Second, the traditional generate-then-matte pipelines estimate alpha only after RGB synthesis, so semi-transparent regions are often blurred by background, resulting in unstable matting outputs. More recently, many methods have begun to model RGB and alpha jointly, but existing approaches are mostly text-conditioned, and still have unresolved issues in efficiency and quality. To address these challenges, we introduce GameAlpha-2.4K, a 2.4K-clip game-style RGBA video dataset built with matte-friendly synthesis, multi-hypothesis alpha recovery, and compositing-based quality gates. Using this dataset, we train a reference-conditioned RGBA video generator that jointly produces RGB frames and alpha mattes in a single pass. To improve efficiency, we propose a visibility router that identifies transparent tokens in an early stage and bypasses their later DiT updates, while x_0-lock guides them along the original flow-matching schedule toward self-predicted endpoints. Our model obtains lower FVD than traditional two-stage pipelines, and the visibility router skips 35% of token evaluations in the final two DiT denoising steps, providing a 1.2x backbone speedup with negligible quality degradation compared to dense inference.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09355v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09355v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09355v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "这项工作把 alpha 从额外输出通道变成 RGBA image-to-video 的效率信号：合并 RGB-A VAE 与 pretrained DiT 后，以中途 alpha 预测找出最终透明 token，并在后续 evaluations 跳过其更新。作者报告 validation 上平均跳过 35% token-evaluations、DiT backbone 约 1.2× 加速，质量接近 dense；但收益依赖透明区域比例，前景密集视频加速有限。",
+    "methodFlow": [
+      "RGBA Reference and Video Data",
+      "Merged RGB-A VAE",
+      "Pretrained DiT with LoRA",
+      "Intermediate Alpha Prediction",
+      "Visibility Routing with Reactivation",
+      "Compositable RGBA Video"
+    ],
+    "whyRelevantZh": "它为 video generation 提供与输出语义绑定的动态稀疏化思路，也把可合成 RGBA asset generation 与 inference efficiency 联系起来。",
+    "evidenceZh": "方法联合生成 RGB 与 alpha，并由预测透明度驱动 token routing。（Method overview and Fig. 1, p. 3）；作者报告 router 在 validation 平均路由约 35% token-evaluations。（Table 3 and Sec. 4.4, p. 7）；作者报告 routing 后 FVD 174.4 对 dense 172.3，DiT speedup 1.2×。（Table 3, p. 7）；无 reactivation 会显著恶化 FVD 与 DINO-ID。（Routing ablation, p. 7）",
+    "caveatZh": "作者限制：速度收益在 foreground-dense clips 上有限。；作者限制：训练仍依赖合成视频和 alpha extractor 选出的数据，soft opacity 仅占约 2.2%。；作者限制：未来需按 expected compositing error 分配计算并测试跨背景、域与视频模型迁移。；审阅风险：报告的 1.2× 是 DiT-backbone speedup，不能写成完整 pipeline 端到端加速。；审阅风险：alpha 错误在 hair、glow 与 motion blur 等软区域可能影响后续合成。",
+    "motivationZh": "模型以 merged RGB-A latent 表示 joint color/opacity，通过 LoRA 适配 pretrained image-to-video DiT。Visibility router 在 evaluation 2 读取预测 alpha，按保守阈值路由最终透明 tokens，缓存 K/V 并允许后续 reactivation；实验以合成与 extractor-selected RGBA 数据训练，在 GameAlpha-2.4K 上比较 dense、Drop-KV、static 与 random routing。",
+    "methodZh": "模型以 merged RGB-A latent 表示 joint color/opacity，通过 LoRA 适配 pretrained image-to-video DiT。Visibility router 在 evaluation 2 读取预测 alpha，按保守阈值路由最终透明 tokens，缓存 K/V 并允许后续 reactivation；实验以合成与 extractor-selected RGBA 数据训练，在 GameAlpha-2.4K 上比较 dense、Drop-KV、static 与 random routing。 新意是利用生成任务自身的 alpha 作为 spatially meaningful sparsity signal，并用 delayed routing、safety margin 与 reactivation 控制误删风险；相比静态或显著性 proxy，它直接针对最终不可见计算。",
+    "experimentsZh": "在 GameAlpha-2.4K validation 上评 FVD、DINO-ID、aesthetic、motion smoothness、flow difference、MAD 与 backbone speed；另比较 synthetic/extracted alpha 数据、routing time、阈值与 reactivation。 作者报告：作者报告 visibility router 以约 35% 平均 routed fraction 达到 1.2× DiT speedup，FVD 174.4 接近 dense 的 172.3。（Table 3, p. 7）；作者报告 no-reactivation 的 FVD 从 174.4 升至 537.2，表明早期 alpha 判断会产生 consequential errors。（Table 3, p. 7） Baseline boundary：覆盖 dense、Drop-KV、RAS、static、random policies 与多项 visual/alpha metrics；未见跨 backbone 或真实生产 RGBA corpus 的广泛验证。 Ablation boundary：消融了 signal、routing policy、reactivation、routing time/safety margin，并报告 quality-speed trade-off。",
+    "insightZh": "新意是利用生成任务自身的 alpha 作为 spatially meaningful sparsity signal，并用 delayed routing、safety margin 与 reactivation 控制误删风险；相比静态或显著性 proxy，它直接针对最终不可见计算。 方法清楚且消融有说服力，但收益中等、数据与跨模型验证有限，适合收录后略读而非作为通用加速结论。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2512.08240",
+  "slug": "hybrid-token-compression-for-vision-language-models",
+  "title": "Hybrid Token Compression for Vision-Language Models",
+  "authors": [
+    "Jusheng Zhang",
+    "Xiaoyang Guo",
+    "Tongyu Mo",
+    "Qinhan Lv",
+    "Wenhao Chai",
+    "Jian Wang",
+    "Keze Wang",
+    "Liang Lin"
+  ],
+  "publishedAt": "2025-12-09",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2512.08240"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "hybrid",
+    "token",
+    "compression",
+    "vision-language",
+    "models",
+    "vlm-mllm"
+  ],
+  "abstract": "Vision-language models (VLMs) rely on hundreds of visual tokens, leading to high computational and memory costs. Existing compression methods face a trade-off: continuous compression can weaken high-level semantics, while discrete quantization may lose fine-grained appearance details. We introduce HTC-VLM, a hybrid visual token compression framework that disentangles semantics and appearance through two complementary pathways. A continuous pathway preserves detailed ViT patch features, while a discrete pathway provides semantic anchors using MGVQ quantization represented by four tokens. The two pathways are fused into a 580-token hybrid sequence and compressed into a single token using a disentanglement attention mask and a <voco> bottleneck. Under the same one-token output budget, HTC-VLM achieves 87.2% average performance retention across seven benchmarks (GQA, VQAv2, MMBench, MME, POPE, SEED-Bench, and ScienceQA-Image), outperforming the leading continuous baseline at 81.0%. Attention analysis shows that the compressed token prioritizes discrete anchors, supporting their role as semantic guidance. We further study token-budget scaling, cross-architecture generalization, inference efficiency, robustness to codebook and masking variations, and the information-theoretic properties of the hybrid bottleneck. These results show that combining continuous appearance features with discrete semantic anchors enables effective extreme visual token compression for efficient VLMs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2512.08240v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2512.08240v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/jushengzhang/HybridToken-VLM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2512.08240v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/jushengzhang/HybridToken-VLM）。",
+    "ideaZh": "HTC-VLM 在单一视觉输出 token 的极端预算下，把连续 patch detail 与 4 个 MGVQ discrete semantic anchors 先组成 hybrid sequence，再经 disentanglement mask 压入 <voco>。作者报告七项 benchmark 平均保持率 87.2%，高于 continuous-only 81.0%；它提供了语义/细节互补的清楚证据，但量化 codebook 训练成本和 one-token bottleneck 的开放生成适用性仍需谨慎。",
+    "methodFlow": [
+      "ViT 产生 576 个连续 patch embeddings",
+      "MGVQ 将语义量化为 4 个 discrete anchors",
+      "拼接连续与离散表示并施加 disentanglement attention mask",
+      "用 <voco> bottleneck 压成一个视觉 token",
+      "LLM 基于该 token 完成下游任务"
+    ],
+    "whyRelevantZh": "它为 MLLM visual token compression 提供语义—细节双通道设计，对长上下文视觉 agent 的成本控制直接相关。",
+    "evidenceZh": "HTC 将 576 continuous patches 与 4 discrete semantic tokens 融合后压到一个 <voco>。（Sec. 4 and Fig. 2, p. 4）；作者报告七项 benchmark 平均性能保持率 87.2%，continuous baseline 为 81.0%。（Table 1, p. 9）；attention 与 mask/codebook 分析支持 discrete anchors 提供语义引导。（Sec. 6.7 and Tables 9, 13, pp. 12-15）",
+    "caveatZh": "作者限制：MGVQ 引入额外 codebook 训练与实现复杂度。；作者限制：one-token compression 对需要密集空间定位的任务仍可能损失信息。；审阅风险：平均保持率掩盖不同任务的尾部退化。；审阅风险：当前模型/benchmark 尺度不足以证明该 bottleneck 可无损迁移到高分辨率视频和视觉 agent。",
+    "motivationZh": "连续支路保留纹理、姿态等细节，离散支路用 MGVQ 产生少量语义锚点；两者在受控 attention mask 下汇入一个 trainable <voco> token。论文扩展测试 token budget、跨架构、效率、codebook/mask robustness 和 attention 分析。",
+    "methodZh": "连续支路保留纹理、姿态等细节，离散支路用 MGVQ 产生少量语义锚点；两者在受控 attention mask 下汇入一个 trainable <voco> token。论文扩展测试 token budget、跨架构、效率、codebook/mask robustness 和 attention 分析。 核心贡献是在单 token bottleneck 前保留连续/离散双通道，而非在两类压缩中二选一；attention 与 codebook 消融支持 discrete anchors 充当 semantic scaffold。",
+    "experimentsZh": "在 GQA、VQAv2、MMBench、MME、POPE、SEED-Bench、ScienceQA-Image 七项任务比较 one-token continuous、discrete 与 hybrid compression，并扩展多预算、架构和效率。 作者报告：作者报告 one-token HTC-VLM 平均保持率 87.2%，领先 continuous-only 的 81.0%。（Table 1, p. 9） Baseline boundary：同预算对比覆盖 pooling、continuous bottleneck 与量化方案；尚缺大型现代 MLLM、长视频和开放式生成任务的充分对照。 Ablation boundary：覆盖离散 token 数、mask、codebook、budget 和跨架构；缺少 codebook 预训练成本与不同数据规模的完整曲线。",
+    "insightZh": "核心贡献是在单 token bottleneck 前保留连续/离散双通道，而非在两类压缩中二选一；attention 与 codebook 消融支持 discrete anchors 充当 semantic scaffold。 方法设计、同预算基线和消融较完整，适合精读；结论应限定在当前 one-token benchmark 设置。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

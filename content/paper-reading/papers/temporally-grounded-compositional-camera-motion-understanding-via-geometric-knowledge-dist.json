@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2608.10932",
+  "slug": "temporally-grounded-compositional-camera-motion-understanding-via-geometric-knowledge-dist",
+  "title": "Temporally Grounded Compositional Camera Motion Understanding via Geometric Knowledge Distillation",
+  "authors": [
+    "Dazhao Du",
+    "Shiyan Du",
+    "Jian Liu",
+    "Yongjian Yu",
+    "Bohai Gu",
+    "Tao Han",
+    "Hualuo Liu",
+    "Eric Liu",
+    "Yujia Zhang",
+    "Xi Chen",
+    "Song Guo"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10932"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "video-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "temporally",
+    "grounded",
+    "compositional",
+    "camera",
+    "motion",
+    "vlm-mllm",
+    "video-generation"
+  ],
+  "abstract": "Understanding camera motion is fundamental to video perception, with applications in spatial intelligence and controllable video generation. Multimodal large language models (MLLMs) provide a natural interface for this task, but existing work typically assigns one or more labels to an entire clip. Such clip-level recognition overlooks two defining properties of real camera motion: it can change within a shot, and multiple movements can occur simultaneously. We therefore formulate camera-motion understanding as temporally grounded, compositional recognition, which requires a model to localize motion-consistent intervals and identify every movement active within each interval. We introduce CamChoreo, a benchmark of 4,229 real single-shot clips with expert-annotated temporal segments. Its annotations use a compact vocabulary of 20 direction-aware labels, and nearly half of the segments contain compound camera motion, with multiple movement primitives active simultaneously. Recognizing such fine-grained, compositional motion is hard for current MLLMs, whose visual encoders emphasize semantic content rather than the geometric evidence on which camera motion depends. Directly injecting features from a frozen 3D foundation model addresses this gap, but requires running the expensive geometry model on every input; we refer to this baseline as CamInject. We instead propose CamDistill, which distills the same geometric knowledge into lightweight camera tokens during training and removes the 3D model at inference. CamDistill matches the accuracy of direct feature injection without running the 3D teacher at inference. Together, CamChoreo and CamDistill advance camera-motion understanding from clip-level labeling to temporally grounded, compositional recognition. Project page: https://ddz16.github.io/cammotion.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10932v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10932v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10932v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "CamChoreo 建立逐帧 camera-motion/pose benchmark，并用 CamDistill 将 pose-aware teacher 信息蒸馏给不需额外 pose input 的 video VLM；作者报告 CameraBench/CMVQA 与自建 benchmark 提升，但数据来自公开视频且 camera labels 自动/半自动生成，domain 与 annotation bias 需谨慎。",
+    "methodFlow": [
+      "Video clips",
+      "Frame-level camera pose/motion labels",
+      "Pose-aware teacher",
+      "Camera-conditioned supervision",
+      "Knowledge distillation",
+      "Camera-aware video VLM"
+    ],
+    "whyRelevantZh": "对 video VLM、camera control 和 video-generation evaluation 都有价值，尤其适合设计 camera-aware agents。",
+    "evidenceZh": "CamChoreo 以 frame-level direction-aware labels 描述 camera motion，CamDistill 用 pose-aware teacher 训练普通 video VLM。（Secs. 3-4 and Fig. 2, p. 4）；部署时 student 不需 pose input，但训练时吸收 camera trajectory information。（Sec. 4.2, pp. 5-7）；作者报告 CamDistill 在 CameraBench 的 mAP 与 CMVQA accuracy 分别相对相应 backbone 显著提升，并在 CamChoreo frame metrics 上领先 PromptInject/SFT variants。（Tables 2-3, p. 7）",
+    "caveatZh": "作者限制：公开视频来源和 camera annotations 带来 domain、版权与 label-quality 限制。；审阅风险：video content cues 可能与 camera motion 共现，模型可能学到语义 shortcut 而非真实 camera geometry。",
+    "motivationZh": "论文指出现有 video benchmarks 常把 camera motion 压成 clip-level label，不能检验 pan/tilt/zoom/trajectory 的时变组合。CamChoreo 提供 direction-aware frame labels；CamDistill 在训练时给 teacher pose-as-text 或 pose features，再将知识迁给 standard student，部署不需显式 camera metadata。",
+    "methodZh": "论文指出现有 video benchmarks 常把 camera motion 压成 clip-level label，不能检验 pan/tilt/zoom/trajectory 的时变组合。CamChoreo 提供 direction-aware frame labels；CamDistill 在训练时给 teacher pose-as-text 或 pose features，再将知识迁给 standard student，部署不需显式 camera metadata。 贡献由 benchmark granularity 和 training-time pose distillation 两部分构成；逐帧 camera labels 比 clip category 更能测 choreography，CamDistill 则避免 inference-time pose dependency。",
+    "experimentsZh": "在 CamChoreo、CameraBench 与 CMVQA 上评估 frame-level precision/recall/F1、mAP 和 QA accuracy，比较 prompt injection、SFT、pose-aware/distilled variants，并报告 latency/memory。 作者报告：作者报告 CamDistill 在 CameraBench 的 mAP 与 CMVQA accuracy 分别相对相应 backbone 显著提升，并在 CamChoreo frame metrics 上领先 PromptInject/SFT variants。（Tables 2-3, p. 7） Baseline boundary：matched variants 有助于隔离 pose signal；但 benchmark 与训练数据的 camera taxonomy、自动 labels 和公开视频 source 可能重叠，跨 cinematic/egocentric/robotic domains 不充分。 Ablation boundary：分析 pose input、distillation 与不同 backbones，并报告 system overhead；缺少 label noise、camera calibration error 与 mixed object/camera motion 的细分。",
+    "insightZh": "贡献由 benchmark granularity 和 training-time pose distillation 两部分构成；逐帧 camera labels 比 clip category 更能测 choreography，CamDistill 则避免 inference-time pose dependency。 建议略读 benchmark taxonomy 与 distillation controls；收录为 camera understanding 资源，不外推到精确 pose estimation。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

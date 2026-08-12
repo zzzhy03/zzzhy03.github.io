@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2608.08326",
+  "slug": "structreward-efficient-structured-process-rewards-for-self-correcting-multimodal-reasoning",
+  "title": "StructReward: Efficient Structured Process Rewards for Self-Correcting Multimodal Reasoning",
+  "authors": [
+    "Yifan Li",
+    "Ruxin Sun",
+    "Tongzhou Zhao"
+  ],
+  "publishedAt": "2026-08-08",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2608.08326"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "llm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "structreward",
+    "efficient",
+    "structured",
+    "process",
+    "rewards",
+    "vlm-mllm",
+    "llm"
+  ],
+  "abstract": "Reinforcement learning with verifiable rewards (RLVR) has emerged as an effective approach for improving multimodal reasoning. However, most existing methods evaluate an entire response using a binary reward based only on final-answer correctness, thereby discarding the supervision available in intermediate reasoning steps. Process reward models offer finer-grained feedback, but they typically rely on separately trained verifiers, costly chain-of-thought annotations, or online judging by large language models (LLMs). In this work, we introduce StructReward, a compute-efficient framework that provides dense reinforcement signals through structured step-level reward alignment. StructReward represents each generated solution as a sequence of reasoning steps and aligns them with process-labeled reference steps using lightweight numerical, symbolic, and lexical matching rules. The aligned labels are aggregated into a dense process reward and combined with final-answer consistency and output-validity rewards through a gated Group Relative Policy Optimization (GRPO) objective. We further recycle policy rollouts into complementary supervision for response comparison and reflective self-correction, rather than discarding them after policy updates. Separately, we use a strong LLM to rewrite sampled correct trajectories into reflection-oriented training instances, further strengthening the policy's ability to evaluate and refine its reasoning. Since reward computation is performed online without an additional learned verifier or external LLM judge, StructReward substantially reduces the computational overhead of multimodal reinforcement learning. Experimental results show that structured process supervision and rollout recycling provide an efficient path toward self-improving multimodal reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08326v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08326v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08326v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "StructReward 把 MLLM reasoning 强制成可解析的 Step-i/<think>/boxed schema，以 per-step verifiable rewards、错误轨迹重写和 rollout recycling 构造 self-correcting RL；作者报告 Qwen3-VL 2B/4B/8B 平均分分别从 50.8/60.3/66.2 提至 54.4/64.4/70.6，但强 LLM rewrite 带来额外 teacher dependence，且只覆盖同一模型家族与四个 benchmark。",
+    "methodFlow": [
+      "Image + reasoning problem",
+      "Structured cold-start traces",
+      "Step-wise rollout with local results",
+      "Rule/verifier process rewards",
+      "Strong-LLM rewrite and filtering",
+      "Recycled self-correcting policy"
+    ],
+    "whyRelevantZh": "直接关联 MLLM process supervision、可解析 reasoning 与 self-correction training。",
+    "evidenceZh": "StructReward 规定唯一 think block、连续 Step-i markers 和可抽取 local/final boxed results。（Sec. 3.1 and Fig. 1, p. 3）；失败 rollout 经 strong-LLM rewriting 与 judgment/choice 过滤，再作为 auxiliary supervised data 回收。（Secs. 3.2-3.3, pp. 3-5）；作者报告 Qwen3-VL 2B/4B/8B 跨四 benchmark 平均分由 50.8/60.3/66.2 提至 54.4/64.4/70.6。（Table 1, p. 6）",
+    "caveatZh": "作者限制：论文未设独立 limitations section；验证集中在 Qwen3-VL family 与四个可结构化 reasoning benchmarks。；审阅风险：格式规则可被策略利用，结构正确不等同 reasoning 正确。；审阅风险：strong LLM 的 rewrite/choice 既增加成本，也可能把 teacher bias 注入 student。",
+    "motivationZh": "模型先用 structured cold start 学会显式 step boundaries 和局部 boxed results。RL 阶段把 final correctness、step validity 与结构遵循组合成 process reward；失败 rollout 交给 strong LLM 重写成修正轨迹，并通过 judgment/choice 过滤后回收为监督样本。该流程试图用便宜的结构规则替代专门训练的 dense reward model。",
+    "methodZh": "模型先用 structured cold start 学会显式 step boundaries 和局部 boxed results。RL 阶段把 final correctness、step validity 与结构遵循组合成 process reward；失败 rollout 交给 strong LLM 重写成修正轨迹，并通过 judgment/choice 过滤后回收为监督样本。该流程试图用便宜的结构规则替代专门训练的 dense reward model。 贡献在把结构化接口、process reward 与失败 rollout recycling 组合成轻量 multimodal RL recipe；它并未消除外部强模型，而是将其集中在重写和过滤阶段。",
+    "experimentsZh": "在 Qwen3-VL 2B/4B/8B 上评估四个 multimodal reasoning benchmarks，比较 SFT/RL variants；对 structured RL、strong-LLM rewrite、judgment/choice 和 rollout recycling 做消融。 作者报告：作者报告 2B/4B/8B 平均分分别提升 3.6、4.1、4.4 点，完整 4B 配置达到 64.4。（Tables 1-2, pp. 6-7） Baseline boundary：覆盖同 backbone 的训练 recipe 和不同模型尺度，内部对照较清楚；但模型 family、benchmark 数量、视觉任务类型和 seed reporting 有限。 Ablation boundary：组件级消融较完整；缺少结构 reward gaming、rewrite factual errors、不同强 teacher 与开放式回答的 robustness 分析。",
+    "insightZh": "贡献在把结构化接口、process reward 与失败 rollout recycling 组合成轻量 multimodal RL recipe；它并未消除外部强模型，而是将其集中在重写和过滤阶段。 结构 reward 与 rollout recycling 对多模态推理训练有实用推进，建议精读；需把 external teacher 与 format-gaming 风险作为核心 caveat。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

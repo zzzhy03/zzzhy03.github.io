@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.10744",
+  "slug": "beyond-pixels-from-video-priors-to-4d-worlds",
+  "title": "Beyond Pixels: From Video Priors to 4D Worlds",
+  "authors": [
+    "Zihao Liu",
+    "Xiaolong Shen",
+    "Zhenglin Zhou",
+    "Ruijie Quan",
+    "Yi Yang"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10744"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "beyond",
+    "pixels",
+    "video",
+    "priors",
+    "worlds",
+    "3d-generation",
+    "video-generation"
+  ],
+  "abstract": "4D generation synthesizes dynamic 3D scenes from conditions such as text or images. Existing methods either reconstruct generated RGB videos with a separate 4D model or adapt a particular video generator to predict geometry directly. The former suffers from distribution mismatch and error propagation, whereas the latter ties 4D prediction to a specific generator and may require retraining when the generator or conditioning regime changes. We ask whether the final denoised latents of video models that share a variational autoencoder (VAE) can instead provide a reusable interface to explicit 4D prediction. Building on this insight, we introduce direct latent-to-4D generation and instantiate it as Latent-to-4D, which bypasses RGB by aligning a video latent with the token grid of a pretrained 4D decoder and refining it through frame-wise and global spatiotemporal attention. Trained on roughly 1K existing reconstruction clips, a single checkpoint transfers unchanged across multiple video diffusion transformers within the same VAE family. On Text4D-200 and I4D-200, Latent-to-4D surpasses matched same-latent Wan+4RC cascades in projection-based DINO-F1 by 2.88--3.45 and 5.81 points, respectively, while also being preferred by human raters for geometry, temporal stability, and overall quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10744v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10744v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10744v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Beyond Pixels 把预训练 video diffusion 的 latent sequence 直接 lift 成动态 3D/4D representation，再用 uncertainty-aware alignment 与 refinement 解码，而不是逐帧从 RGB 重建；作者报告 Text4D-200/I4D-200 的自动指标与用户偏好提升，但强依赖 video prior，复杂 topology、遮挡和长时身份一致性仍受限。",
+    "methodFlow": [
+      "Text or image condition",
+      "Pretrained video-diffusion latents",
+      "Latent-to-4D lifting",
+      "Uncertainty-aware alignment",
+      "Geometry/appearance refinement",
+      "Dynamic 4D asset"
+    ],
+    "whyRelevantZh": "它直接命中 3D/4D generation，并代表从 foundation video latents 迁移结构先验的重要路线。",
+    "evidenceZh": "时序 diffusion latents 被直接映射为动态 4D representation，再经 alignment/refinement 解码。（Sec. 3 and Fig. 2, p. 3）；uncertainty-aware objective 降低低置信 temporal/multi-view correspondences 对 geometry 的破坏。（Secs. 3.3-3.4, pp. 4-5）；作者报告在 Text4D-200 和 I4D-200 上优于所列 text/image-to-4D baselines，并在用户比较中获得更高 geometry、completeness 与 temporal-stability preference。（Tables 1-2, p. 5）",
+    "caveatZh": "作者限制：方法受 video diffusion 数据与生成质量限制，复杂运动、遮挡和 topology change 仍会产生不完整或不稳定几何。；审阅风险：用户偏好和 rendering metrics 可能奖励外观 plausible 而非真实 4D geometry；没有真实 ground-truth motion 时尤其需谨慎。",
+    "motivationZh": "方法从 text/image-conditioned video diffusion 中提取时序 latents，以 4D decoder 初始化动态 geometry/appearance，再通过跨视角/时间 alignment 和 uncertainty-aware losses refine。其论点是 latent features 比最终 pixels 保留更适合 4D lifting 的 correspondences 与 generative priors。",
+    "methodZh": "方法从 text/image-conditioned video diffusion 中提取时序 latents，以 4D decoder 初始化动态 geometry/appearance，再通过跨视角/时间 alignment 和 uncertainty-aware losses refine。其论点是 latent features 比最终 pixels 保留更适合 4D lifting 的 correspondences 与 generative priors。 主要新意是直接消费 video-model latent space 进行 4D decoding，并显式用 uncertainty 调节不可靠 correspondences；相对 video-to-4D pipelines，减少对逐帧 pixel reconstruction 的依赖。",
+    "experimentsZh": "在 text-to-4D 与 image-to-4D suites 上比较已有 4D generation/reconstruction pipelines，使用自动 geometry/perceptual metrics、component ablations 和每 case 十次 user ratings。 作者报告：作者报告在 Text4D-200 和 I4D-200 上优于所列 text/image-to-4D baselines，并在用户比较中获得更高 geometry、completeness 与 temporal-stability preference。（Tables 1-2, p. 5） Baseline boundary：覆盖近期 4D baselines 与用户评价；但不同 video priors/生成质量带来资源差异，自动 4D metrics 和较小人评不足以证明物理一致性。 Ablation boundary：Table 3 分析 latent alignment 和 refinement；缺少 latent layer/timestep、video-prior family、长序列与极端运动的全面敏感性。",
+    "insightZh": "主要新意是直接消费 video-model latent space 进行 4D decoding，并显式用 uncertainty 调节不可靠 correspondences；相对 video-to-4D pipelines，减少对逐帧 pixel reconstruction 的依赖。 建议精读 latent interface 与 uncertainty objective；把结果视为作者报告的生成质量，不等同于物理准确 dynamic reconstruction。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

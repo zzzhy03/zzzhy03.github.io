@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.08585",
+  "slug": "evtrajgs-accurate-and-efficient-3d-gaussian-splatting-from-unposed-event-streams",
+  "title": "EvTrajGS: Accurate and Efficient 3D Gaussian Splatting from Unposed Event Streams",
+  "authors": [
+    "Zixuan Chen",
+    "Jiakai Zhang",
+    "Junhao Dong",
+    "Guangcong Wang",
+    "Jianhuang Lai",
+    "Yew-Soon Ong",
+    "Xiaohua Xie"
+  ],
+  "publishedAt": "2026-08-09",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.08585"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "evtrajgs",
+    "accurate",
+    "efficient",
+    "gaussian",
+    "splatting",
+    "3d-reconstruction"
+  ],
+  "abstract": "Event cameras, with high temporal resolution, high dynamic range, and asynchronous sensing characteristics, have shown great potential for dense 3D reconstruction. Traditional reconstruction methods based on off-the-shelf pose estimates achieve high efficiency but produce low-fidelity results, as inaccurate pose initialization introduces cumulative reconstruction errors. In contrast, recent SLAM-style methods stabilize joint pose-scene optimization through incremental tracking and mapping, yielding higher reconstruction fidelity at the expense of considerable computational overhead. To address this trade-off, this paper presents EvTrajGS, an accurate and efficient 3D Gaussian Splatting framework for unposed event streams. Our method enables reliable joint pose-scene optimization initialized from coarse pose priors, eliminating the need for computationally expensive SLAM-style pipelines. EvTrajGS parameterizes camera motion as a continuous-time trajectory initialized from discrete camera poses, providing a unified representation for pose refinement. We then aggregate adjacent trajectory states into a temporally coupled pose, promoting temporally consistent pose updates during joint optimization. Additionally, we introduce a loss-reweighted event sampling strategy to adaptively emphasize temporally under-reconstructed intervals. Extensive experiments on both synthetic and real-world datasets demonstrate that EvTrajGS outperforms state-of-the-art methods in terms of both geometric reconstruction quality and pose estimation accuracy, achieving 3.8 dB higher PSNR, 0.1 higher SSIM, and over 40\\% lower ATE RMSE while retaining high computational efficiency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08585v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08585v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08585v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "EvTrajGS 从 unposed event stream 同时优化连续 time-to-pose function 与 3D Gaussians，以 temporally coupled pose integration 平滑局部轨迹，再用 loss-reweighted event sampling 聚焦欠重建区间；作者报告精度与约 20 分钟级训练优势，但仍需 coarse pose initialization，实验集中事件数据集且未发现公开 code。",
+    "methodFlow": [
+      "Unposed event stream",
+      "Coarse pose initialization",
+      "Continuous time-to-pose function",
+      "Temporally coupled pose integration",
+      "Event-driven joint 3DGS optimization",
+      "Loss-reweighted event sampling"
+    ],
+    "whyRelevantZh": "对 unposed event-stream 3D reconstruction、continuous camera trajectory 与高效 GS optimization 有参考。",
+    "evidenceZh": "CTPF 连续参数化 camera motion，TCPI 通过局部相对 pose increments 抑制独立 pose noise。（Sec. 3 and Fig. 3, p. 5）；LRES 根据 temporal interval 的 reconstruction loss 重新分配 event samples。（Sec. 3.C, pp. 6-7）；作者报告在 Replica 与真实 event datasets 上兼顾更低 pose error、较高 rendering quality 与显著短于 SLAM-style baselines 的训练时间。（Tables I-II, pp. 8-9）",
+    "caveatZh": "作者限制：论文没有独立 limitations section；方法仍从外部模型产生的 coarse initial poses 启动。；审阅风险：把 pose 和 scene 联合优化会存在互相补偿的 gauge/degeneracy，渲染指标好不保证真实 trajectory 准确。；审阅风险：缺少公开 code 会妨碍复核事件预处理、初始化和 baseline timing。",
+    "motivationZh": "CTPF 把任意 timestamp 映射到 SE(3) pose，并从 E2VID/VGGT 等粗初值启动。TCPI 在局部时间窗积分相对 pose increments，约束孤立 pose fluctuations；渲染两个时刻的 log-intensity difference 与 event measurement 对齐。LRES 根据区间 loss 自适应增加难时段的事件采样。",
+    "methodZh": "CTPF 把任意 timestamp 映射到 SE(3) pose，并从 E2VID/VGGT 等粗初值启动。TCPI 在局部时间窗积分相对 pose increments，约束孤立 pose fluctuations；渲染两个时刻的 log-intensity difference 与 event measurement 对齐。LRES 根据区间 loss 自适应增加难时段的事件采样。 将 continuous trajectory、局部 Lie-group pose coupling 与 error-adaptive event sampling 联合进 3DGS，是对 event-NeRF/SLAM-style alternation 的有效简化；但并非完全 initialization-free。",
+    "experimentsZh": "在 Replica synthetic events 和若干真实 event-camera scenes 上比较 event-NeRF/GS、SLAM-style 与 initialization variants，以 ATE、PSNR/SSIM/LPIPS 和训练时间评价；消融 CTPF、TCPI、LRES。 作者报告：作者报告 EvTrajGS 在 Replica 多场景取得最佳或接近最佳 ATE/渲染质量，并将训练缩短到约 20 分钟量级，显著快于逐帧 SLAM-style 优化。（Tables I-II, pp. 8-9） Baseline boundary：覆盖 trajectory+scene joint optimization 和相关 event reconstruction systems；部分 baseline code 不公开，配置可比性及真实场景规模有限。 Ablation boundary：分离 continuous pose、temporal coupling 和 reweighted sampling；缺少完全错误初始化、高速滚动/大旋转、长序列 drift 与 event threshold variation 的压力测试。",
+    "insightZh": "将 continuous trajectory、局部 Lie-group pose coupling 与 error-adaptive event sampling 联合进 3DGS，是对 event-NeRF/SLAM-style alternation 的有效简化；但并非完全 initialization-free。 技术组合和效率证据适合略读收录；初始化依赖、数据规模和 code 缺失使其尚不足以深度推荐。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

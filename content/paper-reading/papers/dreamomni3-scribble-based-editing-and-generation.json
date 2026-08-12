@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2512.22525",
+  "slug": "dreamomni3-scribble-based-editing-and-generation",
+  "title": "DreamOmni3: Scribble-based Editing and Generation",
+  "authors": [
+    "Bin Xia",
+    "Bohao Peng",
+    "Jiyang Liu",
+    "Sitong Wu",
+    "Jingyao Li",
+    "Junjia Huang",
+    "Xu Zhao",
+    "Yitong Wang",
+    "Ruihang Chu",
+    "Bei Yu",
+    "Jiaya Jia"
+  ],
+  "publishedAt": "2025-12-27",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2512.22525"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "2d-design"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "dreamomni3",
+    "scribble-based",
+    "editing",
+    "generation",
+    "image-generation",
+    "2d-design"
+  ],
+  "abstract": "Recently unified generation and editing models have achieved remarkable success with their impressive performance. These models rely mainly on text prompts for instruction-based editing and generation, but language often fails to capture users intended edit locations and fine-grained visual details. To this end, we propose two tasks: scribble-based editing and generation, that enables more flexible creation on graphical user interface (GUI) combining user textual, images, and freehand sketches. We introduce DreamOmni3, tackling two challenges: data creation and framework design. Our data synthesis pipeline includes two parts: scribble-based editing and generation. For scribble-based editing, we define four tasks: scribble and instruction-based editing, scribble and multimodal instruction-based editing, image fusion, and doodle editing. Based on DreamOmni2 dataset, we extract editable regions and overlay hand-drawn boxes, circles, doodles or cropped image to construct training data. For scribble-based generation, we define three tasks: scribble and instruction-based generation, scribble and multimodal instruction-based generation, and doodle generation, following similar data creation pipelines. For the framework, instead of using binary masks, which struggle with complex edits involving multiple scribbles, images, and instructions, we propose a joint input scheme that feeds both the original and scribbled source images into the model, using different colors to distinguish regions and simplify processing. By applying the same index and position encodings to both images, the model can precisely localize scribbled regions while maintaining accurate editing. Finally, we establish comprehensive benchmarks for these tasks to promote further research. Experimental results demonstrate that DreamOmni3 achieves outstanding performance, and models and code will be publicly released.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2512.22525v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2512.22525v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2512.22525v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "DreamOmni3 把文字、原图、scribbled source 和参考图统一成 GUI-like editing/generation 输入，构造四类编辑与三类生成数据，并以同位置编码的 joint input 加 VLM joint training 处理圈选、涂鸦和局部参考。作者报告其人类/模型 judge 成功率整体领先开源基线；交互范式很相关，但 benchmark 自建、自动 judge 一致性有限且训练数据合成偏差较强。",
+    "methodFlow": [
+      "从编辑/生成数据合成框、圈、涂鸦与 cropped-image 指令",
+      "并行编码原图与 scribbled source image",
+      "共享 index 与 positional encoding 对齐同一空间位置",
+      "VLM 与 generation/editing model 联合训练理解抽象笔画",
+      "统一输出局部编辑或条件生成结果"
+    ],
+    "whyRelevantZh": "直接关联 2D visual design interaction、controllable editing 与多模态 GUI 输入。",
+    "evidenceZh": "方法用原图/标记图 joint input 与共享位置编码定位 scribble 区域。（Sec. 3 and Fig. 2, p. 5）；作者报告 DreamOmni3 在七类 scribble editing/generation 的自动与人工成功率上整体领先所测开源系统。（Table 1, p. 11）；作者报告图像一致性 CLIP-I 0.8702、DINO 0.8172，与商业系统相近。（Table 2, p. 11）",
+    "caveatZh": "作者限制：自动 VLM judge 对局部像素瑕疵和复杂编辑的识别有限。；审阅风险：大量合成 scribble 可能不足以覆盖真实用户的歧义、粗糙和连续修改。；审阅风险：自建 benchmark 与训练数据来源接近，泛化证据弱于跨数据集评测。",
+    "motivationZh": "工作扩展 unified generation/editing 到 freehand scribble：从既有编辑数据提取区域并叠加框、圈、涂鸦或 cropped reference，构造七类训练任务；模型并行输入原图和标记图，以共享 index/position encoding 对齐区域，并联合训练 VLM 提升抽象 scribble 理解。",
+    "methodZh": "工作扩展 unified generation/editing 到 freehand scribble：从既有编辑数据提取区域并叠加框、圈、涂鸦或 cropped reference，构造七类训练任务；模型并行输入原图和标记图，以共享 index/position encoding 对齐区域，并联合训练 VLM 提升抽象 scribble 理解。 贡献在于将自然 freehand annotation 作为统一 generation/editing interface，并提供对应数据管线与 joint-input alignment；相较 binary mask 更能表示多笔画、多参考和开放指令。",
+    "experimentsZh": "在自建 scribble editing/generation benchmark 上比较多种开源与商业图像模型，由 Gemini、Doubao 和人类评估成功率，并以 CLIP-I/DINO 测一致性、Cohen's κ 测 judge agreement。 作者报告：作者报告 DreamOmni3 的 CLIP-I 0.8702、DINO 0.8172。（Table 2, p. 11）；作者报告 joint input 与 joint training 在 editing/generation 消融中均带来提升。（Table 4, p. 12） Baseline boundary：包含开源 unified editors 与 GPT-4o、Nano Banana 等商业参考；prompt budget、API 版本和自建 judge 可能影响公平性。 Ablation boundary：对 generation/editing training、joint input、joint VLM training 有组件对照；还缺真实用户交互效率、笔画噪声与跨文化 doodle robustness。",
+    "insightZh": "贡献在于将自然 freehand annotation 作为统一 generation/editing interface，并提供对应数据管线与 joint-input alignment；相较 binary mask 更能表示多笔画、多参考和开放指令。 交互范式与方法完整度足以精读；自动评估和合成数据边界必须随摘要一起保留。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "early"
+  }
+}

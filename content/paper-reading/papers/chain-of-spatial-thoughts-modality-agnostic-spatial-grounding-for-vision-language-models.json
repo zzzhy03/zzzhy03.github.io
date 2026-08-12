@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.10278",
+  "slug": "chain-of-spatial-thoughts-modality-agnostic-spatial-grounding-for-vision-language-models",
+  "title": "Chain of Spatial Thoughts: Modality-Agnostic Spatial Grounding for Vision Language Models",
+  "authors": [
+    "Hunter Schofield",
+    "Mohammed Elmahgiubi",
+    "Mohammad Mahdavian",
+    "Richard Shi",
+    "Jinjun Shan",
+    "Amir Rasouli",
+    "Dongfeng Bai"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10278"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "chain",
+    "spatial",
+    "thoughts",
+    "modality-agnostic",
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "abstract": "Spatial understanding is fundamental to embodied intelligence, underpinning applications such as robotic manipulation, embodied navigation, and autonomous driving. Although recent vision-language models (VLMs) have achieved impressive performance on spatial reasoning benchmarks, state-of-the-art approaches typically rely on additional spatial encoders or architectural modifications during inference, increasing computational cost. We introduce Space Tokens, a lightweight, architecture-agnostic framework that equips VLMs with explicit continuous spatial representations without requiring additional inference-time modules. By distilling scene-level 3D geometry and object-centric spatial attributes into continuous latent tokens, our method enables these modalities to be directly incorporated into a chain-of-thought reasoning process, thereby improving the VLM's spatial reasoning capabilities. At the same time, the learned representations can be explicitly decoded to verify that they encode meaningful geometric information, while the unified token interface remains extensible to additional modalities. Experiments on VSI-Bench improve Qwen3-VL-8B by 4.3% and SenseNova-SI-1.3 by 1.3%, while achieving state-of-the-art performance on object size (79.2%) and room size estimation (75.7%). These results demonstrate that continuous spatial tokens provide an effective, interpretable, and computationally efficient mechanism for integrating geometric reasoning into large vision-language models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10278v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10278v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10278v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Chain of Spatial Thoughts 不让 VLM 只输出不可检查的文字 CoT，而是插入可解码为 depth、camera、3D boxes 等几何状态的 spatial tokens；作者在 VSI-Bench 与 OOD spatial benchmarks 报告提升，最值得关注的是把 intermediate reasoning 变成视觉可验证的 3D state，但效果仍依赖合成 supervision 与专用 decoder。",
+    "methodFlow": [
+      "Image / video observation",
+      "Geometry and object annotations",
+      "Spatial token encoding",
+      "Autoregressive chain of spatial thoughts",
+      "3D modality decoding",
+      "Language answer"
+    ],
+    "whyRelevantZh": "这是 VLM/MLLM spatial reasoning 与 3D representation 的直接交叉，尤其适合研究可验证 intermediate states 和 design-agent reasoning traces。",
+    "evidenceZh": "模型在回答前自回归地产生可解码的 scene-level 与 object-level spatial tokens。（Sec. 3 and Fig. 2, p. 4）；空间 tokens 可被还原为 interpretable 3D modalities，从而为 reasoning trace 提供视觉诊断界面。（Sec. 3.3 and Fig. 4, pp. 5-7）；作者报告在 VSI-Bench 的 object size 与 room-size 等任务取得最佳或竞争性结果，并在 OOD benchmarks 上总体优于 matched LoRA/text baselines。（Tables 1-2, pp. 6-7）",
+    "caveatZh": "作者限制：可解释 spatial tokens 需要额外几何标注与 decoders，扩展到无标定或动态场景仍受限。；审阅风险：benchmark 增益不自动证明模型进行了因果空间推理；它也可能利用 token supervision 学到任务特定捷径。",
+    "motivationZh": "方法把 scene-level geometry 和 object-centric spatial information 编码成离散/连续 spatial tokens，并让模型在自然语言回答前按 chain 生成这些 tokens；专用 decoders 将中间状态恢复成 depth、camera pose 或 3D object layouts，用于训练和诊断。相比只加 LoRA 或文本 CoT，这种 design 将空间推理过程暴露为可视证据。",
+    "methodZh": "方法把 scene-level geometry 和 object-centric spatial information 编码成离散/连续 spatial tokens，并让模型在自然语言回答前按 chain 生成这些 tokens；专用 decoders 将中间状态恢复成 depth、camera pose 或 3D object layouts，用于训练和诊断。相比只加 LoRA 或文本 CoT，这种 design 将空间推理过程暴露为可视证据。 新意不是增加一个空间 benchmark，而是把 VLM reasoning trace 约束为能重建几何的 tokens，使中间推理既参与 next-token learning 又可被外部 visual verification。",
+    "experimentsZh": "在 VSI-Bench full split 和多个 OOD spatial reasoning datasets 上评估，比较通用 VLM、spatially tuned VLM 与 matched fine-tuning baselines，并用 scaling 和 token-type ablations 分析监督来源。 作者报告：作者报告在 VSI-Bench 的 object size 与 room-size 等任务取得最佳或竞争性结果，并在 OOD benchmarks 上总体优于 matched LoRA/text baselines。（Tables 1-2, pp. 6-7） Baseline boundary：包含多种 closed/open VLM 及 matched adaptation baselines；但训练数据规模、geometry annotations 与 backbone 能力并非所有模型都严格对齐。 Ablation boundary：分别测试数据规模和特定 spatial token types，说明显式几何状态带来增益；仍缺少 decoder error 对最终答案的因果分解和真实机器人闭环测试。",
+    "insightZh": "新意不是增加一个空间 benchmark，而是把 VLM reasoning trace 约束为能重建几何的 tokens，使中间推理既参与 next-token learning 又可被外部 visual verification。 建议精读 token interface、decoding fidelity 与 OOD protocol；其核心价值是可检查的空间思维链，而非单一榜单名次。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

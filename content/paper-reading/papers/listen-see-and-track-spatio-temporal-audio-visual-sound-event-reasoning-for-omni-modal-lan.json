@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.09435",
+  "slug": "listen-see-and-track-spatio-temporal-audio-visual-sound-event-reasoning-for-omni-modal-lan",
+  "title": "Listen, See and Track: Spatio-Temporal Audio-Visual Sound Event Reasoning for Omni-Modal Language Models",
+  "authors": [
+    "Zhi Zeng",
+    "Cheng Zhang",
+    "Zesheng Yang",
+    "Rendong Pi",
+    "Jiaying Wu",
+    "Di Zhang",
+    "Zihan Ma",
+    "Guodong Li",
+    "Zhou Yang",
+    "Yu Xiang",
+    "Yifei Zheng",
+    "Minnan Luo"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09435"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "listen",
+    "see",
+    "track",
+    "spatio-temporal",
+    "audio-visual",
+    "vlm-mllm"
+  ],
+  "abstract": "Understanding dynamic sound sources requires jointly determining what produces a sound, where the source is located, and how it moves over time. Yet existing audio-language models often represent clips as global acoustic events, while vision-language models lack the spatial audio cues needed to localize and track individual sources. To evaluate this missing capability, we introduce ST-OmniQA, a spatio-temporal audio-visual question-answering benchmark built from panoramic videos paired with synchronized first-order Ambisonics (FOA) audio of moving sound sources. It contains 40K videos and 400K question-answer pairs organized into four capability levels covering sound-event recognition, direction of arrival, source distance, motion trajectories, and temporally grounded audio-visual reasoning. Building on this benchmark, we propose ST-Omni-R1, which integrates FOA-derived semantic and trajectory representations with panoramic visual context and is trained through progressive curriculum learning and reasoning-tree reinforcement learning. ST-Omni-R1 achieves 77.83\\% average semantic accuracy across the four levels, compared with 37.28\\% for the best evaluated baseline. Results on three public spatial-audio benchmarks further indicate that its learned spatial and motion representations transfer beyond ST-OmniQA.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09435v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09435v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09435v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "论文把 audio-visual understanding 从 event classification 推到“何时响、从哪里响、如何移动”的联合推理：ST-OmniQA 同时含 temporal localization、panoramic spatial grounding 与 motion tracking，ST-Omni-R1 用 focus-of-attention 表征和分阶段 SFT/RL 训练。作者报告主表平均 77.83，显著领先对比 omni-modal models，并在 real-world videos 上保持迁移。",
+    "methodFlow": [
+      "Omni-modal Audio-Video Input",
+      "Focus-of-Attention Encoding",
+      "Temporal Event Localization",
+      "Panoramic Spatial Grounding",
+      "Motion-Path Reasoning",
+      "Staged SFT and Reasoning-Tree RL"
+    ],
+    "whyRelevantZh": "它扩展 MLLM 对动态、多模态事件的空间时间 grounding，和具身场景中的听觉-视觉感知及 tracking 高度相关。",
+    "evidenceZh": "ST-OmniQA 同时评测时间定位、全景方位与动态轨迹推理。（Dataset and task overview, pp. 2–3）；ST-Omni-R1 采用 focus-of-attention fusion 与三阶段训练。（Framework, Fig. 2, p. 4）；作者报告 ST-Omni-R1 在 ST-OmniQA 平均得分 77.83。（Table 2, p. 6）；模型在 real-world audio-visual evaluation 中仍优于 omni-modal baselines。（Table 3, p. 7）",
+    "caveatZh": "审阅风险：benchmark performance 不等同于开放世界声源定位可靠性，尤其是多源重叠和混响场景。；审阅风险：部分数据生成/标注结构可能让模型利用任务格式，而非真正联合音视频因果推理。",
+    "motivationZh": "ST-OmniQA 将声音事件的时间段、360°视域方位和跨帧轨迹组织为多任务问答。ST-Omni-R1 先建立 audio/video token 的 focus-of-attention 交互，再以基础理解、spatio-temporal curriculum 和 reasoning-tree-guided RL 逐步训练，从单模态线索过渡到联合定位与跟踪。",
+    "methodZh": "ST-OmniQA 将声音事件的时间段、360°视域方位和跨帧轨迹组织为多任务问答。ST-Omni-R1 先建立 audio/video token 的 focus-of-attention 交互，再以基础理解、spatio-temporal curriculum 和 reasoning-tree-guided RL 逐步训练，从单模态线索过渡到联合定位与跟踪。 核心贡献是把时间、全景空间和运动轨迹纳入同一 audio-visual reasoning benchmark，并用显式 curriculum 与 reasoning-tree reward 训练统一模型，而非只做声音来源分类或单帧定位。",
+    "experimentsZh": "比较 proprietary/open omni-modal language models，在 ST-OmniQA 多个 temporal/spatial/tracking subsets 及 real-world set 上评测；训练包含 SFT curriculum 与 RL，另做 component ablations。 作者报告：作者报告 ST-Omni-R1 主表平均 77.83，为所列模型最高。（Table 2, p. 6）；作者报告 real-world set 上训练方案仍带来稳定提升。（Table 3, p. 7） Baseline boundary：覆盖多种 omni-modal baselines 和三类 reasoning tasks；数据规模、语言/声学域与真实机器人 embodied settings 的覆盖仍有限。 Ablation boundary：分别分析 focus-of-attention、curriculum 与 reasoning-tree RL，支持 staged recipe 的增益来源。",
+    "insightZh": "核心贡献是把时间、全景空间和运动轨迹纳入同一 audio-visual reasoning benchmark，并用显式 curriculum 与 reasoning-tree reward 训练统一模型，而非只做声音来源分类或单帧定位。 新 benchmark 与训练框架直接推进 omni-modal spatio-temporal reasoning，证据足以精读；需保留真实复杂声场泛化边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

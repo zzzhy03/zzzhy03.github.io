@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2605.15532",
+  "slug": "deltaprompts-escaping-the-zero-delta-trap-in-multimodal-distillation",
+  "title": "DeltaPrompts: Escaping the Zero-Delta Trap in Multimodal Distillation",
+  "authors": [
+    "Jaehun Jung",
+    "Hyunwoo Kim",
+    "Brandon Cui",
+    "Ximing Lu",
+    "David Acuna",
+    "Prithviraj Ammanabrolu",
+    "Yejin Choi"
+  ],
+  "publishedAt": "2026-05-15",
+  "updatedAt": "2026-08-08",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v3",
+  "identifiers": {
+    "arxiv": "2605.15532"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "llm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "deltaprompts",
+    "escaping",
+    "zero-delta",
+    "trap",
+    "multimodal",
+    "vlm-mllm",
+    "llm"
+  ],
+  "abstract": "Distillation enables compact Vision-Language Models (VLMs) to obtain strong reasoning capabilities, yet the prompts driving this process are typically chosen via simple heuristics or aggregated from off-the-shelf datasets. We reveal a critical inefficiency in this approach: up to 69% of the prompts in standard chart / document reasoning datasets are effectively zero-delta, meaning the teacher and student already induce the exact same answer distribution. Training on these prompts provides minimal learning signal, causing student improvement to rapidly saturate regardless of data scale. To escape the zero-delta trap, we return to first principles: distillation fundamentally minimizes distributional divergence, and thus a prompt is valuable only if it exposes a functional capability gap between the teacher and student. We quantify this gap through answer divergence ($Δ$), demonstrating that non-zero divergence is critical for effective scaling. Building on this insight, we propose a staged synthesis pipeline that repurposes existing datasets as seeds, actively targeting student failure modes to produce better prompts. The result is DeltaPrompts, a diverse dataset of 200k synthetic, high-divergence reasoning problems. We evaluate DeltaPrompts across three distinct settings: on-policy distillation with the target teacher-student pair, transfer to a novel model family without regenerating the data, and off-policy fine-tuning of a non-reasoning model. Across all scenarios, DeltaPrompts drives substantial gains, yielding up to 15% relative improvement even on top of a highly-optimized reasoning model (e.g., Qwen3-VL-8B-Thinking) -- averaged over 10 benchmarks spanning chart, document and perception-centric reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.15532v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.15532v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2605.15532v3 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "DeltaPrompts 发现 multimodal on-policy distillation 的关键瓶颈不是更多 prompts，而是 teacher 与 student 回答相同的 zero-delta prompts。它用 answer divergence 量化能力缺口，再以 seed-guided + skill-guided synthesis 和 rejection sampling 专采 student failures；作者报告在强 reasoning student 上跨 benchmark 最高约 15% 相对提升。贡献是可迁移的数据选择原则，但成本、teacher judge 偏差与 divergence 对真正新技能的代理质量仍需注意。",
+    "methodFlow": [
+      "以 seed examples 与 skill taxonomy 合成 multimodal prompts",
+      "分别获取 teacher/student answers",
+      "计算 answer divergence 作为 learning delta",
+      "rejection sampling 去除 zero-delta 并保证多样性",
+      "用 DeltaPrompts 蒸馏 student 并跨任务评估"
+    ],
+    "whyRelevantZh": "直接推进 MLLM post-training、distillation data curation 和 hard-example mining。",
+    "evidenceZh": "方法用 answer divergence 过滤 teacher/student 已一致的 zero-delta prompts。（Sec. 3 and Fig. 1, p. 2）；作者报告 DeltaPrompts divergence 0.38（原 mixture 0.11），E-Vendi 162.46（原 141.67）。（Table 1, p. 7）；作者报告跨 benchmark 对强 reasoning student 最高约 15% relative improvement。（Tables 3-5, pp. 9-11）",
+    "caveatZh": "作者限制：answer divergence 依赖 teacher 质量与 judge 的答案比较可靠性。；作者限制：高 delta 也可能来自歧义、噪声或 teacher 错误。；审阅风险：过滤会改变题型分布，可能以 benchmark-specific failure mining 换取分数。；审阅风险：两阶段生成/查询成本可能抵消数据效率收益。",
+    "motivationZh": "管线先从现有混合数据/技能 taxonomy 生成候选问题，分别查询 teacher/student，过滤答案无差异样本并保留高 divergence、足够多样的 prompts，再用于 multimodal distillation。论文比较 data scale、seed/skill synthesis、in/out-of-domain transfer。",
+    "methodZh": "管线先从现有混合数据/技能 taxonomy 生成候选问题，分别查询 teacher/student，过滤答案无差异样本并保留高 divergence、足够多样的 prompts，再用于 multimodal distillation。论文比较 data scale、seed/skill synthesis、in/out-of-domain transfer。 将 teacher-student answer delta 从事后诊断变成主动数据采样目标，直接解释为何普通数据扩容迅速饱和；两阶段 failure-targeted synthesis 是主要工程贡献。",
+    "experimentsZh": "比较 existing mixtures、random/zero/high-delta subsets、seed/skill synthesis，在多模态 reasoning benchmarks 与不同 student 强度/数据规模上做 distillation，并测 OOD transfer。 作者报告：作者报告 DeltaPrompts answer divergence 0.38、E-Vendi 162.46，而原 mixture 为 0.11、141.67。（Table 1, p. 7）；作者报告跨 benchmark 最高约 15% 相对提升。（Tables 3-5, pp. 9-11） Baseline boundary：包含 off-the-shelf mixtures、随机、zero-delta 和多种生成策略；teacher/model judge 更换与实际数据生成成本的覆盖有限。 Ablation boundary：data scale、delta bins、seed vs skill、student strength 和 transfer 均有对照；缺少基于不确定性/梯度影响的等成本 active-learning baseline。",
+    "insightZh": "将 teacher-student answer delta 从事后诊断变成主动数据采样目标，直接解释为何普通数据扩容迅速饱和；两阶段 failure-targeted synthesis 是主要工程贡献。 数据原则可复用且实验证据广，适合精读；应把 divergence 视为 proxy 而非绝对数据质量。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.08020",
+  "slug": "thought-level-beam-search-for-reasoning",
+  "title": "Thought-Level Beam Search for Reasoning",
+  "authors": [
+    "Lijie Yang",
+    "Hongyin Luo",
+    "Jiawei Zhao",
+    "Tri Dao",
+    "Ravi Netravali"
+  ],
+  "publishedAt": "2026-08-08",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2608.08020"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "thought-level",
+    "beam",
+    "search",
+    "reasoning",
+    "llm"
+  ],
+  "abstract": "Test-time compute scaling is a primary driver of performance in large reasoning models (LRMs), but extreme inefficiency bounds current approaches, shifting the critical question from \\emph{how much} compute to spend, to \\emph{where} to allocate it. We formalize test-time reasoning as a constrained compute allocation problem over partial trajectories. Under a fixed hardware budget, existing paradigms fail to actively allocate the compute to the most promising partial progress: traditional parallel sampling treats traces independently and induces severe memory bottlenecks, while subtractive pruning starves hardware and fails to actively and sufficiently shift the output distribution. To overcome this dichotomy, we introduce Gambit, an inference algorithm that executes \\emph{thought-level beam search}. By periodically pruning unpromising trajectories and immediately branching from high-quality prefixes, Gambit dynamically concentrates compute onto the most promising reasoning traces via a light-weight scorer probing hidden states while maintaining continuous high hardware utilization. Extensive evaluations across multiple models and benchmarks demonstrate that Gambit strictly dominates existing baselines. Under identical hardware constraints, our method yields up to a +6.7\\% absolute accuracy gain on HMMT-24 and +3.3\\% on AIME-25 over pruning baselines, delivers $>2\\times$ higher throughput on trace completion, and reduces total token consumption by up to 68.5\\% relative to standard parallel sampling.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08020v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08020v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Dao-AILab/Gambit.git"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08020v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/Dao-AILab/Gambit.git）。",
+    "ideaZh": "Gambit 把 beam search 的 unit 从 token 提升到 thought：固定容量并行跑多条 reasoning traces，周期性用 hidden-state scorer 排名，淘汰低分支并从高分 prefix cache 分叉；作者报告在相同 N=256 sampling budget 下可减少最多 68.5% output tokens 并保持/提升数学推理准确率，但 scorer calibration、单 B300 测试与数学任务集中度限制部署外推。",
+    "methodFlow": [
+      "Question and fixed capacity C",
+      "Parallel reasoning warmup",
+      "Hidden-state thought scoring",
+      "Periodic prune-and-branch tournament",
+      "Prefix-cache reuse under fixed memory",
+      "Score-weighted answer vote"
+    ],
+    "whyRelevantZh": "它直接推进 inference-time reasoning search 与 serving-aware compute allocation。",
+    "evidenceZh": "Gambit 以固定容量 pool 执行周期性 thought-level prune-and-branch，并保持零和算力重分配。（Sec. 4 and Fig. 4, p. 5）；logical branching 与 physical execution/cache 解耦，以避免 prefix duplication 导致内存失控。（Sec. 4.2, pp. 6-7）；作者报告在 N=256 对照下，Gambit 跨数学任务保持或提高 accuracy，并最多减少 68.5% output tokens。（Table 1, p. 8）",
+    "caveatZh": "作者限制：结果主要来自数学 reasoning 和固定大采样预算，系统效率在单 B300 上测量。；审阅风险：早期 scorer 的系统性误判会反复复制错误 prefix，造成比 independent sampling 更相关的失败。；审阅风险：token reduction 不等同按比例 wall-clock 或成本下降，取决于 batching、KV transfer 与 tournament synchronization。",
+    "motivationZh": "系统 warm up C 条独立 traces，每隔 Δ tokens 做一次 tournament。分数较低的 traces 被停止，腾出的 slots 从高分 prefix 分叉；logical search state 与 physical KV/cache memory 解耦，始终保持固定并发容量。最终答案按 score-weighted vote 聚合。",
+    "methodZh": "系统 warm up C 条独立 traces，每隔 Δ tokens 做一次 tournament。分数较低的 traces 被停止，腾出的 slots 从高分 prefix 分叉；logical search state 与 physical KV/cache memory 解耦，始终保持固定并发容量。最终答案按 score-weighted vote 聚合。 相对 best-of-N，Gambit 在生成过程中按 thought prefix 动态重配预算；相对 token beam search，它保留长 reasoning chunks 和多样性，并把系统级 cache management 纳入算法。",
+    "experimentsZh": "在 AIME、HMMT、BRUMO 等数学 reasoning benchmarks 上，以 N=256 比较 majority vote、reward/rank selection 和 Gambit；分析 scorer architecture、swap size、tournament interval、token/latency 与单 B300 serving。 作者报告：作者报告 Gambit 在所列任务上相对 256-sample baseline 最多减少 68.5% output tokens，同时保持或提高 end-to-end accuracy。（Table 1, p. 8） Baseline boundary：覆盖 best-of-N、majority vote 与 reward/scorer baselines，并提供 token 和系统 latency breakdown；但主要为数学任务、一个 serving stack 与单 B300。 Ablation boundary：测试 scorer architecture、capacity、swap size 与 interval；缺少 scorer shift、adversarial prefixes、跨 model family 及真实多租户 queue 的稳定性分析。",
+    "insightZh": "相对 best-of-N，Gambit 在生成过程中按 thought prefix 动态重配预算；相对 token beam search，它保留长 reasoning chunks 和多样性，并把系统级 cache management 纳入算法。 thought-level budget reallocation 是明确的范式与系统贡献，达到 LLM landmark-only gate，建议精读；摘要需把单机/数学域和 scorer risk 写明。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

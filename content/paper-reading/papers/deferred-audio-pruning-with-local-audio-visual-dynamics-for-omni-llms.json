@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.08794",
+  "slug": "deferred-audio-pruning-with-local-audio-visual-dynamics-for-omni-llms",
+  "title": "Deferred Audio Pruning with Local Audio-Visual Dynamics for Omni-LLMs",
+  "authors": [
+    "Kyeongyoon Lee",
+    "Hongyeob Kim",
+    "Youngeun Kim",
+    "Sungeun Hong"
+  ],
+  "publishedAt": "2026-08-09",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.08794"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.MM",
+    "cs.SD"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "video-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "deferred",
+    "audio",
+    "pruning",
+    "local",
+    "audio-visual",
+    "vlm-mllm",
+    "video-generation"
+  ],
+  "abstract": "Omni-modal LLMs jointly process audio, video, and text, but long multimodal sequences incur substantial prefill and KV-cache costs. Existing omni-modal compression methods primarily focus on pre-LLM token reduction, leaving modality-specific compression across the LLM boundary underexplored. We propose A-PACK, a two-stage framework that defers audio pruning until query-conditioned multimodal interactions emerge. Our analysis shows that audio exhibits higher task-relevant information density and representational diversity per token than video. We further find that local audio-visual dynamics provide a more effective cue for visual selection than token-wise matching. We therefore preserve audio and compress video with local dynamics before the LLM, then progressively prune low-relevance audio and visual tokens and their KV-cache entries inside the LLM. Across four benchmarks on Qwen2.5-Omni-7B/3B, A-PACK achieves the strongest average performance among the evaluated prior methods while reducing prefill FLOPs by up to 78% and improving decoding throughput by up to 2.21x.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08794v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08794v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08794v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "A-PACK 发现 audio tokens 通常比 video 更紧凑且承载时间证据，因此先保留 audio、用 local audio-visual CKA 给 video 分配预算，等进 LLM 形成 query-conditioned fusion 后再联合剪枝；作者报告在 25% prefill budget 保留约 97.8% full-model accuracy、减少约 78% prefill FLOPs，但细秒级定位会失败，收益也依赖模型、任务与音画同步。",
+    "methodFlow": [
+      "Audio-video tokens + query",
+      "Local-window gated CKA",
+      "Audio-preserving visual allocation",
+      "Multimodal LLM fusion",
+      "Progressive joint token/KV pruning",
+      "Efficient omni-modal answer"
+    ],
+    "whyRelevantZh": "对 omni-LLM 的多模态 token budget、audio-video temporal reasoning 与高效长视频推理有参考。",
+    "evidenceZh": "A-PACK 在 pre-LLM 阶段保留 audio，并以 local-window CKA 为 video tokens 分配预算。（Secs. 3-4 and Fig. 1, pp. 1-4）；进入 LLM 后再以 query-conditioned scores progressive prune fused audio/visual tokens 和 KV entries。（Sec. 4.3, pp. 4-5）；作者报告在 25% prefill budget 下平均保留约 97.8% full accuracy，并减少约 78% prefill FLOPs、最高获得 2.21× speedup。（Tables 1-2, p. 5）",
+    "caveatZh": "作者限制：激进压缩可能损失 fine-grained/long-range evidence，audio-preserving 策略的收益会随模型与任务变化。；作者限制：local co-variation 对 audio-video temporal offsets 敏感。；审阅风险：论文 failure case 显示即使保留相关音画区间，也会错过笑声的秒级位置；coarse event retention 不等于 precise temporal localization。",
+    "motivationZh": "pre-LLM 阶段计算短时间窗内 audio/video representation co-variation，用 gated CKA 确定哪些视觉区间应保留，同时不提前剪掉 compact audio evidence。进入 LLM 后，query-conditioned attention 已建立，再逐层对融合后的 audio/visual tokens 与 KV cache 做 progressive pruning。",
+    "methodZh": "pre-LLM 阶段计算短时间窗内 audio/video representation co-variation，用 gated CKA 确定哪些视觉区间应保留，同时不提前剪掉 compact audio evidence。进入 LLM 后，query-conditioned attention 已建立，再逐层对融合后的 audio/visual tokens 与 KV cache 做 progressive pruning。 新意在决定何时剪某个 modality：audio 延迟到 fusion 后再剪，video 则由 local cross-modal dynamics 预筛；比静态 modality budget 更贴合音画互补关系。",
+    "experimentsZh": "在 AVUT、WorldSense、AVHBench 等四个 audio-video benchmarks 上，用 Qwen2.5-Omni 7B/3B 比较 token compressors；报告 accuracy retention、prefill FLOPs、latency，并消融 pre/post-LLM stages 与 alignment scores。 作者报告：作者报告 25% prefill budget 下平均保留约 97.8% full-model accuracy，prefill FLOPs 减少约 78%，最高 speedup 2.21×。（Tables 1-2, p. 5） Baseline boundary：覆盖多种 omni-modal pruning/compression baselines、两模型尺度和多个 benchmarks；硬件/实现依赖的 latency 与 audio-heavy 任务分布限制外推。 Ablation boundary：分离 visual allocation、deferred audio pruning、inner-LLM pruning 与 CKA alternatives；缺少不同 audio frame rates、严重 A/V offsets 和噪声注入的系统测试。",
+    "insightZh": "新意在决定何时剪某个 modality：audio 延迟到 fusion 后再剪，video 则由 local cross-modal dynamics 预筛；比静态 modality budget 更贴合音画互补关系。 机制清楚、效率与 failure analysis 充分，适合略读；属于实用 compression 方法，尚不足以证明 fine temporal evidence 可无损保留。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

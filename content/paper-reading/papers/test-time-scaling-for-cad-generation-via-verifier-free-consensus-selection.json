@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.09706",
+  "slug": "test-time-scaling-for-cad-generation-via-verifier-free-consensus-selection",
+  "title": "Test-Time Scaling for CAD Generation via Verifier-Free Consensus Selection",
+  "authors": [
+    "Aaron Haag",
+    "Altay Kaçan",
+    "Bertram Fuchs",
+    "Oliver Lohse"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09706"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CE",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "fabrication"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "test-time",
+    "scaling",
+    "cad",
+    "generation",
+    "verifier-free",
+    "3d-generation",
+    "fabrication"
+  ],
+  "abstract": "Large language models can write parametric CAD programs from a natural-language description (text-to-CAD generation), but a single sample is often wrong. Increasing test-time compute by sampling multiple candidates only helps if a good candidate can be identified, yet no ground-truth model is available at generation time. Existing systems often require a separate verifier, such as a vision-language judge, to select among candidates. We investigate whether the candidate pool itself provides enough signal for effective selection and a verifier-free alternative. We introduce 3D CAD consensus selection, hereafter consensus selection: sample $N$ parametric CAD programs, compile them to 3D models, and return the candidate that agrees most with the rest of the pool. The method is training-free and compatible with existing CAD agents. We investigate geometric and topological notions of agreement, each of which improves its corresponding evaluation metric. On the exact candidate pools of a state-of-the-art CAD generation method, geometric consensus improves all three geometric metrics over the method's verifier, while topological consensus matches it on topology. Across every tested LLM and prompt variant, geometric consensus also improves geometric accuracy over random selection from the same pool, reducing Chamfer distance by $1-10\\%$.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09706v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09706v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09706v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "论文提出无需 learned verifier 的 CAD test-time scaling：对同一 prompt 采样多份 parametric CAD programs，把可执行结果转成几何表示，按样本间 chamfer/feature consensus 选 medoid。作者报告随着 sample budget 增加，consensus selection 比随机或单样本更可靠，并改善 CAD validity/shape fidelity；优点是 training-free，缺点是多数一致不保证满足工程意图。",
+    "methodFlow": [
+      "CAD Prompt or Reference",
+      "Multiple Program Samples",
+      "Execution and Geometry Canonicalization",
+      "Pairwise Shape Similarity",
+      "Consensus Medoid Selection",
+      "Selected Parametric CAD"
+    ],
+    "whyRelevantZh": "它直接服务 generative CAD，并提供无需训练 verifier 的 test-time scaling baseline，可与工程 validator 组合。",
+    "evidenceZh": "方法只依赖多次 sampling、CAD execution 与 pairwise geometry similarity。（Method and Fig. 2, p. 3）；consensus output 是候选集中最接近其他有效样本的 medoid。（Consensus selection, Sec. 3）；作者报告增加 sampling budget 后 consensus 优于 random/single-sample selection。（Table 1, p. 5）；作者分析 performance 随 N 增长及 similarity choice 的变化。（Scaling and ablation, pp. 5–6）",
+    "caveatZh": "作者限制：consensus 会偏向 generator 的 dominant mode，若多数样本系统性错误则无法纠正。；作者限制：pairwise geometry 计算随 sample count 增长，且几何相近不保证参数语义或制造约束正确。；审阅风险：test-time scaling 的额外生成/执行成本必须与质量增益一起报告。；审阅风险：shape consensus 不能替代 functional、parametric-editability 或 fabrication verification。",
+    "motivationZh": "方法从 generator 独立采样 N 个 CAD candidates，先过滤不可执行程序并 canonicalize geometry，再构建 pairwise similarity matrix，以和其余候选最一致的 medoid 作为输出。它不需要 ground truth 或额外 verifier，可作为现有 text/image-to-CAD model 的 inference wrapper。",
+    "methodZh": "方法从 generator 独立采样 N 个 CAD candidates，先过滤不可执行程序并 canonicalize geometry，再构建 pairwise similarity matrix，以和其余候选最一致的 medoid 作为输出。它不需要 ground truth 或额外 verifier，可作为现有 text/image-to-CAD model 的 inference wrapper。 把 self-consistency/test-time scaling 从离散答案迁到 executable CAD geometry，并以 verifier-free medoid 规避训练 CAD reward model 的成本，是简单但实用的推理策略。",
+    "experimentsZh": "在 CAD generation benchmarks 上对现有 generator 采样不同 N，比较 random、single、oracle-like/consensus selectors，评 executable validity 与 geometric similarity，并消融 distance/过滤。 作者报告：作者报告 consensus medoid 在主表优于随机选择，并随 sample count 增加稳定改善。（Table 1, p. 5）；作者报告 execution filtering 与 geometry-level consensus 都对结果有贡献。（Ablations, pp. 5–6） Baseline boundary：覆盖随机/单样本与不同 budget，方法适配性强；缺少真正工程 constraint verifier、用户 study 和复杂 assemblies。 Ablation boundary：分析 sample budget、有效性过滤、similarity metric 和 selection rule。",
+    "insightZh": "把 self-consistency/test-time scaling 从离散答案迁到 executable CAD geometry，并以 verifier-free medoid 规避训练 CAD reward model 的成本，是简单但实用的推理策略。 方法简洁、可复用且与 CAD generation 高度相关，应精读；不可把几何多数一致误写为 engineering correctness。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

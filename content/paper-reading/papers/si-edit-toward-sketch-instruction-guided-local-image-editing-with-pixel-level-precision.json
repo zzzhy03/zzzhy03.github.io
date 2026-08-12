@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.09097",
+  "slug": "si-edit-toward-sketch-instruction-guided-local-image-editing-with-pixel-level-precision",
+  "title": "SI-Edit: Toward Sketch-Instruction Guided Local Image Editing with Pixel-Level Precision",
+  "authors": [
+    "Weixin Ye",
+    "Wei Wang",
+    "Hongguang Zhu",
+    "Xuecheng Nie"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09097"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design",
+    "image-generation"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "si-edit",
+    "sketch-instruction",
+    "guided",
+    "local",
+    "image",
+    "2d-design",
+    "image-generation"
+  ],
+  "abstract": "Despite rapid advances in generative models, achieving pixel-level precision in sketch-based image editing remains a persistent challenge, particularly for fine-grained local deformations. This gap stems primarily from the critical shortage of high-quality, publicly available benchmark datasets that jointly provide geometric constraints and semantic instructions. To address this issue, we first introduce **SI-Data**, a high-quality dataset specifically designed for instruction-guided local sketch editing. We develop an automated pipeline leveraging Multimodal Large Language Models (MLLMs) to synthesize comprehensive quadruplets comprising original images, local geometric sketches, semantic instructions, and corresponding edited images. By providing both reliable spatial anchors and explicit semantic intent, SI-Data uniquely enables collaborative spatial-semantic learning. Building upon this, we propose a collaborative framework called **SI-Edit** that integrates semantic instructions with precise geometric constraints. Furthermore, to address the lack of standardized evaluation, we establish a comprehensive set of metrics designed to measure both structural fidelity (e.g., sketch-to-edge alignment) and semantic adherence. Experimental results demonstrate that SI-Edit provides more reliable structural control than baselines for sketch-based image editing, and achieves precise, pixel-level local refinements aligned with user intent. The data and code are released on the [project page](https://github.com/ywxsuperstar/SIEdit).",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09097v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09097v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09097v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "SI-Edit 把 local image editing 中“文本缺精确位置、sketch 缺语义意图”的互补问题合并：SI-Data 提供 source/instruction/target/local-sketch quadruplets，模型用 sketch-overlay token 与 instruction 中的 learnable task trigger 在共享位置编码下做 collaborative spatial-semantic learning。作者报告在 159-sample test 上 LCD/mIoU/ΔCS/BPS 和 620 次 pairwise judgments 均优于三类 sketch baselines，但训练目标依赖闭源 Nano Banana Pro 合成 targets，且没有独立 limitation section。",
+    "methodFlow": [
+      "Source Image",
+      "Instruction + Local Geometry Sketch",
+      "Sketch Overlay and Shared Position Encoding",
+      "Learnable Sketch Task Token",
+      "LoRA Fine-Tuned FLUX Kontext",
+      "Pixel-Localized Edited Image"
+    ],
+    "whyRelevantZh": "它直接命中 explicit 2D design interaction：用户以 sketch 指定精确 shape/location，以语言补足 semantic intent，适合迁移到 line-art、layered raster、SVG 和视觉设计 agent 的局部编辑。",
+    "evidenceZh": "SI-Data 从 instruction-driven target 与 source-target optical flow 构造 local sketch quadruplets。（Sec. 3.2 and Fig. 4, p. 6）；共享位置编码和 learnable task token 用于对齐 sketch geometry 与 instruction semantics。（Sec. 4.2 and Fig. 4, p. 6）；作者报告 SI-Edit 在主表的 LCD 4.292、mIoU 0.362、ΔCS 0.0174、BPS 0.648。（Table 2, p. 7）；作者报告 620 次 pairwise judgments 中相对三 baseline 的 preference 大多超过 80%。（Table 4, p. 8）",
+    "caveatZh": "审阅风险：训练 target 由 Nano Banana Pro 生成，模型可能学习 teacher artifact，数据和模型复现依赖闭源服务。；审阅风险：局部 geometric sketch 从 target optical flow 反推，真实用户在编辑前无法提供同等准确 supervision。；审阅风险：人评样本和 participant reporting 不充分，且没有独立的 leakage/identity preservation analysis。",
+    "motivationZh": "数据流程从 source image 出发，由 Qwen3-VL 写局部几何 instruction，Nano Banana Pro 生成 target，再用 optical flow 提取 local sketch，形成 11K+ 训练 quadruplets。SI-Edit 基于 FLUX.1 Kontext，在 instruction 前插入 learnable <sk> token，并将 source 与 sketch overlay 分别 tokenize、共享 RoPE positions；SPE 把 sketch-local geometry 投影进与 semantic instruction 对齐的 latent space。实验覆盖局部 bend/stretch/enlarge、motion editing、自动与手绘 sketch，并引入 LCD、mIoU、CLIP semantic delta 与 background preservation。",
+    "methodZh": "数据流程从 source image 出发，由 Qwen3-VL 写局部几何 instruction，Nano Banana Pro 生成 target，再用 optical flow 提取 local sketch，形成 11K+ 训练 quadruplets。SI-Edit 基于 FLUX.1 Kontext，在 instruction 前插入 learnable <sk> token，并将 source 与 sketch overlay 分别 tokenize、共享 RoPE positions；SPE 把 sketch-local geometry 投影进与 semantic instruction 对齐的 latent space。实验覆盖局部 bend/stretch/enlarge、motion editing、自动与手绘 sketch，并引入 LCD、mIoU、CLIP semantic delta 与 background preservation。 贡献不是首个 sketch-guided editor，而是将 explicit local geometry 与 natural-language semantics 放在同一 conditioning sequence，并用 quadruplet dataset 和 geometry/semantic/background 分解指标验证；SPE、LoRA 与 optical-flow sketch extraction 本身是组合式创新。",
+    "experimentsZh": "基于 FLUX.1 Kontext 做 LoRA fine-tuning，训练约 11K quadruplets；159-sample test 比较 SketchEdit、MagicQuill、FramePainter，并以 LCD、mIoU、ΔCS、BPS 和 60 cases/620 valid pairwise comparisons 人评；另在 Motion-X kungfu subset 测 pose editing。 作者报告：作者报告 SI-Edit 的 mIoU 0.362，高于 FramePainter 0.129、MagicQuill 0.231、SketchEdit 0.082。（Table 2, p. 7）；作者报告相对 SketchEdit 的人评偏好为 visual consistency 91.9%、edit accuracy 93.3%、image quality 94.8%。（Table 4, p. 8） Baseline boundary：覆盖一类 dedicated sketch editor、interactive brush editor 和 video-diffusion editor，并含 quantitative/human/hand-drawn tests；缺少最接近的 mask+instruction strong editors、真实设计师 sketches 和 cross-domain datasets。 Ablation boundary：task token fixed/learnable 与 BOS/EOS 消融支持 <sk> 的 semantic alignment 作用，但缺少 SPE、overlay choice、数据生成各阶段、dataset size 和 closed teacher dependence 的完整消融。",
+    "insightZh": "贡献不是首个 sketch-guided editor，而是将 explicit local geometry 与 natural-language semantics 放在同一 conditioning sequence，并用 quadruplet dataset 和 geometry/semantic/background 分解指标验证；SPE、LoRA 与 optical-flow sketch extraction 本身是组合式创新。 方法任务高度相关，证据同时含 metrics、human study 与 hand-drawn examples，值得精读；收录时必须写明 synthetic closed-teacher targets 与真实用户 sketch gap。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

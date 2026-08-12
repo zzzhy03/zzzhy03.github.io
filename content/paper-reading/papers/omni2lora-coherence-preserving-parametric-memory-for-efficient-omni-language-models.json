@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2608.09227",
+  "slug": "omni2lora-coherence-preserving-parametric-memory-for-efficient-omni-language-models",
+  "title": "Omni2LoRA: Coherence-Preserving Parametric Memory for Efficient Omni Language Models",
+  "authors": [
+    "Puneet Mathur",
+    "Manan Suri",
+    "Dinesh Manocha"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09227"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "omni2lora",
+    "coherence-preserving",
+    "parametric",
+    "memory",
+    "efficient",
+    "vlm-mllm"
+  ],
+  "abstract": "Omnimodal language models (OLMs) enable unified audio-visual understanding, but processing long joint token sequences makes inference computationally prohibitive. While recent token compression methods attempt to alleviate this burden, compressing modalities in isolation often destroys the temporal cross-modal anchors necessary for coherent reasoning. We introduce Omni2LoRA, a two-stage framework for efficient parametric memory compression via coherence-preserving context distillation that bypasses the token bottleneck entirely. First, a Perceiver hypernetwork processes intermediate representations from a frozen OLM to encode the multimodal context into a full-rank Low-Rank Adaptation (LoRA) adapter in a single forward pass. To prevent the resulting parameter footprint from scaling linearly with recording length, we optimize a discrete rank allocation policy via Group Relative Policy Optimization (GRPO) that uses a modality-ablated counterfactual reward to explicitly penalize the loss of audio-visual coherence, forcing the model to allocate its fixed sub-linear rank budget to synergistic cross-modal anchors rather than isolated visual features. Across three omnimodal backbones, Omni2LoRA operating at a 30% rank budget outperforms direct full-context inference and strong token-compression baselines (OmniZip, OMAC, O-MARC) on four audio-visual question answering benchmarks, improving average accuracy by 8-12% over the strongest baseline and remaining stable under compression ratios as tight as 75%, where token-pruning methods degrade sharply. By converting multimodal memory into a fixed-budget, reusable parameter state, our method drives answer-time multimodal-token load to zero, cutting per-query Time to First Token (TTFT) by up to 12x relative to full-context inference and amortizing to under 0.5s after a handful of queries.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09227v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09227v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09227v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Omni2LoRA 把整段同步音视频从 active tokens 转成 recording-specific LoRA memory：Perceiver hypernetwork 先生成 full-rank adapter bank，O2L-GRPO 再在固定 rank budget 下选择 slots，并以 audio-only/video-only counterfactual reward 惩罚跨模态 coherence 丢失。作者在三种 omni backbone、五个 benchmarks 上报告 30% rank budget 仍优于 full-context 与 token compression baselines，重复查询时 7B TTFT 从 6.03s 降至 0.49s；但方法非 streaming、每段 recording 一套 adapter，单 query setup cost 不划算且 adapter 本身带隐私。",
+    "methodFlow": [
+      "Synchronized Audio-Visual Recording",
+      "Frozen Omni Encoder",
+      "Perceiver Hypernetwork Generates LoRA Bank",
+      "Coherence-Aware O2L-GRPO Slot Selection",
+      "Cached Recording-Specific Adapter",
+      "Zero-Multimodal-Token Repeated QA"
+    ],
+    "whyRelevantZh": "它直接推进长音视频 MLLM 的可复用 context representation，并将 memory 从 token space 转到 parameter space，对长设计会话和多轮视觉询问有迁移价值。",
+    "evidenceZh": "方法分 full-rank hypernetwork internalization 与 GRPO rank allocation 两阶段。（Methodology and Fig. 2, p. 3）；Stage 2 用 joint AV、audio-only、video-only references 约束跨模态 dependence。（Sec. Methodology, pp. 3–5）；作者报告 30% rank budget 在三种 backbone 的平均分高于 direct full-context 和 compression baselines。（Table 1, p. 6）；作者报告 repeated QA 的 7B per-question TTFT 为 0.49s，full-context 为 6.03s。（Fig. 4 and Efficiency, p. 7）",
+    "caveatZh": "作者限制：每个 recording 生成独立 adapter，多 recording 需重新 internalize 或 composition。；作者限制：必须拿到完整 recording，不能 live streaming。；作者限制：single query 时 setup cost 不能摊销。；作者限制：Stage 2 无法恢复 Stage 1 bank 未表达的信息。；作者限制：evidence 限于三 backbone、五 benchmark 和 English content。；审阅风险：adapter 是源媒体的压缩记忆，不能视为删除原视频后的隐私安全表示。；审阅风险：优于 full-context 的 accuracy 可能部分来自 recording-specific parameter adaptation，训练/serving存储成本需整体核算。",
+    "motivationZh": "Stage 1 将每个 recording 的 layer-wise audio/video hidden states经 Perceiver-style hypernetwork 投影成 candidate rank-one LoRA factors，并用 frozen omni model 模仿 teacher caption。Stage 2 冻结 encoder、answer model 和 hypernetwork，scoring policy在严格 rank budget 下选择 adapter slots；joint/audio-only/video-only counterfactual rewards 构造 dependence degradation 与 coherence penalty，GRPO 学习保留 temporal cross-modal anchors。推理先 internalize 一次，后续问题只激活 cached adapter 和 text query。",
+    "methodZh": "Stage 1 将每个 recording 的 layer-wise audio/video hidden states经 Perceiver-style hypernetwork 投影成 candidate rank-one LoRA factors，并用 frozen omni model 模仿 teacher caption。Stage 2 冻结 encoder、answer model 和 hypernetwork，scoring policy在严格 rank budget 下选择 adapter slots；joint/audio-only/video-only counterfactual rewards 构造 dependence degradation 与 coherence penalty，GRPO 学习保留 temporal cross-modal anchors。推理先 internalize 一次，后续问题只激活 cached adapter 和 text query。 从 token compression 转向 parametric memory 并非首次，但把长音视频 temporal chunks 压为可复用 LoRA、再用 counterfactual multimodal reward分配固定 rank budget，是清晰的新组合；优势主要发生在 repeated-query amortization，而非单次理解。",
+    "experimentsZh": "Qwen2.5-Omni-3B/7B 与 InteractiveOmni-4B，五类 audio-video QA benchmarks；比较 direct AV context、full-rank adapter、OmniZip、OMAC、OMARC、uniform/norm allocation，并测试 25–75% compression、8–1024 frames 和 VidCapBench repeated queries。 作者报告：作者报告 Qwen2.5-Omni-7B 在 30% rank budget 的平均分 53.2，高于 direct full-context 47.2。（Table 1, p. 6）；作者报告 7B 单 query accounting 下 Omni2LoRA TTFT 0.49s，而 full-context baseline 6.03s；五次 query 后 amortized latency 约 0.82s。（Fig. 4, p. 7） Baseline boundary：覆盖 token pruning/compression、full-rank parametric adapter 和三 backbone；缺少 video-to-memory/RAG caching strong baselines、real streaming 与 cross-recording retrieval。 Ablation boundary：full-rank capacity、uniform/norm/O2L allocation、compression ratio、frame scaling、coherence reward与 efficiency studies充分；adapter size、privacy leakage 和 composition 未实验。",
+    "insightZh": "从 token compression 转向 parametric memory 并非首次，但把长音视频 temporal chunks 压为可复用 LoRA、再用 counterfactual multimodal reward分配固定 rank budget，是清晰的新组合；优势主要发生在 repeated-query amortization，而非单次理解。 方法和 evidence 足以精读收录；摘要中的“zero context”应准确写成 answer-time 无 multimodal tokens，而非无 setup、无存储或 streaming-ready。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

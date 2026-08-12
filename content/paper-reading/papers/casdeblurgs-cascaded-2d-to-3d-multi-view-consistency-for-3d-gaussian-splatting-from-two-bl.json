@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2608.10345",
+  "slug": "casdeblurgs-cascaded-2d-to-3d-multi-view-consistency-for-3d-gaussian-splatting-from-two-bl",
+  "title": "CasDeblurGS: Cascaded 2D-to-3D Multi-View Consistency for 3D Gaussian Splatting from Two Blurry Images",
+  "authors": [
+    "Haeyun Choi",
+    "Minhyuk Jang",
+    "I-Gil Kim"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10345"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "casdeblurgs",
+    "cascaded",
+    "2d-to-3d",
+    "multi-view",
+    "consistency",
+    "3d-reconstruction"
+  ],
+  "abstract": "Free-viewpoint 3D scene media is increasingly important for immersive applications, yet practical capture often suffers from severe view sparsity and motion blur. Although neural rendering has advanced sparse-view synthesis, existing blur-aware methods typically require substantial multi-view redundancy, accurate camera poses, or costly per-scene optimization. We address a stringent yet practical setting: reconstructing a coherent 3D scene from only two motion-blurred images with known intrinsics, without input-view poses, auxiliary sharp images, or per-scene test-time optimization. To this end, we propose CasDeblurGS, a cascaded framework that progressively recovers reliable cross-view information from local 2D correspondences to global 3D guidance. Stage 1 constructs locally reliable guidance through occlusion-aware correspondence filtering, while Stage 2 aggregates the intermediate restorations into a provisional pose-free 3D Gaussian representation whose input-view re-renders provide dense global guidance for final restoration. The resulting views enable a more coherent 3D representation and higher-quality novel-view synthesis. Experiments on real-world and synthetic Deblur-NeRF scenes show consistent gains over strong baselines, improving PSNR by 1.19 dB and 2.11 dB, respectively. Progressive ablations, cross-view correspondence visualization, and camera reprojection analysis further demonstrate improvements in both rendering quality and multi-view geometric consistency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10345v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10345v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10345v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "CasDeblurGS 把 blurry multi-view Gaussian reconstruction 分成 stabilization、2D blur correction 与 3D-aware refinement 的 feed-forward cascade；作者报告真实与合成 Deblur-NeRF 场景的质量/位姿一致性改善，但假设已知 intrinsics，且极端 motion blur、rolling shutter 和非刚体运动仍未覆盖。",
+    "methodFlow": [
+      "Blurry multi-view observations",
+      "Motion/camera stabilization",
+      "2D deblurring correction",
+      "3D reprojection-aware refinement",
+      "Feed-forward Gaussian reconstruction",
+      "Sharp novel views"
+    ],
+    "whyRelevantZh": "它是退化观测下 feed-forward 3D Gaussian reconstruction 的实用系统，对可控 3D capture pipeline 有参考价值。",
+    "evidenceZh": "级联分别处理 stabilization、2D restoration 与 3D consistency，避免把所有 blur ambiguity 交给单一 Gaussian predictor。（Sec. 3 and Fig. 2, p. 6）；3D stage 通过跨视图 reprojection signal 修正仅靠 2D sharpness 可能产生的几何漂移。（Secs. 3.3-3.4, pp. 8-10）；作者报告完整 cascade 在真实和合成 Deblur-NeRF scenes 上逐级改善 reconstruction metrics，并降低 symmetric camera reprojection error。（Tables 1-3, pp. 11-13）",
+    "caveatZh": "作者限制：框架假设已知 camera intrinsics，并对极端 motion blur、复杂动态场景和错误 calibration 存在局限。；审阅风险：多个 learned stages 串联可能把早期 restoration hallucination 固化为 3D geometry，当前指标不足以排除这一风险。",
+    "motivationZh": "方法不做每场景优化，而是级联处理退化：先稳定跨帧 camera/motion signal，再在 image space 恢复可用观测，最后用 3D reprojection consistency 修正 Gaussian geometry 与 appearance。论文同时用 symmetric reprojection error 诊断真实场景的 camera consistency。",
+    "methodZh": "方法不做每场景优化，而是级联处理退化：先稳定跨帧 camera/motion signal，再在 image space 恢复可用观测，最后用 3D reprojection consistency 修正 Gaussian geometry 与 appearance。论文同时用 symmetric reprojection error 诊断真实场景的 camera consistency。 新意主要在把 blur correction 和 3D reconstruction 组织为 progressively constrained feed-forward cascade，并加入相机 reprojection 诊断；单个 deblurring/stabilization 模块并非独立新范式。",
+    "experimentsZh": "在 real-world 与 synthetic Deblur-NeRF scenes 上比较 deblurring、NeRF/GS reconstruction 及组合 baselines，报告 image-quality metrics、reprojection diagnostics、runtime，并作 progressive component ablation。 作者报告：作者报告完整 cascade 在真实和合成 Deblur-NeRF scenes 上逐级改善 reconstruction metrics，并降低 symmetric camera reprojection error。（Tables 1-3, pp. 11-13） Baseline boundary：覆盖 blur-aware rendering 和常见 restoration/reconstruction 组合；但场景规模较小，camera assumptions 与 input blur distributions 不足以代表手机 rolling shutter 或动态主体。 Ablation boundary：逐步加入 stabilization、2D、3D modules，能显示每层贡献；缺少不同 blur kernel、intrinsics error、non-rigid motion 和跨设备 domain shift 的系统测试。",
+    "insightZh": "新意主要在把 blur correction 和 3D reconstruction 组织为 progressively constrained feed-forward cascade，并加入相机 reprojection 诊断；单个 deblurring/stabilization 模块并非独立新范式。 建议略读 cascade 与 reprojection analysis；不把作者报告的重建改善外推到任意真实模糊视频。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

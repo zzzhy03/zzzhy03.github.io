@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.09682",
+  "slug": "thinking-with-tools-not-with-pixels-tool-calls-as-text-scaffolds-for-visual-reasoning",
+  "title": "Thinking With Tools, Not With Pixels: Tool Calls as Text Scaffolds for Visual Reasoning",
+  "authors": [
+    "Jiahao Shao",
+    "Yuanbo Yang",
+    "Yiyi Liao",
+    "Yujun Shen",
+    "Ceyuan Yang",
+    "Yinghao Xu"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09682"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "llm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "thinking",
+    "tools",
+    "not",
+    "pixels",
+    "tool",
+    "vlm-mllm",
+    "llm"
+  ],
+  "abstract": "Tool-augmented vision-language models increasingly \"think with images\": they call crop, zoom, or code tools and reason over the returned pixels. However, recent work using blind tests, gain decompositions, and attention analyses has shown that returned images contribute little, raising the question: if pixels do not carry the gain, what does? We hypothesize that the load-bearing signal is the structured text emitted before any returned pixel arrives: tool name, coordinates, target description, and intent. This textual scaffold encodes where to look and what to find. We introduce TextCall (call-but-no-return) to test this: it keeps the scaffold but replaces returned images with the text placeholder [Image output skipped]. Three studies support the hypothesis. (i) Non-necessity of returned pixels: across LoRA, full fine-tuning, and RL, TextCall matches or exceeds full thinking-with-images; under RL it preserves tool use at the reported checkpoint, avoiding the failure mode where, under matched settings, seeing the returned image causes the model to stop calling tools and answer directly. (ii) Sufficiency of the scaffold: on matched training queries, scaffold-only input yields equivalent accuracy to returned-image input. (iii) Component specificity: decomposing the scaffold into reasoning text and spatial code shows both components contribute, with the dominant one varying by task. Together these results support the Tool-Call Scaffold Hypothesis: in current thinking-with-images distributions, the active signal is the structured text emitted at tool-call time; the returned image is a redundant carrier. TextCall preserves accuracy while reducing latency by 29-46% and eliminating tool-execution API calls. Our claims hold for current thinking-with-images benchmarks; constructing tasks where pixels are genuinely load-bearing remains an open direction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09682v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09682v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09682v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "TextCall 检验视觉 tool-use 的增益究竟来自返回 pixels 还是调用动作本身：训练时正常执行 crop/zoom/code tools，推理时把工具返回图像替换为空，仅保留结构化 textual call trace。作者报告这种 carrier swap 仍保留大部分增益，表明 tool calls 可作为离散 reasoning scaffold；但研究聚焦 perception-heavy benchmarks、单一训练 recipe，不能推出 pixels 普遍无用。",
+    "methodFlow": [
+      "Visual Question and Image",
+      "Tool-Call Policy",
+      "Structured Text Call and Arguments",
+      "Optional Pixel Return Removal",
+      "Reasoning over Call Scaffold",
+      "Final Answer"
+    ],
+    "whyRelevantZh": "它对 VLM agent/tool reasoning 的机制判断非常直接，能影响 visual tool API、训练轨迹和评测控制的设计。",
+    "evidenceZh": "TextCall 在推理时保留 tool-call text，但移除工具返回 pixels。（Method overview and Fig. 1, p. 2）；实验包含 full tool、no-pixel carrier swap 与 blind/control 条件。（Experimental protocol, pp. 4–5）；作者报告 TextCall 在多项 perception-heavy benchmarks 保留 full-tool 的大部分增益。（Table 1, p. 6）；gain decomposition/attention 分析支持调用动作重组推理过程。（Analysis, pp. 7–10）",
+    "caveatZh": "作者限制：实验主要覆盖一个 base model、单一 corpus/seed 与一次 GRPO epoch。；作者限制：benchmark suite 偏 perception-heavy，returned pixels 在需要新细节的 positive-pixel tasks 上可能仍关键。；审阅风险：“大部分增益来自 calls”不能简化成“视觉工具返回无用”。；审阅风险：工具 trace 可能编码数据集特定的 answer shortcuts，跨 agent/tool APIs 泛化尚未建立。",
+    "motivationZh": "方法将 tool-augmented VLM 轨迹拆成 call decision、textual arguments 与 returned visual carrier。模型经 GRPO 类训练学习何时/如何调用工具，评测时做 full-tool、TextCall/no-pixel 与 blind/control conditions，结合 accuracy、gain decomposition 和 attention analysis，隔离行动结构与新视觉证据的贡献。",
+    "methodZh": "方法将 tool-augmented VLM 轨迹拆成 call decision、textual arguments 与 returned visual carrier。模型经 GRPO 类训练学习何时/如何调用工具，评测时做 full-tool、TextCall/no-pixel 与 blind/control conditions，结合 accuracy、gain decomposition 和 attention analysis，隔离行动结构与新视觉证据的贡献。 贡献是用 carrier-swap 干预而非相关分析区分 tool action scaffold 与 returned pixels，揭示训练出的调用序列本身可承担 planning/attention bottleneck。",
+    "experimentsZh": "对同一 tool-augmented VLM training recipe 比较 returned pixels、empty carrier、blind tests 与 structured-call controls，在多个 visual QA/reasoning benchmarks 上评 accuracy，并做 gain/attention decompositions。 作者报告：作者报告移除 returned pixels 后，TextCall 仍保留 full-tool 条件的大部分准确率提升。（Table 1, p. 6）；作者报告无结构或错误 call controls 明显更弱，说明收益不只是额外 token 长度。（Control experiments, pp. 7–9） Baseline boundary：干预 controls 比较扎实，并覆盖若干 visual benchmarks；主要围绕一个 base model、一个 corpus/seed、一次 GRPO epoch，且任务偏 perception-heavy。 Ablation boundary：carrier swap、blind return、call structure/argument controls 与 attention analysis 共同隔离 pixels、text scaffold 和 policy learning。",
+    "insightZh": "贡献是用 carrier-swap 干预而非相关分析区分 tool action scaffold 与 returned pixels，揭示训练出的调用序列本身可承担 planning/attention bottleneck。 干预设计和结论边界都值得精读；收录时必须避免把特定 benchmark 结果夸大为 pixels 对视觉推理普遍不重要。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

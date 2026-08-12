@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2607.01077",
+  "slug": "message-passing-enables-efficient-reasoning",
+  "title": "Message Passing Enables Efficient Reasoning",
+  "authors": [
+    "Xuecheng Liu",
+    "Daman Arora",
+    "Gokul Swamy",
+    "Andrea Zanette"
+  ],
+  "publishedAt": "2026-07-01",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.01077"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "message",
+    "passing",
+    "enables",
+    "efficient",
+    "reasoning",
+    "llm"
+  ],
+  "abstract": "While inference-time scaling has improved the reasoning abilities of large language models (LLMs), the need to generate long chains-of-thought (CoTs) is a computational bottleneck. Thus, in contrast to sequential scaling methods like CoT, recent parallel scaling techniques instead use fork and join (FJ) primitives to divide work across multiple LLM threads. However, in the fork-join paradigm, threads are typically transient and do not communicate pointwise with one another which limits scalability. To tackle this, we introduce Message Passing Language Models (MPLMs), a framework for LLM reasoning in which threads communicate directly via lightweight send and receive primitives. MPLMs enable efficient scaling through two key mechanisms: (1) reduced communication costs, achieved by avoiding redundant context sharing, and (2) preemption, which allows threads to terminate early based on partial information from their peers. We demonstrate the promise of MPLMs on 3 classes of tasks. First, on Sudoku puzzles, we show that MPLMs require an asymptotically smaller context than both serial CoT and parallel FJ. We then fine-tune a single model to solve 25 x 25 puzzles that remain challenging for standard CoT and FJ approaches, as well as frontier reasoning models without tools. Second, on 3-SAT puzzles, the capability of preemption allows termination of unpromising branches, which results in improved efficiency. Finally, we show that appropriately prompted large pre-trained models follow the MPLM protocol, achieving competitive results on long-context question answering relative to popular fork-join approaches.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.01077v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.01077v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.01077v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "MPLM 把单条串行 CoT 改为可动态 spawn、send/recv、preempt 的 message-passing reasoning graph，并以 scheduler 在固定并发池中重分配推理算力；作者报告其在合成算法任务和 LongBench-v2 同时降低延迟并保持或提升准确率，但证据仍高度依赖专门 SFT、中心调度与多次独立 LLM 请求，尚非通用模型原生并行推理。",
+    "methodFlow": [
+      "Problem prompt",
+      "Master decomposes and spawns workers",
+      "Workers reason in private contexts",
+      "Asynchronous send/receive and preemption",
+      "Scheduler reallocates fixed concurrency",
+      "Aggregated final answer"
+    ],
+    "whyRelevantZh": "它触及 inference-time scaling 的执行模型变化，对可并行 reasoning agents 与低延迟长任务编排有方法级参考。",
+    "evidenceZh": "MPLM 定义了 persistent workers、异步 message passing 与 scheduler-managed concurrency。（Sec. 2 and Fig. 1, pp. 2-4）；算法任务通过专门生成的 Sudoku/SAT traces 对模型进行 SFT，并比较 serial 与 fork-join。（Secs. 3-4 and Figs. 2-3, pp. 5-7）；作者报告 Qwen3-30B-A3B 在 LongBench-v2 中准确率由 29.7 提至 37.8、平均延迟由 105.7 秒降至 61.3 秒。（Table 2, p. 8）",
+    "caveatZh": "作者限制：LongBench-v2 orchestration 尚依赖集中式 coordinator，完整去中心化 message passing 留待未来工作。；审阅风险：每个 worker 是独立 LLM execution；真实 serving 的 batching、排队与通信开销可能改变论文展示的 wall-clock 优势。；审阅风险：算法任务的结构化 SFT 可能把收益限定在易分解、可验证的问题，不能直接外推为一般智能提升。",
+    "motivationZh": "论文把推理轨迹视作一组持久 worker：父 worker 可以分叉任务、子 worker 直接通信并把中间状态留在各自上下文中，scheduler 则依据消息依赖和置信信号调度有限并发槽。与 fork-join 不同，MPLM 允许异步通信和抢占，从而避免每个分支都等待完成；实验覆盖 Sudoku、SAT 以及无需专门训练的 LongBench-v2 orchestration。",
+    "methodZh": "论文把推理轨迹视作一组持久 worker：父 worker 可以分叉任务、子 worker 直接通信并把中间状态留在各自上下文中，scheduler 则依据消息依赖和置信信号调度有限并发槽。与 fork-join 不同，MPLM 允许异步通信和抢占，从而避免每个分支都等待完成；实验覆盖 Sudoku、SAT 以及无需专门训练的 LongBench-v2 orchestration。 核心贡献不是再采样更多 CoT，而是把并行推理明确化为带持久上下文、点对点消息和抢占的运行时语义，并给出 communication-depth 视角的理论说明；是否能跨出特制训练分布仍需后续验证。",
+    "experimentsZh": "在 9×9 至 25×25 Sudoku、不同变量数 SAT 上比较 serial、fork-join 与 MPLM，并用 Qwen3 系列在 LongBench-v2 做 prompted multi-worker orchestration；同时报告 wall-clock、accuracy、token、GPU 与 KV-cache profiling。 作者报告：作者报告 MPLM 在 25×25 Sudoku 达到 72% 准确率，并在 LongBench-v2 的 Qwen3-30B-A3B 配置上把 29.7 提至 37.8，同时将平均延迟从 105.7 秒降至 61.3 秒。（Table 1, p. 6; Table 2, p. 8） Baseline boundary：包含 serial、fork-join、多个 frontier/API models 和同 backbone 对照，并给出系统 profiling；但算法任务样本量和训练 recipe 较特制，跨普通对话、代码与 agent tasks 的覆盖有限。 Ablation boundary：分析通信、并发槽和 token/latency 构成；缺少去掉专门 SFT、改变 scheduler policy、网络延迟与失败 worker 注入下的系统消融。",
+    "insightZh": "核心贡献不是再采样更多 CoT，而是把并行推理明确化为带持久上下文、点对点消息和抢占的运行时语义，并给出 communication-depth 视角的理论说明；是否能跨出特制训练分布仍需后续验证。 达到 LLM landmark-only gate 的边缘但值得精读：运行时抽象和实验跨度有实质新意；收录时需把特制 SFT 与真实通用部署之间的证据边界写清。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "early"
+  }
+}

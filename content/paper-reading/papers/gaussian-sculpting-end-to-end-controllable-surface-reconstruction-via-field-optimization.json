@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2608.10602",
+  "slug": "gaussian-sculpting-end-to-end-controllable-surface-reconstruction-via-field-optimization",
+  "title": "Gaussian Sculpting: End-to-End Controllable Surface Reconstruction via Field Optimization",
+  "authors": [
+    "Ke Jiaxin",
+    "Juncheng Liu",
+    "Yi Wang",
+    "Zhouhui Lian",
+    "Bin Liu",
+    "Shengfa Wang",
+    "Xiangjia He"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10602"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "fabrication"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "gaussian",
+    "sculpting",
+    "end-to-end",
+    "controllable",
+    "surface",
+    "3d-reconstruction",
+    "fabrication"
+  ],
+  "abstract": "3D Gaussian Splatting (3DGS) has recently enabled real-time novel view synthesis with impressive quality. However, it struggles to recover accurate surfaces under limited viewpoints and due to the inherent irregularity of Gaussian primitives. The resulting geometric errors are notoriously difficult to correct manually. To address these issues, we propose Gaussian Sculpting, a fully differentiable end-to-end framework for high-quality surface reconstruction. Our key insight is to anchor Gaussians onto an evolving differentiable surface, allowing them to guide signed distance field (SDF) optimization instead of extracting the surface only during post-processing. To enable stable gradient isolation during joint optimization, we design a bi-level training strategy in which the outer loop optimizes the geometry represented by the SDF, while the inner loop updates the Gaussians with the geometry fixed. We further impose constraints on Gaussian parameters to ensure consistency with the underlying surface, thereby improving both geometric and appearance fidelity during optimization. In addition, we introduce a multi-resolution subdivision scheme based on octree-like partitioning to preserve fine details while reducing memory consumption. Experiments on object-level scenes demonstrate that our method effectively removes redundant surfaces, recovers missing structures caused by limited viewpoints, and achieves strong reconstruction quality even at relatively low resolutions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10602v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10602v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10602v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Gaussian Sculpting 把 Gaussian radiance field 与 neural implicit SDF 做 bi-level、gradient-isolated 联合优化，并给 Gaussians 加 opacity/scale/distribution constraints，直接输出更规则的 mesh；作者报告 DTU/NeRF Synthetic 的 Chamfer 与 mesh quality 改善，但优化慢、显存重，反光与细纹理仍会造成 geometry ambiguity。",
+    "methodFlow": [
+      "Calibrated multi-view images",
+      "Constrained surface Gaussians",
+      "Neural implicit SDF",
+      "Bi-level optimization with gradient isolation",
+      "Differentiable surface extraction",
+      "Controllable mesh"
+    ],
+    "whyRelevantZh": "它直接连接 3D reconstruction、mesh extraction 与可制造表面质量，是 graphics/fabrication 交叉方向的高价值论文。",
+    "evidenceZh": "Gaussian constraints 与 implicit SDF 在 bi-level loop 中协同优化，并通过 gradient isolation 降低互相污染。（Sec. 3 and Fig. 2, p. 3）；opacity、scale 与 distribution constraints 让 Gaussian spatial coverage 更贴合待提取 surface。（Secs. 3.1-3.3, pp. 3-5）；作者报告在 DTU 和 NeRF Synthetic 上降低 Chamfer distance，并生成更少 sliver/irregular triangles；full model 在 ablation 的 CD 为 1.16。（Tables 1-3 and Figs. 4-7, pp. 5-7）",
+    "caveatZh": "作者限制：bi-level optimization 导致较长 reconstruction time 和较大 GPU memory，只适合 object-level scenes。；作者限制：Gaussian rendering 对 reflective materials 与 fine-scale textures 仍脆弱，几何线索可能含糊。；审阅风险：更规则 triangles 不一定等价为 fabrication-ready watertight topology；下游 CAD/printing 仍需独立验证。",
+    "motivationZh": "方法先用 constrained surface Gaussians 表达外观和局部覆盖，再由 neural implicit SDF 提供连续 surface field；bi-level optimization 交替更新两种表示，并隔离部分 gradients，避免错误 supervision 互相污染。可微 surface extraction 使 reconstruction 到 mesh 的链路端到端可控。",
+    "methodZh": "方法先用 constrained surface Gaussians 表达外观和局部覆盖，再由 neural implicit SDF 提供连续 surface field；bi-level optimization 交替更新两种表示，并隔离部分 gradients，避免错误 supervision 互相污染。可微 surface extraction 使 reconstruction 到 mesh 的链路端到端可控。 新意在以约束 Gaussian field 提供 photometric supervision、implicit SDF 保持连续 geometry，并用 gradient isolation 处理两者耦合；相比纯 Gaussian meshing，它更关注直接可用的 surface topology。",
+    "experimentsZh": "在 DTU 与 NeRF Synthetic 上比较 Gaussian/implicit surface reconstruction，报告 Chamfer、rendering metrics、mesh qualitative results 和不同 resolution；消融 Gaussian constraints、neural SDF 与 gradient isolation。 作者报告：作者报告在 DTU 和 NeRF Synthetic 上降低 Chamfer distance，并生成更少 sliver/irregular triangles；full model 在 ablation 的 CD 为 1.16。（Tables 1-3 and Figs. 4-7, pp. 5-7） Baseline boundary：覆盖常见 Gaussian surface extraction 和 neural implicit methods；但 object-level calibrated datasets 与受控 backgrounds 不能代表大场景、稀疏视图或 in-the-wild captures。 Ablation boundary：Table 3 和 Figs. 5-7 分别验证 opacity/scale/distribution constraints、neural SDF 与 gradient isolation；缺少时间/显存随 resolution/scene scale 的系统曲线。",
+    "insightZh": "新意在以约束 Gaussian field 提供 photometric supervision、implicit SDF 保持连续 geometry，并用 gradient isolation 处理两者耦合；相比纯 Gaussian meshing，它更关注直接可用的 surface topology。 建议精读 coupled optimization、constraint ablations 与 limitations；收录时把“controllable surface”限定在论文测试的 object-scale setting。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

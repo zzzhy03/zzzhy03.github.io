@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.09613",
+  "slug": "marrying-optimal-transport-and-odes-for-unified-continuous-time-4d-reconstruction-and-trac",
+  "title": "Marrying Optimal Transport and ODEs for Unified Continuous-Time 4D Reconstruction and Tracking",
+  "authors": [
+    "Liying Yang",
+    "Hao Mo",
+    "Jialun Liu",
+    "Chen Liu",
+    "Xinxing Yu",
+    "Chenhao Guan",
+    "Hui Ma",
+    "Xiao Cao",
+    "Ajian Liu",
+    "Yanyan Liang"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09613"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "marrying",
+    "optimal",
+    "transport",
+    "odes",
+    "unified",
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "abstract": "Existing unified 4D reconstruction and point tracking approaches typically rely on heuristic interpolations or just predict at integer timestamps, lacking kinematic coherence and failing to model dynamics at any arbitrary timestamp. In this paper, we propose Uni4R, a framework that unifies these tasks by learning continuous velocity fields through the synergy of Optimal Transport (OT) and Ordinary Differential Equation (ODE). Importantly, this continuous velocity field acts as a kinematic prior that mutually benefits both 4D reconstruction and point tracking. Specifically, we propose the Flow Matching Guided Decoder (FMGD). A global velocity branch first extracts anchor features that capture the global dynamic state of the sequence. Then, FMGD leverages Flow Matching (FM) theory to formulate a probability path defined by OT on the anchor feature manifold, instantiating it as FM-guided velocity features for velocity prediction. This establishes a robust kinematic inductive bias. Meanwhile, a point reconstruction branch provides geometric features. The local velocity prediction module then joint above features and time embeddings, to decode velocities at arbitrary timestamps. To overcome the absence of high-quality ground-truth velocities in fractional frames, we propose an integral-consistency training strategy. This strategy uses an ODE solver to integrate velocities to recover target pointmaps, enabling the model to be supervised end-to-end directly from integer timestamps. Experimental results demonstrate that Uni4R achieves SOTA performance in both 4D reconstruction and point tracking, and achieves SOTA in our new kinematics-aware benchmark at continuous time.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09613v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09613v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09613v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Uni4R 用 optimal transport 在离散观测间建立 soft correspondences，再把它们蒸馏为 neural ODE velocity field，从而以同一 continuous-time representation 同时完成动态 3D reconstruction、任意时刻插值和 point tracking。作者在多个动态场景数据集报告 geometry 与 tracking 改善，亮点是避免分别训练 scene flow 与 canonical deformation。",
+    "methodFlow": [
+      "Discrete Dynamic 3D Observations",
+      "Feature-Geometric OT Matching",
+      "Soft Transport Correspondence",
+      "Neural ODE Velocity Learning",
+      "Continuous-Time Integration",
+      "4D Reconstruction and Point Tracks"
+    ],
+    "whyRelevantZh": "它连接 dynamic 3D reconstruction、4D representation 与 tracking，统一表征思路对具身动态场景建模直接相关。",
+    "evidenceZh": "Uni4R 先用 OT transport plan 建立跨时间 soft correspondences。（Method overview, Fig. 2, p. 4）；neural ODE 将离散 supervision 转为可在任意时间积分的 velocity field。（Continuous-time formulation, Sec. 3, pp. 3–5）；作者报告主 reconstruction benchmarks 上优于所列 continuous/dynamic baselines。（Table 1, p. 6）；作者报告 point tracking 指标也因 OT 与 unified flow 改善。（Table 2, p. 6）",
+    "caveatZh": "审阅风险：OT correspondence 在严重遮挡、拓扑改变或外观重复区域可能匹配错误并传播到 ODE。；审阅风险：连续且可逆的 flow 假设不天然表示物体出现/消失、断裂或接触拓扑事件。",
+    "motivationZh": "输入为时间采样的 point/geometry observations。OT 模块以几何与特征成本求相邻/跨时刻 transport plans，为 ODE 学习提供 correspondence supervision；连续 velocity field 经积分映射任意时间点，配合 reconstruction losses 保持表面。推理时既可查询中间 geometry，也可沿流积分轨迹。",
+    "methodZh": "输入为时间采样的 point/geometry observations。OT 模块以几何与特征成本求相邻/跨时刻 transport plans，为 ODE 学习提供 correspondence supervision；连续 velocity field 经积分映射任意时间点，配合 reconstruction losses 保持表面。推理时既可查询中间 geometry，也可沿流积分轨迹。 主要新意是以 OT bridging 离散匹配与连续 ODE dynamics，用单一 flow field 服务 reconstruction 和 tracking，减少两任务表征不一致。",
+    "experimentsZh": "在动态 3D/4D datasets 上与 reconstruction、scene-flow/tracking baselines 比较 geometry 和 tracking metrics；分析 OT correspondence、ODE flow、loss terms 与 temporal sampling。 作者报告：作者报告 Uni4R 在主 reconstruction table 的多数 geometry metrics 最优或具竞争力。（Table 1, p. 6）；作者报告 unified continuous flow 在 tracking table 上较无 OT/离散 variants 更好。（Table 2, p. 6） Baseline boundary：涵盖动态 reconstruction 与 tracking 方法并有 component studies；大运动、拓扑变化、遮挡与 real-time scalability 的覆盖有限。 Ablation boundary：消融 OT matching、ODE dynamics、features/losses 和 temporal choices，能识别两核心组件贡献。",
+    "insightZh": "主要新意是以 OT bridging 离散匹配与连续 ODE dynamics，用单一 flow field 服务 reconstruction 和 tracking，减少两任务表征不一致。 方法耦合有清楚动机且同时验证 geometry/tracking，应精读；连续流对拓扑变化的边界需重点保留。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

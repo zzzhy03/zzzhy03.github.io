@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.10489",
+  "slug": "when-vision-becomes-text-visual-token-pruning-via-cross-modal-residual-guidance-in-vlms",
+  "title": "When Vision Becomes Text: Visual Token Pruning via Cross-Modal Residual Guidance in VLMs",
+  "authors": [
+    "Congyang Ou",
+    "Ruike Song",
+    "Yang Zhou",
+    "Libo Sun",
+    "Haokui Zhang",
+    "Zhenbo Luo"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10489"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "when",
+    "vision",
+    "becomes",
+    "text",
+    "visual",
+    "vlm-mllm"
+  ],
+  "abstract": "Abundant visual information strengthens vision-language model (VLM) perception, yet massive visual tokens raise inference costs. Existing visual token pruning methods rely on similarity-based guidance, which exploits pairwise text-vision and vision-vision token correlations for compression. However, such methods only capture local layer-level signals and overlook the whole inference process in VLM. In this paper, we revisit VLM inference and present a new efficient guidance scheme that complements similarity-based guidance. In particular, we identify a key observation: as LLM layers deepen, text tokens continuously aggregate visual information via self-attention and progressively absorb partial visual content into textual representations. To quantify this phenomenon, we propose Cross Modal Absorption (CMA) from a geometric representation perspective to measure how much visual information is absorbed by text, revealing that more visual tokens in deeper layers can be approximately explained by the text subspace. We accordingly propose Cross Modal Residual (CMR). It projects visual tokens onto the text subspace via Tikhonov regularized least squares and exploits reconstruction residuals to quantify visual information that cannot be explained by text. Finally, based on CMR, we present SIEVE, a training-free visual token compression method that combines CMR, text-attention relevance, and residual-space diversity to retain task-relevant and complementary tokens. Experiments on diverse VLM architectures verify the effectiveness of SIEVE. For instance, on LLaVA-NeXT-7B, SIEVE keeps only $11.1\\%$ of visual tokens while preserving $97.5\\%$ of the original average performance, achieving $3.62\\times$ prefill speedup, $2.49\\times$ end-to-end speedup, and a $6.02\\times$ KV-cache reduction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10489v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10489v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10489v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "SIEVE 将 attention saliency 与 CMR/projection-based complementary relevance 合并，逐层筛掉视觉 tokens；作者在 LLaVA-NeXT 与 Qwen2.5-VL 上报告高压缩率下优于 FastV 等方法，但收益依赖 head/layer/energy-ratio choices，且 benchmark accuracy 不能完全刻画细粒度视觉信息损失。",
+    "methodFlow": [
+      "Visual token sequence",
+      "Layer/head attention saliency",
+      "CMR projection score",
+      "Score normalization and fusion",
+      "Layer-wise token selection",
+      "Compressed MLLM inference"
+    ],
+    "whyRelevantZh": "对部署 MLLM 和 visual design agent 的 context/latency 管理有直接参考，尤其适合多图与长上下文压缩。",
+    "evidenceZh": "SIEVE 用 attention 与 CMR 两类互补分数选择 visual tokens，并按能量比例控制保留量。（Sec. 3 and Fig. 2, p. 3）；跨层统计显示 attention 与 CMR 偏好不同 tokens，支持联合选择而非只依赖单一 saliency。（Sec. 4.4 and Table 10, p. 14）；作者报告在 LLaVA-NeXT-7B 与 Qwen2.5-VL-7B 多 benchmark 平均分上，高压缩配置优于 FastV 等 training-free pruning baselines。（Tables 2-4, pp. 5-7）",
+    "caveatZh": "作者限制：固定 selection hyperparameters 可能无法适配所有层、模型和细粒度视觉任务。；审阅风险：平均 benchmark 分数可能掩盖稀有 token、文字和小目标被剪除的灾难性样例，需任务级 worst-case audit。",
+    "motivationZh": "方法认为单看 attention 会漏掉对 hidden representation 有互补贡献的 visual tokens，因此计算 attention score 与经 Tikhonov-regularized projection 得到的 CMR score，再按 layer-wise budget 合并排序。它是 training-free token reduction，可插入已有 MLLM inference。",
+    "methodZh": "方法认为单看 attention 会漏掉对 hidden representation 有互补贡献的 visual tokens，因此计算 attention score 与经 Tikhonov-regularized projection 得到的 CMR score，再按 layer-wise budget 合并排序。它是 training-free token reduction，可插入已有 MLLM inference。 新意在把直接 attention relevance 与 residual/complementary representational value 联合用于 visual-token pruning，强调两者 selection overlap 较低；不是新的视觉 encoder。",
+    "experimentsZh": "在两种 MLLM backbones 和多项 VQA/vision-language benchmarks 上评估不同 token budgets，与 FastV 等 reduction baselines 比较，并分析 attention heads、fusion 与 energy ratio。 作者报告：作者报告在 LLaVA-NeXT-7B 与 Qwen2.5-VL-7B 多 benchmark 平均分上，高压缩配置优于 FastV 等 training-free pruning baselines。（Tables 2-4, pp. 5-7） Baseline boundary：覆盖主流 training-free visual-token pruning；但缺少端到端 wall-clock/energy 在不同 hardware 和长图/多图任务上的完整测量。 Ablation boundary：分离 attention、CMR 与融合并做 head/eta sensitivity；对 OCR、small-object、spatial grounding 的失真分解和自适应 budget calibration 仍不足。",
+    "insightZh": "新意在把直接 attention relevance 与 residual/complementary representational value 联合用于 visual-token pruning，强调两者 selection overlap 较低；不是新的视觉 encoder。 建议略读 scoring derivation 和 sensitivity tables；收录为实用 efficiency 方法，不外推为通用无损压缩。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

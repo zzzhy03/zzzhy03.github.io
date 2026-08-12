@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2607.24721",
+  "slug": "dreamstyle3d-efficient-3d-stylized-asset-generation-via-dual-attention-disentanglement",
+  "title": "DreamStyle3D: Efficient 3D Stylized Asset Generation via Dual-Attention Disentanglement",
+  "authors": [
+    "Kai Wang",
+    "Ziheng Ouyang",
+    "Xuying Zhang",
+    "Ming-Ming Cheng",
+    "Qibin Hou"
+  ],
+  "publishedAt": "2026-07-27",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v3",
+  "identifiers": {
+    "arxiv": "2607.24721"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "dreamstyle3d",
+    "efficient",
+    "stylized",
+    "asset",
+    "generation",
+    "3d-generation",
+    "image-generation"
+  ],
+  "abstract": "With the growth of gaming, animation, and virtual reality industries, the demand for efficient generation of stylized 3D assets is rapidly increasing. However, existing approaches still struggle to jointly preserve style fidelity, geometric consistency, and generation efficiency, as most of them still rely on indirect 2D-to-3D stylization pipelines. This motivates a native 3D stylization framework that can explicitly disentangle style from geometry while remaining efficient. To this end, we propose DreamStyle3D, an efficient framework for stylized 3D asset generation built on a Decoupled Dual Cross-Attention mechanism. Our method explicitly separates geometric and stylistic features to enable efficient style injection while preserving structural consistency, and further adopts a lightweight training strategy to enhance style consistency and model generalization. In addition, we build an automated data pipeline and construct a dataset of about 15K content-style-stylized triplets for training and evaluation. Extensive experiments demonstrate that our DreamStyle3D can generate high-fidelity, geometrically consistent stylized 3D assets within 10 seconds, substantially improving efficiency while maintaining superior style quality and offering a new solution for 3D content creation. The project is available at https://github.com/NK-JittorCV/nk-3D/tree/main/models/DreamStyle3D.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.24721v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.24721v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/NK-JittorCV/nk-3D/tree/main/models/DreamStyle3D"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.24721v3 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/NK-JittorCV/nk-3D/tree/main/models/DreamStyle3D）。",
+    "ideaZh": "DreamStyle3D 直接在 native structured 3D latent 中把 DINO geometry 与 CLIP style 分成两条 cross-attention，并用 color remapping/structure-aware perturbation 打破样式和结构耦合；作者报告约 10 秒生成并在 reference/style metrics 上领先优化式方法，但训练样式由 2D pipeline 构造、评价含 VLM judge，复杂材质与拓扑保持仍缺更广验证。",
+    "methodFlow": [
+      "Content image + style image",
+      "Sparse structured latent",
+      "DINO geometry features",
+      "CLIP style features",
+      "Decoupled dual cross-attention + disentanglement augmentation",
+      "Stylized 3D asset"
+    ],
+    "whyRelevantZh": "直接命中 reference-conditioned 3D asset generation、latent disentanglement 与快速内容创作。",
+    "evidenceZh": "方法将 geometry 与 style 送入相互独立的 cross-attention branches。（Sec. 3.3 and Fig. 3, p. 4）；color remapping 与 structure-aware perturbation 用于破坏 style image 的结构捷径并保留样式统计。（Sec. 3.4, pp. 4-5）；作者报告 Ours 的 CLIP 80.096、DINO 63.319、AdaIN 91.682、VLM 73.096，生成约 10 秒。（Tables 1-2, p. 7）",
+    "caveatZh": "作者限制：论文未给出独立 limitations section；结论主要建立在其构造的约 15K stylized training pairs 与所选 reference styles 上。；审阅风险：DINO/CLIP/VLM metrics 与训练表征相近，可能高估人类感知的 geometry preservation 和 style fidelity。；审阅风险：direct generation 的快速优势不能保证 manifold topology、UV consistency 或下游可编辑性。",
+    "motivationZh": "输入 content image 与 style reference 后，系统先生成 sparse 3D structure latents。Decoupled Dual Cross-Attention 分别注入 DINO 几何特征和 CLIP style 特征；Style Disentanglement Augmentation 对 style image 做 color remapping 与 structure-aware perturbation，抑制内容形状被错误复制。decoder 一次前向生成 stylized 3D asset。",
+    "methodZh": "输入 content image 与 style reference 后，系统先生成 sparse 3D structure latents。Decoupled Dual Cross-Attention 分别注入 DINO 几何特征和 CLIP style 特征；Style Disentanglement Augmentation 对 style image 做 color remapping 与 structure-aware perturbation，抑制内容形状被错误复制。decoder 一次前向生成 stylized 3D asset。 相较 SDS/mesh optimization，论文把 reference-guided 3D stylization 学成直接 latent generation，并用结构/样式分路 attention 解决 entanglement；构造训练对的方法也服务于这一目标。",
+    "experimentsZh": "比较 StyleTex 等 reference-based 3D stylization methods，以 CLIP、DINO、Gram/AdaIN、VLM score、user study 与 runtime 评价；对 dual attention 和两种 augmentation 分别消融。 作者报告：作者报告 DreamStyle3D 的 CLIP/DINO/AdaIN/VLM 分别为 80.096/63.319/91.682/73.096，推理约 10 秒，而 optimization baselines 通常需分钟级。（Tables 1-2, p. 7） Baseline boundary：覆盖多种 optimization/reference stylization baselines，并报告效率；但不同方法使用的 base geometry、render views 和 style inputs 可能不完全一致。 Ablation boundary：拆分 dual cross-attention、color remapping 与 structure-aware perturbation；缺少极端 non-photorealistic styles、多 component assets 与纹理接缝的专项测试。",
+    "insightZh": "相较 SDS/mesh optimization，论文把 reference-guided 3D stylization 学成直接 latent generation，并用结构/样式分路 attention 解决 entanglement；构造训练对的方法也服务于这一目标。 方法速度、结构创新和消融足以精读收录；摘要应把 metric/judge dependence 与非拓扑保证作为证据边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

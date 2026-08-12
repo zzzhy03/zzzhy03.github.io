@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2604.05695",
+  "slug": "let-geometry-guide-layer-wise-unrolling-of-geometric-priors-in-multimodal-llms",
+  "title": "Let Geometry GUIDE: Layer-wise Unrolling of Geometric Priors in Multimodal LLMs",
+  "authors": [
+    "Chongyu Wang",
+    "Ting Huang",
+    "Chunyu Sun",
+    "Xinyu Ning",
+    "Di Wang",
+    "Hao Tang"
+  ],
+  "publishedAt": "2026-04-07",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2604.05695"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "let",
+    "geometry",
+    "guide",
+    "layer-wise",
+    "unrolling",
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "abstract": "Multimodal Large Language Models (MLLMs) have achieved remarkable progress in 2D visual tasks but still struggle to understand physical space in real-world visual streams. Recently, feed-forward geometric foundation models that implicitly extract geometric priors from visual inputs have offered a promising direction. However, many existing geometry-aware MLLMs extract features from a single deep encoder layer and perform one-shot fusion at the language-model input, potentially overlooking complementary information across geometric encoder layers, limiting access to fine-grained geometric cues, and hindering progressive cross-modal adaptation. To address these limitations, we propose GUIDE (Geometric Unrolling Inside MLLM Early-layers), a progressive framework for integrating geometric priors. GUIDE samples and aligns multi-level features from the geometric encoder and sequentially injects them into the early layers of the MLLM. This design enables the MLLM to continuously access multi-granularity geometric cues and progressively integrate them with visual representations during layer-wise semantic abstraction. GUIDE further introduces a dual context-aware gating mechanism at both the token and layer levels, selectively regulating geometric information to reduce redundant injection and interference with pretrained representations. Extensive experiments on spatial reasoning and 3D scene understanding benchmarks, including VSI-Bench, ScanRefer, and Scan2Cap, validate the effectiveness and cross-task applicability of GUIDE. Our 5B and 9B models achieve average scores of 71.5 and 72.1 on VSI-Bench, respectively.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.05695v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.05695v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2604.05695v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "GUIDE 不再只把几何 encoder 的最后层特征一次性塞入 MLLM，而是采样多层 VGGT features，在 LLM 早期层逐层注入，并用 token/layer dual gates 控制冗余与干扰。作者报告 GUIDE-5B/9B 在 VSI-Bench 平均 71.5/72.1，完整 gating 比无 gate 的 6 层注入高 5.3 点；设计直接、消融清楚，但依赖强几何 foundation encoder。",
+    "methodFlow": [
+      "RGB 经视觉 encoder 与几何 foundation encoder",
+      "采样并投影多尺度几何 features",
+      "在 LLM early layers 逐层注入",
+      "token-level 与 layer-level gates 调节信息量",
+      "LLM 输出空间问答或 3D grounding/caption"
+    ],
+    "whyRelevantZh": "直接连接 3D geometry prior 与 MLLM spatial reasoning，对 embodied/LEGO 场景中的几何 grounding 有迁移价值。",
+    "evidenceZh": "GUIDE 将多层 geometric features 逐层注入 LLM early layers。（Sec. 3 and Fig. 2, p. 3）；作者报告 GUIDE-5B/9B 在 VSI-Bench 平均 71.5/72.1。（Table 1, p. 5）；作者报告完整双 gate 比无 gate 的 6 层注入高 5.3 点。（Ablation, p. 8）",
+    "caveatZh": "作者限制：模型依赖预训练几何 encoder 提供可靠 prior。；审阅风险：benchmark 分数不等于实体机器人中的 metric accuracy 与闭环可靠性。；审阅风险：额外 VGGT 路径的完整 latency/memory 成本未与收益等量呈现。",
+    "motivationZh": "RGB 帧分别经过原视觉 encoder 与冻结几何 encoder；后者多层特征经 projector 对齐后在前六个 LLM layers 顺序注入，token gate 按上下文筛局部几何，layer gate 控制全局强度。实验覆盖 spatial reasoning、ScanRefer 和 Scan2Cap。",
+    "methodZh": "RGB 帧分别经过原视觉 encoder 与冻结几何 encoder；后者多层特征经 projector 对齐后在前六个 LLM layers 顺序注入，token gate 按上下文筛局部几何，layer gate 控制全局强度。实验覆盖 spatial reasoning、ScanRefer 和 Scan2Cap。 相对 input-level one-shot fusion，核心是把几何先验 unroll 到语义抽象过程，并明确控制每 token/每层的注入；属于有效融合架构而非新几何模型。",
+    "experimentsZh": "使用 5B/9B MLLM、冻结视觉与 VGGT encoder，在 VSI-Bench、MMSI-Bench、ViewSpatial、CV-Bench、ScanRefer、Scan2Cap 上比较 input fusion 和 geometry-aware baselines。 作者报告：作者报告 VSI-Bench 平均分 GUIDE-5B 71.5、GUIDE-9B 72.1。（Table 1, p. 5）；作者报告 6-layer 注入从无 gate 50.3 提升到双 gate 55.6。（Ablation, p. 8） Baseline boundary：覆盖通用与几何增强 MLLM、2D/3D tasks；缺少不同几何 encoder 与真实 embodied rollout。 Ablation boundary：注入深度、直接/门控、token/layer gate 和 input fusion 均有对照；还需计算成本和不同 frame count 的详细曲线。",
+    "insightZh": "相对 input-level one-shot fusion，核心是把几何先验 unroll 到语义抽象过程，并明确控制每 token/每层的注入；属于有效融合架构而非新几何模型。 结构和消融均清晰，值得精读；需把性能归因限定为 geometry-encoder-assisted MLLM。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2607.13468",
+  "slug": "hive-3d-hierarchical-voxel-enhancement-for-high-quality-3d-scene-generation",
+  "title": "HIVE-3D: Hierarchical Voxel Enhancement for High-Quality 3D Scene Generation",
+  "authors": [
+    "Bin Zang",
+    "Wenting Zheng",
+    "Xiaoliang Luo",
+    "Zhiyuan Fang",
+    "Shi Li",
+    "Lvchun Wang",
+    "Wei Yu",
+    "Yi Zhao",
+    "Tian Xie",
+    "Yuchi Huo",
+    "Rengan Xie"
+  ],
+  "publishedAt": "2026-07-15",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.13468"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "hive-3d",
+    "hierarchical",
+    "voxel",
+    "enhancement",
+    "high-quality",
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "abstract": "Recently, a line of works can generate impressive 3D objects from a single image, but they are limited by restricted representation resolution, making them unsuitable for 3D scene generation. In this work, we introduce HIVE-3D, a novel method for high-quality 3D scene generation based on hierarchical voxel enhancement framework. Specifically, given a single scene image as input, we first produce a coarse initial scene, then introduce image segmentation and attention-based retrieval to align 2D image components with 3D scene components. Subsequently, we organize these scene relations into a hierarchical component tree, where nodes closer to the leaves denote finer-grained components. Finally, we propose a voxel super-resolution model that generates refined voxels for the target instance while maintaining strong consistency with the coarse voxels. Equipped with this model, we perform coarse-to-fine hierarchical super-resolution on images and voxels for each component, producing a high-resolution and high-quality 3D scene. Extensive experiments demonstrate that our method significantly outperforms previous approaches, achieving state-of-the-art performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.13468v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.13468v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.13468v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "HIVE-3D 从单图初始 TRELLIS scene 出发，以 Florence-2/SAM2 建 hierarchical 2D regions 和 2D–3D correspondence，再对每个 component 做 voxel super-resolution、scale/pose registration 和 coarse-to-fine assembly；作者报告几何质量与速度优势，但上限受初始 TRELLIS、2D detection/segmentation error 和大场景 voxel budget 约束。",
+    "methodFlow": [
+      "Single scene image",
+      "Initial TRELLIS scene",
+      "Hierarchical 2D region tree",
+      "2D–3D component matching",
+      "Component voxel super-resolution",
+      "Scale/pose registration and scene assembly"
+    ],
+    "whyRelevantZh": "直接命中 compositional 3D scene generation、hierarchical representations 与高质量资产细化。",
+    "evidenceZh": "HIVE-3D 用 hierarchical 2D regions 和 attention-based 2D–3D matching 构建 scene tree。（Sec. 4.1 and Fig. 2, p. 4）；每个 component 经 voxel super-resolution 后再估计 scale 与 pose，并按 tree 回装到场景。（Secs. 4.2-4.3, pp. 5-6）；作者报告方法在定量表中达到 CD 0.0035、F-score 84.34、IoU 0.7449，平均运行时间 36.5 秒。（Tables 1-2, p. 7）",
+    "caveatZh": "作者限制：性能受 TRELLIS 初始输出限制，voxel generation 对大场景受限。；作者限制：2D hierarchy 依赖 detection 与 segmentation models，错误会传递到最终 3D。；审阅风险：多阶段系统的局部几何指标提升不必然意味着整体 scene topology、碰撞或可编辑关系正确。",
+    "motivationZh": "论文先生成粗粒度多物体 3D scene，再把输入图分解为层级区域，通过 image-to-voxel attention matching 找出 component voxels。一个冻结 SS-VAE encoder 与可训练 super-resolution model 把粗 voxel 细化，最后估计 component scale/pose 并按 tree 逐层组装。它把单体细节增强转化为可组合的 scene refinement。",
+    "methodZh": "论文先生成粗粒度多物体 3D scene，再把输入图分解为层级区域，通过 image-to-voxel attention matching 找出 component voxels。一个冻结 SS-VAE encoder 与可训练 super-resolution model 把粗 voxel 细化，最后估计 component scale/pose 并按 tree 逐层组装。它把单体细节增强转化为可组合的 scene refinement。 主要新意是 hierarchical scene tree 与 component-level voxel SR 的结合，使高分辨率单体生成器可用于多物体 scene；它仍是建立在多个强预训练 detector、segmenter 和 TRELLIS 上的复合 pipeline。",
+    "experimentsZh": "在单图生成的多物体 scenes 上比较 M.I.D.I、Gen3DSR 等方法，以 CD、F-score、IoU、image metrics 和 runtime 评价；另做 super-resolution、matching、registration 及 user study。 作者报告：作者报告 HIVE-3D 的 CD 为 0.0035、F-score 为 84.34、IoU 为 0.7449，并以 36.5 秒平均时间完成场景。（Tables 1-2, p. 7） Baseline boundary：覆盖相邻 scene generation/SR baselines 和配准对照；但 evaluation scenes 的规模与类别有限，且所有方法受初始 scene generator 质量影响。 Ablation boundary：分析 hierarchical refinement、component SR 与 RANSAC registration；缺少 detector/segmenter 扰动、严重遮挡和超出训练尺度场景的系统 robustness curve。",
+    "insightZh": "主要新意是 hierarchical scene tree 与 component-level voxel SR 的结合，使高分辨率单体生成器可用于多物体 scene；它仍是建立在多个强预训练 detector、segmenter 和 TRELLIS 上的复合 pipeline。 方法把单物体 3D prior 扩展到 scene 的接口清楚、结果和 failure case 充分，值得精读；应把它定位为上游依赖很重的 refinement pipeline。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

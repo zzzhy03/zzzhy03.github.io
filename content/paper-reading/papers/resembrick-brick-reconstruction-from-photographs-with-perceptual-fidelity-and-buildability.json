@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.09597",
+  "slug": "resembrick-brick-reconstruction-from-photographs-with-perceptual-fidelity-and-buildability",
+  "title": "ResemBrick: Brick Reconstruction from Photographs with Perceptual Fidelity and Buildability",
+  "authors": [
+    "Xilun Chen",
+    "Hanwen Wan",
+    "Yusong Zhao",
+    "Zexin Lin",
+    "Ruixiang Liao",
+    "Xiaoqiang Ji"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09597"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "lego",
+    "3d-reconstruction",
+    "fabrication"
+  ],
+  "primaryTopicId": "lego",
+  "keywords": [
+    "resembrick",
+    "brick",
+    "reconstruction",
+    "photographs",
+    "perceptual",
+    "lego",
+    "3d-reconstruction"
+  ],
+  "abstract": "Producing a hand-buildable, colored brick model of a 3D object from a few casual photographs is a clean testbed for a broader challenge: generating 3D content that meets hard physical-assembly constraints under a discrete, budget-limited voxel grid. On a coarse lattice, visual resemblance and structural stability pull against each other, yet prior brick pipelines address only one side and treat voxelization as fixed preprocessing rather than a variable to optimize. We present ResemBrick, which couples the two. Budgeted occupancy completion reframes discretization as allocation: given a target occupied-voxel count, a single resolution-conditioned network decides in one feed-forward pass which surface voxels to fill for best appearance, one weight set spanning 13 resolutions. Buildability by construction then combines support- and look-ahead-aware greedy placement with a deterministic, provably terminating repair that grounds every floating component. Under a matched budget, ResemBrick surpasses existing voxel selectors in perceptual fidelity while uniquely reaching zero floating and zero unstable bricks on unfiltered held-out objects; as a complete pipeline, it attains the best perceptual fidelity among prior brick-construction systems. Our results point to treating discretization and assembly as tightly coupled stages rather than independent ones.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09597v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09597v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09597v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "ResemBrick 从单张照片恢复既像原物又能真实搭建的 brick model：先在预算约束下预测 occupancy/color，再以支持关系、连接性和 repair-aware greedy search 把体素转成可装配 bricks。作者在 198 个 held-out objects 与四个手工实建模型上报告较好的 perceptual fidelity，并称实建均保持稳定；关键价值是把视觉匹配与 buildability 同时纳入。",
+    "methodFlow": [
+      "Single Object Photograph",
+      "Budgeted Colored Occupancy Completion",
+      "Voxel-to-Brick Candidate Generation",
+      "Support-Aware Greedy Assembly",
+      "Connectivity Repair",
+      "Physically Buildable Brick Model"
+    ],
+    "whyRelevantZh": "它直接命中 LEGO-style 3D reconstruction 与 fabrication，把生成结果能否真实搭建作为一等约束。",
+    "evidenceZh": "方法将视觉 occupancy completion 与 buildability-aware brick assembly 分成两个耦合阶段。（Pipeline overview, Fig. 2, p. 3）；assembly search 显式检查 support、connectivity 并修复 invalid placements。（Assembly algorithm, Sec. 3.3, pp. 4–5）；作者在 198 个 held-out objects 上比较 fidelity/buildability。（Experimental setup, p. 5）；作者制作四个 physical brick models 并报告全部可稳定放置。（Physical validation, Sec. 4.4）",
+    "caveatZh": "作者限制：方法使用有限 brick types、颜色集合与离散 resolution。；作者限制：复杂细长结构、遮挡和 unseen geometry 仍可能被过度简化。；作者限制：物理验证样本规模小，未来需扩展更大对象与机器人搭建。；审阅风险：proxy structural validity 不等于运输、碰撞或长期受力下的真实稳定性。；审阅风险：单视图 completion 的幻觉几何可能看似合理但偏离原物背面结构。",
+    "motivationZh": "pipeline 从 image-conditioned 3D completion 生成离散 colored occupancy，在指定 brick budget 下平衡 silhouette/appearance；assembly stage 逐层选择 brick placements，检查 overlap、support 与 connectivity，并对不可建区域修复。评测同时使用 render/perceptual metrics、brick count、stability proxies 与 physical builds。",
+    "methodZh": "pipeline 从 image-conditioned 3D completion 生成离散 colored occupancy，在指定 brick budget 下平衡 silhouette/appearance；assembly stage 逐层选择 brick placements，检查 overlap、support 与 connectivity，并对不可建区域修复。评测同时使用 render/perceptual metrics、brick count、stability proxies 与 physical builds。 相较只做 voxel/mesh reconstruction，工作把有限 brick inventory、结构支持和实际搭建顺序引入优化，形成感知相似度与物理可建性的联合目标。",
+    "experimentsZh": "198 个 held-out objects 上评 perceptual/image similarity、geometry、brick budget 和 structural validity；比较 reconstruction/brick baselines、各 stage ablations，并物理搭建四个模型。 作者报告：作者报告 ResemBrick 在固定 brick budgets 下取得更好的感知相似度与 structural-validity trade-off。（Main quantitative results, p. 5）；作者报告四个手工搭建样例均完成并保持稳定。（Physical builds, Sec. 4.4） Baseline boundary：涵盖 visual reconstruction 与 brick assembly baselines，并有实物展示；physical sample 仅四个，远不足以估计普遍 build failure rate。 Ablation boundary：分析 occupancy completion、budgeting、support/repair 与 assembly components 对 fidelity 和 validity 的影响。",
+    "insightZh": "相较只做 voxel/mesh reconstruction，工作把有限 brick inventory、结构支持和实际搭建顺序引入优化，形成感知相似度与物理可建性的联合目标。 方向高度相关且含 physical validation，应精读；四个实物样本与受限 brick vocabulary 是主要证据边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

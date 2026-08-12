@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.11150",
+  "slug": "causalsplat-towards-comprehensive-hierarchical-reasoning-in-3d-gaussian-splatting",
+  "title": "CausalSplat: Towards Comprehensive Hierarchical Reasoning in 3D Gaussian Splatting",
+  "authors": [
+    "Jiayu Ding",
+    "Meilu Song",
+    "Yun Chen",
+    "Wei Gao",
+    "Ge Li"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.11150"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "causalsplat",
+    "comprehensive",
+    "hierarchical",
+    "reasoning",
+    "gaussian",
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "abstract": "While 3D Gaussian Splatting (3DGS) has advanced open vocabulary scene understanding, existing methods remain confined to explicit queries. They struggle to interpret implicit intents, complex spatial constraints, and commonsense reasoning required for practical embodied interactions. To address this gap, we introduce the task of reasoning 3D Gaussian segmentation and construct two benchmarks, Causal-LERF and Causal-ScanNet. These benchmarks systematically evaluate commonsense, spatial, affordance, and counterfactual reasoning. Evaluations reveal that current state of the art methods perform poorly on these reasoning challenges. Therefore, we propose CausalSplat, a framework that integrates vision-language models with 3D scene graphs to disentangle explicit structural perception from implicit logical inference. Extensive experiments demonstrate that CausalSplat achieves state of the art performance on our reasoning benchmarks while showing strong generalizability on standard referring and open vocabulary 3D segmentation tasks. Project Page: https://jiayuding031020.github.io/CausalSplat",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.11150v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.11150v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.11150v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "CausalSplat 把 referring 3D Gaussian segmentation 分成实体/关系的 structural causal reasoning，再将语言条件落到 Gaussian masks；作者报告复杂 reasoning subsets 的平均 mIoU 47.0%，比 ReferSplat 高 6.9 点，但 simple/commonsense subsets 仍暴露 relation error，且“causal”主要是结构化建模而非真实干预因果识别。",
+    "methodFlow": [
+      "3D Gaussian scene + referring query",
+      "Entity/relation parsing",
+      "Structural causal graph",
+      "Relation-aware evidence propagation",
+      "Gaussian feature grounding",
+      "Referred 3D mask"
+    ],
+    "whyRelevantZh": "它直接命中 language-grounded 3D segmentation，并把 multi-hop spatial/affordance reasoning 放入可分析结构。",
+    "evidenceZh": "CausalSplat 将 query 分解为实体/关系图，并在 Gaussian features 上做 relation-aware evidence propagation。（Sec. 3 and Fig. 2, p. 4）；benchmark/evaluation 分离 spatial、affordance 与 commonsense subsets，使复杂 relation grounding 可单独诊断。（Secs. 4.1-4.2, pp. 5-6）；作者报告复杂 reasoning tasks 平均 mIoU 47.0%，比次优 ReferSplat 高 6.9 点；在更强 assumptions 的 subset 上相对旧结果有更大绝对提升。（Table 4 and subset tables, pp. 6-9）",
+    "caveatZh": "作者限制：错误主要来自复杂 relation interpretation 与 scene ambiguity，commonsense/affordance queries 仍有显著失败。；审阅风险：结构图被命名为 causal 不等于已识别真实因果机制；应将结论限定为 relation-structured reasoning。",
+    "motivationZh": "方法从 language query 解析 entities、attributes 与 relations，构造因果/依赖 graph，在 3D Gaussian scene features 上逐步传播并聚合 evidence，最后输出 referred mask。任务专门包含 spatial、affordance 与 commonsense reasoning，而不仅是 object-name matching。",
+    "methodZh": "方法从 language query 解析 entities、attributes 与 relations，构造因果/依赖 graph，在 3D Gaussian scene features 上逐步传播并聚合 evidence，最后输出 referred mask。任务专门包含 spatial、affordance 与 commonsense reasoning，而不仅是 object-name matching。 新意在为复杂 3D referring segmentation 显式组织 multi-hop relations，并用任务分组验证 structural reasoning；但 causal terminology 更接近 directed dependency modeling。",
+    "experimentsZh": "在 Teatime 等 3D referring datasets/subsets 上比较 Gaussian-language baselines，按 simple semantic、spatial、affordance、commonsense 分组报告 mIoU，并做 relation/threshold ablations 和 runtime。 作者报告：作者报告复杂 reasoning tasks 平均 mIoU 47.0%，比次优 ReferSplat 高 6.9 点；在更强 assumptions 的 subset 上相对旧结果有更大绝对提升。（Table 4 and subset tables, pp. 6-9） Baseline boundary：覆盖相关 referring Gaussian methods并分解任务难度；但 benchmark construction、语言解析和基础 scene features 可能共同决定增益，跨 datasets 验证有限。 Ablation boundary：测试 causal/relation modules、distance threshold 与运行时间；仍缺少 parser error oracle、counterfactual relation interventions 和真实 causal evaluation。",
+    "insightZh": "新意在为复杂 3D referring segmentation 显式组织 multi-hop relations，并用任务分组验证 structural reasoning；但 causal terminology 更接近 directed dependency modeling。 建议精读 relation graph 与 subset breakdown；收录时保留 causal 术语边界和 parser-dependent 风险。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

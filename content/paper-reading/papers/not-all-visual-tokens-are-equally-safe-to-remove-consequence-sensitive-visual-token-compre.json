@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.09176",
+  "slug": "not-all-visual-tokens-are-equally-safe-to-remove-consequence-sensitive-visual-token-compre",
+  "title": "Not All Visual Tokens Are Equally Safe to Remove:Consequence-Sensitive Visual Token Compression",
+  "authors": [
+    "Jingbo Wen",
+    "Liang He",
+    "Mingyu Cao",
+    "Haoyu Wang",
+    "Minxuan Hu",
+    "Kangning Cui",
+    "Xilu Wang"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09176"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "not",
+    "all",
+    "visual",
+    "tokens",
+    "equally",
+    "vlm-mllm"
+  ],
+  "abstract": "Visual token compression for vision--language models (VLMs) has largely relied on criteria such as attention, redundancy, and uncertainty to maximize average accuracy under a fixed compute budget, implicitly assuming that all errors carry equal cost. However, the consequence of an incorrect prediction on downstream tasks is rarely symmetric: misreading an invoice amount can be far more costly than misclassifying a background color. Motivated by this, we introduce consequence-sensitive visual token compression, which allocates visual computation across requests according to their potential error costs. Our method follows a calibrate-then-allocate procedure, estimating consequence-specific error-budget curves offline and applying the calibrated token budgets online using consequence signals available from question or task information. On a controlled within-task benchmark, high- and low-consequence questions are drawn from the same document images, so content alone cannot reveal which questions are costly to get wrong. In this setting, our method reduces high-stakes errors from 0.300 to 0.133 under the same total token budget, whereas a content-driven allocator performs no better than uniform allocation. Measuring how error rates change with token budget across different cost ratios, we derive an allocation frontier: uniform allocation is optimal when errors are equally costly, and token transfer toward high-consequence questions becomes increasingly beneficial as the cost gap grows. This allocation principle generalizes well across three dense vision-language benchmarks, two budget realization mechanisms (token deletion and resolution reallocation), two VLM architectures, and multiple token selection strategies. On a realistic mixed workload, consequence-sensitive allocation reduces cost-weighted error by 38% while achieving approximately 21% lower latency than full-resolution inference.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09176v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09176v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09176v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "这篇论文不再把 visual token pruning 目标设为平均 accuracy，而是先估计任务错误后果，再在固定总预算下按 measured error–budget curves 给 high/low consequence tiers 分配 tokens。作者在 DocVQA within-task control 中报告 cost-weighted error 从 uniform 的 0.312 降至 0.252，但平均 error 反而升高；这是一个清晰的 deployment-objective correction，而非新的 token selector，且 consequence labels、两档分组和 600-sample frontier 都限制了外推。",
+    "methodFlow": [
+      "Question/Task Consequence Signal",
+      "Offline Error-vs-Budget Calibration",
+      "Cost-Weighted Budget Optimization",
+      "Per-Tier Token Budget",
+      "Token Deletion or Resolution Reallocation",
+      "VLM Answer"
+    ],
+    "whyRelevantZh": "它为 MLLM efficiency 增加了任务后果这一缺失维度，对高代价视觉 design/inspection workflows 的算力分配比单纯平均 accuracy 更合理。",
+    "evidenceZh": "框架离线校准 tier-specific error curves，在线只应用已固定预算。（Sec. 3 and Fig. 2, p. 3）；within-task control 保持 image distribution 与总 token budget 相同，只改变 consequence allocation。（Table 2 and Sec. 5.1, p. 5）；作者报告 cost-aware allocation 将 cost-weighted error 从 0.312 降到 0.252，同时 average error 从 0.337 升至 0.488。（Table 2, p. 5）",
+    "caveatZh": "作者限制：Consequence weights 预先分配且只在 downstream costs observable 时可用。；作者限制：只评估两个 consequence tiers，frontier 来自离散 empirical curves。；作者限制：成本与视觉敏感性同时变化的更广 workload 仍是开放问题。；审阅风险：若 consequence proxy 与真实 utility 错配，方法会有意牺牲低档任务且可能伤害公平性。；审阅风险：贡献是 allocation policy，不应误写为 visual-token representation 或 selector 本身的改善。",
+    "motivationZh": "框架先离线测每个 consequence tier 在离散 token budget grid 上的 error curve，以 exhaustive search 找固定总预算下的 cost-weighted optimum；在线仅从 question/task metadata 决定 tier，再用真实 token deletion 或 resolution reallocation 实现预算。论文专门设计 cross-task diagnostic、within-task attribution、symmetric-cost control、anti-direction control 和 frozen tier rule replication，以区分 content difficulty 与 consequence utility。",
+    "methodZh": "框架先离线测每个 consequence tier 在离散 token budget grid 上的 error curve，以 exhaustive search 找固定总预算下的 cost-weighted optimum；在线仅从 question/task metadata 决定 tier，再用真实 token deletion 或 resolution reallocation 实现预算。论文专门设计 cross-task diagnostic、within-task attribution、symmetric-cost control、anti-direction control 和 frozen tier rule replication，以区分 content difficulty 与 consequence utility。 新意是把 downstream error cost 引入视觉 token allocation objective，并用 attribution controls 证明收益来自 cost asymmetry 而非 sample sensitivity；底层 FastV/attention selector 与 exhaustive grid allocation都不是新压缩架构。",
+    "experimentsZh": "以 DocVQA 与 solid-color diagnostic、within-DocVQA 600 samples、混合 task workload 测试；固定平均 304 tokens/image，总预算等价；consequence signal 使用 keyword rule、task ID 或 lightweight classifier，并比较 uniform/content/cost-aware/anti allocations。 作者报告：作者报告 within-task r=5 的 calibrated cost-sensitive allocation 使 CWE 低于 uniform，并在 anti-direction control 中显著恶化。（Tables 2–3, p. 5）；作者报告 resolution allocation 的 deployed point 在 304 tokens 时比 full-resolution latency 低约 21%。（Table 15, p. 12） Baseline boundary：比较 uniform、content sensitivity、anti allocation，并跨 token deletion/resolution 与 datasets；没有与 risk-aware serving/scheduling 方法和多模型真实业务 utility 的 head-to-head。 Ablation boundary：cost ratio frontier、label validation、allocation mechanism、token selector、dense benchmark 与 automatic predictor studies较完整；缺少多档/continuous costs 和 joint content+consequence optimal policy。",
+    "insightZh": "新意是把 downstream error cost 引入视觉 token allocation objective，并用 attribution controls 证明收益来自 cost asymmetry 而非 sample sensitivity；底层 FastV/attention selector 与 exhaustive grid allocation都不是新压缩架构。 建议 skim 收录其 objective 和 controls，而不是当成通用 token compression SOTA；应用边界取决于 consequence label 的可靠性。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

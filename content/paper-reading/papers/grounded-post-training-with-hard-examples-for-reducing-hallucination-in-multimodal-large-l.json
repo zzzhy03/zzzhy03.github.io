@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2605.16411",
+  "slug": "grounded-post-training-with-hard-examples-for-reducing-hallucination-in-multimodal-large-l",
+  "title": "Grounded Post-Training with Hard Examples for Reducing Hallucination in Multimodal Large Language Models",
+  "authors": [
+    "Qinwu Xu"
+  ],
+  "publishedAt": "2026-05-13",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v3",
+  "identifiers": {
+    "arxiv": "2605.16411"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV",
+    "cs.DB",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "grounded",
+    "post-training",
+    "hard",
+    "examples",
+    "reducing",
+    "vlm-mllm"
+  ],
+  "abstract": "Hallucination remains a fundamental challenge in vision-language models (VLMs), where autoregressive generation may produce linguistically plausible yet physically inconsistent or visually ungrounded responses due to likelihood maximization under joint probabilistic modeling. We propose a stage-wise preference optimization framework for hallucination reduction through targeted multimodal data construction. Rather than directly optimizing on generic instruction-following data, our approach progressively constructs hallucination-focused preference pairs near known failure boundaries. The framework emphasizes ambiguous spatial orientation, object relationships, OCR uncertainty, and adversarial false-premise training. Hallucinated negatives are generated through minimally perturbed yet visually inconsistent alternatives, enabling Direct Preference Optimization (DPO) to better separate grounded reasoning from plausible hallucination. Experiments on open-source benchmarks and real-world multimodal evaluation scenarios demonstrate improved grounding consistency, reduced hallucination, and more informative grounded responses. Cross-model qualitative evaluation further shows that the proposed multimodal LLM DPO framework produces more visually grounded responses than several frontier proprietary VLMs, such as in ambiguous spatial reasoning and adversarial false-premise settings. The results suggest that hallucination may arise not only from limited model capacity, but also from inherent tendencies of autoregressive probabilistic generation to favor linguistically plausible continuations under weak visual grounding. Future work may explore physical consistency modeling, uncertainty-aware multimodal reasoning, and architectural alternatives beyond standard autoregressive decoding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.16411v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.16411v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2605.16411v3 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "论文从 iterative multimodal questioning 中采 hard examples，构造成 visually supported preference pairs，再用 DPO 让模型偏好承认不确定或严格依图回答，而不是维持语言上自洽的幻觉。作者报告 DPO 在 DocVQA、TextVQA、MMBench、VQAv2 均高于 SFT，三个 LLM judges 的 pairwise win rate 高 6.2–8.2pp；方向直接，但数据仅约 1K、judge-based evaluation 与单 recipe 使结论尚属中等强度。",
+    "methodFlow": [
+      "对同一图像迭代提问暴露 unsupported assumptions",
+      "筛选 perceptual/spatial/physical hard examples",
+      "构造 grounded chosen 与 hallucinated rejected preference pairs",
+      "从 SFT checkpoint 做 multimodal DPO",
+      "以标准任务和独立 judges 比较 grounding"
+    ],
+    "whyRelevantZh": "直接关联 MLLM hallucination、hard-example post-training 和 grounding preference data。",
+    "evidenceZh": "hard-example pipeline 围绕同图多轮追问构造 visually grounded preferences。（Sec. 3 and Fig. 2, p. 4）；作者报告 DPO 相对 SFT 在 DocVQA、TextVQA、MMBench、VQAv2 均提升。（Table 2, p. 8）；作者报告三个 LLM judges 的 DPO pairwise win rate 比 SFT 高 6.2–8.2pp。（Table 3, p. 9）",
+    "caveatZh": "作者限制：hard-preference 数据规模约 1K，覆盖和泛化有限。；作者限制：评估部分依赖 LLM judges。；审阅风险：偏好模型可能学会保守拒答而非更强视觉推理。；审阅风险：单一 backbone 与数据构造 recipe 不足以证明普遍有效。",
+    "motivationZh": "系统反复追问同一图像以诱发 unsupported assumptions，筛选 perceptual/spatial/physical hard cases，生成 grounded chosen 与 hallucinated rejected responses，然后在 SFT checkpoint 上做 DPO，并以标准 benchmark、pairwise judge 与 qualitative cases 检查 grounding。",
+    "methodZh": "系统反复追问同一图像以诱发 unsupported assumptions，筛选 perceptual/spatial/physical hard cases，生成 grounded chosen 与 hallucinated rejected responses，然后在 SFT checkpoint 上做 DPO，并以标准 benchmark、pairwise judge 与 qualitative cases 检查 grounding。 贡献在于针对 iterative questioning 的难例 preference construction，而非新 preference objective；强调负例必须视觉可证伪。",
+    "experimentsZh": "在 LLaMA-3 MM SFT/DPO 上用约 1K hard preferences，评估四个标准 multimodal benchmarks、三个 LLM pairwise judges 与 qualitative iterative reasoning cases。 作者报告：作者报告 DPO/SFT 在 DocVQA 为 83.0/81.5、TextVQA 81.6/80.5、MMBench 80.1/78.0、VQAv2 82.2/81.5。（Table 2, p. 8）；作者报告三个 judge 的 pairwise win-rate 增益为 6.2–8.2pp。（Table 3, p. 9） Baseline boundary：有 SFT baseline、外部模型和多个 judge；缺少 OPA-DPO/GRPO 等同数据强 preference baselines 与人工盲评。 Ablation boundary：难例类别和 SFT/DPO 有比较；数据量、chosen/rejected construction 与迭代深度的消融不充分。",
+    "insightZh": "贡献在于针对 iterative questioning 的难例 preference construction，而非新 preference objective；强调负例必须视觉可证伪。 问题与方法高度相关，接受精读；但证据强度应标为中等并突出数据/judge 边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "early"
+  }
+}

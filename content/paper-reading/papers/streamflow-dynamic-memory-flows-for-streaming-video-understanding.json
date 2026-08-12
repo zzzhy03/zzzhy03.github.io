@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.10949",
+  "slug": "streamflow-dynamic-memory-flows-for-streaming-video-understanding",
+  "title": "StreamFlow: Dynamic Memory Flows for Streaming Video Understanding",
+  "authors": [
+    "Muxin Fu",
+    "Yifan Zhang",
+    "Wentao Zhang",
+    "Fangming Guo",
+    "Qian Chen",
+    "Guibin Zhang",
+    "Shuicheng Yan",
+    "Bo An"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10949"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "streamflow",
+    "dynamic",
+    "memory",
+    "flows",
+    "streaming",
+    "vlm-mllm"
+  ],
+  "abstract": "Streaming video understanding requires multimodal large language models (MLLMs) to preserve relevant evidence from continuously evolving streams under strict causality and bounded memory. Yet existing paradigms remain limited: model-based methods require intrusive backbone updates, while memory-based methods expend substantial visual-encoding computation on temporally redundant content and rely on rigid access to visual history. To address these limitations, we introduce StreamFlow, an efficient visual memory framework that enables dynamic, on-demand access to historical visual information. StreamFlow combines a lightweight, dynamics-aware mid-term memory that filters temporal redundancy before visual encoding with a latent long-term memory that consolidates historical video content into visual latents accessible to subsequent reasoning. During generation, an attention-guided retrieval mechanism injects relevant visual latents when the model's reliance on visual evidence weakens. StreamFlow achieves state-of-the-art streaming video understanding performance, reaching 67.73% overall accuracy on StreamingBench, while also delivering strong performance on offline long-video benchmarks. Relative to the vanilla setting, it improves the visual attention score (VAS) by 59.1% while reducing end-to-end latency and peak memory by 50.4% and 21.1%, respectively, enabling more visually grounded and efficient reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10949v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10949v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10949v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "StreamFlow 为 real-time video understanding 在 ViT 前做 visual sparsification，并以 bounded memory + flow-style consolidation 防止注意力随流漂移；作者报告 StreamingBench、VideoMME 与 RTVU 的准确率/效率改善，但真实优势依赖硬件、chunk rate 和 memory budget。",
+    "methodFlow": [
+      "Incoming video stream",
+      "Pre-ViT visual sparsification",
+      "Visual encoding",
+      "Bounded memory retrieval/update",
+      "Flow-style anti-drift consolidation",
+      "Online answer"
+    ],
+    "whyRelevantZh": "对持续运行的 multimodal agents 和长视频 context budgeting 有直接系统价值。",
+    "evidenceZh": "StreamFlow 在 ViT 前筛选 visual input，再用固定容量 memory 进行增量更新。（Sec. 3 and Fig. 2, p. 3）；memory consolidation objective 旨在防止长期 streaming 中 attention 偏向最新 chunks。（Secs. 3.3-3.4, pp. 4-6）；作者报告 StreamingBench 比 strongest memory baseline 高 1.17 个百分点，offline benchmarks 也有提升，并给出分阶段 RTVU latency/memory 结果。（Tables 1 and 3, pp. 7-9）",
+    "caveatZh": "作者限制：bounded memory 仍会遗忘早期细节，极长流和高事件密度场景可能失效。；审阅风险：平均 accuracy 改善较小，真实部署应检查任务级置信区间、吞吐和被剪掉关键帧的失败代价。",
+    "motivationZh": "方法先在昂贵 visual encoder 前筛选 frames/tokens，减少前端成本；随后把新证据与固定容量 memory 做增量融合，并通过 anti-drift objective 保留长期关键信息。论文明确分开 visual-front-end、decoder 与 end-to-end timing，避免只报 token count。",
+    "methodZh": "方法先在昂贵 visual encoder 前筛选 frames/tokens，减少前端成本；随后把新证据与固定容量 memory 做增量融合，并通过 anti-drift objective 保留长期关键信息。论文明确分开 visual-front-end、decoder 与 end-to-end timing，避免只报 token count。 主要新意是把 pre-encoder sparsification 与 bounded memory jointly designed，并显式针对 streaming attention drift；相比只压 decoder KV，它覆盖了常被忽略的 ViT cost。",
+    "experimentsZh": "在 StreamingBench、VideoMME 和 RTVU 上比较 streaming/offline video-memory methods，报告 accuracy、visual front-end/decoder/end-to-end efficiency，并分析 sparsification 与 memory variants。 作者报告：作者报告 StreamingBench 比 strongest memory baseline 高 1.17 个百分点，offline benchmarks 也有提升，并给出分阶段 RTVU latency/memory 结果。（Tables 1 and 3, pp. 7-9） Baseline boundary：覆盖 streaming memory 和 budget-matched selection baselines，且分拆 timing；但 hardware/kernel、video rate 与 caching implementation 影响 wall-clock 可比性。 Ablation boundary：分别测试 pre-ViT selection、memory update 和 budget strategies；缺少小时级 streams、abrupt topic shifts 和 recall latency 的 worst-case analysis。",
+    "insightZh": "主要新意是把 pre-encoder sparsification 与 bounded memory jointly designed，并显式针对 streaming attention drift；相比只压 decoder KV，它覆盖了常被忽略的 ViT cost。 建议略读 pre-ViT pruning、memory update 和 timing scope；收录为 streaming efficiency 方法，需按自身硬件复测。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

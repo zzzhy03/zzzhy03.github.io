@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.08460",
+  "slug": "instructioncrafter-generating-consistent-and-high-fidelity-visual-instructions",
+  "title": "InstructionCrafter: Generating Consistent and High-Fidelity Visual Instructions",
+  "authors": [
+    "Shun Okamoto",
+    "Satoshi Iizuka",
+    "Kazuhiro Fukui"
+  ],
+  "publishedAt": "2026-08-09",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.08460"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "video-generation",
+    "2d-design"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "instructioncrafter",
+    "generating",
+    "consistent",
+    "high-fidelity",
+    "visual",
+    "image-generation",
+    "video-generation"
+  ],
+  "abstract": "Given textual task instructions, generating step-by-step visual instructions as an image sequence requires the simultaneous satisfaction of multiple properties, specifically step faithfulness, cross-image consistency, and per-frame visual quality. Existing text-to-image generation approaches rarely meet all three properties, owing to independent sampling that breaks consistency, finetuning on low-quality video that degrades per-frame quality, and frozen backbones that lack multi-step understanding. In this work, we propose InstructionCrafter, a diffusion-based framework with the key idea of separating the optimization of temporal and instructional alignment from per-frame visual quality via (1) spatial-freeze training and (2) instruction-aware adapters. Built on a pretrained video diffusion backbone, InstructionCrafter freezes the spatial layers that control per-frame detail and updates only temporal and text-conditioning pathways to learn instruction semantics and inter-step relations, which preserves the generative prior for per-frame quality and reduces trainable parameters by about 50 percent compared with full finetuning. We also introduce two lightweight adapters that enhance the model's understanding of instructional context. The Consistent Adapter aggregates textual cues from the entire instruction sequence and from neighboring steps to keep object identity and attributes consistent across frames, and the Context-Aware Temporal Adapter converts cross-attention outputs into biases for temporal self-attention, explicitly propagating inter-frame relations. Extensive experiments on two benchmark datasets demonstrate state-of-the-art overall performance on step faithfulness, cross-image consistency, and per-frame visual quality while significantly reducing noise, blur, and spurious subtitles. Our code and trained models will be publicly available.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08460v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08460v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08460v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "InstructionCrafter 在冻结 VideoCrafter2 spatial backbone 上加入 Consistent Adapter 与 Context-Aware Temporal Adapter：前者建模跨步骤全局/相邻关系，后者用 step text bias 调制 temporal attention；作者报告在 ShowHowTo/WikiHow-VGSI 的 consistency、semantic 与 perceptual metrics 上综合领先，但对抽象/复杂指令仍弱，微调大 diffusion backbone 的资源成本也被作者明确承认。",
+    "methodFlow": [
+      "Ordered text instructions",
+      "Latent video diffusion backbone",
+      "Consistent global/adjacent adapter",
+      "Cross-step text features",
+      "Context-aware temporal adapter",
+      "Step-consistent visual sequence"
+    ],
+    "whyRelevantZh": "直接关联多步骤 visual instruction generation、2D design consistency 与 video priors。",
+    "evidenceZh": "Consistent Adapter 组合 global 与 adjacent attention 来捕捉跨步骤和相邻步骤关系。（Sec. 3.1 and Fig. 3, p. 5）；Context-Aware Temporal Adapter 用各 step text 的 cross-attention-derived bias 调制 temporal attention。（Sec. 3.1, pp. 5-7）；作者报告在 ShowHowTo 上 SC-F/Semantic/Perceptual 为 0.460/0.537/0.732，在 WikiHow-VGSI 为 0.520/0.569/0.742。（Table 1, p. 10）",
+    "caveatZh": "作者限制：抽象或高度复杂 instructions 仍难处理，可能需要更强 diffusion backbone。；作者限制：微调大型 diffusion models 仍需显著计算资源，尽管可训练参数较少。；审阅风险：视觉一致与步骤语义指标不能证明过程在物理或操作上正确，教学用途需要安全/可执行性审核。；审阅风险：artifact 与 watermark failure cases 表明 adapter 不能完全修复 backbone/data quality。",
+    "motivationZh": "输入是一组顺序文本步骤。Consistent Adapter 通过 global 与 adjacent attention 在 latent frames 间传递主体和状态，Context-Aware Temporal Adapter 将所有 step texts 的 cross-attention bias 注入 temporal transformer，让每帧既遵循当前步骤又保留上下文。训练只更新 lightweight adapters 和 text-related components，以保留预训练视觉质量。",
+    "methodZh": "输入是一组顺序文本步骤。Consistent Adapter 通过 global 与 adjacent attention 在 latent frames 间传递主体和状态，Context-Aware Temporal Adapter 将所有 step texts 的 cross-attention bias 注入 temporal transformer，让每帧既遵循当前步骤又保留上下文。训练只更新 lightweight adapters 和 text-related components，以保留预训练视觉质量。 论文把 visual instruction generation 重述为带步骤上下文的视频生成，并用两个 adapter 分别处理跨帧 identity/state consistency 与 step semantics；相比单图串联或全量微调更有结构针对性。",
+    "experimentsZh": "在 ShowHowTo 和 WikiHow-VGSI 上比较 T2I、story visualization、video diffusion 和 adapter variants，以 step consistency、semantic alignment、perceptual quality、VLM score 和 15 人 user study 评价。 作者报告：作者报告 InstructionCrafter 在 ShowHowTo 的 SC-F/Semantic/Perceptual 达 0.460/0.537/0.732，在 WikiHow-VGSI 达 0.520/0.569/0.742；user study 平均 preference 为 58% 对 StackedDiffusion。（Table 1, p. 10; Table 7, p. 13） Baseline boundary：覆盖 zero-shot T2I、subject-consistent image methods、story visualization 与 video diffusion，并含同 backbone 对照；用户研究仅 15 人与 100 samples。 Ablation boundary：拆分训练策略、两个 adapters、attention choices 和 cross-attention finetuning；对长步骤、错误/矛盾 instructions、物理可执行性缺少系统测试。",
+    "insightZh": "论文把 visual instruction generation 重述为带步骤上下文的视频生成，并用两个 adapter 分别处理跨帧 identity/state consistency 与 step semantics；相比单图串联或全量微调更有结构针对性。 问题设定、adapter design、量化和 limitations 都清楚，建议精读；收录时应把视觉 instruction 与真实操作指导严格区分。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

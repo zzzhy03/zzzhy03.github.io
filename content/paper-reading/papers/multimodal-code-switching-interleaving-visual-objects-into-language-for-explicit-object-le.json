@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.11167",
+  "slug": "multimodal-code-switching-interleaving-visual-objects-into-language-for-explicit-object-le",
+  "title": "MultiModal Code-Switching: Interleaving Visual Objects into Language for Explicit Object-Level Alignment",
+  "authors": [
+    "Changhao Xiang",
+    "Shangyu Xing",
+    "Zhen Wu",
+    "Jianbing Zhang",
+    "Xinyu Dai"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.11167"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "multimodal",
+    "code-switching",
+    "interleaving",
+    "visual",
+    "objects",
+    "vlm-mllm"
+  ],
+  "abstract": "Existing Multimodal Large Language Models (MLLMs) predominantly rely on image-text pairs for modality alignment pretraining, mapping global image representations to long textual descriptions. However, this image-level alignment suffers from referential ambiguity: models struggle to infer the correspondences between multiple visual objects and textual entities from the global representation, leading to data inefficiency and suboptimal semantic grounding. To address this, we propose MultiModal Code-Switching (MMCS), a novel pretraining paradigm that provides explicit object-level supervision. Inspired by the linguistic phenomenon of code-switching, MMCS interleaves vision and language by replacing textual entities with their corresponding visual objects, enforcing local vision-language grounding. We further develop a scalable data synthesis pipeline to generate a pretraining dataset of 773K samples with accurate object-entity correspondences. Experiments show that MMCS is highly data-efficient: with only 50K samples, it matches or surpasses models trained on 600K image-text pairs. Furthermore, MMCS consistently improves visual grounding and perception capabilities across varying model scales.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.11167v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.11167v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.11167v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "MMCS 用 multi-modal caption similarity 构造 pretraining curriculum/positive structure，使 MLLM 不只学 image-level caption pairs，而能利用 caption 之间的跨模态关系；作者在 perception、VQA、referring comprehension 及多 seed/noisy-caption tests 报告稳定提升，但效果依赖 caption source 与 similarity graph，训练资源成本需单独核算。",
+    "methodFlow": [
+      "Image-caption corpus",
+      "Multimodal caption embeddings",
+      "Similarity graph / mutual k-NN",
+      "Cross-sample structured objective",
+      "Vision-language pretraining",
+      "Perception and VQA transfer"
+    ],
+    "whyRelevantZh": "它与 MLLM pretraining/data structure 直接相关，尤其适合研究如何利用 caption corpus 内部关系而非只扩数据量。",
+    "evidenceZh": "MMCS 从 captions 构造 cross-sample similarity graph，并将近邻结构作为额外 pretraining signal。（Sec. 3 and Fig. 2, p. 3）；centered similarity 与 mutual k-NN 旨在降低全局偏置和不可靠近邻，让跨样本语义关系可被训练目标消费。（Secs. 3.2-3.4, pp. 3-5）；作者报告 MMCS 在 referring expression、perception-centric 与 general VQA benchmarks 上持续优于 standard image-level pretraining，并在 30% caption corruption 与 multi-seed comparisons 中保持优势。（Tables 9-15, pp. 9-15）",
+    "caveatZh": "作者限制：方法质量依赖 captions 和 similarity graph；系统性 caption bias 会被跨样本关系放大。；审阅风险：更多跨样本 positives 可能牺牲细粒度 instance discrimination；平均下游提升应结合任务级负迁移和额外 preprocessing cost 评估。",
+    "motivationZh": "方法为图像 captions 建立 cross-sample similarity structure，以 centered kernels、mutual k-NN 等筛选/加权 semantically related examples，并把这种结构加入 pretraining objective。目标是比标准独立 image-caption learning 更充分利用 dataset 内部的 multimodal semantic neighborhoods。",
+    "methodZh": "方法为图像 captions 建立 cross-sample similarity structure，以 centered kernels、mutual k-NN 等筛选/加权 semantically related examples，并把这种结构加入 pretraining objective。目标是比标准独立 image-caption learning 更充分利用 dataset 内部的 multimodal semantic neighborhoods。 新意在把 caption-to-caption multimodal structure 系统引入 image-language pretraining，并研究不同 similarity construction、noise 与 data scale；不是仅做更大 caption augmentation。",
+    "experimentsZh": "以 matched vision-language backbones/data 进行 standard pretraining 与 MMCS 对照，在多项 perception、VQA、referring benchmarks 评估，并测试 caption source、noise、pretraining scale、similarity choice 与多 seeds。 作者报告：作者报告 MMCS 在 referring expression、perception-centric 与 general VQA benchmarks 上持续优于 standard image-level pretraining，并在 30% caption corruption 与 multi-seed comparisons 中保持优势。（Tables 9-15, pp. 9-15） Baseline boundary：matched image-level pretraining 对照和多任务 transfer 较充分；但与更强 data curation/contrastive mining methods 的统一 compute comparison、caption generator 成本仍需明确。 Ablation boundary：覆盖 similarity construction、k、caption source、30% noise、data scale 和 multi-seed，证据较完整；缺少更高噪声、domain-specific captions 与 very-large-scale compute curves。",
+    "insightZh": "新意在把 caption-to-caption multimodal structure 系统引入 image-language pretraining，并研究不同 similarity construction、noise 与 data scale；不是仅做更大 caption augmentation。 建议精读 similarity objective、noise/multi-seed evidence 和 compute accounting；收录为扎实 pretraining 方法，结果仍按作者报告表述。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

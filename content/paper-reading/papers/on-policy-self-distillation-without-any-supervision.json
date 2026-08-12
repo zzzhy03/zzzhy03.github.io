@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2608.06296",
+  "slug": "on-policy-self-distillation-without-any-supervision",
+  "title": "On-Policy Self-Distillation without Any Supervision",
+  "authors": [
+    "Yijiang Li",
+    "Bingyang Wang",
+    "Yijun Liang",
+    "Yunjie Tian",
+    "Di Fu",
+    "Nuno Vasconcelos"
+  ],
+  "publishedAt": "2026-08-06",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2608.06296"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "on-policy",
+    "self-distillation",
+    "without",
+    "any",
+    "supervision",
+    "llm"
+  ],
+  "abstract": "On-policy (Self-)Distillation (OPD / OPSD) has shown strong potential for post-training large language models (LLMs). However, existing methods still rely heavily on external supervision, including ground-truth signals, environmental feedback, or guidance from larger models, and therefore fall short of genuine \"self\"-distillation. In this study, we show that on-policy self-distillation can be achieved using only a model's own generations via internal consistency. We propose unsupervised on-policy self-distillation (U-OPSD). U-OPSD first samples multiple rollouts and constructs a pseudo solution by majority vote under a self-consistency threshold. It then conditions the model's distribution on the pseudo-solution and distills itself on the disagreeing completions, allowing the model to correct itself precisely where it is confidently wrong. Across diverse benchmarks, base models, and training settings, U-OPSD consistently improves over the base models and matches or surpasses supervised methods with ground truth (GT) such as OPSD and GRPO. On five mathematical reasoning benchmarks, i.e., AIME24, AIME25, HMMT25, MATH500, and AMC23, U-OPSD improves over the base model by 8.5% and 10.7% on Qwen3 non-thinking mode at 4B and 8B scales, and outperforms OPSD by 3.2% and 2.3% on average, respectively. In thinking mode, U-OPSD stays on par with OPSD, ahead by 0.9% at 4B and level at 8B and surpassing GRPO by 0.7% and 1.1%, respectively. Code is available at [https://github.com/williamium3000/u-opsd](https://github.com/williamium3000/u-opsd).",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.06296v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.06296v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/williamium3000/u-opsd"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.06296v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/williamium3000/u-opsd）。",
+    "ideaZh": "U-OPSD 用同一模型多次 on-policy rollout 的 majority-vote answer 替代 gold solution，只对与共识不一致的 rollouts 做 self-distillation；作者报告 Qwen3 4B/8B 非思考模式相对 supervised OPSD 提升 3.2/2.3 个百分点，但收益在 thinking mode 缩到 0.9/0.02，且只验证可 exact-match 的竞赛数学，弱 base model 会把错误多数票自我强化。",
+    "methodFlow": [
+      "Unlabeled math question",
+      "On-policy rollout group",
+      "Canonicalize and majority vote",
+      "Select consensus teacher trajectory",
+      "Distill inconsistent rollouts",
+      "Updated reasoning model"
+    ],
+    "whyRelevantZh": "它是 inference/training-time reasoning 自举与无标签 post-training 的清晰机制研究。",
+    "evidenceZh": "U-OPSD 以 rollout majority vote 构造 pseudo-label，并只蒸馏 self-inconsistent trajectories。（Sec. 2 and Fig. 1, p. 4）；teacher 与 student 来自同一当前 policy，省去 stronger external teacher 和 ground-truth solution。（Secs. 2.2-2.3, pp. 4-6）；作者报告非思考模式 U-OPSD 相对 OPSD 在 4B/8B 上提升 3.2/2.3 个百分点，thinking mode 仅提升 0.9/0.02。（Tables 1-2, pp. 7-8）",
+    "caveatZh": "作者限制：只覆盖 Qwen3 4B/8B 和 competition mathematics，要求可抽取、可 canonicalize 的答案。；作者限制：majority vote 受 base-model competence 上限约束，probe 中 13.3% pseudo-labels 错误。；作者限制：每种训练设置的 seed-replicated error bars 仍待补充。；审阅风险：同一模型家族的相关错误可能获得高票，共识并不等于 correctness；开放域应用需外部校准。",
+    "motivationZh": "每道题采样 G 个 rollouts，canonicalize 最终答案并选多数票；从同意共识的 rollout 中选 teacher reference，对不一致的 student trajectory 施加 on-policy token-level divergence。这样保留 OPSD 的 self-teacher 结构，却移除 gold solution；方法还研究 teacher selection、longest rollout 与 divergence compression。",
+    "methodZh": "每道题采样 G 个 rollouts，canonicalize 最终答案并选多数票；从同意共识的 rollout 中选 teacher reference，对不一致的 student trajectory 施加 on-policy token-level divergence。这样保留 OPSD 的 self-teacher 结构，却移除 gold solution；方法还研究 teacher selection、longest rollout 与 divergence compression。 贡献是把 gold-conditioned on-policy distillation 改为纯自生成 consensus，并明确测量何时 consensus 可替代监督；它不是通用无监督学习，因为仍依赖可抽取、可 canonicalize 的最终答案。",
+    "experimentsZh": "在五个 competition-math benchmarks 上，用 Qwen3 4B/8B 的 thinking/non-thinking modes 比较 base、GRPO、supervised OPSD 与 U-OPSD；另分析 group size、teacher choice、divergence 与训练 collapse。 作者报告：作者报告非思考模式下 U-OPSD 对 supervised OPSD 提升 3.2/2.3 个百分点；thinking mode 分别仅 0.9/0.02，接近持平。（Tables 1-2, pp. 7-8） Baseline boundary：包含 supervised counterpart、RL baseline、两模型尺度和两 reasoning modes；但只有 Qwen3 family 和数学 exact-answer domain，且完整 seed error bars 尚待修订。 Ablation boundary：覆盖 consensus group、teacher selection、KL/divergence 与 reasoning length；未系统测试 deliberately corrupted votes、开放问答 soft consensus 或跨 domain transfer。",
+    "insightZh": "贡献是把 gold-conditioned on-policy distillation 改为纯自生成 consensus，并明确测量何时 consensus 可替代监督；它不是通用无监督学习，因为仍依赖可抽取、可 canonicalize 的最终答案。 在 landmark-only LLM gate 下，纯自生成 consensus 取代 gold 的结果具有方法意义，建议精读；必须限制为可验证数学域，不能宣传成一般无监督 reasoning。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2608.09907",
+  "slug": "distmoe-private-data-rehearsal-free-routing-in-mixture-of-experts-for-distributed-instruct",
+  "title": "DistMoE: Private-data Rehearsal-free Routing in Mixture-of-Experts for Distributed Instruction Tuning",
+  "authors": [
+    "Mainak Singha",
+    "Niccolò Biondi",
+    "Elisa Ricci",
+    "Subhankar Roy"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09907"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "llm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "distmoe",
+    "private-data",
+    "rehearsal-free",
+    "routing",
+    "mixture-of-experts",
+    "vlm-mllm",
+    "llm"
+  ],
+  "abstract": "Multimodal Large Language Models (MLLMs) have shown strong multimodal instruction-following ability, but adapting them to diverse visual-language domains typically assumes centralized data access and costly joint training. This is restrictive when data is distributed across private, domain-specific, or permission-limited clients. To this end, we propose DistMoE, a mixture-of-experts (MoE) approach for distributed visual instruction tuning. In each layer of the language decoder it augments the public feedforward network (FFN) with a client-specific private FFN expert, with the goal to acquire domain-specific knowledge. However, independent expert training causes the private FFNs to learn representation of different scale and magnitudes, making merging the experts difficult. To reduce client-specific drift, we introduce a public-anchored expert composition stage that updates only routers and lightweight private projection adapters on a mix of local client data and public data, via an isotropic regularization loss, therefore making it cross-client rehearsal-free composition. During inference, DistMoE performs modular routing over public and private experts, enabling token-wise domain composition without explicit domain labels. Experiments across diverse visual-language benchmarks show that DistMoE enables flexible expert reuse, effective domain adaptation, and competitive performance while preserving modular control over client-specific knowledge. Codes are available at https://github.com/mainaksingha01/DistMoE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09907v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09907v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/mainaksingha01/DistMoE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09907v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/mainaksingha01/DistMoE）。",
+    "ideaZh": "DistMoE 面向多客户端私有 instruction tuning：每个 client 用私有数据训练 local FFN expert，服务器只用公共数据学习 router/adapter 并锚定 public expert，避免上传或 rehearsal 私有样本。作者在 Qwen、Phi、StableLM 等骨干上报告比 federated/adapter baselines 更好的多域保持，但 centralized access 有时仍更强，且方案依赖约 19K public instructions。",
+    "methodFlow": [
+      "Distributed Private Instruction Sets",
+      "Local Private FFN Expert Tuning",
+      "Shared Public Expert",
+      "Public-Data Router Calibration",
+      "Anchored Mixture Routing",
+      "Rehearsal-Free Multi-Domain Inference"
+    ],
+    "whyRelevantZh": "它涉及 VLM/LLM distributed instruction tuning 与 modular experts，对多域模型适配有参考价值，但不是视觉推理主线的直接能力推进。",
+    "evidenceZh": "私有数据仅用于本地 FFN experts，server 不 rehearsal 私有样本。（Method overview, Fig. 2, p. 5）；router 通过 public data 与 public-expert anchoring 学习分派。（Stage II routing, pp. 5–7）；作者报告多 backbone/多 domain 上 DistMoE 优于多数 distributed baselines。（Main results, p. 8）；作者报告 public expert、router anchoring 与 private experts 各有贡献。（Ablations, pp. 8–9）",
+    "caveatZh": "作者限制：方法依赖约 19K public instructions 做 router calibration。；作者限制：没有 formal differential-privacy guarantee，也未解决 malicious clients 或 expert leakage。；作者限制：centralized training 在部分设定仍可更强。；审阅风险：“不传私有样本”不能等同于不存在模型参数泄露。；审阅风险：private expert 数量增长会带来存储、部署和 routing scalability 问题。",
+    "motivationZh": "Stage I 将 transformer FFN 分成共享 public expert 与 client-specific private experts，各 client 本地适配而不交换样本。Stage II 在 server 端以 public instructions 校准 router，使输入分派至适当 expert，并用 anchor/regularization 抑制 forgetting。推理组合公共与私有能力，不需保存旧私有数据。",
+    "methodZh": "Stage I 将 transformer FFN 分成共享 public expert 与 client-specific private experts，各 client 本地适配而不交换样本。Stage II 在 server 端以 public instructions 校准 router，使输入分派至适当 expert，并用 anchor/regularization 抑制 forgetting。推理组合公共与私有能力，不需保存旧私有数据。 主要贡献是把 rehearsal-free privacy constraint 融入 MoE routing：私有 specialization 留在 local experts，router 只依赖公开数据学习组合，避免常规 federated gradient/data 汇聚。",
+    "experimentsZh": "在 Qwen/Phi/StableLM 系列与多类 instruction domains 上比较 federated/adapter/MoE/centralized baselines，评各域 accuracy、average retention 和 forgetting，并消融 experts、router、public anchor。 作者报告：作者报告 DistMoE 在多数 distributed multi-domain settings 提升平均任务表现并降低 forgetting。（Main tables, p. 8）；作者报告 centralized access 在部分设置仍优于 private distributed method。（Main results discussion, p. 8） Baseline boundary：跨三类 backbone 和多种 baselines，覆盖尚可；未给 formal privacy accounting，且 public instruction set 的规模/分布是重要依赖。 Ablation boundary：消融 public/private experts、router adapter、anchoring 与 public-data scale。",
+    "insightZh": "主要贡献是把 rehearsal-free privacy constraint 融入 MoE routing：私有 specialization 留在 local experts，router 只依赖公开数据学习组合，避免常规 federated gradient/data 汇聚。 方法与隐私约束有价值，适合略读收录；由于缺 formal privacy guarantee、依赖公开数据且与核心视觉方向间接，不提升为深读。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

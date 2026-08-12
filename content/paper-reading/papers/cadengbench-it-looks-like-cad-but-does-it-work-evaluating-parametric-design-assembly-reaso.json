@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.09296",
+  "slug": "cadengbench-it-looks-like-cad-but-does-it-work-evaluating-parametric-design-assembly-reaso",
+  "title": "CADEngBench: It Looks Like CAD, but Does It Work? Evaluating Parametric Design, Assembly Reasoning, and Physics Simulation",
+  "authors": [
+    "Harmanjot Singh",
+    "Abhra Dubey",
+    "Jorge Alejandro Amador Herrera"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09296"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "fabrication",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "cadengbench",
+    "looks",
+    "like",
+    "cad",
+    "but",
+    "3d-generation",
+    "fabrication"
+  ],
+  "abstract": "A CAD model is not engineering-grade merely because it looks correct. It must satisfy design requirements, respond predictably to parameter changes, support controlled edits, match a reference structural response under a declared analysis, and connect to other parts through valid joints. We present CADEngBench, a two-track benchmark for these capabilities. CADEngBench-P evaluates 300 parametric parts, each used for one zero-to-CAD task and one functional-editing task (600 tasks in total), through boundary-representation (B-Rep) validity, engineering and DFM checks, parameter-family perturbations, functional editing, and matched linear-static FEA in CalculiX. CADEngBench-A evaluates 150 body pairs through ranked joint retrieval, exact face-and-edge grounding, joint-frame prediction, and kinematic verification. Across eight multimodal, code-capable models, editing supplied CAD is substantially easier than generating it, while complex edits and matched FEA remain difficult. Assembly predictions often locate the relevant region but fail to recover the recorded joint or mating entities. These results show that CAD evaluation must test engineering behavior rather than appearance alone.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09296v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09296v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09296v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "CADEngBench 把 generative CAD evaluation 从“像不像”推进到“能否作为工程模型运行”：P track 对 600 个 parametric construction/editing tasks 逐级检查 CadQuery execution、B-Rep/DFM、parameter perturbation、functional editing 与 matched FEA；A track 对 150 assembly pairs 检查 B-Rep entity grounding、joint frames 和 kinematic motion。八个 multimodal/code models 中，作者报告 1,030/2,400 outputs 可执行但仅 432 继续通过 engineering requirements，说明 render/compile success 严重高估 fabrication readiness。",
+    "methodFlow": [
+      "Engineering Brief / Source CAD / Assembly Pair",
+      "Executable Parametric CAD Output",
+      "B-Rep Validity and DFM",
+      "Parameter/Edit Perturbation",
+      "FEA or Joint-Frame Verification",
+      "Evidence-Bound Engineering Verdict"
+    ],
+    "whyRelevantZh": "它直接连接 3D generation 与 fabrication：不仅看外观，还检查 executable parameterization、manufacturability、physics 和 assembly motion，是生成式 CAD 走向真实设计 agent 的关键门槛。",
+    "evidenceZh": "P/A tracks 分别覆盖 parametric CAD engineering checks 与 assembly grounding/motion。（Benchmark Design and Fig. 1, p. 2）；所有 CAD outputs 都实际执行、导出并重新导入 B-Rep 后再做 measurements。（Layered Evaluation Design, pp. 2–4）；作者报告 2,400 generated programs 中 1,030 过 L0，但仅 432 同时过 L1。（Results and Analysis, p. 5）；作者报告 assembly 正确 B-Rep pair 排首位 542/960 次，但同时正确 joint family/body roles 仅 143 次。（Assembly Results, p. 7）",
+    "caveatZh": "作者限制：Benchmark 受 source CAD 提供的信息与可构造 reference checks 限制。；作者限制：FEA 只在 reference analysis 可用时运行，复杂 nonlinear/multiphysics 未覆盖。；作者限制：Assembly evaluation 依赖 source-recorded joint families 与有限 task families。；审阅风险：frontier API model名称和版本在 2026 时间点可变，复现需固定 outputs。；审阅风险：从 benchmark failure 不能直接推断真实工程师 workflow 的生产率或 safety。",
+    "motivationZh": "CADEngBench-P 从 BenchCAD/Fusion histories 构造 zero-to-CAD 与 editing tasks，执行 generated code、重载 STEP、测量 requirements/DFM，沿 parameter range 重建验证 design intent，再用 matched linear-static FEA 判断 physics behavior。CADEngBench-A 从 source assemblies 抽取 B-Rep graphs 与 recorded joints，依次评 entity retrieval、joint family/body roles、frame grounding 与 allowed-DoF motion。评分保留 first-failure evidence cards，不把多阶段压成单一 render metric。",
+    "methodZh": "CADEngBench-P 从 BenchCAD/Fusion histories 构造 zero-to-CAD 与 editing tasks，执行 generated code、重载 STEP、测量 requirements/DFM，沿 parameter range 重建验证 design intent，再用 matched linear-static FEA 判断 physics behavior。CADEngBench-A 从 source assemblies 抽取 B-Rep graphs 与 recorded joints，依次评 entity retrieval、joint family/body roles、frame grounding 与 allowed-DoF motion。评分保留 first-failure evidence cards，不把多阶段压成单一 render metric。 贡献不是新 CAD generator，而是把 parametric behavior、physics 与 assembly kinematics 都纳入 executable evaluation hierarchy，并将每个 verdict 绑定 source geometry/solver evidence；这是 fabrication-ready generative CAD 的重要测量基础设施。",
+    "experimentsZh": "P track 600 tasks，A track 150 assembly pairs/每模型120 evaluated items；八个 multimodal/code models，P 依次测 L0 executable、L1 engineering/DFM、L2 parameter/editability、L3 FEA，A 测 entity/joint/frame/kinematics；10,000 item-clustered bootstrap 与 Holm-corrected tests。 作者报告：作者报告 GPT-5.2、Claude、Gemini 等没有模型在全部 stages 领先，L3 physics reach 与 pair pass 普遍显著低于 executable rate。（Table 2, p. 6）；作者报告 only 432/2,400 outputs 在可执行后继续满足 L1，显示 compile success 不是 engineering readiness。（Results, p. 5） Baseline boundary：横跨八个 frontier/open multimodal code models 与 generation/editing/assembly tracks，证据丰富；benchmark 不比较 dedicated CAD generators 的训练模型，也受 commercial API versions 与 source dataset coverage 限制。 Ablation boundary：作为 benchmark 没有模型组件消融；有 stage-wise failure, bootstrap, paired tests, functional edit families, FEA stages 和 assembly joint slices，足以分析 evaluation hierarchy。",
+    "insightZh": "贡献不是新 CAD generator，而是把 parametric behavior、physics 与 assembly kinematics 都纳入 executable evaluation hierarchy，并将每个 verdict 绑定 source geometry/solver evidence；这是 fabrication-ready generative CAD 的重要测量基础设施。 尽管是 benchmark-only，它对核心 fabrication-ready CAD evaluation 具有基础价值，应精读收录；不可把 benchmark score 写成工程认证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

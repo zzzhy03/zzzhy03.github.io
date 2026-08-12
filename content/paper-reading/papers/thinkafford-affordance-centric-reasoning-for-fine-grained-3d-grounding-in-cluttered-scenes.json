@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.10981",
+  "slug": "thinkafford-affordance-centric-reasoning-for-fine-grained-3d-grounding-in-cluttered-scenes",
+  "title": "ThinkAfford: Affordance-Centric Reasoning for Fine-Grained 3D Grounding in Cluttered Scenes",
+  "authors": [
+    "Xinrui Lin",
+    "Sha Zhang",
+    "Shumin Wang",
+    "Zenghuan Zhu",
+    "Jiajun Deng",
+    "Yanyong Zhang"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10981"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "thinkafford",
+    "affordance-centric",
+    "reasoning",
+    "fine-grained",
+    "grounding",
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "abstract": "Task-driven 3D affordance grounding aims to localize the functional region in a cluttered 3D scene that enables an action specified by a natural-language instruction. Existing methods either predict 3D masks directly or construct them by selecting and fusing intermediate 2D/3D regions. However, they remain vulnerable to two intertwined failure modes: the predicted or selected regions may miss the target interaction area or have unsuitable granularity, while language grounding may confuse visually similar alternatives under relational instructions. To this end, we introduce ThinkAfford, which decouples high-recall affordance proposal generation from instruction-grounded reasoning. Specifically, the Affordance Proposal Generation module first uses learnable affordance prompts and multi-level visual features to predict interaction-conditioned heatmaps, extracting a variable number of fine-grained proposals without parsed object or part names as segmentation prompts. Visual-Prompted Affordance Reasoning then reasons over labeled proposal overlays using the full instruction, returning identifiers in a structured \"think-then-answer\" response. Moreover, Group Relative Policy Optimization uses proposal-level rewards from lifted 3D overlap to align VPAR selection with final 3D grounding. On the SceneFun3D validation split, ThinkAfford achieves 10.69% AP50 and 25.46% AP25 under the official evaluator, outperforming comparable 3D open-vocabulary and vision-language-model-based 2D-to-3D baselines. Module-level diagnostics further show that APG attains 77.5% recall at 25% intersection-over-union, while GRPO-trained VPAR achieves 72.1% selection accuracy on APG-covered queries, compared with 63.4% under supervised fine-tuning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10981v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10981v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10981v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "ThinkAfford 用 MLLM 先产生 affordance proposals，再将 geometry-semantic descriptors 投到 3D、做 proposal verification/selection，解决 open-vocabulary 3D functional grounding；作者在 SceneFun3D 报告 AP 提升，但 proposal recall 与 tight localization 存在明显落差，依赖 VLM commonsense 也可能引入语义幻觉。",
+    "methodFlow": [
+      "3D scene + affordance query",
+      "Multi-view VLM proposal generation",
+      "Geometry-semantic descriptor projection",
+      "Query-conditioned affordance reasoning",
+      "3D proposal verification",
+      "Affordance mask"
+    ],
+    "whyRelevantZh": "它直接命中 open-vocabulary 3D segmentation、functional reasoning 与 agent affordance grounding。",
+    "evidenceZh": "方法先生成 affordance proposals，再用 geometry-semantic descriptors 和 3D verification 定位 functional regions。（Sec. 3 and Fig. 2, p. 3）；将 VLM 开放词汇常识与 3D proposal verification 分离，使语义推断具有空间落点。（Secs. 3.2-3.4, pp. 3-5）；作者报告在 SceneFun3D official evaluator 的 AP25/AP50 上优于 comparable 3D open-vocabulary/VLM methods；proposal coverage 明显高于最终 tight-mask AP。（Tables 1 and 3, p. 5）",
+    "caveatZh": "作者限制：proposal generation 的高 coverage 尚未转化为 tight localization，边界和小部件仍是瓶颈。；审阅风险：VLM commonsense 可能生成视觉上合理但物理不可执行的 affordance；静态 mask AP 不能替代真实 interaction success。",
+    "motivationZh": "输入为 3D scene 与自然语言 functional query。系统先让 VLM 基于 multi-view images 提议可交互区域/对象，再把 proposal IDs、geometry 与 semantics 对齐到 3D，经过 query-conditioned reasoning 和 spatial verification 输出 affordance mask。方法兼顾开放词汇常识与 3D localization。",
+    "methodZh": "输入为 3D scene 与自然语言 functional query。系统先让 VLM 基于 multi-view images 提议可交互区域/对象，再把 proposal IDs、geometry 与 semantics 对齐到 3D，经过 query-conditioned reasoning 和 spatial verification 输出 affordance mask。方法兼顾开放词汇常识与 3D localization。 贡献在把 2D VLM commonsense proposals 与可验证的 3D geometry descriptors 串联，而非让语言模型直接输出不可定位答案；proposal coverage 分析也暴露 recall 与 tightness 瓶颈。",
+    "experimentsZh": "在 SceneFun3D validation 上按 official AP25/AP50 评估，与 open-vocabulary 3D methods 和 VLM variants 比较，另做 architecture ablation 与 proposal-coverage breakdown。 作者报告：作者报告在 SceneFun3D official evaluator 的 AP25/AP50 上优于 comparable 3D open-vocabulary/VLM methods；proposal coverage 明显高于最终 tight-mask AP。（Tables 1 and 3, p. 5） Baseline boundary：覆盖相关 3D affordance/open-vocabulary baselines并使用官方 evaluator；但数据集规模、query taxonomy 与静态 indoor scenes 限制真实机器人泛化。 Ablation boundary：分离 VLM proposal、geometry descriptors 与 spatial reasoning，支持各组件；缺少 embodied execution、occlusion perturbation 与 query ambiguity 的系统测试。",
+    "insightZh": "贡献在把 2D VLM commonsense proposals 与可验证的 3D geometry descriptors 串联，而非让语言模型直接输出不可定位答案；proposal coverage 分析也暴露 recall 与 tightness 瓶颈。 建议精读 proposal-to-3D interface 和 coverage gap；收录时不把静态 benchmark AP 等同为机器人可执行性。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

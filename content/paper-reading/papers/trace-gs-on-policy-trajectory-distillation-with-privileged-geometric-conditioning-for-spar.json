@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.10286",
+  "slug": "trace-gs-on-policy-trajectory-distillation-with-privileged-geometric-conditioning-for-spar",
+  "title": "TRACE-GS: On-Policy Trajectory Distillation with Privileged Geometric Conditioning for Sparse-View 3DGS Restoration",
+  "authors": [
+    "Linlian Jiang",
+    "Yuchen Xi",
+    "Sadman Rakib Pinon",
+    "Ruigang Yang",
+    "Yang Wang",
+    "Xinxin Zuo"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10286"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "trace-gs",
+    "on-policy",
+    "trajectory",
+    "distillation",
+    "privileged",
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "abstract": "We present TRACE-GS, an on-policy trajectory distillation framework that leverages privileged geometric conditioning at training time, thereby adapting a diffusion prior to sparse-view 3D Gaussian Splatting (3DGS) restoration. Rather than pursuing increasingly sophisticated restoration architectures, we identify a more fundamental limitation shared by existing diffusion-based approaches: supervision at independently noised states does not cover those reached during inference. In sparse-view 3DGS, under-constrained geometry biases denoising from the outset, and the resulting deviations compound along the rollout. TRACE-GS instead performs on-policy trajectory distillation: a teacher conditioned on richer geometry from additional training views supplies targets along the sparse-view student's own rollout, aligning denoising directions and cross-view responses at each visited state. This training-only geometry places TRACE-GS in the learning using privileged information (LUPI) setting. At deployment, only the sparse-view student is retained, and its restored renderings serve as pseudo-observations for 3DGS refinement. To the best of our knowledge, TRACE-GS is the first to derive on-policy supervision from privileged geometry for sparse-view 3DGS restoration, achieving consistent gains and strong generalization across datasets and sparse-view settings.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10286v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10286v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10286v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "TRACE-GS 用 privileged dense-view geometry 训练 sparse-view Gaussian reconstruction：先做 geometry-aware warm-up，再以 on-policy retrieval alignment 蒸馏到部署时只需稀疏视图的模型；作者报告 3/6-view 设置优于对照，但优势建立在训练期 dense views 与 retrieval bank 可用的假设上。",
+    "methodFlow": [
+      "Sparse input views",
+      "Dense-view privileged geometry during training",
+      "Geometry-aware warm-up",
+      "On-policy query and retrieval alignment",
+      "Student Gaussian prediction",
+      "Sparse-view novel-view rendering"
+    ],
+    "whyRelevantZh": "对 sparse-view 3D reconstruction 很直接，并提供可迁移的 privileged-information distillation 设计。",
+    "evidenceZh": "训练期利用 dense-view privileged geometry，但部署保持与 feed-forward sparse-view baseline 相同输入和算法形态。（Sec. 3 and Fig. 2, p. 3）；on-policy retrieval 让 teacher response 随 student 当前 queries 对齐，缓解固定离线蒸馏的 distribution mismatch。（Secs. 3.3-3.4, pp. 4-5）；作者报告在 RealEstate10K 等 sparse-view protocols 下取得最佳 PSNR；3-view 时相对 GSFixer 提升 0.73 dB，并保持 feed-forward deployment。（Table 2, p. 6）",
+    "caveatZh": "作者限制：训练依赖 dense-view captures 和可信 geometry，真实稀疏采集域未必具备相同 privileged supervision。；审阅风险：PSNR 增益可能部分来自额外训练期视角信息；对大视角变化、动态物体和错误相机位姿的稳健性仍未充分证明。",
+    "motivationZh": "论文解决 sparse-view feed-forward Gaussian reconstruction 的 geometry ambiguity。训练阶段从 dense views 提取 privileged geometric responses，先对 student 做 aligned initialization，再让 student 自己的 queries 从 bank 检索并对齐 teacher responses，减少 off-policy distribution gap；推理阶段丢弃 privileged branch。",
+    "methodZh": "论文解决 sparse-view feed-forward Gaussian reconstruction 的 geometry ambiguity。训练阶段从 dense views 提取 privileged geometric responses，先对 student 做 aligned initialization，再让 student 自己的 queries 从 bank 检索并对齐 teacher responses，减少 off-policy distribution gap；推理阶段丢弃 privileged branch。 贡献在将 privileged geometry 蒸馏拆成 aligned warm-up 与 on-policy retrieval，而不是在部署时增加 optimizer；相对普通 feature distillation，它显式处理 student query distribution 与 teacher response 不一致。",
+    "experimentsZh": "以 3/6 views 等 sparse-view settings 在视频/场景 datasets 上比较 feed-forward Gaussian、NeRF 与 diffusion/reconstruction baselines，报告 PSNR/SSIM/LPIPS，另分析 privileged geometry 和 retrieval alignment。 作者报告：作者报告在 RealEstate10K 等 sparse-view protocols 下取得最佳 PSNR；3-view 时相对 GSFixer 提升 0.73 dB，并保持 feed-forward deployment。（Table 2, p. 6） Baseline boundary：覆盖 sparse-view rendering 的代表方法并控制主要 student 初始化；但 privileged dense-view data 是额外训练资源，不能与不使用该资源的方法作完全资源等价比较。 Ablation boundary：Table 3 分离 privileged geometry、off-policy 与 on-policy retrieval，支持 distribution-alignment 论点；bank size、跨域 dense-view noise 与训练成本敏感性仍有限。",
+    "insightZh": "贡献在将 privileged geometry 蒸馏拆成 aligned warm-up 与 on-policy retrieval，而不是在部署时增加 optimizer；相对普通 feature distillation，它显式处理 student query distribution 与 teacher response 不一致。 建议略读 method/ablation，关注 training-only privilege 与部署成本边界；其方向相关性高但主要影响集中在稀疏重建。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

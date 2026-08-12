@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2608.09778",
+  "slug": "roboseg-online-part-level-semantic-reconstruction-for-robotic-manipulation-via-a-single-ey",
+  "title": "RoboSeg: Online Part-Level Semantic Reconstruction for Robotic Manipulation via a Single Eye-in-Hand Camera",
+  "authors": [
+    "Zhaochen Lan",
+    "Mengxiang Lin"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09778"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "3d-reconstruction",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "roboseg",
+    "online",
+    "part-level",
+    "semantic",
+    "reconstruction",
+    "3d-segmentation",
+    "3d-reconstruction"
+  ],
+  "abstract": "Robotic manipulation requires perception systemsthat identify actionable parts such as handles, rims, triggers,and tool tips, not merely object categories or point clouds. This paper presents RoboSeg, a part-level semantic reconstructionsystem that links vision-language model (VLM) functional-partdiscovery, asynchronous online RGB-D semantic reconstruc-tion, and task-oriented grasp generation without requiring CAD models or pre-scanned meshes. RoboSeg queries a VLM onthe initial RGB observation to obtain compact functional part prompts, then scans with two asynchronous streams: a high-frequency geometry thread for RGB-D odometry and truncated signed distance function (TSDF) fusion, and a keyframe-triggered semantic thread for SAM3 part masks. Projectedmasks are fused by voxel-level temporal voting into a persistentpart-labeled point cloud; RoboSeg uses this map to assign AnyGrasp 6-DoF candidates to semantic parts and select grasps consistent with the task-relevant part label. RoboSeg reaches 83.4% mean part intersection-over-union (mIoU) over manually labeled objects; in a 24-trial physical pilot across fourobjects and eight tasks, the selected grasp contacts the requestedpart in all trials and achieves 21/24 combined task successes.These results characterize RoboSeg as a semantic indexing layerfor task-conditioned manipulation, with AnyGrasp retained asthe proposal generator.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09778v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09778v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09778v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "RoboSeg 用单个 eye-in-hand RGB-D camera 在线构建 part-level semantic TSDF：VLM 先从任务文本发现功能部件，SAM 类 mask 随帧传播，异步 fusion 与 voxel voting 抑制抖动，最后将目标 part point cloud 交给 AnyGrasp。作者在五类物体/24 次物理 trials 中报告组合系统成功 21 次，证明 part semantics 可直接支持 manipulation，但样本仍很小。",
+    "methodFlow": [
+      "Task Text and Eye-in-Hand RGB-D",
+      "VLM Functional-Part Discovery",
+      "Framewise Part Masks",
+      "Asynchronous TSDF Fusion",
+      "Voxel Semantic Voting",
+      "Part-Conditioned Grasp Generation"
+    ],
+    "whyRelevantZh": "它直接结合 3D part segmentation、online reconstruction、VLM 与 robotic manipulation，是研究方向的强交叉点。",
+    "evidenceZh": "VLM 根据 manipulation task 发现 handle、rim、trigger 等功能部件。（System overview, Fig. 2, p. 3）；异步 TSDF 与 voxel voting 将多帧 2D masks 融合为 part-level 3D map。（Online reconstruction, Sec. III, pp. 3–4）；作者报告 part reconstruction 指标优于单帧/无投票 variants。（Tables I–II, p. 5）；作者报告组合系统在 24 次 physical manipulation trials 成功 21 次。（Robot experiments, pp. 5–6）",
+    "caveatZh": "审阅风险：21/24 来自五个 objects 的小规模 pilot，不能视为通用 manipulation 成功率。；审阅风险：VLM part naming、mask propagation、pose/depth error 会级联，透明/反光/遮挡对象风险更高。",
+    "motivationZh": "系统接收任务与 RGB-D stream，VLM 生成 actionable part names/visual cues，image segmenter 产生 masks；相机运动中，geometry 线程更新 TSDF，semantic 线程将 noisy 2D labels 投票融合到 voxels。重建后的目标 part surface 经 task-conditioned selection 送入 grasp planner，形成 perception-to-action loop。",
+    "methodZh": "系统接收任务与 RGB-D stream，VLM 生成 actionable part names/visual cues，image segmenter 产生 masks；相机运动中，geometry 线程更新 TSDF，semantic 线程将 noisy 2D labels 投票融合到 voxels。重建后的目标 part surface 经 task-conditioned selection 送入 grasp planner，形成 perception-to-action loop。 工作把开放词汇 functional-part discovery、在线 RGB-D semantic reconstruction 与 grasp execution 串成无需 CAD model 的轻量 pipeline；重点是 actionable parts 而非 object category。",
+    "experimentsZh": "以五类 objects 做 online RGB-D reconstruction/part segmentation 比较，并在真实机械臂上进行 24 次 part-conditioned grasp/manipulation trials；消融 VLM discovery、temporal fusion/voting 等组件。 作者报告：作者报告在线 voxel semantic fusion 提升 part reconstruction/segmentation 相对单帧 variants 的稳定性。（Tables I–II, p. 5）；作者报告完整系统在物理实验中成功 21/24 次。（Robot experiments, pp. 5–6） Baseline boundary：含 online reconstruction/segmentation ablations 和真实 robot loop；仅五个 objects、单相机/环境，统计规模与开放世界多样性不足。 Ablation boundary：比较 framewise、fusion/voting 与完整 pipeline，能说明 temporal 3D aggregation 的价值。",
+    "insightZh": "工作把开放词汇 functional-part discovery、在线 RGB-D semantic reconstruction 与 grasp execution 串成无需 CAD model 的轻量 pipeline；重点是 actionable parts 而非 object category。 完整 perception-to-action system 且有物理试验，值得精读；结论必须受五对象/24 trials 的小样本边界约束。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

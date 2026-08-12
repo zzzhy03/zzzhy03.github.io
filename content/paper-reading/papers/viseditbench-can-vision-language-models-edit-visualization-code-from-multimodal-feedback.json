@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2608.10408",
+  "slug": "viseditbench-can-vision-language-models-edit-visualization-code-from-multimodal-feedback",
+  "title": "VisEditBench: Can Vision-Language Models Edit Visualization Code from Multimodal Feedback?",
+  "authors": [
+    "Mizanur Rahman",
+    "Arshia Azimlu",
+    "Shadikur Rahman",
+    "Md Tahmid Rahman Laskar",
+    "Amran Bhuiyan",
+    "Shafiq Joty",
+    "Enamul Hoque Prince"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10408"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "vlm-mllm",
+    "2d-design"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "viseditbench",
+    "can",
+    "vision-language",
+    "models",
+    "edit",
+    "visual-design-agents",
+    "vlm-mllm"
+  ],
+  "abstract": "Vision-language models (VLMs) have shown strong capabilities in generating visualization code from textual or visual specifications. However, real-world visualization authoring is inherently iterative: users frequently revise existing visualizations to repair flawed charts or adapt them to desired styles. Existing benchmarks primarily evaluate generation from scratch, leaving visualization code editing from multimodal feedback largely unexplored. We introduce VisEditBench, a benchmark of 1,395 human-annotated visualization code-editing tasks grounded in realistic visualization workflows and failure cases. VisEditBench covers two practical settings: feedback-guided repair, where models revise visualization code using buggy or marked charts together with textual feedback, and reference-guided restyling, where models modify code to match a target chart image. Evaluating 20 state-of-the-art VLMs reveals that visualization code editing remains challenging: Claude-4.6-Sonnet achieves the best overall pass rate of 74.46%, while most open-source models remain below 50%. Performance is particularly weak on visually grounded style adaptation, where Claude-4.6-Sonnet achieves only 55.71%. To establish a strong baseline, we further propose VisEditAgent, a render-grounded editing framework that iteratively generates, executes, validates, and refines candidate edits. Built on GPT-4o, VisEditAgent improves overall pass rate from 55.75% to 67.99%, demonstrating the importance of render-grounded feedback for faithful visualization editing. We will release VisEditBench at https://github.com/vis-nlp/VisEditBench.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10408v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10408v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/vis-nlp/VisEditBench"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10408v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/vis-nlp/VisEditBench）。",
+    "ideaZh": "VisEditBench 用 1,395 个真实 visualization edits 测 VLM 是否能在给定环境中正确修改 chart/code，而不是只会描述修改；20 个模型在 execution、intent 与 metric-level pass rates 上仍有明显差距，benchmark 对 visual design agent 很直接，但 judge/runtime 环境和任务分布仍可能带来偏差。",
+    "methodFlow": [
+      "Source visualization artifact",
+      "Natural-language edit request",
+      "VLM-generated edit",
+      "Sandboxed execution",
+      "Intent-specific and metric-level checks",
+      "Pass/failure taxonomy"
+    ],
+    "whyRelevantZh": "它直接提供 visual design agents 的可执行编辑 evaluation，尤其适合检验 instruction following、artifact preservation 和 tool-use failure。",
+    "evidenceZh": "每个样例把 source artifact、instruction、execution environment 和 criteria 绑定，允许验证真实编辑结果。（Secs. 2-3 and Fig. 2, p. 6）；评价同时覆盖 execution、editing intent 与 metric-level correctness，区分能运行但改错对象的失败。（Sec. 4, pp. 6-7）；作者报告 closed models 整体领先，但各模型在不同 edit intents 与 fine-grained metrics 上表现不均，最弱 open models 的总体通过率仍处低位。（Tables 2-3, p. 7）",
+    "caveatZh": "作者限制：任务和 artifacts 仍不能覆盖完整 visualization design space，自动 evaluation 也可能遗漏主观设计质量。；审阅风险：同一执行环境与 scorer 定义可能偏向特定 libraries；单轮结果不能代表允许工具调用、视觉反馈与多轮修复的 design agents。",
+    "motivationZh": "数据集从 visualization editing workflow 中整理原始 artifact、natural-language instruction、目标修改和可执行环境，以 intent taxonomy 与多层 metrics 检验模型生成编辑是否能运行、是否满足局部/全局意图及是否破坏未要求内容。论文统一评测 20 个 open/closed VLM，并公开参数与 scorer 细节。",
+    "methodZh": "数据集从 visualization editing workflow 中整理原始 artifact、natural-language instruction、目标修改和可执行环境，以 intent taxonomy 与多层 metrics 检验模型生成编辑是否能运行、是否满足局部/全局意图及是否破坏未要求内容。论文统一评测 20 个 open/closed VLM，并公开参数与 scorer 细节。 主要贡献是把 visualization editing 从静态问答变成可执行、意图分层且能检查 regression 的 benchmark；技术新意在 evaluation artifact/design，而不是新模型。",
+    "experimentsZh": "1,395 examples 覆盖多类 visualization artifacts 和 editing intents；评测 20 个 VLM，固定 decoding/execution parameters，报告 intent pass rate、metric scores 和 failure breakdown。 作者报告：作者报告 closed models 整体领先，但各模型在不同 edit intents 与 fine-grained metrics 上表现不均，最弱 open models 的总体通过率仍处低位。（Tables 2-3, p. 7） Baseline boundary：模型覆盖广、统一执行环境是优点；但 benchmark 主要比较通用 VLM，没有与专业 chart editors、agentic repair loops 或 human editing cost 作同条件比较。 Ablation boundary：benchmark 论文没有传统模型组件消融；提供 intent/metric/model-size stratification 和 inference settings，仍需 judge sensitivity、rerun/repair budget 与 contamination audit。",
+    "insightZh": "主要贡献是把 visualization editing 从静态问答变成可执行、意图分层且能检查 regression 的 benchmark；技术新意在 evaluation artifact/design，而不是新模型。 建议精读 dataset construction、scoring boundary 与 failure taxonomy；可作为自建 design-agent eval 的强参考，但要补多轮 repair 和 human criteria。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

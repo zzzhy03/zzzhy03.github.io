@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2608.10439",
+  "slug": "stream-forcing-constructing-unified-training-trajectory-for-robust-streaming-video-generat",
+  "title": "Stream Forcing: Constructing Unified Training Trajectory for Robust Streaming Video Generation",
+  "authors": [
+    "Yueting Zhu",
+    "Yuehao Song",
+    "Kaicheng Zhang",
+    "Bao Tang",
+    "Shaoyu Chen",
+    "Qian Zhang",
+    "Wenyu Liu",
+    "Xinggang Wang"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10439"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "stream",
+    "forcing",
+    "constructing",
+    "unified",
+    "training",
+    "video-generation",
+    "image-generation"
+  ],
+  "abstract": "Streaming video generation holds strong potential for world modeling, where future frames must be inferred online sequentially to form a continuous video stream. However, streaming video diffusion models introduce a fundamental train-inference mismatch: inference follows a specialized denoising order, whereas advanced training strategies typically require diverse noise-level configurations. To address this trade-off between train-inference consistency and training coverage, we reformulate the video diffusion sampling as a frame-indexed stochastic process over noise levels. Within this stochastic process space, we construct a continuous training trajectory along which the sampling schedule progressively evolves from independent sampling to inference-consistent sampling. We further introduce a joint calibration algorithm and a temporal correlative sampling algorithm to ensure trajectory smoothness and cross-frame correlation. Building on these designs, we propose Stream Forcing, a unified training framework for streaming video generation that balances training sufficiency and inference efficiency. Extensive experiments demonstrate that Stream Forcing significantly improves generation quality with a 36.6% FVD improvement on the UCF-101 benchmark. Furthermore, our method facilitates robust zero-shot extrapolation to long-horizon video generation with a 27.9% FVD improvement on the UCF-101 benchmark.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10439v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10439v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10439v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Stream Forcing 为长视频 flow/diffusion 引入 causal streaming training：让模型在历史由自身生成、误差已累积的状态上继续预测，并用 temporal schedule 控制 context/target；作者报告 16/128-frame unconditional 与 driving generation 改善，但长时一致性仍受有限 context、误差传播和训练成本约束。",
+    "methodFlow": [
+      "Video clips and noise schedule",
+      "Streaming rollout of generated history",
+      "Causal context window",
+      "Tempo-aware flow targets",
+      "Next-chunk denoising",
+      "Long video stream"
+    ],
+    "whyRelevantZh": "它直接命中 video generation，并对任何 autoregressive/chunked visual generator 的 exposure bias 有通用方法价值。",
+    "evidenceZh": "训练上下文包含模型自身 rollout，从而使 next-chunk predictor 看到部署时的累积误差分布。（Sec. 3 and Fig. 2, p. 4）；temporal schedule 协调 clean/noisy context 与目标时间步，使 streaming forcing 可接入 flow-based video models。（Secs. 3.2-3.3, pp. 4-5）；作者报告在 UCF 的 16/128-frame unconditional generation 及 driving-video comparisons 中优于所列 teacher-forced/long-video baselines。（Tables 1-3, pp. 5-7）",
+    "caveatZh": "作者限制：streaming rollout 增加训练成本，有限 context 下仍会累积身份、几何与运动误差。；审阅风险：更好的短段 FVD 不保证分钟级叙事/物理一致性；on-policy history 也可能牺牲局部清晰度或扩大早期 artifacts。",
+    "motivationZh": "论文指出 teacher-forced video generation 在训练时总看到 clean history，部署时却条件于自己的 noisy/generated frames。Stream Forcing 通过 streaming rollout 形成 on-policy-like contexts，并按时间位置分配 flow-matching targets，使训练显式覆盖 exposure bias；方法用于 unconditional 和 conditional driving video。",
+    "methodZh": "论文指出 teacher-forced video generation 在训练时总看到 clean history，部署时却条件于自己的 noisy/generated frames。Stream Forcing 通过 streaming rollout 形成 on-policy-like contexts，并按时间位置分配 flow-matching targets，使训练显式覆盖 exposure bias；方法用于 unconditional 和 conditional driving video。 核心是把 sequence exposure bias 直接纳入 flow-matching video training，而不是仅在 inference 做 sliding-window tricks；streaming context 与 temporal target schedule 的联合设计是主要贡献。",
+    "experimentsZh": "评估短/长 unconditional UCF generation 和 conditional driving generation，比较 diffusion/flow video baselines，报告 FVD 等指标，并分析 temporal schedule 与 context ratios。 作者报告：作者报告在 UCF 的 16/128-frame unconditional generation 及 driving-video comparisons 中优于所列 teacher-forced/long-video baselines。（Tables 1-3, pp. 5-7） Baseline boundary：覆盖代表性的 long-video and streaming generation methods；但数据、backbone、训练预算不完全一致，长视频质量仍主要由 automated metrics 和选定 qualitative sequences 支撑。 Ablation boundary：分析 temporal schedule、context/target ratio 与 rollout forcing，支持减少 train-test mismatch；缺少超长 horizon、交互式控制和多 seed 稳健性。",
+    "insightZh": "核心是把 sequence exposure bias 直接纳入 flow-matching video training，而不是仅在 inference 做 sliding-window tricks；streaming context 与 temporal target schedule 的联合设计是主要贡献。 建议精读 training distribution 与 schedule；重点是 streaming objective，而不是把现有 benchmark 分数视为长视频问题已解决。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

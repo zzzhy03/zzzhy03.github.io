@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2608.08676",
+  "slug": "unispace-unified-visual-representation-and-scalable-multimodal-modeling",
+  "title": "UniSpace: Unified Visual Representation and Scalable Multimodal Modeling",
+  "authors": [
+    "Jinbo Yan",
+    "Limeng Qiao",
+    "Jie Qin",
+    "Junyan He",
+    "Feize Wu",
+    "Guanglu Wan"
+  ],
+  "publishedAt": "2026-08-09",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.08676"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "vlm-mllm",
+    "2d-design"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "unispace",
+    "unified",
+    "visual",
+    "representation",
+    "scalable",
+    "image-generation",
+    "vlm-mllm"
+  ],
+  "abstract": "Semantic vision encoders have become a central visual interface for multimodal understanding and semantic conditioning in image generation. However, their final tokens discard fine-grained visual details, leading to poor pixel reconstruction and limiting their use in reconstruction-sensitive tasks such as image generation and editing. In this work, we ask whether understanding, generation, and editing can be modeled in a single visual representation space built from a pretrained semantic ViT. We show that the frozen Transformer blocks of a semantic ViT are not intrinsically unable to preserve visual details. Instead, the original patch parameterization drives the representation toward semantic abstraction, making fine-grained information difficult to recover from the final tokens. Based on this observation, we introduce \\emph{Patch Reparameterization}, which preserves the original semantic pathway while adding a reconstruction-aware patch embedding that provides fine-grained visual information to the same frozen ViT blocks. The resulting unified representation preserves multimodal understanding while enabling high-fidelity image reconstruction and a favorable reconstruction--generation trade-off. We further scale this representation into \\emph{UniSpace}, an 8B Mixture-of-Transformer-Experts model that performs understanding, generation, and editing in the same visual space without a separate VAE pathway. System-level evaluations demonstrate practical text-to-image generation and instruction-based image editing, showing that a reparameterized pretrained ViT can serve as a unified visual interface for scalable multimodal modeling.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08676v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08676v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yjb6/UniSpace"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08676v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/yjb6/UniSpace）。",
+    "ideaZh": "UniSpace 将 SigLIP semantic tokens 与 high-fidelity reconstruction tokens 显式分解，再用 balanced flow matching 训练一个可被 understanding、reconstruction、T2I 和 editing 共享的 visual space；作者报告 ImgEdit overall 4.28、DPG 86.49 和 OneIG-EN 56.1，但系统 understanding 仍落后专用 VLM，冻结 shared encoder 又限制继续提升理解能力。",
+    "methodFlow": [
+      "Image/text multimodal input",
+      "Semantic visual encoder",
+      "High-fidelity reconstruction encoder",
+      "Factorized unified token space",
+      "Balanced flow-matching prior",
+      "Understanding/reconstruction/generation/editing"
+    ],
+    "whyRelevantZh": "直接关联统一视觉 tokenization、image generation/editing 与 MLLM representation sharing。",
+    "evidenceZh": "UniSpace 将 semantic 与 reconstruction components 显式分解，并对齐为共享 visual tokens。（Secs. 3-4 and Fig. 2, p. 6）；作者的 entangled diagnostic 在真实 latents 上重建良好，却在 generative decoding 时用 reconstruction decoder 得到 FID 120.9。（Sec. 3.2 and Fig. 5, pp. 5-6）；作者报告 UniSpace 在 ImgEdit overall 4.28、DPG-Bench 86.49，并在 OneIG-Bench English 达到 56.1。（Tables 6, 9 and 11, pp. 16-20）",
+    "caveatZh": "作者限制：系统级 understanding 仍落后专用 VLM，尽管 representation 保留原 semantic encoder 能力。；作者限制：shared encoder 不能为 understanding 自由更新，否则可能损害生成，限制后续理解能力扩展。；审阅风险：跨系统结果混合了数据规模、model size、training compute 与 representation 差异，不能归因于 UniSpace 单一设计。；审阅风险：统一 token 的任务冲突可能在更大规模或新 domains 下重新出现。",
+    "motivationZh": "论文先证明把 semantic/reconstruction features 直接 merge 会被语义路径主导，generated latents 无法高保真解码。UniSpace 因而保留两个互补分量，用 patch-reparameterized tokenizer 对齐空间粒度，再以 balanced flow matching 学生成 prior；共享 tokens 同时服务 LLM understanding、image reconstruction、generation 和 reference editing。",
+    "methodZh": "论文先证明把 semantic/reconstruction features 直接 merge 会被语义路径主导，generated latents 无法高保真解码。UniSpace 因而保留两个互补分量，用 patch-reparameterized tokenizer 对齐空间粒度，再以 balanced flow matching 学生成 prior；共享 tokens 同时服务 LLM understanding、image reconstruction、generation 和 reference editing。 关键不是简单合并 two encoders，而是用 failure diagnostic 说明 entangled representation 的生成崩溃，再通过显式 factorization 与 balanced flow matching 保留两类信息。",
+    "experimentsZh": "评估 ImageNet reconstruction、multimodal understanding、latent generation、ImgEdit/GEdit、GenEval、OneIG 与 DPG；与 BAGEL、SenseNova、Chameleon 等 unified systems 和专用 models 比较，并消融 representation weighting。 作者报告：作者报告 ImgEdit overall 4.28（BAGEL 4.00）、DPG 86.49（BAGEL 85.07）、OneIG-English 56.1（BAGEL 47.0）。（Tables 6, 9 and 11, pp. 16-20） Baseline boundary：覆盖 unified models 与多种理解/生成/编辑 benchmarks，任务面广；模型训练数据、规模和 evaluation service 不完全等量，部分比较不宜解释为 representation 单因素胜出。 Ablation boundary：entangled failure diagnostic、factor weights、tokenizer 和 balanced flow matching 有分析；缺少共享 encoder 持续更新、task interference 与 scaling law 的完整消融。",
+    "insightZh": "关键不是简单合并 two encoders，而是用 failure diagnostic 说明 entangled representation 的生成崩溃，再通过显式 factorization 与 balanced flow matching 保留两类信息。 failure-driven representation design、任务广度和公开 code 值得精读；需避免把非等量系统比较写成严格 SOTA 因果证明。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

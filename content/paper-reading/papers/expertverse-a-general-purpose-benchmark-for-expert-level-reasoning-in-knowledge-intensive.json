@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2607.19341",
+  "slug": "expertverse-a-general-purpose-benchmark-for-expert-level-reasoning-in-knowledge-intensive",
+  "title": "ExpertVerse: A General-Purpose Benchmark for Expert-Level Reasoning in Knowledge-Intensive Visual Synthesis",
+  "authors": [
+    "Yuan Wang",
+    "Yongchao Du",
+    "Mengting Chen",
+    "Jinsong Lan",
+    "Jiaxuan Luo",
+    "Xuetao Feng",
+    "Xiaoyong Zhu"
+  ],
+  "publishedAt": "2026-07-21",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.19341"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "expertverse",
+    "general-purpose",
+    "benchmark",
+    "expert-level",
+    "reasoning",
+    "image-generation",
+    "vlm-mllm"
+  ],
+  "abstract": "Recent advances in multimodal generative models have enabled instruction-based image generation to move beyond semantic manipulation to knowledge-driven visual reasoning. However, these methods focus on explicit commonsense reasoning, shallow causal understanding, and direct knowledge recall, failing at knowledge-intensive generation. We develop \\textbf{ExpertVerse}, a capability-centric benchmark to evaluate generative models via knowledge-intensive lens. ExpertVerse stratifies reasoning generation across an orthogonal taxonomy of \\textit{9 cognitive capabilities} and \\textit{8 expert disciplines}, yielding \\textit{58 sub-disciplines}. We curate 1,611 expert-annotated instances covering single-image editing, multi-image composition, and text-to-image generation. We further develop an automated workflow to produce \\textbf{ExpertVerse-100K}, a large-scale dataset with reasoning traces and knowledge-anchored rationale annotations. Based on this, we train \\textbf{KnowThinker} with RL fine-tuning, a VLM reasoning engine with world knowledge that jointly generates thinking processes and refined instructions. Towards the cross-modal credit misalignment and multi-objective gradient conflicts in multi-reward optimization, we propose a tailored Bootstrapped Pareto Policy Optimization (BPPO), which synergizes Bootstrapping Reward Rectification (BRR) and Conflict-Aware Pareto Advantage Fusion (CPAF). Extensive results of both open-source and proprietary models exposes critical reasoning deficits, highlighting imperative for knowledge-intensive benchmarks towards next-generation visual generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.19341v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.19341v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.19341v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "ExpertVerse 把 knowledge-intensive image editing 拆为跨 11 个 expert domains 的 benchmark、ExpertVerse-100K reasoning corpus，以及用 conflict-aware BPPO 训练的 prompt rewriter KnowThinker；作者报告它能显著提升冻结 image editor 的跨域表现，但数据构造和评价大量依赖 proprietary MLLM/judges，难区分真实 expert knowledge 与 judge-aligned prompt verbosity。",
+    "methodFlow": [
+      "Knowledge-intensive edit request",
+      "Domain knowledge retrieval/reasoning",
+      "ExpertVerse-100K supervision",
+      "Conflict-aware BPPO",
+      "KnowThinker prompt rewrite",
+      "Frozen image editor output"
+    ],
+    "whyRelevantZh": "它连接 VLM reasoning、prompt agents 与 knowledge-intensive image generation，对视觉 design agents 的上游规划很相关。",
+    "evidenceZh": "ExpertVerse 覆盖多种专业领域并要求 structured cognitive plan 与 domain-anchored rationale。（Sec. 2 and Table 1, pp. 2-3）；KnowThinker 用 ExpertVerse-100K 与 conflict-aware BPPO 学习把隐式编辑需求改写为可执行 prompt。（Secs. 3-4, pp. 4-6）；作者报告 KnowThinker 在 ExpertVerse 多领域综合评估中达到 83.02，明显高于 base editor 的 67.14。（Table 4, p. 9）",
+    "caveatZh": "作者限制：论文没有给出独立专家标注的大规模事实正确性验证，也未充分讨论 proprietary judge 的偏差。；审阅风险：更长、更专业措辞的 prompt 可能更迎合 MLLM judge，却未必提高真实知识正确性。；审阅风险：由生成模型构造的 100K corpus 可能放大相同模型家族的知识错误和文化偏差。",
+    "motivationZh": "给定隐含专业知识的编辑请求，KnowThinker 先产生 domain-aware rationale、显式约束与重写 prompt，再交给冻结图像编辑器。训练数据包含跨学科知识解释和视觉合成任务，BPPO 对多个偏好/奖励信号冲突进行约束优化；benchmark 同时测 reasoning plan 和最终编辑结果。",
+    "methodZh": "给定隐含专业知识的编辑请求，KnowThinker 先产生 domain-aware rationale、显式约束与重写 prompt，再交给冻结图像编辑器。训练数据包含跨学科知识解释和视觉合成任务，BPPO 对多个偏好/奖励信号冲突进行约束优化；benchmark 同时测 reasoning plan 和最终编辑结果。 贡献是把 expert knowledge grounding 明确纳入图像编辑 benchmark 和 prompt-rewriter training，并尝试处理多奖励冲突；模型本身不生成图像，而是优化上游 reasoning interface。",
+    "experimentsZh": "在 ExpertVerse、RISEBench、KRIS-Bench、WiseEdit、WiseEdit-Complex 与 UniREditBench 上比较 proprietary/community image editors 和不同 thinkers，并做 reward conflict、rewriter components 与 data-domain ablations。 作者报告：作者报告 KnowThinker+冻结编辑器在 ExpertVerse 综合分达到 83.02，而对应 base editor 为 67.14；在跨 benchmark prompt-rewriting 对照中也保持优势。（Table 4, p. 9; Table 10, p. 12） Baseline boundary：覆盖多种强闭源/开源 image editors 和 VLM prompt rewriters；但不同模型访问方式、版本、safety policy 与 judge affinity 会引入不可控差异。 Ablation boundary：包含 CPAF/BPPO reward conflict 与 core components；仍缺 blinded human expert audit、跨 judge robustness 和更严格的知识事实核验。",
+    "insightZh": "贡献是把 expert knowledge grounding 明确纳入图像编辑 benchmark 和 prompt-rewriter training，并尝试处理多奖励冲突；模型本身不生成图像，而是优化上游 reasoning interface。 benchmark+corpus+training recipe 构成实质贡献，值得精读；最终摘要必须强调 judge dependence，不能把综合分直接写成专家正确率。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "early"
+  }
+}

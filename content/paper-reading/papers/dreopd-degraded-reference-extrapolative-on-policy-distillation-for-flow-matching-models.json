@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.09233",
+  "slug": "dreopd-degraded-reference-extrapolative-on-policy-distillation-for-flow-matching-models",
+  "title": "DreOPD: Degraded-Reference Extrapolative On-Policy Distillation for Flow-matching Models",
+  "authors": [
+    "Mingfeng Lin",
+    "Chengfei Cai",
+    "Lin Xu",
+    "Yuxiang Wei",
+    "Liang Han"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09233"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "dreopd",
+    "degraded-reference",
+    "extrapolative",
+    "on-policy",
+    "distillation",
+    "image-generation"
+  ],
+  "abstract": "Flow-matching models are now a mainstream method to image generation, but its adaptation to diverse downstream scenarios typically relies on post-training, which may cause conflicts among task-specific optimization objectives. Reinforcement learning enables direct optimization of task-specific rewards beyond the original models, yet trajectory-level optimization may incur high-variance gradients and cross-task interference. On-policy distillation (OPD) offers dense and stable supervision on student rollouts, but conventional teacher matching remains imitation-based. We propose DreOPD, a Degraded-reference extrapolative OPD method for flow-matching models that bridges these two paradigms. Our DreOPD converts implicit reward extrapolation into closed-form velocity regression, enabling extrapolative post-training with the stability of OPD. It further uses a mildly degraded reference to strengthen the teacher-reference contrast, yielding a clearer extrapolation direction. Experiments on single- and multi-teacher settings show that DreOPD outperforms OPD and multi-task RL baselines in average performance, while surpassing specialized teachers on most metrics.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09233v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09233v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09233v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "DreOPD 将 flow-model on-policy distillation 从 teacher imitation 改成 degraded-reference extrapolation：用共享但稍退化的 reference 形成 closed-form velocity regression target，让 student 沿各 task-specific RL teacher 的 reward-improvement direction 超越 teacher，再以一个 shared reference 统一多 teacher distillation。作者在 SD3.5-M 的 GenEval/OCR/aesthetic rewards 上报告 cross-task average 优于 OPD 与 multi-task RL；但实验仍集中一个 base family、自有组合指标，缺少显式 limitations 与 matched wall-clock。",
+    "methodFlow": [
+      "Task-Specific RL Teachers",
+      "Shared Mildly Degraded Reference",
+      "Teacher/Reference Trajectory Contrast",
+      "Closed-Form Velocity Extrapolation",
+      "Multi-Teacher Shared Student",
+      "Consolidated Flow Generator"
+    ],
+    "whyRelevantZh": "它为 reward-specialized image generators 的模型合并/蒸馏提供了一个无需额外 verifier 的训练方向，可服务多目标视觉生成。",
+    "evidenceZh": "DreOPD 用 degraded reference 构造 beyond-teacher 的 multi-task extrapolation direction。（Sec. 3 and Fig. 2, p. 4）；Gaussian transition 使 trajectory-level objective 化为 closed-form velocity regression。（Sec. 3.2, pp. 4–5）；作者报告 multi-task DreOPD 的 cross-metric average 0.9939，高于 OPD 0.9680 与 multi-task RL rows。（Table 2, p. 9）；λ/degraded-reference 消融显示过度 extrapolation 会牺牲部分任务。（Tables 3–4, p. 10）",
+    "caveatZh": "审阅风险：结论只在 SD3.5-M 与三个 reward directions 验证，不能外推到任意 flow models 或复杂 multi-objective reward。；审阅风险：normalized average 可能隐藏任务间 trade-off，应保留分项 metrics。；审阅风险：项目页不是明确 source-code URL，代码状态不能记 available。",
+    "motivationZh": "标准 OPD 对 teacher trajectory 做 interpolation，多个 specialized teachers 容易产生 knowledge consolidation conflict。DreOPD 先从 mildly degraded reference构造 teacher/reference trajectory likelihood-ratio objective，在 Gaussian flow transition 下推导无需 rollout likelihood 的 closed-form velocity target；λ>1 实现 extrapolation。单 teacher 学各 reward，multi-teacher 共享 reference并沿多条 teacher directions训练一个 student。",
+    "methodZh": "标准 OPD 对 teacher trajectory 做 interpolation，多个 specialized teachers 容易产生 knowledge consolidation conflict。DreOPD 先从 mildly degraded reference构造 teacher/reference trajectory likelihood-ratio objective，在 Gaussian flow transition 下推导无需 rollout likelihood 的 closed-form velocity target；λ>1 实现 extrapolation。单 teacher 学各 reward，multi-teacher 共享 reference并沿多条 teacher directions训练一个 student。 新意是把 reward direction 编码为相对 degraded reference 的 extrapolative target，并在 Gaussian flow matching 中化为可训练回归；它连接 RL 与 OPD，但仍是特定 transition family 和 hand-chosen degradation/λ 下的构造。",
+    "experimentsZh": "SD3.5-M 上训练 GenEval、OCR、aesthetic/PickScore task teachers，比较 single-task RL、multi-task RL、OPD、DiffusionNFT/Flow-OPD 和 model merging；报告 GenEval/OCR/CLIP/PickScore/HPS/Aesthetic/ImageReward 以及 λ、reference degradation、noise-level ablations。 作者报告：作者报告 multi-task Ours 的 GenEval 0.9681、OCR 0.9111、PickScore 24.085、normalized average 0.9939。（Table 2, p. 9）；作者报告 λ=1.25 在 cross-task balance 最佳，而 λ=1.5 进一步提高 OCR 但损害 GenEval/perceptual quality。（Table 3, p. 10） Baseline boundary：覆盖 RL、OPD 与 training-free merging，单/多 teacher settings；缺少 REST/其他 concurrent RL-native distillation、larger backbones 和人评。 Ablation boundary：λ、degraded reference 与 noise level 直接检验核心构造；缺少 degradation operator 类型、teacher diversity、student capacity 与 seed variance。",
+    "insightZh": "新意是把 reward direction 编码为相对 degraded reference 的 extrapolative target，并在 Gaussian flow matching 中化为可训练回归；它连接 RL 与 OPD，但仍是特定 transition family 和 hand-chosen degradation/λ 下的构造。 建议 skim 收录该训练构造；证据尚不足以称通用范式，需明确单 backbone、指标聚合与 λ trade-off。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "early"
+  }
+}

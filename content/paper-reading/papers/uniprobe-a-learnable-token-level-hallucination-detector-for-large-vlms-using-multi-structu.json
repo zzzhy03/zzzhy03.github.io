@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.10835",
+  "slug": "uniprobe-a-learnable-token-level-hallucination-detector-for-large-vlms-using-multi-structu",
+  "title": "UniProbe: A Learnable Token-Level Hallucination Detector for Large VLMs using Multi-Structural Internal Representations",
+  "authors": [
+    "Dvir Samuel",
+    "Guy Bar-Shalom",
+    "Fabrizio Frasca",
+    "Ethan Fetaya",
+    "Yftah Ziser",
+    "Gal Chechik",
+    "Haggai Maron"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10835"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "uniprobe",
+    "learnable",
+    "token-level",
+    "hallucination",
+    "detector",
+    "vlm-mllm"
+  ],
+  "abstract": "Large Vision-Language Models (LVLMs) achieve impressive visual reasoning and dialogue capabilities, yet frequently hallucinate content unsupported by the visual input. Effective mitigation requires token-level localization, enabling targeted intervention without discarding the entire response. Existing detectors require expensive full-model fine-tuning, rely on external verifiers that ignore the model's generation process, or reduce internal signals to isolated features and hand-crafted statistics, discarding spatial, sequential, and relational structure. We introduce \\textbf{UniProbe}, a lightweight, unified, learnable detector that models a frozen LVLM's heterogeneous computational trace from a single forward pass. UniProbe constructs a directed graph over image patches, query tokens, and generated tokens, with attention weights encoding their relations. It processes this trace with alternating structure-aware modules: a GNN for relational evidence, a ViT for 2-D visual geometry, and a GRU for response order. Interleaving them allows spatial, relational, and sequential evidence to interact throughout the detector. We further develop a streaming variant for hallucination-aware decoding, which detects and resamples hallucinated tokens during generation, and a self-adaptation strategy aligning the detector with the LVLM's own generations. Across diverse LVLM backbones, UniProbe achieves state-of-the-art token-level and object-hallucination detection. During decoding, it reduces object hallucinations by up to 55\\% at $1.06\\times$ the latency of standard generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10835v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10835v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10835v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "UniProbe 从 MLLM 生成前 hidden states 训练统一 probe，同时做 hallucination detection 与 token grounding，避免仅在输出后找错误；作者在 MHALO/HalLoc 和 self-generation tests 报告提升，但方法要求访问内部 states，跨闭源模型、architecture 与 decoding regime 的泛化受限。",
+    "methodFlow": [
+      "Image + prompt",
+      "Pre-generation multimodal hidden states",
+      "Unified probing head",
+      "Hallucination score + token grounding",
+      "Optional detector-guided re-decoding",
+      "Answer"
+    ],
+    "whyRelevantZh": "对构建可信 MLLM/design agents 的生成前检查与可定位 failure signal 有实用参考。",
+    "evidenceZh": "UniProbe 在解码前的 multimodal states 上同时估计 hallucination 与 token grounding。（Sec. 3 and Fig. 2, p. 4）；检测信号可用于 detector-guided re-decoding，而不只是事后分类。（Sec. 3.4, pp. 5-6）；作者报告在 MHALO 的 token detection、HalLoc localization 和 self-generation/object-hallucination detection 上优于所列 detectors。（Tables 1-3, p. 6）",
+    "caveatZh": "作者限制：方法要求访问 hidden states，且不同 MLLM architecture 的内部表示不统一。；审阅风险：probe accuracy 可能依赖 benchmark-specific annotation 和 model family，错误触发 re-decoding 也可能损害原本正确答案。",
+    "motivationZh": "方法在生成前的 multimodal representations 上定位与候选 tokens 相关的信号，联合训练 sequence-level hallucination score 和 token-level grounding/localization，并可触发 detector-guided re-decoding。它试图统一预警、定位与 mitigation，而非只依赖输出文本的一致性检查。",
+    "methodZh": "方法在生成前的 multimodal representations 上定位与候选 tokens 相关的信号，联合训练 sequence-level hallucination score 和 token-level grounding/localization，并可触发 detector-guided re-decoding。它试图统一预警、定位与 mitigation，而非只依赖输出文本的一致性检查。 贡献在统一 pre-generation detection 和 token localization，并展示同一 probe 可服务 self-generated outputs；本质仍是 access-dependent representation probing。",
+    "experimentsZh": "在 MHALO、HalLoc 与 self-generation protocols 上评估 sequence/token-level detection 和 localization，比较输出后 detector 与 hidden-state probes，并测试 re-decoding。 作者报告：作者报告在 MHALO 的 token detection、HalLoc localization 和 self-generation/object-hallucination detection 上优于所列 detectors。（Tables 1-3, p. 6） Baseline boundary：包含多类 hallucination detectors 和不同 backbones；但只有可访问 hidden states 的模型可用，闭源 API 和架构迁移比较不完整。 Ablation boundary：分析 pre-generation layers、probe inputs 和 mitigation；缺少跨版本/quantization/decoding-temperature 的稳定性与 calibration curves。",
+    "insightZh": "贡献在统一 pre-generation detection 和 token localization，并展示同一 probe 可服务 self-generated outputs；本质仍是 access-dependent representation probing。 建议略读 probe placement、localization 与 calibration；收录为内部-state diagnostic，不视为 model-agnostic hallucination solution。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

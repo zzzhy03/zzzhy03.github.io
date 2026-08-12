@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2607.28675",
+  "slug": "meshy-t2-fast-native-mesh-generation-with-flow-matching",
+  "title": "Meshy T2: Fast Native Mesh Generation with Flow Matching",
+  "authors": [
+    "Jiale Xu",
+    "Rendong Liang",
+    "Yuhao Long",
+    "Siyuan Shen",
+    "Zangyueyang Xian",
+    "Xiaofei Wu",
+    "Zeyi Xu",
+    "Yuanming Hu"
+  ],
+  "publishedAt": "2026-07-28",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.28675"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "2d-design"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "meshy",
+    "fast",
+    "native",
+    "mesh",
+    "generation",
+    "3d-generation",
+    "2d-design"
+  ],
+  "abstract": "Polygonal meshes are the standard surface representation of modern 3D pipelines, and generating high-quality meshes with artist-style topology is essential for film, gaming, and interactive 3D applications. Mainstream approaches serialize a mesh into a token sequence and decode it autoregressively, which is slow at inference and sensitive to error accumulation, making them impractical for interactive asset creation. We present Meshy T2, a fast native mesh generation framework built on flow matching. At its core is a vertex-set mesh VAE that encodes a mesh into one continuous latent token per vertex and decodes vertices, edge connectivity, and face winding order in a single pass, preserving high-precision geometry and artist-authored topology without vertex quantization or welding. Generation proceeds as a coarse-to-fine cascade of two flow-matching models: an image-conditioned voxel flow first sketches the overall shape as a coarse occupancy scaffold, and a mesh flow then populates the scaffold with per-vertex latent tokens, conditioned on the image, the scaffold, and a requested vertex budget. This design delivers three practical capabilities: interactive generation speed through parallel flow-based synthesis; effective face-count control through the requested vertex budget; and native support for multi-part assets, whose components emerge directly from the generated connectivity. In our experiments, Meshy T2 achieves state-of-the-art geometric fidelity and completes end-to-end image-to-mesh generation within a median of 6 seconds, over an order of magnitude faster than autoregressive baselines. Code and weights will be available at https://github.com/meshy-dev/meshy-t2.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.28675v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.28675v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.28675v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "Meshy T2 用 vertex-set mesh autoencoder 同时编码连续顶点、undirected edges 与 halfedge successor permutations，再以 coarse-to-fine flow matching 直接生成 native mesh；作者报告 3–10 秒、100% benchmark success 与较强 face-count/retopology control，但高质量对照集只有 115 assets，code 仍承诺发布，工业复杂拓扑与失败边界尚未充分开放核验。",
+    "methodFlow": [
+      "Image/text condition",
+      "Sample requested vertex slots",
+      "Vertex-set latent flow matching",
+      "Coarse geometric generation",
+      "Edge + halfedge successor decoding",
+      "Compact native mesh"
+    ],
+    "whyRelevantZh": "直接关联 native mesh generation、可控面数与高效 3D asset pipeline。",
+    "evidenceZh": "autoencoder 同时从 sparse surface context、vertices 与 edges 编码，并预测 coordinates、edges 和 halfedge permutations。（Sec. 3.1 and Fig. 2, p. 6）；生成端用 coarse-to-fine flow matching 建模可变数量的 vertex-set latents。（Secs. 3.2-3.3, pp. 7-10）；作者报告高多边形 retopology 评测中 CD 0.020、HD 0.044、NC 0.80、non-manifold 0.6%、tri-to-quad 70.1%、3 秒与 100% success。（Table 2, p. 13）",
+    "caveatZh": "作者限制：论文结论将更复杂 topology robustness 与 irregular shapes 留作未来方向，尚未给出专门 limitations section。；审阅风险：100% success 是在作者定义的小型 benchmark 和 validity checks 下，不能等同于工业 watertight/manufacturable success。；审阅风险：在公开 code 前，关键 topology decoder、sampling 和 baseline failure handling 难以独立核验。",
+    "motivationZh": "encoder 为每个 ground-truth vertex 产生一个 latent token，graph attention 只沿真实边传递；decoder 预测 vertex coordinates、edge adjacency 和 local halfedge successor，从而恢复 faces。生成端先采样 vertex slots，再用 flow matching 逐步去噪并做 coarse-to-fine connectivity refinement，避免传统 face-by-face autoregression 的长序列瓶颈。",
+    "methodZh": "encoder 为每个 ground-truth vertex 产生一个 latent token，graph attention 只沿真实边传递；decoder 预测 vertex coordinates、edge adjacency 和 local halfedge successor，从而恢复 faces。生成端先采样 vertex slots，再用 flow matching 逐步去噪并做 coarse-to-fine connectivity refinement，避免传统 face-by-face autoregression 的长序列瓶颈。 把 mesh topology 拆为 edge set 与 per-vertex permutation，并用 set latent/flow matching 统一生成，是相对 polygon autoregression 的结构性变化；face-count control 也直接来自 vertex-slot interface。",
+    "experimentsZh": "在 image-to-mesh、text-to-mesh 和 high-poly retopology 任务上比较 MeshFlow、DeepMesh、MeshSilksong 等，以 geometry、normal、manifoldness、tri/quad ratio、runtime 与 success rate 评估；另做 positional encoding 和 OT matching 消融。 作者报告：作者报告 retopology benchmark 上 3 秒平均运行、100% success、CD 0.020 与 non-manifold 0.6%；常规生成约 6 秒至 10 秒。（Tables 1-2, pp. 12-13） Baseline boundary：覆盖 autoregressive 和 flow-based native mesh systems，并将失败率纳入比较；但主要高多边形测试仅 115 assets，部分 baseline code 不可用。 Ablation boundary：分析 positional encoding、OT matching、vertex slots 与 topology representation；缺少自交、薄结构、多 component、极端 genus 和 fabrication validity 的全面压力测试。",
+    "insightZh": "把 mesh topology 拆为 edge set 与 per-vertex permutation，并用 set latent/flow matching 统一生成，是相对 polygon autoregression 的结构性变化；face-count control 也直接来自 vertex-slot interface。 结构表示和系统效率都有明显推进，值得精读；在 code release 和更广 topology audit 前保留复现与工业有效性 caveat。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

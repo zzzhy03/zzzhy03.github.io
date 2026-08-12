@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.09637",
+  "slug": "duet-a-diversity-quality-duet-of-distillation-experts-for-two-step-video-generation",
+  "title": "DUET: A Diversity-Quality Duet of Distillation Experts for Two-Step Video Generation",
+  "authors": [
+    "Zian Li",
+    "Litong Gong",
+    "Borui Liao",
+    "Pengfei Liu",
+    "Xinyu Wang",
+    "Xinyuan Wei",
+    "Yifan Gao",
+    "Tiezheng Ge",
+    "Muhan Zhang"
+  ],
+  "publishedAt": "2026-08-10",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.09637"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "duet",
+    "diversity-quality",
+    "distillation",
+    "experts",
+    "video-generation"
+  ],
+  "abstract": "Diffusion models have enabled high-quality video generation in recent years, but the high cost of iterative sampling hinders their practical deployment. Few-step distillation alleviates this cost, yet exposes a quality--diversity trade-off between its two dominant paradigms: trajectory-level distillation (e.g., sCM) favors diversity, whereas distribution-level distillation (e.g., DMD) favors quality. Targeting extreme two-step video generation, we introduce DUET, which reconciles the two paradigms through a noise-level duet of experts: an sCM expert takes the high-noise step to lay out diverse structure, and a DMD expert takes the low-noise step to refine appearance detail. Since the two experts are trained independently with their native objectives, DUET sidesteps the optimization difficulties of loss-level combinations and delivers quality and diversity jointly rather than trading one for the other. We further identify the relay interface and the high-noise stage as the remaining bottlenecks, and address them with RL-guided expert adaptation, yielding DUET+. With the Wan2.1-T2V-1.3B backbone, DUET lifts the two-step quality of sCM close to the level of DMD while retaining nearly all of its structural diversity---about twice that of DMD---and DUET+ further improves overall quality while preserving this diversity advantage. Together, these results establish noise-level expert specialization as a simple, effective paradigm for reconciling diversity and quality in two-step video generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.09637v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.09637v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.09637v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "DUET 针对 two-step video generation 中“高噪声一步决定 diversity、低噪声一步决定 quality”的不对称性，训练两个 distillation experts：高噪声 expert 用 consistency-style objective 保留多样性，低噪声 expert 用 distribution matching 修复视觉质量，再于固定 timestep 切换并加入 reward fine-tuning。作者报告两步采样下兼顾动态多样性与成片质量。",
+    "methodFlow": [
+      "Text and Initial Noise",
+      "High-Noise Diversity Expert",
+      "Intermediate Latent at Switch Time",
+      "Low-Noise Quality Expert",
+      "Reward Fine-Tuning",
+      "Two-Step Video"
+    ],
+    "whyRelevantZh": "它直接推进 few-step video generation，并提供按 denoising stage 分配目标与模型能力的可复用设计。",
+    "evidenceZh": "高噪声第一步主要控制 motion/content diversity，低噪声第二步主要修复 quality。（Analysis and Fig. 2, pp. 2–3）；DUET 为两个 noise regions 使用不同 distillation objectives。（Method and Fig. 3, p. 4）；作者报告 two-step DUET 在视频质量与 diversity 指标上优于单目标 distillation baselines。（Main results, Table 1, p. 6）；作者报告 expert/objective pairing 与 reward fine-tuning 均有可测贡献。（Ablations, p. 7）",
+    "caveatZh": "作者限制：实验主要在 Wan2.1-1.3B backbone 上，向更大/不同架构迁移仍待验证。；审阅风险：自动 video metrics 未必充分反映长时一致性与 prompt faithfulness。；审阅风险：两个 experts 的存储/训练成本可能抵消一部分两步推理优势，应区分 NFE 与系统成本。",
+    "motivationZh": "论文先实证分析两步 denoising 的功能分工，再分别用 stochastic-consistency-like distillation 和 DMD-style objective 训练 high-/low-noise experts。推理从噪声经 diversity expert 到中间 latent，再由 quality expert 生成视频；最后用 reward optimization 校准人类偏好指标。",
+    "methodZh": "论文先实证分析两步 denoising 的功能分工，再分别用 stochastic-consistency-like distillation 和 DMD-style objective 训练 high-/low-noise experts。推理从噪声经 diversity expert 到中间 latent，再由 quality expert 生成视频；最后用 reward optimization 校准人类偏好指标。 相比用单一 student/objective 蒸馏全部 noise levels，DUET 显式按两步采样的功能分工选择不同 distillation objectives，是有解释性的 heterogeneous expert design。",
+    "experimentsZh": "基于 Wan2.1-1.3B 等 video diffusion backbone，比较 consistency/DMD/两步蒸馏 baselines，评 VBench-style quality、motion/diversity 与 human-aligned rewards，并消融 switch timestep、expert objective 和 RL。 作者报告：作者报告 DUET 在仅两次 function evaluations 下取得更好的 diversity-quality 综合表现。（Table 1, p. 6）；作者报告去掉 expert specialization 或交换 objectives 会降低对应 diversity/quality 指标。（Ablation study, p. 7） Baseline boundary：覆盖相关 few-step distillation objectives 与多类自动指标；主要聚焦单一 1.3B backbone，跨架构和真实 latency 的外推有限。 Ablation boundary：分析两专家、各自 objective、switch time、reward tuning 与 sampling choices，分工证据较完整。",
+    "insightZh": "相比用单一 student/objective 蒸馏全部 noise levels，DUET 显式按两步采样的功能分工选择不同 distillation objectives，是有解释性的 heterogeneous expert design。 two-step specialization 新意和消融都较强，值得精读；需把 NFE 改善与双专家训练/存储代价分开。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

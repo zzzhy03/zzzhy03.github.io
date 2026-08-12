@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2601.03100",
+  "slug": "tgif-text-guided-layer-fusion-mitigates-hallucination-in-multimodal-llms",
+  "title": "TGIF: Text-Guided Layer Fusion Mitigates Hallucination in Multimodal LLMs",
+  "authors": [
+    "Chenchen Lin",
+    "Sanbao Su",
+    "Rachel Luo",
+    "Yuxiao Chen",
+    "Yan Wang",
+    "Marco Pavone",
+    "Fei Miao"
+  ],
+  "publishedAt": "2026-01-06",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v3",
+  "identifiers": {
+    "arxiv": "2601.03100"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "tgif",
+    "text-guided",
+    "layer",
+    "fusion",
+    "mitigates",
+    "vlm-mllm"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) typically rely on a single late-layer feature from a frozen vision encoder, leaving the encoder's rich hierarchy of visual cues under-utilized. MLLMs still suffer from visually ungrounded hallucinations, often relying on language priors rather than image evidence. While many prior mitigation strategies operate on the text side, they leave the visual representation unchanged and do not exploit the rich hierarchy of features encoded across vision layers. Existing multi-layer fusion methods partially address this limitation but remain static, applying the same layer mixture regardless of the query. In this work, we introduce TGIF (Text-Guided Inter-layer Fusion), a lightweight module that treats encoder layers as depth-wise \"experts\" and predicts a prompt-dependent fusion of visual features. TGIF follows the principle of direct external fusion, requires no vision-encoder updates, and adds minimal overhead. Integrated into LLaVA-1.5-7B, TGIF provides consistent improvements across hallucination, OCR, and VQA benchmarks, while preserving or improving performance on ScienceQA, GQA, and MMBench. These results suggest that query-conditioned, hierarchy-aware fusion is an effective way to strengthen visual grounding and reduce hallucination in modern MLLMs. Code: https://github.com/Linchenchen/TGIF.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2601.03100v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2601.03100v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Linchenchen/TGIF"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2601.03100v3 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/Linchenchen/TGIF）。",
+    "ideaZh": "TGIF 让文本条件 router 在 CLIP 多层视觉特征间动态加权，以相同 token budget 为不同 query 选择合适抽象层。作者报告 POPE、HallusionBench 和 OCRBench 均有增益，HallusionBench 49.94、比 LLaVA-1.5 高约 3 点；方法轻量且代码公开，但主要是单 backbone 上的增量组件，宜速读。",
+    "methodFlow": [
+      "CLIP 提取多层 patch features",
+      "文本 router 根据 query 产生 layer weights",
+      "对齐后加权融合多层视觉表示",
+      "保持 token 数不变送入原 LLM 回答"
+    ],
+    "whyRelevantZh": "与 MLLM hallucination、visual grounding 和低开销 representation routing 直接相关。",
+    "evidenceZh": "router 按 query 动态融合不同 CLIP 深度且不增加 token budget。（Sec. 3 and Fig. 2, p. 3）；作者报告 POPE 三种采样的 accuracy/F1 均优于 LLaVA 基线和若干 decoding mitigation。（Table 1, p. 6）；作者报告 HallusionBench All Accuracy 49.94，比 LLaVA-1.5 高约 3 点。（Table 2, p. 7）",
+    "caveatZh": "作者限制：效果依赖预训练视觉 encoder 各层确实保留互补信息。；审阅风险：单 backbone 结果不足以证明所有 MLLM 都存在相同最优层动态。；审阅风险：benchmark 增益不等同于开放式长回答中的事实性改善。",
+    "motivationZh": "论文发现固定 late-layer feature 并不对所有 query 最优，于是用 query embedding 预测各视觉层权重，融合后沿原 projector 输入 LLM；不改 vision encoder、无额外视觉 token。",
+    "methodZh": "论文发现固定 late-layer feature 并不对所有 query 最优，于是用 query embedding 预测各视觉层权重，融合后沿原 projector 输入 LLM；不改 vision encoder、无额外视觉 token。 把视觉层选择从固定超参变为 query-adaptive fusion，简单而可解释；与已有多层融合相比，主要新意是 text-conditioned router 与 hallucination 目标。",
+    "experimentsZh": "基于 LLaVA-1.5-7B 测 POPE、HallusionBench、OCRBench 和通用 VQA，并分析不同 query 的 layer-weight dynamics。 作者报告：作者报告 HallusionBench All Accuracy 为 49.94，较 LLaVA-1.5 提升约 3.0。（Table 2, p. 7） Baseline boundary：覆盖 hallucination decoding 方法和同量级模型；不同 backbone/vision encoder 的覆盖有限。 Ablation boundary：有固定层、融合方式和 router dynamics 分析；缺少大规模跨域及完整 inference latency 对照。",
+    "insightZh": "把视觉层选择从固定超参变为 query-adaptive fusion，简单而可解释；与已有多层融合相比，主要新意是 text-conditioned router 与 hallucination 目标。 贡献实用但偏轻量增量，适合速读方法图、POPE 表和 router 分析，不需深挖全部附录。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

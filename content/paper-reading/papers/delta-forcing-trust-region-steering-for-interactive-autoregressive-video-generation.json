@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2605.14382",
+  "slug": "delta-forcing-trust-region-steering-for-interactive-autoregressive-video-generation",
+  "title": "Delta Forcing: Trust Region Steering for Interactive Autoregressive Video Generation",
+  "authors": [
+    "Yuheng Wu",
+    "Xiangbo Gao",
+    "Tianhao Chen",
+    "Xinghao Chen",
+    "Qing Yin",
+    "Zhengzhong Tu",
+    "Dongman Lee"
+  ],
+  "publishedAt": "2026-05-14",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v5",
+  "identifiers": {
+    "arxiv": "2605.14382"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.MM"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "delta",
+    "forcing",
+    "trust",
+    "region",
+    "steering",
+    "video-generation"
+  ],
+  "abstract": "Interactive real-time autoregressive video generation is essential for applications such as content creation and world modeling, where visual content must adapt to dynamically evolving event conditions. A fundamental challenge lies in balancing reactivity and stability: models must respond promptly to new events while maintaining temporal coherence over long horizons. Existing approaches distill bidirectional models into autoregressive generators and further adapt them via streaming long tuning, yet often exhibit persistent drift after condition changes. We identify the cause as conditional bias, where the teacher may provide condition-aligned but trajectory-agnostic guidance, biasing generation toward locally valid yet globally inconsistent modes. Inspired by Trust Region Policy Optimization, we propose Delta Forcing, a simple yet effective framework that constrains unreliable teacher supervision within an adaptive trust region. Specifically, Delta Forcing estimates transition consistency from the latent delta between teacher and generator trajectories, and uses it to balance teacher supervision with a monotonic continuity objective. This suppress unreliable teacher-induced shifts while preserving responsiveness to new events. Extensive experiments demonstrate that Delta Forcing significantly improves consistency while maintaining event reactivity.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.14382v5",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.14382v5"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2605.14382v5 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Delta Forcing 针对 interactive autoregressive video 在 prompt/event switch 后的 teacher conditional bias：比较 teacher denoised feature delta 与 history-grounded rollout delta，在一致时保留 distribution matching，偏离时转向 continuity regularization。作者报告长时 identity/background stability 和 prompt responsiveness 同时改善；但只验证 1.3B Wan student，且显式 scene cut 会被误判为 drift。",
+    "methodFlow": [
+      "autoregressive student 基于历史生成下一 video chunk",
+      "teacher 按新事件产生 denoised target",
+      "计算 teacher/student rollout 的 feature-space deltas",
+      "trust-region gate 衡量 transition compatibility",
+      "在 distribution matching 与 continuity regularization 间自适应加权"
+    ],
+    "whyRelevantZh": "直接关联 interactive/streaming video generation、long-horizon stability 和动态 control。",
+    "evidenceZh": "gate 依据 teacher 与 history-grounded rollout 的 normalized feature delta 差异调整监督。（Sec. 3 and Fig. 1, p. 2）；作者报告 Delta Forcing 在 VBench 的 subject/background consistency 处于同规模 causal models 最优，同时维持 motion/quality。（Table 2, p. 8）；作者报告 Long-CLIP、VideoAlign 与 user preference 均支持长时响应性和一致性增益。（Table 1 and user study, pp. 8-9）",
+    "caveatZh": "作者限制：仅验证 1.3B student 与 Wan2.1-T2V-14B teacher，跨 family/scale 尚未证明。；作者限制：方法假定连续 one-shot 场景，刻意 scene cut 会产生被 gate 抑制的 displacement spike。；审阅风险：自动一致性指标可能奖励静态或低动态视频。；审阅风险：feature delta 的阈值可能对事件类型和 representation scale 敏感。",
+    "motivationZh": "在 streaming distillation 中，每个 chunk 计算 teacher update 与 student historical trajectory 的 normalized descriptor displacement，用 calibrated gate 定义 trust region；gate 低时降低 teacher steering 并约束连续性，从而避免新条件把已生成历史拉向不兼容 mode。",
+    "methodZh": "在 streaming distillation 中，每个 chunk 计算 teacher update 与 student historical trajectory 的 normalized descriptor displacement，用 calibrated gate 定义 trust region；gate 低时降低 teacher steering 并约束连续性，从而避免新条件把已生成历史拉向不兼容 mode。 把交互视频的 stability-reactivity trade-off 表述为 teacher/student transition delta compatibility，并以连续 gate steering，而不是固定蒸馏权重。",
+    "experimentsZh": "将 1.3B student 从 Wan2.1-T2V-14B teacher 蒸馏，评估 VBench、Long-CLIP、VideoAlign、长时 event switches 与 human preference，并与 Diffusion/Reward Forcing 等 causal baselines 比较。 作者报告：作者报告 Delta Forcing 在同规模 distilled-causal 组取得最佳 subject/background consistency。（Table 2, p. 8） Baseline boundary：覆盖相近参数 autoregressive baselines 和多类 metrics；单一 teacher/student family 与训练 recipe 限制归纳。 Ablation boundary：gate、delta descriptor、threshold/weight 和 streaming stages 有对照；缺少跨 backbone 与 intentional-cut-aware gate。",
+    "insightZh": "把交互视频的 stability-reactivity trade-off 表述为 teacher/student transition delta compatibility，并以连续 gate steering，而不是固定蒸馏权重。 方法针对关键失败模式且限制诚实，值得精读；摘要需明确单模型和无 deliberate cut 的边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

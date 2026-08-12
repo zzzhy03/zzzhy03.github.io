@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.08964",
+  "slug": "math-vision-diagrams-a-comprehensive-benchmark-for-evaluating-llm-mathematical-diagram-gen",
+  "title": "Math-Vision Diagrams: A Comprehensive Benchmark for Evaluating LLM Mathematical Diagram Generation Capabilities",
+  "authors": [
+    "Harish Kashyap",
+    "Kiran Byadarhaly",
+    "Sriram Chakaravarthy",
+    "Sanyukta Tuti",
+    "Aryan Mistry"
+  ],
+  "publishedAt": "2026-08-09",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.08964"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "2d-design",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "math-vision",
+    "diagrams",
+    "comprehensive",
+    "benchmark",
+    "evaluating",
+    "2d-design",
+    "vlm-mllm"
+  ],
+  "abstract": "The generation of mathematically precise diagrams from tex- tual prompts has emerged as a critical yet underexplored capability of Large Language Models (LLMs). This has been of interest to researchers in the areas of curriculum preparation, automated ranking of problem sets, and scientific publishing. For LLMs to achieve this, it requires per- fect coordination between Spatial Reasoning, Mathematical Reasoning, and Rendering systems. While existing benchmarks such as MathVision, MathVista are built for Math Reasoning or DiagramGenBenchmark, Mer- maidSeqBench on general purpose diagram generation, no prior work provides a standardized set of prompt, image pairs that can be used to evaluate the LLMs specifically on math diagram generation. This includes fields that span both both text-to-code and text-to-image paradigms. We introduce Math-Vision Diagrams, the first benchmark specifically designed to evaluate LLMs on mathematical diagram generation, and the first to assess text-to-code and text-to-image generation paradigms together in a single unified setting, agnostic of the underlying coding lan- guage or model type. Building on the Math-Vision benchmark, we select a subset of 2920 images out of 3040 from high-quality competition problems with essential visual context. A novel pipeline combining an ensemble of LLMs with Subject Matter Expert (SME) curation is presented, together with a suite of evaluation metrics. Testing several leading models against this benchmark, we demonstrate that LLMs struggle with math diagram generation. All code, data, curation pipeline, and evaluation scripts will be fully open-sourced.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08964v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08964v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08964v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 promised，未发布 Code link。",
+    "ideaZh": "Math-Vision Diagrams 建立 text-to-code 与 text-to-image 数学图生成的统一 benchmark：2,920 个 prompt–image pairs 来自 3,040 道高质量竞赛题，配套 compile rate、DISTS/CLIP、edge IoU/F1 与 50-pair SME prompt-sufficiency check。全文价值主要在诊断结构化 diagram generation 的评测缺口，而非新生成方法；作者也承认只覆盖 English static 2D、edge metrics 很低且有效样本数不均。",
+    "methodFlow": [
+      "Math Problem Diagram Collection",
+      "Multi-VLM Description and Grounded Refinement",
+      "SME Prompt-Sufficiency Validation",
+      "Text-to-Code / Text-to-Image Generation",
+      "Compile and Visual Metrics",
+      "Common-Subset Analysis"
+    ],
+    "whyRelevantZh": "数学图是高度 structured、可编辑 2D visual representation；benchmark 对 text-to-code 与 raster generation 的统一测量可直接启发 SVG/diagram/design agent evaluation。",
+    "evidenceZh": "数据构建结合多 VLM 描述、图像 grounded refinement 与人工 SME validation。（Secs. 3.2–3.5, p. 5）；作者评估十一种模型并同时记录 compilation、perceptual、semantic 与 geometric metrics。（Tables 2–4, pp. 8–10）；common subset analysis 表明排名基本稳定，但没有模型在所有轴占优。（Sec. 4.3 and Tables 4/6, pp. 10, 19）",
+    "caveatZh": "作者限制：仅覆盖 English prompts 与 static 2D diagrams。；作者限制：Edge IoU/F1 的绝对值很低，Canny-based edge detection 对多样 stroke/style 的区分力有限。；作者限制：不同模型 valid pair 数不同，per-model results 省略失败输出。；审阅风险：多 VLM 生成 prompt 可能把原图信息压缩成模型家族偏好的描述。；审阅风险：benchmark 评测结构相似性，但不能验证 diagram 中所有数学关系与 labels 的形式正确性。",
+    "motivationZh": "论文从 vision-based math problems 过滤原始图片，以多 VLM 描述、grounded refinement 和 SME validation 构建简洁生成 prompts，评估十一种 closed/open LLM 的 text-to-code 与 text-to-image 输出。评测同时记录 code compilation、perceptual similarity、semantic CLIP 和 edge geometry；common subset 分析缓解不同 compile rate 造成的 selection effect。结论是 code models 更可靠但受 compilation/semantic correctness 限制，image models 视觉更自然却容易幻觉 labels 与几何。",
+    "methodZh": "论文从 vision-based math problems 过滤原始图片，以多 VLM 描述、grounded refinement 和 SME validation 构建简洁生成 prompts，评估十一种 closed/open LLM 的 text-to-code 与 text-to-image 输出。评测同时记录 code compilation、perceptual similarity、semantic CLIP 和 edge geometry；common subset 分析缓解不同 compile rate 造成的 selection effect。结论是 code models 更可靠但受 compilation/semantic correctness 限制，image models 视觉更自然却容易幻觉 labels 与几何。 新意是将两类 output paradigm 放进同一 math-diagram benchmark，并显式审计 prompt sufficiency 与 compilation selection bias；数据合成、CLIP/DISTS、Canny edge metrics 本身均是已有技术。",
+    "experimentsZh": "从 3,040 个竞赛题构建 2,920 prompt-image pairs；比较 11 个 closed/open models，code models 允许 TikZ/Asymptote/Matplotlib/Manim，image models直接生成 raster；50 pairs 由两位 SMEs 评 prompt completeness/correctness/clarity。 作者报告：作者报告 Claude Opus 4.6 在全量数据的 DISTS 为 0.263、CLIP 0.905，compile rate 89.1%；Llama 4 Maverick 与 Nanon Banana Pro compile 为 100%，但视觉指标各有差异。（Table 4, p. 10）；作者报告 common subset n=1,068 上排名大体保持，显示差异不只是 compile success selection。（Table 6, p. 19） Baseline boundary：覆盖多家 closed/open LLM、code/image paradigms 与多种 code format；没有专门训练的 diagram-generation systems 和真实 editing workflow，API model versions 也使复现实验受限。 Ablation boundary：benchmark 论文没有模型组件消融；提供 common-subset、category/difficulty、metric correlation 与 SME sufficiency analyses，能审计数据和指标但不能归因模型差异。",
+    "insightZh": "新意是将两类 output paradigm 放进同一 math-diagram benchmark，并显式审计 prompt sufficiency 与 compilation selection bias；数据合成、CLIP/DISTS、Canny edge metrics 本身均是已有技术。 建议 skim 并作为评测资源收录；它不提供新 generation method，且 edge metric 与开放性仍有边界，不应当作能力榜单终局。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2607.16305",
+  "slug": "lookme-lookup-based-multimodal-embeddings-for-layer-injection-in-vision-language-models",
+  "title": "LookME: Lookup-Based Multimodal Embeddings for Layer Injection in Vision-Language Models",
+  "authors": [
+    "Zeyu Xu",
+    "Xingzhong Hou",
+    "Pengkai Guo",
+    "Siling Lin",
+    "Xiao Xu",
+    "Menghua Zhai",
+    "Haoyu Chen",
+    "Yunke Zhang",
+    "Fei Huang"
+  ],
+  "publishedAt": "2026-07-14",
+  "updatedAt": "2026-08-10",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v2",
+  "identifiers": {
+    "arxiv": "2607.16305"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "lookme",
+    "lookup-based",
+    "multimodal",
+    "embeddings",
+    "layer",
+    "vlm-mllm"
+  ],
+  "abstract": "Vision-Language Models (VLMs) have achieved strong progress in multimodal understanding. However, scaling dense or sparse Mixture-of-Experts (MoE) models to improve performance limits deployment in resource-constrained environments due to the trade-off between high memory usage from full loading and increased latency from on-demand loading. Recently, the Per-Layer Embedding (PLE) architecture addresses this by scaling models with large external embedding tables stored in read-only memory (ROM) and performing lightweight lookup to retrieve relevant embeddings to enhance token representations. Nevertheless, existing PLE-style methods are primarily designed for text embeddings due to the convenience of ID-based retrieval, limiting their effectiveness in VLMs where multimodal embeddings contain richer information for visual tasks. In this paper, we propose LookME, the first framework that enables lookup-based enhancement for multimodal embeddings in VLMs while supporting partitioned storage and on-demand loading. To efficiently lookup arbitrary continuous multimodal embeddings from large-scale embedding tables, we propose a hierarchical two-level lookup method employing a coarse-to-fine strategy that performs lookups from the scene-level to the intra-scene primitive-level. Furthermore, we integrate the lookup method with a sparse injection strategy, which adaptively prioritizes critical embeddings over voluminous multimodal embeddings within layers, and facilitates embedding table reuse across neighboring layers, improving the trade-off among efficiency, model size, and performance. Experiments on multiple visual benchmarks show that LookME outperforms text-only PLE-style methods, validating the effectiveness of lookup-based multimodal embedding enhancement.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.16305v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.16305v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2607.16305v2 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "LookME 把视觉信息拆成 scene-level 与 primitive-level embeddings，先从连续 lookup bank 检索与当前 layer query 匹配的表示，再稀疏注入语言层；作者报告在图像、OCR、spatial 与视频 benchmark 上有一致增益并保持较低额外成本，但仍依赖 continued pretraining 和覆盖面足够的 multimodal corpus。",
+    "methodFlow": [
+      "Image/video and prompt",
+      "Scene/primitive embedding bank",
+      "Layer-state lookup",
+      "Selected multimodal embeddings",
+      "Sparse layer injection",
+      "VLM response"
+    ],
+    "whyRelevantZh": "对 VLM 的跨层视觉记忆、token efficiency 与多粒度表示融合有直接参考。",
+    "evidenceZh": "LookME 维护 scene-level 和 primitive-level 表示，并依据 layer hidden state 做 lookup。（Sec. 3 and Fig. 2, p. 3）；注入只发生在选择的 layers，目标是兼顾局部视觉细节与推理效率。（Secs. 3.2-3.3, pp. 3-4）；作者报告 LookME 在 MMMU、MMBench、OCR、spatial 与 video benchmarks 上取得跨任务提升。（Table 1, p. 5）",
+    "caveatZh": "作者限制：方法需要 continued pretraining 来对齐 lookup embeddings，且依赖覆盖多样视觉概念的训练数据。；审阅风险：检索到语义相近但视觉证据不符的 embedding 可能造成隐式 hallucination，平均 benchmark 分数未显示 worst-case lookup failure。",
+    "motivationZh": "方法不再只把 vision encoder 的固定输出一次性接给 LLM，而是构建分层 multimodal embedding bank。每个 transformer layer 根据当前 hidden state 检索 scene 或 primitive entries，只在选定层执行 injection，从而按推理阶段补充全局语义或局部视觉细节。",
+    "methodZh": "方法不再只把 vision encoder 的固定输出一次性接给 LLM，而是构建分层 multimodal embedding bank。每个 transformer layer 根据当前 hidden state 检索 scene 或 primitive entries，只在选定层执行 injection，从而按推理阶段补充全局语义或局部视觉细节。 新意在 lookup-based continuous visual memory 与 sparse layer injection 的组合；相较 projector-only bridge 更灵活，但本质仍需额外预训练来教会各层使用检索表示。",
+    "experimentsZh": "在 image reasoning、knowledge、OCR、spatial、hallucination 和 video understanding benchmarks 上比较同尺寸 VLMs，并报告 peak memory/latency；消融 lookup pathways 和 sparse injection layers。 作者报告：作者报告 LookME 在 MMMU 达到 48.7、MMBench 79.8、OCRBench 82.5、VideoMME 61.4，并在多数组合指标上优于对应 baseline。（Table 1, p. 5） Baseline boundary：基线覆盖相近参数规模的通用 VLM 与若干视觉注入方案；但训练数据、token 数和不同模型 recipe 未必完全等量。 Ablation boundary：拆分 scene/primitive pathways 与 sparse layer choices；尚缺 corpus coverage、bank staleness、跨 domain lookup error 的细化分析。",
+    "insightZh": "新意在 lookup-based continuous visual memory 与 sparse layer injection 的组合；相较 projector-only bridge 更灵活，但本质仍需额外预训练来教会各层使用检索表示。 覆盖面和消融足以支持略读收录；创新属于实用 interface improvement，证据尚未证明在开放域、长尾视觉检索下稳定。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

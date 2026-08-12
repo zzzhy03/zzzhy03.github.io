@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.10525",
+  "slug": "dynamic-context-adapters-efficiently-infusing-history-into-vision-and-language-models",
+  "title": "Dynamic Context Adapters: Efficiently Infusing History into Vision-and-Language Models",
+  "authors": [
+    "Yuhang Song",
+    "Bor-Jiun Lin",
+    "Jiaxu Liu",
+    "Te-Chuan Chiu",
+    "Anh Nguyen",
+    "Chun-Yi Lee"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10525"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "dynamic",
+    "context",
+    "adapters",
+    "efficiently",
+    "infusing",
+    "vlm-mllm"
+  ],
+  "abstract": "Historical context integration presents a fundamental challenge for Vision-Language Models (VLMs) in sequential decision-making tasks. Current VLMs process visual inputs independently, which creates critical limitations for downstream applications that require temporal understanding. Direct incorporation of historical frames into Transformer inputs produces quadratic attention complexity and excessive memory consumption. Existing approaches suffer from significant drawbacks: computational inflation or substantial information loss through temporal compression. To address these challenges, we introduce Dynamic Context Adapter (DCA), a novel context injection approach for pretrained VLMs. Our method employs fixed-size, dynamically compressed memory to preserve historical semantics without frame concatenation. DCA bridges static VLMs and recurrent policies and enables memory capabilities in pretrained models while maintaining computational efficiency. DCA achieves over $25\\%$ reduction in attention FLOPs and $13\\%$ memory savings while improving performance on long-horizon tasks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10525v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10525v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10525v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "Dynamic Context Adapters 为 sequential VLM tasks 维护可更新的 bounded context states，而不是持续拼接全部 observations；作者在 VLN-CE R2R unseen navigation 上报告性能/吞吐改善，但证据集中在 navigation，尚不能证明对开放式长程多模态 agent 同样有效。",
+    "methodFlow": [
+      "Sequential visual-language observations",
+      "Context feature extraction",
+      "Dynamic adapter update",
+      "Bounded memory aggregation",
+      "Action/query prediction",
+      "Next observation"
+    ],
+    "whyRelevantZh": "它与 sequential MLLM agents 的 memory/context efficiency 直接相关，可启发长流程 design agents 的 bounded state。",
+    "evidenceZh": "动态 adapters 随 observation 更新 compact context，而不是把完整历史拼接进 transformer。（Sec. 3 and Fig. 2, p. 3）；bounded context 使 sequential inference 的历史开销受控，同时保留环境相关的适应信号。（Secs. 3.2-3.3, pp. 4-6）；作者报告在 VLN-CE R2R Val-Unseen 上优于 no-adapt 与 concatenation-based variants，并在吞吐比较中降低长期 context 开销。（Tables 1-2, p. 7）",
+    "caveatZh": "作者限制：主要验证集中在 vision-language navigation，跨任务泛化仍未建立。；审阅风险：compact adapter state 难以审计，可能丢失少见但关键历史事件；平均 navigation metrics 不揭示 memory failure modes。",
+    "motivationZh": "DCA 从当前 visual-language observation 提取 context features，以轻量 adapters 动态写入/聚合历史，并保持固定规模 representation 供后续 policy/query 使用。它试图同时解决 context concatenation 的计算增长和静态 memory 对环境变化适配不足。",
+    "methodZh": "DCA 从当前 visual-language observation 提取 context features，以轻量 adapters 动态写入/聚合历史，并保持固定规模 representation 供后续 policy/query 使用。它试图同时解决 context concatenation 的计算增长和静态 memory 对环境变化适配不足。 贡献是把长期 context 更新放到可训练 adapters 中，并强调 bounded compute；相对常见 recurrent memory，方法更贴近 frozen/pretrained VLM 的 parameter-efficient adaptation。",
+    "experimentsZh": "以 VLN-CE R2R unseen split 为主要任务，对比 no-adaptation、history concatenation 和 memory/adaptation variants，报告 navigation metrics、throughput 与设计消融。 作者报告：作者报告在 VLN-CE R2R Val-Unseen 上优于 no-adapt 与 concatenation-based variants，并在吞吐比较中降低长期 context 开销。（Tables 1-2, p. 7） Baseline boundary：对 navigation 内部 baselines 控制较清楚；缺少跨 task、跨 backbone 和多小时交互的通用 long-context agent 比较。 Ablation boundary：Table 3 分析 update/aggregation choices；仍需 memory capacity、catastrophic overwrite、环境突变与视觉噪声敏感性。",
+    "insightZh": "贡献是把长期 context 更新放到可训练 adapters 中，并强调 bounded compute；相对常见 recurrent memory，方法更贴近 frozen/pretrained VLM 的 parameter-efficient adaptation。 建议略读 adapter update 与 efficiency table；作为 navigation-backed memory design 收录，不宣称已经解决通用 agent memory。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

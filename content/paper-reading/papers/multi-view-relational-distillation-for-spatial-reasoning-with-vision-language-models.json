@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.10864",
+  "slug": "multi-view-relational-distillation-for-spatial-reasoning-with-vision-language-models",
+  "title": "Multi-View Relational Distillation for Spatial Reasoning with Vision-Language Models",
+  "authors": [
+    "Kiet T. Nguyen",
+    "Hanbo Shim",
+    "Jinwoo Kim",
+    "Seunghoon Hong"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.10864"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "multi-view",
+    "relational",
+    "distillation",
+    "spatial",
+    "reasoning",
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "abstract": "Vision-language models (VLMs) have achieved strong image and video understanding, yet their visual-spatial representations remain geometrically fragile, leading to failures in spatial reasoning needed for embodied AI, robotics, and autonomous driving. Prior approaches to geometry grounding either fine-tune VLMs on spatial question answering, which can perpetuate spurious visual representations, or fuse features from large geometry-grounded vision models, which substantially increases model size at inference. Knowledge distillation from geometry-grounded vision models offers an alternative, but directly matching multi-view teacher features can disrupt the pretrained alignment between visual and textual representations, degrading object- and language-semantic capabilities. We propose multi-view relational distillation (MVRD), which distills patch-wise cosine similarities across views instead of the teacher features themselves. These relations encode geometric correspondences adequate for spatial understanding, while leaving the student representation underdetermined, allowing it to remain close to its pretrained vision- language space. Across representative VLMs, MVRD improves visual-spatial reasoning, outperforming supervised fine-tuning and feature distillation while approaching feature fusion methods with considerably fewer added parameters and lower latency. We show that MVRD makes visual representations more geometric while retaining language alignment, and generalizes to 3D scene understanding tasks such as object grounding, dense captioning, and question answering.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10864v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10864v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.10864v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "MVRD 不直接蒸馏多视图 features，而是匹配 teacher/student 跨视图 relation matrix 的 rank-order 结构，减少 backbone/feature-space mismatch；作者在 3D scene understanding、VSI-Bench、ScanQA/SQA3D 等报告稳定提升，但仍依赖 teacher views 与 relation construction，且不保证恢复显式 geometry。",
+    "methodFlow": [
+      "Multi-view teacher observations",
+      "Teacher visual features",
+      "Cross-view relation matrix",
+      "Rank/correlation distillation",
+      "Student VLM adaptation",
+      "3D scene reasoning answer"
+    ],
+    "whyRelevantZh": "它对 multi-view VLM adaptation 和 3D spatial reasoning 直接相关，并提供跨 backbone 更稳健的 distillation abstraction。",
+    "evidenceZh": "MVRD 构造跨视图 relation matrices，并让 student 匹配 teacher 的相对关系而非原始 features。（Sec. 3 and Fig. 2, p. 6）；relation/rank objective 可容忍 teacher/student feature dimensionality 与 backbone 的表示差异。（Secs. 3.2-3.3, pp. 6-8）；作者报告在多个 3D scene-understanding/VSI tasks 和两种 VLM backbones 上多数指标优于 feature distillation；row-wise Pearson 配 cosine relation 最稳健。（Main tables and Tables 12-13, pp. 9-10 and 20-21）",
+    "caveatZh": "作者限制：性能取决于 teacher multi-view relations 的质量，错误或冗余 views 会污染 distillation target。；审阅风险：relation matching 可能提升 benchmark correlation 而未形成可解释 3D world model；需要显式 geometry probes 或 embodied transfer 验证。",
+    "motivationZh": "方法从多视图 teacher features 构造 cross-view relations，以 row-wise Pearson/cosine 等结构性目标将关系顺序蒸馏给 student VLM，再与 LoRA/SFT 结合。这样避免要求两种 backbone 的 feature vectors 逐点同构，重点保留视角间对应与相对相似性。",
+    "methodZh": "方法从多视图 teacher features 构造 cross-view relations，以 row-wise Pearson/cosine 等结构性目标将关系顺序蒸馏给 student VLM，再与 LoRA/SFT 结合。这样避免要求两种 backbone 的 feature vectors 逐点同构，重点保留视角间对应与相对相似性。 贡献是将 multi-view distillation target 从 absolute features 改为 cross-view relational geometry，并实证 Pearson-style rank structure 比 MSE 更稳健。",
+    "experimentsZh": "在 VSI-Bench、ScanQA、SQA3D 等 3D/VLM tasks 上，以不同 VLM backbones 比较 SFT、feature distillation、3DRS 与 relation variants，并给 per-task/ablation results。 作者报告：作者报告在多个 3D scene-understanding/VSI tasks 和两种 VLM backbones 上多数指标优于 feature distillation；row-wise Pearson 配 cosine relation 最稳健。（Main tables and Tables 12-13, pp. 9-10 and 20-21） Baseline boundary：覆盖 matched SFT 与 feature-distillation variants，且报告 reproduced 3DRS；但 teacher 数据/算力和 multi-view annotations 是额外资源，跨真实 agent tasks 的 transfer 未验证。 Ablation boundary：比较 relation construction、MSE/Pearson losses 和 backbones，支持结构目标；缺少 view count、pose noise、teacher error 与 relation sparsity 的全面敏感性。",
+    "insightZh": "贡献是将 multi-view distillation target 从 absolute features 改为 cross-view relational geometry，并实证 Pearson-style rank structure 比 MSE 更稳健。 建议精读 relation construction 和 Table 13；把提升解释为作者报告的 relational distillation 效果，不等价为完整 3D reconstruction。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

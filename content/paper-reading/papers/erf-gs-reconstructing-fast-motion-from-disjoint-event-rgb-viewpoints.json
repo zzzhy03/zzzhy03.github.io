@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.08531",
+  "slug": "erf-gs-reconstructing-fast-motion-from-disjoint-event-rgb-viewpoints",
+  "title": "ERF-GS: Reconstructing Fast Motion from Disjoint Event-RGB Viewpoints",
+  "authors": [
+    "Xiaoyang Bai",
+    "Zhenyang Li",
+    "Weiwei Xu",
+    "Edmund Y. Lam",
+    "Yifan Peng"
+  ],
+  "publishedAt": "2026-08-09",
+  "updatedAt": "2026-08-09",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.08531"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "erf-gs",
+    "reconstructing",
+    "fast",
+    "motion",
+    "disjoint",
+    "3d-reconstruction"
+  ],
+  "abstract": "Deep learning-driven representations such as neural radiance fields (NeRFs) and 3D Gaussian splatting (3DGS) have revolutionized the field of dynamic 3D scene reconstruction with improved visual precision and scalability. However, the reconstruction of fast-moving objects remains a challenge; existing methods based on conventional frame-based videos often struggle in scenarios such as sports events and animal videography. We propose an event-RGB fusion Gaussian splatting (ERF-GS) framework that integrates event information into both optimization and densification stages of the Gaussian splatting pipeline, taking advantage of novel event sensors with high frame-rate. Unlike many other event-assisted scene reconstruction methods, ERF-GS was developed using realistic simulation settings and realizes event-based learning detached from RGB inputs. This design enables its application beyond straightforward synthetic data into the realm of natural video with complex layout, low frame rates and severe motion blur. Our experiments show that ERF-GS outperforms both the 4DGS baseline and the concurrent E-D3DGS on different variants of the Neu3D and Nvidia datasets which include blurry RGB frames and disjoint RGB-event viewpoints. Our code is available at https://github.com/andrewbxy/ERF-GS.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.08531v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.08531v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/andrewbxy/ERF-GS"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.08531v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/andrewbxy/ERF-GS）。",
+    "ideaZh": "ERF-GS 用 disjoint-view RGB 提供外观、event stream 提供高速运动监督，以 EARL 将 event activations 对齐到 3D Gaussian scene content，再用 EDS 的 event difference 重建动态；作者报告在 Neu3D-dv/Nvidia-dv 有稳定但幅度有限的提升，且明确承认 sim-to-real gap、暗区噪声、反射材质和连续事件模拟限制。",
+    "methodFlow": [
+      "Disjoint RGB views + event stream",
+      "RGB-initialized dynamic Gaussians",
+      "Event activation representation",
+      "EARL event-to-scene alignment",
+      "EDS log-intensity supervision",
+      "Fast-motion novel-view rendering"
+    ],
+    "whyRelevantZh": "对 event-guided dynamic 3D reconstruction 和异步多传感器融合有直接参考。",
+    "evidenceZh": "EARL 用 event activations 学习场景内容，EDS 用 rendered log-intensity differences 形成事件监督。（Sec. 3 and Fig. 2, p. 4）；系统允许 RGB 与 event viewpoints disjoint，以事件补偿 fast-motion 时间信息。（Secs. 3.1-3.3, pp. 4-7）；作者报告 Neu3D-dv 平均 PSNR 26.65、SSIM 0.901、LPIPS 0.166，并在 Nvidia-dv 取得平均 PSNR 20.39。（Tables 1-2, p. 9）",
+    "caveatZh": "作者限制：模拟 motion blur 与真实 blur 存在 gap，模拟事件的时间分辨率受原 RGB frame rate 限制。；作者限制：反射表面、暗区高 event noise 与突然亮度变化会产生 floating Gaussians 和失真。；审阅风险：simulated-event benchmark 上的小幅指标提升可能在真实 sensor noise、calibration error 和 asynchronous latency 下消失。",
+    "motivationZh": "方法先以 RGB views 初始化动态 3DGS，再从事件体中学习位置/时间相关的 activation。EARL 把 event features 映射到 Gaussian content，EDS 对相邻渲染 log-intensity difference 与 events 做监督，从而在 RGB camera 与 event camera viewpoint 不重合时恢复 fast motion。",
+    "methodZh": "方法先以 RGB views 初始化动态 3DGS，再从事件体中学习位置/时间相关的 activation。EARL 把 event features 映射到 Gaussian content，EDS 对相邻渲染 log-intensity difference 与 events 做监督，从而在 RGB camera 与 event camera viewpoint 不重合时恢复 fast motion。 贡献在 disjoint event-RGB setup 与无需同视点同步 RGB 的事件监督接口；不是新的通用 4D representation，核心仍依赖动态 Gaussian backbone 和模拟/对齐假设。",
+    "experimentsZh": "构造 Neu3D-dv 与 Nvidia-dv disjoint-view protocols，比较 event-based/4DGS baselines，以 PSNR、SSIM、LPIPS 评价；消融 EARL、EDS、event ratios 并分析真实风格 failure cases。 作者报告：作者报告 Neu3D-dv 平均 26.65 PSNR/0.901 SSIM/0.166 LPIPS，Nvidia-dv 平均 20.39 PSNR；相对最强基线多为小到中等幅度提升。（Tables 1-2, p. 9） Baseline boundary：含多个 dynamic GS/event baselines 和困难序列；但事件主要由 RGB videos 模拟，真实 event camera 的时空噪声、校准和域差距不足。 Ablation boundary：组件与事件采样有消融，另给反射/暗区 failure；仍缺真实双传感器数据和不同 simulator 的 cross-domain evaluation。",
+    "insightZh": "贡献在 disjoint event-RGB setup 与无需同视点同步 RGB 的事件监督接口；不是新的通用 4D representation，核心仍依赖动态 Gaussian backbone 和模拟/对齐假设。 设置新颖且 code/failure analysis 完整，适合略读收录；受模拟事件和有限增益影响，不建议把它表述成已解决真实 fast-motion capture。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

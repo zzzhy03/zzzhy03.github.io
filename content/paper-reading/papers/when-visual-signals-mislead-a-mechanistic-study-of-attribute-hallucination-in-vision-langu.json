@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2608.11024",
+  "slug": "when-visual-signals-mislead-a-mechanistic-study-of-attribute-hallucination-in-vision-langu",
+  "title": "When Visual Signals Mislead: A Mechanistic Study of Attribute Hallucination in Vision-Language Models",
+  "authors": [
+    "Yufei Zhang",
+    "Chenlu Zhan",
+    "Hongwei Wang"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-11",
+  "collectedAt": "2026-08-13",
+  "venue": "arXiv preprint · v1",
+  "identifiers": {
+    "arxiv": "2608.11024"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "when",
+    "visual",
+    "signals",
+    "mislead",
+    "mechanistic",
+    "vlm-mllm"
+  ],
+  "abstract": "Attribute hallucination---where vision-language models (VLMs) correctly identify an object but mischaracterize its properties---is prevalent yet mechanistically poorly understood. The dominant explanation, language-prior dominance, has motivated prior-suppression methods, but this explanation has not been directly tested at the attribute level. We present VISOR (Visual-Operational Remediation), a unified framework that couples null-image-based diagnosis with routed remediation. Its VSNR diagnostic decomposes each prediction into a visual logit signal and a language-prior signal. Across 10,791 negative-ground-truth samples from three VLM families and three attribute types, the visual signal strongly predicts false positives, whereas the language-prior signal is near chance. VISOR uses this diagnosis to separate two failure modes: low-margin but directionally correct visual signals in color/state attributes, and low-SNR or misaligned visual signals in material attributes. The same diagnosis routes each query to the appropriate operator: calibration for threshold-placement errors, abstention for training-free low-SNR handling, or targeted visual adaptation for material failures that prior suppression cannot correct. Across Qwen, InternVL, and LLaVA, VISOR reduces attribute false positives without relying on the prior-dominance assumption.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.11024v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.11024v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2608.11024v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
+    "ideaZh": "VISOR 用 VSNR 等可干预诊断测量文字 token 与真实 image content 的融合强度，并以 VISOR-Adapt 改善 target material words；作者报告 VSNR 与词级表现强负相关，但诊断面向有限词汇/模型，相关性不能单独证明融合机制的因果充分性。",
+    "methodFlow": [
+      "Image-text pair",
+      "Controlled visual interventions",
+      "Token-level representation measurement",
+      "VSNR fusion diagnostic",
+      "Targeted adaptation",
+      "Visually grounded prediction"
+    ],
+    "whyRelevantZh": "它为 MLLM 内部 visual grounding 提供可干预诊断，可用于 design agents 的输入依赖与 shortcut audit。",
+    "evidenceZh": "VISOR 通过真实/扰动视觉输入对比，计算词级 VSNR 来测量视觉信息是否改变 language token。（Secs. 2-3 and Fig. 1, p. 2）；diagnostic 不只做分析，还用于定位弱融合词并驱动 VISOR-Adapt。（Sec. 4, pp. 3-4）；作者报告 VSNR 与六个 material target words 的性能相关系数为 -0.916，优于单独 signal/noise 指标，并展示 adaptation 后提升。（Main results, p. 4）",
+    "caveatZh": "作者限制：VSNR diagnostic 目前面向受控目标词和可访问内部表示的模型，适用范围有限。；审阅风险：高相关性样本规模有限，且词级 fusion 强并不保证模型正确解释视觉因果关系。",
+    "motivationZh": "论文通过保留文本、替换或扰动视觉输入，比较 internal representations/outputs，定义 signal-to-noise style metrics 来量化词 token 是否真正吸收视觉证据；再根据诊断信号进行轻量 adaptation。它关注模型是否在多模态层发生实质融合，而不只是最终 QA accuracy。",
+    "methodZh": "论文通过保留文本、替换或扰动视觉输入，比较 internal representations/outputs，定义 signal-to-noise style metrics 来量化词 token 是否真正吸收视觉证据；再根据诊断信号进行轻量 adaptation。它关注模型是否在多模态层发生实质融合，而不只是最终 QA accuracy。 新意主要是可干预、词级的 fusion diagnostic，以及用其指导 adaptation；与 attention visualization 相比，它尝试用 counterfactual visual signal 定量。",
+    "experimentsZh": "对选定 VLM、material words 与视觉干预设置测量 token-level diagnostics，比较 signal/noise/VSNR correlations，并评估 targeted adaptation。 作者报告：作者报告 VSNR 与六个 material target words 的性能相关系数为 -0.916，优于单独 signal/noise 指标，并展示 adaptation 后提升。（Main results, p. 4） Baseline boundary：诊断基线清楚但任务/词汇范围有限；缺少跨模型、跨层、开放词汇和复杂 spatial reasoning 的广泛复验。 Ablation boundary：拆分 signal/noise components 并比较 adaptation；需要控制 intervention realism、layer choice、tokenization 和 multiple-comparison effects。",
+    "insightZh": "新意主要是可干预、词级的 fusion diagnostic，以及用其指导 adaptation；与 attention visualization 相比，它尝试用 counterfactual visual signal 定量。 建议略读 diagnostic definition 和 intervention protocol；收录为分析工具，不把相关性写成普适机制证明。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}
