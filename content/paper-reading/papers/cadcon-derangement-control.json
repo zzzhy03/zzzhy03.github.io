@@ -6,9 +6,9 @@
     "Yang Xiao"
   ],
   "publishedAt": "2026-07-25",
-  "updatedAt": "2026-08-10",
+  "updatedAt": "2026-08-13",
   "collectedAt": "2026-08-07",
-  "venue": "arXiv preprint · v3",
+  "venue": "arXiv v4",
   "identifiers": {
     "arxiv": "2607.23191"
   },
@@ -25,66 +25,43 @@
   ],
   "primaryTopicId": "3d-generation",
   "keywords": [
-    "parametric CAD",
-    "design-intent conditioning",
-    "program completion",
-    "execution-gated evaluation",
-    "derangement control"
+    "3d generation",
+    "fabrication",
+    "2d design",
+    "Wrong",
+    "Design",
+    "Intent",
+    "Worse",
+    "Than"
   ],
-  "facets": {
-    "task": [
-      "generation",
-      "completion"
-    ],
-    "content-scope": [
-      "part-assembly"
-    ],
-    "representation": [
-      "cad-brep-parametric",
-      "discrete-program"
-    ],
-    "conditioning": [
-      "text"
-    ],
-    "method": [
-      "program-synthesis"
-    ],
-    "output-property": [
-      "editable"
-    ]
-  },
   "abstract": "Fine-tuned code LLMs are routinely conditioned on a design-intent specification, but the correctness axis of such a signal -- a wrong intent rather than an absent one -- has not been tested, and the benefit of conditioning is usually scored with the same detector that defines the signal. We study CADCON, a five-feature design-intent header prepended to CadQuery-style programs during LoRA fine-tuning of Qwen2.5-Coder-1.5B, scoring adherence with executable geometric assertions that share no code with the header-defining extractor. On a pre-registered sample of 400 deduplicated held-out programs stratified over eleven intent profiles, at 40% prefix and three seeds, a semantically wrong header degrades adherence below the never-header-trained baseline on 3/3 seeds under both tokenizations at the program level, and on 3/3 token and 2/3 text seeds at the 298 distinct model inputs they present. Wrong-header executability is not depressed relative to that baseline. A derangement control, retrained so every program receives another program's header -- holding the header marginal fixed while destroying its correlation with the program -- saw the same programs, indices and wrong headers. Its correct-to-wrong change is -0.006/+0.016/-0.003 against 0.124/0.241/0.230 for the standard model, and the interaction is significant on 3/3 seeds (p <= 5.9e-7), so the model's sensitivity to whether the header is right or wrong requires the learned mapping. The control sits below the baseline by the same margin under a correct as under a wrong header, so we claim that sensitivity and not the below-baseline level. On features the true intent lacks, the standard model realizes a feature far more often when the wrong header names it; the control does not. Ground truth itself scores only 0.567 here, the scale on which arm levels should be read. Wrong design intent is not inert: it actively misdirects generation.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2607.23191v3",
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.23191v4",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2607.23191v3"
-    },
-    {
-      "label": "Code",
-      "href": "https://github.com/Jacky628/cadcon-derangement-control"
+      "href": "https://arxiv.org/abs/2607.23191v4"
     }
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 arXiv 2607.23191v3 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 available（https://github.com/Jacky628/cadcon-derangement-control）。",
-    "ideaZh": "CADCON v3 是实质更新：它把早期 38 unique-program clusters/76 entries 扩为预注册的 400 programs、298 distinct 40%-prefix inputs 与 11 intent profiles，并以 derangement-trained control 和执行级 geometry metric 复核“错误设计意图比无条件更糟”；多数 primary cells 和 Test-D interaction 仍成立，但 40% prefix、input clustering、extractor truncation 与 1.5B 单模型限制外推。",
+    "sourceNote": "依据 arXiv 2607.23191v4 exact-version PDF、文本抽取与页面渲染整理；PDF 共 47 页，SHA-256 3ba73542f20923d8e84a7b3d115b39a6db426d132310f6109dcff1b7707580f1，视觉核验第 1、2、8、9 页。本次 exact-version review 未确认可发布的 Code link。",
+    "ideaZh": "CADCON v4 是实质更新：在 v3 的 400-program pre-registered replication 与 derangement control 上，新增 independently pre-registered extractor-repair inference run；修复 first-result truncation 后 wrong-header 仍劣于 never-conditioned，削弱了原结果由 scoring asymmetry 造成的替代解释。",
     "methodFlow": [
       "CadQuery program + frozen 40% prefix",
-      "Correct/wrong/none intent headers",
-      "Matched LoRA completion models",
-      "Derangement-trained control",
-      "Execute generated CAD solids",
-      "Distinct-input paired and interaction tests"
+      "Correct / wrong / none intent headers",
+      "Matched Qwen2.5-Coder LoRA models",
+      "Derangement-trained causal control",
+      "Independent executable B-rep assertions",
+      "Pre-registered replication + extractor-repair retest"
     ],
-    "whyRelevantZh": "它是 design-conditioned CAD agents 的 failure-mode 与 evaluation-instrument 研究，直接关系可控生成和安全回退。",
-    "evidenceZh": "v3 在 400 个去重 programs、11 intent profiles 和 298 个 distinct 40%-prefix inputs 上执行预注册 replication。（Secs. 3.1-3.3 and Tables 1-2, pp. 8-10）；derangement control 接收同分布但内容不相关的 headers，用于区分机械输入异常与 learned semantic response。（Secs. 3.2-3.3 and Fig. 1, pp. 6-9）；作者报告 wrong-vs-none harm 在 program level 两种 tokenization 的 3/3 seeds 显著；distinct-input primary reading 中 6 cells 保留 5 cells，而 Test-D interaction 仍极显著。（Secs. 4.1-4.2 and Tables 3-5, pp. 18-22）",
-    "caveatZh": "作者限制：结论只覆盖 40% prefix conditional completion，不是 0% from-scratch generation。；作者限制：400 programs 只有 298 distinct inputs，首个 result assignment 的 extractor truncation 会丢掉后续几何阶段。；作者限制：仅验证 1.5B code LLM 和五类 proxy intent features，不能外推到自然语言工程规范。；审阅风险：执行级 target 仍由 regex 从 reference program 提取，target 本身并不等同真实 designer intent 或 manufacturability。",
-    "motivationZh": "论文把 design intent 编码成五类 CAD header，比较 correct、wrong、none 与 derangement-control 条件。核心不是追求最佳 CAD generator，而是诊断 conditional generator 是否语义性地响应错误信号：同样看到 byte-identical wrong headers 的 control 若不退化，就排除 rare-input mechanical effect。v3 进一步用程序执行后实体几何特征评分，并按 distinct inputs 重算 paired tests。",
-    "methodZh": "论文把 design intent 编码成五类 CAD header，比较 correct、wrong、none 与 derangement-control 条件。核心不是追求最佳 CAD generator，而是诊断 conditional generator 是否语义性地响应错误信号：同样看到 byte-identical wrong headers 的 control 若不退化，就排除 rare-input mechanical effect。v3 进一步用程序执行后实体几何特征评分，并按 distinct inputs 重算 paired tests。 科学贡献是把 derangement control 引入 design-conditioned program generation，并区分 signal adherence detector 与实际执行几何；v3 的扩大样本、预注册 protocol 与 cluster-aware reanalysis 对结论可信度有实质影响，不是版本戳变化。",
-    "experimentsZh": "用 Qwen2.5-Coder-1.5B 对 CadQuery-style sketch-extrude programs 做 LoRA，比较正确、错误、无 header 及 derangement control；每个 condition 三 seeds，在 regex adherence 和执行 B-rep geometry 上做 paired tests、interaction 和 sensitivity analyses。 作者报告：作者报告 program-level wrong-vs-none 在 text/token 两侧均为 3/3 seeds 显著；按 298 distinct inputs 重算后 6 个 primary cells 中 5 个保留显著，Test-D interaction p 值仍约 10^-9 至 10^-10。（Tables 3-5, pp. 18-22; Sec. 6, p. 29） Baseline boundary：control design、三 seeds、执行级 metric 与多种 zero/truncation sensitivity 较强；但模型仅 1.5B、program family 较窄，尚无自然语言 designer intent 或工业 CAD tasks。 Ablation boundary：v3 增加 cluster-aware、executability、geometry scoring、profile weighting 与 zero-handling analyses；仍未重测 0% prefix，也未完成修复 extractor 后的独立预注册复验。",
-    "insightZh": "科学贡献是把 derangement control 引入 design-conditioned program generation，并区分 signal adherence detector 与实际执行几何；v3 的扩大样本、预注册 protocol 与 cluster-aware reanalysis 对结论可信度有实质影响，不是版本戳变化。 v3 相对 archived v2 有 material scientific delta，不能按无实质版本更新拒绝；建议精读其 control logic 与限制，并保留原 collectedAt、只作为版本更新事件处理。",
+    "whyRelevantZh": "它直接审计 design-conditioned CAD agent 的错误上游意图：不仅问 conditioning 是否有效，还用 causal control 区分 learned semantic mapping 与机械性的 off-distribution reaction，并用独立 B-rep assertions 避免自指式评分。",
+    "evidenceZh": "作者在 400 个 deduplicated held-out programs、11 个 intent profiles、298 个 distinct 40%-prefix inputs 上报告 wrong-vs-none：program level 两种 tokenization 均 3/3 seeds 显著；distinct-input level 为 token 3/3、text 2/3。text wrong-header executability 为 0.638，对应 baseline 为 0.603；derangement-control interaction 在 3/3 seeds 显著（p≤5.9×10^-7）。v4 的 extractor-repair retest 在允许模型 continuation 越过首个 result block 的 scoring surface 上仍复现 deficit；数字均为作者报告，未独立复现。",
+    "caveatZh": "结论只覆盖 40% prefix conditional completion；0% prefix 下 baseline 不能生成有效 CAD，wrong-vs-none 无定义。400 programs 只形成 298 distinct inputs，11 个 profile 的 effect 强异质且 3 个方向相反。extractor-repair 复验复用原 checkpoints，62.7% multi-stage generations 在两种 extraction 下相同、仅 11.2% scored rows 改变；模型也仅为 Qwen2.5-Coder-1.5B 与 DeepCAD/CadQuery task family。",
+    "motivationZh": "structured generator 经常接受上游 plan 或 design-intent signal，但错误 signal 未必只让模型退化到 unconditioned baseline。CADCON 研究错误 header 是否主动误导 geometry，以及观察到的差异究竟来自 learned header→program mapping，还是罕见输入、共享 extractor 与 executability 等评测混杂。",
+    "methodZh": "作者给 CadQuery sketch-extrude programs 加入五类 intent header，训练 correct、never-header 与 derangement-header 的 matched LoRA models；测试时注入 byte-identical wrong headers。几何 adherence 由与 header extractor 不共享代码的 executable B-rep assertions 评分，并在 program、distinct-input、profile、executability 与 interaction 层面按冻结规则分析。v4 再预注册 extractor-repair retest，专门检验 first-result truncation asymmetry。",
+    "experimentsZh": "pre-registered replication 使用 400 programs、11 profiles、三 seeds 与 text/token headers；wrong header 在 distinct-input unit 的六个 primary cells 中保留五个，derangement control 的 correct→wrong change 近零而 standard model 明显下降。作者还报告 independent metric 约把 text correct-header gain 减半，token ordering 受 executability 影响。v4 修复 generation extractor 后仍在两种 tokenization 与 cluster unit 复现 wrong<none，只有原本失败的 text seed 继续失败，因此更新强化的是 robustness boundary，不是新的模型能力。",
+    "insightZh": "最可迁移的结论是 conditioning interface 应具备“signal 可疑时退回 unconditioned behavior”的机制；评估则应同时包含独立于 conditioning extractor 的 outcome metric 与破坏 signal-content correlation 的 causal control。v4 的新增复验排除一个具体 truncation artifact，但没有扩大模型、representation 或 deployment domain 的外推范围。",
     "relevance": "high",
     "readingAction": "deep",
     "evidenceMaturity": "solid"
