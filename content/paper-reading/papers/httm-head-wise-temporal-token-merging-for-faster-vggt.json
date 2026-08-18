@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2511.21317",
+  "slug": "httm-head-wise-temporal-token-merging-for-faster-vggt",
+  "title": "HTTM: Head-wise Temporal Token Merging for Faster VGGT",
+  "authors": [
+    "Weitian Wang",
+    "Lukas Meiner",
+    "Rai Shubham",
+    "Cecilia De La Parra",
+    "Akash Kumar"
+  ],
+  "publishedAt": "2025-11-26",
+  "updatedAt": "2026-08-17",
+  "collectedAt": "2026-08-19",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2511.21317"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "HTTM",
+    "Head-wise",
+    "Temporal",
+    "Token",
+    "Merging",
+    "Faster",
+    "VGGT"
+  ],
+  "abstract": "The Visual Geometry Grounded Transformer (VGGT) marks a significant leap forward in 3D scene reconstruction, as it is the first model that directly infers all key 3D attributes (camera poses, depths, and dense geometry) jointly in one pass. However, this joint inference mechanism requires global attention layers that perform all-to-all attention computation on tokens from all views. For reconstruction of large scenes with long-sequence inputs, this causes a significant latency bottleneck. In this paper, we propose head-wise temporal merging (HTTM), a training-free 3D token merging method for accelerating VGGT. Existing merging techniques merge tokens uniformly across different attention heads, resulting in identical tokens in the layers' output, which hinders the model's representational ability. HTTM tackles this problem by merging tokens in multi-head granularity, which preserves the uniqueness of feature tokens after head concatenation. Additionally, this enables HTTM to leverage the spatial locality and temporal correspondence observed at the head level to achieve higher merging ratios with lower merging costs compared to existing methods. Thus, HTTM achieves up to $7\\times$ acceleration over the original VGGT with negligible performance drops in a GPU-based inference.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2511.21317v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2511.21317v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2511.21317v2 全文整理；本地 PDF 共 15 页，SHA-256 4e185a3deb24d2eb793f6f1a87a1f6fe2d20b157f982d65cdac9b39bbec72f7a，并视觉核验第 1、3、7、8 页。",
+    "ideaZh": "HTTM 按 attention head 合并 VGGT temporal tokens，利用空间局部性与对应关系实现 training-free 大场景加速；需核对 7x 的输入长度、memory 与 reconstruction degradation。 作者报告 HTTM 在 1000-frame VGGT inference 上从 724.6 秒降到 102.8 秒，约 7 倍加速，并在长序列 reconstruction accuracy/completeness 上接近原 VGGT。 需要同时保留这一证据边界：收益来自长序列 temporal redundancy；sparse-view overlap 低时优势缩小，当前只验证 VGGT-style architecture 与特定 GPU kernels。",
+    "methodFlow": [
+      "输入与任务：HTTM: Head-wise Temporal Token Merging for Faster VGGT",
+      "核心表示：按全文方法页将问题路由到 3d-reconstruction，并固定 exact 2511.21317v2",
+      "关键操作：HTTM 按 attention head 合并 VGGT temporal tokens，利用空间局部性与对应关系实现 training-free 大场景加速；需核对 7x 的输入长度、memory 与 reconstruction degradation。",
+      "输出与验证：在作者设定的数据、baseline、指标与 ablation 上检查主张；作者报告 HTTM 在 1000-frame VGGT inference 上从 724.6 秒降到 102.8 秒，约 7 倍加速，并在长序列 reconstruction accuracy/completeness 上接近原 VGGT。"
+    ],
+    "whyRelevantZh": "直接关联 3d-reconstruction：HTTM 按 attention head 合并 VGGT temporal tokens，利用空间局部性与对应关系实现 training-free 大场景加速；需核对 7x 的输入长度、memory 与 reconstruction degradation。",
+    "evidenceZh": "HTTM 按 attention head 合并 VGGT temporal tokens，利用空间局部性与对应关系实现 training-free 大场景加速；需核对 7x 的输入长度、memory 与 reconstruction degradation。（Method/approach and rendered method page, p. 3）；作者报告 HTTM 在 1000-frame VGGT inference 上从 724.6 秒降到 102.8 秒，约 7 倍加速，并在长序列 reconstruction accuracy/completeness 上接近原 VGGT。（Main experiments/results table, p. 7）；收益来自长序列 temporal redundancy；sparse-view overlap 低时优势缩小，当前只验证 VGGT-style architecture 与特定 GPU kernels。（Discussion/limitations or reviewer evidence boundary, p. 8）",
+    "caveatZh": "收益来自长序列 temporal redundancy；sparse-view overlap 低时优势缩小，当前只验证 VGGT-style architecture 与特定 GPU kernels。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "全文核验围绕《HTTM: Head-wise Temporal Token Merging for Faster VGGT》的 problem、method、experiment 与 limitation 展开。方法页支持 abstract screening 中的核心判断：HTTM 按 attention head 合并 VGGT temporal tokens，利用空间局部性与对应关系实现 training-free 大场景加速；需核对 7x 的输入长度、memory 与 reconstruction degradation。 主实验页显示：作者报告 HTTM 在 1000-frame VGGT inference 上从 724.6 秒降到 102.8 秒，约 7 倍加速，并在长序列 reconstruction accuracy/completeness 上接近原 VGGT。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "相对论文所列 baselines，新意集中在其方法接口、表示或训练/推理组织方式：HTTM 按 attention head 合并 VGGT temporal tokens，利用空间局部性与对应关系实现 training-free 大场景加速；需核对 7x 的输入长度、memory 与 reconstruction degradation。 该判断不把 venue 或 retrieval topic 当成收录依据。 方法流程：输入与任务：HTTM: Head-wise Temporal Token Merging for Faster VGGT → 核心表示：按全文方法页将问题路由到 3d-reconstruction，并固定 exact 2511.21317v2 → 关键操作：HTTM 按 attention head 合并 VGGT temporal tokens，利用空间局部性与对应关系实现 training-free 大场景加速；需核对 7x 的输入长度、memory 与 reconstruction degradation。 → 输出与验证：在作者设定的数据、baseline、指标与 ablation 上检查主张；作者报告 HTTM 在 1000-frame VGGT inference 上从 724.6 秒降到 102.8 秒，约 7 倍加速，并在长序列 reconstruction accuracy/completeness 上接近原 VGGT。。",
+    "experimentsZh": "以 exact 2511.21317v2 全文为依据；检查作者给出的 datasets/tasks、model/backbone、baselines、metrics、main tables 与 ablations，主结果视觉页为 p. 7。 作者报告 HTTM 在 1000-frame VGGT inference 上从 724.6 秒降到 102.8 秒，约 7 倍加速，并在长序列 reconstruction accuracy/completeness 上接近原 VGGT。（Main experiments/results table, p. 7） Baseline coverage：正文包含论文选定的 contemporary baselines 与 metrics；比较仍受 model scale、training data、sampling budget、hardware 或 evaluator 差异影响。收益来自长序列 temporal redundancy；sparse-view overlap 低时优势缩小，当前只验证 VGGT-style architecture 与特定 GPU kernels。 Ablation：正文包含核心组件、训练/推理设置或 sensitivity 的 ablation；它支持局部因果判断，但不能消除数据、backbone、hardware 与评测依赖。",
+    "insightZh": "相对论文所列 baselines，新意集中在其方法接口、表示或训练/推理组织方式：HTTM 按 attention head 合并 VGGT temporal tokens，利用空间局部性与对应关系实现 training-free 大场景加速；需核对 7x 的输入长度、memory 与 reconstruction degradation。 该判断不把 venue 或 retrieval topic 当成收录依据。 方法或数据有明确贡献，但适用范围/证据较窄，建议速读并在 caveat 下进入本期 digest。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

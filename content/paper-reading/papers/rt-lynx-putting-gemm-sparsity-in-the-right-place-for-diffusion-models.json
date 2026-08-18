@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2605.26632",
+  "slug": "rt-lynx-putting-gemm-sparsity-in-the-right-place-for-diffusion-models",
+  "title": "RT-Lynx: Putting GEMM Sparsity in the Right Place for Diffusion Models",
+  "authors": [
+    "Xing Cong",
+    "Hanlin Tang",
+    "Kan Liu",
+    "Tao Lan",
+    "Lin Qu",
+    "Chenhao Xie"
+  ],
+  "publishedAt": "2026-05-26",
+  "updatedAt": "2026-08-17",
+  "collectedAt": "2026-08-19",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2605.26632"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "RT-Lynx",
+    "Putting",
+    "GEMM",
+    "Sparsity",
+    "Right",
+    "Place",
+    "Diffusion"
+  ],
+  "abstract": "Diffusion Transformers (DiT) achieve strong performance in image generation but incur substantial inference costs. While prior work has reduced this cost via quantization and distillation, semi-structured sparsity, which can nearly halve FLOPs, remains underexplored. A key reason is that most existing approaches focus on weight sparsification, and pruning 50% of the weights can remove critical model capacity and degrade generation quality. Our study, however, shows that DiT activations are intrinsically sparse and significantly more robust to N:M semi-structured sparsification than weights. Motivated by this observation, we advocate a paradigm shift from weight sparsification to activation sparsification. We propose RT-Lynx, which applies N:M sparsification to activations and incorporates error-compensation techniques to mitigate accuracy loss. We further implement highly optimized CUDA kernels tailored to this setting, achieving up to a 1.55x speedup on average in linear layers. Extensive experiments across multiple diffusion models demonstrate that our method preserves the generation quality of the original models while substantially accelerating inference.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.26632v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.26632v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.26632v3 全文整理；本地 PDF 共 33 页，SHA-256 065f2da13d6c9d865f7a2741b7799466590dacb7629ae873ff2b0dae59417609，并视觉核验第 1、4、6、11 页。",
+    "ideaZh": "RT-Lynx 将 DiT semi-structured sparsity 从 weights 转向更稳健的 activations，并实现专用 CUDA kernels；需核对真实端到端 speedup、hardware coverage 与生成质量。 作者报告 RT-Lynx 在 Qwen-Image 等 DiT 上将生成质量恢复到 dense model 附近，并通过 activation-sparse CUDA kernels 使 linear layers 平均最多加速约 1.55 倍。 需要同时保留这一证据边界：报告的 1.55 倍主要是 linear-layer speedup，端到端收益受非 GEMM stages 与 hardware support 限制；CUDA kernels 对平台敏感。",
+    "methodFlow": [
+      "输入与任务：RT-Lynx: Putting GEMM Sparsity in the Right Place for Diffusion Models",
+      "核心表示：按全文方法页将问题路由到 image-generation，并固定 exact 2605.26632v3",
+      "关键操作：RT-Lynx 将 DiT semi-structured sparsity 从 weights 转向更稳健的 activations，并实现专用 CUDA kernels；需核对真实端到端 speedup、hardware coverage 与生成质量。",
+      "输出与验证：在作者设定的数据、baseline、指标与 ablation 上检查主张；作者报告 RT-Lynx 在 Qwen-Image 等 DiT 上将生成质量恢复到 dense model 附近，并通过 activation-sparse CUDA kernels 使 linear layers 平均最多加速约 1.55 倍。"
+    ],
+    "whyRelevantZh": "直接关联 image-generation：RT-Lynx 将 DiT semi-structured sparsity 从 weights 转向更稳健的 activations，并实现专用 CUDA kernels；需核对真实端到端 speedup、hardware coverage 与生成质量。",
+    "evidenceZh": "RT-Lynx 将 DiT semi-structured sparsity 从 weights 转向更稳健的 activations，并实现专用 CUDA kernels；需核对真实端到端 speedup、hardware coverage 与生成质量。（Method/approach and rendered method page, p. 4）；作者报告 RT-Lynx 在 Qwen-Image 等 DiT 上将生成质量恢复到 dense model 附近，并通过 activation-sparse CUDA kernels 使 linear layers 平均最多加速约 1.55 倍。（Main experiments/results table, p. 6）；报告的 1.55 倍主要是 linear-layer speedup，端到端收益受非 GEMM stages 与 hardware support 限制；CUDA kernels 对平台敏感。（Discussion/limitations or reviewer evidence boundary, p. 11）",
+    "caveatZh": "报告的 1.55 倍主要是 linear-layer speedup，端到端收益受非 GEMM stages 与 hardware support 限制；CUDA kernels 对平台敏感。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "全文核验围绕《RT-Lynx: Putting GEMM Sparsity in the Right Place for Diffusion Models》的 problem、method、experiment 与 limitation 展开。方法页支持 abstract screening 中的核心判断：RT-Lynx 将 DiT semi-structured sparsity 从 weights 转向更稳健的 activations，并实现专用 CUDA kernels；需核对真实端到端 speedup、hardware coverage 与生成质量。 主实验页显示：作者报告 RT-Lynx 在 Qwen-Image 等 DiT 上将生成质量恢复到 dense model 附近，并通过 activation-sparse CUDA kernels 使 linear layers 平均最多加速约 1.55 倍。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "相对论文所列 baselines，新意集中在其方法接口、表示或训练/推理组织方式：RT-Lynx 将 DiT semi-structured sparsity 从 weights 转向更稳健的 activations，并实现专用 CUDA kernels；需核对真实端到端 speedup、hardware coverage 与生成质量。 该判断不把 venue 或 retrieval topic 当成收录依据。 方法流程：输入与任务：RT-Lynx: Putting GEMM Sparsity in the Right Place for Diffusion Models → 核心表示：按全文方法页将问题路由到 image-generation，并固定 exact 2605.26632v3 → 关键操作：RT-Lynx 将 DiT semi-structured sparsity 从 weights 转向更稳健的 activations，并实现专用 CUDA kernels；需核对真实端到端 speedup、hardware coverage 与生成质量。 → 输出与验证：在作者设定的数据、baseline、指标与 ablation 上检查主张；作者报告 RT-Lynx 在 Qwen-Image 等 DiT 上将生成质量恢复到 dense model 附近，并通过 activation-sparse CUDA kernels 使 linear layers 平均最多加速约 1.55 倍。。",
+    "experimentsZh": "以 exact 2605.26632v3 全文为依据；检查作者给出的 datasets/tasks、model/backbone、baselines、metrics、main tables 与 ablations，主结果视觉页为 p. 6。 作者报告 RT-Lynx 在 Qwen-Image 等 DiT 上将生成质量恢复到 dense model 附近，并通过 activation-sparse CUDA kernels 使 linear layers 平均最多加速约 1.55 倍。（Main experiments/results table, p. 6） Baseline coverage：正文包含论文选定的 contemporary baselines 与 metrics；比较仍受 model scale、training data、sampling budget、hardware 或 evaluator 差异影响。报告的 1.55 倍主要是 linear-layer speedup，端到端收益受非 GEMM stages 与 hardware support 限制；CUDA kernels 对平台敏感。 Ablation：正文包含核心组件、训练/推理设置或 sensitivity 的 ablation；它支持局部因果判断，但不能消除数据、backbone、hardware 与评测依赖。",
+    "insightZh": "相对论文所列 baselines，新意集中在其方法接口、表示或训练/推理组织方式：RT-Lynx 将 DiT semi-structured sparsity 从 weights 转向更稳健的 activations，并实现专用 CUDA kernels；需核对真实端到端 speedup、hardware coverage 与生成质量。 该判断不把 venue 或 retrieval topic 当成收录依据。 方法或数据有明确贡献，但适用范围/证据较窄，建议速读并在 caveat 下进入本期 digest。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

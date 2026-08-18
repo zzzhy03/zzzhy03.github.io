@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2608.16585",
+  "slug": "squad-sub-quadratic-attention-distillation-for-efficient-video-generation",
+  "title": "SQuad: Sub-Quadratic Attention Distillation for Efficient Video Generation",
+  "authors": [
+    "Animesh Karnewar",
+    "Denis Korzhenkov",
+    "Amirhossein Habibian",
+    "Mohsen Ghafoorian"
+  ],
+  "publishedAt": "2026-08-17",
+  "updatedAt": "2026-08-17",
+  "collectedAt": "2026-08-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.16585"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "SQuad",
+    "Sub-Quadratic",
+    "Attention",
+    "Distillation",
+    "Efficient",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Video Diffusion Transformers (DiTs) spend most of their compute inside the Self-Attention operation, whose cost grows quadratically, $\\mathcal{O}(n^2)$, with the number of latent tokens $n$. For the task of video generation, the token count is large, so this term dominates runtime and memory, and thereby caps the resolution and duration we can generate. Linear $\\mathcal{O}(n)$ and low-rank $\\mathcal{O}(nk)$ surrogates of Self-Attention trade the full softmax $QK^T$ for cheaper kernels, but rarely recover the original's expressivity, leaving a stubborn quality gap. Motivated by this, we propose SQuad, a Sub-Quadratic Attention Distillation framework that achieves a complexity of $\\mathcal{O}(n\\sqrt{n})$ in the resulting distilled Attention, naturally balancing the efficiency v/s expressivity trade-off. Instead of training our own Video DiT from scratch, which is prohibitively expensive, we fit a pretrained full softmax Self-Attention DiT into our proposed SQuad-Attention one by distilling the former in two stages: Flow-Matching Supervised Fine-Tuning (SFT), followed by improved Distribution Matching Distillation (DMD2) which additionally makes the sampling more efficient. On the Wan~2.2 5B text-to-video model, SQuAD matches the quadratic teacher on VBench ($83.20$ v/s $83.08$) while cutting the per-step per-block attention FLOPs by $\\sim$$67\\times$ and attention latency by $\\sim$$11\\times$, and end-to-end DiT latency by 2$\\times$, all while also generating a video in only $6$ Neural Functional Evaluations (NFEs) instead of the default $100$.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.16585v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.16585v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.16585v1 全文整理；本地 PDF 共 25 页，SHA-256 97dc99e005c5be2f0545bf1865080570bb137e8418c857363b5f139001eb83f3，并视觉核验第 1、4、7、11 页。",
+    "ideaZh": "SQuad 将 video DiT attention 蒸馏为 O(n sqrt(n)) 并叠加 DMD2 少步采样，摘要报告显著 attention 与端到端加速；需核对 FLOPs、kernel latency 和生成质量。 作者报告 SQuad 在 Wan2.2-5B 上 VBench 83.20 对 teacher 83.08，同时 attention FLOPs 约降 67 倍、attention latency 约降 11 倍、端到端 DiT latency 约降 2 倍。 需要同时保留这一证据边界：attention distillation 与 DMD2 step distillation 耦合，端到端收益不能完全分离；纯 flow-matching 与预训练时使用该 attention 尚未验证。",
+    "methodFlow": [
+      "输入与任务：SQuad: Sub-Quadratic Attention Distillation for Efficient Video Generation",
+      "核心表示：按全文方法页将问题路由到 video-generation，并固定 exact 2608.16585v1",
+      "关键操作：SQuad 将 video DiT attention 蒸馏为 O(n sqrt(n)) 并叠加 DMD2 少步采样，摘要报告显著 attention 与端到端加速；需核对 FLOPs、kernel latency 和生成质量。",
+      "输出与验证：在作者设定的数据、baseline、指标与 ablation 上检查主张；作者报告 SQuad 在 Wan2.2-5B 上 VBench 83.20 对 teacher 83.08，同时 attention FLOPs 约降 67 倍、attention latency 约降 11 倍、端到端 DiT latency 约降 2 倍。"
+    ],
+    "whyRelevantZh": "直接关联 video-generation：SQuad 将 video DiT attention 蒸馏为 O(n sqrt(n)) 并叠加 DMD2 少步采样，摘要报告显著 attention 与端到端加速；需核对 FLOPs、kernel latency 和生成质量。",
+    "evidenceZh": "SQuad 将 video DiT attention 蒸馏为 O(n sqrt(n)) 并叠加 DMD2 少步采样，摘要报告显著 attention 与端到端加速；需核对 FLOPs、kernel latency 和生成质量。（Method/approach and rendered method page, p. 4）；作者报告 SQuad 在 Wan2.2-5B 上 VBench 83.20 对 teacher 83.08，同时 attention FLOPs 约降 67 倍、attention latency 约降 11 倍、端到端 DiT latency 约降 2 倍。（Main experiments/results table, p. 7）；attention distillation 与 DMD2 step distillation 耦合，端到端收益不能完全分离；纯 flow-matching 与预训练时使用该 attention 尚未验证。（Discussion/limitations or reviewer evidence boundary, p. 11）",
+    "caveatZh": "attention distillation 与 DMD2 step distillation 耦合，端到端收益不能完全分离；纯 flow-matching 与预训练时使用该 attention 尚未验证。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "全文核验围绕《SQuad: Sub-Quadratic Attention Distillation for Efficient Video Generation》的 problem、method、experiment 与 limitation 展开。方法页支持 abstract screening 中的核心判断：SQuad 将 video DiT attention 蒸馏为 O(n sqrt(n)) 并叠加 DMD2 少步采样，摘要报告显著 attention 与端到端加速；需核对 FLOPs、kernel latency 和生成质量。 主实验页显示：作者报告 SQuad 在 Wan2.2-5B 上 VBench 83.20 对 teacher 83.08，同时 attention FLOPs 约降 67 倍、attention latency 约降 11 倍、端到端 DiT latency 约降 2 倍。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "相对论文所列 baselines，新意集中在其方法接口、表示或训练/推理组织方式：SQuad 将 video DiT attention 蒸馏为 O(n sqrt(n)) 并叠加 DMD2 少步采样，摘要报告显著 attention 与端到端加速；需核对 FLOPs、kernel latency 和生成质量。 该判断不把 venue 或 retrieval topic 当成收录依据。 方法流程：输入与任务：SQuad: Sub-Quadratic Attention Distillation for Efficient Video Generation → 核心表示：按全文方法页将问题路由到 video-generation，并固定 exact 2608.16585v1 → 关键操作：SQuad 将 video DiT attention 蒸馏为 O(n sqrt(n)) 并叠加 DMD2 少步采样，摘要报告显著 attention 与端到端加速；需核对 FLOPs、kernel latency 和生成质量。 → 输出与验证：在作者设定的数据、baseline、指标与 ablation 上检查主张；作者报告 SQuad 在 Wan2.2-5B 上 VBench 83.20 对 teacher 83.08，同时 attention FLOPs 约降 67 倍、attention latency 约降 11 倍、端到端 DiT latency 约降 2 倍。。",
+    "experimentsZh": "以 exact 2608.16585v1 全文为依据；检查作者给出的 datasets/tasks、model/backbone、baselines、metrics、main tables 与 ablations，主结果视觉页为 p. 7。 作者报告 SQuad 在 Wan2.2-5B 上 VBench 83.20 对 teacher 83.08，同时 attention FLOPs 约降 67 倍、attention latency 约降 11 倍、端到端 DiT latency 约降 2 倍。（Main experiments/results table, p. 7） Baseline coverage：正文包含论文选定的 contemporary baselines 与 metrics；比较仍受 model scale、training data、sampling budget、hardware 或 evaluator 差异影响。attention distillation 与 DMD2 step distillation 耦合，端到端收益不能完全分离；纯 flow-matching 与预训练时使用该 attention 尚未验证。 Ablation：正文包含核心组件、训练/推理设置或 sensitivity 的 ablation；它支持局部因果判断，但不能消除数据、backbone、hardware 与评测依赖。",
+    "insightZh": "相对论文所列 baselines，新意集中在其方法接口、表示或训练/推理组织方式：SQuad 将 video DiT attention 蒸馏为 O(n sqrt(n)) 并叠加 DMD2 少步采样，摘要报告显著 attention 与端到端加速；需核对 FLOPs、kernel latency 和生成质量。 该判断不把 venue 或 retrieval topic 当成收录依据。 方法、实验与证据边界均通过全文核证，且对 video-generation 有较高研究价值，建议精读并进入本期 digest。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
