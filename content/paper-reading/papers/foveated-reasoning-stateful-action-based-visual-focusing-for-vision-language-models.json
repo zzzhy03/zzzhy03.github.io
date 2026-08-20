@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2604.21079",
+  "slug": "foveated-reasoning-stateful-action-based-visual-focusing-for-vision-language-models",
+  "title": "Foveated Reasoning: Stateful, Action-based Visual Focusing for Vision-Language Models",
+  "authors": [
+    "Juhong Min",
+    "Lazar Valkov",
+    "Vitali Petsiuk",
+    "Hossein Souri",
+    "Deen Dayal Mohan"
+  ],
+  "publishedAt": "2026-04-22",
+  "updatedAt": "2026-08-18",
+  "collectedAt": "2026-08-21",
+  "venue": "European Conference on Computer Vision 2026 · arXiv v2",
+  "identifiers": {
+    "arxiv": "2604.21079"
+  },
+  "venueIds": [
+    "eccv"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Foveated",
+    "Reasoning",
+    "Stateful",
+    "Action",
+    "Visual"
+  ],
+  "abstract": "Vision-language models benefit from high-resolution images, but the increase in visual-token count incurs high compute overhead. Humans resolve this tension via foveation: a coarse view guides \"where to look\", while selectively acquired high-acuity evidence refines \"what to think\". We introduce Foveated Reasoner, an autoregressive vision-language framework that unifies foveation and reasoning within a single decoding trajectory. Starting from a low-resolution view, the model triggers foveation only when needed, retrieves high-resolution evidence from selected regions, and injects it back into the same decoding trajectory. We train the method with a two-stage pipeline: coldstart supervision to bootstrap foveation behavior, followed by reinforcement learning to jointly improve evidence acquisition and task accuracy while discouraging trivial \"see-everything\" solutions. Experiments show that the method learns effective foveation policies and achieves stronger accuracy under tight visual-token budgets across multiple vision-language benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.21079v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.21079v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2604.21079v2 全文整理；本地 PDF 共 34 页，SHA-256 a0f1a3e13d06758eb84d5aee9ae1bce4df22baf0b2745fed88256fe117f3c6e1，并视觉核验第 1、6、11、14、28 页。",
+    "ideaZh": "FoveateR 把高分辨率取证从额外 VLM pass 或坐标文本改成同一自回归轨迹中的连续 box action：token policy 决定何时 `<fov>`，轻量 policy 选区，裁剪视觉 token 回注 KV-cache；cold-start SFT 后以 GRPO 联合优化答案、取证策略与区域面积。作者报告 3B 模型在 336² 输入下用约 307 个视觉 token，在多项 Visual CoT/V* 指标超过更大的多 pass baseline；单 H100 上相对 VisCoT7B 将 V7W latency 从 9.78s 降至 1.06s。证据边界是单图 benchmark、cache 随取证线性增长，且尚未验证 video/长时序与更复杂 action space。",
+    "methodFlow": [
+      "输入：低分辨率全局图像、问题，以及环境中暂未完整观察的原始高分辨率图像",
+      "状态：截断 VLM hidden state 汇总文本与已获取视觉证据，KV-cache 保留单一连续推理轨迹",
+      "动作：token policy 生成文本或 `<fov>`；触发时 foveation MLP 输出连续 box，裁剪高分辨率 token 并回注上下文",
+      "训练与输出：cold-start SFT 学会触发/定位，再以 GRPO + 区域面积正则优化准确率和取证预算，最终输出答案"
+    ],
+    "whyRelevantZh": "直接推进 VLM/MLLM 在高分辨率输入下的动态视觉取证与推理效率，并提供可迁移到 agentic perception 的 mixed discrete-continuous action 设计。",
+    "evidenceZh": "FoveateR 在单一自回归轨迹中交替执行文本 token 与连续 box foveation，并把裁剪视觉 token 注入同一 KV-cache。（Sec. 3.1-3.2, Eqs. 5-8, Fig. 2, p. 6）；作者报告 3B/7B 在多项 Visual CoT 与 V* 指标优于 prior focusing baselines，且单 H100 上 FoveateR3B 的 fov-only latency 为 1.06s、VisCoT7B 为 9.78s。（Tables 1-2, p. 11; Tables 5-6, p. 14）；当前证据局限于 single-image benchmarks，且每次新取证都会让 Transformer KV-cache 的 memory/compute 线性增长。（Appendix C, Limitations and Future Work, p. 28）",
+    "caveatZh": "新取证证据累积在 KV-cache 中，memory 与 compute 随证据量线性增长。；只验证 single-image benchmarks，尚未验证 video/temporal settings。；当前 foveation policy 与单 box action space 较简单。；与引用 prior reported results 的比较不总是同训练数据、同 backbone、同 evaluator。；视觉 token 和单 H100 latency 优势不能直接外推长视频、edge hardware 或多区域并行取证。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "工作解决高分辨率 VLM 的 accuracy-compute 张力：由共享 hidden state 同时驱动文本 token 与非语言连续 foveation action，并把选区视觉证据回注同一 decoding stream，避免重启推理状态。训练以伪 box/reasoning 构造 cold-start，再用 GRPO 和面积正则让模型按任务难度动态取证。作者在 Visual CoT、V* 和单 H100 latency/VRAM 测试中报告更好的准确率-视觉 token-延迟折中；所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "相对 multi-pass zoom 与 text-grounded coordinates，核心新意是把 foveation 建模为共享 hidden state 驱动的非语言连续动作，并在不重启 decoding 的情况下回注证据；RL 同时覆盖离散 token 与连续 box policy，并用面积正则抑制 see-everything 解。 方法流程：输入：低分辨率全局图像、问题，以及环境中暂未完整观察的原始高分辨率图像 → 状态：截断 VLM hidden state 汇总文本与已获取视觉证据，KV-cache 保留单一连续推理轨迹 → 动作：token policy 生成文本或 `<fov>`；触发时 foveation MLP 输出连续 box，裁剪高分辨率 token 并回注上下文 → 训练与输出：cold-start SFT 学会触发/定位，再以 GRPO + 区域面积正则优化准确率和取证预算，最终输出答案。",
+    "experimentsZh": "以 Qwen2.5-VL 3B/7B 为 backbone；cold-start 训练使用 Visual CoT、RefCOCO/+/g、ScienceQA 共 765K triplets，随后 RL 70K steps；评测覆盖 12 个 Visual CoT 数据集、V*，并在单 H100 测 latency/VRAM/throughput。 作者报告：336² 输入下 FoveateR3B 平均使用 307.0±156.0 个视觉 token，在 DocVQA/TextVQA 分别达到 74.0/83.0，而 VisCoT7B 使用 1,152 token、对应 47.6/77.5。（Table 1, p. 11） 作者报告：V7W 单 H100 上 fov-only FoveateR3B 使用 80.6 foveated tokens、latency 1.06s、accuracy 68.8；VisCoT7B 为 576 tokens、9.78s、57.9。（Table 6, p. 14） Baseline coverage：比较 VisCoT、UV-CoT、VPT、DocThink、标准 Qwen/LLaVA/Sphinx 与 V* 上多种 VLM；但部分表格引用 prior reported numbers、模型规模和训练数据并非完全 matched。 Ablation：resolution-efficiency、λreg、cold-start target、test-time foveation count/box center/box size ablations 支持 learned location/scale 与适度证据预算的重要性；它们仍主要在文档/VQA 单图域内。",
+    "insightZh": "方法接口、训练目标、主结果、效率表和显式限制均经 exact-version 全文与渲染页核验；对 VLM stateful evidence acquisition 有较高研究价值，建议精读并进入本期 digest。 FoveateR 把高分辨率取证从额外 VLM pass 或坐标文本改成同一自回归轨迹中的连续 box action：token policy 决定何时 `<fov>`，轻量 policy 选区，裁剪视觉 token 回注 KV-cache；cold-start SFT 后以 GRPO 联合优化答案、取证策略与区域面积。作者报告 3B 模型在 336² 输入下用约 307 个视觉 token，在多项 Visual CoT/V* 指标超过更大的多 pass baseline；单 H100 上相对 VisCoT7B 将 V7W latency 从 9.78s 降至 1.06s。证据边界是单图 benchmark、cache 随取证线性增长，且尚未验证 video/长时序与更复杂 action space。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

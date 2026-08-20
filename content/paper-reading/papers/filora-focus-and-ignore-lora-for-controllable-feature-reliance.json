@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2602.02060",
+  "slug": "filora-focus-and-ignore-lora-for-controllable-feature-reliance",
+  "title": "FiLoRA: Focus-and-Ignore LoRA for Controllable Feature Reliance",
+  "authors": [
+    "Hyunsuk Chung",
+    "Soyeon Caren Han",
+    "Seungyeon Ji",
+    "Jinwoo Kim",
+    "Eun-Jung Holden",
+    "Kyungreem Han"
+  ],
+  "publishedAt": "2026-02-02",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2602.02060"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "FiLoRA",
+    "Focus",
+    "Ignore",
+    "LoRA",
+    "Controllable"
+  ],
+  "abstract": "Multimodal foundation models integrate heterogeneous signals across modalities, yet it remains unclear whether their predictions can be controlled by explicitly modulating reliance on different internal feature pathways. Existing approaches to shortcut and spurious behavior primarily rely on post hoc analysis or data-level interventions, offering limited ability to directly intervene on how models use information. We introduce FiLoRA (Focus-and-Ignore LoRA), an instruction-conditioned, parameter-efficient adaptation framework that enables controllable modulation of feature reliance while keeping the task and predictive objective fixed. FiLoRA decomposes adaptation into feature-aligned low-rank modules and applies instruction-conditioned gating, allowing natural language instructions to act as computation-level control signals over internal representations. We evaluate FiLoRA across both controlled classification settings and generative multimodal tasks, and under a range of instruction types, including natural and compositional instructions. Results show that FiLoRA induces consistent and interpretable shifts in feature reliance, selectively amplifying or suppressing different feature groups in accordance with the instruction, without altering task semantics. Our findings suggest that instruction-conditioned parameter adaptation can serve as a practical mechanism for intervening on internal model behavior, providing a new perspective on controllability and analysis of multimodal systems beyond output-level prompting or post hoc interpretation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2602.02060v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2602.02060v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2602.02060v2 全文整理；本地 PDF 共 39 页，SHA-256 85f102cd3649a71646f3a4419d2433682f4b23d82fb1d3f8d8cc0639860e5456，并视觉核验第 1、2、8、32 页。",
+    "ideaZh": "FiLoRA 把 LoRA updates 分成 semantic、appearance、cross-modal 等 feature-aligned groups，再由 instruction embedding 产生共享跨层 gates，使同一任务在不改 label space 的条件下改变 internal feature reliance。作者报告 focus-core 下 Core/Spurious reliance sensitivity ratio 为 2.59，ignore-core 时反转为 0.45，并在 Flickr30K captioning 中保留相近 CIDEr/CLIPScore；但 semantic grouping 与 proxy intervention supervision 都由人工定义，复杂 reasoning/dialogue/agents 尚未验证。",
+    "methodFlow": [
+      "把 frozen multimodal backbone 的每个 LoRA update 分解为 feature-aligned low-rank groups",
+      "编码 focus/ignore natural-language instruction 为连续 control vector",
+      "经 sigmoid gating 对各 group 的 LoRA update 做 sample-wise soft scaling",
+      "使用固定任务 loss 与弱 gate regularization 学习 reliance shift",
+      "以 gate modulation、prediction sensitivity 和 targeted feature intervention 验证内部依赖变化"
+    ],
+    "whyRelevantZh": "直接推进 multimodal internal control 与 parameter-efficient adaptation，对需要可靠 feature grounding 的 VLM 可迁移。",
+    "evidenceZh": "FiLoRA 用 instruction-conditioned gates 激活或抑制 feature-aligned LoRA paths，同时保持任务与 label space 不变。（Fig. 1, p. 2; Secs. 3.4-3.7, pp. 4-5）；作者报告 focus-core 的 Core/Spurious RS ratio 为 2.59，neutral 1.14，ignore-core 0.45。（Table 2, p. 8）；作者报告 Flickr30K 的 semantic focus、appearance focus、appearance suppress CIDEr 分别 112.4、109.7、113.1。（Table 4 and Fig. 4, p. 8）；FiLoRA 的 grouping 仍依赖人工语义设计，实验主要是可清楚标注 feature groups 的 controlled settings。（Limitations, p. 32）",
+    "caveatZh": "semantically motivated grouping 的最优结构仍是开放问题。；实验集中 feature groups 可清晰识别的 controlled settings。；尚未评估复杂 reasoning、dialogue 或 agentic systems。；feature taxonomy 与 proxy intervention labels 由研究者构造，internal reliance 的可解释性可能依赖这一先验。；作者报告 code 已提供但 PDF 未打印可核验的项目 URL，因此不能记为 available；结果未独立复现。",
+    "motivationZh": "base multimodal model 完全冻结，grouped LoRA 和 instruction-conditioned sigmoid gates 只调节 adaptation paths；弱 gate regularizer 将 natural-language focus/ignore instructions 对齐到 feature groups。分类、audio-visual 和 captioning experiments 证明 gate modulation 与 prediction sensitivity 同向变化，而不是只改变 gate 数值；证据仍集中 controlled settings。",
+    "methodZh": "相对 prompting 或 post-hoc attribution，FiLoRA 把 instruction following 下沉到 parameter-update pathways，并用 functional sensitivity 验证内部 reliance 确实变化；新意主要在可控干预框架而非 task accuracy。 方法流程：把 frozen multimodal backbone 的每个 LoRA update 分解为 feature-aligned low-rank groups → 编码 focus/ignore natural-language instruction 为连续 control vector → 经 sigmoid gating 对各 group 的 LoRA update 做 sample-wise soft scaling → 使用固定任务 loss 与弱 gate regularization 学习 reliance shift → 以 gate modulation、prediction sensitivity 和 targeted feature intervention 验证内部依赖变化。",
+    "experimentsZh": "MM-IMDb、CREMA-D、RAVDESS controlled classification 与 Flickr30K captioning；Qwen2.5-VL/Omni、Gemma-3n、AV-HuBERT、AudioCLIP 等 backbones；使用 GMR、RS、decision stability 和 caption metrics。 作者报告 focus-core Core RS 0.184、Spurious RS 0.071；ignore-core 分别 0.069 与 0.153。（Table 2, p. 8） 作者报告 semantic grouping 的 C/S RS ratio 2.47、GMR 0.42，random grouping 为 1.08 与 0.17。（Table 5, p. 9） Baseline coverage：比较 full fine-tuning、LoRA、prompt-only、coarse/random grouping 与 targeted spurious-feature removal；caption quality 对照和 real-world reasoning coverage 较弱。 Ablation：grouping strategy、instruction paraphrase/composition、cross-architecture 与 gate trajectories 支持机制，但 proxy supervision quality 仍可能循环定义 core/spurious。",
+    "insightZh": "机制与多种 controlled experiments 足以速读收录，但人工 grouping、proxy supervision 与缺少复杂 reasoning evaluation 限制精读优先级。 FiLoRA 把 LoRA updates 分成 semantic、appearance、cross-modal 等 feature-aligned groups，再由 instruction embedding 产生共享跨层 gates，使同一任务在不改 label space 的条件下改变 internal feature reliance。作者报告 focus-core 下 Core/Spurious reliance sensitivity ratio 为 2.59，ignore-core 时反转为 0.45，并在 Flickr30K captioning 中保留相近 CIDEr/CLIPScore；但 semantic grouping 与 proxy intervention supervision 都由人工定义，复杂 reasoning/dialogue/agents 尚未验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

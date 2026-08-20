@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.18734",
+  "slug": "cl4d-contrastive-language-4d-pretraining-for-vision-language-reasoning-in-dynamic-scenes",
+  "title": "CL4D: Contrastive Language-4D Pretraining for Vision-Language Reasoning in Dynamic Scenes",
+  "authors": [
+    "Kumal Hewagamage",
+    "Isuranga Senavirathne",
+    "Sasika Amarasinghe",
+    "Hasitha Gallella",
+    "Dulanga Weerakoon",
+    "Vigneshwaran Subbaraju",
+    "Ranga Rodrigo"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "European Conference on Computer Vision 2026 · arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18734"
+  },
+  "venueIds": [
+    "eccv"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "CL4D",
+    "Contrastive",
+    "Language",
+    "Pretraining",
+    "Vision"
+  ],
+  "abstract": "4D understanding and reasoning is a fundamental capability for embodied AI agents operating in dynamic physical environments. However, existing vision encoders are largely limited to static 2D images or 3D point clouds without temporal modeling, or to 2D videos that lack accurate geometric depth reasoning. Consequently, current approaches fail to jointly capture spatial structure and motion evolution in dynamic scenes. We present CL4D, the first foundational 4D vision encoder that directly operates on dynamic point clouds, trained with a contrastive learning objective to align spatio-temporal geometric representations with natural language descriptions. By learning a shared embedding space between text and 4D scene dynamics, CL4D enables zero-shot motion-to-text and text-to-motion retrieval in dynamic environments and serves as a foundational 4D vision encoder for downstream 4D vision-language tasks. Building on this encoder, we introduce 4DVLM, a 4D vision-language model that conditions language generation on dynamic geometric representations. 4DVLM is the first VLM designed to operate directly on 4D point clouds without relying on 2D images, 2D videos, or static 3D point clouds. We train CL4D and subsequently 4DVLM on a newly constructed dataset termed DynAction4D capturing diverse human motions across varying object interactions and scene environments. Extensive experiments across multiple 4D human action benchmarks demonstrate that CL4D achieves state-of-the-art performance, with improvements of approximately ~16.75% over prior methods. Furthermore, 4DVLM outperforms frontier video VLMs such as Gemini and GPT-5 even when these models are provided with RGB video sequences corresponding to the same scenes represented as 4D point clouds for 4DVLM.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18734v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18734v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://4d-vision-uom.github.io/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18734v1 全文整理；本地 PDF 共 33 页，SHA-256 ffd009881078c391ccd30702cb2da14a2b18528f96f926d5825d8b4e4c4b3b75，并视觉核验第 1、8、10、14、15 页。",
+    "ideaZh": "CL4D 把 per-frame point groups、spatial transformer 和 temporal transformer 组成原生 dynamic-point-cloud encoder，以 InfoNCE 对齐语言，再冻结 encoder/LLM 只训练 projector 得到 4DVLM；作者报告 DynAction4D HumanOnly text-to-motion batch R@1 为 70.32、较重训 baseline 高 16.75 points，并在 VQA text metrics 上超过 video VLM，但数据以合成人体动作和 Gemini-generated QA 为主，精读时要区分 4D representation 创新与 benchmark 自洽性。",
+    "methodFlow": [
+      "输入 temporally evolving 3D point-cloud sequence 与 paired text",
+      "PointNet 对每帧 point groups 编码",
+      "spatial transformer 汇聚 frame features，temporal transformer 建模 motion",
+      "InfoNCE 将 4D embedding 与 language embedding 对齐",
+      "冻结 CL4D 与 LLaVA backbone，仅训练 projector 生成 4DVLM answers"
+    ],
+    "whyRelevantZh": "原生 4D point-cloud tokenization、language alignment 与 multimodal reasoning 直接扩展 tracked VLM 的 3D/4D representation 能力。",
+    "evidenceZh": "CL4D 由 PointNet、per-frame spatial encoder、temporal encoder 和双向 InfoNCE 组成，4DVLM 通过 projector 接入 LLaVA。（Sec. 3.2–3.3, Fig. 4, pp. 7–10）；作者报告 HumanOnly text-to-motion batch R@1 为 70.32，相对最强重训 baseline 53.57 高 16.75 points。（Sec. 4.1, Table 1, pp. 10–11）；作者报告 4DVLM 在 DynAction4D-VQA 的 BLEU/ROUGE/METEOR/SimCSE 上高于所选 video VLM，并优于替代 4D encoders。（Sec. 4.2, Tables 3–4, p. 14）；论文只在 human/object actions 和一个 robotic dataset 上验证，作者将更广泛 non-human/general scene 泛化列为未来工作。（Sec. 5 Discussion, p. 15）",
+    "caveatZh": "当前主要覆盖人体动作、物体交互与 RH20T manipulator，更广泛的 agent 和 dynamic scene generalization 仍是未来工作。；DynAction4D 大量来自 HumanML3D/Unity synthesis，4D-VQA 由 Gemini 3.0 Flash 从视频和描述生成，可能形成语言模板与 evaluator 偏置。；VQA 使用 BLEU/ROUGE 等文本相似度，不能充分验证 geometric reasoning correctness；与 frontier video VLM 的输入和训练域也不对等。；论文将模型称为 foundational，但当前规模与任务覆盖仍明显窄于开放动态 4D 世界。",
+    "motivationZh": "论文构建 DynAction4D 的 HumanOnly、object interaction、cluttered、robot manipulation 与 4D-VQA segments。CL4D 以 PointNet 编码每帧 point groups，用 spatial encoder 汇聚 max/CLS/mean，再由 temporal ViT 建模动态，和可训练 text encoder 做双向 contrastive alignment。4DVLM 在 LLaVA/Vicuna 7B 上注入投影后的 4D token，仅训练 projection layer 完成 action/spatial/temporal QA。",
+    "methodZh": "真正新意是把 language contrastive pretraining 直接施加到 dynamic point clouds，并把所得原生 4D token 接到 VLM；相比重训 P4Transformer/PST-Transformer/Motion PointNet，它不是简单分类 encoder，而是可检索、可条件生成的 shared 4D-language representation。 方法流程：输入 temporally evolving 3D point-cloud sequence 与 paired text → PointNet 对每帧 point groups 编码 → spatial transformer 汇聚 frame features，temporal transformer 建模 motion → InfoNCE 将 4D embedding 与 language embedding 对齐 → 冻结 CL4D 与 LLaVA backbone，仅训练 projector 生成 4DVLM answers。",
+    "experimentsZh": "CL4D 在 DynAction4D 多 segments 上与 P4Transformer、PST-Transformer、Motion PointNet 的 contrastively retrained variants 比较 text↔motion Recall@1，并在 RH20T 测 real-world robot transfer；4DVLM 与 VideoLLaMA3、Gemini、GPT-5 及替代 4D encoders 比较生成文本指标。 作者报告 HumanOnly/ObjInteractions/Cluttered text-to-motion batch R@1 分别提升 16.75、8.1、13.36 points。（Table 1 and Sec. 4.1, pp. 10–11） 作者报告 4DVLM 的 BLEU 0.0729、METEOR 0.3152、SimCSE 0.8189，高于所列 video baselines。（Table 3, p. 14） Baseline coverage：4D encoder baselines被统一 contrastive retraining，具一定公平性；但 VQA baseline 只能接收 mesh-rendered RGB video，训练/输入 modality、prompt 和 domain specialization 均不等价。 Ablation：ViT size、frozen text encoder、SigLIP loss、untrained ViT、frame shuffle 与 point-cloud corruptions 均有 sensitivity test；结果支持 temporal order 和 joint text training，但没有独立数据集上的完整 4DVLM ablation。",
+    "insightZh": "收录并精读：representation 和 modality interface 都有明确原创性，检索/迁移/下游证据较完整；同时必须深入核对 synthetic data、VQA metric 和 cross-modality baseline 的公平性。 CL4D 把 per-frame point groups、spatial transformer 和 temporal transformer 组成原生 dynamic-point-cloud encoder，以 InfoNCE 对齐语言，再冻结 encoder/LLM 只训练 projector 得到 4DVLM；作者报告 DynAction4D HumanOnly text-to-motion batch R@1 为 70.32、较重训 baseline 高 16.75 points，并在 VQA text metrics 上超过 video VLM，但数据以合成人体动作和 Gemini-generated QA 为主，精读时要区分 4D representation 创新与 benchmark 自洽性。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

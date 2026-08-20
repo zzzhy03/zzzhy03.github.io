@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2608.18410",
+  "slug": "role-conditioned-sub-token-routing-for-efficient-vision-language-action-policies",
+  "title": "Role-Conditioned Sub-Token Routing for Efficient Vision-Language-Action Policies",
+  "authors": [
+    "Wei Jiang",
+    "Wei Wang"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18410"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Role",
+    "Conditioned",
+    "Token",
+    "Routing",
+    "Efficient"
+  ],
+  "abstract": "Vision-Language-Action (VLA) models process long multimodal token sequences, making inference expensive in both memory and computation. Existing efficiency methods mainly reduce visual tokens, but aggressive token pruning becomes fragile because removing a token discards its entire representation. Sub-token compression provides a complementary alternative by retaining more tokens while reducing their value width. However, directly applying sub-token compression to VLA policies is less effective because information important for perception, language understanding, and control is distributed differently across the multimodal representation. We introduce Role-Conditioned Sub-Token Routing (RoleSub), which learns how to compress the value representations of retained tokens. After visual token reduction, RoleSub partitions each retained value representation into groups in an orthogonal space and uses a lightweight router to determine which groups should be preserved. The routing decision is conditioned on the token representation, a learned latent role representation, and language context. The same mechanism can also be applied to language values, allowing visual and language representations to be compressed without removing additional tokens. We evaluate RoleSub on OpenVLA-OFT-7B across the four LIBERO suites. At matched visual-KV budgets, RoleSub outperforms a trained token-only control in 33 of 36 settings, with the largest gains under aggressive compression. Combining visual and language compression reduces total KV to 9.2--11.3% of the original while retaining strong control performance on most tasks. These results show that reducing the representation within retained tokens provides an effective complement to token pruning for aggressive VLA compression.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18410v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18410v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18410v1 全文整理；本地 PDF 共 12 页，SHA-256 036548afe86dd8fe8b9876b92e41cf1959e67f7350677e5b1a6c94877644f423，并视觉核验第 1、4、8、11 页。",
+    "ideaZh": "RoleSub 不只删 visual tokens，而是在保留 token 的完整 query/key 后，把 value 投影到 fixed orthogonal basis、切成 16 groups，再用 token state、latent role 与 language context 决定保留哪些 groups，并为不同 token types 分配独立预算。作者报告在 matched visual-KV budgets 下 36 个设置中 33 个优于 trained token-only control；combined visual/language KV 可降到原始 9.2%-11.3%，但 LIBERO-10 会损失 10.0-11.2 points，且论文没有实际 end-to-end latency。",
+    "methodFlow": [
+      "对 multimodal sequence 按 visual/language/proprioceptive/action token types 分组",
+      "先用任意 token selector 保留指定 token locations",
+      "把 surviving value vector 投影到 fixed orthogonal routing space 并切为 16 groups",
+      "结合 token state、learned latent role 与 pooled language context 计算 group scores",
+      "按 token-type budget 选择 value groups，并与 LoRA/routing heads 一起用 action L1 loss 训练"
+    ],
+    "whyRelevantZh": "直接涉及 multimodal token/value compression，对 VLM/MLLM efficiency 有迁移价值，即使实验载体是 VLA。",
+    "evidenceZh": "RoleSub 将 token-level retention 与 orthogonal value-group routing 分离，并用 latent role/language context 决定 group selection。（Sec. 3.1-3.4, pp. 4-6）；作者报告 RoleSub 在 36 个 matched visual-KV settings 中 33 个优于 trained token-only pruning。（Table 1 and Sec. 4.3, pp. 8-9）；作者报告 language-only Klang=1 在四个 suites 近乎无损，但与 heavy visual compression 结合后 LIBERO-10 明显退化。（Tables 3-4, p. 10）；论文只评估 retained KV，没有测 end-to-end inference latency。（Limitations, p. 11）",
+    "caveatZh": "latent role components 不保证对应可解释 semantic roles。；visual/language budgets 分配独立，未显式优化 cross-modal coupling。；只测 retained KV，没有测 end-to-end inference latency。；结果来自单一 OpenVLA-OFT-7B/LIBERO environment，向通用 MLLM tokenization 的迁移仍待验证。；PDF 未打印 own-method public code URL；作者报告结果未独立复现。",
+    "motivationZh": "方法把 token count 与 value width 视为正交 compression axes：visual tokens 先 pruning，surviving values 再 group routing；language tokens 可全部保留但压缩 value。OpenVLA-OFT-7B 的四个 LIBERO suites 表明 sub-token routing 在激进 budget 下比等预算 token-only 更稳，然而结论限于 VLA policy 和 KV amount，而非真实 hardware speed。",
+    "methodZh": "相对 token pruning，RoleSub 保留更多 spatial/language token locations 而缩窄 value width；latent-role conditioning 与 adaptive group budget 在最紧 budget 下优于 plain sub-token routing。 方法流程：对 multimodal sequence 按 visual/language/proprioceptive/action token types 分组 → 先用任意 token selector 保留指定 token locations → 把 surviving value vector 投影到 fixed orthogonal routing space 并切为 16 groups → 结合 token state、learned latent role 与 pooled language context 计算 group scores → 按 token-type budget 选择 value groups，并与 LoRA/routing heads 一起用 action L1 loss 训练。",
+    "experimentsZh": "OpenVLA-OFT-7B 在 Goal、LIBERO-10、Object、Spatial 四 suites；每 suite 10 tasks、每 task 50 trials；8/16/32 of 512 visual tokens、16 value groups，与 training-free/trained token-only 和 plain router 比较。 作者报告 16 visual tokens、Kvis=1 时 LIBERO-10 success 83.9%，matched token-only 为 75.3%。（Table 1, p. 8） 作者报告 combined KV 9.2%-11.3% 时 Object/Spatial 近似 visual-only，但 LIBERO-10 下降 10.0-11.2 points。（Table 4, p. 10） Baseline coverage：包含 training-free token pruning、同 LoRA procedure 的 matched-budget token-only control 与去掉 orthogonal/role/adaptive allocation 的 plain router；只覆盖单一 VLA backbone 和 LIBERO。 Ablation：Kvis/Klang budgets、plain routing 与 combined modality sweep 支持各机制；没有 actual latency、energy 或 kernel ablation。",
+    "insightZh": "matched-budget controls 与 modality sweep 支持 representation-level advance，适合速读；因无真实 latency、单一 backbone/domain，不建议精读。 RoleSub 不只删 visual tokens，而是在保留 token 的完整 query/key 后，把 value 投影到 fixed orthogonal basis、切成 16 groups，再用 token state、latent role 与 language context 决定保留哪些 groups，并为不同 token types 分配独立预算。作者报告在 matched visual-KV budgets 下 36 个设置中 33 个优于 trained token-only control；combined visual/language KV 可降到原始 9.2%-11.3%，但 LIBERO-10 会损失 10.0-11.2 points，且论文没有实际 end-to-end latency。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

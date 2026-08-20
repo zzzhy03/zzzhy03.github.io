@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2607.16841",
+  "slug": "look-clearly-before-answering-mitigating-hallucinations-in-lvlms-via-saliency-driven-perceptual-realignment",
+  "title": "Look Clearly Before Answering: Mitigating Hallucinations in LVLMs via Saliency-Driven Perceptual Realignment",
+  "authors": [
+    "Pengxu Chen",
+    "Yao Zhu",
+    "Guangming Zhu",
+    "Jun Sheng",
+    "Jincai Huang",
+    "Xiangyang Ji",
+    "Liang Zhang"
+  ],
+  "publishedAt": "2026-07-18",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "ACM International Conference on Multimedia 2026 · arXiv v2",
+  "identifiers": {
+    "arxiv": "2607.16841"
+  },
+  "venueIds": [
+    "acm-mm"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV",
+    "cs.MM"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Look",
+    "Clearly",
+    "Before",
+    "Answering",
+    "Mitigating"
+  ],
+  "abstract": "Large vision-language models (LVLMs) have demonstrated remarkable capabilities in multimodal understanding. However, they remain prone to hallucinations, generating responses that are inconsistent with the visual evidence. Existing mitigation methods largely address language-prior bias or cross-modal imbalance, while progressive visual degradation across perception and memory remains underexplored. In this work, we propose Saliency-Driven Perceptual Realignment (SDPR), a training-free framework that mitigates the degradation of visual awareness throughout inference. Specifically, we first introduce saliency-driven attention redistribution to release attention hijacked by non-semantic sink tokens, thereby recovering critical visual evidence. Second, we identify spatial distortion in the KV cache and propose saliency-driven cache alignment to preserve query-relevant visual features during generation. Finally, we introduce prior-constrained contrastive decoding to penalize unfaithful predictions induced by dominant language priors. Our proposed SDPR is robust against hallucinations due to its holistic alignment of visual awareness across the entire generative trajectory. Extensive experiments across diverse LVLM architectures show that SDPR outperforms state-of-the-art methods on both hallucination and general-purpose benchmarks, requiring no additional training and incurring minimal runtime overhead. The code is available \\href{https://github.com/PengSyuChen/SDPR}{\\color{blue}{here}}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.16841v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.16841v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/PengSyuChen/SDPR"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.16841v2 全文整理；本地 PDF 共 9 页，SHA-256 0805677a4ac0c92941d37fb63bccc7907e7db25829d5fa942c7bce75cccc4d89，并视觉核验第 1、5、7、8 页。",
+    "ideaZh": "SDPR 把 LVLM hallucination 归因于生成全程的 visual-awareness degradation，并在 perception、memory、prediction 三层同时介入：局部平均削弱 sink attention、query saliency 重标定 visual key cache、early-layer language-prior reference 驱动 adaptive contrastive decoding；作者报告跨 LLaVA/Qwen/InternVL 改善 POPE/MME/CHAIR。",
+    "methodFlow": [
+      "分析 LVLM attention sinks 与 KV-cache sequence-position distortion",
+      "选择 low-entropy sink-dominated heads并聚合 global saliency candidates",
+      "用 candidate 周围 3×3 local average 重分配 attention，恢复语义区域",
+      "从 query-visual similarity 生成 saliency map并重标定 cached visual keys",
+      "从 early-layer text-biased heads 构造 language-prior reference logits",
+      "根据 original/reference disagreement 自适应采用 collaboration 或 contrast decoding"
+    ],
+    "whyRelevantZh": "工作直接推进通用 LVLM visual grounding、internal multimodal memory 与 hallucination control；三阶段 evidence preservation 也可迁移到 visual design agents 的 observe-reason-act loop。",
+    "evidenceZh": "hallucinatory responses 的 attention 更集中，cached visual keys 也呈更强 sequence-position dependence。（Tables 1-2, Figs. 2-6, pp. 3-4）；SDPR 在 perception、memory、prediction 三个位置分别执行 SDAR、SDCA 与 PCD。（Fig. 7, Sec. 5, pp. 5-6）；SDAR 用跨 head candidate localization 与 local spatial averaging 区分 isolated sink 和 coherent semantic response。（Sec. 5.1, Fig. 8, p. 5）；完整三模块在 hallucination 与 general-purpose measures 上优于各单模块组合。（Table 6, Sec. 6.3, p. 8）",
+    "caveatZh": "方法需访问并修改 internal attention、KV cache 与 early-layer heads，不能用于 closed APIs，且对不同 architecture 的 hook/层选择可能不统一。；低 entropy 不等同于 non-semantic sink，local averaging 可能损失 tiny object 或高频 spatial cue；论文的三 benchmark 主要聚焦 object-level hallucination。；PCD 使用 backbone-specific threshold，SDAR/SDCA 也依赖固定 layers/heads；跨任务免调参与完整额外 latency 仍需确认。",
+    "motivationZh": "论文先以 attention concentration 和 cached-key PCA/Spearman 分析建立两个机制假设：hallucinatory response 更受少数 non-semantic sink tokens hijack，且 causal prefill 造成 visual keys 的 sequence-position distortion，削弱 decoding 对 query-relevant visual evidence 的检索。SDAR 选择 low-entropy heads，以跨 head saliency 定位 candidate positions，再把中心与 3×3 local neighborhood 平均以压低孤立 sink、保留 coherent semantic regions。SDCA 用 query hidden states 与 visual states 相似度生成 saliency map，直接 reweight cached visual keys。PCD 从 early-layer text-biased heads构造 language-prior reference，根据 original/reference distributions 的差异在 collaboration 与 contrast paths 间切换。三类主干、多个 hallucination/general benchmarks 与 module ablation 支持组合效果；PDF 内嵌公开 code URL。",
+    "methodZh": "新意在于把 hallucination intervention 从单一 decoding trick 扩展为 perception-memory-prediction 的三阶段 coordinated realignment，并以 internal-state diagnosis 对应每个模块；尤其 SDCA 直接修改 visual key retrieval priority，和 SDAR/PCD 的职责区分较清楚。 方法流程：分析 LVLM attention sinks 与 KV-cache sequence-position distortion → 选择 low-entropy sink-dominated heads并聚合 global saliency candidates → 用 candidate 周围 3×3 local average 重分配 attention，恢复语义区域 → 从 query-visual similarity 生成 saliency map并重标定 cached visual keys → 从 early-layer text-biased heads 构造 language-prior reference logits → 根据 original/reference disagreement 自适应采用 collaboration 或 contrast decoding。",
+    "experimentsZh": "在 LLaVA-1.5、Qwen2.5-VL、InternVL2.5 上评测 POPE、CHAIR、MME，并在 supplementary 中报告 MMMU、MMMU-Pro、MME-RealWorld、MMVP；比较 VCD、M3ID、VAR、VAF、ONLY、AvisC、MoD。主实现固定选择 16 个 low-entropy heads、5 个 candidate positions、layer 15 query saliency，并按 backbone 设置 decoding threshold。 作者报告 LLaVA-1.5 上 SDPR 相对 vanilla 的 POPE average accuracy 在 COCO/A-OKVQA/GQA 分支分别提高 4.33/3.96/2.91 points。（Table 3 and Sec. 6.2, p. 7） 作者报告 LLaVA-1.5 64-token CHAIR 设置中，CHAIRS 从 21.2 降到 15.2、CHAIRI 从 7.4 降到 4.7、precision 从 89.5 升到 92.5。（Table 5, p. 7） 作者报告完整 SDAR+SDCA+PCD 在 LLaVA-1.5 上将 MME 从 1648.0 提到 1855.9、CHAIRS 从 10.8 降到 7.2；PCD 单独贡献最大，三模块组合最佳。（Table 6, p. 8） Baseline coverage：覆盖代表性 contrastive decoding 和 attention-intervention baselines，并同时报告 POPE、MME、CHAIR 及 general-purpose supplementary benchmarks；但主 PDF 未给清晰端到端 runtime/memory table，且不同 baseline 的 hyperparameter tuning parity 不易核查。 Ablation：三主模块做完整组合消融，另有 hyperparameter studies 指向 supplementary；机制诊断支持 attention/cache motivation。不过固定 layer/head counts、不同 backbone 阈值与每模块 runtime cost 没有在主文充分展开。",
+    "insightZh": "方法与诊断紧密对应、跨 backbone/benchmark 结果和 module ablation 完整，且 code URL 在 PDF 中可核验；尽管通用性与开销仍有风险，仍建议 accept-deep 并进入 digest。 SDPR 把 LVLM hallucination 归因于生成全程的 visual-awareness degradation，并在 perception、memory、prediction 三层同时介入：局部平均削弱 sink attention、query saliency 重标定 visual key cache、early-layer language-prior reference 驱动 adaptive contrastive decoding；作者报告跨 LLaVA/Qwen/InternVL 改善 POPE/MME/CHAIR。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

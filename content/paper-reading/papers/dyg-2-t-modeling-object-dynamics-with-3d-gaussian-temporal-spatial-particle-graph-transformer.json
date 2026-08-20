@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.18498",
+  "slug": "dyg-2-t-modeling-object-dynamics-with-3d-gaussian-temporal-spatial-particle-graph-transformer",
+  "title": "DyG$^2$T: Modeling Object Dynamics with 3D Gaussian Temporal-Spatial Particle Graph Transformer",
+  "authors": [
+    "Yansong Wang",
+    "Zhaobo Qi",
+    "Xinyan Liu",
+    "Beichen Zhang",
+    "Shuhui Wang",
+    "Weigang Zhang",
+    "Qingming Huang"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18498"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Modeling",
+    "Object",
+    "Dynamics",
+    "Gaussian",
+    "Temporal"
+  ],
+  "abstract": "Modeling object dynamics from limited visual observations is a fundamental problem for enabling accurate motion trajectory prediction in embodied interaction scenarios. Existing dynamics modeling methods first compress reconstructed particle representations into sparse Key Points and model their evolution using locally constrained interactions, thereby discarding fine-grained local details and obscuring discriminative interaction modeling across spatial and temporal scales, leading to drifting trajectories and inaccurate appearance prediction. To tackle these issues, we propose DyG$^2$T, a dynamics modeling framework that infers object motion trajectories by spatially completing and temporally discriminating Key Point representations and modeling multi-scale interaction over particle graphs. Spatially, DyG$^2$T enriches each Key Point by aggregating neighboring raw particle positions to recover fine-grained local details, while explicitly encoding relative offsets among Key Points to enhance geometric structure perception. Temporally, we introduce a Temporal Disentangling Network (TDN) to identify dominant cross-frame variations in latent space and amplify inter-frame differences, yielding temporally discriminative representations that are subsequently aggregated via Temporal Attention to capture frame-wise temporal evolution cues. For comprehensive interaction modeling, a Particle Graph Transformer leverages global attention to preserve discriminative long-range dependencies among Key Points, mitigating representation homogenization induced by locality-constrained modeling and providing a robust basis for accurate trajectory prediction. Experiments on both synthetic and real-world datasets demonstrate that DyG$^2$T achieves accurate dynamics modeling and reasoning, and exhibits strong cross-object and real-world generalization.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18498v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18498v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18498v1 全文整理；本地 PDF 共 15 页，SHA-256 4234be056f6b5a8aee2297256a40648e5413e1ff79e84c8d0d5c4993e9413155，并视觉核验第 1、4、8、12 页。",
+    "ideaZh": "DyG²T 从短 multi-view observations 重建 trackable 3D Gaussian particles，再为 FPS key points 补回 raw-neighbor geometry、用 Temporal Disentangling/Attention 提取 motion cues，并以 global Particle Graph Transformer 预测未来 displacement。作者报告 Spring-Gaus synthetic mean CD 0.039，优于 Spring-Gaus 0.066 与 GS-Dynamics 0.176；但这是 object-dynamics forecasting 而非通用 3D asset generation，实验对象与物理覆盖有限，且 appearance descriptors 在未来帧固定复用。",
+    "methodFlow": [
+      "从多视角短视频以 3DGS/Dyn3DGS 重建 trackable Gaussian particle sequences",
+      "FPS 采样 key points，并聚合 raw-neighbor positions 与 relative offsets 补全空间语义",
+      "TDN 放大跨帧 latent differences，Temporal Attention 汇总 motion evolution",
+      "Particle Graph Transformer 以 global attention 预测 key-point displacement",
+      "用 LBS densification 传播到 raw Gaussians，迭代生成未来 trajectories 与 renderings"
+    ],
+    "whyRelevantZh": "对 physically plausible dynamic 3D content 有可迁移的 particle representation 与 motion modeling，但不是核心 3D asset generation 方法。",
+    "evidenceZh": "DyG²T 由 dynamic reconstruction、spatial-temporal feature completion 与 particle graph prediction 三段组成。（Fig. 2, p. 4）；作者报告 Spring-Gaus synthetic mean CD 0.039、EMD 0.019、PSNR 15.587、SSIM 0.889。（Table II, p. 8）；作者报告 real-world/Unity3D-H 多数对象上 LPIPS 优于 baselines，但 Potato 等个别 PSNR/SSIM 并非最佳。（Table III, p. 8）；论文明确 LBS 会抹平小于 key-point spacing 的 deformation，固定 SH appearance 难以覆盖动态光照与 specular changes。（Sec. V Limitations, p. 12）",
+    "caveatZh": "LBS densification 会削弱 local wrinkles 与 fine surface deformation。；未来帧复用 SH appearance descriptors，不能显式建模 dynamic lighting 或 specular changes。；物理泛化主要来自少量 synthetic/real objects，尚不能等同于可控或可编辑的通用 dynamic 3D generation。；没有在 PDF 中找到该方法的 public code URL；作者报告结果未独立复现。",
+    "motivationZh": "方法先用 Dyn3DGS 得到跨帧可追踪 Gaussian positions，key-point branch 聚合 local raw particles 和 pairwise offsets，temporal branch 分离跨帧变化，graph transformer 建模 long-range interactions，最后用 LBS 将 key-point motion densify 回所有 Gaussians。对 synthetic、少量 real-world 与 heterogeneous torus 的结果显示 trajectory/appearance gains；相关性主要是 physically plausible dynamic 3D 的 transferable modeling。",
+    "methodZh": "贡献是对 sparse key-point dynamics 表示做 spatial completion、temporal disentangling 与 global graph interaction 的组合；相比 local GNN dynamics 更完整，但并非新的 3D generative prior。 方法流程：从多视角短视频以 3DGS/Dyn3DGS 重建 trackable Gaussian particle sequences → FPS 采样 key points，并聚合 raw-neighbor positions 与 relative offsets 补全空间语义 → TDN 放大跨帧 latent differences，Temporal Attention 汇总 motion evolution → Particle Graph Transformer 以 global attention 预测 key-point displacement → 用 LBS densification 传播到 raw Gaussians，迭代生成未来 trajectories 与 renderings。",
+    "experimentsZh": "Spring-Gaus synthetic/real subsets、authors' Unity3D-H heterogeneous objects；单 RTX 4090，预测训练未见的末 10 frames，比较 Spring-Gaus、GS-Dynamics，heterogeneous case 加 PAC-NeRF/GIC。 作者报告 synthetic mean CD 从 Spring-Gaus 0.066、GS-Dynamics 0.176 降到 0.039。（Table II, p. 8） 作者报告 module ablation 中 full model CD 0.055、EMD 0.029、LPIPS 0.122，移除任一 spatial/temporal/transformer module 都退化。（Table VI, p. 9） Baseline coverage：主要 dynamics baselines 为 Spring-Gaus 与 GS-Dynamics，physics-prior baselines 只在 heterogeneous torus 上比较；作者重实现部分 metrics，协议差异仍有风险。 Ablation：覆盖 spatial completion、temporal module、graph transformer、key-point count、prediction horizon 与 efficiency，组件级证据较充分。",
+    "insightZh": "全文显示明确技术推进和 cross-object results，适合以 transferable 3D dynamics 速读收录；因任务、baseline 与物理覆盖边界，不建议精读。 DyG²T 从短 multi-view observations 重建 trackable 3D Gaussian particles，再为 FPS key points 补回 raw-neighbor geometry、用 Temporal Disentangling/Attention 提取 motion cues，并以 global Particle Graph Transformer 预测未来 displacement。作者报告 Spring-Gaus synthetic mean CD 0.039，优于 Spring-Gaus 0.066 与 GS-Dynamics 0.176；但这是 object-dynamics forecasting 而非通用 3D asset generation，实验对象与物理覆盖有限，且 appearance descriptors 在未来帧固定复用。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

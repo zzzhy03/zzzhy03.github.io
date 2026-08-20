@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2608.15265",
+  "slug": "vibeworlding-can-multimodal-agents-construct-3d-open-worlds-end-to-end",
+  "title": "VibeWorlding: Can Multimodal Agents Construct 3D Open Worlds End-to-End?",
+  "authors": [
+    "Yansong Ning",
+    "Jingwen Ye",
+    "Zhongkai Wu",
+    "Yang Sun",
+    "Yiqin Zhu",
+    "Xingyi Li",
+    "Weidong Zhang",
+    "Hao Liu"
+  ],
+  "publishedAt": "2026-08-15",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.15265"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "3d-generation",
+    "vlm-mllm",
+    "VibeWorlding",
+    "Multimodal",
+    "Agents",
+    "Construct",
+    "Open"
+  ],
+  "abstract": "Constructing an interactive 3D open world from a user query is important. However, existing methods are primarily evaluated on idealized, simple queries, making it difficult to systematically analyze and compare how multimodal agents understand user intent, use 3D tools, and reason over textual and visual 3D world information. To this end, we propose VibeWorlding, a unified framework for benchmarking and training vibe worlding agents: a multimodal agent that can autonomously infer user intent, plan scene layout, invoke 3D tools, and reflect on the multimodal feedback in a multi-turn agent-environment interaction process. To achieve this, we first build VWE-BENCH, a benchmark of 2,616 high-quality 3D assets, 323 human-annotated seed 3D worlds, and 6,828 reverse-synthesized multimodal user queries, split into verified queries with ground-truth and unverified queries with carefully designed rubrics. Moreover, we develop VibeWorlding-Gym, a joint multimodal RL post-training framework that integrates (1) a sandbox environment unifying asset retrieval, editing, and image rendering as MCP tools, and (2) a rubric-based verifier that combines physical feasibility and intent fulfillment verification, supporting both fair model evaluation and scalable multimodal RL reward service. Our experiments show that current frontier MLLMs are far from solving the vibe worlding agent task, with even GPT-5.5 and Qwen3.8-Max reaching below 60% success rate, and trace the bottleneck to precise 3D world editing. We further find that RL training can ease this weakness and enable open-source MLLMs to even surpass closed-source frontiers: our VibeWorlder-8B is comparable to frontier MLLMs, while our flagship VibeWorlder-30B-A3B attains the best overall Pass@1 among all evaluated models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.15265v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.15265v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/usail-hkust/VibeWorlding-Gym"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.15265v2 全文整理；本地 PDF 共 38 页，SHA-256 6040e2d75a39e7209ee68ba289e61b016225f7c43540a3d1465abd66e24f9014，并视觉核验第 1、7、10、11、15、33 页。",
+    "ideaZh": "VibeWorlding 把 3D open-world construction 明确定义为多轮 multimodal agent task：agent 检索/增删/旋转/平移资产，每轮读取 five-view renders，并用 collision/height hard checks 与 intent rubric 做 SFT+GRPO；作者报告 30B-A3B 从 base 13.6% 经 SFT 34.5% 到 RL 59.3% auto Pass@1、blind-human 47.2%，这是直接命中 visual design agent 的高价值系统，但 cartoon assets、254 test queries 和 judge-bound reward 需要精读。",
+    "methodFlow": [
+      "输入文本或带 3D map/five-view renders 的 multimodal query",
+      "agent 规划并调用 asset retrieval/edit MCP tools",
+      "Blender 渲染多视角结果并回传形成多轮 feedback",
+      "geometry checks 与 MLLM rubric 共同计算 dual-constraint reward",
+      "cold-start SFT 后用 joint multimodal GRPO 训练 VibeWorlder"
+    ],
+    "whyRelevantZh": "它精确命中 visual design agents：规划、3D tool use、rendered observation、iterative correction、verifiable training 五个环节齐全，并直接产出可交互 3D world。",
+    "evidenceZh": "agent 每轮自主规划并调用五类 3D tools，接收 map 与 five-view renders，dual verifier 同时约束物理可行与意图满足。（Sec. 2.2 and 4.1–4.2, Table 1, pp. 4 and 7）；作者报告 30B-A3B 从 base 13.6%、SFT 34.5% 提升到 RL 59.3% auto Pass@1，超过 GPT-5.5 的 57.3%。（Sec. 6.1, Table 4, p. 10）；作者报告 RL 期间 3D understanding 从 0.17→0.80、3D reasoning 从 0.04→0.69，verified reward 0.14→0.64，而 unverified judge reward 更不稳定。（Sec. 6.2, Fig. 6, p. 11）；blind study 的 verifier/human overall agreement κ=0.54，model-level Spearman ρ=0.88；automatic score 仍不能替代开放域人评。（Appendix A.4, Table 7, p. 33）；作者明确列出 asset style/scale、sparse reward、rendering cost、spatial reasoning 和 end-to-end verification 等限制。（Sec. 8 Discussion, pp. 14–15）",
+    "caveatZh": "最复杂 world 只有 258 assets，asset library 仅 cartoon art style，query 不覆盖 image/video-to-world。；trajectory-level reward 对长 horizon 稀疏，rendering 昂贵，精确 spatial quantities 和 open-ended verification 仍困难。；6,828 queries 多为从 artist worlds 反向合成，test 仅 254，可能高估对自然用户分布和任意资产生态的泛化。；unverified training/evaluation 依赖 Gemini rubric；作者自己观察到 reward 更不稳定，RL 改进受 judge fidelity 上限约束。；auto 59.3% 与 human 47.2% 的差距说明 benchmark success 不能直接等同真实 3D design quality。",
+    "motivationZh": "论文构建 VWE-Bench：2,616 assets、323 artist seed worlds、6,828 reverse-synthesized multimodal queries，覆盖从空场景 construction 与已有场景 refinement。VibeWorlding-Gym 以 Blender 返回 five-view images，以 asset retrieval/add/delete/rotate/translate 作为 MCP tools；verifier 先检查 collision/height，再用 MLLM rubric 评估生态合理性、3D understanding/reasoning 与 retrieval。训练先从 ground truth/reward-filtered trajectories 做 full SFT，再以 outcome reward 做 joint text+multimodal GRPO。",
+    "methodZh": "新意在于把可操作 3D sandbox、复杂真实查询 taxonomy、physical+intent verifier 和 multimodal agentic RL 打通，而非只让 LLM 单次输出 Blender code；它同时提供 benchmark、gym、models 和 failure taxonomy，是 visual design agents 的完整实验基础设施。 方法流程：输入文本或带 3D map/five-view renders 的 multimodal query → agent 规划并调用 asset retrieval/edit MCP tools → Blender 渲染多视角结果并回传形成多轮 feedback → geometry checks 与 MLLM rubric 共同计算 dual-constraint reward → cold-start SFT 后用 joint multimodal GRPO 训练 VibeWorlder。",
+    "experimentsZh": "VWE-Bench 按 seed worlds disjoint 划分，test 254 queries；比较 8 个 frontier/open MLLMs、3 个 GPT-5.5 scaffold agents、Qwen3-VL 8B/30B bases 及 SFT/RL variants。RL 用 Gemini 3.5-flash verifier、8 rollouts/group；另做 capability curves、failure cases、CLI study 和 blind artist evaluation。 作者报告 VibeWorlder-30B-A3B overall auto Pass@1 59.3%、human holistic Pass@1 47.2%，base 为 13.6%/13.3%。（Table 4, p. 10） 作者报告 human/verifier overall agreement 83.4%（κ=0.54），model-level intent ranking Spearman ρ=0.88。（Table 7 and agreement analysis, p. 33） Baseline coverage：frontier MLLMs、open bases、post-training stages 与 representative 3D agent scaffolds 都在同 sandbox/tools 下测试；但 proprietary model prompts、vendor access、human sample size与 exact decoding budget 仍可能影响直接排名。 Ablation：关键 ablation 是有/无 cold-start 的 RL curves，并按 physical/ecological/understanding/reasoning 分解；没有对 five-view count、individual verifier component、tool set 和 asset generator 做全面结构消融。",
+    "insightZh": "收录并精读：这是当前最直接、最系统的 3D design-agent benchmark+training framework 之一，开源证据和 failure analysis 很有价值；精读重点应放在 verifier validity、自然查询泛化与真实资产规模。 VibeWorlding 把 3D open-world construction 明确定义为多轮 multimodal agent task：agent 检索/增删/旋转/平移资产，每轮读取 five-view renders，并用 collision/height hard checks 与 intent rubric 做 SFT+GRPO；作者报告 30B-A3B 从 base 13.6% 经 SFT 34.5% 到 RL 59.3% auto Pass@1、blind-human 47.2%，这是直接命中 visual design agent 的高价值系统，但 cartoon assets、254 test queries 和 judge-bound reward 需要精读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

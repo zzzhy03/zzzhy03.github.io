@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2608.19075",
+  "slug": "reweigh-the-evidence-calibrating-token-level-ordinal-visual-evidence-to-mitigate-hallucinations-in-large-vision-language-models",
+  "title": "ReWEIGH the Evidence: Calibrating Token-Level Ordinal Visual Evidence to Mitigate Hallucinations in Large Vision-Language Models",
+  "authors": [
+    "Jihae Jeong",
+    "Junha Choi",
+    "Hwanjo Yu"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19075"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "ReWEIGH",
+    "Evidence",
+    "Calibrating",
+    "Token",
+    "Level"
+  ],
+  "abstract": "Large vision-language models (LVLMs) often hallucinate, generating content that the input image does not support. Preventing such content during decoding calls for a candidate-specific measure of how strongly the image supports the token under consideration. The model's visual-token states offer a natural source of this evidence because projecting each state through the output head reveals which vocabulary items that position favors. These position-wise readouts cannot be pooled directly because their probability magnitudes are not comparable across visual positions. Vocabulary ranks provide a scale-invariant basis for pooling, but tokens still differ systematically in their typical rank-based evidence. We propose ReWEIGH, a training-free decoding intervention that aggregates these ranks across visual positions and compares each candidate with a token-specific reference estimated from unlabeled images. At inference, ReWEIGH caches the image evidence during prefill and applies a bounded penalty only to candidates that fall below their reference. On four 7B backbones, ReWEIGH reduces hallucinated object mentions by up to 21.3% while largely preserving or improving descriptive and general performance. With evidence cached, the average added latency is 1.33% per token, and the reductions extend across six architecture families to 32B parameters.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19075v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19075v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19075v1 全文整理；本地 PDF 共 31 页，SHA-256 40f2ece1f34568375e80f646c09bef89f1dcb82e9ade7195d30c7b3f392285e9，并视觉核验第 1、5、6、8 页。",
+    "ideaZh": "ReWEIGH 把每个 visual-token hidden state 投影到 vocabulary，用跨位置的 dense mean reciprocal rank 构造 image-specific evidence，再以 token-specific calibration reference 对低证据候选施加有界惩罚；作者报告它跨多类 LVLM 降低 object hallucination，且 cached-evidence 每 token 平均只增加 1.33% latency。",
+    "methodFlow": [
+      "将每个 visual-token state 经 output head 投影为 vocabulary ranking",
+      "用 DMRR 跨视觉位置聚合候选 token 的 ordinal evidence",
+      "在无标签校准图像上估计 token-specific reference 与稳定性范围",
+      "prefill 时缓存当前图像的 evidence vector",
+      "解码时只对 registered 且 evidence-deficient 的候选 token 施加有界单向惩罚",
+      "保持未注册或证据充分的候选 logits 不变"
+    ],
+    "whyRelevantZh": "它直接推进 LVLM visual grounding、hallucination mitigation 与内部 multimodal token evidence，且 ordinal calibration 思路可迁移到视觉设计 agent 对 rendering evidence 的可靠性控制。",
+    "evidenceZh": "不同 visual positions 的概率尺度不可比，rank aggregation 提供对位置单调重标定不敏感的 evidence。（Sec. 3.1, Figs. 1-3, pp. 3-4）；完整流程由 Measure、Register、Intervene 构成，并把 online evidence 计算移到 prefill。（Fig. 4, Secs. 4.1-4.4, pp. 5-6）；主实验同时评测 hallucination、内容保留、通用 multimodal utility 与推理成本。（Tables 1-2, pp. 6-7）；token-specific reference 和 image-specific evidence 都不能被 global/shuffled/mismatched substitutes 替代。（Table 3, Sec. 5.3, pp. 7-8; Tables 20-21, p. 26）",
+    "caveatZh": "需要访问 visual-token hidden states、output normalization 与 vocabulary head，不能通过 closed API 使用。；每个 backbone 都需要独立 calibration table、readout layer 与 intervention strength。；实验没有证明 reference 或 operating point 可跨 backbone 直接迁移。；方法依赖 COCO 风格无标签 calibration 和候选 occurrence frequency，长尾/专业 vocabulary 的 reference 稳定性仍需关注。；核心收益集中于 object hallucination 与现有 benchmark scorer；更复杂关系、OCR/spatial reasoning hallucination 的覆盖边界需要进一步验证。",
+    "motivationZh": "论文先证明 visual positions 的 probability sharpness 不可直接比较，甚至 affine scale equalization 后仍有显著 dispersion，因此改用对单调变换不敏感的 vocabulary rank。离线 Register 阶段在无标签校准图像上收集候选 token 的 DMRR 分布，计算 token-specific median reference 与稳定性区间，只注册 reference 足够稳定的词。在线 Measure 阶段在 prefill 一次性缓存当前图像的 evidence；Intervene 阶段仅对候选集中低于自身 reference 的 token 施加 bounded one-sided logit penalty。实验覆盖四个 7B 主干的完整对比，并扩展到六个架构家族、最高 32B；counterfactual 和 matched-budget ablation 支持 ordinal readout、token identity 与 image-specific evidence 三个关键设计。",
+    "methodZh": "核心新意不是又一个额外 forward-pass contrastive decoder，而是把 scale-invariant ordinal readout、token-conditioned baseline 与 conservative bounded edit 组合成低开销接口；论文通过 shuffled reference、mismatched evidence、probability readout 和 unbounded update 等对照较好地隔离了各模块贡献。 方法流程：将每个 visual-token state 经 output head 投影为 vocabulary ranking → 用 DMRR 跨视觉位置聚合候选 token 的 ordinal evidence → 在无标签校准图像上估计 token-specific reference 与稳定性范围 → prefill 时缓存当前图像的 evidence vector → 解码时只对 registered 且 evidence-deficient 的候选 token 施加有界单向惩罚 → 保持未注册或证据充分的候选 logits 不变。",
+    "experimentsZh": "在 LLaVA-1.5-7B、Qwen2.5-VL-7B、InstructBLIP-7B、LLaVA-NeXT-7B 上以 500 张 MS COCO train images 校准与独立 500 张图选择 operating point；用 CHAIR、AMBER、MMHal-Bench、MM-Vet 评测，并扩展到 11 个模型、六个架构家族、7B-32B。 作者报告四个 7B backbone 的 CHAIRI 相对下降 10.3%-21.3%，同时整体保持或改善 F1；扩展模型上的 CHAIRS/CHAIRI 也全部下降。（Table 1, Sec. 5.2, pp. 6-7; Table 27, p. 28） 作者报告 cached-evidence 协议下平均每 token 额外 latency 为 1.33%，含 online prefill DMRR 时端到端 overhead 为 2.40%，peak allocated memory 增加 0.31%。（Sec. 5.4, p. 8; Table 16, p. 22） 作者报告 LLaVA-1.5-7B 上 full method 的 CHAIRS/CHAIRI/F1 为 44.8/12.67/80.85，而 unbounded update 虽把 CHAIRS 降至 39.2，却把 CHAIRI 推高到 29.71 并使 F1 降至 69.09。（Table 3, p. 7） Baseline coverage：主表比较 VCD、OPERA、DoLa、PAI、ReVisiT，并在 open-ended/general benchmarks 检查 utility；appendix 给出完整模型 checkpoints、数据 splits、candidate rules、full grids、统计区间和 scaling results。仍缺少 closed API 场景和跨 backbone 免校准对照。 Ablation：probability versus ordinal matched-budget、global/shuffled token references、mismatched image evidence、no abstention、bidirectional/unbounded update、calibration size/corpus、layer与 beta grid 均有覆盖；这些消融较充分地定位了收益来源及保守约束的必要性。",
+    "insightZh": "方法新意明确，跨模型实验与 counterfactual ablation 扎实，成本边界也有实测；与 VLM/MLLM 主方向高度相关，建议 deep reading 并进入本次 digest。 ReWEIGH 把每个 visual-token hidden state 投影到 vocabulary，用跨位置的 dense mean reciprocal rank 构造 image-specific evidence，再以 token-specific calibration reference 对低证据候选施加有界惩罚；作者报告它跨多类 LVLM 降低 object hallucination，且 cached-evidence 每 token 平均只增加 1.33% latency。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

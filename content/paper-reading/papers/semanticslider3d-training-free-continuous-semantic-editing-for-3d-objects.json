@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2608.18560",
+  "slug": "semanticslider3d-training-free-continuous-semantic-editing-for-3d-objects",
+  "title": "SemanticSlider3D: Training-Free Continuous Semantic Editing for 3D Objects",
+  "authors": [
+    "Ru Wang",
+    "Rahul Jain",
+    "Koichiro Niinuma",
+    "Aakar Gupta"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18560"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.HC"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "SemanticSlider3D",
+    "Training",
+    "Free",
+    "Continuous",
+    "Semantic"
+  ],
+  "abstract": "Fine-grained control over continuous semantic attributes of 3D objects is essential for 3D content creation, but is not well supported by conventional 3D modeling workflows or prompt-based interaction with existing generative AI tools. While slider-based methods have proven effective for fine-grained semantic control in 2D image generation, no equivalent approach exists for 3D. Extending these 2D methods to 3D is non-trivial due to challenges unique to 3D, including geometric integrity and cross-view coherence. We present SemanticSlider3D, a technique for continuous semantic attribute editing of 3D objects that requires no per-attribute training. Given a user-specified attribute, our pipeline constructs a semantic editing direction in the latent space of a state-of-the-art 3D generation model, presenting a diverse and coherent spectrum of 3D variations. A technical validation on a dataset of 50 3D object-attribute pairs shows our method was preferred by all five human assessors across variation range, consistency, 3D object quality, and attribute disentanglement, over a baseline combining a 2D slider with an image-to-3D model. An exploratory study with six participants demonstrates that SemanticSlider3D supported decision-making in 3D prototyping and was perceived as a valuable addition to existing workflows.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18560v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18560v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18560v1 全文整理；本地 PDF 共 17 页，SHA-256 42230406e25d12a400b639eb1150568154b970ea34ac32a3c5effd55abe6b710，并视觉核验第 1、4、7、11 页。",
+    "ideaZh": "SemanticSlider3D 把任意 semantic attribute 变成 TRELLIS flow sampling 中的连续 3D latent steering direction：先从多视角 render 中选择 attribute-relevant views，用 contrastive image edits 形成正负条件，再平均 velocity differences，并用 VLM quality bounds 与 LPIPS/Hungarian mapping 建立可感知的 slider。作者报告在 50 个 object-attribute pairs 上五位 assessors 全部总体偏好该方法，但统计仍是五人 descriptive evaluation，且一个 slider 初始生成约需 12 分钟。",
+    "methodFlow": [
+      "将输入 3D object 渲染为球面分布的 multi-view images",
+      "由用户 attribute 生成 positive/negative prompts，并选择 edit-relevant views",
+      "用 image editor 生成 contrastive view pairs，编码为 TRELLIS multi-view conditions",
+      "在 flow sampling 每一步平均正负 velocity difference，并以 alpha 控制双向 edit intensity",
+      "用 VLM quality check、LPIPS view matching 与 adaptive anchors 映射为连续 slider"
+    ],
+    "whyRelevantZh": "这是直接面向 3D content creation 的连续可控 editing 方法，并把 generation prior、geometry consistency 与 design exploration 串成完整 workflow。",
+    "evidenceZh": "完整 pipeline 从 multi-view rendering、prompt pair、view selection、contrastive image pair 到 TRELLIS steering。（Fig. 1, p. 1）；编辑方向由多视角正负条件的 velocity difference 平均得到，并注入 TRELLIS 两个 sampling stages。（Sec. 4.1-4.3, Eqs. 1-3, pp. 4-5）；作者报告方法在 50 个 pairs 上 3D quality 5.70、range 6.60、consistency 5.69、irrelevant-attribute preservation 5.69。（Sec. 5.4, p. 7）；作者明确报告 VLM quality check 误判、common-object dataset、五位 assessors 与约 12 分钟 latency 等限制。（Secs. 7.3-7.5, p. 11）",
+    "caveatZh": "GPT-5.2 quality checks 可能拒绝结构有效结果或放过 artifact。；validation 集中 common everyday objects，artistic/abstract attributes 覆盖有限。；五位 assessors 使两侧 Wilcoxon test 无法达到显著性，初始 slider generation 约 12 分钟。；pipeline 依赖 GPT-5.2、GPT Image 1.5 与 TRELLIS，多模型误差和服务可用性会共同影响复现。；作者报告人评结果未在本项目独立复现。",
+    "motivationZh": "该方法无需为每个 attribute 训练 LoRA，而是在生成时同时控制 TRELLIS 的 structure 与 latent stages；adaptive bounds、perceptual remapping 和 invalid-variation filtering 将原始 alpha 变成可用 slider。技术验证覆盖 range、quality、consistency 与 attribute preservation，另有六人 exploratory prototyping study。所有分数均为作者报告，本项目未复现。",
+    "methodZh": "核心新意是把 2D semantic slider 的 contrastive direction 扩展到 joint geometry-appearance 3D structured latent，并补上多视角聚合、adaptive bounds 与 perceptual slider calibration；不是单纯 prompt UI。 方法流程：将输入 3D object 渲染为球面分布的 multi-view images → 由用户 attribute 生成 positive/negative prompts，并选择 edit-relevant views → 用 image editor 生成 contrastive view pairs，编码为 TRELLIS multi-view conditions → 在 flow sampling 每一步平均正负 velocity difference，并以 alpha 控制双向 edit intensity → 用 VLM quality check、LPIPS view matching 与 adaptive anchors 映射为连续 slider。",
+    "experimentsZh": "46 unique 3D objects 构成 50 object-attribute pairs；五位 assessors 与 Concept Sliders + SAM 3D baseline 做 2-hour within-subject technical validation；另有六位具有 3D-tool 经验的 exploratory users。 作者报告五位 assessors 对 SemanticSlider3D 的总体 preference rate 各为 72%-96%，Gwet AC1 为 0.79。（Sec. 5.4.5, p. 7） 作者报告 3D quality mean 5.70、range 6.60、consistency 5.69、preservation 5.69，均为 descriptive ratings。（Secs. 5.4.1-5.4.4, p. 7） Baseline coverage：由于没有直接 3D semantic slider baseline，作者组合 Concept Sliders、SAM 3 与 image-to-3D；这是一条合理但可能累积 2D segmentation/lifting 损失的弱 baseline。 Ablation：技术设计包含 view selection、adaptive bounds 与 perceptual remapping，但没有覆盖多个 3D foundation backbones，也没有足够 assessor 数支持显著性检验。",
+    "insightZh": "方法贡献直接、机制清楚且有技术验证与用户边界，建议精读；收录时必须保留小样本、闭源模型依赖与高 latency caveat。 SemanticSlider3D 把任意 semantic attribute 变成 TRELLIS flow sampling 中的连续 3D latent steering direction：先从多视角 render 中选择 attribute-relevant views，用 contrastive image edits 形成正负条件，再平均 velocity differences，并用 VLM quality bounds 与 LPIPS/Hungarian mapping 建立可感知的 slider。作者报告在 50 个 object-attribute pairs 上五位 assessors 全部总体偏好该方法，但统计仍是五人 descriptive evaluation，且一个 slider 初始生成约需 12 分钟。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

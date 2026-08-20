@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.18948",
+  "slug": "roboedit-turning-human-manipulation-videos-into-scalable-robot-experience",
+  "title": "RoboEdit: Turning Human Manipulation Videos into Scalable Robot Experience",
+  "authors": [
+    "Yaowei Guo",
+    "Zeng Tao",
+    "Yuxin Jiang",
+    "Yunuo Chen",
+    "Zhiyang Dou",
+    "Yuxiang Ma",
+    "Yin Yang",
+    "Demetri Terzopoulos",
+    "Ying Jiang",
+    "Chenfanfu Jiang"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18948"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "video-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "3d-reconstruction",
+    "RoboEdit",
+    "Turning",
+    "Human",
+    "Manipulation",
+    "Videos"
+  ],
+  "abstract": "Collecting robot hand-object interaction data is costly and embodiment-specific, yet abundant human-object videos remain unusable for robot training. We present RoboEdit, a human-to-robot video editing suite that transforms human manipulation videos into action-consistent, physically plausible robot videos with aligned 3D hand states. To enable scalable supervision, we introduce RoboEdit-ADC, an automatic pipeline that reconstructs and retargets 3D interactions from RGB videos across embodiments. This pipeline generates RoboEdit-14M, a large-scale dataset of 174K aligned video pairs (14M frames) spanning seven robot embodiments, diverse scenes, and interaction types. The core editing engine, RoboEdit-Trans, employs cross-embodiment adaptation modules to preserve temporal coherence while adapting appearance and motion. It further integrates a 3D Robot-State Decoder to recover per-frame hand states for structured motion supervision. Experiments show that RoboEdit achieves state-of-the-art editing quality and supports downstream robot control policies in real-world manipulation tasks. Ultimately, the RoboEdit suite unlocks the vast potential of unlabeled human videos, providing scalable, high-fidelity visual and 3D motion supervision for generalizable robot learning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18948v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18948v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18948v1 全文整理；本地 PDF 共 14 页，SHA-256 928839288aa2c2993f8f84f682cc004e83ebb2ad0495913bb73f4f4d3f94b0db，并视觉核验第 1、2、5、7 页。",
+    "ideaZh": "RoboEdit 把 human manipulation video 直接编辑成跨 embodiment 的 robot interaction video，并同步解码 3D robot-hand states：自动 ADC pipeline 用 hand/object/camera reconstruction、kinematic retargeting、depth/physics refinement 建立大规模 paired supervision，Trans 模型再以 LoRA/residual adapters 与 3D decoder学习时序一致的跨形态编辑。",
+    "methodFlow": [
+      "从 human RGB video 重建 hand、object mesh/pose、camera/depth 与 edit masks",
+      "按目标 robot embodiment 做 kinematic retargeting",
+      "以 depth alignment、collision/contact 与 temporal objective 做 physics refinement",
+      "inpaint source 并渲染/composite robot interaction，构造 paired RoboEdit-14M",
+      "用 sparse robot keyframes、LoRA/residual adapters 训练 cross-embodiment video editor",
+      "从 edited video 解码并时序细化 3D robot-hand trajectory，用于下游控制"
+    ],
+    "whyRelevantZh": "工作直接命中 Video Generation/Editing，并把 3D reconstruction、retargeting、structured motion state 与生成视频结合；对 3D/4D generation、visual design agents 和 embodied multimodal data engine 都有高迁移价值。",
+    "evidenceZh": "RoboEdit suite 同时包含 Trans editor、ADC data curation 与 14M-frame paired dataset。（Fig. 1, pp. 1-2）；ADC 从 monocular video 组合多种 reconstruction/tracking foundation models，并通过 depth 与 physics constraints 修正 retargeting。（Sec. 3.1, Fig. 3, pp. 2 and 4）；RoboEdit-Trans 用 cross-embodiment LoRA/residual adapters 编辑视频，并由独立 decoder恢复 3D robot states。（Sec. 3.2, Fig. 2, pp. 2 and 4-6）；编辑指标、adapter ablation 和 decoded trajectory 的 real-robot control共同构成证据链。（Tables 2-3 and Fig. 8, p. 7; Appendix E, p. 14）",
+    "caveatZh": "ADC 串联 HaMeR、SAM2、TRELLIS、FoundationPose、VGGT 与 inpainting，任一 upstream error 都可能被物理 refinement 或 paired data 隐性放大；全文没有端到端 failure-rate audit。；real-robot 部分未报告与 baseline 对照的任务成功率，只证明部分 decoded trajectories 可执行，不能等同于大规模 robot-policy improvement。；编辑使用 sparse robot keyframes，数据与 conditioning construction 成本较高，不能简单解读为从任意 human video 零条件生成 robot experience。",
+    "motivationZh": "论文同时解决训练数据生产、生成式视频编辑和结构化运动监督。RoboEdit-ADC 从单目 RGB video 组合 HaMeR hand pose、SAM2 object mask、TRELLIS object mesh、FoundationPose object trajectory 与 VGGT camera/depth，先校准尺度/深度，再针对不同机器人手形态做 IK retargeting，并用 penetration/contact/temporal losses 进行 physics-guided refinement，最后 inpaint+render/composite 得到 paired robot video。RoboEdit-14M 汇总 real/synthetic pairs。RoboEdit-Trans 基于 Wan2.1-VACE/NovaEdit，用 sparse target-robot keyframes、LoRA 和 residual adapters 学跨 embodiment appearance/kinematics/contact dynamics；3D Robot-State Decoder 从生成视频预测 palm/fingertip/joints/camera 并用 temporal Transformer 细化。实验覆盖编辑质量、component ablation、simulation trajectory reproduction 与 real Franka deployment。",
+    "methodZh": "新意不只是机器人 domain 的 video edit，而是把 automatic 3D retargeting pipeline、跨 embodiment diffusion editing、结构化 3D state decoding 和 downstream control 证据连成同一数据引擎；尤其 generated video 与 metric robot state 的联合输出，使工作同时触及 video generation 与 dynamic 3D supervision。 方法流程：从 human RGB video 重建 hand、object mesh/pose、camera/depth 与 edit masks → 按目标 robot embodiment 做 kinematic retargeting → 以 depth alignment、collision/contact 与 temporal objective 做 physics refinement → inpaint source 并渲染/composite robot interaction，构造 paired RoboEdit-14M → 用 sparse robot keyframes、LoRA/residual adapters 训练 cross-embodiment video editor → 从 edited video 解码并时序细化 3D robot-hand trajectory，用于下游控制。",
+    "experimentsZh": "RoboEdit-Trans 在固定 300-case benchmark 上比较 VACE、UniVideo、VINO、Kiwi-Edit、OmniWeaving、EditCtrl、AnyV2V、ReCo，报告 SSIM/LPIPS、edit LPIPS、background SSIM、VBench 与 OpenVE；数据来自五个人类交互数据集与七种 robot embodiment。3D decoder trajectory 在 512 个 Genesis environments/18 YCB objects 训练 residual PPO，并部署到 Franka Panda。 作者报告 RoboEdit-14M 含 174,547 个 aligned clips、14,138,307 paired frames、约 130.91 小时视频，覆盖七种 robot embodiment。（Table 1, p. 5; Tables 4-5, p. 13） 作者报告在 300-case benchmark 上，RoboEdit-Trans 的 SSIM/LPIPS/edit-LPIPS 为 0.9282/0.0470/0.0171，三项优于表中 baselines；background SSIM 为 0.9188，低于部分方法。（Table 2, p. 7） 作者报告 decoded trajectory 的 simulation reproduction success 为 Panda 71%、XHand 62%，并展示 Franka Panda 的 YCB-object real deployment。（Sec. 4.5, p. 7; Appendix E, p. 14） Baseline coverage：视频编辑比较覆盖 single-reference 和 multi-keyframe baselines，并以 paired reference、local edit、background preservation、perceptual/temporal metrics 多维评估；但各 baseline 支持的 conditioning interface 不同，OpenVE overall 并非所有指标都由本方法领先。下游 real-robot 主要是可行性展示，未给大规模成功率与控制 baselines。 Ablation：LoRA/residual adapter 2×2 消融显示 residual branch 较强、组合最佳；ADC 的 depth regularization/physics refinement 用 qualitative ablation；3D decoder、dataset scale、conditioning keyframes 和 foundation-component error propagation 缺乏完整量化拆解。",
+    "insightZh": "方法覆盖数据、生成和下游结构化验证，规模与实验均显著，属于对 video editing/3D motion supervision 的实质推进；尽管 real-control evidence 尚有限，仍建议 accept-deep 并在 digest 清楚标注作者报告与系统链式风险。 RoboEdit 把 human manipulation video 直接编辑成跨 embodiment 的 robot interaction video，并同步解码 3D robot-hand states：自动 ADC pipeline 用 hand/object/camera reconstruction、kinematic retargeting、depth/physics refinement 建立大规模 paired supervision，Trans 模型再以 LoRA/residual adapters 与 3D decoder学习时序一致的跨形态编辑。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

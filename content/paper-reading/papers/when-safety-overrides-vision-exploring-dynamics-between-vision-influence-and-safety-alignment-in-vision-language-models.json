@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2608.18628",
+  "slug": "when-safety-overrides-vision-exploring-dynamics-between-vision-influence-and-safety-alignment-in-vision-language-models",
+  "title": "When Safety Overrides Vision: Exploring Dynamics between Vision Influence and Safety Alignment in Vision-Language Models",
+  "authors": [
+    "Mehak Gupta",
+    "Tanmoy Chakraborty"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18628"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "When",
+    "Safety",
+    "Overrides",
+    "Vision",
+    "Exploring"
+  ],
+  "abstract": "Aligned vision-language models (VLMs) are designed to balance grounded visual reasoning with safe generation behavior. However, we observe a striking phenomenon: under safety-constrained instruction, models frequently abstain from answering questions that remain correctly answerable under default instruction despite receiving identical image-question inputs. This raises a fundamental question: does safety alignment suppress perceptual grounding itself, or does visual evidence remain internally available while generation is redirected toward abstention? In this work, we investigate the internal decoding dynamics underlying safety-induced abstention in aligned VLMs. Across multiple architectures and multimodal benchmarks, we show that abstained generations remain consistently influenced by visual evidence throughout decoding, indicating that perceptual grounding is largely preserved despite refusal behavior. We further demonstrate that, although the representational organization of refusal differs substantially across architectures, safety-constrained instruction consistently alters late-stage hidden-state dynamics toward refusal-oriented decoding. Finally, through targeted activation-level interventions, we show that suppressing refusal-related representations reliably restores grounded answering behavior across models without retraining or modifying visual inputs. Together, these findings reveal a previously underexplored failure mode in aligned VLMs: safety alignment can override grounded visual expression even when perceptual evidence remains internally preserved.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18628v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18628v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18628v1 全文整理；本地 PDF 共 26 页，SHA-256 381712dd671c9b0741edf9ec0d99448bf76e8c92347629c34c31a1d94fb13879，并视觉核验第 1、6、10、11、13 页。",
+    "ideaZh": "论文用同图同问、只增加“看不清就拒答”的 cautious prompt 构造 answered→abstained pairs，发现 blur-based visual influence 仍存在而 late hidden states 向 refusal direction 移动；作者报告 suppress direction 可降低 abstention，但 Qwen3-VL/POPE 的 incorrect rate 同时从 0.03 升到 0.33，说明结论更像 epistemic-abstention control 而非无代价的 safety fix，建议略读并保留强 caveat。",
+    "methodFlow": [
+      "对相同 image-question 运行 default 与 cautious safety prompt",
+      "筛选 default answered、constrained answered/abstained paired samples",
+      "以 clean/blurred target-token logit 差衡量 visual influence",
+      "从 hidden-state centroids 估计逐层 refusal direction",
+      "逐层加减 direction 测试 abstention、correct 与 incorrect behavior"
+    ],
+    "whyRelevantZh": "它直接涉及 VLM grounding、alignment 与 activation-level mechanistic control，对理解“模型看见但不表达”有价值。",
+    "evidenceZh": "answered 与 abstained samples 在三架构中都保留 nonzero vision influence，轨迹形态依模型而异。（Sec. 4.2, Fig. 2, pp. 6–7）；abstained samples 在 deeper layers 更偏向 refusal direction，但 Qwen/LLaVA/Phi 的线性可分性明显不同。（Sec. 5.2–5.3, Fig. 4, pp. 9–10）；refusal suppression 普遍减少 abstention，却可能显著增加 incorrect answers；Qwen3-VL POPE 从 0.03 增至 0.33。（Sec. 6.1–6.2, Table 2, p. 11）；论文证明的是 prompt-induced epistemic abstention 的 representation control，不能直接外推到完整 safety alignment。（Prompt definition Appendix A.1, p. 18; Discussion, p. 13）",
+    "caveatZh": "“safety-constrained”只是一条 cautious epistemic prompt，不能代表 RLHF/constitutional safety 或 harmful-content refusal。；abstention 用关键词匹配，Table 1 标为百分比却以 0.32 等比例值呈现，报告口径可能引发误读。；suppression 对部分设置大幅增加 incorrect answers，尤其 Qwen3-VL POPE 0.03→0.33，不能称为无代价恢复 grounded behavior。；vision influence 依赖单一 strong blur 和 first-token logit proxy，refusal direction 也可能编码 prompt/style 而非独立 safety mechanism。",
+    "motivationZh": "作者在 Qwen3-VL-8B、LLaVA-v1.6-7B、Phi-3-Vision 上对 VQAv2/GQA/POPE 各抽 2,000 samples，对 default 与 safety-constrained prompt 做 paired inference。以 clean-vs-Gaussian-blur target-token logit difference 估计 layer-wise vision influence，以 answered/abstained centroid difference 定义 refusal direction，并在每层加减该 direction 观察 answer/abstain/incorrect 变化。结果显示 vision signal 与 refusal alignment 可共存，late layers 对行为影响最大，但 architecture geometry 和错误代价差异显著。",
+    "methodZh": "新意是把 VLM refusal 拆成 preserved visual influence 与 late-stage behavioral representation，并用 activation intervention 提供因果证据；但“safety”操作实际是单一 epistemic caution prompt，机制未覆盖 harmful-content safety policies。 方法流程：对相同 image-question 运行 default 与 cautious safety prompt → 筛选 default answered、constrained answered/abstained paired samples → 以 clean/blurred target-token logit 差衡量 visual influence → 从 hidden-state centroids 估计逐层 refusal direction → 逐层加减 direction 测试 abstention、correct 与 incorrect behavior。",
+    "experimentsZh": "三种 7B/8B aligned VLM、VQAv2/GQA/POPE 各随机 2,000 samples；default 与 safety prompt 仅 instruction 不同。分析 first generated-token hidden states、radius-30 blur、top-2/entropy、refusal direction 与 α sensitivity。 作者报告 Qwen3-VL 在 safety prompt 下 abstention proportion 为 VQAv2 0.32、GQA 0.28、POPE 0.56，default 为 0。（Table 1, p. 5） 作者报告 Qwen3-VL refusal suppression 后 POPE correct/abstain/incorrect 从 0.41/0.56/0.03 变为 0.68/0.01/0.33。（Table 2, p. 11） Baseline coverage：跨三架构和三 benchmark，并用 uncertainty controls 与 α sweep；但没有 standard safety benchmark、policy-violating content、trained safety heads 或与 calibrated abstention methods 的比较。 Ablation：逐层 intervention、正负 direction、强度 sensitivity、entropy/top-2 controls 较完整；没有 alternative abstention detectors、不同 safety prompts 或 held-out direction estimation 的系统消融。",
+    "insightZh": "收录并略读：问题和 causal intervention 值得跟踪，但 safety framing、abstention heuristic 与 accuracy trade-off 使证据成熟度偏低，不宜按普适 alignment mechanism 解读。 论文用同图同问、只增加“看不清就拒答”的 cautious prompt 构造 answered→abstained pairs，发现 blur-based visual influence 仍存在而 late hidden states 向 refusal direction 移动；作者报告 suppress direction 可降低 abstention，但 Qwen3-VL/POPE 的 incorrect rate 同时从 0.03 升到 0.33，说明结论更像 epistemic-abstention control 而非无代价的 safety fix，建议略读并保留强 caveat。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

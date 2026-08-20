@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2608.19066",
+  "slug": "gs-vla-plug-and-play-viewpoint-canonicalization-for-frozen-vla-policies-via-gaussian-splatting",
+  "title": "GS-VLA: Plug-and-Play Viewpoint Canonicalization for Frozen VLA Policies via Gaussian Splatting",
+  "authors": [
+    "Yechan Park",
+    "HyunJin Kim"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19066"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Plug",
+    "Play",
+    "Viewpoint",
+    "Canonicalization",
+    "Frozen"
+  ],
+  "abstract": "This paper proposes a lightweight, plug-and-play framework that improves robustness to viewpoint shifts in Vision-Language-Action (VLA) policies without policy retraining. To our knowledge, this is the first approach to directly leverage 3D Gaussian-based novel-view synthesis for observation-space adaptation in VLA policies. Current VLA performance relies on the implicit assumption that training and deployment camera configurations are identical. Our experiments show that even a small displacement of the camera mount can reduce the success rate on the LIBERO benchmark from about 90% to about 10% in the worst case. Prior approaches, such as large-scale fine-tuning or generative data augmentation, are computationally expensive and risk catastrophic forgetting. To address this, viewpoint shifts are reformulated as a localized novel-view synthesis problem. Under a Locality assumption, that camera perturbations remain within a small bounded region relative to the workspace, viewpoint normalization reduces to a scene- and policy-independent disocclusion task. Our work implements this idea with a 4M-parameter 3D-Gaussian canonicalizer prepended to a frozen VLA policy. Without modifying policy weights, GS-VLA improves performance across three orthogonal axes: (1) Policy architectures, (2) Unseen task suites, and (3) Perturbation scales. These results show that a lightweight visual module can recover a large fraction of the performance lost under viewpoint shift, without policy retraining.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19066v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19066v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19066v1 全文整理；本地 PDF 共 20 页，SHA-256 eb52464fd644e8c913a8f677d805e411a9e11e8af7f0a89b63789e5f216058d9，并视觉核验第 1、4、7、9 页。",
+    "ideaZh": "GS-VLA 不重训 VLA，而把相机偏移转成 bounded-locality 下的 observation-space canonicalization：metric depth 回投影出 pixel-aligned Gaussians，4M U-Net 只预测局部 residual attributes，再 splat 回训练视角；作者报告单一 checkpoint 在多 policy/LIBERO suites 上大幅恢复成功率，但证据仍全在模拟器且依赖校准深度。",
+    "methodFlow": [
+      "输入 shifted RGB、metric depth、source/canonical camera parameters",
+      "将 source pixels 反投影为 world-space Gaussian anchors",
+      "4M FiLM-conditioned U-Net 预测受深度约束的 Gaussian residual attributes",
+      "用 differentiable alpha splatting 渲染 canonical-view image",
+      "把 canonicalized observation 送入完全冻结的 VLA policy"
+    ],
+    "whyRelevantZh": "它把显式 3D Gaussian representation 用作冻结 multimodal policy 的 spatial interface，对 VLM spatial grounding、3D-aware design agent 的 observation normalization 和 view robustness 有直接迁移价值。",
+    "evidenceZh": "Locality 将 viewpoint canonicalization 约化为主要由几何 warp 处理、学习只负责窄 disocclusion band 的问题。（Secs. 3.1-3.2, pp. 4-5; graphical overview, p. 1）；每个像素产生一个 depth-anchored Gaussian，网络预测 14 维 attributes，并以 10% local-depth residual cap 防止几何漂移。（Sec. 3.3, Eq. 5, p. 5）；单一 checkpoint 在 cross-policy、cross-suite 与 perturbation-scale 三条轴上均提高 frozen policy success。（Table 1, p. 7）；真实可用性仍受 metric depth、pose calibration 与 simulator-only evidence 限制。（Sec. 5 and Sec. 6, pp. 8-9）",
+    "caveatZh": "single-view input 无法恢复 source camera 完全不可见的内容。；大 rotation 可能使 workspace 离开 camera frustum，超出 Locality boundary。；全部实验位于 LIBERO simulator，真实机器人还需要 external metric-depth source 和 rig calibration。；默认 100 cm translation 相对约 0.7 m workspace 并不直观地属于“小偏移”，模拟 perturbation distribution 与真实 re-mounting 的对应关系需谨慎。；adapter 依赖 per-frame metric depth、source/canonical pose 和 intrinsics；这些额外感知与校准失败可能抵消 plug-and-play 优势。",
+    "motivationZh": "论文观察到冻结 VLA 的失败可能来自相机视角分布偏移而非 reasoning/control 本身。在 Locality 假设下，新显露区域面积随 pose perturbation 近似线性增长，因此不需通用 novel-view generator；系统对每个 source pixel 依据 metric depth 构造 world-space Gaussian anchor，4M U-Net 预测 14 维 position residual、scale、orientation、opacity 与 color residual，最后由 differentiable gsplat 合成 canonical view，冻结 policy 在该 view 上执行。单一模型只在 libero_spatial、固定 perturbation setting 训练，却跨四种 policy、四个 suite 与多个扰动量级测试。全文限制清楚：single-view、metric depth/extrinsics、rotation locality，以及缺少 real-robot evaluation。",
+    "methodZh": "论文明确声明不创新通用 NVS architecture；新意是把 bounded camera drift 形式化为 O(rho) disocclusion problem，并据此把 observation-space adapter 缩到轻量 pixel-aligned 3D Gaussian module，同时验证它跨 policy/task transfer。对 VLA spatial grounding 有迁移价值，但不是通用 VLM foundation advance。 方法流程：输入 shifted RGB、metric depth、source/canonical camera parameters → 将 source pixels 反投影为 world-space Gaussian anchors → 4M FiLM-conditioned U-Net 预测受深度约束的 Gaussian residual attributes → 用 differentiable alpha splatting 渲染 canonical-view image → 把 canonicalized observation 送入完全冻结的 VLA policy。",
+    "experimentsZh": "在四个 LIBERO suites 上，以 pi0.5 为主 policy，并测试 OpenVLA-OFT、RynnVLA-002、XVLA；canonicalizer 只在 libero_spatial、translation setting 100 cm 训练一次。比较 no canonicalization 与 depth-only forward warp，并做 perturbation、translation-rotation、calibration noise、capacity、data size、depth substitution 消融。 作者报告 cross-policy 设置中 XVLA success 从 1.4% 提升到 81.0%，OpenVLA-OFT 从 19.8% 提升到 81.6%。（Table 1(a), p. 7） 作者报告 unseen long-horizon libero_10 上 pi0.5 success 从 9.3% 提升到 72.1%，单一 checkpoint 的四 suite 平均增益为 39.8 percentage points。（Table 1(b), p. 7; Sec. 7, p. 9） 作者报告用 zero-shot DepthAnything V2 替代 metric depth 时 success 只有 44.5%，在 LIBERO frames 上微调 depth backbone 后为 71.7%，仍比 ground-truth-depth ceiling 低 15.1 points。（Sec. 5, p. 9; Table 16, p. 20） Baseline coverage：主实验提供 no-canon 与 geometry-only forward-warp baseline，跨四种 frozen policy；但没有 real-robot comparison，也没有与 concurrent AnyCamVLA 在完全同协议下的端到端质量/成本对照。 Ablation：覆盖 capacity、训练 pair 数、extrinsic/intrinsic error、translation-rotation、depth encoder substitution，并显示 PSNR 与 policy success 可脱钩；这些结果支持 compact adapter，但真实传感深度与动态噪声仍未验证。",
+    "insightZh": "方法与 VLM/MLLM 是 transferable 而非核心 foundation advance；模拟结果和消融足以收录，但 metric-depth、calibration 与 real-world 缺口较大，因此建议 accept-skim，不作为 deep priority。 GS-VLA 不重训 VLA，而把相机偏移转成 bounded-locality 下的 observation-space canonicalization：metric depth 回投影出 pixel-aligned Gaussians，4M U-Net 只预测局部 residual attributes，再 splat 回训练视角；作者报告单一 checkpoint 在多 policy/LIBERO suites 上大幅恢复成功率，但证据仍全在模拟器且依赖校准深度。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

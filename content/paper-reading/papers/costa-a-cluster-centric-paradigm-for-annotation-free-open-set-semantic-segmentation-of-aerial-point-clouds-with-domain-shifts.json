@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2608.18479",
+  "slug": "costa-a-cluster-centric-paradigm-for-annotation-free-open-set-semantic-segmentation-of-aerial-point-clouds-with-domain-shifts",
+  "title": "COSTA: A Cluster-Centric Paradigm for Annotation-Free Open-Set Semantic Segmentation of Aerial Point Clouds with Domain Shifts",
+  "authors": [
+    "Yanghong Lin",
+    "Li Fang",
+    "Tianyu Li",
+    "Shudong Zhou",
+    "Wei Yao"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18479"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3d-segmentation",
+    "COSTA",
+    "Cluster",
+    "Centric",
+    "Paradigm",
+    "Annotation"
+  ],
+  "abstract": "Semantic segmentation of aerial point cloud is trapped in a generalization crisis under distinct domain shifts. While test-time adaptation offers a privacy-preserving and computationally efficient way to adapt pre-trained models to unlabeled target-domain data during inference, existing methods, bound to closed-set label assumptions and non-scalable point-wise segmentation pipelines, still struggle with semantic shifts. We ask: can we adapt any given pre-trained aerial point cloud segmentation model to a shifted target domain at the inference phase alone, without additional training, while segmenting target-specific categories beyond the source label space on demand? This paper introduces COSTA, which breaks this limitation by shifting from closed-set point-wise adaptation to cluster-centric open-set semantic propagation. Our core discovery is that, once effectively adapted at test time, the rich feature distribution of aerial point clouds can be distilled into a compact set of well-separated semantic centroids that are transferable across label spaces. COSTA leverages this to reformulate open-set semantic segmentation as a cluster-level propagating process: it first bridges the domain gap through proven test-time adaptation, then groups each batch of target-domain points into a small set of semantic clusters based on the similarity distribution in the adapted feature space, and finally propagates high-confidence pseudo labels obtained from an open-vocabulary vision-language model to all points through cluster-level voting. This cluster-centric paradigm enables test-time adaptation of aerial point clouds under significant domain gaps with mixed semantic shifts. With DALES as the source domain, COSTA enables on-demand segmentation across three aerial point cloud benchmarks with distinct domains and heterogeneous category spaces, achieving up to 70.09% mIoU under this new setting.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18479v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18479v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18479v1 全文整理；本地 PDF 共 39 页，SHA-256 fbc987518b0119dde1ba0491bb7a8dbad5e8165ba436f26ce48289f0582f6d96，并视觉核验第 1、9、24、33 页。",
+    "ideaZh": "COSTA 将 source-trained aerial point model 的 test-time adaptation 扩展到用户指定的新 label space：hybrid BEV/oblique renders 让 frozen VLM 产生 2D masks，reliability fusion 回投 3D seeds，BN-only ID entropy minimization/OOD entropy maximization 重塑 target features，最后以 K-means cluster voting 传播 open-set labels。作者报告 DALES-SUM 70.09% mIoU，但 H3D fine-grained shift 只有 34.13%，说明能力高度依赖 renderability 与 category semantics。",
+    "methodFlow": [
+      "将 target aerial point cloud 渲染为互补 BEV 与 oblique virtual-camera views",
+      "用 frozen VLM 按 user-specified classes 生成 masks，并以 multi-view reliability fusion 回投 3D pseudo seeds",
+      "根据 source/target label intersection 区分 pseudo-ID 与 pseudo-OOD points",
+      "只更新 source model 的 BN affine parameters，最小化 ID entropy、最大化 OOD entropy并保持 diversity",
+      "在 adapted decoder features 上 K-means clustering，并以 reliability-weighted cluster voting 输出 open-set labels"
+    ],
+    "whyRelevantZh": "直接命中 open-set 3D semantic segmentation，并提供可迁移的 VLM-to-3D seeds 与 cluster propagation 设计。",
+    "evidenceZh": "COSTA 依次执行 hybrid rendering、reliability pseudo-labeling、differentiated BN-TTA 与 cluster-centric propagation。（Fig. 2, p. 9）；作者报告 DALES-SUM 上 COSTA 达到 70.09% mIoU、88.52% OA。（Table 3, p. 24）；作者报告 full pipeline 相对 Sa2VA+hybrid base 从 62.89 提高到 70.09 mIoU，BN-TTA、OOD loss 与 reliability weighting 逐步贡献。（Table 10, p. 31）；COSTA 对 small, sparse, fine-grained 或 category definition 含混的 classes 明显受限。（Discussion and limitations, pp. 32-33）",
+    "caveatZh": "2D VLM pseudo labels 依赖 point density、visibility 与 rendering quality。；small/fine-grained objects 和 urban furniture 等语义含混 categories 表现差。；K-means cluster purity 是关键假设，复杂混合边界或 batch composition 变化可能破坏传播。；没有在 PDF 中找到 own-method public code URL；作者报告结果未独立复现。",
+    "motivationZh": "该框架无需 source replay、target annotations 或 offline retraining，最终 labels 不是 source classifier 直接输出，而是 adapted feature clusters 上的 reliability-weighted open-vocabulary propagation。三组跨域/跨 label-space benchmarks 和 pipeline ablation 支持方法，但 heterogeneous supervision settings 不能直接按排名比较，小而含混类别仍明显失败。",
+    "methodZh": "新意在于把 VLM semantic seeds、open-set BN-TTA 与 cluster-level propagation 串成无需 target retraining 的 aerial 3D pipeline，并显式支持 target-specific categories。 方法流程：将 target aerial point cloud 渲染为互补 BEV 与 oblique virtual-camera views → 用 frozen VLM 按 user-specified classes 生成 masks，并以 multi-view reliability fusion 回投 3D pseudo seeds → 根据 source/target label intersection 区分 pseudo-ID 与 pseudo-OOD points → 只更新 source model 的 BN affine parameters，最小化 ID entropy、最大化 OOD entropy并保持 diversity → 在 adapted decoder features 上 K-means clustering，并以 reliability-weighted cluster voting 输出 open-set labels。",
+    "experimentsZh": "DALES source 到 SUM、H3D、CUS3D 三个 target benchmarks；KPConv source model、frozen Sa2VA VLM、RTX PRO 6000；指标 mIoU/OA/mAcc，并按 known/cross-granularity/unseen classes 报告。 作者报告 SUM 70.09% mIoU、H3D 34.13%、CUS3D 49.30%，显示 unseen-class 与 fine-grained shift 难度差异。（Secs. 4.2.1, pp. 22-23） 作者报告 CUS3D 相对 direct Sa2VA mIoU 从 39.28% 提高到 49.30%、OA 从 61.53% 提高到 77.98%。（Sec. 4.2.1, p. 23） Baseline coverage：包含 fully supervised、open-vocabulary distillation、multi-dataset pretraining 和 open-set TTA；作者明确各设置 target data/training 权限不同，横向数字只能结合 supervision cost 解释。 Ablation：覆盖 projection mode、reliability threshold、BN entropy/diversity、OOD loss 与 reliability-weighted cluster propagation；主要 ablation 集中 SUM。",
+    "insightZh": "方法变化与 ablations 达到 focused segmentation gate，适合速读；domain-specific rendering、heterogeneous protocols 和 small-class failures 限制精读优先级。 COSTA 将 source-trained aerial point model 的 test-time adaptation 扩展到用户指定的新 label space：hybrid BEV/oblique renders 让 frozen VLM 产生 2D masks，reliability fusion 回投 3D seeds，BN-only ID entropy minimization/OOD entropy maximization 重塑 target features，最后以 K-means cluster voting 传播 open-set labels。作者报告 DALES-SUM 70.09% mIoU，但 H3D fine-grained shift 只有 34.13%，说明能力高度依赖 renderability 与 category semantics。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

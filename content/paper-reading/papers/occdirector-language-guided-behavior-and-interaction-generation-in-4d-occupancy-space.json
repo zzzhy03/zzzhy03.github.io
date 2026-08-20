@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2604.22240",
+  "slug": "occdirector-language-guided-behavior-and-interaction-generation-in-4d-occupancy-space",
+  "title": "OccDirector: Language-Guided Behavior and Interaction Generation in 4D Occupancy Space",
+  "authors": [
+    "Zhuding Liang",
+    "Tianyi Yan",
+    "Dubing Chen",
+    "Jiasen Zheng",
+    "Huan Zheng",
+    "Cheng-zhong Xu",
+    "Yida Wang",
+    "Kun Zhan",
+    "Jianbing Shen"
+  ],
+  "publishedAt": "2026-04-24",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2604.22240"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "OccDirector",
+    "Language",
+    "Guided",
+    "Behavior",
+    "Interaction"
+  ],
+  "abstract": "Generative world models increasingly rely on 4D occupancy for realistic autonomous driving simulation. However, existing generation frameworks depend on rigid geometric conditions (e.g., explicit trajectories) or simplistic attribute-level text, failing to orchestrate complex, sequential multi-agent interactions. To address this semantic-spatiotemporal gap, we propose OccDirector, a pioneering framework that generates 4D occupancy dynamics conditioned solely on natural language. Operating as a ``scenario director'', OccDirector maps natural language scripts into physically plausible voxel dynamics without requiring geometric priors. Technically, it employs a VLM-driven Spatio-Temporal MMDiT equipped with a history-prefix anchoring strategy to ensure long-horizon interaction consistency. Furthermore, we introduce OccInteract-85k, a novel dataset uniquely annotated with multi-level language instructions: ranging from static layouts to intricate multi-agent behaviors, alongside a novel VLM-based evaluation benchmark. Extensive experiments demonstrate that OccDirector achieves state-of-the-art generation quality and unprecedented instruction-following capabilities, successfully shifting the paradigm from appearance synthesis to language-driven behavior orchestration.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.22240v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.22240v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2604.22240v2 全文整理；本地 PDF 共 44 页，SHA-256 4e5bef04c59ddcdc61bf3a912a368993b68db34328734c6c50dc3736893ab464，并视觉核验第 1、5、12、14、42 页。",
+    "ideaZh": "OccDirector 把自然语言脚本、可选历史 occupancy prefix 与 4D voxel generation 统一到 VLM-conditioned Spatio-Temporal MMDiT 中；作者报告 full model 的 FVD 为 275、VLM instruction score 为 3.73，但应用局限于 11 类驾驶 occupancy，且核心语义评价依赖 VLM judge，适合略读其语言到 4D interaction 的接口与评测边界。",
+    "methodFlow": [
+      "输入自然语言 scenario script 与可选历史 4D occupancy context",
+      "Occ-VAE 压缩 voxel sequence，frozen VLM 与 Token Refiner 生成语义 token",
+      "Spatio-Temporal MMDiT 以分离空间/时间 attention 建模 occupancy dynamics",
+      "history-prefix anchoring 在 flow-matching sampling 中约束未来连续性",
+      "解码为受语言行为与交互约束的 4D occupancy rollout"
+    ],
+    "whyRelevantZh": "它直接研究语言控制的 dynamic 4D scene generation，并提供把 procedural instruction、历史上下文与 occupancy dynamics 结合的可迁移设计。",
+    "evidenceZh": "方法以 Occ-VAE、frozen VLM+Token Refiner、Spatio-Temporal MMDiT 和 history-prefix anchoring 完成 script-conditioned 4D generation。（Sec. 3.1–3.4, Fig. 2, pp. 5–7）；作者报告 full model 的 FVD 为 275，优于 DynamicCity+CLIP 的 388；VLM mean score 为 3.73。（Sec. 5.2, Tables 3–4, p. 12）；STSA 和 Token Refiner 均有独立贡献；作者报告 full-attention+refiner 的 FVD 532，而 STSA+refiner 为 354。（Sec. 5.3, Table 5, p. 14）；模型在超过 8 秒的极长序列、细粒度状态以及传感器 artifacts 上仍有限，绝对语义评分还受 VLM judge calibration 影响。（Appendix D.2, p. 42）",
+    "caveatZh": "训练日志继承 blind spots 和 missing ego voxels；超过 8 秒仍可能累积物理误差。；VLM judge 存在 calibration bias，模型只覆盖 11 类语义而不表示 turn signal、brake light 等细状态。；主要证据来自驾驶 occupancy 与 BEV rendering，尚不能推出对一般 dynamic 3D asset generation 的泛化。；文本数据生成、semantic evaluation 和部分可靠性论证均依赖大型模型；仅 30 clips 的用户研究不足以完全校准 judge bias。；数字均为作者报告，本项目未独立复现。",
+    "motivationZh": "论文用 frozen Qwen3-VL-2B 提取 procedural semantics，经 Token Refiner 对齐后送入双流 MMDiT；occupancy stream 采用 spatial-temporal separated attention，history-prefix anchoring 在 flow-matching 训练与采样中固定历史上下文。作者还构造 85k 条多层级指令数据，并用 image/video distribution metrics、VLM rubric、消融和小规模用户研究评估文本控制、时序质量与长时一致性。",
+    "methodZh": "相对依赖 trajectory/layout 的 4D occupancy generator，论文把 free-form multi-agent script 作为唯一条件，并将 procedural VLM features、STSA 与 history anchoring 组合成 text-to-4D pipeline；新意主要在任务定义、控制接口和系统组合，而非全新的生成基础架构。 方法流程：输入自然语言 scenario script 与可选历史 4D occupancy context → Occ-VAE 压缩 voxel sequence，frozen VLM 与 Token Refiner 生成语义 token → Spatio-Temporal MMDiT 以分离空间/时间 attention 建模 occupancy dynamics → history-prefix anchoring 在 flow-matching sampling 中约束未来连续性 → 解码为受语言行为与交互约束的 4D occupancy rollout。",
+    "experimentsZh": "作者在 OccInteract-85k 上训练 14-layer MMDiT 100k iterations，以 DOME、COME、DynamicCity 及 CLIP/T5 text adaptations 为基线；用 10K 个 16-frame clips 计算 FID/KID/FVD/precision/recall，并以 Gemini-3.0-pro 评估指令一致性。 作者报告 full model 的 FVD 275，相比 DynamicCity+CLIP 的 388 降低 29.1%，instruction-alignment mean 为 3.73。（Table 4, p. 12） 作者报告 30-sample、10-participant 用户研究中 human/VLM mean score 的 Pearson correlation 为 0.88。（Appendix B.5, Table S8, pp. 36–37） Baseline coverage：覆盖几何条件 occupancy baselines 和两种 text-adapted baselines，但不存在同等成熟的纯文本 4D occupancy 方法；部分比较因此混合了条件强度与架构差异，且 VLM-based semantic score 不是物理模拟准确度。 Ablation：作者消融 full attention/STSA、Token Refiner、history anchoring ratio、CFG、backbone depth 与 text encoder；结果支持各组件的局部作用，但训练数据由自动 pipeline 生成，judge 与任务定义共享 VLM 偏差。",
+    "insightZh": "收录并略读：任务和 language-to-4D interface 对 3D generation 有明确价值，组件消融也较完整；但应用、语义粒度和 VLM-judge 依赖使其证据尚不足以作为通用 world-generation 范式精读。 OccDirector 把自然语言脚本、可选历史 occupancy prefix 与 4D voxel generation 统一到 VLM-conditioned Spatio-Temporal MMDiT 中；作者报告 full model 的 FVD 为 275、VLM instruction score 为 3.73，但应用局限于 11 类驾驶 occupancy，且核心语义评价依赖 VLM judge，适合略读其语言到 4D interaction 的接口与评测边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

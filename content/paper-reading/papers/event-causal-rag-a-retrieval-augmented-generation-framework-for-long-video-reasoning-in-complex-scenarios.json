@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2605.06185",
+  "slug": "event-causal-rag-a-retrieval-augmented-generation-framework-for-long-video-reasoning-in-complex-scenarios",
+  "title": "Event-Causal RAG: A Retrieval-Augmented Generation Framework for Long Video Reasoning in Complex Scenarios",
+  "authors": [
+    "Peizheng Yan",
+    "Yu Zhao",
+    "Liang Xie",
+    "Juntong Qi",
+    "Mingming Wang",
+    "Erwei Yin"
+  ],
+  "publishedAt": "2026-05-07",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.06185"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Event",
+    "Causal",
+    "Retrieval",
+    "Augmented",
+    "Generation"
+  ],
+  "abstract": "Large vision-language models perform well on short- and medium-length video understanding but still struggle to maintain coherent event memory and recover long-range relationships in ultra-long videos. End-to-end methods are limited by visual-token growth and context length, while fixed-segment retrieval often fragments complete events and weakens state-transition modeling.We propose Event-Causal RAG (EC-RAG), a lightweight retrieval-augmented framework for ultra-long and streaming video reasoning. A dual visual-audio sentinel mechanism segments video streams into semantically complete events, represented as State-Event-State (SES) structures that organize observable pre-event states, central events, and post-event states as event-local causal transitions. These transitions are stored in dual vector-graph memory and temporally connected through entity-consistent trajectories. During question answering, bidirectional graph retrieval recovers relevant predecessor and successor events, and answers are generated using both structured memory and the corresponding video evidence.We further introduce ECV-1H, an hour-scale long-video QA benchmark dedicated to directed event-causal reasoning, with all source videos exceeding one hour. It covers over 150 hours of untrimmed video and contains 1,251 fully human-annotated QA pairs. EC-RAG improves overall accuracy by 4.96\\%--11.67\\% across three open-source video foundation models and achieves consistent gains across public datasets. On a single RTX 5090 GPU with 32 GB of memory, EC-RAG can continuously process videos while maintaining controlled streaming memory usage.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.06185v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.06185v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.06185v2 全文整理；本地 PDF 共 9 页，SHA-256 57c9f1d462448c8f940c99d16bea28802a083c8ecde67713c54667f3be752814，并视觉核验第 1、4、5、6、7 页。",
+    "ideaZh": "EC-RAG 用 visual+audio sentinel 把超长视频切成完整事件，再以 State–Event–State、entity trajectories 和 vector+graph memory 做前驱/后继检索；作者报告三种 open video VLM 在 ECV-1H 上提升 4.96–11.67 points、context tokens 从 15,429 降到 361，但 counter-intuitive subset 下降且 event/SES 都依赖 VLM 抽取，适合略读其 event-memory 设计。",
+    "methodFlow": [
+      "视觉变化与 ASR sentinel 将 stream 切为语义完整事件",
+      "VLM 抽取 State–Event–State 与 entity mentions",
+      "entity alignment 构建 vector store 和 temporal/state graph",
+      "query 触发 vector anchors 与 predecessor/successor graph traversal",
+      "去重后的 structured memory 与 source clips 支持 LVLM answer"
+    ],
+    "whyRelevantZh": "它推进 long-video VLM 的事件记忆与时序/因果检索，对 streaming multimodal reasoning 和 agent memory 有直接迁移价值。",
+    "evidenceZh": "EC-RAG 把 dual-sentinel event segmentation、SES memory、dual-store graph 和 bidirectional retrieval 组成闭环。（Methodology, Fig. 2, pp. 3–4）；作者报告 ECV-1H 上 InternVL3.5、VideoLLaMA3、Qwen3-VL overall 分别提升 4.96、11.67、6.95 points。（Table 1, p. 5）；作者报告相对 Video-RAG，平均 retrieved context 从 15,429 tokens 降至 361，但 Event-Bench counter-intuitive accuracy 对三 backbone 均下降。（Tables 2–3 and analysis, p. 6）；移除 graph topology+bidirectional traversal 的 text-only accuracy 从 49.37 降到 38.99；24-hour test 仍暴露 extraction validity 与部署成本边界。（Table 5 and Figs. 3–4, p. 7）",
+    "caveatZh": "counter-intuitive questions 因 literal SES over-anchoring 出现 0.44–6.61 points 下降。；未来仍需扩展 ECV-1H，并加强 segmentation、memory 与 adaptive retrieval 的耦合。；event boundaries、SES 和 entity coreference 均由模型/threshold 产生，错误会被 graph 放大并形成看似结构化的伪因果。；ECV-1H 规模仅 1,251 QA，且由论文团队构建；24-hour stress test 证明稳定性但不等于开放域 reasoning accuracy。；没有 PDF 内公开 code URL；所有数字为作者报告，本项目未复现。",
+    "motivationZh": "框架用 SigLIP change minima 和 ASR sentence boundaries 形成 event clips，VLM 为每个事件抽取 entity-specific precondition/event/post-state，再通过 embedding coreference 建立跨事件轨迹。问答时先 vector recall，再沿 graph 做双向 predecessor/successor expansion、semantic deduplication，并把结构化 memory 与 source clips交给原 LVLM。论文同时发布 150+ hours、1,251 QA 的 ECV-1H，并做跨 backbone、公开 benchmark、消融、24-hour stress test 与 VRAM profiling。",
+    "methodZh": "相对 fixed-chunk video RAG，主要新意是 event-local SES transition、entity-consistent temporal graph 和双向因果检索；它是轻量外部记忆框架，不改变 backbone video VLM 本身。 方法流程：视觉变化与 ASR sentinel 将 stream 切为语义完整事件 → VLM 抽取 State–Event–State 与 entity mentions → entity alignment 构建 vector store 和 temporal/state graph → query 触发 vector anchors 与 predecessor/successor graph traversal → 去重后的 structured memory 与 source clips 支持 LVLM answer。",
+    "experimentsZh": "作者在 123 个一小时以上视频构成的 ECV-1H（1,251 four-choice QA）上评测三种 7B/8B backbones，并在 NExT-QA、Event-Bench、Video-MME Long 做 transfer；另进行 text-only structural ablation、24-hour surveillance stress test 和 RTX 5090 VRAM profile。 作者报告 Qwen3-VL-8B 在 ECV-1H 从 53.88 提升到 60.83，Video-RAG 为 57.07。（Table 1, p. 5） 作者报告 EC-RAG 在 24-hour stream 中以约 2.14× real-time 处理，strict event validity 90.57%，VRAM 保持约 16.33–16.46 GiB。（Figs. 3–4, p. 7） Baseline coverage：与 direct inference、Video-RAG 及公开报告结果比较，并固定部分 frame budget；但 event extraction 本身调用 VLM，端到端计算成本与所有 baseline 的等价预算并未完全对齐。 Ablation：fixed chunks、SES、graph traversal、semantic deduplication 均有 text-only ablation；graph component 影响最大，但消融只在 Event-Bench Contextual 与 Qwen3-VL-8B 上进行。",
+    "insightZh": "收录并略读：event-centric memory 与 context compression 很有启发性，跨 backbone 和部署测试也较完整；但它仍是 VLM-extracted RAG wrapper，benchmark 规模、counter-intuitive regression 和端到端成本限制了优先级。 EC-RAG 用 visual+audio sentinel 把超长视频切成完整事件，再以 State–Event–State、entity trajectories 和 vector+graph memory 做前驱/后继检索；作者报告三种 open video VLM 在 ECV-1H 上提升 4.96–11.67 points、context tokens 从 15,429 降到 361，但 counter-intuitive subset 下降且 event/SES 都依赖 VLM 抽取，适合略读其 event-memory 设计。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

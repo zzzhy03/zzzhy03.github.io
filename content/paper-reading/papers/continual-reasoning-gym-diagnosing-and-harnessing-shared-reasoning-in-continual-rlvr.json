@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.18574",
+  "slug": "continual-reasoning-gym-diagnosing-and-harnessing-shared-reasoning-in-continual-rlvr",
+  "title": "Continual Reasoning Gym: Diagnosing and Harnessing Shared Reasoning in Continual RLVR",
+  "authors": [
+    "Lirui Luo",
+    "Guoxi Zhang",
+    "Hongming Xu",
+    "Rongqing Li",
+    "Cong Fang",
+    "Lifeng Fan"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18574"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "llm",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "llm",
+    "vlm-mllm",
+    "Continual",
+    "Reasoning",
+    "Diagnosing",
+    "Harnessing",
+    "Shared"
+  ],
+  "abstract": "Reinforcement learning with verifiable rewards (RLVR) commonly post-trains reasoning models on multiple tasks, while rerunning multitask RLVR (MTRL) as new tasks are added makes capability expansion costly. We therefore study continual RLVR, which updates the existing model as each task arrives. The central question is whether a model updated this way can perform as well as a jointly trained model. To answer this question, we introduce Continual Reasoning Gym, a continual-RLVR environment that organizes text and visual reasoning tasks into five task sequences. In this setting, we identify two key observations: Sequential RLVR exhibits modest forgetting, yet its final performance remains below that of MTRL. To understand the latter, we decompose final performance and show that forgetting accounts for only part of the gap. To explain the former, we identify shared reasoning: transferable reasoning structure allows training on one task to support others on average. We therefore introduce Continual Prompt Replay (CPR), which harnesses shared reasoning to improve learning on the arriving and future tasks by replaying previous-task prompts and regenerating their responses with the current policy. On average, only CPR reaches MTRL-level performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18574v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18574v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18574v1 全文整理；本地 PDF 共 41 页，SHA-256 ea89fc84b7f8bcf12eff97a675fb972402327656b33de91086b2b1feac4e1dec，并视觉核验第 1、2、8、9 页。",
+    "ideaZh": "CRG 把 continual learning 引入 RLVR，用五条 text/visual reasoning task sequences 区分 forgetting、forward transfer 与 arriving-task learning；CPR 不复用旧 trajectories，而是混入 previous-task prompts 并由 current policy 重生成 response。作者报告 CPR 的 mean CTM 从 sequential RLVR 的 0.88 提升到 1.03，并成为所测 continual methods 中唯一平均达到 MTRL 水平的方法，但证据只覆盖 Qwen3-4B、Qwen2.5-VL-7B 和五条人工组织的 task sequences。",
+    "methodFlow": [
+      "按五条 CRG sequences 依次接收可验证的 text 或 visual reasoning tasks",
+      "以 FinalAvg = BaseAvg + FWT + TLG + BWT 分解 continual 与 MTRL 的差距",
+      "保存 previous-task prompts，并按中间 pass-rate 采样替换部分 current prompts",
+      "用当前 policy 重新生成 response、调用原 task verifier 给 reward，再执行 RLVR update",
+      "在每阶段评估 earlier/current/future tasks 并汇总 CTM、FWT、TLG 与 BWT"
+    ],
+    "whyRelevantZh": "continual RLVR 同时覆盖 LLM/VLM reasoning post-training，且把 transfer、forgetting 与 replay 机制拆成可审计实验，属于值得精读的训练范式候选。",
+    "evidenceZh": "CPR 将 previous-task prompts 混入 current-policy training，以 shared reasoning 同时影响 earlier、current 与 upcoming tasks。（Fig. 1, p. 2; Sec. 5.3, p. 6）；作者报告 sequential RLVR 平均只遗忘 2.47 percentage points，但 final performance 仅达到 MTRL 的 88%。（Eq. 3 and Fig. 3, p. 5）；作者报告 CPR 的 mean CTM 为 1.03，相比 sequential RLVR 0.88，mean FinalAvg 增益 6.4 points。（Table 2, p. 8）；作者报告 old-policy sample replay 的 FinalAvg 47.5% 低于 no replay 49.9%，而 CPR 为 63.3%、MTRL 为 65.3%。（Fig. 7, p. 9）",
+    "caveatZh": "实验只覆盖五条 task sequences、Qwen3-4B 与 Qwen2.5-VL-7B。；gradient analysis 描述 local update effects，不能捕获长训练中的 nonlinear dynamics。；CRG 的任务顺序、verifier 与 500-step budget 可能强烈决定 transfer geometry，尚不能外推到开放式 agent tasks。；作者报告结果未在本项目复现。",
+    "motivationZh": "论文发现 sequential RLVR 仅有 modest forgetting，却仍落后 joint multitask training；其分解将差距归因到 FWT、TLG 与 BWT，并用 task-gradient mean alignment 解释 shared reasoning。CPR 通过 previous prompts + current-policy regeneration 改变训练采样分布，在固定 500-step budget 下提升新任务与未来任务学习。所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "新意不只是 replay：论文把 continual RLVR 形式化为独立环境与可解释分解，并指出 previous-prompt replay 必须配合 current-policy regeneration 才能利用跨任务 shared reasoning。 方法流程：按五条 CRG sequences 依次接收可验证的 text 或 visual reasoning tasks → 以 FinalAvg = BaseAvg + FWT + TLG + BWT 分解 continual 与 MTRL 的差距 → 保存 previous-task prompts，并按中间 pass-rate 采样替换部分 current prompts → 用当前 policy 重新生成 response、调用原 task verifier 给 reward，再执行 RLVR update → 在每阶段评估 earlier/current/future tasks 并汇总 CTM、FWT、TLG 与 BWT。",
+    "experimentsZh": "Qwen3-4B 的两条 text sequences 与 Qwen2.5-VL-7B 的三条 visual sequences；每种设置固定 500 optimizer steps，并比较 sequential RLVR、MTRL 与七类 continual baselines。 作者报告 CPR mean CTM 1.03，为所测 continual methods 中唯一平均达到 MTRL-level 的方法。（Table 2, p. 8） 作者报告 CPR 将 all-task mean gradient cosine alignment 从 0.43 提高到 0.79。（Fig. 6, p. 9） Baseline coverage：包含 reset、regularization、optimizer、isolation、KL replay controls 与 MTRL；但只在两个模型规模和五条 CRG sequences 上建立结论。 Ablation：sample replay、replay pool、replay ratio 与 gradient diagnostics 支持 current-policy regeneration；没有覆盖更大模型或 agentic continual tasks。",
+    "insightZh": "方法、分解和 controls 构成完整证据链，达到 LLM landmark-only 的候选门槛；尽管模型与环境范围有限，仍建议精读并收录。 CRG 把 continual learning 引入 RLVR，用五条 text/visual reasoning task sequences 区分 forgetting、forward transfer 与 arriving-task learning；CPR 不复用旧 trajectories，而是混入 previous-task prompts 并由 current policy 重生成 response。作者报告 CPR 的 mean CTM 从 sequential RLVR 的 0.88 提升到 1.03，并成为所测 continual methods 中唯一平均达到 MTRL 水平的方法，但证据只覆盖 Qwen3-4B、Qwen2.5-VL-7B 和五条人工组织的 task sequences。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.19036",
+  "slug": "usr-drive-unified-driving-scene-representation-via-joint-denoising-of-3d-gaussians-and-boxes",
+  "title": "USR-Drive: Unified Driving Scene Representation via Joint Denoising of 3D Gaussians and Boxes",
+  "authors": [
+    "Li-Heng Chen",
+    "Haokai Pang",
+    "Chengye Su",
+    "Jiarun Liu",
+    "Qifeng Chen",
+    "Ziqian Ni",
+    "Jianxin Huang",
+    "Shi-Sheng Huang",
+    "Hongbo Fu",
+    "Sheng Yang"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19036"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "3d-generation",
+    "Drive",
+    "Unified",
+    "Driving",
+    "Scene",
+    "Representation"
+  ],
+  "abstract": "Spatial representation learning for autonomous driving aims to map raw visual signals into structured 3D scene representations, where object-centric bounding boxes and rendering-oriented 3D primitives (\\eg, 3D Gaussians) serve as two distinct yet highly complementary levels for scene understanding. Existing methods typically treat dynamic reconstruction and instance-level perception as separate tasks, despite their shared goal of estimating the underlying 3D world state. As a result, dynamic reconstruction is under-constrained while 3D detection lacks geometric grounding. To address this gap, we propose USR-Drive, a unified conditional generative framework that, given only posed multi-view driving videos, jointly recovers dense dynamic geometry and instance-level object layouts within a shared scene representation. Specifically, USR-Drive represents dense Gaussian primitives and sparse 3D bounding boxes as two aligned latent token streams and jointly denoises them with a unified multi-modal diffusion Transformer. Unlike prior paradigms that use boxes as external conditions or predict them with detached modules, USR-Drive treats them as mutually constrained state variables with a Unified Positional Encoding (UPE) that aligns heterogeneous tokens within a shared metric spatiotemporal coordinate. Via such unified representation and generative framework, the two modalities reinforce each other: geometry supplies dense metric evidence for box prediction, while boxes provide instance-level structural priors that help preserve spatial consistency and reduce ambiguity in sequential 3D geometric representation. Our approach successfully delivers state-of-the-art results for both dynamic reconstruction and 3D detection on the nuScenes and VKitti datasets.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19036v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19036v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19036v1 全文整理；本地 PDF 共 16 页，SHA-256 27d5db266aa3bbc7362b0767fcc5dc5d89338d33e9f0d6de77adf5947aff3d41，并视觉核验第 1、4、6、7 页。",
+    "ideaZh": "USR-Drive 把 dynamic 3D Gaussians 与 3D boxes 视为共同演化的 scene-state tokens：两个 autoencoder 分别压缩 dense geometry 与 slot-aligned layout，Unified Positional Encoding 将其锚定到同一 metric spacetime，再由 MMDiT 联合 rectified-flow denoise；作者报告该互约束同时改善 driving-scene reconstruction 与 detection。",
+    "methodFlow": [
+      "从 posed multi-view driving video 提取/压缩 dense geometry latent",
+      "把 slot-aligned 3D boxes 编码为 sparse object-layout latent",
+      "以 Unified Positional Encoding 对齐两类 token 的 metric 3D 与时间坐标",
+      "用 video VAE latent 作为 condition，将 geometry/box noisy tokens送入统一 MMDiT",
+      "联合 rectified-flow denoise 并交换 dense geometry 与 instance structure evidence",
+      "分别解码 dynamic 3D Gaussians 和 3D detection boxes"
+    ],
+    "whyRelevantZh": "虽然应用是 driving reconstruction，dense Gaussian + sparse object layout 的共去噪表示对 structured 3D generation、scene reconstruction 与可编辑 object-level scene state 有明确迁移价值。",
+    "evidenceZh": "Stage I 分别学习 dense geometry 与 sparse box autoencoders，Stage II 才在共同 latent space 联合去噪。（Fig. 2, Secs. 3.1-3.2, pp. 3-4）；UPE 用 metric 3D anchors 与 normalized frame time 对齐 Gaussian patch tokens 和 BEV box tokens。（Sec. 3.3, Fig. 3, pp. 4-5）；joint denoising 相比 Stage-I geometry-only、decoupled two-stage 与 DA3+StreamPETR 同时改善 reconstruction 与 detection。（Table 4, p. 7）；方法的证据边界是 offline driving-scene estimation，缺少 global scene state、long-term identity 与实时推理。（Limitations and Future Work, p. 7; Appendix D, p. 12）",
+    "caveatZh": "patch/frame-aligned representation 缺少 compact global scene state 与 explicit long-term identities，不直接支持 4D tracking。；iterative denoising 带来显著 latency，当前模型只适合 offline estimation。；autonomous driving mapping 是 3D Reconstruction 配置中的强负面先验；收录价值依赖 UPE/co-denoising 能否迁移到一般 structured 3D scenes。；方法使用 box autoencoder、slot alignment 与 driving annotations 形成强任务先验，离开道路场景后 mutual benefit 尚未验证。",
+    "motivationZh": "论文针对 dynamic driving reconstruction 容易 temporal smearing、3D detection 缺少 dense geometric grounding 的问题，设计 dual-branch scene representation。Geometry branch 借助冻结的 Depth Anything 3 foundation encoder 和 RAE/DPT decoder 表示动态 Gaussian geometry；layout branch 将 box corners、category、slot sequence 编码成 object tokens。UPE 给两类异构 token 统一 metric 3D+time anchors，随后 Wan2.1-initialized MMDiT 在 posed multi-view video condition 下联合去噪两条 latent stream，并同时预测 box confidence、offset、velocity、attribute。nuScenes/VKitti 实验与 joint-vs-decoupled、branch/UPE 消融支持双向约束，但任务完全是 autonomous driving，模型为 offline iterative denoising，缺少 long-term identity 与 real-time capability。",
+    "methodZh": "主要新意是 box 不再作为外部 condition 或 detached detector output，而与 dense Gaussians 成为同一 denoising process 中的 state variables；UPE 用共同 metric anchor 解决异构 token 的 cross-modal spatial correspondence。这个结构化 scene representation 对一般 3D scene generation/reconstruction 有迁移性，但当前实现和证据高度 driving-specific。 方法流程：从 posed multi-view driving video 提取/压缩 dense geometry latent → 把 slot-aligned 3D boxes 编码为 sparse object-layout latent → 以 Unified Positional Encoding 对齐两类 token 的 metric 3D 与时间坐标 → 用 video VAE latent 作为 condition，将 geometry/box noisy tokens送入统一 MMDiT → 联合 rectified-flow denoise 并交换 dense geometry 与 instance structure evidence → 分别解码 dynamic 3D Gaussians 和 3D detection boxes。",
+    "experimentsZh": "在 nuScenes val 上评估 scene/object reconstruction 的 PSNR、SSIM、LPIPS、depth RMSE 以及官方 3D detection metrics；在 VKitti 做 zero-shot reconstruction/detection。比较 VGGT、DA3、Pi-3、AnySplat、STORM、DGGT 与多种 detection baseline，并做 joint pipeline、branch、UPE、auxiliary variable、loss weight、curriculum、hidden dimension 消融。 作者报告 nuScenes scene-level reconstruction 达到 PSNR 27.55、SSIM 0.853、LPIPS 0.076、D-RMSE 4.59，优于列出的 feed-forward baselines。（Table 1, p. 7） 作者报告 nuScenes detection 达到 NDS 0.625 与 mAP 0.552；主表中 mAOE/mAVE 仍略弱于最佳专用 detector。（Table 2, p. 7） 作者报告移除 UPE 后 PSNR/SSIM/mAP 从 27.55/0.853/0.552 降到 25.32/0.799/0.214；box-only branch 的 mAP 仅 0.012。（Table 4, p. 7） Baseline coverage：覆盖 reconstruction foundation models、dynamic Gaussian methods 与官方 detection baselines，并用 decoupled/cascade 控制联合建模收益；但不同 baseline 有的只输出 point cloud 或只做单任务，表中并非所有方法都在统一多任务/compute setting 下训练。 Ablation：branch-only、w/o UPE、decoupled pipeline、auxiliary token placement、lambda_box、高噪声 curriculum 与 MMDiT width 都有消融；仍缺 denoising step/latency、box annotation dependency、不同 camera sparsity 与更长 sequence 的系统实验。",
+    "insightZh": "方法结构和消融足以越过 selective 方向的迁移门槛，但 domain-specific prior、offline latency 与 tracking 缺口使其不宜 deep reading；建议 accept-skim，并在摘要中明确 autonomous-driving evidence boundary。 USR-Drive 把 dynamic 3D Gaussians 与 3D boxes 视为共同演化的 scene-state tokens：两个 autoencoder 分别压缩 dense geometry 与 slot-aligned layout，Unified Positional Encoding 将其锚定到同一 metric spacetime，再由 MMDiT 联合 rectified-flow denoise；作者报告该互约束同时改善 driving-scene reconstruction 与 detection。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

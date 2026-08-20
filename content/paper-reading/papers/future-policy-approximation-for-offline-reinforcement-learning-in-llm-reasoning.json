@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2509.19893",
+  "slug": "future-policy-approximation-for-offline-reinforcement-learning-in-llm-reasoning",
+  "title": "Future Policy Approximation for Offline Reinforcement Learning in LLM Reasoning",
+  "authors": [
+    "Minjae Oh",
+    "Yunho Choi",
+    "Dongmin Choi",
+    "Yohan Jo"
+  ],
+  "publishedAt": "2025-09-24",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2509.19893"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "llm",
+    "Future",
+    "Policy",
+    "Approximation",
+    "Offline",
+    "Reinforcement"
+  ],
+  "abstract": "Reinforcement learning (RL) has emerged as a key driver of post-training for complex reasoning in large language models (LLMs), yet online RL introduces substantial instability and computational overhead. Offline RL offers a compelling alternative by decoupling generation from training; however, offline algorithms for reasoning remain under-optimized relative to their online counterparts. We revisit the potential of policy-gradient-style offline RL and address a central challenge in offline learning: gradient entanglement. In long-horizon reasoning trajectories, correct and incorrect solutions share substantial token overlap, causing gradient updates from incorrect trajectories to suppress tokens that are also critical for correct ones. We propose Future Policy Approximation (FPA), a simple offline policy-gradient method that weights gradients using an estimate of the future policy rather than the current policy, enabling proactive gradient reweighting. We estimate the future policy through logit- space extrapolation. Across three models, seven mathematical reasoning benchmarks, and three code-generation benchmarks, FPA consistently improves over strong offline baselines, including DPO, RPO, KTO, and vanilla offline RL. FPA stabilizes long-horizon training, where vanilla objectives degrade, and achieves accuracy comparable to state-of-the-art RLVR methods such as GRPO and DAPO at a fraction of the GPU hours.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2509.19893v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2509.19893v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2509.19893v3 全文整理；本地 PDF 共 30 页，SHA-256 e5095b5f6a938e9eaaba92e2d7a56d03cedd0be25c672495c109d94bac40a07f，并视觉核验第 1、4、6、9、10、12 页。",
+    "ideaZh": "FPA 针对 fixed offline reasoning trajectories 中 correct/incorrect token overlap 导致的 gradient entanglement，用 current-reference logits 的线性外推估计 future policy，提前压低未来会衰减的错误 trajectory gradient；作者报告 Qwen3-4B 七项数学平均 Pass@1 从 Off-RL 46.26 提升到 51.77，并在 matched 2×H200 设置下约 3 小时达到 DAPO 约 17 小时的表现，但证据限于 3–7B、math/code 与线性 logit 假设，适合略读。",
+    "methodFlow": [
+      "固定离线采样 correct/incorrect reasoning trajectories",
+      "由 current/reference logits 估计训练方向",
+      "沿 logit direction 外推 future policy probability",
+      "用 future probability stop-gradient weight 重加权 REINFORCE update",
+      "复用同一 offline data 训练并评估 reasoning/code performance"
+    ],
+    "whyRelevantZh": "它属于 LLM reasoning post-training 的潜在成本/稳定性范式，并可能迁移到需要固定高质量 trajectories 的 multimodal reasoning。",
+    "evidenceZh": "FPA 以 extrapolated future policy 只改变 gradient magnitude，实际 gradient 仍对 current policy 求导。（Sec. 3.1–3.2, Eqs. 3–6, pp. 4–5）；作者报告三模型七项数学 benchmark 平均均优于所列 offline baselines，Qwen3-4B 为 51.77 vs Off-RL 46.26。（Sec. 4.2, Table 1, p. 6）；targeted ablation 显示主要收益来自 regularizing incorrect trajectories，且 KL、reward scaling、learning-rate decay 不能复现 full FPA。（Sec. 4.3, Table 2 and Fig. 6, p. 9）；作者报告 compute-matched 2×H200 下 FPA 约 3 小时达到 73% MATH500，而 DAPO 约 17 小时；该结论只适用于所给 recipe。（Sec. 4.3, Fig. 8, p. 10）",
+    "caveatZh": "核心假设是 reference→current logit direction 能预测 future policy；强非线性或长程 policy shift 时未必成立。；只验证 3B–7B 模型和 math/code verifiable tasks，尚不足以证明对 frontier-scale multimodal/agentic RL 的迁移。；6× wall-clock 优势来自单一 matched recipe，不能消除 data quality、实现优化和 hyperparameter asymmetry。；代码仅承诺 publication 后发布，PDF 没有 public URL；本项目未复现。",
+    "motivationZh": "论文先比较 MATH、IMDb 和 HH 的 preferred/dispreferred gradient direction 与 norm，提出 reasoning trajectories 共享 token 时错误样本会过度抑制正确路径。FPA 保留 current-policy gradient，但以 softmax((1+λ)h_current−λh_ref) 的 trajectory probability 做 stop-gradient weight。实验覆盖三模型、七数学 benchmark、三 code benchmark、Step-DPO data、targeted/λ/KL/reward-scale ablations、多 seed 和 GRPO/DAPO wall-clock comparison。",
+    "methodZh": "新意是把 logit-space future-policy extrapolation 用作 offline policy-gradient 的 proactive trajectory weight，而不是 KL、统一 reward shrink 或 current-policy reactive weight；方法简单且缓存 reference logits 后开销小。 方法流程：固定离线采样 correct/incorrect reasoning trajectories → 由 current/reference logits 估计训练方向 → 沿 logit direction 外推 future policy probability → 用 future probability stop-gradient weight 重加权 REINFORCE update → 复用同一 offline data 训练并评估 reasoning/code performance。",
+    "experimentsZh": "模型包括 Qwen3-4B-Base、Qwen2.5-Math-7B、Llama-3.2-3B-Instruct；offline math data 从 MATH 每题采 8 trajectories，代码数据来自 TACO/APPS。比较 SFT、DPO、RPO、DPOP、KTO、A*-PO、Off-RL，并对主 Qwen 与 code 做三 seed。 作者报告 Qwen3-4B 三 seed 数学平均 50.93±1.04，DPO 为 47.02±0.82，Off-RL 为 46.72±0.41。（Table 12, p. 30） 作者报告 code generation 上 Qwen3-4B 平均 41.63 vs Off-RL 40.79，Llama-3.2-3B 为 27.41 vs 26.02。（Table 4, p. 11） Baseline coverage：offline baselines、step-level data 和 online RLVR efficiency comparison 覆盖较广；但不同算法的 tuning depth、rollout freshness、data generation 与 distributed stack 仍可能影响 cost/performance 比较。 Ablation：覆盖 λ、future-checkpoint approximation、learning-rate/reward scaling、KL、correct/incorrect-only、step-level data 和 multi-seed；支持 proactive weighting 机制，但没有更大模型或非 verifiable open-ended reasoning。",
+    "insightZh": "收录并略读：方法简单、消融扎实、效率主张值得跟踪；但尚非经 frontier scale 验证的 landmark，且与视觉方向只有间接迁移关系。 FPA 针对 fixed offline reasoning trajectories 中 correct/incorrect token overlap 导致的 gradient entanglement，用 current-reference logits 的线性外推估计 future policy，提前压低未来会衰减的错误 trajectory gradient；作者报告 Qwen3-4B 七项数学平均 Pass@1 从 Off-RL 46.26 提升到 51.77，并在 matched 2×H200 设置下约 3 小时达到 DAPO 约 17 小时的表现，但证据限于 3–7B、math/code 与线性 logit 假设，适合略读。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

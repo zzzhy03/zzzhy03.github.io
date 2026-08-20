@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2608.18682",
+  "slug": "rtpo-reverse-turn-policy-optimization-for-stabilizing-agentic-rl-training",
+  "title": "RTPO: Reverse-Turn Policy Optimization for Stabilizing Agentic RL Training",
+  "authors": [
+    "Yugu Li",
+    "Jimmy Cao",
+    "Jianglin Qiao",
+    "Siyi Hu"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18682"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "llm",
+    "RTPO",
+    "Reverse",
+    "Turn",
+    "Policy",
+    "Optimization"
+  ],
+  "abstract": "Training multi-turn agentic workflows with reinforcement learning (RL) enables large language models to perform complex reasoning, use external tools, and conduct iterative search beyond single-turn settings. Yet multi-turn RL training remains highly unstable, often causing severe performance degradation as the number of turns increases. Through theoretical analysis, we identify three tightly coupled sources of instability: rollout-training context mismatch, weak turn-level credit assignment under sparse terminal rewards, and asynchronous policy drift when short and long trajectories are optimized under different policy versions. We show that these issues share a common structural origin in flattened trajectory optimization and address them through a unified reverse-turn formulation. We propose Reverse-Turn Policy Optimization (RTPO), which organizes multi-turn rollouts as sparse reverse trees and performs turn-level policy updates in temporal reverse order, aligning each decision with its downstream continuation. RTPO enables causally consistent turn-level credit assignment and on-policy continuation to control asynchronous drift. We provide theoretical guarantees showing that RTPO eliminates context mismatch and asynchronous drift under the proposed turn-level formulation, reduces credit bias, and converges to recursive optimality. Experiments on multi-turn agentic RL benchmarks show that RTPO improves upon trajectory- and turn-level baselines by 21.50% and 10.76%, respectively, highlighting its potential to support more stable training for tool-using agents.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18682v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18682v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18682v1 全文整理；本地 PDF 共 50 页，SHA-256 a9c60795ac94171d933d9a6cb872ec7f5f65dab53ac794cdd99915db006b395d，并视觉核验第 1、5、8、9、42、50 页。",
+    "ideaZh": "RTPO 把 multi-turn agent RL 拆成 turn-boundary MDP，保存 rollout 的 exact visible context，以 reverse-order sparse sibling trees 做 state-matched credit，并用 current downstream policy 重新 continuation；作者报告 Qwen3-8B 八项 tool-use benchmark overall 61.66，GRPO/SeeUPO 为 53.71/57.68，但训练 GPU-hours 高约 41.3%、理论全局保证只在 tabular fixed-policy 条件成立，值得精读结构同时严看成本。",
+    "methodFlow": [
+      "把 multi-turn episode 表述为 turn-boundary MDP 并记录 exact rollout context",
+      "从 trunk 的每个 turn boundary fork sparse sibling rollouts",
+      "同状态 sibling returns 形成 turn-level group advantage",
+      "从最后一 turn 向前只更新当前 turn output tokens",
+      "用已更新 downstream policy on-policy continuation 规避 stale drift"
+    ],
+    "whyRelevantZh": "它是 multi-turn tool-agent RL 的结构性训练方案，可迁移到需要 visual feedback 的 design agents，即使当前实验本身不含视觉设计。",
+    "evidenceZh": "RTPO 在 same boundary state 生成 siblings、反向逐 turn 优化，并只给当前 turn tokens 分配 advantage。（Sec. 3.1–3.3, Fig. 2, pp. 4–8）；作者报告八项 benchmark overall 61.66，GRPO 53.71，SeeUPO 57.68；RTPO 在八项均为最高或并列最高。（Sec. 4.1, Table 1, p. 8）；controlled credit experiment 中 RTPO-CA overall Pass@1/Pass@4 为 79.13/86.55，并在三个长搜索 benchmark 上优于 off-policy continuation。（Sec. 4.3–4.4, Tables 2–3, pp. 9–10）；作者明确承认 single-trunk dependence、K-phase overhead、downstream token under-utilization；补充实验还报告 G=3 比 GRPO GPU-hours 高约 41.3%。（Appendix F.4 and G.9, pp. 42 and 49–50）",
+    "caveatZh": "依赖单个 trunk quality，poor early state 会让后续 sibling advantages 接近零。；reverse K phases、policy sync 与 on-policy continuation 增加延迟，并丢弃 trunk/prefix/downstream tokens 的训练利用。；tabular fixed-downstream convergence 不自动扩展到 shared non-convex neural policy。；作者报告 G=3 的 wall-clock/GPU-hours 比 GRPO 高约 41.3%，G=4 generation tokens 高约 152.8%，性能提升伴随显著成本。；Airline sparse reward 的 zero-advantage rate 仍超过 80%，且 online success 在 step 40→50 从 56.25% 降至 40.63%。；只覆盖 Qwen3-4B/8B、3-turn math 和 6-turn search；tool-call 统计在 knowledge tasks 上 RTPO 反而更高。",
+    "motivationZh": "论文把 flattened trajectory 的 instability 归因于 rollout–training context mismatch、cross-state trajectory credit contamination 和 asynchronous downstream policy drift。RTPO 在每个 turn 保存同一 conditioning context，只对该 turn output tokens 更新；从 trunk boundary fork G−1 siblings 估计 local group advantage，并从末 turn 向前训练，每阶段用已更新 policy 继续采样到终点。理论给出 tabular recursive optimality/local unbiasedness，实验覆盖数学 Python tools 与 knowledge web search。",
+    "methodZh": "贡献不只是 reverse order，而是把 context identity、state-matched sibling credit 和 on-policy downstream continuation 统一为一套 turn-level PPO formulation；相较 GRPO、SeeUPO、ARPO/TreeGRPO，它同时针对三个结构性失配。 方法流程：把 multi-turn episode 表述为 turn-boundary MDP 并记录 exact rollout context → 从 trunk 的每个 turn boundary fork sparse sibling rollouts → 同状态 sibling returns 形成 turn-level group advantage → 从最后一 turn 向前只更新当前 turn output tokens → 用已更新 downstream policy on-policy continuation 规避 stale drift。",
+    "experimentsZh": "主实验以 Qwen3-8B 和 8×A100 80GB 运行 12 个 mathematical/knowledge experiments，比较 Vanilla、GRPO、SeeUPO，并在 controlled credit 中加入 ARPO/TreeGRPO；global rollout budget 固定为 math 80k、knowledge 16k，另测试 Qwen3-4B、deep-search on/off-policy variants 和 Airline online environment。 作者报告主表 RTPO overall 61.66，相对 GRPO 53.71 和 SeeUPO 57.68；AIME24 为 33.33 vs 10.00/20.00。（Table 1, p. 8） 作者报告 RTPO rollout/train logprob ratio 保持 1.0，而 knowledge task 的 SeeUPO/GRPO 约从 0.80 恢复到 0.89/0.83。（Fig. 3, p. 9） Baseline coverage：主表有 trajectory 与 turn-level baseline，controlled studies 进一步比较 ARPO/TreeGRPO；但不同方法的 rollout reuse、tool-call counts 和 wall-clock cost不等价，overall 还混合 Pass@1 与 F1。 Ablation：context consistency、turn-level credit、on/off-policy continuation、sibling group size、tool usage 与 Airline online dynamics 均有分析；没有证明 shared neural policy 的全局 convergence，且大规模/更长 turn 稳定性未覆盖。",
+    "insightZh": "收录并精读：三类失配的统一形式化、controlled analyses 和明确成本披露很有研究价值；是否成为 landmark 取决于更大模型、更长 turn 与等算力复现。 RTPO 把 multi-turn agent RL 拆成 turn-boundary MDP，保存 rollout 的 exact visible context，以 reverse-order sparse sibling trees 做 state-matched credit，并用 current downstream policy 重新 continuation；作者报告 Qwen3-8B 八项 tool-use benchmark overall 61.66，GRPO/SeeUPO 为 53.71/57.68，但训练 GPU-hours 高约 41.3%、理论全局保证只在 tabular fixed-policy 条件成立，值得精读结构同时严看成本。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

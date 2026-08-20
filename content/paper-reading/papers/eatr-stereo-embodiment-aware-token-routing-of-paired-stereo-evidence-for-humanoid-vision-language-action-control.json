@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2608.17453",
+  "slug": "eatr-stereo-embodiment-aware-token-routing-of-paired-stereo-evidence-for-humanoid-vision-language-action-control",
+  "title": "EATR-Stereo: Embodiment-Aware Token Routing of Paired Stereo Evidence for Humanoid Vision-Language-Action Control",
+  "authors": [
+    "Songwei Wu",
+    "Rui Zhao",
+    "Fan Yang",
+    "Zhongqiang Nie",
+    "Zhiduo Jiang",
+    "Wandong Sun",
+    "Yuwei Li",
+    "Jian Hu",
+    "Yang Liu",
+    "Hong Liu"
+  ],
+  "publishedAt": "2026-08-18",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.17453"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "EATR",
+    "Stereo",
+    "Embodiment",
+    "Aware",
+    "Token"
+  ],
+  "abstract": "Long-horizon humanoid vision--language--action (VLA) control with head-mounted stereo cameras requires visual interfaces that can exploit complementary views while maintaining compatibility with pretrained representations. Existing interfaces often discard complementary stereo evidence or fuse additional observations without preserving the native primary-view pathway and adapting auxiliary information to robot embodiment. We present EATR-Stereo, an embodiment-aware token-routing framework that retains primary-view tokens and constructs primary-aligned Cross-View Auxiliary Tokens (CVATs) by querying the synchronized auxiliary-view token sequence. A body-segmented proprioceptive encoder further conditions token-wise auxiliary usage on robot configuration history, enabling selective incorporation of stereo evidence during action generation. The routed auxiliary stream augments the language and primary-visual context of a pretrained VLA while keeping its vision--language model frozen. On a 33-DoF physical humanoid with a 37-D proprioceptive state, we evaluate nine configurations in over-100-s search--approach--grasp--place--return tasks. EATR-Stereo achieves 60.0% full-task success, 100.0% grasp success, and 80.0% stage success. Under severe asymmetric occlusion, it improves recovery to 80% compared with 30% for CVAT alone. Ablation studies further show the importance of preserving primary tokens and combining cross-view auxiliary features with structured proprioceptive routing. These results demonstrate that selectively routed paired stereo evidence improves spatial grounding for reliable long-horizon humanoid VLA control.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.17453v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.17453v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.17453v2 全文整理；本地 PDF 共 8 页，SHA-256 4c2905b32479cd94d88044e43f7913315e13ddb5a99a7a804f24a03110f5e69b，并视觉核验第 1、3、6、8 页。",
+    "ideaZh": "EATR-Stereo 为冻结 humanoid VLA 保留 native primary-view tokens，同时用 primary queries 对 synchronized auxiliary view 做 cross-attention 生成 aligned CVATs，再以 body-segmented proprioceptive history 预测逐 token gate；作者报告它在长时 humanoid tasks 与 asymmetric occlusion 中提高 spatial grounding，但实验仍限单一平台和小样本物理 trials。",
+    "methodFlow": [
+      "冻结 pretrained VLM 并分别编码 synchronized primary/auxiliary stereo views",
+      "以 primary tokens 查询 auxiliary sequence，构造 primary-aligned CVAT stream",
+      "把 proprioceptive history 按 body-semantic segments 独立编码并汇聚",
+      "由 primary/CVAT relations 与 embodied state 预测逐 token auxiliary gate",
+      "拼接 language、未改动 primary、gated CVAT 与原 state condition",
+      "由 flow-matching action expert 预测 continuous action chunk并做 deployment stitching"
+    ],
+    "whyRelevantZh": "它以明确的 tokenization/routing 结构推进多视图 spatial grounding，对 VLM/MLLM 如何保留 native representation 并注入 geometry/embodiment evidence 有可迁移价值。",
+    "evidenceZh": "CVAT 以 primary tokens 为 query、auxiliary sequence 为 keys/values，并保持 primary stream 原样。（Sec. III-B, Fig. 2, p. 3）；router 使用五类 body-semantic proprioceptive history 与 token-pair relations 逐 token 决定 auxiliary evidence 权重。（Sec. III-C, Eqs. 7-10, pp. 3-4）；物理 humanoid 主比较覆盖 long-horizon full-task、grasp、ID/OOD stage success。（Table II, p. 6）；asymmetric occlusion 与 representation/router ablation 支持 selective stereo evidence 的收益。（Fig. 4, p. 6; Tables III-IV, p. 7）",
+    "caveatZh": "当前 physical evaluation 只覆盖 Omega humanoid，未来需更多 trials、embodiments 与复杂 stereo conditions。；calibrated uncertainty modeling 与 explicit depth representation 仍是 future work。；physical protocol 允许每 trial 最多两次 safety interventions，并使用 external VLM completion checker，60% full-task success 不等同于完全自治。；方法与实验高度 humanoid/robot-control specific，对通用 VLM 或 visual design 的迁移主要来自 token-routing interface，而非已验证跨域能力。；小样本 physical rates 未报告置信区间；100% grasp 等数字应只理解为本协议下 20/20。",
+    "motivationZh": "论文指出 head-mounted bipedal cameras 会随 gait、waist/head motion 和 limbs self-occlusion 改变视觉证据，简单拼接 stereo images 或替换 primary tokens 会破坏 pretrained representation。EATR-Stereo 让冻结 Cosmos VLM 分别编码 primary/auxiliary views；CVAT 模块以 primary tokens 为 queries、auxiliary tokens 为 keys/values，生成 one-to-one primary-indexed auxiliary stream而不改 primary stream。37-D proprioception 被分为 leg/arm/head/waist/pose，分别编码历史后汇聚成 state embedding；router 根据 primary/CVAT、difference/product 与 state 条件输出逐 token gate。合并后的 language+primary+gated-auxiliary context 进入 flow-matching action expert。实验含 RoboCasa365 simulation、HONOR Omega physical trials、position/language generalization、occlusion recovery 与 training-cost comparison；deployment 另依赖 external VLM completion checker 和 B-spline chunk stitching。",
+    "methodZh": "新意是三项接口约束的组合：保留 pretrained primary token structure、为 stereo evidence 建立 primary-indexed auxiliary stream、再用 body-semantic proprioception 路由每个 token。相较普通多图拼接或直接 cross-attention 修改 primary，它对 embodiment-dependent partial observability 的表示设计更清晰，但属于 VLA application/interface advance。 方法流程：冻结 pretrained VLM 并分别编码 synchronized primary/auxiliary stereo views → 以 primary tokens 查询 auxiliary sequence，构造 primary-aligned CVAT stream → 把 proprioceptive history 按 body-semantic segments 独立编码并汇聚 → 由 primary/CVAT relations 与 embodied state 预测逐 token auxiliary gate → 拼接 language、未改动 primary、gated CVAT 与原 state condition → 由 flow-matching action expert 预测 continuous action chunk并做 deployment stitching。",
+    "experimentsZh": "RoboCasa365 做 18 tasks×20 trials×多配置共 3,600 rollouts；physical setting 使用 33-DoF HONOR Omega、37-D proprioception、240×320 stereo、10Hz、30-step chunks，九种配置各 20 trials（总 180），ID/OOD positions 各半；occlusion analysis 每方法 10 trials。所有 humanoid policies 以 1,000 demonstrations、60,000 steps、16 H20 GPUs训练。 作者报告 RoboCasa simulation 中 EATR-Stereo aggregate success 为 43.33%（156/360），比 CVAT 39.44% 和 StereoPolicy 38.06% 更高。（Table I, p. 5） 作者报告 physical humanoid 20 trials 中 full-task/grasp/stage success 为 60%/100%/80%，StereoPolicy 对应 45%/85%/65%。（Table II, p. 6） 作者报告 severe asymmetric occlusion recovery 为 80%（8/10），CVAT-Flat 为 60%、CVAT 为 30%，成功 trials 的平均恢复时间为 22.4 秒。（Table IV, p. 7） Baseline coverage：比较 monocular/default/wide GR00T、StereoPolicy、Main-XAttn、CVAT、CVAT-Flat、Stereo-Route，并给 estimated-depth VLA 的 training cost；但 physical main table 只列部分 baselines，所有方法共享 external VLM task switcher 与 safety-assisted protocol，真实 autonomy边界需谨慎。 Ablation：通过 Main-XAttn→CVAT 隔离 primary preservation，通过 CVAT→flat→segmented state 隔离 routing condition，再以 Stereo-Route 检查 stereo fusion替代；physical trials 每配置仅 20 次，差异未给 statistical intervals。",
+    "insightZh": "技术设计和 physical ablation 足以作为 VLM spatial-interface 的 transferable advance 收录，但机器人特化、safety/external orchestration 与小样本限制明显；建议 accept-skim，不列 deep priority。 EATR-Stereo 为冻结 humanoid VLA 保留 native primary-view tokens，同时用 primary queries 对 synchronized auxiliary view 做 cross-attention 生成 aligned CVATs，再以 body-segmented proprioceptive history 预测逐 token gate；作者报告它在长时 humanoid tasks 与 asymmetric occlusion 中提高 spatial grounding，但实验仍限单一平台和小样本物理 trials。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

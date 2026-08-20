@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2605.30338",
+  "slug": "rest3d-reconstructing-physically-stable-3d-scenes-from-a-single-image",
+  "title": "REST3D: Reconstructing Physically Stable 3D Scenes from a Single Image",
+  "authors": [
+    "Xiaoxuan Ma",
+    "Jiashun Wang",
+    "Nicolas Ugrinovic",
+    "Yehonathan Litman",
+    "Kris Kitani"
+  ],
+  "publishedAt": "2026-05-28",
+  "updatedAt": "2026-08-18",
+  "collectedAt": "2026-08-21",
+  "venue": "ACM SIGGRAPH Asia 2026 · arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.30338"
+  },
+  "venueIds": [
+    "siggraph-asia"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "3d-generation",
+    "visual-design-agents",
+    "REST3D",
+    "Reconstructing",
+    "Physically",
+    "Stable",
+    "Scenes"
+  ],
+  "abstract": "Reconstructing physically stable 3D scenes from a single RGB image enables casual images to be converted into simulation-ready digital assets for applications such as immersive interaction and content creation. However, existing single-image reconstruction methods fall short in capturing the physical structure of a scene. As a result, they often produce geometrically plausible but physically inconsistent results, including object floating and penetration, which lead to unstable behavior in physics simulations. Image-conditioned scene generation methods improve physical plausibility but often rely on strong scene priors, yielding plausible yet inaccurate object arrangements that fail to match the input image. We propose REST3D, a single-image reconstruction framework that can reconstruct physically stable 3D scenes by integrating physical scene understanding with physics-constrained refinement. We first introduce an agentic physical scene understanding technique that constructs a scene-tree representation capturing object physical states and inter-object relationships from a gravity-support perspective, providing a structural prior for reconstruction. Leveraging this structure, we initialize the scene using image-to-3D models, followed by scene-tree-guided alignment and physics-constrained optimization to resolve physical violations while preserving visual consistency with the input image. Experiments show that our method significantly reduces physical errors and improves simulation stability on both synthetic and real-world datasets while maintaining strong reconstruction quality. We further demonstrate the reconstructed scenes in VR-based human-object interaction, showing their potential for immersive applications.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.30338v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.30338v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ShirleyMaxx/REST3D"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.30338v2 全文整理；本地 PDF 共 25 页，SHA-256 2870d3413b3f721aaca278f5beedd0fb0d8bd9987f9cb4a8c2f11fe1319cd67c，并视觉核验第 1、4、6、8、9、20 页。",
+    "ideaZh": "REST3D 不只追求单图几何相似，而是先用 VLM agents 做 open-vocabulary object/mask verification 和 gravity-support scene tree，再以 image-to-3D 初始化、scene-tree canonicalization、local-to-global CEM + Isaac Gym energy 优化得到 simulation-ready scene。作者报告 Replica/ScanNet++/25 张 custom images 的 stable rate 分别为 96.2%/93.6%/95.5%，明显高于各基线，并展示 30 FPS VR interaction。证据边界是 object detection/VLM grounding 与 image-to-3D errors 会改变布局，当前主要是刚体、平面地面，墙支撑/关节/非刚体未显式建模，25.8 min/scene 也离实时重建很远。",
+    "methodFlow": [
+      "输入：单张 RGB 图像；VLM 生成 open-vocabulary object list，segmentation/verifier agents 迭代得到实例 masks",
+      "结构：从 gravity-support 关系构建以 ground/wall/ceiling 为根的 scene tree，并用 image-to-3D 重建每个对象",
+      "优化：先 scene-tree canonicalization，再对局部 support groups 和全局 layout 运行 Isaac Gym 驱动的 CEM physics optimization",
+      "输出：保持输入布局语义、降低碰撞与漂移的 simulation-ready 3D scene，可接 VR hand interaction"
+    ],
+    "whyRelevantZh": "直接连接 single-image 3D reconstruction、image-to-3D、agentic scene understanding 与 simulation-ready content creation，且把结构先验和物理评测结合得较完整。",
+    "evidenceZh": "REST3D 由 scene-tree construction、scene canonicalization 与 local/global physics-constrained optimization 三阶段组成。（Sec. 3, Fig. 2, p. 4）；作者报告 Ours 在 Replica、ScanNet++、Custom 的 stable rate 为 96.2%、93.6%、95.5%，collision rate 为 6.7%、5.9%、1.2%。（Table 1, p. 6）；VLM/object reconstruction errors、非平面地面、关节/非刚体与 wall support 缺失会导致布局偏移，即稳定性不等价于输入保真。（Limitations, p. 8; Appendix C.4 and Fig. 15, pp. 20-21）",
+    "caveatZh": "依赖 VLM scene understanding 与 image-to-3D robustness，错误会使重建偏离输入。；当前聚焦 rigid indoor objects，不显式处理 deformable/non-rigid/articulated objects 或 non-planar ground。；墙未作为 physics optimization 中的显式 support，wall-supported objects 可能被移到更稳定但不忠实的位置。；稳定率依赖 Isaac Gym、手工物理参数、质量类别与能量阈值，不等价于真实世界动力学正确。；25.8 min/scene 和 Gemini/SAM3D 依赖限制了可部署性；VR demo 是 simulation proof-of-concept。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文把 single-image 3D reconstruction 的目标从视觉 plausibility 推向物理可执行性。Stage 1 构建带 support relation 的 scene tree；Stage 2 用 SAM3D 初始化并按树 canonicalize；Stage 3 对局部 support groups 与全局 layout 分层执行基于仿真的 CEM，联合 penetration、stability、velocity、layout 与 position energy。作者在 Replica、ScanNet++ 和多风格 custom set 上报告高稳定率、低 collision，并做 VR 交互演示；所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "相对仅做 object-level reconstruction 或语言反馈的 agentic scene generation，REST3D 的主要新意是 gravity-support scene tree 作为重建与局部-全局 physics optimization 的共同结构先验，并把 full-dynamics stability 作为优化和评测目标。 方法流程：输入：单张 RGB 图像；VLM 生成 open-vocabulary object list，segmentation/verifier agents 迭代得到实例 masks → 结构：从 gravity-support 关系构建以 ground/wall/ceiling 为根的 scene tree，并用 image-to-3D 重建每个对象 → 优化：先 scene-tree canonicalization，再对局部 support groups 和全局 layout 运行 Isaac Gym 驱动的 CEM physics optimization → 输出：保持输入布局语义、降低碰撞与漂移的 simulation-ready 3D scene，可接 VR hand interaction。",
+    "experimentsZh": "10 个 Replica scenes、12 个 ScanNet++ scenes 与 25 张 Internet/prior-work custom images（每景 4-30 objects）；Isaac Gym 仿真 60 steps，比较 retrieval、generation、reconstruction baselines，并测 physical/geometric metrics、组件消融、runtime/API cost 与 VR demo。 作者报告：Replica 上 Ours stable rate 96.2%、collision 6.7%，SAM3D† 为 2.5%/48.5%；ScanNet++ 上 Ours 93.6%/5.9%，SAM3D† 为 4.6%/39.1%。（Table 1, p. 6） 作者报告：custom set 上 Ours stable rate 95.5%、collision 1.2%；完整 pipeline 平均 25.8 min/scene，其中 physics optimization 10.4 min。（Table 1 and implementation paragraph, p. 6） Baseline coverage：覆盖 DigitalCousins、Gen3DSR、MIDI、SceneGen、DepR、SAM3D†、3D-RE-GEN，并说明 SAM3D 的 scene-level integration 和 reproduce 条件；CAST 无 public code，仅作 reported qualitative comparison。 Ablation：canonicalization、global-only、projection alternative、scene tree、各 energy term 和 CEM elite fraction ablations 支持 local-global tree-guided simulation optimization 的作用；failure-only metrics 可能对 global-only 难例偏乐观。",
+    "insightZh": "method、主结果表、ablation、runtime 与主/补充限制均通过 exact-version 全文和渲染页核证；对 3D reconstruction 与 agentic content pipeline 有较高价值，建议精读并进入本期 digest。 REST3D 不只追求单图几何相似，而是先用 VLM agents 做 open-vocabulary object/mask verification 和 gravity-support scene tree，再以 image-to-3D 初始化、scene-tree canonicalization、local-to-global CEM + Isaac Gym energy 优化得到 simulation-ready scene。作者报告 Replica/ScanNet++/25 张 custom images 的 stable rate 分别为 96.2%/93.6%/95.5%，明显高于各基线，并展示 30 FPS VR interaction。证据边界是 object detection/VLM grounding 与 image-to-3D errors 会改变布局，当前主要是刚体、平面地面，墙支撑/关节/非刚体未显式建模，25.8 min/scene 也离实时重建很远。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

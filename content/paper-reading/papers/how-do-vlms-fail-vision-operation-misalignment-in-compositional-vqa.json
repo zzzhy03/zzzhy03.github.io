@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2607.16094",
+  "slug": "how-do-vlms-fail-vision-operation-misalignment-in-compositional-vqa",
+  "title": "How Do VLMs Fail? Vision-Operation Misalignment in Compositional VQA",
+  "authors": [
+    "Navya Gupta",
+    "Bingjie Xu",
+    "Avinash Anand",
+    "Timothy Liu",
+    "Zhengchen Zhang"
+  ],
+  "publishedAt": "2026-07-17",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "ACM International Conference on Multimedia 2026 · arXiv v2",
+  "identifiers": {
+    "arxiv": "2607.16094"
+  },
+  "venueIds": [
+    "acm-mm"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "VLMs",
+    "Fail",
+    "Vision",
+    "Operation",
+    "Misalignment"
+  ],
+  "abstract": "Compositional visual question answering requires Vision-Language Models (VLMs) to execute multiple reasoning operations like object selection, spatial relation resolution, and attribute verification. Despite strong aggregate performance, the mechanistic basis of VLM failures on this task remains underexplored. To address this gap, we analyze vision-operation misalignment in VLMs by examining how failures relate to specific reasoning operations and the internal computational pathways through which they arise and propagate. We introduce an Operation-centric mechanistic framework that decomposes VLM failures by both the reasoning operation where they originate and the internal computational pathway through which they propagate. Our analysis reveals four dominant failure modes: grounding failure, reasoning failure, attribute extraction failure, and language-prior dominance, each characterized by a distinct relationship between visual grounding strength and answer correctness. Through three complementary causal interventions applied across all transformer layers, we find that object-selection failures are associated primarily with feedforward computation, multi-step relational failures with late-layer direct attention, and attribute-extraction failures with answer-position feedforward computation. Validation on VSR further shows that single-step spatial failures are concentrated at object-position encoding, distinguishing them from multi-step relational composition. These findings reveal distinct computational bottlenecks across operation types and provide a principled basis for targeted diagnosis of VLM failures in multimedia reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.16094v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.16094v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.16094v2 全文整理；本地 PDF 共 9 页，SHA-256 d698ec73b37c42b09113f230ad6642ca42f7c522260946cc36592b45b81b4e48，并视觉核验第 1、4、7、8 页。",
+    "ideaZh": "论文不把 compositional VQA 错误视为一个总分问题，而是按 select/relate/verify/query/exist 等 operation 与 mean ablation、direct-attention knockout、MLP knockout 的计算路径交叉诊断；作者报告 select 的 mean-ablation correctness effect 为 d=+0.75，而 relate 的 late-attention effect 为 d=-0.32，揭示 grounding、relation composition 与 attribute extraction 具有不同 bottleneck，值得精读其实验设计和 oracle grounding 边界。",
+    "methodFlow": [
+      "用 GQA functional program 将问题拆成 typed reasoning operations",
+      "由 scene graph 为每个 operation 解析 causally relevant object-token set",
+      "逐层执行 mean ablation、direct-attention knockout 和 MLP knockout",
+      "按 correct/incorrect degradation 的 Cohen's d 识别 failure locus",
+      "用 probes、VSR 与第二架构检验视觉性和可迁移性"
+    ],
+    "whyRelevantZh": "它直接推进 VLM visual grounding、spatial/compositional reasoning 与 mechanistic interpretability，并为 design agent 的失败诊断提供 operation-aware 视角。",
+    "evidenceZh": "三个干预分别测试 object representation 总依赖、answer-to-object direct attention 和 object/answer-position feedforward processing。（Sec. 3.3–3.4, Fig. 2, pp. 4–5）；作者报告 select 的 mean-ablation d=+0.75、answer-position MLP d=-0.80；relate 的 direct-attention d=-0.32。（Sec. 5.2–5.4, Table 3, p. 7）；VSR 的单步 spatial failures 更集中于 object-position MLP，而 GQA multi-step relate 更依赖 late direct attention。（Sec. 5.6, Table 4, p. 8）；LLaVA 只稳定复现 attribute-extraction effects；作者明确承认 grounding/relational profiles 对 encoder spatial specificity 敏感。（Sec. 5.7 and Limitations, p. 8）",
+    "caveatZh": "主分析仅为 3B Qwen model，high-accuracy operations 的错误样本较少。；所定位的是 dominant 而非 exclusive mechanisms，framework 只诊断、不纠错。；GQA functional programs 与 scene-graph bounding boxes 提供了部署时通常不存在的 oracle decomposition/grounding。；LLaVA 只清晰复现 attribute-extraction 部分，说明 taxonomy 的跨 encoder 稳定性有限。；correctness-conditioned intervention effect 是机制证据，但仍可能混入样本难度与 operation distribution 差异；本项目未复现。",
+    "motivationZh": "方法借助 GQA functional program 和 scene-graph bbox 为每个 reasoning operation 指定 target vision tokens，再逐层独立实施 causal mean ablation、answer-to-object attention knockout 和 object/answer-position MLP knockout，以 correct–incorrect Cohen's d 形成 operation-level failure signature。作者在 GQA 上构建 taxonomy，并以 counterfactual probes、image corruption、VSR single-step spatial relations 和 LLaVA cross-architecture test 做验证。",
+    "methodZh": "新意不是提出新 VLM，而是把 operation semantics 与 attention/MLP causal pathway 组成二维 failure taxonomy；相较只看 attention map、linear probe 或总体 hallucination，它能区分未 grounding、过度 grounding、answer-side attribute extraction 和 language-prior shortcuts。 方法流程：用 GQA functional program 将问题拆成 typed reasoning operations → 由 scene graph 为每个 operation 解析 causally relevant object-token set → 逐层执行 mean ablation、direct-attention knockout 和 MLP knockout → 按 correct/incorrect degradation 的 Cohen's d 识别 failure locus → 用 probes、VSR 与第二架构检验视觉性和可迁移性。",
+    "experimentsZh": "主分析使用 Qwen2.5-VL-3B-Instruct，GQA 七类 operation 各 500 questions；每项干预逐层运行 36 layers。外部验证包括 VSR 2,195 samples、contrastive probes、image corruption 与 LLaVA-1.5-7B。 作者报告 operation-ranking 的 peak 与 layer-AUC Spearman correlation 为 0.96（p=0.0005），并给出 select、relate、verify 等路径 effect sizes。（Sec. 5 and Table 3, pp. 6–7） 作者报告 gray/noise image corruption 下 filter 与 choose 保留 66.4%/51.1% accuracy，而 verify/relate 为 43.3%/32.0%。（Sec. 5.5, p. 8） Baseline coverage：论文不是性能竞赛，而是机制诊断；其控制包含 zero-vector baseline、probe、corruption、VSR 和第二架构，但没有更大模型、更多 VLM family 或不依赖 oracle functional program/scene graph 的自然问题验证。 Ablation：三种干预与 object/answer/intermediate positions 形成 pathway controls，且做多重检验和 AUC robustness；这些分析定位 dominant associations，但无法证明该 locus 是产生原始错误的唯一根因。",
+    "insightZh": "收录并精读：operation×pathway 的诊断框架、统计控制和跨任务验证都很有信息量；阅读时必须同时保留 oracle annotations、单一主模型和跨架构复现不完整的限制。 论文不把 compositional VQA 错误视为一个总分问题，而是按 select/relate/verify/query/exist 等 operation 与 mean ablation、direct-attention knockout、MLP knockout 的计算路径交叉诊断；作者报告 select 的 mean-ablation correctness effect 为 d=+0.75，而 relate 的 late-attention effect 为 d=-0.32，揭示 grounding、relation composition 与 attribute extraction 具有不同 bottleneck，值得精读其实验设计和 oracle grounding 边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

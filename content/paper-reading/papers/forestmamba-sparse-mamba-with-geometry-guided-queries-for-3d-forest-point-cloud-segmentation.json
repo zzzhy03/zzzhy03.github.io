@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2606.01549",
+  "slug": "forestmamba-sparse-mamba-with-geometry-guided-queries-for-3d-forest-point-cloud-segmentation",
+  "title": "ForestMamba: Sparse Mamba with Geometry-guided Queries for 3D Forest Point Cloud Segmentation",
+  "authors": [
+    "Trung Thanh Nguyen",
+    "Tuan-Anh Vu",
+    "Duc Viet Le",
+    "Yasutomo Kawanishi",
+    "Takahiro Komamizu",
+    "Ichiro Ide",
+    "Teja Kattenborn"
+  ],
+  "publishedAt": "2026-06-01",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2606.01549"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3d-segmentation",
+    "ForestMamba",
+    "Sparse",
+    "Mamba",
+    "Geometry",
+    "guided"
+  ],
+  "abstract": "Semantic and instance segmentation of terrestrial and drone LiDAR point clouds is emerging as a transformative approach for converting the complex 3D structure of forests into actionable information for forest monitoring and biodiversity assessment. However, forest LiDAR scenes remain highly challenging due to their large data volumes, irregular sampling density, overlapping and complex canopy structure, and geographic variability. Existing methods based on sparse convolutions or Transformers achieve promising results, but suffer from two key limitations: Quadratic complexity of attention scales poorly to large forest scenes, and generic context modeling does not exploit forest structural priors, limiting tree separation in complex regions. To address these challenges, we propose ForestMamba, which integrates forest-specific priors with linear-time state-space modeling for efficient, structure-aware learning. First, we introduce a sparse encoder with vertical-priority slab serialization that organizes sparse voxels into vertically coherent sequences for efficient long-range context modeling. Second, we propose a geometry-guided query initialization strategy based on an on-the-fly multi-scale Canopy Height Model, where canopy maxima provide ecologically meaningful query seeds, supplemented by Farthest Point Sampling to cover understory trees. Third, we design a Mamba-based query decoder that combines local kNN voxel aggregation with a spatial dual-path Mamba for query refinement with linear computational complexity. Extensive experiments across seven forest regions demonstrate that ForestMamba consistently outperforms existing baselines in both segmentation tasks, while achieving 3 times faster inference and 2.3 times lower GPU memory than Transformer-based methods. The source code is available at https://github.com/thanhhff/ForestMamba.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.01549v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.01549v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/thanhhff/ForestMamba"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.01549v2 全文整理；本地 PDF 共 27 页，SHA-256 4ed1f9a7a433b22f9d520bcd0a003b6946cbad079fc712087d856ab66baa8b7e，并视觉核验第 1、5、11、14、25 页。",
+    "ideaZh": "ForestMamba 把 forest vertical structure 同时编码进 sparse voxel serialization、CHM canopy-peak queries 与 dual-path Mamba decoder；作者报告七区域 weighted instance F1 83.4%，较 ForestFormer3D 82.3% 提高 1.1 points，并把 full inference 从约 2048 ms 降到 684 ms、peak memory 从 28.4 GB 降到 12.1 GB。提升有真实结构与效率证据，但场景高度 forest-specific，YuChen/BlueCat 等区域并非所有指标领先。",
+    "methodFlow": [
+      "将 forest point cloud voxelize，并按 vertical-priority slabs 序列化",
+      "sparse U-Net/Mamba encoder 提取 long-range vertical context 与 tree/background logits",
+      "从 multi-scale CHM canopy peaks 初始化 queries，FPS 补充 understory coverage",
+      "query decoder 依次执行 local kNN aggregation 与 spatial dual-path Mamba",
+      "以 one-to-many matching 联合输出 tree instances 与 leaf/wood/ground semantics"
+    ],
+    "whyRelevantZh": "直接推进 point-cloud semantic/instance segmentation，并提供结构化 query 与效率设计，但主要迁移价值在 query-based 3D segmentation 而非 forest application 本身。",
+    "evidenceZh": "ForestMamba 由 vertical sparse encoder、CHM/FPS query initialization 与 Mamba query decoder 三部分构成。（Fig. 1 and method overview, p. 5）；作者报告七区域 weighted F1 为 83.4%，ForestFormer3D 为 82.3%，但在 YuChen、TUWIEN、SCION 与 BlueCat 并非所有指标领先。（Table 1, p. 11）；作者报告 end-to-end inference 684.2 ms，对 ForestFormer3D 的 2047.6 ms 约 2.99x；peak memory 12,130 MB 对 28,413 MB。（Table 2, p. 12）；CHM queries、kNN aggregation、dual-path Mamba 与 one-to-many matching 各有明显 ablation drop。（Table 3, p. 13）",
+    "caveatZh": "依赖 auxiliary branch 产生可靠 tree voxels，dense multi-layer forests 会破坏 CHM。；fixed allometric parameters 在所有 regions 共用，tropical/multi-stemmed trees 可能不适配。；方法对 forest ecology 做了强定制，向通用 object/part 3D segmentation 的迁移有限。；作者报告效率和精度未在本项目复现。",
+    "motivationZh": "输入 LiDAR point cloud 经 cylindrical voxelization 和 vertical-priority sparse encoder；auxiliary tree/background branch 在线构造 multi-scale CHM peaks，FPS 补 understory queries；decoder 用 local kNN 与 ascending/descending shared Mamba 执行实例/语义预测。七区域与 component ablations 支持各模块，但 fixed allometry 和 canopy observability 限制跨生态迁移。",
+    "methodZh": "新意在于把生态结构先验贯穿 encoder、query initialization 与 decoder，而非仅用 Mamba 替换 Transformer；CHM+FPS 与 bidirectional query scan 对 crowded canopy 有针对性。 方法流程：将 forest point cloud voxelize，并按 vertical-priority slabs 序列化 → sparse U-Net/Mamba encoder 提取 long-range vertical context 与 tree/background logits → 从 multi-scale CHM canopy peaks 初始化 queries，FPS 补充 understory coverage → query decoder 依次执行 local kNN aggregation 与 spatial dual-path Mamba → 以 one-to-many matching 联合输出 tree instances 与 leaf/wood/ground semantics。",
+    "experimentsZh": "FOR-instanceV2 的七个 forest regions，统一 point-cloud augmentation 与 instance/semantic metrics；效率在 RTX A6000、约 1M voxels 上比较。 作者报告 weighted instance F1 83.4%、Recall 76.6%，相对 ForestFormer3D 分别 +1.1 和 +1.7 points。（Table 1, p. 11） 作者报告 decoder 435.7 ms、full network 684.2 ms、peak memory 12,130 MB。（Table 2, p. 12） Baseline coverage：比较 OneFormer3D、ForestFormer3D，并引用 TreeLearn/ForAINet reported results；semantic mIoU 的 weighted gain 仅约 0.2 point，且多区域结果混合。 Ablation：覆盖 encoder Mamba、CHM/FPS queries、kNN、single/dual-path decoder 和 matching strategy，结构归因较完整。",
+    "insightZh": "方法和 ablations 超过普通 scene-segmentation tweak，适合速读收录；因 domain-specific priors 与总体精度增益有限，不建议精读。 ForestMamba 把 forest vertical structure 同时编码进 sparse voxel serialization、CHM canopy-peak queries 与 dual-path Mamba decoder；作者报告七区域 weighted instance F1 83.4%，较 ForestFormer3D 82.3% 提高 1.1 points，并把 full inference 从约 2048 ms 降到 684 ms、peak memory 从 28.4 GB 降到 12.1 GB。提升有真实结构与效率证据，但场景高度 forest-specific，YuChen/BlueCat 等区域并非所有指标领先。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2502.02891",
+  "slug": "interactive-stroke-based-neural-sdf-sculpting",
+  "title": "Interactive Stroke-based Neural SDF Sculpting",
+  "authors": [
+    "Fizza Rubab",
+    "Yiying Tong"
+  ],
+  "publishedAt": "2025-02-05",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2502.02891"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Interactive",
+    "Stroke",
+    "Neural",
+    "Sculpting"
+  ],
+  "abstract": "Recent advances in implicit neural representations have made them a popular choice for modeling 3D geometry. However, directly editing these representations presents challenges due to the complex relationship between model weights and surface geometry, as well as the slow optimization required to update neural fields. Among various editing tools, sculpting stands out as a valuable operation for the graphics and modeling community. While traditional mesh-based tools like ZBrush enable intuitive edits, a comparable high-performance toolkit for sculpting neural SDFs is currently lacking. We introduce a framework that enables interactive surface sculpting directly on neural implicit representations with optimized performance. Unlike previous methods, which are limited to spot edits, our approach allows users to perform stroke-based modifications on the fly, ensuring intuitive shape manipulation without switching representations. By employing tubular neighborhoods to sample strokes and customizable brush profiles, we achieve smooth deformations along user-defined curves, providing intuitive control over the sculpting process. Our method demonstrates that versatile edits can be achieved while preserving the smooth nature of implicit representations, all without compromising interactive performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2502.02891v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2502.02891v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Fizza-Rubab/Interactive-Neural-Sculpting"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2502.02891v2 全文整理；本地 PDF 共 10 页，SHA-256 32ce7606e09a70d7bf5e0fcdb3d6d630452185d1e3fd7896eed214db16a725ac，并视觉核验第 1、2、7、8、9 页。",
+    "ideaZh": "这篇工作把 mesh sculpting 的 stroke/brush 交互直接搬到 neural SDF：沿 surface stroke 建立 u-v-n frame，用可自定义 brush profile 与沿程 modulation 生成目标 zero-level-set samples，再以 tubular neighborhood 局部微调 SIREN；作者报告相对 point-wise 3DNS 最多 15 倍加速并保持更低 Chamfer error。",
+    "methodFlow": [
+      "在 neural SDF viewer 上绘制 surface stroke 并选择/编辑 brush profile",
+      "沿 stroke 建立 u-v-n moving frame 与 modulation function",
+      "在 curve 周围生成 tubular interaction samples",
+      "按 brush profile 沿 surface normal 移动 zero-level target points",
+      "用 interaction samples 与 untouched-region regularization 微调 SIREN",
+      "实时渲染更新后的 implicit surface并支持连续下一笔编辑"
+    ],
+    "whyRelevantZh": "论文直接命中 3D Generation/Editing：它研究显式 stroke、brush 与 neural SDF geometry 的可编辑接口，方法也可迁移到 structured 3D design agent 的局部操作 primitive。",
+    "evidenceZh": "pipeline 在不切换表示的前提下直接微调 neural SDF，并以 user stroke、brush profile 与 tubular region 驱动编辑。（Fig. 1, p. 1; Sec. 3, pp. 4-6）；u-v-n coordinate frame 将 stroke direction、cross-stroke brush profile 和 normal displacement 解耦，支持 carving/extrusion 与沿程 modulation。（Secs. 3.2-3.4, Eqs. 8-12, pp. 5-6）；Tubular sampling 用约 99×101 interaction grid 与 10,000 untouched samples 替代 3DNS 的高冗余逐点采样。（Sec. 3.5, p. 6）；定量表同时检查 editing latency、whole-surface/interaction-region Chamfer 与 sampling density。（Tables 1-3, p. 7）",
+    "caveatZh": "低容量 global MLP 会模糊高频 oscillatory brush profile，并在 unedited region 引入 bumps。；高 intensity brush 可能因大 weight update 造成 geometry discontinuity。；PyTorch 对小网络/batch 的 Python overhead 和缺少 kernel fusion 限制响应速度。；所谓 interactive 仍依赖每笔 50-100 epochs fine-tuning，长会话多笔编辑的累计 drift、撤销和可逆性未验证。；只有六类基础形状的定量实验，复杂 topology、thin structures 与 production-scale high-frequency SDF 的稳定性仍未知。",
+    "motivationZh": "论文针对 neural implicit geometry 难以局部、连续、交互式编辑的问题，设计一套可视化 sculpting toolkit。用户在渲染的 neural SDF 表面画 stroke 并定义一维 brush profile；系统沿曲线建立 tangent、cross-stroke tangent 与 normal 构成的局部坐标系，使用 Catmull-Rom profile 和 modulation function 计算沿 normal 的正负 displacement。Tubular sampling 只在 stroke interaction band 与少量 untouched region 采点，将 displacement points 作为新的 zero-level constraints 微调 SIREN，而不转换为 mesh。实验在六类形状上与 3DNS point edits、high/coarse mesh edits 比较 edit fidelity 与运行时间，并提供 profiling、复杂连续编辑示例和明确限制。",
+    "methodZh": "相较 3DNS 的独立 point brush，论文真正新增的是连续 stroke representation、可非径向的用户 brush/modulation 和一次 tubular batch sampling；这些设计把无法高效模拟的长曲线编辑转成单轮局部优化，属于 neural implicit editing 的直接、实用推进。 方法流程：在 neural SDF viewer 上绘制 surface stroke 并选择/编辑 brush profile → 沿 stroke 建立 u-v-n moving frame 与 modulation function → 在 curve 周围生成 tubular interaction samples → 按 brush profile 沿 surface normal 移动 zero-level target points → 用 interaction samples 与 untouched-region regularization 微调 SIREN → 实时渲染更新后的 implicit surface并支持连续下一笔编辑。",
+    "experimentsZh": "在 RTX 4070 8GB、PyTorch/SIREN 2 hidden layers×128 neurons 上测试 sphere、torus、frog、bust、pumpkin、Stanford bunny；与 3DNS point edits、high-resolution target mesh 和参数量近似的 coarse mesh 比较，Chamfer 使用 100,000 sampled points，编辑质量对 10 次随机 edit 取均值。 作者报告当 stroke points 从 8 增到 128 时，本方法 editing time 维持约 0.468-0.517 秒，而 3DNS 从 0.553 增到 7.755 秒，最高相对 gain 为 15.011 倍。（Table 1, p. 7） 作者报告六种形状上本方法在 whole surface 与 tubular interaction region 的 mean Chamfer 均低于 3DNS 和同复杂度 coarse mesh。（Table 2, p. 7） 作者 profiling 显示单次 fine-tuning iteration 的 data sampling 约占 63.34%，backpropagation 约占 29.19%，其中 surface/stroke projection 是主要采样成本。（Fig. 8 and Table 4, p. 8） Baseline coverage：与唯一直接 neural SDF sculpting baseline 3DNS、ideal high-res mesh 与同表示复杂度 coarse mesh 对照；但没有与现代局部 neural field/hash-grid、可逆 edit 或商业 sculpting latency 做比较，也没有 user study。 Ablation：通过 stroke sample count 检查 edit fidelity，并以多 brush/profile qualitative examples 展示表达力；对 backbone resolution 仅做图示分析，缺少 regularization strength、brush intensity、sequential edit drift 的系统消融。",
+    "insightZh": "核心任务与 active direction 直接一致，方法/实验/代码证据完整，且局部几何编辑对当前 3D generation 与 design tooling 有高迁移价值；建议 accept-deep 并进入 digest。 这篇工作把 mesh sculpting 的 stroke/brush 交互直接搬到 neural SDF：沿 surface stroke 建立 u-v-n frame，用可自定义 brush profile 与沿程 modulation 生成目标 zero-level-set samples，再以 tubular neighborhood 局部微调 SIREN；作者报告相对 point-wise 3DNS 最多 15 倍加速并保持更低 Chamfer error。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2608.18413",
+  "slug": "comvs-gs-collaborative-multi-view-stereo-and-3d-gaussian-splatting-for-surface-reconstruction",
+  "title": "CoMVS-GS: Collaborative Multi-View Stereo and 3D Gaussian Splatting for Surface Reconstruction",
+  "authors": [
+    "Shihan Chen",
+    "Junjing Zhang",
+    "Qingsong Yan",
+    "Haibing Liu",
+    "Haofan Ren",
+    "Fei Deng"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18413"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "CoMVS",
+    "Collaborative",
+    "Multi",
+    "View",
+    "Stereo"
+  ],
+  "abstract": "3D Gaussian Splatting enables efficient novel view synthesis, but accurate mesh reconstruction remains difficult in weakly observed and occluded regions, where Gaussian primitives may grow into unstable or geometrically inconsistent structures. We propose CoMVS-GS, a general surface reconstruction framework that combines Multi-View Stereo with Gaussian splatting. CoMVS-GS initializes Gaussian primitives from dense multi-view stereo points with pre-flattened scales and normal-aligned orientations, providing stronger geometric priors than sparse structure-from-motion initialization and reducing ambiguity during early optimization. It further introduces PatchMatch-3DGS Mutual Supervision, where Gaussian-rendered depths and normals initialize PatchMatch refinement, and refined PatchMatch depths supervise Gaussian optimization to improve weakly constrained geometry. For surface extraction, CoMVS-GS replaces truncated signed distance field voxel fusion with a Delaunay graph-cut meshing pipeline, reducing sensitivity to voxel resolution while preserving visibility-consistent surface evidence. Experiments on DTU, GauU-Scene V2, and MatrixCity show that CoMVS-GS remains competitive on object-level reconstruction and improves geometric accuracy and mesh compactness in outdoor scenes while maintaining high rendering quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18413v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18413v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18413v1 全文整理；本地 PDF 共 13 页，SHA-256 a4bbc3f4fb0774be31c4fdeacfdc5985fd46acae593e4e1d7b8319110dc012f2，并视觉核验第 1、4、8、11 页。",
+    "ideaZh": "CoMVS-GS 用 dense MVS points 初始化 pre-flattened、normal-aligned Gaussians，再让 Gaussian-rendered depth/normal 与 PatchMatch refined depths 周期性交叉监督，最后以 visibility-aware Delaunay graph cut 代替 TSDF extraction。作者报告 DTU mean CD 0.48，与 GGGS 并列最优；三个 outdoor subsets 的 MAE/RMSE 为 0.603/1.133 m，平均 mesh faces 8.762M，明显小于 PGSR 的 50.169M。方法实用但更像 MVS/3DGS components 的强组合，PatchMatch overhead 与 specular/transparent surfaces 仍是硬限制。",
+    "methodFlow": [
+      "从 posed multi-view images 运行 MVS，获得 dense points、colors 与 normals",
+      "将每个 point 初始化为 normal-aligned、pre-flattened planar Gaussian",
+      "周期性用 current 3DGS depth/normal 初始化 PatchMatch，并以 refined depth 反向监督 Gaussians",
+      "通过 co-visibility/baseline/view direction 过滤 source views 做多视角 regularization",
+      "融合 final depth samples，以 camera-ray evidence 做 Delaunay graph-cut meshing 和 refine"
+    ],
+    "whyRelevantZh": "直接命中 multi-view surface reconstruction，并对 3DGS 获得 compact, geometry-aware meshes 有实用迁移价值。",
+    "evidenceZh": "CoMVS-GS 将 dense initialization、PatchMatch-3DGS mutual supervision 与 Delaunay meshing 串成三阶段 pipeline。（Fig. 2 and Sec. 3, p. 4）；作者报告 DTU 15-scan mean Chamfer Distance 0.48，与 GGGS 0.48 并列，优于 PGSR 0.52。（Table 1, p. 8）；作者报告 outdoor mean MAE/RMSE 0.603/1.133 m，mesh faces 8.762M；PGSR 为 0.670/1.284 与 50.169M。（Table 2, p. 8）；作者明确指出 PatchMatch 在 specular/transparent surfaces 上不可靠，并增加 high-resolution refinement cost。（Limitations and Future Work, p. 11）",
+    "caveatZh": "PatchMatch 在 specular 或 transparent surfaces 上缺少可靠 correspondence。；periodic PatchMatch refinement 对 high-resolution outdoor scenes 带来额外计算开销。；outdoor results 来自作者裁剪的三个 subsets，scalability 与完整 city scenes 尚未建立。；PDF 没有打印 own-method public code URL；作者报告结果未独立复现。",
+    "motivationZh": "框架把 MVS 分别用作 dense geometric initialization、训练中的 periodic depth supervision 和 meshing visibility evidence，而不是独立 final reconstruction。DTU 与 outdoor geometry/visual metrics 及 Sub-Small City ablation 支持三部分贡献；其 novelty 是完整 geometry-aware pipeline，非新的 universal 3D prior。",
+    "methodZh": "新意在 MVS 与 3DGS 的闭环 mutual supervision，以及用 Delaunay visibility graph 替代 TSDF；单个 building block 并非全新，但组合直接针对 weakly constrained surface geometry。 方法流程：从 posed multi-view images 运行 MVS，获得 dense points、colors 与 normals → 将每个 point 初始化为 normal-aligned、pre-flattened planar Gaussian → 周期性用 current 3DGS depth/normal 初始化 PatchMatch，并以 refined depth 反向监督 Gaussians → 通过 co-visibility/baseline/view direction 过滤 source views 做多视角 regularization → 融合 final depth samples，以 camera-ray evidence 做 Delaunay graph-cut meshing 和 refine。",
+    "experimentsZh": "DTU standard 15 scans；GauU-Scene V2/MatrixCity 的 Sub-Village、Sub-Technology College、Sub-Small City；RTX 4090D、30K iterations、OpenMVS PatchMatch periodic calls。 作者报告 DTU mean CD 0.48，达到同表最佳并明显优于普通 3DGS 1.96。（Table 1, p. 8） 作者报告 Sub-Small City full model MAE 0.512、RMSE 1.047；去 PatchMatch 时为 0.579/1.133。（Table 3, p. 10） Baseline coverage：DTU 覆盖 neural implicit、Gaussian surface 与 OpenMVS；outdoor 覆盖 Neuralangelo、2DGS、RaDe-GS、PGSR、CityGS-X、OpenMVS，但只用三个 selected subsets 且未报告 runtime。 Ablation：dense vs SfM initialization、with/without PatchMatch、TSDF vs Delaunay 均有 visual+geometry metrics，支持 pipeline attribution。",
+    "insightZh": "标准 geometry metrics、outdoor results 与 component ablations 足以速读收录；因组合式 novelty、selected subsets 与额外 optimization cost，不建议精读。 CoMVS-GS 用 dense MVS points 初始化 pre-flattened、normal-aligned Gaussians，再让 Gaussian-rendered depth/normal 与 PatchMatch refined depths 周期性交叉监督，最后以 visibility-aware Delaunay graph cut 代替 TSDF extraction。作者报告 DTU mean CD 0.48，与 GGGS 并列最优；三个 outdoor subsets 的 MAE/RMSE 为 0.603/1.133 m，平均 mesh faces 8.762M，明显小于 PGSR 的 50.169M。方法实用但更像 MVS/3DGS components 的强组合，PatchMatch overhead 与 specular/transparent surfaces 仍是硬限制。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.18593",
+  "slug": "rex-shot-single-image-rephotography-via-geometry-and-camera-grounded-generation",
+  "title": "ReX-Shot: Single-Image Rephotography via Geometry- and Camera-Grounded Generation",
+  "authors": [
+    "Ruiqi Zhang",
+    "Hao Zhu",
+    "Wenhao Zhang",
+    "Qi Zhang",
+    "Junqi Shi",
+    "Ming Lu",
+    "Xun Cao",
+    "Zhan Ma"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18593"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Shot",
+    "Single",
+    "Image",
+    "Rephotography",
+    "Geometry"
+  ],
+  "abstract": "Single-image rephotography aims to synthesize new shots of a scene from a single reference image with specified viewpoints, focal lengths, and photographic effects, which are intrinsically coupled in imaging. Existing methods typically treat these factors separately and struggle under joint control: novel-view synthesis may introduce geometric distortions under focal-length changes, while super-resolution and instruction-guided editing remain confined to 2D and cannot reliably extend detail restoration or appearance control to novel viewpoints. We attribute these limitations to imperfect single-image 3D reconstruction and the sampling limit of continuous focal-length enlargement. To reduce projection bias from geometric errors, we use implicitly transformed foundation-model features for robust target-view guidance. We further formulate focal-length enlargement as a geometry-guided super-resolution problem and exploit generative detail priors to recover details lost during sparse 3D resampling. Built on this 3D-aware generative backbone, we lift photographic-effect control from 2D filtering to 3D-aware appearance editing, preserving content consistency across viewpoints and focal lengths. These components form ReX-Shot, a geometry- and camera-grounded generative framework for single-image rephotography. To our knowledge, ReX-Shot is the first unified framework to jointly control viewpoint, focal length, and parameterized photographic effects from a single image. Experiments show that ReX-Shot outperforms representative baselines across all three controls while enabling near-real-time interactive rephotography.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18593v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18593v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18593v1 全文整理；本地 PDF 共 15 页，SHA-256 5a72632ad483bbdab9bf0e8ab4bb3b89d31a7f412670700f951877128d4d1f61，并视觉核验第 1、4、8、12、13 页。",
+    "ideaZh": "ReX-Shot 把单图“重拍”定义为 viewpoint、focal length 与 photographic effect 的联合控制：VGGT point cloud 做 pixel anchor，PRoPE 将 VGGT/DINO features 隐式投到 target camera，再用 one-step TSD-SR prior 补细节；作者报告 joint-control average PSNR 20.35 vs 最强 baseline 16.66，并以约 0.154s 完成一帧，但只覆盖放大焦距、窄视角和单一 effect，建议略读其 dual-space camera grounding。",
+    "methodFlow": [
+      "从单张 reference image 估计 per-pixel geometry 与 camera",
+      "在 target camera 下显式渲染 coarse pixel anchor",
+      "以 PRoPE 将 foundation features 隐式投影为 target-view tokens",
+      "one-step generative SR backbone 恢复/补全 target shot",
+      "parameterized effect encoder 连续控制一个 photographic effect"
+    ],
+    "whyRelevantZh": "它把 camera geometry 与 raster generation/editing 联合控制，直接可迁移到 3D-aware visual creation workflow。",
+    "evidenceZh": "ReX-Shot 用 pixel-space point-cloud render 与 PRoPE feature-space projection 双重约束 one-step generative backbone。（Sec. 3, Fig. 2, pp. 4–6）；作者报告 joint viewpoint+focal control average PSNR/SSIM/LPIPS 为 20.35/0.590/0.229，优于所列 baselines。（Sec. 4.3, Table 1, p. 8）；TSD-SR prior 与 feature projector 分别主要改善 focal-length 和 viewpoint control；full ablation joint PSNR 为 23.05。（Sec. 4.6, Table 5 and Figs. 11–12, p. 12）；作者明确限制为 focal-length enlargement、窄 viewpoint changes、每次 forward 一个 effect。（Sec. 5 Conclusion, p. 13）",
+    "caveatZh": "只支持 focal-length enlargement、相对窄的 viewpoint changes，并且一次 forward 只能控制一个 photographic effect。；单图不适定 geometry 下的 disocclusion 仍由 generative prior 补全，较高 PSNR 不保证新可见区域事实正确。；联合 task 对多数 baseline 是 out-of-distribution adaptation，不能把表格优势全部归因于单个组件。；PDF 只打印 project page，没有明确 public code repository；稿件页眉仍是旧 IEEE template metadata，成熟度需后续确认。",
+    "motivationZh": "方法先由 VGGT 从 reference image 估计 per-pixel point cloud 与 camera，将点云渲染到 target view 形成 pixel-space coarse condition；同时用 learnable queries、PRoPE cross-attention 把 VGGT/DINO features 变换为 camera-aware tokens。生成 backbone 从 one-step TSD-SR 初始化，按 target camera 恢复 sparse resampling 丢失的细节；独立 effect encoder 将 color temperature、exposure、saturation 或 contrast parameter 注入 DiT。",
+    "methodZh": "新意是将 camera-grounded NVS、geometry-guided SR 和 parameterized appearance editing 统一为 rephotography task，并以 pixel/feature dual-space conditions 缓解单图 geometry bias；这是明确的 controllable generation interface，但仍依赖现有 VGGT、DINO、TSD-SR 和 SD3。 方法流程：从单张 reference image 估计 per-pixel geometry 与 camera → 在 target camera 下显式渲染 coarse pixel anchor → 以 PRoPE 将 foundation features 隐式投影为 target-view tokens → one-step generative SR backbone 恢复/补全 target shot → parameterized effect encoder 连续控制一个 photographic effect。",
+    "experimentsZh": "在 DL3DV-140 训练，以 DL3DV、MipNeRF360、Tanks & Temples 测 viewpoint/focal/joint control；比较 AnySplat、LVSM、CameraCtrl、ViewCrafter、PE-Field、OSEDiff、TSD-SR，另与 IP2P/ICEdit 比 effect control，并报告 latency 与 component ablation。 作者报告 focal-length-only average PSNR/SSIM/LPIPS 为 29.13/0.861/0.095，TSD-SR 为 25.19/0.721/0.159。（Table 3, p. 8） 作者报告 one-time reconstruction 0.093s、render 0.043s、effect edit 0.018s，总计约 0.154s；复用 scene 后 rendering 约 23 FPS、带 effect 约 16 FPS。（Sec. 4.5, Fig. 9, pp. 11–12） Baseline coverage：按 camera、focal、effect task 分组覆盖 feed-forward/generative baselines，并使用 official implementations；但各 baseline 并非为联合 rephotography 设计，任务适配差异使大幅优势部分来自新 task definition。 Ablation：SD3 fine-tuning、TSD-SR initialization 与 camera-aware feature projector 有量化/视觉消融；没有系统消融 VGGT geometry quality、effect encoders、不同 camera ranges 或训练数据规模。",
+    "insightZh": "收录并略读：task/interface 清晰、定量与消融较完整，dual-space grounding 有直接迁移价值；但范围窄、baseline task mismatch 与 hallucinated disocclusion 限制了范式级结论。 ReX-Shot 把单图“重拍”定义为 viewpoint、focal length 与 photographic effect 的联合控制：VGGT point cloud 做 pixel anchor，PRoPE 将 VGGT/DINO features 隐式投到 target camera，再用 one-step TSD-SR prior 补细节；作者报告 joint-control average PSNR 20.35 vs 最强 baseline 16.66，并以约 0.154s 完成一帧，但只覆盖放大焦距、窄视角和单一 effect，建议略读其 dual-space camera grounding。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

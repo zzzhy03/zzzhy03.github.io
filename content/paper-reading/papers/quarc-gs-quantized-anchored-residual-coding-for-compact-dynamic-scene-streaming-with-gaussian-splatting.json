@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.18285",
+  "slug": "quarc-gs-quantized-anchored-residual-coding-for-compact-dynamic-scene-streaming-with-gaussian-splatting",
+  "title": "QuARC-GS: Quantized Anchored Residual Coding for Compact Dynamic Scene Streaming with Gaussian Splatting",
+  "authors": [
+    "Vu Trung Nghia Nguyen",
+    "Yuchen Wang",
+    "Kyung Chul Lee",
+    "Kevin C. Zhou"
+  ],
+  "publishedAt": "2026-08-18",
+  "updatedAt": "2026-08-18",
+  "collectedAt": "2026-08-21",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.18285"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "QuARC",
+    "Quantized",
+    "Anchored",
+    "Residual",
+    "Coding"
+  ],
+  "abstract": "3D scene representation techniques such as neural radiance fields (NeRFs) and Gaussian splatting have made substantial progress in novel view synthesis, achieving high-quality renderings from arbitrary view angles. More recently, such techniques have been extended to dynamic 3D scenes; however, achieving sustainable online free-viewpoint video (FVV) streaming remains challenging, especially for longer videos, due to significant storage demands of detailed scene representations and high reconstruction/rendering speed needs. To address these challenges, we propose Quantized Anchored Residual Coding Gaussian Streaming (QuARC-GS), a quantization-aware 4D scene optimization framework for online dynamic scene reconstruction that achieves ultra-high compression while maintaining reconstruction speed and quality. QuARC-GS represents a scene using a single canonical frame and highly compressed per-frame residuals. Specifically, we compress each residual through two complementary strategies targeting motion, appearance, and densification. We introduce quantization-aware anchor deformation, which suppresses insignificant motion updates while preserving meaningful deformations, maintaining reconstruction quality under low-storage streaming. Furthermore, we design a change-gated densification strategy that allocates new Gaussians only in regions exhibiting genuine temporal changes, effectively eliminating redundant appearance updates and reducing storage overhead. Extensive experiments on widely used datasets demonstrate that QuARC-GS enables competitive reconstruction quality and training speed while cutting per-frame storage by up to 11$\\times$ compared to the state-of-the-art.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18285v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18285v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/high-performance-computational-optics/QuARC-GS"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18285v1 全文整理；本地 PDF 共 9 页，SHA-256 ca56f456168562596b1eb1e32015fa046821df7f2224738e9c4be45b8020d7dc，并视觉核验第 1、4、6、8 页。",
+    "ideaZh": "QuARC-GS 针对 online free-viewpoint video 的两类 payload：用三层 hierarchical anchors 表示 Gaussian motion，并在 forward pass 量化 residual，使 near-static anchors 归零后直接 entropy-code；再以相邻帧 photometric-loss 的 view-space gradient difference gate densification，只给真实变化/新显露区域添 Gaussian。作者报告 N3DV 上与 ReCon-GS 相同 32.16 dB/0.951/0.129，却把 per-frame storage 从 400/440 KB 降到 36/56 KB；MeetRoom 为 18/26 KB。证据边界是每段视频仍需昂贵 initial 3DGS，后续约 3-5s/frame 也不是真实时 streaming，且只验证两套 300-frame multi-view indoor datasets。",
+    "methodFlow": [
+      "输入：首帧 multi-view images 优化 compact canonical 3DGS，后续帧从上一帧状态 warm-start",
+      "运动编码：三层 hierarchical anchors 共享 Gaussian 6D pose deformation，binding 可由 seeded geometry 重建而无需传输",
+      "压缩与增密：STE 量化 anchor residual 并 entropy-code；view-space temporal gradient gate 只在无法由运动解释的区域增 Gaussian",
+      "输出：逐帧 compressed residual bitstream 与可实时渲染的 dynamic Gaussian scene"
+    ],
+    "whyRelevantZh": "直接关联 dynamic 3D reconstruction/Gaussian streaming，提供清晰的 rate-distortion-latency 设计与可复用的 quantization-aware residual 思路。",
+    "evidenceZh": "QuARC-GS 以 quantized hierarchical anchor deformation 压 motion payload，并以 change-gated densification 限制 appearance payload。（Secs. 3.3-3.5, Fig. 2, p. 4）；作者报告 N3DV 上 QuARC-GS 为 PSNR 32.16、SSIM 0.951、LPIPS 0.129、storage 36/56 KB、train 5.0s、render 243 FPS。（Table 1, p. 6）；当前系统需要高质量 initial 3DGS 的 upfront compute，且逐帧优化仍太慢，不能实现 true real-time streaming。（Conclusion and limitations, pp. 7-8）",
+    "caveatZh": "每个视频需要高质量 initial 3DGS 和较高 upfront compute。；逐帧优化虽接近 online SOTA，仍太慢而不是真实时 streaming。；只覆盖两套 300-frame multi-view indoor datasets，长视频、复杂照明/拓扑变化与网络 bitstream latency 未充分验证。；部分 SOTA 数字来自非同环境报告，rate-distortion 比较并非全部严格 matched。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "方法从 canonical 3DGS 开始，逐帧 warm-start hierarchical anchor deformation；训练中对 translation/quaternion residual 做 STE quantization，静态 anchors 映射到 identity bin，从 motion payload 中消失。对于运动无法解释的 appearance change，使用 view-space gradient difference gate clone/split densification，抑制静态区域冗余增长。作者在 N3DV/MeetRoom 报告与 online SOTA 相当的 PSNR/SSIM/LPIPS 和训练/渲染速度，但显著更小的传输量；所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "核心不是新的 dynamic GS backbone，而是让 hierarchical anchor residual 在训练时就匹配 transmitted quantization，并用 deformation 后的 temporal gradient 控制 densification，从 motion 与 appearance 两侧同时压 payload。 方法流程：输入：首帧 multi-view images 优化 compact canonical 3DGS，后续帧从上一帧状态 warm-start → 运动编码：三层 hierarchical anchors 共享 Gaussian 6D pose deformation，binding 可由 seeded geometry 重建而无需传输 → 压缩与增密：STE 量化 anchor residual 并 entropy-code；view-space temporal gradient gate 只在无法由运动解释的区域增 Gaussian → 输出：逐帧 compressed residual bitstream 与可实时渲染的 dynamic Gaussian scene。",
+    "experimentsZh": "N3DV 六个 indoor dynamic scenes（18-21 views、300 frames、2704×2028）和 MeetRoom 三景（13 views、300 frames、1280×720）；held-out first view 测 NVS，RTX PRO 6000，比较 offline/online GS baselines。 作者报告：N3DV 上 QuARC-GS 32.16 dB/0.951/0.129、36/56 KB，与 reproduced ReCon-GS 的质量相同，但后者为 400/440 KB。（Table 1, p. 6） 作者报告：MeetRoom 上 QuARC-GS 30.67 dB/0.949、18/26 KB、3.3s/frame、271 FPS；ReCon-GS 为 30.68/0.949、300/390 KB、3.2s、303 FPS。（Table 2, p. 6） Baseline coverage：覆盖 STG、SaRO-GS、Swift4D、SplineGS、Dynamic 3DGS、StreamRF、3DGStream、4DGC、QUEEN、HiCoM、ComGS、ReCon-GS；3DGStream/ReCon-GS 使用 official code 同环境 reproduce，其余部分结果来自论文。 Ablation：移除 quantization 时质量不变而 storage 从 36/56 增到 402/441 KB；移除 change gate 时 new GS/frame 从 153 增到 468，支持两组件分别压 motion 与 appearance payload。",
+    "insightZh": "方法、主表、matched reproductions、组件消融、代码链接与限制均经 exact-version 全文和渲染页核证；贡献实用但更偏表示压缩，建议速读并进入本期 digest。 QuARC-GS 针对 online free-viewpoint video 的两类 payload：用三层 hierarchical anchors 表示 Gaussian motion，并在 forward pass 量化 residual，使 near-static anchors 归零后直接 entropy-code；再以相邻帧 photometric-loss 的 view-space gradient difference gate densification，只给真实变化/新显露区域添 Gaussian。作者报告 N3DV 上与 ReCon-GS 相同 32.16 dB/0.951/0.129，却把 per-frame storage 从 400/440 KB 降到 36/56 KB；MeetRoom 为 18/26 KB。证据边界是每段视频仍需昂贵 initial 3DGS，后续约 3-5s/frame 也不是真实时 streaming，且只验证两套 300-frame multi-view indoor datasets。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
