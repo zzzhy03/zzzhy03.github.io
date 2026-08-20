@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2608.17298",
+  "slug": "3d-gaussian-accelerated-ray-tracing-fast-training-through-particle-based-backward-propagat",
+  "title": "3D Gaussian Accelerated Ray Tracing: Fast training through particle-based backward propagation",
+  "authors": [
+    "Laurent Vit",
+    "Oliver Batchelor",
+    "Richard Green"
+  ],
+  "publishedAt": "2026-08-18",
+  "updatedAt": "2026-08-18",
+  "collectedAt": "2026-08-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.17298"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Gaussian",
+    "Accelerated",
+    "Ray",
+    "Tracing",
+    "Fast",
+    "training"
+  ],
+  "abstract": "3D Gaussian Splatting has made Gaussian primitives a highly efficient representation for real-time novel view synthesis, but its rasterisation-based formulation relies on screen-space approximations that limit accurate view-dependent ordering and the integration of secondary ray effects such as reflections, refractions, and shadows. Gaussian ray tracing addresses these limitations by evaluating explicit ray-primitive intersections, yet it remains costly to train. We observe that the main bottleneck is not ray traversal alone, but the pixel-centric backward propagation, where many threads concurrently accumulate gradients into the same primitive parameters, causing severe atomic contention and thread serialisation. We present 3DGART, a practical training framework for ray-traced Gaussian rendering. Our key idea is to reorganise backward propagation around primitives rather than pixels. Using conservative perspective-correct screen-space bounds, we build a compact intermediate buffer and a tile-primitive mapping that allows each thread to accumulate the contribution of one primitive over its covered pixels within a tile. This transforms gradient computation from a contention-heavy scatter operation into a structured gather-like process. On Mip-NeRF 360, 3DGART achieves an $\\approx 3-3.5\\times$ raw training speedup over per-pixel baseline and $\\approx4 \\times$ over 3DGRT on Mip-NeRF 360 while improving quality. More importantly, 3DGART makes fully ray-traced Gaussian training practical, reaching runtimes competitive with rasterisation-based pipelines while preserving benefits of ray tracing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.17298v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.17298v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.17298v1 全文整理；本地 PDF 共 8 页，SHA-256 9c015f439cf4b28e16a8f4319c050abc6f244d5b741f2c3ed6ea2a825dac1f61，并视觉核验第 1、3、5、7 页。",
+    "ideaZh": "把 ray-traced Gaussian backward 从 pixel-centric atomic scatter 重排为 tile–primitive mapping，每个 thread 聚合同一 primitive 覆盖 pixels 的梯度，并以 hybrid path 控制 per-pixel buffer memory。 作者报告 1M/2M primitives raw backward 分别加速 3.51×/3.10×，Mip-NeRF 360 上端到端约 4× 快于 3DGRT，同时 reconstruction quality 更高。 证据边界：hybrid buffer 显著增加 VRAM，方法目前只支持 perspective-correct projection；benchmark 在 RTX 4090 与少数 NVS datasets。",
+    "methodFlow": [
+      "输入与任务：3D Gaussian Accelerated Ray Tracing: Fast training through particle-based backward propagation",
+      "核心表示与机制：把 ray-traced Gaussian backward 从 pixel-centric atomic scatter 重排为 tile–primitive mapping，每个 thread 聚合同一 primitive 覆盖 pixels 的梯度，并以 hybrid path 控制 per-pixel buffer memory。",
+      "实验协议：Mip-NeRF 360、Tanks&Temples、Deep Blending，统一 4090 和 standardized PSNR/SSIM/LPIPS。",
+      "输出与判断：作者报告 1M/2M primitives raw backward 分别加速 3.51×/3.10×，Mip-NeRF 360 上端到端约 4× 快于 3DGRT，同时 reconstruction quality 更高。"
+    ],
+    "whyRelevantZh": "直接关联 3d-reconstruction：把 ray-traced Gaussian backward 从 pixel-centric atomic scatter 重排为 tile–primitive mapping，每个 thread 聚合同一 primitive 覆盖 pixels 的梯度，并以 hybrid path 控制 per-pixel buffer memory。",
+    "evidenceZh": "把 ray-traced Gaussian backward 从 pixel-centric atomic scatter 重排为 tile–primitive mapping，每个 thread 聚合同一 primitive 覆盖 pixels 的梯度，并以 hybrid path 控制 per-pixel buffer memory。（Method/approach and rendered method page, p. 3）；作者报告 1M/2M primitives raw backward 分别加速 3.51×/3.10×，Mip-NeRF 360 上端到端约 4× 快于 3DGRT，同时 reconstruction quality 更高。（Main results or exact-version comparison, p. 5）",
+    "caveatZh": "hybrid buffer 显著增加 VRAM，方法目前只支持 perspective-correct projection；benchmark 在 RTX 4090 与少数 NVS datasets。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "问题与方法：把 ray-traced Gaussian backward 从 pixel-centric atomic scatter 重排为 tile–primitive mapping，每个 thread 聚合同一 primitive 覆盖 pixels 的梯度，并以 hybrid path 控制 per-pixel buffer memory。 全文结果：作者报告 1M/2M primitives raw backward 分别加速 3.51×/3.10×，Mip-NeRF 360 上端到端约 4× 快于 3DGRT，同时 reconstruction quality 更高。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "核心是重新分配 gradient ownership，把 atomic-contention scatter 变成 structured gather，而非牺牲 ray/Gaussian accuracy。 方法流程依次为：输入与任务：3D Gaussian Accelerated Ray Tracing: Fast training through particle-based backward propagation → 核心表示与机制：把 ray-traced Gaussian backward 从 pixel-centric atomic scatter 重排为 tile–primitive mapping，每个 thread 聚合同一 primitive 覆盖 pixels 的梯度，并以 hybrid path 控制 per-pixel buffer memory。 → 实验协议：Mip-NeRF 360、Tanks&Temples、Deep Blending，统一 4090 和 standardized PSNR/SSIM/LPIPS。 → 输出与判断：作者报告 1M/2M primitives raw backward 分别加速 3.51×/3.10×，Mip-NeRF 360 上端到端约 4× 快于 3DGRT，同时 reconstruction quality 更高。。",
+    "experimentsZh": "Mip-NeRF 360、Tanks&Temples、Deep Blending，统一 4090 和 standardized PSNR/SSIM/LPIPS。 作者报告：作者报告 1M/2M primitives raw backward 分别加速 3.51×/3.10×，Mip-NeRF 360 上端到端约 4× 快于 3DGRT，同时 reconstruction quality 更高。（Main results, p. 5） Baseline coverage：比较 pixel/primitive/hybrid backward、3DGRT 与 rasterized variants；各 renderer 的近似仍不同。 Ablation：raw speed、primitive scale、VRAM、microbenchmarks 与 global benchmark 分析较完整。",
+    "insightZh": "核心是重新分配 gradient ownership，把 atomic-contention scatter 变成 structured gather，而非牺牲 ray/Gaussian accuracy。 方法、结果与限制均已在 exact-version 全文及渲染页中核证，符合 3d-reconstruction 的 attention policy，建议速读并进入本期 digest。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

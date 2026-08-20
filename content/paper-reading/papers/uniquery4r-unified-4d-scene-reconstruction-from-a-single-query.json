@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.17283",
+  "slug": "uniquery4r-unified-4d-scene-reconstruction-from-a-single-query",
+  "title": "UniQuery4R: Unified 4D Scene Reconstruction from a Single Query",
+  "authors": [
+    "Tiancheng Chen",
+    "Sheng Tang",
+    "Wenhua Jin",
+    "Weiqi Zhang",
+    "Juntong Fang",
+    "Junsheng Zhou",
+    "Zesong Li"
+  ],
+  "publishedAt": "2026-08-18",
+  "updatedAt": "2026-08-18",
+  "collectedAt": "2026-08-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.17283"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "UniQuery4R",
+    "Unified",
+    "Scene",
+    "Reconstruction",
+    "Single",
+    "Query"
+  ],
+  "abstract": "Reconstructing dynamic 4D scenes requires jointly estimating correspondence, geometry, object motion, and camera motion. Existing feed-forward methods typically predict dense task-specific maps or independently process source-target pairs, leading to unnecessary computation for sparse queries and limited feature reuse across different frame pairs. We present UniQuery4R, a query-conditioned framework that encodes a multi-frame clip once and selects the source view, target view, and continuous source-image coordinate only at decoding time via source-to-target cross-attention. Each query jointly predicts target correspondence, target-time 3D position, and scene flow, along with source depth, while camera parameters are estimated per view. This design allows the encoded clip to be reused across arbitrary source-target selections and supports both sparse inference and dense reconstruction through batched queries, without learned temporal embeddings tied to a fixed clip length. We further introduce a direction-magnitude parameterization of scene flow with separate supervision for moving and static points. Among the evaluated methods, UniQuery4R achieves the best macro-average results on WorldTrack for both scene-flow estimation and dynamic-point reconstruction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.17283v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.17283v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.17283v1 全文整理；本地 PDF 共 16 页，SHA-256 a63b0233c27edb8c055b9aa750c4aaeea599bf30dd660efcf66a0c930074a67e，并视觉核验第 1、5、11、13 页。",
+    "ideaZh": "multi-frame clip 只编码一次；continuous source-pixel query 在 decoding 时选择 source/target/view coordinate，经 cross-attention 联合预测 correspondence、target 3D point、scene flow、source depth 和 per-view camera。 作者在 WorldTrack 报告 dynamic-point EPE 2.4105，优于列出的 V-DPM 2.7367 等方法；使用 SynthVerse training 后 EPE 降到 1.3682，且 sparse query runtime 随 query count 近线性扩展。 证据边界：16×H20、150K iterations 和多源数据成本高；shared encoder 本身贡献显著，OpenD4RT baseline 为 unofficial reimplementation，WorldTrack domains 仍有限。",
+    "methodFlow": [
+      "输入与任务：UniQuery4R: Unified 4D Scene Reconstruction from a Single Query",
+      "核心表示与机制：multi-frame clip 只编码一次；continuous source-pixel query 在 decoding 时选择 source/target/view coordinate，经 cross-attention 联合预测 correspondence、target 3D point、scene flow、source depth 和 per-view camera。",
+      "实验协议：WorldTrack 四数据集 macro-average、DAVIS qualitative、SynthVerse zero-shot、runtime/memory scaling。",
+      "输出与判断：作者在 WorldTrack 报告 dynamic-point EPE 2.4105，优于列出的 V-DPM 2.7367 等方法；使用 SynthVerse training 后 EPE 降到 1.3682，且 sparse query runtime 随 query count 近线性扩展。"
+    ],
+    "whyRelevantZh": "直接关联 3d-reconstruction：multi-frame clip 只编码一次；continuous source-pixel query 在 decoding 时选择 source/target/view coordinate，经 cross-attention 联合预测 correspondence、target 3D point、scene flow、source depth 和 per-view camera。",
+    "evidenceZh": "multi-frame clip 只编码一次；continuous source-pixel query 在 decoding 时选择 source/target/view coordinate，经 cross-attention 联合预测 correspondence、target 3D point、scene flow、source depth 和 per-view camera。（Method/approach and rendered method page, p. 5）；作者在 WorldTrack 报告 dynamic-point EPE 2.4105，优于列出的 V-DPM 2.7367 等方法；使用 SynthVerse training 后 EPE 降到 1.3682，且 sparse query runtime 随 query count 近线性扩展。（Main results or exact-version comparison, p. 11）",
+    "caveatZh": "16×H20、150K iterations 和多源数据成本高；shared encoder 本身贡献显著，OpenD4RT baseline 为 unofficial reimplementation，WorldTrack domains 仍有限。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "问题与方法：multi-frame clip 只编码一次；continuous source-pixel query 在 decoding 时选择 source/target/view coordinate，经 cross-attention 联合预测 correspondence、target 3D point、scene flow、source depth 和 per-view camera。 全文结果：作者在 WorldTrack 报告 dynamic-point EPE 2.4105，优于列出的 V-DPM 2.7367 等方法；使用 SynthVerse training 后 EPE 降到 1.3682，且 sparse query runtime 随 query count 近线性扩展。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "统一 query representation 取代多组 dense task maps，让同一 encoded clip 同时支持 sparse inference、dense reconstruction 与任意 source-target selection。 方法流程依次为：输入与任务：UniQuery4R: Unified 4D Scene Reconstruction from a Single Query → 核心表示与机制：multi-frame clip 只编码一次；continuous source-pixel query 在 decoding 时选择 source/target/view coordinate，经 cross-attention 联合预测 correspondence、target 3D point、scene flow、source depth 和 per-view camera。 → 实验协议：WorldTrack 四数据集 macro-average、DAVIS qualitative、SynthVerse zero-shot、runtime/memory scaling。 → 输出与判断：作者在 WorldTrack 报告 dynamic-point EPE 2.4105，优于列出的 V-DPM 2.7367 等方法；使用 SynthVerse training 后 EPE 降到 1.3682，且 sparse query runtime 随 query count 近线性扩展。。",
+    "experimentsZh": "WorldTrack 四数据集 macro-average、DAVIS qualitative、SynthVerse zero-shot、runtime/memory scaling。 作者报告：作者在 WorldTrack 报告 dynamic-point EPE 2.4105，优于列出的 V-DPM 2.7367 等方法；使用 SynthVerse training 后 EPE 降到 1.3682，且 sparse query runtime 随 query count 近线性扩展。（Main results, p. 11） Baseline coverage：与 SpaTracker、S4TRTrack、TraceAnything、Any4D、V-DPM、OpenD4RT 等比较。 Ablation：encoder initialization、direction/magnitude scene flow、sparse queries 与 training data 有附录分析。",
+    "insightZh": "统一 query representation 取代多组 dense task maps，让同一 encoded clip 同时支持 sparse inference、dense reconstruction 与任意 source-target selection。 方法、结果与限制均已在 exact-version 全文及渲染页中核证，符合 3d-reconstruction 的 attention policy，建议精读并进入本期 digest。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

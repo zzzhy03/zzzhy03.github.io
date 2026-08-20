@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.17695",
+  "slug": "magnitude-direction-decoupling-for-fast-video-generation-with-flow-matching-models",
+  "title": "Magnitude-Direction Decoupling for Fast Video Generation with Flow Matching Models",
+  "authors": [
+    "Haonan Xu",
+    "Feiyang Chen",
+    "Songkui Chen",
+    "Hongpeng Pan",
+    "Zhefeng Wang",
+    "Xinyu Duan",
+    "Baoxing Huai",
+    "Yang Yang"
+  ],
+  "publishedAt": "2026-08-18",
+  "updatedAt": "2026-08-18",
+  "collectedAt": "2026-08-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.17695"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Magnitude",
+    "Direction",
+    "Decoupling",
+    "Fast",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Flow matching models for video generation achieve impressive performance but suffer from high computational overhead due to iterative denoising. In fact, the original model is not necessary for all denoising steps, allowing some steps to use lightweight alternatives for faster sampling. However, directly using caching or lightweight models can deviate from the original denoising trajectory, resulting in suboptimal performance. Through empirical analysis, we find that lightweight models can robustly capture the magnitude components of the original model's output, while caching provides reliable directional guidance. Building on this insight, we propose the Magnitude-Direction Decoupling (MDD) method, which adaptively employs a direction-calibrated lightweight model as a substitute for the original model to accelerate inference and effectively correct deviations in the denoising trajectory. Moreover, MDD further reduces inference costs by reusing magnitude information under classifier-free guidance (CFG). As a result, MDD offers a more reliable and lightweight solution to accelerate sampling. Experiments show that MDD outperforms existing acceleration methods, delivering promising speedups (e.g., up to 2.95x on Wan2.1) while preserving high visual fidelity and content richness.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.17695v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.17695v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.17695v1 全文整理；本地 PDF 共 17 页，SHA-256 2e68b45bd2d71b5bea4547916690d6dbc8717cb59630856e4cac22aae7dc84f8，并视觉核验第 1、9、10、17 页。",
+    "ideaZh": "观察 small model 更可靠地预测 output magnitude、cache 更可靠地提供 direction，因而以累计 directional error 自适应切换 large/small model，并复用 CFG magnitude。 作者报告 Wan2.1 上最高 2.95× acceleration，同时 LPIPS 0.178、PSNR 22.72、SSIM 0.748；EasyAnimateV5.1 也获得 1.90×，总体优于 TeaCache、SRDiffusion 等。 证据边界：需要额外 lightweight model，阈值与 schedule 依 model 调整；视觉质量仍主要依赖 VBench/PSNR 类指标和单 A100 latency。",
+    "methodFlow": [
+      "输入与任务：Magnitude-Direction Decoupling for Fast Video Generation with Flow Matching Models",
+      "核心表示与机制：观察 small model 更可靠地预测 output magnitude、cache 更可靠地提供 direction，因而以累计 directional error 自适应切换 large/small model，并复用 CFG magnitude。",
+      "实验协议：Wan2.1 14B/1.3B 与 EasyAnimateV5.1 12B/7B，在 A100 上评估 latency、VBench、LPIPS/PSNR/SSIM。",
+      "输出与判断：作者报告 Wan2.1 上最高 2.95× acceleration，同时 LPIPS 0.178、PSNR 22.72、SSIM 0.748；EasyAnimateV5.1 也获得 1.90×，总体优于 TeaCache、SRDiffusion 等。"
+    ],
+    "whyRelevantZh": "直接关联 video-generation：观察 small model 更可靠地预测 output magnitude、cache 更可靠地提供 direction，因而以累计 directional error 自适应切换 large/small model，并复用 CFG magnitude。",
+    "evidenceZh": "观察 small model 更可靠地预测 output magnitude、cache 更可靠地提供 direction，因而以累计 directional error 自适应切换 large/small model，并复用 CFG magnitude。（Method/approach and rendered method page, p. 9）；作者报告 Wan2.1 上最高 2.95× acceleration，同时 LPIPS 0.178、PSNR 22.72、SSIM 0.748；EasyAnimateV5.1 也获得 1.90×，总体优于 TeaCache、SRDiffusion 等。（Main results or exact-version comparison, p. 10）",
+    "caveatZh": "需要额外 lightweight model，阈值与 schedule 依 model 调整；视觉质量仍主要依赖 VBench/PSNR 类指标和单 A100 latency。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "问题与方法：观察 small model 更可靠地预测 output magnitude、cache 更可靠地提供 direction，因而以累计 directional error 自适应切换 large/small model，并复用 CFG magnitude。 全文结果：作者报告 Wan2.1 上最高 2.95× acceleration，同时 LPIPS 0.178、PSNR 22.72、SSIM 0.748；EasyAnimateV5.1 也获得 1.90×，总体优于 TeaCache、SRDiffusion 等。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "新意是把 diffusion velocity 的 magnitude/direction 可预测性分开建模，使 cache 与 lightweight approximation 各自承担更适合的部分。 方法流程依次为：输入与任务：Magnitude-Direction Decoupling for Fast Video Generation with Flow Matching Models → 核心表示与机制：观察 small model 更可靠地预测 output magnitude、cache 更可靠地提供 direction，因而以累计 directional error 自适应切换 large/small model，并复用 CFG magnitude。 → 实验协议：Wan2.1 14B/1.3B 与 EasyAnimateV5.1 12B/7B，在 A100 上评估 latency、VBench、LPIPS/PSNR/SSIM。 → 输出与判断：作者报告 Wan2.1 上最高 2.95× acceleration，同时 LPIPS 0.178、PSNR 22.72、SSIM 0.748；EasyAnimateV5.1 也获得 1.90×，总体优于 TeaCache、SRDiffusion 等。。",
+    "experimentsZh": "Wan2.1 14B/1.3B 与 EasyAnimateV5.1 12B/7B，在 A100 上评估 latency、VBench、LPIPS/PSNR/SSIM。 作者报告：作者报告 Wan2.1 上最高 2.95× acceleration，同时 LPIPS 0.178、PSNR 22.72、SSIM 0.748；EasyAnimateV5.1 也获得 1.90×，总体优于 TeaCache、SRDiffusion 等。（Main results, p. 10） Baseline coverage：覆盖 cache-based 与 large-small collaborative acceleration baselines。 Ablation：threshold、CFG reuse、model pairing 和各组件消融支持 speed–quality 归因。",
+    "insightZh": "新意是把 diffusion velocity 的 magnitude/direction 可预测性分开建模，使 cache 与 lightweight approximation 各自承担更适合的部分。 方法、结果与限制均已在 exact-version 全文及渲染页中核证，符合 video-generation 的 attention policy，建议速读并进入本期 digest。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

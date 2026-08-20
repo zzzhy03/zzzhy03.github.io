@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2608.17973",
+  "slug": "linca-accelerating-diffusion-models-via-learnable-decomposed-feature-caching",
+  "title": "LinCa: Accelerating Diffusion Models via Learnable Decomposed Feature Caching",
+  "authors": [
+    "Jinshan Liu",
+    "Haoran Qin",
+    "Xiaobing Tu",
+    "Jiacheng Liu",
+    "Jiahui Hu",
+    "Zhengan Yan",
+    "Yukun Xie",
+    "Kerui Shen",
+    "Jinkui Ren",
+    "Yuqi Lin",
+    "Xiantao Zhang",
+    "Linfeng Zhang"
+  ],
+  "publishedAt": "2026-08-18",
+  "updatedAt": "2026-08-18",
+  "collectedAt": "2026-08-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.17973"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "image-generation",
+    "LinCa",
+    "Accelerating",
+    "Diffusion",
+    "Models",
+    "Learnable",
+    "Decomposed"
+  ],
+  "abstract": "Diffusion models have achieved remarkable success in image and video generation, yet the high computational cost of iterative sampling remains a critical bottleneck for practical deployment. Feature caching has emerged as a promising acceleration paradigm by reusing or predicting intermediate features across timesteps. However, existing training-free methods apply uniform prediction strategies that cannot adapt to the heterogeneous feature dynamics, causing significant quality degradation under high acceleration ratios. We propose LinCa, a feature caching framework based on learnable invertible networks. LinCa decomposes cached features into sub-components with distinct continuity properties via a lightweight invertible network and applies differentiated prediction orders matched to each component. The strict invertibility guarantees lossless reconstruction back to the original feature space, forming a unified Decompose-Predict-Reconstruct pipeline. By training separate predictors for different models and timestep segments, LinCa adapts to heterogeneous feature dynamics. Experiments on FLUX, Qwen-Image, and HunyuanVideo demonstrate that LinCa, with less than 0.2% additional parameters, significantly outperforms existing methods and maintains near-lossless quality at 5-7x speedup. Code: https://github.com/QHR69/LinCa",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.17973v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.17973v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/QHR69/LinCa"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.17973v1 全文整理；本地 PDF 共 28 页，SHA-256 f4e4272e8a232839c506da4f4094a5d24c92d82d581d8ae885d424596d54733e，并视觉核验第 1、8、16、27 页。",
+    "ideaZh": "轻量 invertible network 将 cached features 分解为连续性不同的 sub-components，为不同 component、model 与 timestep segment 学习不同阶预测，再无损重构原 feature space。 作者报告不足 0.2% 额外参数，在 FLUX.1-dev、Qwen-Image、HunyuanVideo 与 image editing 上取得约 5–7× 加速并保持接近原模型质量；Qwen-Image 7.14× setting 的 ImageReward 为 1.05。 证据边界：每个模型和 timestep segment 需要独立训练 predictor，端到端收益依赖 GPU、batch 和 baseline implementation；极少步 distilled model 的冗余更小。",
+    "methodFlow": [
+      "输入与任务：LinCa: Accelerating Diffusion Models via Learnable Decomposed Feature Caching",
+      "核心表示与机制：轻量 invertible network 将 cached features 分解为连续性不同的 sub-components，为不同 component、model 与 timestep segment 学习不同阶预测，再无损重构原 feature space。",
+      "实验协议：跨 image/video/editing backbones，在 A100/H100 上用 ImageReward、CLIP、PSNR/SSIM/LPIPS 与 VBench 评估。",
+      "输出与判断：作者报告不足 0.2% 额外参数，在 FLUX.1-dev、Qwen-Image、HunyuanVideo 与 image editing 上取得约 5–7× 加速并保持接近原模型质量；Qwen-Image 7.14× setting 的 ImageReward 为 1.05。"
+    ],
+    "whyRelevantZh": "直接关联 video-generation：轻量 invertible network 将 cached features 分解为连续性不同的 sub-components，为不同 component、model 与 timestep segment 学习不同阶预测，再无损重构原 feature space。",
+    "evidenceZh": "轻量 invertible network 将 cached features 分解为连续性不同的 sub-components，为不同 component、model 与 timestep segment 学习不同阶预测，再无损重构原 feature space。（Method/approach and rendered method page, p. 8）；作者报告不足 0.2% 额外参数，在 FLUX.1-dev、Qwen-Image、HunyuanVideo 与 image editing 上取得约 5–7× 加速并保持接近原模型质量；Qwen-Image 7.14× setting 的 ImageReward 为 1.05。（Main results or exact-version comparison, p. 16）",
+    "caveatZh": "每个模型和 timestep segment 需要独立训练 predictor，端到端收益依赖 GPU、batch 和 baseline implementation；极少步 distilled model 的冗余更小。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "问题与方法：轻量 invertible network 将 cached features 分解为连续性不同的 sub-components，为不同 component、model 与 timestep segment 学习不同阶预测，再无损重构原 feature space。 全文结果：作者报告不足 0.2% 额外参数，在 FLUX.1-dev、Qwen-Image、HunyuanVideo 与 image editing 上取得约 5–7× 加速并保持接近原模型质量；Qwen-Image 7.14× setting 的 ImageReward 为 1.05。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "相较统一缓存 extrapolation，LinCa 显式学习 feature dynamics 的可逆分解，把 heterogeneous continuity 变成可训练的 speed–quality control。 方法流程依次为：输入与任务：LinCa: Accelerating Diffusion Models via Learnable Decomposed Feature Caching → 核心表示与机制：轻量 invertible network 将 cached features 分解为连续性不同的 sub-components，为不同 component、model 与 timestep segment 学习不同阶预测，再无损重构原 feature space。 → 实验协议：跨 image/video/editing backbones，在 A100/H100 上用 ImageReward、CLIP、PSNR/SSIM/LPIPS 与 VBench 评估。 → 输出与判断：作者报告不足 0.2% 额外参数，在 FLUX.1-dev、Qwen-Image、HunyuanVideo 与 image editing 上取得约 5–7× 加速并保持接近原模型质量；Qwen-Image 7.14× setting 的 ImageReward 为 1.05。。",
+    "experimentsZh": "跨 image/video/editing backbones，在 A100/H100 上用 ImageReward、CLIP、PSNR/SSIM/LPIPS 与 VBench 评估。 作者报告：作者报告不足 0.2% 额外参数，在 FLUX.1-dev、Qwen-Image、HunyuanVideo 与 image editing 上取得约 5–7× 加速并保持接近原模型质量；Qwen-Image 7.14× setting 的 ImageReward 为 1.05。（Main results, p. 16） Baseline coverage：与 TaylorSeer、FoCa、TeaCache、SRDiffusion、training-based methods 和 distilled models 比较。 Ablation：prediction order、component count、segmenting 与 distilled compatibility 的结果支持设计，但模型专用训练仍是主要成本。",
+    "insightZh": "相较统一缓存 extrapolation，LinCa 显式学习 feature dynamics 的可逆分解，把 heterogeneous continuity 变成可训练的 speed–quality control。 方法、结果与限制均已在 exact-version 全文及渲染页中核证，符合 video-generation 的 attention policy，建议精读并进入本期 digest。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
