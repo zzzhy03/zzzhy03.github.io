@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.20256",
+  "slug": "learning-when-to-think-adaptive-reasoning-for-test-time-compute-allocation",
+  "title": "Learning When to Think: Adaptive Reasoning for Test-Time Compute Allocation",
+  "authors": [
+    "Gijs Kassenaar",
+    "Zhao Yang",
+    "Vincent François-Lavet"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.20256"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "llm",
+    "Learning",
+    "When",
+    "Think",
+    "Adaptive",
+    "Reasoning",
+    "for",
+    "Test",
+    "Time",
+    "Compute"
+  ],
+  "abstract": "Reasoning language models trained with reinforcement learning typically operate under a fixed token budget rather than an explicitly adaptive one, which can lead to over-computation on easy problems and insufficient computation on difficult ones. We study whether a model can learn to allocate its own reasoning effort by choosing, as the first token of its response, one of three modes: \\textsc{NoThink} (answer as quickly as possible), \\textsc{Short} (brief reasoning), or \\textsc{Long} (extended reasoning). The choice is learned inside Group Relative Policy Optimization (GRPO) with no separate router, through a shaped reward that makes each mode worthwhile at a different response length, together with hard per-mode token caps that keep the modes distinct. On a 1.5B distilled model trained on MATH, the three modes emerge without collapsing to a single choice, and the brief modes end up more accurate than \\textsc{Long}, which shows that the router sorts problems by difficulty rather than at random. Averaged over three seeds, the resulting policy stays close to the base model's accuracy on the held-out MATH500 ($0.782$ vs.\\ $0.796$) while cutting the mean response length from $4{,}796$ to $2{,}811$ tokens (a $41\\%$ reduction). Interestingly, it also transfers to other benchmarks without retraining, with the largest savings where problems are easier, with for instance 76\\% token reduction on GSM8K and at higher accuracy than the baselines at similar response length. In short, we build a reasoning model that adaptively chooses how much to reason for each problem.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.20256v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.20256v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.20256v1 全文整理；本地 PDF 共 13 页，SHA-256 290a68de256a55188c534b896cf2ae1cc6963c88b3510ce8d92cb8aec7cffb1e，并视觉核验第 1、3、7、12 页。",
+    "ideaZh": "模型把NoThink/Short/Long作为response首token，直接在GRPO中用per-mode hard caps、length-shaped reward和balance penalty自路由；作者报告MATH500 accuracy 0.782 vs base 0.796，mean tokens 4,796→2,811，GSM8K减少76%。",
+    "methodFlow": [
+      "在prompt中声明三种reasoning modes",
+      "policy首token选择NoThink/Short/Long",
+      "每mode使用独立hard token cap与reward shape",
+      "mean-centered GRPO避免normalization amplification",
+      "balance penalty维持mode diversity并端到端更新"
+    ],
+    "whyRelevantZh": "test-time compute allocation会广泛影响LLM/VLM reasoning成本，且方法无需额外router，达到深读门槛。",
+    "evidenceZh": "三模式由同一policy首token自选择，hard caps与modified GRPO共同稳定自路由。（Figure 1 and Method, p. 3）；作者报告MATH500 mean tokens从4,796降到2,811（41%），accuracy 0.796→0.782；GSM8K token reduction为76%。（Figures 6-7 and Tables 5-6, pp. 7,12）；只在1.5B math model和三seeds验证，mode caps需匹配task length，accuracy略降且brief-mode validation可能偏乐观。（Discussion, Limitations and Future Work, p. 12）",
+    "caveatZh": "作者明确指出数学单域、1.5B规模、task-specific caps和未测code/agentic/tool use。；只在1.5B math model和三seeds验证，mode caps需匹配task length，accuracy略降且brief-mode validation可能偏乐观。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文不训练独立router，让policy自己选择reasoning mode。作者识别GRPO group normalization会放大length discount，改用mean-centered advantage并加入mode-specific caps与reward shape，防止mode collapse。1.5B distilled model、三seeds、MATH训练及GSM8K/AIME transfer显示token savings；但accuracy略降、mode caps手工task-specific，且只覆盖数学。",
+    "methodZh": "将compute allocation内化为policy action并与answer一起RL，而不是额外difficulty router或两模型ensemble；同时指出并修复length reward与GRPO normalization冲突。 方法流程：在prompt中声明三种reasoning modes → policy首token选择NoThink/Short/Long → 每mode使用独立hard token cap与reward shape → mean-centered GRPO避免normalization amplification → balance penalty维持mode diversity并端到端更新。",
+    "experimentsZh": "1.5B distilled model在MATH上GRPO，三seeds；MATH500 in-domain，GSM8K与AIME OOD；fixed-mode/frontier和training dynamics。 作者报告：作者报告MATH500 mean tokens从4,796降到2,811（41%），accuracy 0.796→0.782；GSM8K token reduction为76%。（Figures 6-7 and Tables 5-6, pp. 7,12） Baseline coverage：base、NoThink-only、Short-only、Long-only与prior adaptive reasoning ideas；缺更大模型、code/agent/tool tasks和latency hardware测量。 Ablation：two-mode collapse、reward gamma、caps、warmup、mode share/entropy与fixed-mode Pareto frontier。",
+    "insightZh": "将compute allocation内化为policy action并与answer一起RL，而不是额外difficulty router或两模型ensemble；同时指出并修复length reward与GRPO normalization冲突。 机制、failure analysis、三seed与OOD savings清晰；虽规模有限，仍是潜在训练/推理范式推进。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

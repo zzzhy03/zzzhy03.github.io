@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.10519",
+  "slug": "sparstar-sparse-attention-for-spacetime-autoregressive-video-synthesis",
+  "title": "SparSTAR: Sparse Attention for SpaceTime AutoRegressive Video Synthesis",
+  "authors": [
+    "Jongbeom Lee",
+    "Hyunwoo Yu",
+    "Jincheol Yang",
+    "Jaemin Choi",
+    "Suk-Ju Kang"
+  ],
+  "publishedAt": "2026-08-11",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.10519"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "SparSTAR",
+    "Sparse",
+    "Attention",
+    "for",
+    "SpaceTime",
+    "AutoRegressive",
+    "Video",
+    "Synthesis"
+  ],
+  "abstract": "InfinityStar extends visual autoregressive generation to video through a sequence of image and clip pyramids. Its changing scale and cross-clip context, however, leave late-scale attention costly and make sparse patterns reused from diffusion or image VAR models unreliable. We introduce SparSTAR, a training-free block-sparse attention method tailored to this setting. At each expensive scale and attention head, SparSTAR scores contiguous key blocks from the current query and key activations, retains required conditioning context, and executes the selected blocks through a forward-only sparse path. We analyze cross-scale consistency within a clip, pattern persistence across clip boundaries, and quality degradation as reuse spans increasingly distant scales. Across these analyses, important key blocks shift, showing that recomputing block selection at each target scale is more reliable than reusing a transferred mask. On 720p text-to-video and image-to-video generation, SparSTAR preserves every token and refinement scale while providing about a 1.6x end-to-end speedup and maintaining VBench and paired-output reconstruction fidelity close to dense InfinityStar.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10519v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.10519v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.10519v2 全文整理；本地 PDF 共 22 页，SHA-256 3db83a391e7f5c9dd1e53cca63030098fcef0fdef513038d1713c1e71e35dca7，并视觉核验第 1、4、6、7 页。",
+    "ideaZh": "SparSTAR 对 InfinityStar 的每个昂贵 scale/head 重新按当前 QK activation 选择 contiguous key blocks，保留 conditioning context，再走 forward-only FlexAttention；作者报告 720p T2V/I2V 端到端 1.60×/1.62×，VBench 接近 dense。",
+    "methodFlow": [
+      "按 clip/scale/head 划分 query-key blocks",
+      "从当前 QK activation 计算 aggregated block scores",
+      "强制保留 text 与 reference conditioning context",
+      "选择 blocks 并用 forward-only FlexAttention 执行",
+      "每个昂贵 target scale 重新校准 sparse mask"
+    ],
+    "whyRelevantZh": "直接关联 Video Generation 的高分辨率推理效率，并保留完整 token/refinement trajectory，适合跟踪但不是范式级模型。",
+    "evidenceZh": "SparSTAR 在每个 sparsified scale 重算 block selection，避免复用跨 scale/clip 已失效的 mask。（Figure 1 and Method, pp. 1-4）；作者报告 720p 5-second T2V/I2V 的端到端 speedup 为 1.60×/1.62×，VBench 为 83.83/80.96，接近 dense 83.79/81.04。（Tables 1-3, pp. 6-7）；所有主实验依赖 InfinityStar、H100 NVL 与固定 block size；论文也承认需测试更长 multi-clip、更多 backbone 和 density schedules。（Conclusion, p. 7）",
+    "caveatZh": "作者明确把 longer multi-clip generation、broader model families、block-size/density sensitivity 留作未来工作。；所有主实验依赖 InfinityStar、H100 NVL 与固定 block size；论文也承认需测试更长 multi-clip、更多 backbone 和 density schedules。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文先实证 cross-scale 与 cross-clip attention mask 不稳定，反对从 image VAR 或前一 scale 直接复用稀疏模式。方法在每个 target scale 重算 aggregated QK block scores，保持 token/refinement schedule 不变。matched seeds 的 dense reconstruction、VBench、PSNR/SSIM/LPIPS、长视频与密度 schedule ablations 支持加速，但限 InfinityStar 和两张 H100。",
+    "methodZh": "重点不是一般 sparse attention，而是证明 video autoregressive pyramid 的重要 blocks 随 scale/clip 漂移，并据此采用 per-scale dynamic selection。 方法流程：按 clip/scale/head 划分 query-key blocks → 从当前 QK activation 计算 aggregated block scores → 强制保留 text 与 reference conditioning context → 选择 blocks 并用 forward-only FlexAttention 执行 → 每个昂贵 target scale 重新校准 sparse mask。",
+    "experimentsZh": "720p 5s T2V/I2V 与 480p 10s；matched prompts/seeds，完整 VBench、reconstruction metrics、latency、mask mass 与 density schedules；两张 H100 NVL。 作者报告：作者报告 720p 5-second T2V/I2V 的端到端 speedup 为 1.60×/1.62×，VBench 为 83.83/80.96，接近 dense 83.79/81.04。（Tables 1-3, pp. 6-7） Baseline coverage：与 dense InfinityStar、SparseVAR、FastVAR、ToMe、FastSTAR 比较；部分 accelerated baseline 数字来自公开实现而非同硬件复现。 Ablation：分析 reference-context budget、跨 clip mask reuse、recalibration frequency、block size、density schedule 和与 guidance/scale skip 组合。",
+    "insightZh": "重点不是一般 sparse attention，而是证明 video autoregressive pyramid 的重要 blocks 随 scale/clip 漂移，并据此采用 per-scale dynamic selection。 证据严谨且加速可用，但 scope 局限单 backbone/硬件且代码未发布，定为 accept-skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

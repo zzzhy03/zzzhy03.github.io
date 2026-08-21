@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.19598",
+  "slug": "pea-dpo-perception-enhanced-alignment-direct-preference-optimization-for-mllms-alignment",
+  "title": "PEA-DPO: Perception-Enhanced Alignment Direct Preference Optimization for MLLMs Alignment",
+  "authors": [
+    "Jiawei Feng",
+    "Jiancan Wu",
+    "Xingyu Zhu",
+    "Junkang Wu",
+    "Xiang Wang",
+    "Xiangnan He"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19598"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV",
+    "cs.MM"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "PEA",
+    "DPO",
+    "Perception",
+    "Enhanced",
+    "Alignment",
+    "Direct",
+    "Preference",
+    "Optimization",
+    "for"
+  ],
+  "abstract": "Direct Preference Optimization (DPO) has emerged as an effective approach for aligning large language models (LLMs) with human preferences. However, its adaptation to multimodal settings remains unexplored. Through representational analysis, we identify a key limitation in multimodal preference optimization, which we term visual insensitivity: models often fail to distinguish between images and those with critical visual context removed. Our theoretical analysis further uncovers two manifestations of this problem, namely Across-Image Insensitivity and Within-Image Insensitivity. To address these challenges, we propose Perception-Enhanced Alignment DPO (PEA-DPO), a framework for multimodal LLMs alignment, which explicitly leverages visual preference signals to overcome visual insensitivity. We further provide a theoretical analysis demonstrating that PEA-DPO provably mitigates both failure modes. Empirical results demonstrate that PEA-DPO enhances sensitivity to visual context while preserving the language modeling capacity of the base model. Evaluations across three hallucination benchmarks using MLLMs of varying scales show that PEA-DPO effectively mitigates visual insensitivity, achieves stronger multimodal alignment, and substantially reduces hallucinations.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19598v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19598v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19598v1 全文整理；本地 PDF 共 10 页，SHA-256 630671367ec73ce95627b5310ef6c8c9f9a0840dc4bfed4d43f5e8ec0fcb18ad，并视觉核验第 1、4、6、8 页。",
+    "ideaZh": "PEA-DPO 把 multimodal DPO 的 visual insensitivity拆成 across-image与within-image margins，自动遮掉关键视觉区域构造 rejected images，并联合 response/image preference；作者报告7B MMHal hallucination rate下降33%，Object HalBench response/object rates下降92%/87%。",
+    "methodFlow": [
+      "从原始multimodal preference pairs出发",
+      "随机mask图像并用CLIP选择关键语义缺失版本",
+      "构造response与image两类preference margins",
+      "mRPO优化回答质量，mVPO增强visual sensitivity",
+      "联合DPO训练并评估hallucination/general ability"
+    ],
+    "whyRelevantZh": "直接推进MLLM alignment与visual grounding，方法也可迁移到视觉设计agent的render-aware preference training。",
+    "evidenceZh": "PEA-DPO通过context-reduced images构造视觉偏好，并联合response/image objectives强化视觉证据敏感性。（Figure 3 and Sec. 4, p. 4）；作者报告7B模型MMHal hallucination rate相对base下降33%，Object HalBench response/object hallucination rates下降92%/87%。（Table 1, p. 6）；生成与评估masked preference data增加计算，coverage略降；实验只到LLaVA-1.5 13B且未覆盖最新MLLM。（Limitation and Conclusion, p. 8）",
+    "caveatZh": "作者明确列出data construction成本、未测最新MLLM、coverage下降与保守回答倾向。；生成与评估masked preference data增加计算，coverage略降；实验只到LLaVA-1.5 13B且未覆盖最新MLLM。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文先比较 original与context-reduced image的representation和preference margin，发现普通DPO可能忽略视觉差异；再用CLIP-guided perturbation选最破坏关键语义的masked image，构建perception-enhanced pairs，并用mRPO+mVPO joint objective拉大视觉margin。LLaVA 7B/13B、三个hallucination benchmarks、theory与data-scale ablations支持结论，但mask generation有额外成本、覆盖率略降且未测最新MLLM。",
+    "methodZh": "把image本身纳入preference pair并对两种visual-insensitivity给出margin-based理论，而非只在文本回答之间做DPO。 方法流程：从原始multimodal preference pairs出发 → 随机mask图像并用CLIP选择关键语义缺失版本 → 构造response与image两类preference margins → mRPO优化回答质量，mVPO增强visual sensitivity → 联合DPO训练并评估hallucination/general ability。",
+    "experimentsZh": "LLaVA-1.5-7B/13B，MMHalBench、Object HalBench、AMBER，以及MMStar/AI2D/LLaVA-Bench/MMMU general capability。 作者报告：作者报告7B模型MMHal hallucination rate相对base下降33%，Object HalBench response/object hallucination rates下降92%/87%。（Table 1, p. 6） Baseline coverage：与DPO、HACL、OPERA、VCD、EOS、POVID、HALVA、RLAIF-V、OPA-DPO、DAMA等比较；不同public checkpoints/data不完全统一。 Ablation：mRPO/mVPO、mask/data scale、hallucination vs recall与general capability；mask strategy跨域敏感性仍有限。",
+    "insightZh": "把image本身纳入preference pair并对两种visual-insensitivity给出margin-based理论，而非只在文本回答之间做DPO。 问题定义、理论、多个hallucination指标和能力保持证据完整，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

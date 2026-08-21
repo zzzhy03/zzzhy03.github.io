@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2607.22830",
+  "slug": "id-v2v-identity-preserving-video-restylization",
+  "title": "ID-V2V: Identity-Preserving Video Restylization",
+  "authors": [
+    "Yuancheng Xu",
+    "Mingming He",
+    "Pablo Salamanca",
+    "Li Ma",
+    "Yash Kant",
+    "Emmett Steven",
+    "Paul Debevec",
+    "Ning Yu"
+  ],
+  "publishedAt": "2026-07-24",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2607.22830"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "V2V",
+    "Identity",
+    "Preserving",
+    "Video",
+    "Restylization"
+  ],
+  "abstract": "In visual storytelling, human performances are central to creative intent and narrative meaning. However, preserving human identity and performance while enabling flexible visual edits remains challenging for generative video models. We formalize this challenge as identity-preserving video restylization, which propagates scene, lighting, and style changes specified by an edited keyframe across a source video, while preserving facial likeness and performance, including expressions, eye gaze, and lip synchronization. A key obstacle is the absence of paired training data, as identity-preserving restylized video pairs are rare in real-world settings. To address this, we propose a decoupling of source-grounded identity preservation and edit-driven video synthesis. Our key insight is that facial appearance and expression should remain invariant, with illumination being the primary permissible variation. We therefore cast identity preservation as a video relighting problem, while modeling visual edit propagation as controlled video synthesis guided by the edited keyframe. Building on this formulation, we introduce ID-V2V, a video-to-video generative framework integrating complementary control signals: relit facial regions and facial normal maps tightly constrain facial likeness and performance, while edited keyframes and depth sequences enable flexible and temporally coherent generation. This design enables constructing training pairs from a single video, eliminating the need for scarce paired data. Extensive experiments demonstrate that ID-V2V significantly outperforms existing methods in preserving facial likeness and fine-grained facial performance, supports both single- and multi-subject scenarios, and delivers high visual quality, highlighting its potential as a human-centric tool for real-world content production. The code is available at: https://github.com/Eyeline-Labs/ID-V2V.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.22830v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.22830v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Eyeline-Labs/ID-V2V"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.22830v2 全文整理；本地 PDF 共 13 页，SHA-256 a635b04e5dd8f2ddfc2a5e113b1d324ce87a93685cb881a96d01843154803ee3，并视觉核验第 1、5、7、8 页。",
+    "ideaZh": "ID-V2V 把 identity preservation 拆成可控 relighting：训练时用 relit face regions 与 normals 约束脸部，推理时以原视频 face pixels、normals、edited keyframe 与 depth 驱动 restylization；作者 user study 在双人场景给出 facial likeness 85.62%、overall quality 81.05% 偏好。",
+    "methodFlow": [
+      "从单视频构造 source/relit training pairs",
+      "提取 face regions、surface normals 与 depth",
+      "edited first frame 定义目标场景/风格",
+      "多 control branches 条件化 video DiT",
+      "生成保身份、表情和时序的 restylized video"
+    ],
+    "whyRelevantZh": "直接推进 video editing 的 identity/performance preservation，对真实 visual creation workflow 和多人内容制作有明确价值。",
+    "evidenceZh": "ID-V2V 以 relit face、face normals、edited keyframe 与 depth 作为互补 controls 注入 video DiT。（Fig. 3 and Sec. 3.3, p. 5）；作者报告双人 user study 中 ID-V2V 获得 85.62% facial-likeness、86.09% performance-preservation 与 81.05% video-quality 偏好。（Table 1, p. 7）；强/不规则 source lighting 会残留在生成视频，depth conditioning 也会限制大幅 layout 改动；训练和评估仍偏人像。（Conclusion and Limitations, p. 8）",
+    "caveatZh": "作者明确指出 depth guide 会和 edited keyframe 的大 layout change 冲突，且不规则 lighting 会引发 color cast 与 temporal inconsistency。；强/不规则 source lighting 会残留在生成视频，depth conditioning 也会限制大幅 layout 改动；训练和评估仍偏人像。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文从 source video 和 edited first frame 出发，保持表情、gaze、lip sync 和 inter-person interaction，同时传播场景/风格编辑。通过单视频构造 relighting-based training pairs，使用 multi-ControlNet 风格的视频 DiT 融合 face/depth/keyframe controls。160 条 single/two-subject evaluation、user study、facial metrics 和 failure cases支持结果。",
+    "methodZh": "将 identity invariance 具体化为 illumination-only variation，使无需真实 paired restylization data 也能构造训练监督；face pixels 与 normals 分别约束 appearance 与 geometry。 方法流程：从单视频构造 source/relit training pairs → 提取 face regions、surface normals 与 depth → edited first frame 定义目标场景/风格 → 多 control branches 条件化 video DiT → 生成保身份、表情和时序的 restylized video。",
+    "experimentsZh": "40k human-centric training videos；测试 100 single-subject 和 60 two-subject videos，并用 face metrics、CLIP、VBench、26 人 user study 与 ablations 评估。 作者报告：作者报告双人 user study 中 ID-V2V 获得 85.62% facial-likeness、86.09% performance-preservation 与 81.05% video-quality 偏好。（Table 1, p. 7） Baseline coverage：与 AnimateAnyone、FantasyPortrait、VACE、WanAnimate、StayDancer 比较；未覆盖长镜头、多拥挤人物或强遮挡 production shots。 Ablation：去除 face normals 或 face video 会降低对应 facial metrics；failure analysis 检查 irregular lighting，多人场景主要定性。",
+    "insightZh": "将 identity invariance 具体化为 illumination-only variation，使无需真实 paired restylization data 也能构造训练监督；face pixels 与 normals 分别约束 appearance 与 geometry。 问题定义、paired-data construction、控制信号、双人评估、局限和公开代码证据完整，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

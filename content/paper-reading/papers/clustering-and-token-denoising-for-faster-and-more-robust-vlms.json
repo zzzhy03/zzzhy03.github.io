@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.19285",
+  "slug": "clustering-and-token-denoising-for-faster-and-more-robust-vlms",
+  "title": "Clustering and Token Denoising for Faster and More Robust VLMs",
+  "authors": [
+    "Baptiste Rossigneux",
+    "Inna Kucher",
+    "Vincent Lorrain",
+    "Emmanuel Casseau"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19285"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Clustering",
+    "and",
+    "Token",
+    "Denoising",
+    "for",
+    "Faster",
+    "More",
+    "Robust",
+    "VLMs"
+  ],
+  "abstract": "Recent Visual-Language Models (VLMs) have enhanced the capabilities of pre-trained LLMs by adding vision tokens alongside text, with approaches like LLaVA showing impressive results. However, the computational burden of processing up to 576 or 729 visual tokens makes edge deployment challenging. While various token pruning techniques require retraining, some are training-free and thus can easily adapt to architecture changes. We introduce ClustRS, a two-part, training-free algorithm for robust token pruning. Its first component is an attention-weighted, clustering algorithm that selects representative tokens from each semantic cluster. The second component, Residual Shrinkage, is a one-pass denoising step on the selected tokens. These training-free lightweight steps make LLaVA ready for real-world data, improving robustness to a wide range of image-noise types and intensities. Experimental results on the ScienceQA-IMG and MM-VET benchmarks show our method outperforms attention- and diversity-based methods by up to 20\\% under extreme noise and token conditions (reducing tokens by 97\\%, down to 16 tokens) on LLaVA 1.5 7b and achieves exceptional results on LLaVA-OneVision, where we match baseline performance with fewer than one-third of their tokens under mild noise conditions. Our study demonstrates a simple yet powerful alternative to both score-only and diversity-only pruning rules, paving the way for compute-efficient and noise-resilient VLM deployment.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19285v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19285v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19285v1 全文整理；本地 PDF 共 31 页，SHA-256 11d973d6052df0ad995f8474ef79cb7e96d4862d5c615790f2dd934fcdf4a0de，并视觉核验第 1、7、17、22 页。",
+    "ideaZh": "ClustRS 先在 projector 后用 attention-weighted Huber k-means 选每个 semantic cluster 的代表 token，再用 residual shrinkage 按 cluster statistics 去噪；作者在 LLaVA-1.5-7B 上最多压到 16 tokens，并在强噪声 MM-VET 上通常优于 training-free pruning baselines。",
+    "methodFlow": [
+      "从 vision encoder/projector 得到 visual tokens 与 attention scores",
+      "attention-weighted Huber k-means 形成 semantic clusters",
+      "每个 cluster 保留一个代表 token",
+      "Residual Shrinkage 按 cluster residual 去噪",
+      "将压缩 token sequence 送入 frozen LLM"
+    ],
+    "whyRelevantZh": "VLM token efficiency 与 robustness 是通用接口问题，对边缘部署和长视觉上下文有价值，但属于实用小步推进。",
+    "evidenceZh": "ClustRS 用 C+H clustering 选代表 tokens，再用 RRS 对保留 tokens 做 cluster-aware denoising。（Figure 2 and Sec. 4, p. 7）；作者报告在 LLaVA-1.5-7B、16-token budget 与 Gaussian σ=0.1 时 MM-VET 为 0.270，高于 FasterVLM 0.218、DivPrune 0.211、VisionZip 0.210。（Tables 2-3, p. 17）；feature-space clustering可能合并空间上不同但语义相似的 tokens，损害 fine-grained localization 与 spatial relation reasoning。（Conclusion, p. 22）",
+    "caveatZh": "作者承认 feature-space clustering 会丢弃空间 distinct 但语义相似的 tokens，可能伤害定位和关系推理。；feature-space clustering可能合并空间上不同但语义相似的 tokens，损害 fine-grained localization 与 spatial relation reasoning。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文把 visual token pruning 的效率与 robustness 联合处理：C+H 保留多样且 salient 的 cluster representatives，RRS 根据 cluster residual 做一次去噪。ScienceQA-IMG、MM-VET 多种 Gaussian/salt-pepper/brightness/contrast/cutout 与 LLaVA-OneVision transfer 显示收益。方法轻量、无需训练，但 clean performance 并非所有预算都最佳，fine-grained localization 可能因 cluster 合并受损。",
+    "methodZh": "相比 score-only 或 diversity-only pruning，方法把 attention saliency、semantic coverage 与 denoising 分成两个可解释的 training-free stages。 方法流程：从 vision encoder/projector 得到 visual tokens 与 attention scores → attention-weighted Huber k-means 形成 semantic clusters → 每个 cluster 保留一个代表 token → Residual Shrinkage 按 cluster residual 去噪 → 将压缩 token sequence 送入 frozen LLM。",
+    "experimentsZh": "LLaVA-1.5-7B 与 LLaVA-OneVision；ScienceQA-IMG/MM-VET；token budgets 16/50/144；多种 noise/brightness/contrast/cutout，比较 clean 与 corrupted performance。 作者报告：作者报告在 LLaVA-1.5-7B、16-token budget 与 Gaussian σ=0.1 时 MM-VET 为 0.270，高于 FasterVLM 0.218、DivPrune 0.211、VisionZip 0.210。（Tables 2-3, p. 17） Baseline coverage：与 FasterVLM、DivPrune、VisionZip 等 training-free methods 比较；缺少端到端 latency、memory、更多 VLM family 和真实传感器噪声。 Ablation：分别检查 clustering、residual shrinkage、token budget、noise type/intensity 与 CLIP/SigLIP adaptation；空间任务专项消融不足。",
+    "insightZh": "相比 score-only 或 diversity-only pruning，方法把 attention saliency、semantic coverage 与 denoising 分成两个可解释的 training-free stages。 跨噪声和 backbone evidence 清晰，限制也明确；因无代码和空间能力风险，定为 skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

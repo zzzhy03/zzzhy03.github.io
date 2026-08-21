@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2608.20237",
+  "slug": "rule-compliant-visual-spatial-planning-for-multimodal-large-language-models",
+  "title": "Rule-Compliant Visual Spatial Planning for Multimodal Large Language Models",
+  "authors": [
+    "Yu Chen",
+    "Ting Lei",
+    "Yaoyi Li",
+    "Jia Cai",
+    "Zhecen Wu",
+    "Yang Liu"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.20237"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Rule",
+    "Compliant",
+    "Visual",
+    "Spatial",
+    "Planning",
+    "for",
+    "Multimodal",
+    "Large",
+    "Language"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) combine linguistic reasoning with visual perception, yet their ability to perform visual spatial planning under explicit or previously unseen rule constraints remains underexplored. This setting requires models to jointly understand spatial layouts, interpret natural-language rules, and plan valid actions accordingly. To address this gap, we introduce RuleMaze, a controllable benchmark in which MLLMs must navigate mazes while obeying natural-language rules of varying complexity. RuleMaze isolates rule-compliant spatial planning by requiring accurate perception, rule interpretation, and constrained action planning. To enable scalable and systematic rule construction, we propose Language-Logic-Function Hybridization, which automatically generates natural-language rules and translates them into logical representations and executable validators, eliminating manual rule engineering. To improve rule following and generalization, we introduce Disentangled Multimodal Planning (DMP), which separates perception, execution, and rule verification through interpretable reasoning primitives. By disentangling these components, DMP facilitates systematic generalization to more complex and previously unseen rules, while providing transparent intermediate planning traces. Experiments demonstrate that DMP substantially improves rule compliance and planning success compared to end-to-end textual planning baselines. Overall, RuleMaze establishes a principled benchmark for studying grounded and interpretable rule-based spatial planning in MLLMs. Code is available at https://github.com/oceanflowlab/RuleMaze.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.20237v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.20237v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/oceanflowlab/RuleMaze"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.20237v1 全文整理；本地 PDF 共 19 页，SHA-256 16c709b11c4f21046f0b328d32b59bb09f79f1860b4a4c1c643a5f3b011307b6，并视觉核验第 1、4、6、8 页。",
+    "ideaZh": "RuleMaze 自动把natural-language rules编译为logic和executable validators；DMP把MLLM planning拆成Locate/Inspect、Execute、VerifyRule/Endpoint工具循环。QuestMaze unseen-rule average EM/PR达到88.0/91.7，显著高于direct/CoT。",
+    "methodFlow": [
+      "生成free-form rules并formalize为logic",
+      "自动合成executable validators",
+      "为规则匹配具有有效路径的maze",
+      "DMP调用perception/execution/verification tools",
+      "发现违规即反馈并修正trajectory"
+    ],
+    "whyRelevantZh": "直接推进MLLM spatial planning与grounded tool use，对visual design agent的constraint checking也有明确迁移。",
+    "evidenceZh": "DMP显式分离perception、execution和rule verification，并在每步保留可审计tool trace。（Figure 4 and Table 1, p. 6）；作者报告DMP-3B在QuestMaze unseen rules的average exact match 88.0%、precision rate 91.7%。（Table 3, p. 8）；procedural maze与synthetic validators远比真实3D场景简单；tool supervision和规则编译质量可能高估generalization。（Conclusion, p. 8）",
+    "caveatZh": "结论限定于RuleMaze，未证明对动态、连续或真实视觉环境同样成立。；procedural maze与synthetic validators远比真实3D场景简单；tool supervision和规则编译质量可能高估generalization。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文把视觉空间规划中的perception、rule interpretation和action validity分离。Language-Logic-Function Hybridization生成规则、formalization和validators，再用constraint-based matching挑选有唯一rule-compliant path的mazes。DMP控制器交替感知、执行和验证，RegularMaze/QuestMaze覆盖seen/unseen rules。优点是可解释和可执行，限制是procedural mazes、teacher-forced tool calls与有限world complexity。",
+    "methodZh": "把新规则泛化转成可执行intermediate primitives与逐步validator反馈，而非只让MLLM输出长文本path。 方法流程：生成free-form rules并formalize为logic → 自动合成executable validators → 为规则匹配具有有效路径的maze → DMP调用perception/execution/verification tools → 发现违规即反馈并修正trajectory。",
+    "experimentsZh": "RegularMaze/QuestMaze各3,600 train与400 test；seen/unseen rules、easy/medium/hard；Qwen2.5-VL-3B与Gemini baselines。 作者报告：作者报告DMP-3B在QuestMaze unseen rules的average exact match 88.0%、precision rate 91.7%。（Table 3, p. 8） Baseline coverage：direct SFT、CoT、text planning variants与Gemini 2.5 Pro/Flash；缺真实embodied environment和更大open MLLM matched training。 Ablation：DMP prompting、coordinates/ASCII文本、action length/difficulty、seen/unseen rules；validator noise与visual corruption未系统测。",
+    "insightZh": "把新规则泛化转成可执行intermediate primitives与逐步validator反馈，而非只让MLLM输出长文本path。 benchmark construction、executable validation、method与unseen-rule结果闭环，建议深读，同时保持synthetic scope边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

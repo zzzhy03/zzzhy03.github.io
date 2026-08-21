@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2607.17097",
+  "slug": "harmohoi-harmonizing-appearance-and-3d-motion-for-multi-view-hand-object-interaction-synthesis",
+  "title": "HarmoHOI: Harmonizing Appearance and 3D Motion for Multi-view Hand-Object Interaction Synthesis",
+  "authors": [
+    "Lingwei Dang",
+    "Juntong Li",
+    "Zonghan Li",
+    "Hongwen Zhang",
+    "Liang An",
+    "Wei Min",
+    "Yebin Liu",
+    "Qingyao Wu"
+  ],
+  "publishedAt": "2026-07-19",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2607.17097"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "3d-generation",
+    "HarmoHOI",
+    "Harmonizing",
+    "Appearance",
+    "and",
+    "Motion",
+    "for",
+    "Multi",
+    "view"
+  ],
+  "abstract": "Hand-Object Interaction (HOI) synthesis is a cornerstone for animation production and embodied AI. Despite the strong priors of video foundation models, multi-view consistent HOI synthesis remains challenging due to complex hand motions and occlusions. We present HarmoHOI, a unified diffusion framework that jointly and harmoniously generates synchronized multi-view HOI videos and globally aligned 3D point tracks. Our core insight is that robust multi-view consistency fundamentally requires globally aligned 3D geometry and motion. To this end, we propose a Mixture of Multi-view Diffusion Transformer that co-models RGB videos and 3D point tracks. By representing point tracks as pseudo-videos, we align 3D geometric signals with the 2D latent space of foundation models, thereby minimizing the domain gap and easing adaptation of priors. To further ensure geometry consistency, we introduce Global Motion Aligning Diffusion, which refines coarse point tracks into metric-scale, globally aligned 3D trajectories. HarmoHOI enables on-the-fly co-evolution of 2D appearance and 3D motion during denoising. To overcome the scarcity of multi-view HOI data, we employ a hybrid data curriculum learning strategy that successfully transfers generic priors from single-view data to synchronized multi-view generation. Experimental results show that HarmoHOI achieves state-of-the-art performance in visual quality, motion plausibility, and multi-view geometric consistency. Project page available at https://droliven.github.io/HarmoHOI_project.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.17097v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.17097v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://droliven.github.io/HarmoHOI_project"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.17097v2 全文整理；本地 PDF 共 13 页，SHA-256 9727c99dbc434327be3c6a347bd9e48f24c9ce0dd25ad03960b39c730b8425c8，并视觉核验第 1、4、7、8 页。",
+    "ideaZh": "HarmoHOI 在同一 diffusion 中把多视角 RGB videos 与 3D point tracks 作为 pseudo-video 联合建模，再用 GloMAD 把 coarse tracks 校准到 metric global motion；作者报告 multi-view matching pixels 535.8、RPE 34.6，并显著减少 layer-wise offset。",
+    "methodFlow": [
+      "按相机位姿渲染 reference 与 pseudo images",
+      "M²DiT 联合生成多视角 RGB 和粗 3D motion videos",
+      "GloMAD 序列化并对齐 coarse point tracks",
+      "估计 global scale 与 metric trajectories",
+      "输出同步多视角视频和全局 3D tracks"
+    ],
+    "whyRelevantZh": "同时命中 Video Generation 和 3D Generation，joint 2D/3D representation 对 multi-view asset creation 与 dynamic scene generation 有高迁移价值。",
+    "evidenceZh": "M²DiT 联合建模 RGB 与 motion pseudo-videos，GloMAD 再恢复 globally aligned metric 3D trajectories。（Fig. 2 and Sec. 3, p. 4）；作者报告 HarmoHOI 的 multi-view matching pixels 为 535.8、multi-view RPE 为 34.6，优于所列 multi-view baselines。（Tables 2-4, pp. 7-8）；残余 cross-view layer offsets 受训练分布和 feed-forward depth/track estimation 误差影响，wild scenes 只做定性验证。（Failure Modes, p. 8）",
+    "caveatZh": "作者指出训练 paired multi-view data 的 coverage 仍导致 unseen HOI 残余失败，metric-scale estimation 也会造成 layer-wise artifacts。；残余 cross-view layer offsets 受训练分布和 feed-forward depth/track estimation 误差影响，wild scenes 只做定性验证。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文针对 multi-view HOI 生成中外观一致但几何漂移的问题，构建 Mixture of Multi-view DiT 同步 denoise RGB 与 motion pseudo-videos，随后以 inter/intra-view attention、temporal alignment 和 scale estimation 细化 3D tracks。hybrid curriculum 从单视角视频迁移到稀缺多视角 HOI。定量、可视、unseen objects 与 in-the-wild 结果支持，但训练数据覆盖和 metric-scale error 仍限制泛化。",
+    "methodZh": "核心是让 2D appearance 与 3D motion 在 denoising 中共同演化，而非先生成视频再独立重建；pseudo-video 对齐降低了 2D/3D domain gap。 方法流程：按相机位姿渲染 reference 与 pseudo images → M²DiT 联合生成多视角 RGB 和粗 3D motion videos → GloMAD 序列化并对齐 coarse point tracks → 估计 global scale 与 metric trajectories → 输出同步多视角视频和全局 3D tracks。",
+    "experimentsZh": "基于 WAN 2.1-1.3B，使用 hybrid single/multi-view curriculum；在 TACO/HOI 数据上比较视频质量、single/multi-view consistency、3D motion accuracy、plausibility、user preference 和 ablations。 作者报告：作者报告 HarmoHOI 的 multi-view matching pixels 为 535.8、multi-view RPE 为 34.6，优于所列 multi-view baselines。（Tables 2-4, pp. 7-8） Baseline coverage：与 DaS、SV4D 2.0、SynCamMaster、Geo4D、GeometryCrafter 等比较；不同方法任务设置和预训练数据不完全一致。 Ablation：移除 multi-view generation、motion-video joint diffusion、GloMAD 或 hybrid data 都降低 matching/RPE，支持各模块；global scale 和 track density 的敏感性分析有限。",
+    "insightZh": "核心是让 2D appearance 与 3D motion 在 denoising 中共同演化，而非先生成视频再独立重建；pseudo-video 对齐降低了 2D/3D domain gap。 方法耦合、结果表、in-the-wild 案例、限制与代码均完整，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

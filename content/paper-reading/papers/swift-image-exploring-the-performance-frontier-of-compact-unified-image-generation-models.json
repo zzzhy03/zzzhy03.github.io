@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2608.20334",
+  "slug": "swift-image-exploring-the-performance-frontier-of-compact-unified-image-generation-models",
+  "title": "Swift-Image: Exploring the Performance Frontier of Compact Unified Image Generation Models",
+  "authors": [
+    "Taihang Hu",
+    "Zhao Wang",
+    "Zuan Gao",
+    "Tao Liu",
+    "Hao Yan",
+    "Zhengze Xu",
+    "Yuhang Yu",
+    "Yongchao Du",
+    "Xingjian Wang",
+    "Jun Zheng",
+    "Qinye Zhou",
+    "Zhengrui Chen",
+    "Chao Lin",
+    "Yefeng Shen",
+    "Zhengtao Wu",
+    "Ge Wu",
+    "Xiaoli Xu",
+    "Denghui Yang",
+    "Huayu Zhang",
+    "Mingzhou Zhang",
+    "Mengting Chen"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.20334"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Swift",
+    "Image",
+    "Exploring",
+    "the",
+    "Performance",
+    "Frontier",
+    "Compact",
+    "Unified",
+    "Generation"
+  ],
+  "abstract": "We present Swift-Image, a compact unified model for text-to-image generation, single-image editing, and multi-image editing. Our goal is to explore how far a relatively small visual generator can be pushed through systematic training engineering under a constrained computational budget. Swift-Image adopts an efficient 6B single-stream DiT and a progressive training pipeline that evolves from broad semantic coverage to higher resolution, stronger visual quality, and unified generation-editing supervision. For post-training, we employ parallel expert reinforcement learning followed by multi-teacher on-policy distillation to alleviate interference among heterogeneous objectives. We further decouple high-level reasoning from pixel-level rendering with a Prompt Enhancer that translates user requests into generator-aligned visual specifications. For efficient deployment, structural pruning and few-step distillation produce 3B and accelerated variants. Swift-Image achieves leading aggregate performance among evaluated open-source models with only 6B parameters and 243K GPU training hours; the compressed 3B model incurs nearly no loss, while few-step distillation further improves aggregate editing performance with substantially fewer sampling steps. Our study also summarizes practical lessons for architecture, data curriculum, post-training, prompt enhancement, and model compression.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.20334v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.20334v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.20334v1 全文整理；本地 PDF 共 28 页，SHA-256 b84d41c2d613abbc8ae9147d52f68e1eb2d4acca0be296bc108de5959e1b376e，并视觉核验第 1、7、10、15 页。",
+    "ideaZh": "Swift-Image 用6B single-stream DiT统一T2I、单图与多图编辑，经过progressive training、parallel expert RL、multi-teacher on-policy distillation、Prompt Enhancer与3B/少步压缩；作者报告6B+PE overall edit 4.33，3B压缩几乎无损。",
+    "methodFlow": [
+      "progressive pretraining建立低到高分辨率T2I",
+      "continual/SFT统一single-与multi-image editing",
+      "parallel expert RL分别优化异质目标",
+      "multi-teacher OPD合并experts为统一模型",
+      "Prompt Enhancer改写请求并做3B/少步压缩部署"
+    ],
+    "whyRelevantZh": "直接命中Image Generation/Editing，紧凑统一模型与训练工程对visual creation pipelines有高参考价值。",
+    "evidenceZh": "统一backbone经过progressive stages、parallel expert RL、multi-teacher OPD和deployment compression，inference由PE提供renderer-aligned spec。（Figure 6 and Sec. 3, p. 7）；作者报告Swift-Image-6B with PE overall edit score 4.33，API PE为4.41；3B with PE为4.31，参数压缩几乎无损。（Table 1, p. 10）；243K GPU-hours仍很高，部分最佳结果依赖API Prompt Enhancer；Pi benchmarks由作者提出，closed/proprietary数据与human preference protocol需独立审计。（Evaluation and references, pp. 10-15）",
+    "caveatZh": "论文主要总结内部大规模training recipe，对data provenance、独立human evaluation和真实deployment failure披露有限。；243K GPU-hours仍很高，部分最佳结果依赖API Prompt Enhancer；Pi benchmarks由作者提出，closed/proprietary数据与human preference protocol需独立审计。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "这是一份紧凑统一图像模型的system report：Qwen3-VL条件编码与FLUX.2 AE接入parallel DiT，训练从低分辨率语义到高分辨率和编辑，再分别优化generation/editing experts并蒸馏回generalist。Prompt Enhancer以renderer feedback把复杂请求变成可执行spec。公共+自建benchmarks、RL/distillation/compression ablations与大量定性图支持结果，但训练243K GPU-hours、部分PE使用API且自建Pi benchmarks需独立验证。",
+    "methodZh": "单个component并非全新，价值在于6B预算下把architecture、curriculum、expert RL/OPD、reasoning-enhanced prompting和compression做成可复用系统配方。 方法流程：progressive pretraining建立低到高分辨率T2I → continual/SFT统一single-与multi-image editing → parallel expert RL分别优化异质目标 → multi-teacher OPD合并experts为统一模型 → Prompt Enhancer改写请求并做3B/少步压缩部署。",
+    "experimentsZh": "三公共editing benchmarks、CPI/Pi-Benchmark suites、Qwen-Image-Bench、expert domains；3B/6B、standard/PE/API PE、RL与few-step distillation。 作者报告：作者报告Swift-Image-6B with PE overall edit score 4.33，API PE为4.41；3B with PE为4.31，参数压缩几乎无损。（Table 1, p. 10） Baseline coverage：覆盖多种open-source和proprietary image editors/generators；模型API、参数披露与自建benchmarks导致比较并非完全同条件。 Ablation：architecture components、data curriculum、RL/OPD、Prompt Enhancer、structural pruning与few-step distillation；跨独立复现与安全/版权评估缺失。",
+    "insightZh": "单个component并非全新，价值在于6B预算下把architecture、curriculum、expert RL/OPD、reasoning-enhanced prompting和compression做成可复用系统配方。 虽是系统工程整合而非单点理论突破，规模、统一能力、压缩和ablation足以深读；数字按作者报告处理。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

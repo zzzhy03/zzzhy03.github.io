@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2608.19726",
+  "slug": "projector-is-all-you-train",
+  "title": "Projector Is All You Train",
+  "authors": [
+    "Nyx Iskandar",
+    "Saathvik Selvan",
+    "Slater Victoroff"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19726"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Projector",
+    "All",
+    "You",
+    "Train"
+  ],
+  "abstract": "The typical training process of a multimodal large language model (MLLM) involves adapting both the language model backbone and the projector between the backbone and a modality-specific encoder. We ask whether fine-tuning the backbone of an MLLM is necessary to adapt it to a new modality. Through experiments on 3D MLLMs, we find that training only the projector is sufficient to achieve strong multimodal performance relative to existing baseline models and our jointly trained MLLMs with the same encoder and backbone. We also show that joint training leads to undesirable drift in existing capabilities of the language model, which projector-only training avoids by definition. Furthermore, projector-only training has approximately twice the training sample throughput of joint training. We validate our findings across different language model backbones via 3D classification and captioning benchmarks as well as standard benchmarks evaluating language, vision, and spatial reasoning capabilities.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19726v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19726v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19726v1 全文整理；本地 PDF 共 21 页，SHA-256 feb78f1cc7d521ee66c8389ebd77594b6facdf88fb3456acc53b5a91e23dfc26，并视觉核验第 1、2、6、9 页。",
+    "ideaZh": "论文在3D MLLM上发现只训练point-encoder→LLM projector即可获得接近或优于joint training的classification/captioning，同时约2× sample throughput且避免language/vision/spatial reasoning drift。",
+    "methodFlow": [
+      "Point-BERT编码3D point cloud",
+      "projector把3D tokens映射到LLM embedding space",
+      "冻结LLM与encoder，仅更新projector",
+      "用3D instruction data训练相同GPU预算",
+      "评估3D能力与原有language/vision/spatial retention"
+    ],
+    "whyRelevantZh": "对VLM/MLLM新模态适配成本和能力保留有通用启发，尤其适合3D representation接入LLM。",
+    "evidenceZh": "所有模块除projector外冻结；joint control仅额外训练LLM LoRA adapters。（Figure 1, p. 2）；作者报告projector-only在多个3D classification/captioning设置与joint models竞争，同时iteration throughput约为joint training两倍并避免backbone drift。（Tables 2-4, pp. 6-8）；结论建立在Point-BERT、有限Llama/Qwen backbones和3D classification/captioning；更强cross-modal generation与其他modalities未验证。（Conclusion, p. 9）",
+    "caveatZh": "作者把2D image、audio等modalities与线性projector/LoRA差异列为后续研究。；结论建立在Point-BERT、有限Llama/Qwen backbones和3D classification/captioning；更强cross-modal generation与其他modalities未验证。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "工作冻结Point-BERT encoder与Llama/Qwen backbones，仅学习projector，并与加LoRA的joint variants在相同16 GPU-hours、相同data下比较。ModelNet40/Objaverse/OmniObject3D、captioning和standard language/vision/spatial benchmarks显示projector足以适配新模态；但scope只覆盖point-cloud 3D MLLMs，结论不能自动推广到audio/2D vision或需要深cross-modal reasoning的任务。",
+    "methodZh": "把modality adaptation视为寻找可触发frozen LLM能力的token interface，并用matched joint-training controls证明backbone更新并非3D MLLM必需。 方法流程：Point-BERT编码3D point cloud → projector把3D tokens映射到LLM embedding space → 冻结LLM与encoder，仅更新projector → 用3D instruction data训练相同GPU预算 → 评估3D能力与原有language/vision/spatial retention。",
+    "experimentsZh": "多种Llama/Qwen backbones、相同Point-BERT encoder、相同16 GPU-hour/data；ModelNet40/Objaverse/OmniObject3D与captioning、language/vision/spatial suites。 作者报告：作者报告projector-only在多个3D classification/captioning设置与joint models竞争，同时iteration throughput约为joint training两倍并避免backbone drift。（Tables 2-4, pp. 6-8） Baseline coverage：与PointLLM 7B/13B和matched projector+LoRA joint variants比较；缺少其他encoder、端到端大规模pretraining与视觉生成任务。 Ablation：训练时长/sample curves、去掉trained LoRA、不同backbones和capability drift；projector architecture/width消融有限。",
+    "insightZh": "把modality adaptation视为寻找可触发frozen LLM能力的token interface，并用matched joint-training controls证明backbone更新并非3D MLLM必需。 matched controls很有价值，但实验只限3D MLLM接口，收录为skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

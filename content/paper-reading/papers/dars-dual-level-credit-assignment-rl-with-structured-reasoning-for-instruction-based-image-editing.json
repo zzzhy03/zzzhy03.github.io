@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.20161",
+  "slug": "dars-dual-level-credit-assignment-rl-with-structured-reasoning-for-instruction-based-image-editing",
+  "title": "DARS: Dual-Level Credit Assignment RL with Structured Reasoning for Instruction-Based Image Editing",
+  "authors": [
+    "Haoxiang Cao",
+    "Jiajiong Cao",
+    "Xuanpu Zhang",
+    "Changqian Yu",
+    "Chaoqun Wang"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.20161"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "image-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "visual-design-agents",
+    "DARS",
+    "Dual",
+    "Level",
+    "Credit",
+    "Assignment",
+    "with",
+    "Structured",
+    "Reasoning"
+  ],
+  "abstract": "Instruction-based image editing uses a planner-renderer pipeline: a vision-language model (VLM) first converts the instruction into an edit plan, and a diffusion model then executes that plan. Training such systems with only final-image rewards is inefficient because a poor edit does not reveal whether additional optimization should place more emphasis on the planner or the renderer, and even planner-dominant cases remain difficult to localize within a free-form reasoning trace. We present DARS, a reinforcement learning framework for dual-level credit assignment in this two-stage setting. Across modules, multi-plan multi-render rollouts estimate between-plan and within-plan reward variability for soft module routing, while rollout mean rewards provide hardness estimates for an adaptive curriculum. Within the planner, a four-field structured reasoning output enables a prefix-gated reward and token-level advantage reweighting, turning outcome-level feedback into localized supervision. Experiments on five benchmarks show that DARS outperforms a Joint~RL baseline with the same backbone, data, reward model, and rollout budget, with the largest gains on reasoning-intensive edits.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.20161v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.20161v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.20161v1 全文整理；本地 PDF 共 36 页，SHA-256 57996c92e1b76d7ffefeebd200cab5c7f28323ed560d28b7cf6c6d633f32150b，并视觉核验第 1、4、6、8 页。",
+    "ideaZh": "DARS 用多plan×多render rollouts的between/within variance决定planner/renderer软路由，再把planner输出固定成Modify/Preserve/Overall/Tips四槽，用prefix-gated reward与token advantage把final-image反馈定位到具体planning slot；五个benchmarks均优于matched Joint RL。",
+    "methodFlow": [
+      "VLM planner生成多个四槽structured plans",
+      "每个plan由diffusion renderer生成多个edits",
+      "between/within-plan variance估计模块责任与hardness",
+      "prefix-gated slot rewards重加权planner tokens",
+      "soft-routed GRPO分别更新planner与renderer"
+    ],
+    "whyRelevantZh": "同时命中image editing与visual design agents；render feedback如何归因到planner/action是核心可迁移问题。",
+    "evidenceZh": "DARS用multi-plan/multi-render variance做cross-module routing，并用structured prefix-gated rewards做within-planner credit。（Figure 3 and Sec. 4, p. 4）；作者报告matched Joint RL control之上，DARS在KRIS-Bench +8.57、RISE-Bench +1.80，五个benchmark均最佳。（Tables 1-4, pp. 6-8）；每example需M×K rollouts，成本高；variance与post-render scores依赖reward model，planner和renderer同时失败时credit仍不稳。（Limitations, p. 8）",
+    "caveatZh": "作者明确列出rollout成本、reward依赖、双模块同时失败与video/multi-turn扩展尚未解决。；每example需M×K rollouts，成本高；variance与post-render scores依赖reward model，planner和renderer同时失败时credit仍不稳。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文解决planner-renderer image editing只有final reward时无法分配模块责任的问题。跨模块variance估计软路由与sample hardness；within planner用structured slots、checklist reward和causal prefix gate细化credit。10K training examples、相同backbone/data/reward/rollout matched control、五benchmarks和routing pseudo-label validation支持机制，但M×K rollouts成本高且reward-model bias仍在。",
+    "methodZh": "同时解决跨module credit和planner内部token credit，且用rollout statistics而非额外人工failure labels进行路由。 方法流程：VLM planner生成多个四槽structured plans → 每个plan由diffusion renderer生成多个edits → between/within-plan variance估计模块责任与hardness → prefix-gated slot rewards重加权planner tokens → soft-routed GRPO分别更新planner与renderer。",
+    "experimentsZh": "10K examples；Qwen3-VL-4B planner、Qwen-Image-Edit-2511 renderer；五benchmarks、matched joint RL与多个edit/planning baselines。 作者报告：作者报告matched Joint RL control之上，DARS在KRIS-Bench +8.57、RISE-Bench +1.80，五个benchmark均最佳。（Tables 1-4, pp. 6-8） Baseline coverage：11种editors加matched backbone/data/reward/rollout control；但reward-model evaluator仍同源且无真实user preference study。 Ablation：curriculum、soft/hard/no routing、四槽结构、prefix gate与routing-signal对GPT-5 pseudo-label discrimination。",
+    "insightZh": "同时解决跨module credit和planner内部token credit，且用rollout statistics而非额外人工failure labels进行路由。 matched control、五benchmark与credit ablation完整，是本轮最相关的视觉agent训练工作之一，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

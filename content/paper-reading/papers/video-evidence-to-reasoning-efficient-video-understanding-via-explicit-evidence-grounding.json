@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2601.07761",
+  "slug": "video-evidence-to-reasoning-efficient-video-understanding-via-explicit-evidence-grounding",
+  "title": "Video Evidence to Reasoning Efficient Video Understanding via Explicit Evidence Grounding",
+  "authors": [
+    "Yanxiang Huang",
+    "Guohua Gao",
+    "Zhaoyang Wei"
+  ],
+  "publishedAt": "2026-01-12",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2601.07761"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Video",
+    "Evidence",
+    "Reasoning",
+    "Efficient",
+    "Understanding",
+    "via",
+    "Explicit",
+    "Grounding"
+  ],
+  "abstract": "Large Vision-Language Models (LVLMs) face a fundamental dilemma in video reasoning: they are caught between the prohibitive computational costs of verbose reasoning and the hallucination risks of efficient, ungrounded approaches. To resolve this, we introduce the Chain of Evidence (CoE), a novel framework that architecturally decouples and co-optimizes perceptual grounding and reasoning efficiency. CoE incorporates two core innovations: (1) A lightweight Evidence Grounding Module (EGM) that acts as a query-guided filter, dynamically identifying and extracting a compact set of high-fidelity visual evidence; and (2) An Evidence-Anchoring Protocol optimized via Reinforcement Learning. Crucially, we design a composite reward mechanism that enforces process alignment, compelling the model to strictly reference identified temporal anchors during deduction, thereby mitigating hallucinations. To enable this, we construct CoE-Instruct, a large-scale dataset (164k samples) featuring a novel dual-annotation schema for separate perception and reasoning supervision. Extensive experiments on five benchmarks, including Video-MME, MVBench, and VSI-Bench, demonstrate that CoE-enhanced models establish a new state-of-the-art. They significantly outperform existing methods in accuracy, proving CoE to be a powerful and practical paradigm for reliable video understanding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2601.07761v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2601.07761v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2601.07761v2 全文整理；本地 PDF 共 6 页，SHA-256 0acc36b2f1c7b72528efdf5490159e73f10535a0fa68a75bf26f7f2daa48437b，并视觉核验第 1、2、4、5 页。",
+    "ideaZh": "CoE 在 video LVLM 中插入 query-guided Evidence Grounding Module，先压缩出带 temporal anchors 的证据，再用 SFT+RL 约束 reasoning 必须引用这些 anchors；作者报告 InternVL3-8B 的 MVBench 从 74.4 提至 91.2，但论文只有六页且未发布代码。",
+    "methodFlow": [
+      "ViT 提取视频帧特征并编码问题",
+      "EGM 以问题 queries 选择 compact evidence",
+      "SFT 学习 temporal anchors 与结构化 reasoning",
+      "RL composite reward 对齐 anchors、draft 与答案",
+      "输出可追溯的 evidence-grounded answer"
+    ],
+    "whyRelevantZh": "直接推进 VLM/MLLM 的长视频 evidence grounding 与 hallucination control，但证据质量更适合快速阅读而非作为强结论。",
+    "evidenceZh": "EGM 用问题条件 cross-attention 选择视频证据，Evidence-Anchoring Protocol 强制 reasoning 引用 temporal anchors。（Fig. 1 and Sec. II-A, p. 2）；作者报告 CoE-8B(RL) 在 MVBench 达到 91.2，相对原 InternVL3-8B 的 74.4 提升 16.8 points。（Tables I-II, pp. 4-5）；训练数据含 programmatic synthetic annotations，真实视频覆盖与 leakage 未充分披露，且跨 architecture 泛化被明确留作未来工作。（Sec. IV and Conclusion, pp. 5-6）",
+    "caveatZh": "作者承认只在 InternVL 系列验证，其他 architecture 的 CoE 泛化尚未研究。；训练数据含 programmatic synthetic annotations，真实视频覆盖与 leakage 未充分披露，且跨 architecture 泛化被明确留作未来工作。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文将长视频推理拆成 perception 与 deduction：浅层 cross-attention EGM 从帧序列选证据，结构化 protocol 生成 anchors、reasoning draft 与 answer，CoE-Instruct 以 150k SFT + 14k RL 样本监督。五个 benchmark 显示准确率提升，但 synthetic annotation、未披露训练重叠和仅两种 InternVL backbone 限制可信边界。",
+    "methodZh": "把可解释 temporal anchors 作为显式中间变量，并同时用于 grounding loss 和 RL process reward，比单纯 CoT 或外部 keyframe selector 更紧耦合。 方法流程：ViT 提取视频帧特征并编码问题 → EGM 以问题 queries 选择 compact evidence → SFT 学习 temporal anchors 与结构化 reasoning → RL composite reward 对齐 anchors、draft 与答案 → 输出可追溯的 evidence-grounded answer。",
+    "experimentsZh": "在 InternVL2.5-4B 与 InternVL3-8B 上，用 Video-MME、MVBench、VSI-Bench、VidHal、EventHall 评估；比较 original、CoT、QA-SFT、CoT-SFT、CoE-SFT 与 CoE-RL。 作者报告：作者报告 CoE-8B(RL) 在 MVBench 达到 91.2，相对原 InternVL3-8B 的 74.4 提升 16.8 points。（Tables I-II, pp. 4-5） Baseline coverage：包含 backbone、CoT 和少量外部 reasoning baselines；闭源模型数据不透明，且没有在同等训练数据下覆盖更多 video LVLM。 Ablation：Table I 解耦 prompt、generic CoT、CoE SFT 与 RL，支持显式 grounding 是主要增益来源；EGM size、anchor errors 与数据混合的独立消融不足。",
+    "insightZh": "把可解释 temporal anchors 作为显式中间变量，并同时用于 grounding loss 和 RL process reward，比单纯 CoT 或外部 keyframe selector 更紧耦合。 任务和方法直接相关，结构化 evidence interface 值得记录；因篇幅、代码和数据边界较弱，定为 accept-skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

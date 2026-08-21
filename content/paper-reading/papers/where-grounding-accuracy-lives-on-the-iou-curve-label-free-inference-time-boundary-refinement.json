@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.19553",
+  "slug": "where-grounding-accuracy-lives-on-the-iou-curve-label-free-inference-time-boundary-refinement",
+  "title": "Where Grounding Accuracy Lives on the IoU Curve: Label-Free Inference-Time Boundary Refinement",
+  "authors": [
+    "Bo Ma"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19553"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Where",
+    "Grounding",
+    "Accuracy",
+    "Lives",
+    "the",
+    "IoU",
+    "Curve",
+    "Label",
+    "Free"
+  ],
+  "abstract": "Vision--language models can identify the correct referent while returning an imprecise bounding box. We study whether a frozen direct-answer model can use its own prediction to allocate one additional localized observation without accessing target annotations at inference. Label-free precision refinement (LFPR) routes predicted-small regions to a higher-resolution pass, re-grounds the expression inside a context crop, admits a candidate only under fixed geometric guards, and returns a fixed coordinate-wise midpoint. We report results across three evidence tiers. On 31,921 retrospective Ref-L4 expressions, LFPR raises mAcc$_{0.5:0.95}$ from 72.947\\% to 76.013\\% (Acc@0.5 88.531\\%$\\to$89.725\\%, Acc@0.9 55.788\\%$\\to$61.142\\%). A frozen transfer to 30,969 RefCOCO/RefCOCO+/RefCOCOg expressions improves every dataset at Acc@0.5, mAcc, and mean IoU (pooled mAcc $+0.645$, Acc@0.5 $+0.817$), while Acc@0.9 is unchanged overall: routing alone gains $+1.162$ points there, but crop, guards, and fusion give back $-1.192$, offsetting rather than showing no strict-IoU effect. A prospective, image-disjoint Flickr30K Entities evaluation improves every endpoint (mAcc $+0.973$, Acc@0.9 $+1.022$), more strongly under a single-box variant (mAcc $+2.575$, Acc@0.9 $+3.689$). The same operator applied to two released grounding specialists improves every endpoint (Acc@0.9 $+1.569$/$+6.716$ for EGM-4B/8B) at roughly twice the latency, composing with specialist training rather than replacing it. A genuine unguarded control (guard removed from the same candidates) underperforms the incumbent on every metric, showing the guard is load-bearing. Together, these results show that referent selection and boundary precision are partially separable, with different components moving opposing regions of the IoU curve -- behavior a single threshold cannot reveal.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19553v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19553v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/mabo1215/BodhiNet"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19553v1 全文整理；本地 PDF 共 40 页，SHA-256 77336203fdf5b544df6df2795383f0c503438ac1b1d12ded805c44b3d48f5979，并视觉核验第 1、3、5、8、13 页。",
+    "ideaZh": "LFPR 只把 frozen VLM 预测的小框路由到高分辨率 crop，再 re-ground、通过 fixed geometry guards 后与 incumbent midpoint fusion；作者报告 Ref-L4 mAcc 72.947→76.013，Flickr30K prospective mAcc +0.973，但约 2× latency。",
+    "methodFlow": [
+      "frozen VLM 先输出 incumbent bounding box",
+      "按预测 pixel area 路由小框到高分辨率",
+      "在 expanded context crop 内重新 grounding",
+      "用 zoom/IoU/area guards拒绝不稳候选",
+      "coordinate-wise midpoint融合并选择 accept/reject"
+    ],
+    "whyRelevantZh": "直接推进 VLM grounding reliability，并示范如何把平均 score拆成 IoU curve和可审计 evidence tiers。",
+    "evidenceZh": "LFPR 以 predicted box size 做 label-free routing，在 crop 中 re-ground 并经 fixed guards 后 midpoint fusion。（Secs. 3.2-3.3, p. 3）；作者报告 Ref-L4 mAcc 从 72.947 提到 76.013；Flickr30K prospective mAcc +0.973、Acc@0.9 +1.022。（Table 1, p. 5; Figure 1, p. 8）；约 2× latency，strict-IoU gains 受 crop/guard/fusion抵消；部分 evidence 是 retrospective，且主模型/benchmark组合仍有限。（Limitations and data firewall, pp. 9-13）",
+    "caveatZh": "作者撤回早期 test-firewall 强声明，承认 retrospective arms、latency、target-size diagnosis与 source influence 限制。；约 2× latency，strict-IoU gains 受 crop/guard/fusion抵消；部分 evidence 是 retrospective，且主模型/benchmark组合仍有限。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文将 referent selection 与 boundary precision 拆开，设计 label-free size router、context crop、zoom consistency/IoU/area guards 和 midpoint fusion。三层 evidence 包含 retrospective Ref-L4、frozen RefCOCO transfer 与 image-disjoint Flickr30K，再把同 operator 接到两种 released specialists。统计、negative control、artifact hashes 很严谨，但 gains 在 transfer/prospective sets 较小且严格 IoU components 会相互抵消。",
+    "methodZh": "不是训练新 grounding head，而是把模型自身 first prediction 当作 label-free resolution allocation signal，并用保守几何 guard把 boundary refinement做成可组合 operator。 方法流程：frozen VLM 先输出 incumbent bounding box → 按预测 pixel area 路由小框到高分辨率 → 在 expanded context crop 内重新 grounding → 用 zoom/IoU/area guards拒绝不稳候选 → coordinate-wise midpoint融合并选择 accept/reject。",
+    "experimentsZh": "31,921 Ref-L4 expressions、30,969 RefCOCO-family frozen transfer、14,481 Flickr30K prospective rows；20+ metrics、image-cluster bootstrap、negative controls 与 two released specialists。 作者报告：作者报告 Ref-L4 mAcc 从 72.947 提到 76.013；Flickr30K prospective mAcc +0.973、Acc@0.9 +1.022。（Table 1, p. 5; Figure 1, p. 8） Baseline coverage：比较 frozen incumbent、routing-only、unguarded control、fine-tune、specialists 与 multiple selectors；没有端到端 latency-constrained deployment study。 Ablation：完整 guard×fusion factorial、router thresholds、single/merged box、IoU curves、specialist composition 与 data-firewall analysis。",
+    "insightZh": "不是训练新 grounding head，而是把模型自身 first prediction 当作 label-free resolution allocation signal，并用保守几何 guard把 boundary refinement做成可组合 operator。 方法实用、统计透明、代码齐全；因 absolute transfer gains小且 latency显著，定为 skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

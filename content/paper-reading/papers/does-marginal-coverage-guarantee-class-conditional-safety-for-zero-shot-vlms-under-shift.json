@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.19376",
+  "slug": "does-marginal-coverage-guarantee-class-conditional-safety-for-zero-shot-vlms-under-shift",
+  "title": "Does Marginal Coverage Guarantee Class-Conditional Safety for Zero-Shot VLMs Under Shift?",
+  "authors": [
+    "Jai Kumar Sharma",
+    "Amartya Dutta"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19376"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Does",
+    "Marginal",
+    "Coverage",
+    "Guarantee",
+    "Class",
+    "Conditional",
+    "Safety",
+    "for",
+    "Zero"
+  ],
+  "abstract": "Split-conformal prediction provides marginal coverage under exchangeability and is increasingly used as an abstention layer for zero-shot vision-language models (VLMs). We audit this practice under deployment shift for CLIP, OpenCLIP, and SigLIP across ImageNet and non-ImageNet settings. Marginal coverage can remain relatively high while class-conditional tail coverage collapses: on ImageNet-Sketch, worst-class coverage falls to $\\approx 0$ and 10-12% of classes lie below a finite-sample null floor, despite marginal coverage of about 0.86. The failure is aligned with target-domain class accuracy but is not predicted by the source-domain diagnostics we test. Source-side Mondrian calibration improves the in-distribution tail but does not transfer, while clustered conformal and Conf-OT improve marginal or average metrics without recovering the worst-class tail. Target-side class calibration substantially lifts the tail, but requires labels for every class and remains set-size-intensive. We further identify a 2-3$\\times$ cross-family efficiency gap and show that native SigLIP sigmoid scores remove APS's probability-mass interpretation. The findings persist across the tested model scale, pretraining corpus, prompt, miscoverage level $α$, and shifted non-ImageNet settings. Marginal conformal coverage should therefore be treated as an average reliability statistic, not as a safety guarantee for the class tail.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19376v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19376v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19376v1 全文整理；本地 PDF 共 34 页，SHA-256 f202f1c61a809ee8471fbad8104f9a37e064d51c87e5ee03691894bb90a14afd，并视觉核验第 1、6、12、14 页。",
+    "ideaZh": "这篇审计显示 zero-shot VLM 在 shift 下即使 marginal conformal coverage 约 0.86，ImageNet-Sketch worst-class coverage 仍可接近 0，10–12% classes 低于 finite-sample null floor；规模增大改善 accuracy，却不修复 class tail。",
+    "methodFlow": [
+      "在 source split 校准 zero-shot VLM conformal sets",
+      "在 shifted target domain测 marginal 与 per-class coverage",
+      "用 finite-sample null floor定位异常 class tails",
+      "比较 source/cluster/OT/target calibration repairs",
+      "分析 backbone、scale、score 与 vocabulary shift robustness"
+    ],
+    "whyRelevantZh": "对 VLM reliability evaluation 有通用价值，尤其提醒不要用单一 aggregate score 支持 deployment safety 声明。",
+    "evidenceZh": "审计同时报告 marginal coverage、below-null class fraction 与 worst-class coverage，而不以单一平均数代表 safety。（Fig. 1 and Sec. 4.2, p. 6）；作者报告 ImageNet-Sketch 上 marginal coverage 约 0.86，但 worst-class coverage 为 0，10–12% classes 低于 0.70 null floor。（Table 3 and Sec. 4.7, pp. 12-14）；统计 coverage 不是 task-level harm；target calibration 需要每类 labels 且 set size 很大，source-derived diagnostics 的不可能性结论也只覆盖所测 predictors。（Limitations and Conclusion, pp. 13-14）",
+    "caveatZh": "作者说明该 safety framing 衡量统计承诺而非 task harm，且 density-ratio/open-set methods 与更强 source diagnostics 未完全覆盖。；统计 coverage 不是 task-level harm；target calibration 需要每类 labels 且 set size 很大，source-derived diagnostics 的不可能性结论也只覆盖所测 predictors。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文在 CLIP/OpenCLIP/SigLIP、ImageNet-Sketch/R/A 等 shift 上检查 APS/LAC、source-Mondrian、clustered conformal、Conf-OT、target calibration 与 score choices。结果把 average reliability 与 class-conditional safety 区分开，并给出 label-access/set-size trade-off。它是审计而非新模型，且 safety 仍是 statistical coverage 而非 measured task harm。",
+    "methodZh": "核心贡献是系统证明 marginal guarantee 会隐藏严重 class-tail collapse，并以 finite-sample null、跨 family 和规模梯度把这一失败与普通平均指标拆开。 方法流程：在 source split 校准 zero-shot VLM conformal sets → 在 shifted target domain测 marginal 与 per-class coverage → 用 finite-sample null floor定位异常 class tails → 比较 source/cluster/OT/target calibration repairs → 分析 backbone、scale、score 与 vocabulary shift robustness。",
+    "experimentsZh": "CLIP/OpenCLIP/SigLIP 多规模、多个 pretraining corpora/prompts、ImageNet 与 non-ImageNet shifts；α=0.10/0.05；APS/LAC 与多种 calibration/repair。 作者报告：作者报告 ImageNet-Sketch 上 marginal coverage 约 0.86，但 worst-class coverage 为 0，10–12% classes 低于 0.70 null floor。（Table 3 and Sec. 4.7, pp. 12-14） Baseline coverage：比较 plain split-conformal、source Mondrian、clustered conformal、Conf-OT、selective retention 和 oracle target Mondrian；未覆盖开放世界 detection/generative VLM。 Ablation：跨 model scale、score family、prompt、corpus、miscoverage、vocabulary expansion 与 shifts 验证；缺少真实 downstream decision study。",
+    "insightZh": "核心贡献是系统证明 marginal guarantee 会隐藏严重 class-tail collapse，并以 finite-sample null、跨 family 和规模梯度把这一失败与普通平均指标拆开。 结论重要且跨 family 稳健，但属于 audit/evaluation 而非能力推进，因此收录为 skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

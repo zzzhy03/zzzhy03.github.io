@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2608.07267",
+  "slug": "wnm-3d-a-world-navigation-model-with-3d-scene-conditioning-for-closed-loop-vln",
+  "title": "WNM-3D: A World Navigation Model with 3D Scene Conditioning for Closed-Loop VLN",
+  "authors": [
+    "Yuehao Huang",
+    "Yunzi Wu",
+    "Xiaotao Zhang",
+    "Xinhai Li",
+    "Jiankun Dong",
+    "Jiajun Lv",
+    "Chi Zhang",
+    "Chenjia Bai",
+    "Yong Liu",
+    "Xuelong Li"
+  ],
+  "publishedAt": "2026-08-07",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.07267"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "video-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "video-generation",
+    "3d-reconstruction",
+    "WNM",
+    "World",
+    "Navigation",
+    "Model",
+    "with",
+    "Scene",
+    "Conditioning"
+  ],
+  "abstract": "Recent vision-language navigation (VLN) systems increasingly adapt pretrained vision-language models (VLMs) into vision-language-action (VLA) policies that map egocentric observations and language instructions directly to navigation actions. Although semantically capable, such action-centric training does not explicitly model how the agent's visual observations should evolve under its predicted motion. Generative world-action models (WAMs) jointly predict future observations and actions, yet existing WAMs for continuous VLN do not condition joint future-view and action generation on geometry-aware representations inferred from the observed history. We present WNM-3D, a generative World Navigation Model with 3D scene conditioning for continuous VLN. To consolidate past observations into persistent scene context, a frozen feed-forward geometry encoder extracts geometry-aware representations from the monocular egocentric RGB history, and a trainable 3D Scene-to-Token Adapter converts them into a fixed-length prefix in the token space of the world-action Diffusion Transformer. Through block-causal attention, this prefix conditions every future video-action block, providing a shared geometric context for both future-view and action generation. We train WNM-3D through supervised world-action fine-tuning on A*-generated demonstrations, DAgger-style adaptation on policy-visited states, and Counterfactual DanceGRPO refinement for closed-loop execution. Experiments on GN-Bench show that WNM-3D outperforms strong VLM-based navigation policies and its 2D-conditioned counterpart in closed-loop navigation. Stage-wise ablations further show that DAgger-SFT provides the larger success-rate gain, while Counterfactual DanceGRPO subsequently improves both navigation success and path efficiency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.07267v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.07267v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/TeleHuman/WNM-3D"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.07267v2 全文整理；本地 PDF 共 22 页，SHA-256 fb921446edb659ab1cb46214157e935ea1c17a3e2760e3958c1893ab535a0b30，并视觉核验第 1、4、8、11 页。",
+    "ideaZh": "WNM-3D 用冻结 VGGT-Ω 把 monocular history 编成 3D scene prefix，条件化未来 video latents 与 actions 的 block-causal joint diffusion，并经 A* SFT、DAgger 和 counterfactual DanceGRPO 闭环训练；GN-Bench unseen SR 最终为 53.5。",
+    "methodFlow": [
+      "从 monocular RGB history 提取 feed-forward 3D features",
+      "Scene-to-Token Adapter 构造 fixed-length history prefix",
+      "block-causal DiT 联合采样 future video/action blocks",
+      "DAgger 收集 policy-visited states 再监督适配",
+      "DanceGRPO 用 counterfactual rollouts 做闭环 refinement"
+    ],
+    "whyRelevantZh": "对 VLM spatial reasoning 与 3D-conditioned video/action world model 有迁移价值，但应用核心仍是 VLN。",
+    "evidenceZh": "WNM-3D 以 geometry-aware prefix 条件化 shared world-action DiT 的未来视觉与动作生成。（Figure 1 and Sec. 3, p. 4）；作者报告完整 WNM-3D 在 GN-Bench unseen split 的 SR 为 53.5、SPL 为 46.6，高于对应 WNM-2D 的 45.9/42.8。（Table 2 and Conclusion, pp. 8-11）；证据仅来自 GN-Bench；预测 visual latents 在闭环时不解码回 RGB，也不进入下一 history，world-model quality 与控制因果关系仍不完全清晰。（Conclusion, p. 11）",
+    "caveatZh": "作者结论限定在 GN-Bench closed-loop navigation；几何 encoder、simulator distribution 与 reward design 的迁移尚未建立。；证据仅来自 GN-Bench；预测 visual latents 在闭环时不解码回 RGB，也不进入下一 history，world-model quality 与控制因果关系仍不完全清晰。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文认为 action-only VLN 不显式建模观察如何随运动变化，因此以 3D Scene-to-Token Adapter 构建 persistent geometry prefix，联合生成 future views/actions。三阶段 training 先 imitation，再 policy-visited DAgger，最后 reward-guided refinement。对 WNM-2D、VLM/VLA baselines 和 stage ablations 的结果显示几何 prefix 与 DAgger 更关键，但只在 GN-Bench simulator 验证。",
+    "methodZh": "把 feed-forward 3D reconstruction 表示作为 world-action diffusion 的持久 prefix，使几何 context 同时约束 future view 与 action，而非只给 policy 一个静态 depth feature。 方法流程：从 monocular RGB history 提取 feed-forward 3D features → Scene-to-Token Adapter 构造 fixed-length history prefix → block-causal DiT 联合采样 future video/action blocks → DAgger 收集 policy-visited states 再监督适配 → DanceGRPO 用 counterfactual rollouts 做闭环 refinement。",
+    "experimentsZh": "GN-Bench seen/unseen split，报告 trajectory length、navigation error、oracle success、success rate、SPL；比较 VLM policies、WNM-2D 与三阶段 curriculum。 作者报告：作者报告完整 WNM-3D 在 GN-Bench unseen split 的 SR 为 53.5、SPL 为 46.6，高于对应 WNM-2D 的 45.9/42.8。（Table 2 and Conclusion, pp. 8-11） Baseline coverage：有强 VLM/VLA 和 2D-conditioned counterpart，但缺真实机器人、跨 simulator 和更长 horizon 验证。 Ablation：A* SFT、DAgger-SFT、DanceGRPO 分阶段消融显示 DAgger 是主要增益，直接从 Stage I 上 GRPO 会退化。",
+    "insightZh": "把 feed-forward 3D reconstruction 表示作为 world-action diffusion 的持久 prefix，使几何 context 同时约束 future view 与 action，而非只给 policy 一个静态 depth feature。 方法与 stage ablation 清晰、代码公开；因单 benchmark 和导航特化，收录为 skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

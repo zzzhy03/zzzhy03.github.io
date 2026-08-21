@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.19567",
+  "slug": "block3d-efficient-text-to-3d-generation-via-block-wise-diffusion",
+  "title": "Block3D: Efficient Text-to-3D Generation via Block-Wise Diffusion",
+  "authors": [
+    "Bowen Cui",
+    "Weijie Wang",
+    "Zeyu Zhang",
+    "Yefei He",
+    "Mingda Lin",
+    "Haoyu Zhao",
+    "Yuanyu He",
+    "Donny Y. Chen",
+    "Feng Chen",
+    "Bohan Zhuang"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19567"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Block3D",
+    "Efficient",
+    "Text",
+    "Generation",
+    "via",
+    "Block",
+    "Wise",
+    "Diffusion"
+  ],
+  "abstract": "While text-to-3D generation has advanced rapidly, achieving high geometric fidelity at low inference cost remains challenging. Existing text-to-3D methods either decode discrete shape tokens autoregressively or iteratively refine global 3D representations with diffusion or flow models. However, autoregressive decoding is sequential and cannot revise errors, whereas diffusion and flow-matching models repeatedly process the full representation, making high-quality generation increasingly expensive. In this paper, we propose Block3D, a block-wise diffusion framework that partitions the discrete shape-token sequence into contiguous blocks, generates the blocks autoregressively, and jointly denoises all tokens within the current block. To alleviate error accumulation, we introduce confidence-guided intra-block correction, which revises low-confidence tokens before each block is finalized. On a held-out set from TRELLIS-500K, Block3D reduces mean end-to-end generation time from 25.71 seconds to 4.99 seconds, achieving a $5.15\\times$ speedup over the fine-tuned autoregressive baseline without sacrificing geometric fidelity.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19567v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19567v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19567v1 全文整理；本地 PDF 共 32 页，SHA-256 d2d7f47e7e1e3e7c871ac93b27e4d5950f0bc86bdc231453a01b779667662ce4，并视觉核验第 1、4、8、11 页。",
+    "ideaZh": "Block3D 把 Cube 的 1024 shape-token 序列分成16个 block，block 间左到右、block 内并行 diffusion，并用 confidence-gated M2T/T2T correction 修低置信 token；作者报告 generation time 25.71→4.99 秒、5.15× speedup。",
+    "methodFlow": [
+      "Cube VQ tokenizer把 mesh编码为1024 discrete codes",
+      "把序列划分为连续 blocks并缓存完成 prefix",
+      "active block 内并行 diffusion denoising",
+      "confidence-gated M2T/T2T editing修正低置信 codes",
+      "frozen VQ decoder输出 mesh"
+    ],
+    "whyRelevantZh": "直接命中 Text-to-3D generation，结构化token schedule和显著 inference speed对3D asset pipelines有高价值。",
+    "evidenceZh": "Block3D 采用 block-causal generation、active-block joint denoising与 confidence-guided token correction。（Figure 3 and Sec. 3, p. 4）；作者报告相对 fine-tuned Cube，平均 end-to-end generation time 从25.71秒降至4.99秒，达到5.15× speedup且paired geometry保持竞争力。（Abstract and Sec. 4, pp. 1, 8-11）；completed prefixes immutable，不能修跨 block semantic/part errors；结果依赖 Cube的一维 code order和100-object held-out set。（Discussion and Limitations, p. 11）",
+    "caveatZh": "作者指出 immutable completed blocks限制 cross-block correction，未来需更广 representations/datasets。；completed prefixes immutable，不能修跨 block semantic/part errors；结果依赖 Cube的一维 code order和100-object held-out set。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文在 frozen Cube VQ tokenizer/decoder上重做 generation schedule：block-causal attention缓存已完成 prefix，active block通过 masked/random corruption与 residual rollout训练，并以 deterministic quota确保固定 horizon。TRELLIS-500K 300k train objects、100 held-out evaluation和多种 text-to-3D baselines显示速度与几何质量兼顾；但 completed blocks不可回改、评估集小且受1D token order限制。",
+    "methodZh": "在 token-wise autoregression与全局 diffusion之间提供 block-wise折中，并用 bounded confidence correction控制 error accumulation和fixed latency。 方法流程：Cube VQ tokenizer把 mesh编码为1024 discrete codes → 把序列划分为连续 blocks并缓存完成 prefix → active block 内并行 diffusion denoising → confidence-gated M2T/T2T editing修正低置信 codes → frozen VQ decoder输出 mesh。",
+    "experimentsZh": "TRELLIS-500K采样300k objects微调，seed42选100 held-out objects；同 frozen tokenizer/decoder，比较 time、CD-L1、F@1%、CLIPScore和定性 front/back views。 作者报告：作者报告相对 fine-tuned Cube，平均 end-to-end generation time 从25.71秒降至4.99秒，达到5.15× speedup且paired geometry保持竞争力。（Abstract and Sec. 4, pp. 1, 8-11） Baseline coverage：与 Cube、Trellis-text、AR3D-R1、ShapeLLM-omni等比较；evaluation规模较小且没有 user study或复杂 scene composition指标。 Ablation：block count/denoising steps、M2T/T2T editing、guidance与confidence quota；cross-block refinement未实现。",
+    "insightZh": "在 token-wise autoregression与全局 diffusion之间提供 block-wise折中，并用 bounded confidence correction控制 error accumulation和fixed latency。 方法清晰、速度收益大且有geometry对照；虽代码和评估规模有限，仍值得深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

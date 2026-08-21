@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.19900",
+  "slug": "avatardynamizer-from-static-to-dynamic-human-avatars-via-generative-dynamic-textures",
+  "title": "AvatarDynamizer: From Static to Dynamic Human Avatars via Generative Dynamic Textures",
+  "authors": [
+    "Guoxing Sun",
+    "Heming Zhu",
+    "Linjie Lyu",
+    "Pascal Fua",
+    "Christian Theobalt",
+    "Marc Habermann"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19900"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "AvatarDynamizer",
+    "From",
+    "Static",
+    "Dynamic",
+    "Human",
+    "Avatars",
+    "via",
+    "Generative",
+    "Textures"
+  ],
+  "abstract": "For full-body avatars, modeling surface dynamics is crucial for overcoming the uncanny valley and achieving perceptual realism. Person-agnostic methods recover static 3D avatars from monocular images, videos, or text prompts, but their skeleton-driven animations lack realistic surface dynamics such as clothing wrinkles. In contrast, person-specific methods achieve high-quality rendering and realistic dynamics, but require expensive multi-view captures for each individual. Recent generalizable dynamic avatar methods struggle to embed surface dynamics, leading to either limited multi-view consistency or dynamic expressiveness. To this end, we propose AvatarDynamizer, a generative method that transforms an off-the-shelf static 3D avatar into a controllable, realistic, and multi-view-consistent 4D avatar. We introduce a novel texture-space surface-dynamics embedding and formulate avatar dynamics modeling as conditional texture generation. Our encoder--decoder representation embeds pose-dependent dynamics into dynamic texture maps, enabling compatibility with pre-trained video diffusion models while decoding them into 3D Gaussians for multi-view consistent rendering. Since existing datasets are limited in scale, sequence length, or motion diversity, we collect a large-scale multi-view dataset with long sequences covering diverse skeletal motions and surface dynamics. Experiments show that our method effectively animates static avatars with faithful surface dynamics and outperforms competing generalizable methods in visual fidelity, especially under limited dynamic training data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19900v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19900v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19900v1 全文整理；本地 PDF 共 22 页，SHA-256 0bf9e71fc712c41ee14b9d54500f9378a9beed2f035a0c2b6efd92218f271f6e，并视觉核验第 1、4、7、8 页。",
+    "ideaZh": "AvatarDynamizer 把pose-dependent wrinkles/shadows编码成texture-space dynamic maps，用video diffusion生成motion textures，再由Generalized Gaussian Decoder恢复multi-view-consistent 3D Gaussians；作者报告跨四数据集多项FVD/FID/LPIPS最佳。",
+    "methodFlow": [
+      "从image/video/text/scan获得static avatar",
+      "fit coarse shape与identity texture",
+      "把multi-view surface dynamics编码为dynamic textures",
+      "video diffusion按pose/normal生成motion texture",
+      "Gaussian decoder输出可控4D avatar"
+    ],
+    "whyRelevantZh": "直接命中controllable 4D avatar/3D generation，texture-space bridge对dynamic asset generation很有迁移价值。",
+    "evidenceZh": "动态表面被显式编码为texture maps，video prior生成后由Gaussian decoder恢复3D appearance/pose offsets。（Figure 2 and Sec. 3, p. 4）；作者报告在DeepCap、DDC、MetaCap、DynaHuman上多项generative FID/FVD/LPIPS最佳，例如DynaHuman FVD 37.00。（Table 1, p. 7）；dynamic ground truth本身不唯一，方法限制human template/fixed topology；任意衣物、拓扑变化与head细节未解决。（Conclusion, p. 8）",
+    "caveatZh": "作者指出template assumption仍限制任意clothing和topological changes，head modeling也非重点。；dynamic ground truth本身不唯一，方法限制human template/fixed topology；任意衣物、拓扑变化与head细节未解决。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "方法接受任意off-the-shelf static avatar，先fit shape/identity texture；用多视角video优化dynamic color/pose textures，训练decoder把texture解成3D Gaussians，再以pretrained video prior条件生成新动作的dynamic texture。DynaHuman含58 subjects、100 cameras、长序列，与LHM/GAS/VAP比较并做dataset/prior/temporal ablations。限制是人类body、fixed topology与动态GT ambiguity。",
+    "methodZh": "把高频surface dynamics从直接回归3D Gaussians改为可借用video foundation prior的2D texture generation，再解码回多视角3D。 方法流程：从image/video/text/scan获得static avatar → fit coarse shape与identity texture → 把multi-view surface dynamics编码为dynamic textures → video diffusion按pose/normal生成motion texture → Gaussian decoder输出可控4D avatar。",
+    "experimentsZh": "四个human datasets与作者DynaHuman；static/dynamic baselines，PSNR/SSIM/LPIPS、FID/FVD、user study与cross-dataset generalization。 作者报告：作者报告在DeepCap、DDC、MetaCap、DynaHuman上多项generative FID/FVD/LPIPS最佳，例如DynaHuman FVD 37.00。（Table 1, p. 7） Baseline coverage：与LHM、GAS、VAP及static/multi-view variants比较；部分baseline无train code需reimplementation。 Ablation：texture representation、training datasets、pretrained video weights、temporal block与reference dynamic textures。",
+    "insightZh": "把高频surface dynamics从直接回归3D Gaussians改为可借用video foundation prior的2D texture generation，再解码回多视角3D。 方法表示、新数据、多视角/跨数据证据和限制完整，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.19807",
+  "slug": "answer-level-trust-selection-for-physical-vision-language-reasoning",
+  "title": "Answer-Level Trust Selection for Physical Vision-Language Reasoning",
+  "authors": [
+    "Rongyu Yu",
+    "Ke Niu",
+    "Fengxiang He"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19807"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Answer",
+    "Level",
+    "Trust",
+    "Selection",
+    "for",
+    "Physical",
+    "Vision",
+    "Language",
+    "Reasoning"
+  ],
+  "abstract": "Vision-language models (VLMs) can estimate physical quantities such as duration, speed, and acceleration from visual observations, but existing benchmarks primarily assess overall model performance against annotated ground truth. In deployment, a key question is whether an individual prediction can be trusted when its ground truth is unavailable. Self-consistency alone may fail to capture important failure modes: a VLM may produce stable-but-wrong estimates or rely on textual priors rather than visual evidence. We formulate answer-level selective prediction for quantitative physical reasoning and propose Answer-Level Trust Selection (ATS), a post-hoc, model-agnostic framework for accepting or rejecting individual VLM predictions. ATS requires no fine-tuning, auxiliary verifier, or access to the model's internal logits. Instead, it aggregates eight interpretable behavioral diagnostic scores derived from repeated queries and controlled interventions into a unified trust score. We evaluate ATS in depth on Qwen2.5-VL-7B and across 20 VLM backbones, examining selective performance, diagnostic behavior, and targeted failure modes. Our results show that intervention-based diagnostics help identify stable-but-wrong and prior-tracking predictions that repeated agreement alone may miss. However, improved failure-case rejection can come at the cost of lower retention of correct predictions. ATS therefore complements model-level capability evaluation with answer-level reliability assessment for quantitative VLM predictions. Code will be released upon publication.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19807v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19807v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19807v1 全文整理；本地 PDF 共 8 页，SHA-256 7c81b99ff04d0f8bd16ba10e34193861536038e08faea73ef38f89d876741e91，并视觉核验第 1、3、7、8 页。",
+    "ideaZh": "ATS 对同一physical VLM问题做video/prior/counterfactual/CoT/self-consistency queries，聚合8个behavioral diagnostics选择是否信任单条答案；作者报告可识别stable-but-wrong与prior-tracking，但总体AURC优势小且会牺牲correct retention。",
+    "methodFlow": [
+      "对原video+question得到baseline numeric answer",
+      "构造prior-only与counterfactual prior queries",
+      "加入CoT与repeated sampling测稳定性",
+      "把responses转成8个diagnostic scores",
+      "聚合trust score并按threshold accept/reject"
+    ],
+    "whyRelevantZh": "VLM answer-level reliability对grounding与physical reasoning重要，但当前更像诊断工具。",
+    "evidenceZh": "ATS通过五种controlled VLM probes构造8个diagnostics，再聚合成answer-level selector。（Figure 2 and Methods, p. 3）；作者报告prior-weighted ATS在Qwen2.5-VL-7B的AURC为0.5300，且在50% coverage拒绝40.9%的stable-but-wrong cases，但同时降低correct retention。（Figure 4 and Table 2, p. 7）；aggregate AURC增益不稳，拒绝错误的同时会拒绝正确答案；physical quantity benchmark与queries成本限制部署。（Conclusion, p. 8）",
+    "caveatZh": "作者强调这是rejection-retention trade-off而非uniform improvement，代码也仅承诺publication后发布。；aggregate AURC增益不稳，拒绝错误的同时会拒绝正确答案；physical quantity benchmark与queries成本限制部署。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文把model-level average accuracy改为answer-level selective prediction，不访问logits或额外verifier。五类controlled interventions生成sampling agreement、prior sensitivity、validity等8个scores，再用fixed/learned selector。Qwen2.5-VL-7B深挖与20 backbones transfer显示特定failure-mode rejection较强，但generic uncertainty在aggregate ranking仍有竞争力，trade-off不能解释为无条件提升。",
+    "methodZh": "用可解释controlled interventions区分self-consistent-but-wrong、text-prior tracking与真实visual evidence，而不是只靠概率或重复一致性。 方法流程：对原video+question得到baseline numeric answer → 构造prior-only与counterfactual prior queries → 加入CoT与repeated sampling测稳定性 → 把responses转成8个diagnostic scores → 聚合trust score并按threshold accept/reject。",
+    "experimentsZh": "Qwen2.5-VL-7B主实验、20 VLM backbones；coverage-retained MRA、AURC、stable-but-wrong/prior-tracking targeted analyses。 作者报告：作者报告prior-weighted ATS在Qwen2.5-VL-7B的AURC为0.5300，且在50% coverage拒绝40.9%的stable-but-wrong cases，但同时降低correct retention。（Figure 4 and Table 2, p. 7） Baseline coverage：与self-consistency、generic uncertainty、learned UQ、prior/equal-weight ATS比较；无内部logits但每题需多次query。 Ablation：8 score groups、weight perturbation、supervision removal与cross-backbone profiles；开放式非数值reasoning未测。",
+    "insightZh": "用可解释controlled interventions区分self-consistent-but-wrong、text-prior tracking与真实visual evidence，而不是只靠概率或重复一致性。 failure-mode analysis值得记录；因aggregate增益小、query成本与trade-off，收录为skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

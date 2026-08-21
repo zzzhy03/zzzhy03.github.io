@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2608.18388",
+  "slug": "depth-anything-v4-dynamic-4d-scene-reconstruction-via-riemannian-flow-matching-on-4d-gaussian-splatting",
+  "title": "Depth Anything V4: Dynamic 4D Scene Reconstruction via Riemannian Flow Matching on 4D Gaussian Splatting",
+  "authors": [
+    "Jiaming Fan",
+    "Jian Lu",
+    "Jinling Jia",
+    "Chenbin Zhang"
+  ],
+  "publishedAt": "2026-08-18",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.18388"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Depth",
+    "Anything",
+    "Dynamic",
+    "Scene",
+    "Reconstruction",
+    "via",
+    "Riemannian",
+    "Flow",
+    "Matching"
+  ],
+  "abstract": "We present Depth Anything V4 (DAV4), a framework for dynamic 4D scene reconstruction from monocular video. Our key contribution is the application of Riemannian Flow Matching (RFM) to 4D Gaussian Splatting parameters, defining probability paths directly on non-Euclidean manifolds (scale, rotation, opacity), ensuring all intermediate states are valid. Through controlled experiments, we isolate RFM's contribution from test-time optimization (TTO) and pre-training. A deterministic MLP baseline with the same data, architecture, and TTO achieves F-score 0.762; RFM achieves 0.806 - the +0.044 gain is RFM's isolated contribution. We provide corrected computational cost analysis: pre-training is 360 GPU-hours, amortizing for large-scale deployment (over 10,000 scenes). Uncertainty is quantified via Negative Gaussian Log-Likelihood and Expected Calibration Error. DAV4 outperforms prior Depth Anything models and per-scene 4D-GS on dynamic reconstruction and novel-view synthesis, while using no human-annotated depth labels as training losses.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.18388v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.18388v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/fjm123456789/Depth-Anything-4"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.18388v2 全文整理；本地 PDF 共 14 页，SHA-256 8032520e49d85e56e31d2e82f2e4bb788f5e15bcc67d72858e0c2cdfac76b90c，并视觉核验第 1、3、5、9 页。",
+    "ideaZh": "DAV4 把 4D Gaussian 的 scale/rotation/opacity 放在各自 manifold 上做 Riemannian Flow Matching，再用 per-scene TTO 细化；受控对照中同 data/architecture/TTO 的 MLP 为 0.762 F-score，RFM 为 0.806。",
+    "methodFlow": [
+      "DINOv2 与 Perceiver 编码 monocular video",
+      "在 4D-GS parameter manifolds 定义 conditional probability path",
+      "RFM vector field 经 ODE solver生成 Gaussians",
+      "multi-head decoder输出 position/scale/quaternion/opacity",
+      "render-loss TTO 细化并估计 uncertainty"
+    ],
+    "whyRelevantZh": "属于 selective 3D Reconstruction 中少见的动态 4D 表示与受控贡献分解，对 3D generation/4D prior 也有迁移价值。",
+    "evidenceZh": "DAV4 在 4D Gaussian 非欧参数空间上学习 Riemannian flow，并以 ODE+TTO恢复动态场景。（Figure 2 and Sec. 4, p. 3）；作者报告同 data、architecture 与 TTO 下 deterministic MLP F-score 0.762，而 RFM+TTO 达到 0.806，isolated gain 为 +0.044。（Table 1, p. 5）；420ms inference 不适合实时，预训练需 360 GPU-hours；NVS comparison 存在随机/预训练初始化偏置，TTO 也缺严格 energy interpretation。（Discussion and Limitations, p. 9）",
+    "caveatZh": "作者明确列出非实时、预训练成本、NVS 初始化 bias 和 TTO guidance 缺少严谨 energy interpretation。；420ms inference 不适合实时，预训练需 360 GPU-hours；NVS comparison 存在随机/预训练初始化偏置，TTO 也缺严格 energy interpretation。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文从 monocular video 提取 DINOv2 features，用 Perceiver 与 RFM prior 产生时空 Gaussians，ODE solver 生成 coarse-to-fine states，最后 render-loss TTO。与 deterministic MLP、4D-GS 和 prior Depth Anything 对照，并单独分析 uncertainty、invalid Gaussians 和 amortized cost。对贡献分解较诚实，但 420ms inference、360 GPU-hour pretraining 和初始化偏置限制应用。",
+    "methodZh": "相较把 Gaussian parameters 当欧氏向量，RFM 保证 rotation、scale、opacity 路径的中间状态有效；论文还用同协议 MLP 明确隔离这一 formulation 的增益。 方法流程：DINOv2 与 Perceiver 编码 monocular video → 在 4D-GS parameter manifolds 定义 conditional probability path → RFM vector field 经 ODE solver生成 Gaussians → multi-head decoder输出 position/scale/quaternion/opacity → render-loss TTO 细化并估计 uncertainty。",
+    "experimentsZh": "WebVid-10M+MegaDepth 预训练，无 human depth labels；Dynamic-Sim/KITTI Dynamic reconstruction，ETH3D/ScanNet NVS；报告 F-score、PSNR/SSIM/LPIPS、NGLL/ECE 与 amortized cost。 作者报告：作者报告同 data、architecture 与 TTO 下 deterministic MLP F-score 0.762，而 RFM+TTO 达到 0.806，isolated gain 为 +0.044。（Table 1, p. 5） Baseline coverage：包含 per-scene 4D-GS、MLP controlled baseline、prior Depth Anything 和 NVS methods；仍缺多种最新 feed-forward dynamic reconstructor 的统一训练对照。 Ablation：隔离 TTO、pretraining、RFM、video-time conditioning、Euclidean vs Riemannian path、uncertainty calibration 与 cost amortization。",
+    "insightZh": "相较把 Gaussian parameters 当欧氏向量，RFM 保证 rotation、scale、opacity 路径的中间状态有效；论文还用同协议 MLP 明确隔离这一 formulation 的增益。 方法新意、受控对照、成本/不确定性和代码证据完整，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

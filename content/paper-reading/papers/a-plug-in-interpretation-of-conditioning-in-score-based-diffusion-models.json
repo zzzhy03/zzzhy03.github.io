@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2608.19504",
+  "slug": "a-plug-in-interpretation-of-conditioning-in-score-based-diffusion-models",
+  "title": "A Plug-in Interpretation of Conditioning in Score-Based Diffusion Models",
+  "authors": [
+    "Libo Chen",
+    "Souvik Ghosh",
+    "Teo Deveney",
+    "Chris Budd",
+    "Vinay P. Namboodiri"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19504"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Plug",
+    "Interpretation",
+    "Conditioning",
+    "Score",
+    "Based",
+    "Diffusion",
+    "Models"
+  ],
+  "abstract": "We propose a conditioning mechanism for diffusion models based on multi-speed joint diffusion of the target and the condition. The mechanism learns an unconditional joint score network and enforces conditioning at inference via a plug-in correction term. The plug-in term separates the conditioning contribution from the learned unconditional dynamics, offering a transparent view of how the condition steers generation of the target distribution. Building on this, we derive explicit conditional reverse-time SDEs and approximate probability-flow ODEs, enabling principled and directly comparable conditional samplers. To reduce the induced ODE--SDE discrepancy, we introduce a log-Fokker--Planck residual regularization that improves ODE sampling quality. Experiments on conditional image generation tasks demonstrate competitive performance and support the effectiveness of the plug-in conditioning view. Additional ODE--SDE comparison experiments show that the log-Fokker--Planck residual regularization improves deterministic ODE sampling.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19504v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19504v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19504v1 全文整理；本地 PDF 共 25 页，SHA-256 62cfb02a7984b4f127a7fd15ae8df14cc2b79418f3b2f0ce31bdc4d7e20c212e，并视觉核验第 1、4、9、13 页。",
+    "ideaZh": "论文联合扩散 target 与 condition、训练 unconditional joint score，再在 inference 通过 analytic plug-in correction 注入条件；同时用 log-Fokker-Planck residual 缩小 ODE/SDE sampler 差异。CelebA inpainting 上 PSNR 25.38、JFID 15.99。",
+    "methodFlow": [
+      "对 target/condition 施加不同速度的 joint forward diffusion",
+      "训练 unconditional joint score network",
+      "由 Bayes 与 plug-in correction构造 conditional reverse SDE",
+      "近似对应 probability-flow ODE",
+      "用 log-Fokker-Planck residual 对齐 deterministic/stochastic samplers"
+    ],
+    "whyRelevantZh": "conditioning interface 和 ODE/SDE 解释可迁移到 image generation/editing，但目前证据主要是小中型 inverse problems。",
+    "evidenceZh": "方法在 joint score 上加入 condition-channel plug-in correction，分离生成 dynamics 与 observation consistency。（Sec. 3.1, p. 4）；作者报告 CelebA inpainting 中本方法 PSNR 25.38、SSIM 0.876、JFID 15.99，优于所列 joint-diffusion baselines 的多数指标。（Figure 1 and Table 1, p. 9）；闭式 plug-in correction 依赖 linear-Gaussian forward kernel；强 multimodal posterior 或高 condition noise 会破坏 screening approximation。（Conclusion and Discussion, p. 13）",
+    "caveatZh": "作者列出 linear-Gaussian kernel、non-Gaussian corruption 需要近似 likelihood score，以及 multimodal/high-noise condition 下近似变差。；闭式 plug-in correction 依赖 linear-Gaussian forward kernel；强 multimodal posterior 或高 condition noise 会破坏 screening approximation。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "方法以 multi-speed joint diffusion 让 condition channel 更慢加噪，推导 conditional reverse-time SDE 和 approximate probability-flow ODE；plug-in term 把 learned dynamics 与 observation correction 分离，也可用于 pretrained prior inverse problems。CelebA、ImageNet256、MNIST 支持效果，但理论依赖 Gaussian/linear condition kernel，任务集中 inpainting/SR。",
+    "methodZh": "用统一 joint score 加 inference-time analytic correction重述 conditioning，避免每个 observation operator 重训 conditional score，并把 ODE-SDE mismatch纳入显式 regularization。 方法流程：对 target/condition 施加不同速度的 joint forward diffusion → 训练 unconditional joint score network → 由 Bayes 与 plug-in correction构造 conditional reverse SDE → 近似对应 probability-flow ODE → 用 log-Fokker-Planck residual 对齐 deterministic/stochastic samplers。",
+    "experimentsZh": "CelebA inpainting/8× SR、ImageNet256 noisy inpainting、MNIST controlled ODE-SDE experiments；同 score backbone与 sampling budget对比。 作者报告：作者报告 CelebA inpainting 中本方法 PSNR 25.38、SSIM 0.876、JFID 15.99，优于所列 joint-diffusion baselines 的多数指标。（Figure 1 and Table 1, p. 9） Baseline coverage：与 CDE、CDiffE、CMDE、HCFLOW、DPS/DiffPIR 类方法比较；大规模 text-to-image conditioning 和非线性条件未测。 Ablation：比较 condition diffusion speed、plug-in correction、ODE/SDE、Fokker-Planck residual 与 checkpoint sensitivity。",
+    "insightZh": "用统一 joint score 加 inference-time analytic correction重述 conditioning，避免每个 observation operator 重训 conditional score，并把 ODE-SDE mismatch纳入显式 regularization。 理论视角有迁移价值，实验边界诚实；因未覆盖 foundation-scale generation，收录为 skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

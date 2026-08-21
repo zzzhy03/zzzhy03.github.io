@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2509.05441",
+  "slug": "decoupling-high-and-low-frequencies-for-faithful-image-generation-with-fine-details",
+  "title": "Decoupling High and Low Frequencies for Faithful Image Generation with Fine Details",
+  "authors": [
+    "Tejaswini Medi",
+    "Hsien-Yi Wang",
+    "Arianna Rampini",
+    "Margret Keuper"
+  ],
+  "publishedAt": "2025-09-05",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v4",
+  "identifiers": {
+    "arxiv": "2509.05441"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Decoupling",
+    "High",
+    "and",
+    "Low",
+    "Frequencies",
+    "for",
+    "Faithful",
+    "Image",
+    "Generation"
+  ],
+  "abstract": "Latent generative models compress images into learned embeddings prior to synthesis, and the generation quality critically depends on how faithfully these embeddings preserve visual detail. We observe that while such embeddings are effective at reconstructing low frequency structure, they struggle to recover sharp high frequency details that are essential for perceptual realism. Conventional reconstruction objectives implicitly prioritize coarse structural information over high frequency content, which can lead to overly smoothed outputs and degraded visual quality in textured regions. Motivated by this observation, we propose DeBaT, a Decoupled frequency Band Tokenizer that explicitly separates the learning of low and high frequency band embeddings. This decoupling enables accurate reconstruction of fine details while preserving global coherence. Integrated into a latent diffusion based generative model, DeBaT allows for sharper and more realistic samples than previous latent tokenizers, confirming that the explicit decoupling of high and low frequency bands eases the preservation of visual details in learned embedding spaces.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2509.05441v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2509.05441v4"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2509.05441v4 全文整理；本地 PDF 共 30 页，SHA-256 a1dc4efec49fc76ddd714a77ac5916bf95d50a9fb79a6f475cb12dea13f2d9fa，并视觉核验第 1、7、11、15 页。",
+    "ideaZh": "DeBaT 先用 Haar wavelet 将图像拆成低/高频，再以两套 VAE encoder-decoder 独立学习并融合 latent；作者报告在相同 16×16×32 latent 下 reconstruction error 0.0044、rFID 0.2156，并改善下游 latent diffusion 的细节生成。",
+    "methodFlow": [
+      "对输入图像做 Haar wavelet decomposition",
+      "分别用低频与高频 VAE 学习专用 latent",
+      "独立重建两个 band 并施加频率感知损失",
+      "融合 band latent 供 latent diffusion 生成",
+      "inverse wavelet 合成最终图像"
+    ],
+    "whyRelevantZh": "直接关系到 Image Generation 的 latent representation；高频/低频解耦可迁移到 structured 2D、纹理和多模态生成 backbone。",
+    "evidenceZh": "DeBaT 用两条专用编码路径分别表示 low/high-frequency bands，并在统一 latent 中供下游 diffusion 使用。（Fig. 3 and Sec. 3.2, p. 7）；作者报告 DeBaT 的 reconstruction error 为 0.0044、rFID 为 0.2156，同时以 50.08 img/s throughput 保持可比训练效率。（Table 1, p. 11; Table 5, p. 15）；当前证据只覆盖单级 wavelet、VAVAE-style tokenizer 与 ImageNet；更深分解和其他 tokenizer 架构的泛化尚未验证。（Conclusion and Discussion, p. 15）",
+    "caveatZh": "作者指出当前仅使用一次 wavelet decomposition，效率增益有限，未来需与其他 complementary latent encoders 和多级分解结合。；当前证据只覆盖单级 wavelet、VAVAE-style tokenizer 与 ImageNet；更深分解和其他 tokenizer 架构的泛化尚未验证。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文把 latent tokenizer 的细节丢失定位为低频结构与高频纹理在单一表示中的优化冲突。方法对两个 frequency bands 分别编码、重建，再以 inverse wavelet 得到图像，并把融合 latent 接入 LightningDiT。ImageNet-1K 上同时评估 reconstruction、生成、效率与 wavelet/tokenizer ablation；可视结果显示文字、服饰与纹理边缘更清晰，但当前只验证单级 wavelet 和 VAVAE 基线族。",
+    "methodZh": "关键新意是把 frequency separation 做进 tokenizer representation 与训练目标，而非只在像素 loss 中提高高频权重；这样把全局结构和细节容量显式解耦，并可直接作为生成模型 latent 接口。 方法流程：对输入图像做 Haar wavelet decomposition → 分别用低频与高频 VAE 学习专用 latent → 独立重建两个 band 并施加频率感知损失 → 融合 band latent 供 latent diffusion 生成 → inverse wavelet 合成最终图像。",
+    "experimentsZh": "在 ImageNet-1K 训练与 50k validation images 上比较多种 latent tokenizers，并把 tokenizer 接入 autoregressive 与 latent diffusion generators；指标含 reconstruction loss、frequency loss、LPIPS、rFID、FID 与效率。 作者报告：作者报告 DeBaT 的 reconstruction error 为 0.0044、rFID 为 0.2156，同时以 50.08 img/s throughput 保持可比训练效率。（Table 1, p. 11; Table 5, p. 15） Baseline coverage：与 DC-AE、SD-VAE、KL-VAE、TiTok、VQ-VAE、LiteVAE、VA-VAE 和 wavelet variants 比较；未覆盖最新闭源 tokenizer 或大型多域生成训练。 Ablation：表格比较 band coupling、wavelet stage、latent size 与生成后端；支持 frequency decoupling，但跨数据域和编辑任务仍缺失。",
+    "insightZh": "关键新意是把 frequency separation 做进 tokenizer representation 与训练目标，而非只在像素 loss 中提高高频权重；这样把全局结构和细节容量显式解耦，并可直接作为生成模型 latent 接口。 方法、主表、定性细节与效率证据闭环，且 tokenizer 设计具有跨生成模型迁移价值，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

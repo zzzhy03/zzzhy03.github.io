@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2608.19556",
+  "slug": "stream4d-4d-consistency-for-streaming-autoregressive-diffusion-video-models",
+  "title": "Stream4D: 4D-Consistency for Streaming Autoregressive Diffusion Video Models",
+  "authors": [
+    "Yuanhao Ban",
+    "Jiaqi Feng",
+    "Hengguang Zhou",
+    "Xiaohuan Pei",
+    "Justin Cui",
+    "Cho-Jui Hsieh"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-20",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19556"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "3d-reconstruction",
+    "Stream4D",
+    "Consistency",
+    "for",
+    "Streaming",
+    "Autoregressive",
+    "Diffusion",
+    "Video",
+    "Models"
+  ],
+  "abstract": "Streaming autoregressive diffusion models enable real-time, long-horizon video generation, but their training objectives optimize local frame prediction rather than the geometry and dynamics of a coherent world: long rollouts accumulate geometric drift and degrade into static or unnatural motion. Recent bidirectional approaches address this problem using rewards signals built upon 3D Gaussian-Splatting reconstruction. However, a single rigid 3d reconstruction cannot model a dynamic scene, so this critic penalizes genuine object motion as reconstruction error and is maximized by freezing the video. This shortcut is especially detrimental in the AR setting, where each chunk can propagate an already-static configuration. In this work, we propose Stream4D, which replaces the static critic with a feed-forward 4D reconstruction reward that explicitly models scene dynamics, allowing coherent motion to receive high consistency rewards. To further guide motion magnitude and quality, we add a motion prior that rewards natural scene-flow magnitude while penalizing jitter and non-rigid artifacts. Our final recipe combines these two terms with a lightweight perceptual anchor. Across various autoregressive video backbones and various generation horizons, Stream4D improves 4D reconstruction quality, preserves motion more effectively, and achieves higher human-aligned preference. Project page: https://banyuanhao.github.io/Stream4D/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19556v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19556v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://banyuanhao.github.io/Stream4D/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19556v1 全文整理；本地 PDF 共 24 页，SHA-256 2ecd1a448cbf1440b694f5ffd175ffd882379de5bd7236e73ddb28d221cf093d，并视觉核验第 1、2、7、10 页。",
+    "ideaZh": "Stream4D 指出 static 3D reconstruction reward 会奖励冻结画面，改用 feed-forward 4D-GS reward、peaked natural-motion gate 和 perceptual anchor；作者报告在 Self-Forcing/Causal-Forcing/LongLive 上 4D-PSNR 分别 +3.46/+5.53/+6.76 dB。",
+    "methodFlow": [
+      "从 AR model rollout sample videos",
+      "feed-forward 4D-GS重建动态 scene",
+      "re-render并计算4D consistency reward",
+      "motion gate奖励自然 scene-flow并惩罚 jitter/rigid artifacts",
+      "加入 perceptual anchor后进行 RL update"
+    ],
+    "whyRelevantZh": "这是 Video Generation 长时一致性与 3D/4D reward design 的直接推进，对 world/video models均有迁移。",
+    "evidenceZh": "Stream4D 用 dynamic 4D reconstruction reward替代 rigid 3D critic，并配合 motion gate与 perceptual anchor。（Figure 1 and Sec. 3, p. 2）；作者报告三种 backbones 的 4D-PSNR 分别提升 3.46、5.53、6.76 dB，并在每个 backbone 上提高 motion-preservation judge score。（Table 1, p. 7）；reward quality依赖 feed-forward 4D reconstructor、Gemini judge和 motion target；对更长 native horizon及真实世界物理一致性未证实。（Conclusion, p. 10）",
+    "caveatZh": "作者把更长 streaming 4D reconstructor、explicit action/camera inputs和 native LongLive horizon列为未来工作。；reward quality依赖 feed-forward 4D reconstructor、Gemini judge和 motion target；对更长 native horizon及真实世界物理一致性未证实。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文把 streaming autoregressive video 的 long-rollout collapse 追溯到 reward shortcut：rigid 3D critic无法容纳真实 motion。新 reward stack分别约束 4D consistency、motion magnitude/smoothness 和 perceptual fidelity，并用 RL transfer到三个 distilled AR backbones。500 prompts、human study、reward-blind judge、reconstructor cross-check 与 ablations支持结果，但依赖 pretrained 4D reconstructor和外部 judge。",
+    "methodZh": "最重要的是识别并消除 static-3D reward 的 freeze shortcut，让动态一致性 reward 不再把真实运动当 reconstruction error。 方法流程：从 AR model rollout sample videos → feed-forward 4D-GS重建动态 scene → re-render并计算4D consistency reward → motion gate奖励自然 scene-flow并惩罚 jitter/rigid artifacts → 加入 perceptual anchor后进行 RL update。",
+    "experimentsZh": "500 object-prominent prompts，Self-Forcing/Causal-Forcing/LongLive，4DGT/MoVieS metrics、VideoReward、LLM judge、50 high-motion prompt human study。 作者报告：作者报告三种 backbones 的 4D-PSNR 分别提升 3.46、5.53、6.76 dB，并在每个 backbone 上提高 motion-preservation judge score。（Table 1, p. 7） Baseline coverage：与 base、World-R1、VideoGPA、full-diffusion references比较；部分 baseline为作者 reproduction且无 published checkpoints。 Ablation：移除4D、motion、perceptual reward，改变 motion gate target/formulation，并做 reconstructor-independent cross-check和 judge blinding。",
+    "insightZh": "最重要的是识别并消除 static-3D reward 的 freeze shortcut，让动态一致性 reward 不再把真实运动当 reconstruction error。 failure mechanism、跨三 backbone、human/metric cross-check与限制完整，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

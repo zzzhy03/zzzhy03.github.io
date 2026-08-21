@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.19491",
+  "slug": "deltamomentum-a-key-value-based-anisotropic-momentum-update-via-delta-rule",
+  "title": "DeltaMomentum: A Key-Value based Anisotropic Momentum Update via Delta Rule",
+  "authors": [
+    "Euijin Hong",
+    "Guannan Qu"
+  ],
+  "publishedAt": "2026-08-19",
+  "updatedAt": "2026-08-19",
+  "collectedAt": "2026-08-22",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.19491"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.LG",
+    "math.OC",
+    "stat.ML"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "llm",
+    "DeltaMomentum",
+    "Key",
+    "Value",
+    "based",
+    "Anisotropic",
+    "Momentum",
+    "Update",
+    "via",
+    "Delta"
+  ],
+  "abstract": "Most modern optimizers form their momentum as an exponential moving average (EMA) of past gradients, forgetting every direction at one fixed rate. However, the inputs a deep network sees during training can be highly anisotropic, with a few directions queried frequently while most are seen rarely. Recent methods address this anisotropy by wrapping extra processing around this buffer, leaving the momentum update itself unchanged. We propose DeltaMomentum, which builds direction-awareness into the momentum update rule. The main observation is that the gradient of a linear layer splits into an input that acts as a key and an output-side error that acts as a value. Exploiting the key-value structure, DeltaMomentum updates the momentum buffer by the canonical delta rule, so each direction is forgotten at a rate set by how often it appears. We prove that it is a valid momentum, that it applies the input-side curvature correction without matrix inversion, and that it clears stale directions faster than EMA under both a fixed and a drifting optimum. It is a drop-in replacement for the momentum buffer of any optimizer, its coefficient transfers across widths under $μ$P, and its extra compute stays between $22.2\\%$ and $25.0\\%$ of a gated-MLP block's linear cost with no persistent memory. In FineWeb-Edu pretraining, AdamW with DeltaMomentum (DeltaAdamW) reaches AdamW's validation loss in up to $46.39 \\pm 4.32\\%$ fewer steps at 67M and $22.12 \\pm 0.80\\%$ at 370M over three seeds, and the gain persists at 1B on a Chinchilla-optimal budget. A Muon baseline tuned under the same protocol sits above DeltaAdamW at both language-model scales, and the gain holds for SGD, ResNet-18, and ViT-Tiny on CIFAR-10. Training-time diagnostics confirm the predicted mechanism, better gradient tracking and healthier input directions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.19491v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.19491v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.19491v1 全文整理；本地 PDF 共 41 页，SHA-256 3bc706feede27ae3a29a2962efee641d23967b030be3d87c4d0ced333354062b，并视觉核验第 1、6、10、12 页。",
+    "ideaZh": "DeltaMomentum 把线性层 input 当 key、output error 当 value，用 canonical delta rule 直接更新 momentum，使频繁方向更快遗忘；作者报告 FineWeb-Edu 上 DeltaAdamW 达到同 validation loss 所需 steps 在 67M 少 46.39%、370M 少 22.12%，1B 单 seed 仍有增益。",
+    "methodFlow": [
+      "将线性层 gradient 分解为 input key 与 output error value",
+      "对 key 做 RMS-style normalization",
+      "用 delta rule 更新方向相关 momentum memory",
+      "把该 buffer 接入 AdamW/SGD optimizer",
+      "按匹配 validation loss评估 steps、FLOPs 与 wall time"
+    ],
+    "whyRelevantZh": "若 step savings 可扩展，会直接影响 LLM/VLM 与生成模型训练成本，达到 LLM landmark-only 的高潜力门槛。",
+    "evidenceZh": "DeltaMomentum 的 fixed point 等价于 Tikhonov-regularized Wiener-style predictor，从而内生 input-side anisotropic correction。（Theorem 3.4 and Table 1, p. 6）；作者报告相对 AdamW，67M/370M 达到相同 loss 的 mean step reduction 为 46.39%/22.12%，但 realized per-step FLOP overhead 为 11.2%/17.4%。（Figure 1 and Tables 2-3, p. 10）；1B 只有单 seed，未覆盖 image generation/RL；non-fused implementation 与 width-dependent overhead 可能削弱 wall-clock收益。（Conclusion and scope discussion, p. 12）",
+    "caveatZh": "作者明确指出 larger scale、image generation 与 RL 未测试，1B 是单 seed，且非 fused 实现带来额外 wall-clock gap。；1B 只有单 seed，未覆盖 image generation/RL；non-fused implementation 与 width-dependent overhead 可能削弱 wall-clock收益。；所有实验数字均为作者报告；本项目没有独立复现。",
+    "motivationZh": "论文从 input anisotropy 出发，把 EMA momentum 重写为 online associative memory，并证明 fixed point 对应 regularized Wiener predictor、带来 input-side curvature correction。实证覆盖 67M/370M/1B LM pretraining、Muon 对照、SGD、ResNet-18、ViT-Tiny 与机制诊断；但 1B 仅单 seed，per-step FLOP overhead 随宽度上升，image generation/RL 尚未测。",
+    "methodZh": "不是在 EMA 外包一层预条件器，而是把方向感知遗忘写进 momentum update 本身，并给出 fixed-point、drifting optimum 与 μP transfer 解释。 方法流程：将线性层 gradient 分解为 input key 与 output error value → 对 key 做 RMS-style normalization → 用 delta rule 更新方向相关 momentum memory → 把该 buffer 接入 AdamW/SGD optimizer → 按匹配 validation loss评估 steps、FLOPs 与 wall time。",
+    "experimentsZh": "FineWeb-Edu 上 67M、370M 三 seeds 与 1B 单 seed，Chinchilla-optimal budgets；同 protocol 调 Muon；CIFAR-10 上 SGD/ResNet-18/ViT-Tiny；机制 diagnostics。 作者报告：作者报告相对 AdamW，67M/370M 达到相同 loss 的 mean step reduction 为 46.39%/22.12%，但 realized per-step FLOP overhead 为 11.2%/17.4%。（Figure 1 and Tables 2-3, p. 10） Baseline coverage：与 AdamW、Muon、SGD-momentum 比较，并控制 μP family；仍缺更大模型、distributed optimizer、modern fused implementation 与视觉生成任务。 Ablation：验证 normalized/un-normalized keys、coefficient transfer、mechanistic covariance metrics、optimizer/architecture transfer；缺少超大规模与 mixed-modality ablation。",
+    "insightZh": "不是在 EMA 外包一层预条件器，而是把方向感知遗忘写进 momentum update 本身，并给出 fixed-point、drifting optimum 与 μP transfer 解释。 理论、跨 scale、机制诊断和成本账本都较完整，虽仍需更大规模复现，建议深读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
