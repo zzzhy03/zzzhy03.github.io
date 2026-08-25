@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2608.22883",
+  "slug": "fovea-focused-on-demand-visual-evidence-adaptation-for-cache-friendly-multimodal-speculative-dec",
+  "title": "FOVEA: Focused On-Demand Visual Evidence Adaptation for Cache-Friendly Multimodal Speculative Decoding",
+  "authors": [
+    "Hengjie Zhu",
+    "Dayan Wu",
+    "Zihao Zhang",
+    "Xinze Liu",
+    "Jingxuan Yu",
+    "Peng Fu",
+    "Zheng Lin",
+    "Weiping Wang",
+    "Ding Wang"
+  ],
+  "publishedAt": "2026-08-24",
+  "updatedAt": "2026-08-24",
+  "collectedAt": "2026-08-26",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.22883"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "FOVEA",
+    "Focused",
+    "Demand",
+    "Visual",
+    "Evidence",
+    "Adaptation",
+    "for",
+    "Cache"
+  ],
+  "abstract": "Multimodal speculative decoding accelerates vision-language models by allowing a lightweight draft model to propose candidate tokens for parallel verification by a larger target model. Existing methods typically condition the drafter on a fixed visual interface, such as a predefined visual-token budget or a static compressed representation. However, our controlled visual-budget analysis shows that visual demand varies substantially across tasks and decoding stages, which means more visual input is not always beneficial. Actually, insufficient evidence may weaken visual grounding, while excessive context adds overhead and may disrupt drafting. We propose FOVEA (Focused On-demand Visual Evidence Adaptation), a cache-friendly approach that builds a reusable visual memory and dynamically retrieves a bounded subset for a draft state. A cumulative-mass rule determines both how many and which entries are selected. The selected entries are aggregated into a visual readout and fused with the current draft hidden state through a lightweight gated residual correction. Rather than inserting visual tokens into the autoregressive context, the correction modifies only the representation passed to the language-model head. Experiments across multiple vision-language backbones and multimodal benchmarks show that FOVEA improves draft acceptance and end-to-end decoding speed, achieving up to $2.13\\times$ speedup over autoregressive decoding. These results demonstrate that state-conditioned evidence retrieval is an effective alternative to reusing a fixed visual representation throughout multimodal generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.22883v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.22883v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.22883v1 全文整理；本地 PDF 共 14 页，SHA-256 67049922dbd23894aff6081b4a03e5a8f1ae58770ea10a73032de713cecf834d，并视觉核验第 1、5、6、11 页。",
+    "ideaZh": "FOVEA 为 multimodal speculative decoding 按 draft state 动态检索视觉 memory，避免把视觉 token 写入自回归上下文；；作者报告 FOVEA 跨多种 VLM backbones/benchmarks 最高达到 2.13x 相对 autoregressive decoding speedup。",
+    "methodFlow": [
+      "为 target VLM 构建 reusable visual memory",
+      "以当前 draft hidden state 查询 memory",
+      "用 cumulative-mass rule 同时决定数量与条目",
+      "聚合为 bounded visual readout",
+      "gated residual correction 只改 LM-head input 并继续 speculative verification"
+    ],
+    "whyRelevantZh": "直接对应 vlm-mllm，且全文给出方法、实验、限制与 exact-version 证据闭环。",
+    "evidenceZh": "论文方法由以下流程构成：为 target VLM 构建 reusable visual memory -> 以当前 draft hidden state 查询 memory -> 用 cumulative-mass rule 同时决定数量与条目 -> 聚合为 bounded visual readout -> gated residual correction 只改 LM-head input 并继续 speculative verification。（Main method section/figure, p. 5）；作者报告 FOVEA 跨多种 VLM backbones/benchmarks 最高达到 2.13x 相对 autoregressive decoding speedup。（Main experiment/table, p. 6）；需训练 critic-like retrieval/fusion components，收益取决于 visual demand 估计；过度筛选可能在细节任务中损害 grounding。（Limitations/discussion and scope, p. 11）",
+    "caveatZh": "需训练 critic-like retrieval/fusion components，收益取决于 visual demand 估计；过度筛选可能在细节任务中损害 grounding。；需训练 critic-like retrieval/fusion components，收益取决于 visual demand 估计；过度筛选可能在细节任务中损害 grounding。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "FOVEA 为 multimodal speculative decoding 按 draft state 动态检索视觉 memory，避免把视觉 token 写入自回归上下文；。全文方法页给出完整数据流，主实验与讨论页支持以下边界：作者报告 FOVEA 跨多种 VLM backbones/benchmarks 最高达到 2.13x 相对 autoregressive decoding speedup。 需训练 critic-like retrieval/fusion components，收益取决于 visual demand 估计；过度筛选可能在细节任务中损害 grounding。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "FOVEA 为 multimodal speculative decoding 按 draft state 动态检索视觉 memory，避免把视觉 token 写入自回归上下文；。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 方法流程：为 target VLM 构建 reusable visual memory -> 以当前 draft hidden state 查询 memory -> 用 cumulative-mass rule 同时决定数量与条目 -> 聚合为 bounded visual readout -> gated residual correction 只改 LM-head input 并继续 speculative verification。",
+    "experimentsZh": "比较 fixed visual budget、compression 与 speculative baselines，评估 acceptance、speed、accuracy 和 retrieval/budget ablations。 作者报告：作者报告 FOVEA 跨多种 VLM backbones/benchmarks 最高达到 2.13x 相对 autoregressive decoding speedup。（Main experiment/table, p. 6） Baseline coverage：全文与论文选定的代表性 baselines 比较；证据边界仍受以下因素限制：需训练 critic-like retrieval/fusion components，收益取决于 visual demand 估计；过度筛选可能在细节任务中损害 grounding。 Ablation：全文包含关键组件、训练或超参数消融；这些结果支持作者内部归因，但不能替代跨实现复现。",
+    "insightZh": "FOVEA 为 multimodal speculative decoding 按 draft state 动态检索视觉 memory，避免把视觉 token 写入自回归上下文；。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 全文证据足以支持 accept-skim；阅读建议沿用 screening 的 medium/skim，并保留作者报告与 reviewer inference 的边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

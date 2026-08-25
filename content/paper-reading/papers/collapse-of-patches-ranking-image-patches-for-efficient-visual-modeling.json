@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2511.22281",
+  "slug": "collapse-of-patches-ranking-image-patches-for-efficient-visual-modeling",
+  "title": "Collapse of Patches: Ranking Image Patches for Efficient Visual Modeling",
+  "authors": [
+    "Wei Guo",
+    "Shunqi Mao",
+    "Zhuonan Liang",
+    "Xuanhua Yin",
+    "Heng Wang",
+    "Weidong Cai"
+  ],
+  "publishedAt": "2025-11-27",
+  "updatedAt": "2026-08-23",
+  "collectedAt": "2026-08-26",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2511.22281"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Collapse",
+    "Patches",
+    "Ranking",
+    "Image",
+    "for",
+    "Efficient",
+    "Visual"
+  ],
+  "abstract": "Observing certain patches in an image reduces the uncertainty of others. Their realization lowers the distribution entropy of each remaining patch feature, analogous to collapsing a particle's wave function in quantum mechanics. This phenomenon can intuitively be called patch collapse. To identify which patches are most relied on during a target region's collapse, we learn an autoencoder that softly selects a subset of informative patches during reconstruction. Graphing these learned dependencies for each patch's PageRank score reveals the optimal patch order to realize an image. We show that respecting this order benefits various masked image modeling methods. First, autoregressive image generation can be boosted by finetuning with the ordered generation sequence. Second, we introduce a new setup for image classification by exposing Vision Transformers only to high-rank patches in the collapse order. Seeing 22% of such patches is sufficient to achieve high accuracy. With these experiments, we propose patch collapse as a novel image modeling perspective that promotes vision efficiency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2511.22281v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2511.22281v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2511.22281v2 全文整理；本地 PDF 共 12 页，SHA-256 754d45cdf993be994a9c1fb6e814833f4db3a02d1921c42c4b0c54c9e76d70b9，并视觉核验第 1、3、5、10 页。",
+    "ideaZh": "Patch Collapse 从条件不确定性学习 patch dependency/PageRank order，并用于 autoregressive generation 与高效视觉建模；可能提供新的 image token ordering 视角，；作者报告按 collapse order 微调可改善 AR image generation，并且只观察 22% 高 rank patches 即能保持较高分类准确率。",
+    "methodFlow": [
+      "用 CoMAE 为每个 target patch 学习依赖权重",
+      "把 patch 依赖构成有向图",
+      "以 PageRank 得到 collapse order",
+      "按该顺序微调 autoregressive generator",
+      "仅暴露高 rank patches 做识别"
+    ],
+    "whyRelevantZh": "直接对应 image-generation，且全文给出方法、实验、限制与 exact-version 证据闭环。",
+    "evidenceZh": "论文方法由以下流程构成：用 CoMAE 为每个 target patch 学习依赖权重 -> 把 patch 依赖构成有向图 -> 以 PageRank 得到 collapse order -> 按该顺序微调 autoregressive generator -> 仅暴露高 rank patches 做识别。（Main method section/figure, p. 3）；作者报告按 collapse order 微调可改善 AR image generation，并且只观察 22% 高 rank patches 即能保持较高分类准确率。（Main experiment/table, p. 5）；主要实验局限在 ImageNet-1K、固定 16x16 patches 与受算力限制的小规模 variants；PageRank order 未证明适用于任意 tokenizer。（Limitations/discussion and scope, p. 10）",
+    "caveatZh": "主要实验局限在 ImageNet-1K、固定 16x16 patches 与受算力限制的小规模 variants；PageRank order 未证明适用于任意 tokenizer。；主要实验局限在 ImageNet-1K、固定 16x16 patches 与受算力限制的小规模 variants；PageRank order 未证明适用于任意 tokenizer。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "Patch Collapse 从条件不确定性学习 patch dependency/PageRank order，并用于 autoregressive generation 与高效视觉建模；可能提供新的 image token ordering 视角，。全文方法页给出完整数据流，主实验与讨论页支持以下边界：作者报告按 collapse order 微调可改善 AR image generation，并且只观察 22% 高 rank patches 即能保持较高分类准确率。 主要实验局限在 ImageNet-1K、固定 16x16 patches 与受算力限制的小规模 variants；PageRank order 未证明适用于任意 tokenizer。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "Patch Collapse 从条件不确定性学习 patch dependency/PageRank order，并用于 autoregressive generation 与高效视觉建模；可能提供新的 image token ordering 视角，。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 方法流程：用 CoMAE 为每个 target patch 学习依赖权重 -> 把 patch 依赖构成有向图 -> 以 PageRank 得到 collapse order -> 按该顺序微调 autoregressive generator -> 仅暴露高 rank patches 做识别。",
+    "experimentsZh": "在 ImageNet-1K 上评估 CoMAE、CMAR 与 sparse-patch ViT，覆盖 reconstruction、generation、classification 和 order ablations。 作者报告：作者报告按 collapse order 微调可改善 AR image generation，并且只观察 22% 高 rank patches 即能保持较高分类准确率。（Main experiment/table, p. 5） Baseline coverage：全文与论文选定的代表性 baselines 比较；证据边界仍受以下因素限制：主要实验局限在 ImageNet-1K、固定 16x16 patches 与受算力限制的小规模 variants；PageRank order 未证明适用于任意 tokenizer。 Ablation：全文包含关键组件、训练或超参数消融；这些结果支持作者内部归因，但不能替代跨实现复现。",
+    "insightZh": "Patch Collapse 从条件不确定性学习 patch dependency/PageRank order，并用于 autoregressive generation 与高效视觉建模；可能提供新的 image token ordering 视角，。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 全文证据足以支持 accept-deep；阅读建议沿用 screening 的 high/deep，并保留作者报告与 reviewer inference 的边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2608.23253",
+  "slug": "e2s-pruner-progressive-two-stage-evidence-fusion-for-visual-token-pruning-in-vision-language-mod",
+  "title": "E2S-Pruner: Progressive Two-Stage Evidence Fusion for Visual Token Pruning in Vision-Language Models",
+  "authors": [
+    "Taoyu Qian",
+    "Qi Wang",
+    "Daqian Shi",
+    "Yuanhao Jiang",
+    "Shang Gao",
+    "Hualong Yu"
+  ],
+  "publishedAt": "2026-08-24",
+  "updatedAt": "2026-08-24",
+  "collectedAt": "2026-08-26",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.23253"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "E2S",
+    "Pruner",
+    "Progressive",
+    "Two",
+    "Stage",
+    "Evidence",
+    "Fusion",
+    "for"
+  ],
+  "abstract": "Vision-language models typically encode an image into hundreds of visual tokens, incurring substantial inference latency and GPU memory overhead. Existing pruning methods largely rely on attention scores and directly aggregate outputs across attention heads and network layers, making it difficult to characterize evidential uncertainty and conflict. We propose E2S-Pruner, a progressive two-stage evidence-fusion framework for visual token pruning that requires no auxiliary model, trainable parameters, or fine-tuning. In the first stage, E2S-Pruner treats each attention head as an independent evidence source, estimates its reliability from evidence clarity and inter-head consistency, and represents each visual token using three states: important, unimportant, and uncertain. In the second stage, Dempster--Shafer evidence theory is used to quantify inter-layer conflict and fuse complementary evidence from multiple network layers. We further introduce a spatial novelty constraint that promotes coverage of distinct image regions and prevents the retained tokens from concentrating in a few locally salient areas. On LLaVA-1.5-7B, E2S-Pruner retains 98.0%, 96.8%, and 90.6% of the aggregate performance when the average numbers of retained visual tokens are 192, 128, and 64, respectively, while improving throughput by 1.96x and 2.09x under the 128-token and 64-token settings. Experiments on Qwen2-VL-7B further demonstrate cross-model generalization. Code is available at https://github.com/taoyu-qian/E2S-Pruner.git.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.23253v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.23253v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/taoyu-qian/E2S-Pruner"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.23253v1 全文整理；本地 PDF 共 14 页，SHA-256 f2666ef6b7ab7fbb52b2d8baa82fedaef008185356d99fee3eec0c9e477449ee，并视觉核验第 1、4、7、12 页。",
+    "ideaZh": "E2S-Pruner 以多头、多层 evidence fusion 与空间新颖性约束做 training-free visual-token pruning，并报告跨模型效率收益；；作者报告在 LLaVA-1.5-7B 保留 128/64 tokens 时保持 96.8%/90.6% aggregate performance，吞吐提高 1.96x/2.09x，并在 Qwen2-VL 上泛化。",
+    "methodFlow": [
+      "把每个 attention head 视为独立 evidence source",
+      "估计 clarity 与 inter-head consistency",
+      "为 token 赋 important/unimportant/uncertain states",
+      "用 Dempster-Shafer 跨层融合并量化冲突",
+      "用 spatial novelty 保持区域覆盖后 pruning"
+    ],
+    "whyRelevantZh": "直接对应 vlm-mllm，且全文给出方法、实验、限制与 exact-version 证据闭环。",
+    "evidenceZh": "论文方法由以下流程构成：把每个 attention head 视为独立 evidence source -> 估计 clarity 与 inter-head consistency -> 为 token 赋 important/unimportant/uncertain states -> 用 Dempster-Shafer 跨层融合并量化冲突 -> 用 spatial novelty 保持区域覆盖后 pruning。（Main method section/figure, p. 4）；作者报告在 LLaVA-1.5-7B 保留 128/64 tokens 时保持 96.8%/90.6% aggregate performance，吞吐提高 1.96x/2.09x，并在 Qwen2-VL 上泛化。（Main experiment/table, p. 7）；核心 evidence 假设来自 attention weights，Dempster-Shafer independence 未必成立；极端 pruning 下 spatial/detail tasks 仍显著退化。（Limitations/discussion and scope, p. 12）",
+    "caveatZh": "核心 evidence 假设来自 attention weights，Dempster-Shafer independence 未必成立；极端 pruning 下 spatial/detail tasks 仍显著退化。；核心 evidence 假设来自 attention weights，Dempster-Shafer independence 未必成立；极端 pruning 下 spatial/detail tasks 仍显著退化。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "E2S-Pruner 以多头、多层 evidence fusion 与空间新颖性约束做 training-free visual-token pruning，并报告跨模型效率收益；。全文方法页给出完整数据流，主实验与讨论页支持以下边界：作者报告在 LLaVA-1.5-7B 保留 128/64 tokens 时保持 96.8%/90.6% aggregate performance，吞吐提高 1.96x/2.09x，并在 Qwen2-VL 上泛化。 核心 evidence 假设来自 attention weights，Dempster-Shafer independence 未必成立；极端 pruning 下 spatial/detail tasks 仍显著退化。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "E2S-Pruner 以多头、多层 evidence fusion 与空间新颖性约束做 training-free visual-token pruning，并报告跨模型效率收益；。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 方法流程：把每个 attention head 视为独立 evidence source -> 估计 clarity 与 inter-head consistency -> 为 token 赋 important/unimportant/uncertain states -> 用 Dempster-Shafer 跨层融合并量化冲突 -> 用 spatial novelty 保持区域覆盖后 pruning。",
+    "experimentsZh": "在 LLaVA 与 Qwen2-VL、多 benchmark 和多 token budgets 上比较 pruning baselines，测性能、throughput、coverage 与两阶段消融。 作者报告：作者报告在 LLaVA-1.5-7B 保留 128/64 tokens 时保持 96.8%/90.6% aggregate performance，吞吐提高 1.96x/2.09x，并在 Qwen2-VL 上泛化。（Main experiment/table, p. 7） Baseline coverage：全文与论文选定的代表性 baselines 比较；证据边界仍受以下因素限制：核心 evidence 假设来自 attention weights，Dempster-Shafer independence 未必成立；极端 pruning 下 spatial/detail tasks 仍显著退化。 Ablation：全文包含关键组件、训练或超参数消融；这些结果支持作者内部归因，但不能替代跨实现复现。",
+    "insightZh": "E2S-Pruner 以多头、多层 evidence fusion 与空间新颖性约束做 training-free visual-token pruning，并报告跨模型效率收益；。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 全文证据足以支持 accept-skim；阅读建议沿用 screening 的 medium/skim，并保留作者报告与 reviewer inference 的边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

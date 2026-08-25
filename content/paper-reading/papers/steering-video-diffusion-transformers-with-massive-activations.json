@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2603.17825",
+  "slug": "steering-video-diffusion-transformers-with-massive-activations",
+  "title": "Steering Video Diffusion Transformers with Massive Activations",
+  "authors": [
+    "Xianhang Cheng",
+    "Yujian Zheng",
+    "Zhenyu Xie",
+    "Tingting Liao",
+    "Hao Li"
+  ],
+  "publishedAt": "2026-03-18",
+  "updatedAt": "2026-08-23",
+  "collectedAt": "2026-08-26",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.17825"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Steering",
+    "Video",
+    "Diffusion",
+    "Transformers",
+    "with",
+    "Massive",
+    "Activations"
+  ],
+  "abstract": "In this work, we study the role of Massive Activations (MAs), which are rare, high-magnitude spikes confined to a few fixed hidden dimensions in video diffusion transformers (DiTs). We uncover a structured positional hierarchy: MA magnitudes peak at first-frame tokens and recur at the spatial boundary tokens of latent frames, with this pattern being most pronounced during early denoising. We trace this organization to an encoding asymmetry of the video VAEs, whose causal temporal padding and zero spatial padding cause the first latent frame and frame borders to carry reduced content load. Elevated MAs consistently align with these lower-content structural positions. To understand their function, we analyze intermediate representations and find that MAs act as implicit rescalers of residual computation: enlarging MAs suppresses the corresponding self-attention and feed-forward updates, while erasing them amplifies these updates. Together, these observations suggest that MAs serves as a token-level rescaler of residual computation, which video DiTs deploy unevenly, placing the strongest damping at the encoding-asymmetric structural positions. Motivated by this native rescaling behavior, we propose Structured Activation Steering (STAS), a training-free technique that steers MAs at the observed structural positions toward a scaled, model-derived reference during early denoising. STAS requires no additional forward passes and consistently improves video quality and temporal coherence across text-to-video models with negligible overhead.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.17825v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.17825v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.17825v2 全文整理；本地 PDF 共 31 页，SHA-256 f96bbe929a479540050018cf648ac991c64280140ade9ada2392fb3cd04d0d37，并视觉核验第 1、4、8、24 页。",
+    "ideaZh": "论文系统分析 video DiT massive activations 的 VAE 边界来源，并提出近零额外开销的 STAS steering；；作者报告 STAS 在多种 T2V backbones 上以近零额外开销一致改善 video quality/temporal coherence，并可叠加 CFG-Zero 与 FlowMo。",
+    "methodFlow": [
+      "定位 video DiT 的 massive-activation dimensions",
+      "用 VAE padding 与 RoPE intervention 追踪其空间时间来源",
+      "验证 MA 对 residual branch 的 rescaling",
+      "构造 model-derived structural reference",
+      "早期 denoising 做 training-free STAS steering"
+    ],
+    "whyRelevantZh": "直接对应 video-generation，且全文给出方法、实验、限制与 exact-version 证据闭环。",
+    "evidenceZh": "论文方法由以下流程构成：定位 video DiT 的 massive-activation dimensions -> 用 VAE padding 与 RoPE intervention 追踪其空间时间来源 -> 验证 MA 对 residual branch 的 rescaling -> 构造 model-derived structural reference -> 早期 denoising 做 training-free STAS steering。（Main method section/figure, p. 4）；作者报告 STAS 在多种 T2V backbones 上以近零额外开销一致改善 video quality/temporal coherence，并可叠加 CFG-Zero 与 FlowMo。（Main experiment/table, p. 8）；多数指标提升幅度有限且依赖 model-specific MA 维度；机制证据来自 intervention，但长期视频、不同 VAE 与极端 prompt 的稳定性仍有限。（Limitations/discussion and scope, p. 24）",
+    "caveatZh": "多数指标提升幅度有限且依赖 model-specific MA 维度；机制证据来自 intervention，但长期视频、不同 VAE 与极端 prompt 的稳定性仍有限。；多数指标提升幅度有限且依赖 model-specific MA 维度；机制证据来自 intervention，但长期视频、不同 VAE 与极端 prompt 的稳定性仍有限。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "论文系统分析 video DiT massive activations 的 VAE 边界来源，并提出近零额外开销的 STAS steering；。全文方法页给出完整数据流，主实验与讨论页支持以下边界：作者报告 STAS 在多种 T2V backbones 上以近零额外开销一致改善 video quality/temporal coherence，并可叠加 CFG-Zero 与 FlowMo。 多数指标提升幅度有限且依赖 model-specific MA 维度；机制证据来自 intervention，但长期视频、不同 VAE 与极端 prompt 的稳定性仍有限。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "论文系统分析 video DiT massive activations 的 VAE 边界来源，并提出近零额外开销的 STAS steering；。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 方法流程：定位 video DiT 的 massive-activation dimensions -> 用 VAE padding 与 RoPE intervention 追踪其空间时间来源 -> 验证 MA 对 residual branch 的 rescaling -> 构造 model-derived structural reference -> 早期 denoising 做 training-free STAS steering。",
+    "experimentsZh": "跨 Wan、CogVideoX、LTX 等 backbones 做 activation analysis、causal steering、quality metrics、compatibility 和 dimension/scale ablation。 作者报告：作者报告 STAS 在多种 T2V backbones 上以近零额外开销一致改善 video quality/temporal coherence，并可叠加 CFG-Zero 与 FlowMo。（Main experiment/table, p. 8） Baseline coverage：全文与论文选定的代表性 baselines 比较；证据边界仍受以下因素限制：多数指标提升幅度有限且依赖 model-specific MA 维度；机制证据来自 intervention，但长期视频、不同 VAE 与极端 prompt 的稳定性仍有限。 Ablation：全文包含关键组件、训练或超参数消融；这些结果支持作者内部归因，但不能替代跨实现复现。",
+    "insightZh": "论文系统分析 video DiT massive activations 的 VAE 边界来源，并提出近零额外开销的 STAS steering；。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 全文证据足以支持 accept-deep；阅读建议沿用 screening 的 high/deep，并保留作者报告与 reviewer inference 的边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

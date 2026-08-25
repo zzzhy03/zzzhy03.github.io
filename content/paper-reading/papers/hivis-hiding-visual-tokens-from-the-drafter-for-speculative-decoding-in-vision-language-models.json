@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2509.23928",
+  "slug": "hivis-hiding-visual-tokens-from-the-drafter-for-speculative-decoding-in-vision-language-models",
+  "title": "HiViS: Hiding Visual Tokens from the Drafter for Speculative Decoding in Vision-Language Models",
+  "authors": [
+    "Zhinan Xie",
+    "Peisong Wang",
+    "Shuang Qiu",
+    "Jian Cheng"
+  ],
+  "publishedAt": "2025-09-28",
+  "updatedAt": "2026-08-23",
+  "collectedAt": "2026-08-26",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2509.23928"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "HiViS",
+    "Hiding",
+    "Visual",
+    "Tokens",
+    "from",
+    "the",
+    "Drafter",
+    "for"
+  ],
+  "abstract": "Speculative decoding has proven effective for accelerating inference in Large Language Models (LLMs), yet its extension to Vision-Language Models (VLMs) remains limited by the computational burden and semantic inconsistency introduced by visual tokens. Recent studies reveal that visual tokens in large VLMs are highly redundant, and most of them can be removed without compromising generation quality. Motivated by this observation, we propose HiViS (Hiding Visual Tokens from the Drafter for Speculative Decoding in Vision-Language Models), a framework that utilizes the target VLM as a semantic fusion model, allowing the drafter to obtain visual information without explicitly processing visual tokens, ensuring that the drafter's prefill sequence length matches that of the textual tokens. Furthermore, HiViS employs a time-step-aware aligned training scheme that allows the drafter to autonomously propagate and refine instructive visual-textual semantics during independent drafting, guided by step-dependent bias-correction residuals. Extensive experiments across representative VLMs and benchmarks demonstrate that HiViS achieves significant improvements in average acceptance length and speedup ratio.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2509.23928v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2509.23928v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/lnn-ops/HiViS"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2509.23928v3 全文整理；本地 PDF 共 11 页，SHA-256 60bc1cfc278e8eea64141210c17f2c2cc2d0e5ab9999916a343e8018b92c863a，并视觉核验第 1、3、7、8 页。",
+    "ideaZh": "HiViS 让 speculative drafter 隐藏视觉 tokens，由 target VLM 完成语义融合并用 timestep-aware 对齐训练；；作者报告 HiViS 在代表 VLM 上最高达到 3.15x speculative-decoding speedup，并以 target verification 保持 lossless output distribution。",
+    "methodFlow": [
+      "target VLM 融合 visual 与 text tokens",
+      "把融合语义注入 drafter text embeddings",
+      "用 timestep-aware residual 对齐独立 drafting",
+      "drafter 连续提出候选 tokens",
+      "target 并行验证并保持原输出分布"
+    ],
+    "whyRelevantZh": "直接对应 vlm-mllm，且全文给出方法、实验、限制与 exact-version 证据闭环。",
+    "evidenceZh": "论文方法由以下流程构成：target VLM 融合 visual 与 text tokens -> 把融合语义注入 drafter text embeddings -> 用 timestep-aware residual 对齐独立 drafting -> drafter 连续提出候选 tokens -> target 并行验证并保持原输出分布。（Main method section/figure, p. 3）；作者报告 HiViS 在代表 VLM 上最高达到 3.15x speculative-decoding speedup，并以 target verification 保持 lossless output distribution。（Main experiment/table, p. 7）；需要训练专用 drafter，收益依赖 target/drafter 与视觉 token 长度；benchmark 不能覆盖开放式长输出和多图高分辨率场景。（Limitations/discussion and scope, p. 8）",
+    "caveatZh": "需要训练专用 drafter，收益依赖 target/drafter 与视觉 token 长度；benchmark 不能覆盖开放式长输出和多图高分辨率场景。；需要训练专用 drafter，收益依赖 target/drafter 与视觉 token 长度；benchmark 不能覆盖开放式长输出和多图高分辨率场景。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "HiViS 让 speculative drafter 隐藏视觉 tokens，由 target VLM 完成语义融合并用 timestep-aware 对齐训练；。全文方法页给出完整数据流，主实验与讨论页支持以下边界：作者报告 HiViS 在代表 VLM 上最高达到 3.15x speculative-decoding speedup，并以 target verification 保持 lossless output distribution。 需要训练专用 drafter，收益依赖 target/drafter 与视觉 token 长度；benchmark 不能覆盖开放式长输出和多图高分辨率场景。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "HiViS 让 speculative drafter 隐藏视觉 tokens，由 target VLM 完成语义融合并用 timestep-aware 对齐训练；。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 方法流程：target VLM 融合 visual 与 text tokens -> 把融合语义注入 drafter text embeddings -> 用 timestep-aware residual 对齐独立 drafting -> drafter 连续提出候选 tokens -> target 并行验证并保持原输出分布。",
+    "experimentsZh": "在 LLaVA/InternVL 类 backbones 与多模态 QA benchmark 上测 acceptance length、吞吐和端到端 speedup。 作者报告：作者报告 HiViS 在代表 VLM 上最高达到 3.15x speculative-decoding speedup，并以 target verification 保持 lossless output distribution。（Main experiment/table, p. 7） Baseline coverage：全文与论文选定的代表性 baselines 比较；证据边界仍受以下因素限制：需要训练专用 drafter，收益依赖 target/drafter 与视觉 token 长度；benchmark 不能覆盖开放式长输出和多图高分辨率场景。 Ablation：全文包含关键组件、训练或超参数消融；这些结果支持作者内部归因，但不能替代跨实现复现。",
+    "insightZh": "HiViS 让 speculative drafter 隐藏视觉 tokens，由 target VLM 完成语义融合并用 timestep-aware 对齐训练；。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 全文证据足以支持 accept-skim；阅读建议沿用 screening 的 medium/skim，并保留作者报告与 reviewer inference 的边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}

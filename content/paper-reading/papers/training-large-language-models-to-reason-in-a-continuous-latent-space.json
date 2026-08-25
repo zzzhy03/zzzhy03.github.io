@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2412.06769",
+  "slug": "training-large-language-models-to-reason-in-a-continuous-latent-space",
+  "title": "Training Large Language Models to Reason in a Continuous Latent Space",
+  "authors": [
+    "Shibo Hao",
+    "Sainbayar Sukhbaatar",
+    "DiJia Su",
+    "Xian Li",
+    "Zhiting Hu",
+    "Jason Weston",
+    "Yuandong Tian"
+  ],
+  "publishedAt": "2024-12-09",
+  "updatedAt": "2026-08-23",
+  "collectedAt": "2026-08-26",
+  "venue": "arXiv v4",
+  "identifiers": {
+    "arxiv": "2412.06769"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "llm",
+    "Training",
+    "Large",
+    "Language",
+    "Models",
+    "Reason",
+    "Continuous",
+    "Latent",
+    "Space"
+  ],
+  "abstract": "Large language models (LLMs) are typically constrained to reason in the language space, where they express the reasoning process through a chain-of-thought (CoT) to solve complex problems. However, the language space may not always be optimal for reasoning. Most word tokens primarily ensure textual coherence and are not essential for reasoning, while some critical tokens require complex planning and pose challenges to LLMs. To explore the potential of reasoning beyond language, we introduce a new paradigm called Coconut (Chain of Continuous Thought). Coconut utilizes the last hidden state of the LLM as a representation of the reasoning state, termed \"continuous thought.\" Instead of decoding this state into words, we feed it back to the model as the next input embedding directly in the continuous space. This latent reasoning paradigm enables an advanced reasoning pattern, where continuous thoughts can encode multiple alternative next steps, allowing the model to perform a breadth-first search (BFS) rather than committing prematurely to a single deterministic path as in CoT. Coconut outperforms CoT on logical reasoning tasks that require substantial search during planning and achieves a better trade-off between accuracy and efficiency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2412.06769v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2412.06769v4"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/facebookresearch/coconut"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2412.06769v4 全文整理；本地 PDF 共 18 页，SHA-256 27db5069d4361a607f02133ab4da4d9dae601bfbff0677191b3ba7febe2f987c，并视觉核验第 1、9、10、11 页。",
+    "ideaZh": "Coconut 以 hidden state 回灌实现 continuous latent reasoning，并声称可表达多条候选推理路径；这是潜在 reasoning paradigm 变化，；作者报告 Coconut 在 ProsQA 达到 97.0%（CoT 77.5%），同时在 GSM8K 为 34.1%（CoT 42.9%），说明优势集中在需搜索的逻辑任务而非所有推理。",
+    "methodFlow": [
+      "问题与示范推理",
+      "以多阶段 curriculum 逐步替换语言 CoT",
+      "把末层 hidden state 作为 continuous thought 回灌",
+      "在 latent space 迭代推理",
+      "恢复语言并输出答案"
+    ],
+    "whyRelevantZh": "直接对应 llm，且全文给出方法、实验、限制与 exact-version 证据闭环。",
+    "evidenceZh": "论文方法由以下流程构成：问题与示范推理 -> 以多阶段 curriculum 逐步替换语言 CoT -> 把末层 hidden state 作为 continuous thought 回灌 -> 在 latent space 迭代推理 -> 恢复语言并输出答案。（Main method section/figure, p. 9）；作者报告 Coconut 在 ProsQA 达到 97.0%（CoT 77.5%），同时在 GSM8K 为 34.1%（CoT 42.9%），说明优势集中在需搜索的逻辑任务而非所有推理。（Main experiment/table, p. 10）；实验只覆盖小模型与三类任务，continuous thought 数量由任务结构手工设定，BFS 解释来自 probing 而非直接可读搜索轨迹。（Limitations/discussion and scope, p. 11）",
+    "caveatZh": "实验只覆盖小模型与三类任务，continuous thought 数量由任务结构手工设定，BFS 解释来自 probing 而非直接可读搜索轨迹。；实验只覆盖小模型与三类任务，continuous thought 数量由任务结构手工设定，BFS 解释来自 probing 而非直接可读搜索轨迹。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "Coconut 以 hidden state 回灌实现 continuous latent reasoning，并声称可表达多条候选推理路径；这是潜在 reasoning paradigm 变化，。全文方法页给出完整数据流，主实验与讨论页支持以下边界：作者报告 Coconut 在 ProsQA 达到 97.0%（CoT 77.5%），同时在 GSM8K 为 34.1%（CoT 42.9%），说明优势集中在需搜索的逻辑任务而非所有推理。 实验只覆盖小模型与三类任务，continuous thought 数量由任务结构手工设定，BFS 解释来自 probing 而非直接可读搜索轨迹。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "Coconut 以 hidden state 回灌实现 continuous latent reasoning，并声称可表达多条候选推理路径；这是潜在 reasoning paradigm 变化，。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 方法流程：问题与示范推理 -> 以多阶段 curriculum 逐步替换语言 CoT -> 把末层 hidden state 作为 continuous thought 回灌 -> 在 latent space 迭代推理 -> 恢复语言并输出答案。",
+    "experimentsZh": "GSM8K、ProntoQA 与 ProsQA 上比较 CoT、No-CoT、iCoT、pause token 及 curriculum ablations。 作者报告：作者报告 Coconut 在 ProsQA 达到 97.0%（CoT 77.5%），同时在 GSM8K 为 34.1%（CoT 42.9%），说明优势集中在需搜索的逻辑任务而非所有推理。（Main experiment/table, p. 10） Baseline coverage：全文与论文选定的代表性 baselines 比较；证据边界仍受以下因素限制：实验只覆盖小模型与三类任务，continuous thought 数量由任务结构手工设定，BFS 解释来自 probing 而非直接可读搜索轨迹。 Ablation：全文包含关键组件、训练或超参数消融；这些结果支持作者内部归因，但不能替代跨实现复现。",
+    "insightZh": "Coconut 以 hidden state 回灌实现 continuous latent reasoning，并声称可表达多条候选推理路径；这是潜在 reasoning paradigm 变化，。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 全文证据足以支持 accept-deep；阅读建议沿用 screening 的 high/deep，并保留作者报告与 reviewer inference 的边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
