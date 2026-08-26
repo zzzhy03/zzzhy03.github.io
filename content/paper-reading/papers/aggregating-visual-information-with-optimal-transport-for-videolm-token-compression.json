@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2608.20473",
+  "slug": "aggregating-visual-information-with-optimal-transport-for-videolm-token-compression",
+  "title": "Aggregating Visual Information with Optimal Transport for VideoLM Token Compression",
+  "authors": [
+    "Wenti Yin",
+    "Xiaotian Han",
+    "Junyuan Shang",
+    "Yuchen Ding",
+    "Shuohuan Wang",
+    "Dianhai Yu",
+    "Changxin Gao",
+    "Nong Sang"
+  ],
+  "publishedAt": "2026-08-20",
+  "updatedAt": "2026-08-25",
+  "collectedAt": "2026-08-27",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.20473"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Aggregating",
+    "Visual",
+    "Information",
+    "with",
+    "Optimal",
+    "Transport",
+    "for",
+    "VideoLM"
+  ],
+  "abstract": "Video language models process videos as dense visual-token sequences with substantial representational redundancy. Compressing these sequences is therefore essential for reducing the visual-token burden on language-model decoding. The central challenge is to preserve visual information dispersed across frames under such compression. To this end, we introduce Aggregating Visual Information with Optimal Transport (AVIOT), which casts video token compression as transporting a dense empirical measure of frame observations onto a compact target measure. The resulting source-to-target coupling induces a distribution over source observations for each target support, directly specifying how the compressed video representation is constructed. We further adapt this construction along task and spatial axes. Question conditioning modulates the transport cost between source frames and target supports, while influencing how many supports are allocated to each temporal segment, thereby directing representation capacity toward question-relevant content. At multiple spatial granularities, AVIOT computes region-specific temporal transport plans and adaptively fuses the representations they yield, allowing different regions within the same compact representation to draw from different moments. Evaluations across varying compression ratios show that AVIOT matches or outperforms the uncompressed baseline on multiple video-understanding benchmarks while retaining strong performance at higher compression ratios.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.20473v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.20473v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ernie-research/AVIOT"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.20473v2 全文整理；本地 PDF 共 20 页，SHA-256 6d86293b0a053ce4b266aa3c4d4d518bb39e562d8209e550ac90008010c409f2，并视觉核验第 1、2、5、7 页。",
+    "ideaZh": "以 optimal transport 明确规定 compact tokens 从哪些 frame/region 聚合信息，而非单纯 pruning。 作者报告 AVIOT 在显著压缩下匹配或超过 uncompressed baseline，并在更高 compression ratios 保持较强性能。 证据边界：主要证据来自 video understanding，而非生成；OT 计算本身的端到端 latency 与跨模型迁移仍需谨慎。",
+    "methodFlow": [
+      "把 dense video tokens 表述为 source empirical measure",
+      "学习 compact target supports",
+      "用 question conditioning 调节 transport cost 与 segment budget",
+      "在多空间粒度计算 temporal plans",
+      "自适应融合压缩表示供 VideoLM 解码"
+    ],
+    "whyRelevantZh": "直接对应 vlm-mllm，并提供 exact-version method、experiment、limitation 与 visual evidence。",
+    "evidenceZh": "方法流程：把 dense video tokens 表述为 source empirical measure -> 学习 compact target supports -> 用 question conditioning 调节 transport cost 与 segment budget -> 在多空间粒度计算 temporal plans -> 自适应融合压缩表示供 VideoLM 解码。（Method / system figure, p. 2）；作者报告 AVIOT 在显著压缩下匹配或超过 uncompressed baseline，并在更高 compression ratios 保持较强性能。（Experiments / results, p. 5; abstract, p. 1）；主要证据来自 video understanding，而非生成；OT 计算本身的端到端 latency 与跨模型迁移仍需谨慎。（Discussion / limitations and reviewed scope, p. 7）",
+    "caveatZh": "主要证据来自 video understanding，而非生成；OT 计算本身的端到端 latency 与跨模型迁移仍需谨慎。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "以 optimal transport 明确规定 compact tokens 从哪些 frame/region 聚合信息，而非单纯 pruning。 全文方法、实验页与讨论页形成 exact-version 证据闭环。作者报告 AVIOT 在显著压缩下匹配或超过 uncompressed baseline，并在更高 compression ratios 保持较强性能。 主要证据来自 video understanding，而非生成；OT 计算本身的端到端 latency 与跨模型迁移仍需谨慎。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "以 optimal transport 明确规定 compact tokens 从哪些 frame/region 聚合信息，而非单纯 pruning。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 方法流程：把 dense video tokens 表述为 source empirical measure -> 学习 compact target supports -> 用 question conditioning 调节 transport cost 与 segment budget -> 在多空间粒度计算 temporal plans -> 自适应融合压缩表示供 VideoLM 解码。",
+    "experimentsZh": "作者在多个 video-understanding benchmarks 与不同 compression ratios 下比较 uncompressed 和 token-compression baselines。 作者报告：作者报告 AVIOT 在显著压缩下匹配或超过 uncompressed baseline，并在更高 compression ratios 保持较强性能。（Experiments / results, p. 5; abstract, p. 1） Baseline coverage：全文覆盖作者选定的主要 baselines 与任务设置；仍受以下证据边界限制：主要证据来自 video understanding，而非生成；OT 计算本身的端到端 latency 与跨模型迁移仍需谨慎。 Ablation/diagnosis：全文的组件、设置或诊断性对比用于支持作者内部归因；未见的消融不作补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "以 optimal transport 明确规定 compact tokens 从哪些 frame/region 聚合信息，而非单纯 pruning。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 全文证据支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

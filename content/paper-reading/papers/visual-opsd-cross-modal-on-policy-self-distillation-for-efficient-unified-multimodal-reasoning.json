@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2606.18974",
+  "slug": "visual-opsd-cross-modal-on-policy-self-distillation-for-efficient-unified-multimodal-reasoning",
+  "title": "Visual-OPSD: Cross-Modal On-Policy Self-Distillation for Efficient Unified Multimodal Reasoning",
+  "authors": [
+    "Pengyu Li",
+    "Zhitao Gao",
+    "Lingling Zhang",
+    "Muye Huang",
+    "Yuanming Li",
+    "Fangzhi Xu",
+    "Jun Liu"
+  ],
+  "publishedAt": "2026-06-17",
+  "updatedAt": "2026-08-25",
+  "collectedAt": "2026-08-27",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2606.18974"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "image-generation",
+    "Visual",
+    "OPSD",
+    "Cross",
+    "Modal",
+    "Policy",
+    "Self",
+    "Distillation",
+    "for"
+  ],
+  "abstract": "Unified multimodal models (UMMs) interleave generated ''visual thoughts'' (VTs) with text reasoning to improve spatial tasks. This incurs roughly an order-of-magnitude inference cost from multi-step diffusion. We find this cost yields limited direct benefit. On ThinkMorph, removing or noising VTs barely changes accuracy across nine benchmarks. Once rendered, attention concentrates on the VT regardless of content. Yet a KL diagnostic shows that conditioning on a privileged VT trace shifts the model's completion distribution. This suggests the generation pathway encodes useful reasoning beyond the rendered pixels. Motivated by this gap, we propose Visual On-Policy Self-Distillation(Visual-OPSD). Teacher and student share identical weights but differ in context: the teacher sees privileged VTs while the student sees only the question. Token-level JSD distillation on on-policy student trajectories transfers the teacher's reasoning to a text-only student. Across nine benchmarks, Visual-OPSD improves over its generative teacher by $+3.40$pp with $14.3\\times$ speedup (10.0s vs. 142.8s per sample) and outperforms same-scale VLMs by $+63.83$pp on VSP. A Gaussian-noise control ($+0.40$pp vs. $+10.28$pp for real VTs) and $58.4\\%$ closure of the KL gap confirm that gains come from the semantic content of the generation pathway.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.18974v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.18974v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/TiezMind/Visual-OPSD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.18974v3 全文整理；本地 PDF 共 21 页，SHA-256 5055db08869a214e864ec1c854cd2d3e4f653209bc2b572b8caade338d220624，并视觉核验第 1、2、6、18 页。",
+    "ideaZh": "把 visual thought 的生成路径信息与渲染像素贡献拆开，并用 on-policy self-distillation 移除昂贵 diffusion rollout。 作者报告 Visual-OPSD 相对 generative teacher 提高 3.40pp，并以 10.0s 对 142.8s 达到 14.3x speedup；数字均为作者报告。 证据边界：结论依赖特定 UMM/teacher traces 与 benchmark；蒸馏后的能力是否保留开放式视觉生成作用尚未证明。",
+    "methodFlow": [
+      "分析 unified model 的 visual-thought traces",
+      "用 noising/removal 测 rendered pixels 的直接贡献",
+      "teacher 读取 privileged visual trace",
+      "student 只读取 question 并生成 on-policy trajectories",
+      "以 token-level JSD 蒸馏到 text-only reasoning"
+    ],
+    "whyRelevantZh": "直接对应 vlm-mllm，并提供 exact-version method、experiment、limitation 与 visual evidence。",
+    "evidenceZh": "方法流程：分析 unified model 的 visual-thought traces -> 用 noising/removal 测 rendered pixels 的直接贡献 -> teacher 读取 privileged visual trace -> student 只读取 question 并生成 on-policy trajectories -> 以 token-level JSD 蒸馏到 text-only reasoning。（Method / system figure, p. 2）；作者报告 Visual-OPSD 相对 generative teacher 提高 3.40pp，并以 10.0s 对 142.8s 达到 14.3x speedup；数字均为作者报告。（Experiments / results, p. 6; abstract, p. 1）；结论依赖特定 UMM/teacher traces 与 benchmark；蒸馏后的能力是否保留开放式视觉生成作用尚未证明。（Discussion / limitations and reviewed scope, p. 18）",
+    "caveatZh": "结论依赖特定 UMM/teacher traces 与 benchmark；蒸馏后的能力是否保留开放式视觉生成作用尚未证明。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "把 visual thought 的生成路径信息与渲染像素贡献拆开，并用 on-policy self-distillation 移除昂贵 diffusion rollout。 全文方法、实验页与讨论页形成 exact-version 证据闭环。作者报告 Visual-OPSD 相对 generative teacher 提高 3.40pp，并以 10.0s 对 142.8s 达到 14.3x speedup；数字均为作者报告。 结论依赖特定 UMM/teacher traces 与 benchmark；蒸馏后的能力是否保留开放式视觉生成作用尚未证明。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "把 visual thought 的生成路径信息与渲染像素贡献拆开，并用 on-policy self-distillation 移除昂贵 diffusion rollout。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 方法流程：分析 unified model 的 visual-thought traces -> 用 noising/removal 测 rendered pixels 的直接贡献 -> teacher 读取 privileged visual trace -> student 只读取 question 并生成 on-policy trajectories -> 以 token-level JSD 蒸馏到 text-only reasoning。",
+    "experimentsZh": "作者在 ThinkMorph 与九个 spatial/multimodal benchmarks 上比较 teacher、text-only student、noise controls 和同尺度 VLM。 作者报告：作者报告 Visual-OPSD 相对 generative teacher 提高 3.40pp，并以 10.0s 对 142.8s 达到 14.3x speedup；数字均为作者报告。（Experiments / results, p. 6; abstract, p. 1） Baseline coverage：全文覆盖作者选定的主要 baselines 与任务设置；仍受以下证据边界限制：结论依赖特定 UMM/teacher traces 与 benchmark；蒸馏后的能力是否保留开放式视觉生成作用尚未证明。 Ablation/diagnosis：全文的组件、设置或诊断性对比用于支持作者内部归因；未见的消融不作补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "把 visual thought 的生成路径信息与渲染像素贡献拆开，并用 on-policy self-distillation 移除昂贵 diffusion rollout。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 全文证据支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

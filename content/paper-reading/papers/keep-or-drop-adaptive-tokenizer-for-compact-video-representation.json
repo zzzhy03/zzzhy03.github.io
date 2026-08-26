@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2608.24293",
+  "slug": "keep-or-drop-adaptive-tokenizer-for-compact-video-representation",
+  "title": "Keep-or-Drop? Adaptive Tokenizer for Compact Video Representation",
+  "authors": [
+    "Yeonkyeong Lee",
+    "Hyunsung Go",
+    "Jongmin Kim",
+    "Sewoong Lim",
+    "Donghoon Lee"
+  ],
+  "publishedAt": "2026-08-25",
+  "updatedAt": "2026-08-25",
+  "collectedAt": "2026-08-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.24293"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Keep",
+    "Drop",
+    "Adaptive",
+    "Tokenizer",
+    "for",
+    "Compact",
+    "Video",
+    "Representation"
+  ],
+  "abstract": "Latent diffusion models have emerged as a dominant framework for high-fidelity image and video synthesis, operating in compact latent spaces with variational autoencoders (VAEs) to enhance computational efficiency without compromising visual quality. However, conventional VAEs are suboptimal for video data as they employ fixed compression ratios that cannot adapt to the varying complexity of spatio-temporal content. We present KATok (Keep-or-Drop? Adaptive Tokenizer for Compact Video Representation), a transformer-based VAE that incorporates an adaptive token selector which is jointly learned with latent tokens. By evaluating each token's content-richness as keep-or-drop probability, the token selector effectively discards uninformative tokens, naturally allowing data-dependent compression. Applying adaptive tokenization to diffusion models may cause spatial misalignment, as token dropping can disturb the original spatio-temporal structure. To alleviate this issue, we propose two position-prediction strategies: cascaded and joint generation, to ensure spatial consistency. We empirically show that our model achieves strong reconstruction and generation quality at a state-of-the-art compression ratio. Further analysis on video data reveals that this improvement is primarily achieved by reducing spatio-temporal redundancy and removing uninformative tokens, as supported by both quantitative and qualitative results.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.24293v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.24293v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.24293v1 全文整理；本地 PDF 共 42 页，SHA-256 582cbd94ead30769b564ad0e6e53d70cfca97c7ea38201f6bf3f73c83caa2718，并视觉核验第 1、3、11、14 页。",
+    "ideaZh": "让 video tokenizer 的 compression ratio 随内容变化，并显式补偿 token dropping 造成的位置错位。 作者报告 KATok 在高 compression ratio 下保持有竞争力的 reconstruction/generation quality，selector 主要移除低信息时空 tokens。 证据边界：生成质量、selector overhead 与 irregular token layout 的收益依赖所用 diffusion pipeline；开放域长视频仍需验证。",
+    "methodFlow": [
+      "video VAE 编码 spatio-temporal tokens",
+      "selector 学每个 token 的 keep/drop probability",
+      "按内容复杂度形成可变长度 latent",
+      "用 cascaded/joint position prediction 恢复空间对齐",
+      "将 adaptive latent 接入 diffusion generation"
+    ],
+    "whyRelevantZh": "直接对应 video-generation，并提供 exact-version method、experiment、limitation 与 visual evidence。",
+    "evidenceZh": "方法流程：video VAE 编码 spatio-temporal tokens -> selector 学每个 token 的 keep/drop probability -> 按内容复杂度形成可变长度 latent -> 用 cascaded/joint position prediction 恢复空间对齐 -> 将 adaptive latent 接入 diffusion generation。（Method / system figure, p. 3）；作者报告 KATok 在高 compression ratio 下保持有竞争力的 reconstruction/generation quality，selector 主要移除低信息时空 tokens。（Experiments / results, p. 11; abstract, p. 1）；生成质量、selector overhead 与 irregular token layout 的收益依赖所用 diffusion pipeline；开放域长视频仍需验证。（Discussion / limitations and reviewed scope, p. 14）",
+    "caveatZh": "生成质量、selector overhead 与 irregular token layout 的收益依赖所用 diffusion pipeline；开放域长视频仍需验证。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "让 video tokenizer 的 compression ratio 随内容变化，并显式补偿 token dropping 造成的位置错位。 全文方法、实验页与讨论页形成 exact-version 证据闭环。作者报告 KATok 在高 compression ratio 下保持有竞争力的 reconstruction/generation quality，selector 主要移除低信息时空 tokens。 生成质量、selector overhead 与 irregular token layout 的收益依赖所用 diffusion pipeline；开放域长视频仍需验证。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "让 video tokenizer 的 compression ratio 随内容变化，并显式补偿 token dropping 造成的位置错位。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 方法流程：video VAE 编码 spatio-temporal tokens -> selector 学每个 token 的 keep/drop probability -> 按内容复杂度形成可变长度 latent -> 用 cascaded/joint position prediction 恢复空间对齐 -> 将 adaptive latent 接入 diffusion generation。",
+    "experimentsZh": "作者评估 video reconstruction、generation quality 与 compression ratio，并分析 token selection 对时空冗余的响应。 作者报告：作者报告 KATok 在高 compression ratio 下保持有竞争力的 reconstruction/generation quality，selector 主要移除低信息时空 tokens。（Experiments / results, p. 11; abstract, p. 1） Baseline coverage：全文覆盖作者选定的主要 baselines 与任务设置；仍受以下证据边界限制：生成质量、selector overhead 与 irregular token layout 的收益依赖所用 diffusion pipeline；开放域长视频仍需验证。 Ablation/diagnosis：全文的组件、设置或诊断性对比用于支持作者内部归因；未见的消融不作补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "让 video tokenizer 的 compression ratio 随内容变化，并显式补偿 token dropping 造成的位置错位。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 全文证据支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

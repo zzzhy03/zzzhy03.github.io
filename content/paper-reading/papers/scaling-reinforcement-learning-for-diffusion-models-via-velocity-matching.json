@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2608.23664",
+  "slug": "scaling-reinforcement-learning-for-diffusion-models-via-velocity-matching",
+  "title": "Scaling Reinforcement Learning for Diffusion Models via Velocity Matching",
+  "authors": [
+    "Jaemoo Choi",
+    "Wei Guo",
+    "Yuchen Zhu",
+    "Arash Vahdat",
+    "Molei Tao",
+    "Julius Berner",
+    "Yongxin Chen"
+  ],
+  "publishedAt": "2026-08-24",
+  "updatedAt": "2026-08-24",
+  "collectedAt": "2026-08-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.23664"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "image-generation",
+    "Scaling",
+    "Reinforcement",
+    "Learning",
+    "for",
+    "Diffusion",
+    "Models",
+    "via",
+    "Velocity"
+  ],
+  "abstract": "Reward fine-tuning is becoming an important tool for adapting diffusion models to human preferences and task-specific objectives, but existing methods largely inherit policy-gradient machinery from large language models. Unlike autoregressive models, diffusion models do not provide tractable likelihoods for generated samples. As a result, current approaches either construct trajectory likelihoods from stochastic denoising transitions or approximate endpoint likelihoods with evidence lower bound, introducing additional computation and algorithmic complexity. We demonstrate that this likelihood-based machinery is not necessary for effective diffusion reward fine-tuning. We propose reward-based velocity matching (RVM), a simple trajectory-free update that acts directly on the velocity field. RVM reinforces directions associated with high-reward generations, suppresses those with low reward, and involves an optional anchor term controlling drift from a reference velocity. Notably, it provides a general framework that recovers recent fine-tuning methods, including RAM and DiffusionNFT, as special cases. Across various large-scale diffusion models reward fine-tuning tasks, RVM is competitive with or outperforms trajectory-based policy-gradient methods under substantially reduced training cost. We further find that, once the velocity update is simplified, the particular loss variant matters less than reward and anchor design. For video generation, standard preference rewards can favor visually clean but nearly static outputs; introducing a new dynamic-tracking reward that substantially improve motions while improving overall VBench performance. These results suggest that scalable reward fine-tuning for diffusion models is better posed in the native velocity representation than as likelihood-based policy optimization.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.23664v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.23664v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.23664v1 全文整理；本地 PDF 共 30 页，SHA-256 a2e5e89b90bf4c95ed8f4bc87bf37bc11d264c66f2a73b55585cd778c0d5d463，并视觉核验第 1、2、3、6 页。",
+    "ideaZh": "绕开 diffusion trajectory/endpoint likelihood，直接用 native velocity representation 做 reward fine-tuning。 作者报告 RVM 以更低训练复杂度匹配或超过 trajectory-based methods；video dynamic reward 改善 motion 并提高 overall VBench。 证据边界：reward 与 anchor 设计主导行为，可能放大 evaluator bias；论文未证明 preference gains 等同于人类长期满意度或安全性。",
+    "methodFlow": [
+      "从 diffusion samples 获取 task/preference reward",
+      "直接在 velocity field 构造 reward-weighted update",
+      "可选 anchor 控制 reference drift",
+      "把 RAM/DiffusionNFT 归入统一形式",
+      "为 video 引入 dynamic-tracking reward"
+    ],
+    "whyRelevantZh": "直接对应 video-generation，并提供 exact-version method、experiment、limitation 与 visual evidence。",
+    "evidenceZh": "方法流程：从 diffusion samples 获取 task/preference reward -> 直接在 velocity field 构造 reward-weighted update -> 可选 anchor 控制 reference drift -> 把 RAM/DiffusionNFT 归入统一形式 -> 为 video 引入 dynamic-tracking reward。（Method / system figure, p. 2）；作者报告 RVM 以更低训练复杂度匹配或超过 trajectory-based methods；video dynamic reward 改善 motion 并提高 overall VBench。（Experiments / results, p. 3; abstract, p. 1）；reward 与 anchor 设计主导行为，可能放大 evaluator bias；论文未证明 preference gains 等同于人类长期满意度或安全性。（Discussion / limitations and reviewed scope, p. 6）",
+    "caveatZh": "reward 与 anchor 设计主导行为，可能放大 evaluator bias；论文未证明 preference gains 等同于人类长期满意度或安全性。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "绕开 diffusion trajectory/endpoint likelihood，直接用 native velocity representation 做 reward fine-tuning。 全文方法、实验页与讨论页形成 exact-version 证据闭环。作者报告 RVM 以更低训练复杂度匹配或超过 trajectory-based methods；video dynamic reward 改善 motion 并提高 overall VBench。 reward 与 anchor 设计主导行为，可能放大 evaluator bias；论文未证明 preference gains 等同于人类长期满意度或安全性。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "绕开 diffusion trajectory/endpoint likelihood，直接用 native velocity representation 做 reward fine-tuning。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 方法流程：从 diffusion samples 获取 task/preference reward -> 直接在 velocity field 构造 reward-weighted update -> 可选 anchor 控制 reference drift -> 把 RAM/DiffusionNFT 归入统一形式 -> 为 video 引入 dynamic-tracking reward。",
+    "experimentsZh": "作者在多个 large diffusion models、reward tasks 与 video generation 上比较 trajectory-based policy gradients、RVM variants、reward/anchor design。 作者报告：作者报告 RVM 以更低训练复杂度匹配或超过 trajectory-based methods；video dynamic reward 改善 motion 并提高 overall VBench。（Experiments / results, p. 3; abstract, p. 1） Baseline coverage：全文覆盖作者选定的主要 baselines 与任务设置；仍受以下证据边界限制：reward 与 anchor 设计主导行为，可能放大 evaluator bias；论文未证明 preference gains 等同于人类长期满意度或安全性。 Ablation/diagnosis：全文的组件、设置或诊断性对比用于支持作者内部归因；未见的消融不作补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "绕开 diffusion trajectory/endpoint likelihood，直接用 native velocity representation 做 reward fine-tuning。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 全文证据支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

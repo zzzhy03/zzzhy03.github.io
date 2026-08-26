@@ -6,9 +6,9 @@
     "YiHsuan Tsai"
   ],
   "publishedAt": "2026-08-24",
-  "updatedAt": "2026-08-24",
+  "updatedAt": "2026-08-25",
   "collectedAt": "2026-08-26",
-  "venue": "arXiv v1",
+  "venue": "arXiv v2",
   "identifiers": {
     "arxiv": "2608.23206"
   },
@@ -24,6 +24,7 @@
   "primaryTopicId": "3d-reconstruction",
   "keywords": [
     "3d-reconstruction",
+    "3d-generation",
     "Learning",
     "Spherical",
     "Occupancy",
@@ -35,17 +36,21 @@
   ],
   "abstract": "We study spherical occupancy profiles-the ray-wise occupancy probability profiles P(r) = T(r) o(r) distilled from multi-view 3D Gaussian reconstructions-as a unified intermediate representation for both discriminative and generative 3D reconstruction from images. On a 999-object subset of Google Scanned Objects with 48 turntable views each, we train (i) a discriminative per-ray decoder that injects global view-averaged and ray-specific image evidence into a FiLM-conditioned profile head, reaching median soft depth error 0.035 (normalized) on an independent 90-object test split, and (ii) a generative pipeline built on a profile VAE and a latent diffusion model, which supports unconditional sampling that matches the reconstruction manifold and image-conditioned multi-solution reconstruction whose per-object solution spread is quantifiable and tunable via classifier-free guidance. We further analyze the morphology of predicted profiles: post-hoc power sharpening and a learned sharpening target both recover ground-truth profile width without degrading depth, exposing a monotonic width-peak frontier in the L1-per-ray loss family and motivating a principled redefinition of morphology gates. Real-photo validation on two DTU scenes confirms the pipeline transfers to non-synthetic input. Our results suggest that ray-wise occupancy profiles offer a compact, learned, and uncertainty-aware interface between multi-view reconstruction and generative priors.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2608.23206v1",
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.23206v2",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2608.23206v1"
+      "href": "https://arxiv.org/abs/2608.23206v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/102324988/LSOP_code_release"
     }
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 exact version 2608.23206v1 全文整理；本地 PDF 共 12 页，SHA-256 cba7a9c1f112851aedb80e3a289f98c5c57efb40ffca933a155dae4f64dbf32d，并视觉核验第 1、4、6、10 页。",
-    "ideaZh": "论文以 spherical occupancy profile 统一多视图判别重建与生成式多解重建，并显式建模不确定性；表示设计直接命中 3D reconstruction/generation，；作者在独立 90-object test 上报告 median soft depth error 0.035，并展示可由 classifier-free guidance 调节的多解 reconstruction spread。",
+    "sourceNote": "依据 exact version 2608.23206v2 全文整理；本地 PDF 共 12 页，SHA-256 b05adb1ee63414b250629d59e5321dbb06cb204d8e8fde55bece09c9b3a86f9d，并视觉核验第 1、2、6、10 页。",
+    "ideaZh": "Learning Spherical Occupancy Profiles for Multi-View 3D Reconstruction and Generation 的主方法与结果不变；v2 的主 method/results 与 v1 一致，但新增 code and trained weights URL；本轮已验证 public repository，可更新 canonical Code/Paper link。",
     "methodFlow": [
       "从多视图 3DGS 沿 ray 提取 occupancy probability profile",
       "以 image evidence 和 FiLM decoder 预测 per-ray profiles",
@@ -53,15 +58,15 @@
       "latent diffusion 做 unconditional/conditional multi-solution generation",
       "从 profile 解码 depth/geometry"
     ],
-    "whyRelevantZh": "直接对应 3d-reconstruction，且全文给出方法、实验、限制与 exact-version 证据闭环。",
-    "evidenceZh": "论文方法由以下流程构成：从多视图 3DGS 沿 ray 提取 occupancy probability profile -> 以 image evidence 和 FiLM decoder 预测 per-ray profiles -> profile VAE 学 compact latent -> latent diffusion 做 unconditional/conditional multi-solution generation -> 从 profile 解码 depth/geometry。（Main method section/figure, p. 4）；作者在独立 90-object test 上报告 median soft depth error 0.035，并展示可由 classifier-free guidance 调节的多解 reconstruction spread。（Main experiment/table, p. 6）；训练只用 999 个 GSO turntable objects，真实验证仅两个 DTU scenes；ray profile 到完整表面的拓扑一致性和大场景扩展尚未证明。（Limitations/discussion and scope, p. 10）",
-    "caveatZh": "训练只用 999 个 GSO turntable objects，真实验证仅两个 DTU scenes；ray profile 到完整表面的拓扑一致性和大场景扩展尚未证明。；训练只用 999 个 GSO turntable objects，真实验证仅两个 DTU scenes；ray profile 到完整表面的拓扑一致性和大场景扩展尚未证明。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
-    "motivationZh": "论文以 spherical occupancy profile 统一多视图判别重建与生成式多解重建，并显式建模不确定性；表示设计直接命中 3D reconstruction/generation，。全文方法页给出完整数据流，主实验与讨论页支持以下边界：作者在独立 90-object test 上报告 median soft depth error 0.035，并展示可由 classifier-free guidance 调节的多解 reconstruction spread。 训练只用 999 个 GSO turntable objects，真实验证仅两个 DTU scenes；ray profile 到完整表面的拓扑一致性和大场景扩展尚未证明。 所有数字均为作者报告，本项目未独立复现。",
-    "methodZh": "论文以 spherical occupancy profile 统一多视图判别重建与生成式多解重建，并显式建模不确定性；表示设计直接命中 3D reconstruction/generation，。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 方法流程：从多视图 3DGS 沿 ray 提取 occupancy probability profile -> 以 image evidence 和 FiLM decoder 预测 per-ray profiles -> profile VAE 学 compact latent -> latent diffusion 做 unconditional/conditional multi-solution generation -> 从 profile 解码 depth/geometry。",
-    "experimentsZh": "在 GSO train/test 与两个 DTU scenes 上评估 depth/profile morphology、generation manifold、多解 spread 与 sharpening ablations。 作者报告：作者在独立 90-object test 上报告 median soft depth error 0.035，并展示可由 classifier-free guidance 调节的多解 reconstruction spread。（Main experiment/table, p. 6） Baseline coverage：全文与论文选定的代表性 baselines 比较；证据边界仍受以下因素限制：训练只用 999 个 GSO turntable objects，真实验证仅两个 DTU scenes；ray profile 到完整表面的拓扑一致性和大场景扩展尚未证明。 Ablation：全文包含关键组件、训练或超参数消融；这些结果支持作者内部归因，但不能替代跨实现复现。",
-    "insightZh": "论文以 spherical occupancy profile 统一多视图判别重建与生成式多解重建，并显式建模不确定性；表示设计直接命中 3D reconstruction/generation，。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 全文证据足以支持 accept-deep；阅读建议沿用 screening 的 high/deep，并保留作者报告与 reviewer inference 的边界。",
+    "whyRelevantZh": "该 3d-reconstruction 工作新增 public code/status，改善可复查性。",
+    "evidenceZh": "当前版本保留原方法流程：从多视图 3DGS 沿 ray 提取 occupancy probability profile -> 以 image evidence 和 FiLM decoder 预测 per-ray profiles -> profile VAE 学 compact latent -> latent diffusion 做 unconditional/conditional multi-solution generation -> 从 profile 解码 depth/geometry。（Method / system figure, p. 2）；v2 的主 method/results 与 v1 一致，但新增 code and trained weights URL；本轮已验证 public repository，可更新 canonical Code/Paper link。（Exact-version text/page comparison; results, p. 6）；本次 code-status / attribution 变化可描述，但不宣称 method 或实验被重新验证。（Discussion / metadata / code evidence, p. 10）",
+    "caveatZh": "v2 的主 method/results 与 v1 一致，但新增 code and trained weights URL；本轮已验证 public repository，可更新 canonical Code/Paper link。 本项目未复现实验。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "Learning Spherical Occupancy Profiles for Multi-View 3D Reconstruction and Generation 的主方法与结果不变；v2 的主 method/results 与 v1 一致，但新增 code and trained weights URL；本轮已验证 public repository，可更新 canonical Code/Paper link。 本轮只按 exact-version 证据评价更新事件，数字仍为作者报告且未复现。",
+    "methodZh": "主科学结论未改变；本次新增可验证 public code/status，属于 canonical record 可描述的实质更新。 方法流程：从多视图 3DGS 沿 ray 提取 occupancy probability profile -> 以 image evidence 和 FiLM decoder 预测 per-ray profiles -> profile VAE 学 compact latent -> latent diffusion 做 unconditional/conditional multi-solution generation -> 从 profile 解码 depth/geometry。",
+    "experimentsZh": "逐页、pdftotext-layout 与 metadata 对比 archived exact version 和 2608.23206v2；核对主方法、实验表、结论、code 与 venue。 作者报告：v2 的主 method/results 与 v1 一致，但新增 code and trained weights URL；本轮已验证 public repository，可更新 canonical Code/Paper link。（Exact-version comparison; p. 6） Baseline coverage：v2 的主 method/results 与 v1 一致，但新增 code and trained weights URL；本轮已验证 public repository，可更新 canonical Code/Paper link。 Ablation/diagnosis：本次可发布变化集中在 code/status provenance；原有 method 与实验结论保持原证据边界。",
+    "insightZh": "主科学结论未改变；本次新增可验证 public code/status，属于 canonical record 可描述的实质更新。 accept-skim 只发布可验证的 code/status 更新，并保持原方法、实验与限制边界。",
     "relevance": "high",
-    "readingAction": "deep",
+    "readingAction": "skim",
     "evidenceMaturity": "solid"
   }
 }

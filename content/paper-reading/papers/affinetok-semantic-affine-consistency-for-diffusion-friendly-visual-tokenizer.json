@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2608.23864",
+  "slug": "affinetok-semantic-affine-consistency-for-diffusion-friendly-visual-tokenizer",
+  "title": "AffineTok: Semantic Affine Consistency for Diffusion-Friendly Visual Tokenizer",
+  "authors": [
+    "Junqiu Yu",
+    "Pandeng Li",
+    "Yikai Wang",
+    "Jiaxing Zhao",
+    "Yujie Wei",
+    "Kaixun Jiang",
+    "Quanhao Li",
+    "Hongtao Yu",
+    "Zhihang Liu",
+    "Zhaohe Liao",
+    "Junjie Zhou",
+    "Yun Zheng",
+    "Yu Liu",
+    "Yanwei Fu"
+  ],
+  "publishedAt": "2026-08-24",
+  "updatedAt": "2026-08-24",
+  "collectedAt": "2026-08-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.23864"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "vlm-mllm",
+    "AffineTok",
+    "Semantic",
+    "Affine",
+    "Consistency",
+    "for",
+    "Diffusion",
+    "Friendly",
+    "Visual"
+  ],
+  "abstract": "Visual tokenizers increasingly inject semantic supervision into latent spaces to make downstream diffusion easier. Yet how these semantics should be organized to facilitate denoising remains underexplored. In this paper, we define the semantic recovery objective: the denoising process should recover the semantic content of the clean image from noisy latent, and a good tokenizer should make it easier. Existing approaches train a projector to predict the semantics directly from the noisy latent. We argue that this predicts the average of clean-image semantics, whereas what really needs to be aligned is the semantics of averaged clean latents. More importantly, we demonstrate that the semantic recovery error orthogonally decomposes into the error of the optimal semantic prediction directly from the noisy latent and the error between these two predictions. We therefore identify their consistency as the missing requirement and call it Semantic Affine Consistency (SAC). To examine whether this overlooked requirement is closely related to downstream generation, we introduce M_SAC, a tokenizer-side proxy for SAC. Across the evaluated tokenizers and diffusion model scales, M_SAC closely tracks generation quality, reaching a Pearson correlation of 0.960 with SiT-XL gFID, thereby motivating SAC-guided tokenizer training. We then introduce AffineTok, which promotes SAC through two complementary, training-only components. Global Semantic Coordination Token (GSCT) coordinates the semantic organization of clean latents, keeping semantic averaging meaningful, while Posterior-Mean Semantic Alignment (PMSA) predicts posterior-mean latents from noisy inputs and supervises their semantics. On ImageNet 256, compared with the baseline, AffineTok reduces gFID by 26% at 20 epochs and, with continued training, achieves a new state-of-the-art gFID of 1.21 without classifier-free guidance and 1.10 with guidance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.23864v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.23864v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.23864v1 全文整理；本地 PDF 共 13 页，SHA-256 d980c89b9d0d1292fd1a79ec9ac8377b42f013c1945a67e901d305e7dfe6211c，并视觉核验第 1、2、3、4 页。",
+    "ideaZh": "把 semantic affine consistency 提升为 diffusion-friendly tokenizer 的可测目标，并给出 training-only 实现。 作者报告 M_SAC 与 SiT-XL gFID 的 Pearson correlation 为 0.960；AffineTok 在 ImageNet 256 达到 1.21 gFID（无 CFG）与 1.10（有 CFG）。 证据边界：主要量化集中在 ImageNet 256；高 correlation 不是充分因果证明，跨文本条件、视频和更高分辨率仍需验证。",
+    "methodFlow": [
+      "定义 noisy latent 的 semantic recovery objective",
+      "分解 optimal semantic prediction 与 latent-mean consistency error",
+      "构造 tokenizer-side M_SAC proxy",
+      "GSCT 协调 clean-latent semantics",
+      "PMSA 对 posterior-mean latent 做语义监督并训练 AffineTok"
+    ],
+    "whyRelevantZh": "直接对应 image-generation，并提供 exact-version method、experiment、limitation 与 visual evidence。",
+    "evidenceZh": "方法流程：定义 noisy latent 的 semantic recovery objective -> 分解 optimal semantic prediction 与 latent-mean consistency error -> 构造 tokenizer-side M_SAC proxy -> GSCT 协调 clean-latent semantics -> PMSA 对 posterior-mean latent 做语义监督并训练 AffineTok。（Method / system figure, p. 2）；作者报告 M_SAC 与 SiT-XL gFID 的 Pearson correlation 为 0.960；AffineTok 在 ImageNet 256 达到 1.21 gFID（无 CFG）与 1.10（有 CFG）。（Experiments / results, p. 3; abstract, p. 1）；主要量化集中在 ImageNet 256；高 correlation 不是充分因果证明，跨文本条件、视频和更高分辨率仍需验证。（Discussion / limitations and reviewed scope, p. 4）",
+    "caveatZh": "主要量化集中在 ImageNet 256；高 correlation 不是充分因果证明，跨文本条件、视频和更高分辨率仍需验证。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "把 semantic affine consistency 提升为 diffusion-friendly tokenizer 的可测目标，并给出 training-only 实现。 全文方法、实验页与讨论页形成 exact-version 证据闭环。作者报告 M_SAC 与 SiT-XL gFID 的 Pearson correlation 为 0.960；AffineTok 在 ImageNet 256 达到 1.21 gFID（无 CFG）与 1.10（有 CFG）。 主要量化集中在 ImageNet 256；高 correlation 不是充分因果证明，跨文本条件、视频和更高分辨率仍需验证。 所有数字均为作者报告，本项目未独立复现。",
+    "methodZh": "把 semantic affine consistency 提升为 diffusion-friendly tokenizer 的可测目标，并给出 training-only 实现。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 方法流程：定义 noisy latent 的 semantic recovery objective -> 分解 optimal semantic prediction 与 latent-mean consistency error -> 构造 tokenizer-side M_SAC proxy -> GSCT 协调 clean-latent semantics -> PMSA 对 posterior-mean latent 做语义监督并训练 AffineTok。",
+    "experimentsZh": "作者跨 tokenizers 与 diffusion scales 测 M_SAC/quality correlation，并在 ImageNet 256 比较 generation quality 与 training speed。 作者报告：作者报告 M_SAC 与 SiT-XL gFID 的 Pearson correlation 为 0.960；AffineTok 在 ImageNet 256 达到 1.21 gFID（无 CFG）与 1.10（有 CFG）。（Experiments / results, p. 3; abstract, p. 1） Baseline coverage：全文覆盖作者选定的主要 baselines 与任务设置；仍受以下证据边界限制：主要量化集中在 ImageNet 256；高 correlation 不是充分因果证明，跨文本条件、视频和更高分辨率仍需验证。 Ablation/diagnosis：全文的组件、设置或诊断性对比用于支持作者内部归因；未见的消融不作补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "把 semantic affine consistency 提升为 diffusion-friendly tokenizer 的可测目标，并给出 training-only 实现。 新意在于把该机制实现为可验证的 end-to-end method/data/evaluation pipeline，而不只停留在概念或单一示例。 全文证据支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
