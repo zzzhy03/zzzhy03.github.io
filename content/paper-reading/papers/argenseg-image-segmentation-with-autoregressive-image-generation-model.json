@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2510.20803",
+  "slug": "argenseg-image-segmentation-with-autoregressive-image-generation-model",
+  "title": "ARGenSeg: Image Segmentation with Autoregressive Image Generation Model",
+  "authors": [
+    "Xiaolong Wang",
+    "Lixiang Ru",
+    "Ziyuan Huang",
+    "Kaixiang Ji",
+    "Dandan Zheng",
+    "Jingdong Chen",
+    "Jun Zhou"
+  ],
+  "publishedAt": "2025-10-23",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2510.20803"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "ARGenSeg",
+    "Image",
+    "Segmentation",
+    "with",
+    "Autoregressive",
+    "Generation",
+    "Model"
+  ],
+  "abstract": "We propose a novel AutoRegressive Generation-based paradigm for image Segmentation (ARGenSeg), achieving multimodal understanding and pixel-level perception within a unified framework. Prior works integrating image segmentation into multimodal large language models (MLLMs) typically employ either boundary points representation or dedicated segmentation heads. These methods rely on discrete representations or semantic prompts fed into task-specific decoders, which limits the ability of the MLLM to capture fine-grained visual details. To address these challenges, we introduce a segmentation framework for MLLM based on image generation, which naturally produces dense masks for target objects. We leverage MLLM to output visual tokens and detokenize them into images using an universal VQ-VAE, making the segmentation fully dependent on the pixel-level understanding of the MLLM. To reduce inference latency, we employ a next-scale-prediction strategy to generate required visual tokens in parallel. Extensive experiments demonstrate that our method surpasses prior state-of-the-art approaches on multiple segmentation datasets with a remarkable boost in inference speed, while maintaining strong understanding capabilities.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2510.20803v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2510.20803v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/inclusionAI/ARGenSeg"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2510.20803v2 全文整理；本地 PDF 共 25 页，SHA-256 5c4e66490b008768393e429f1d69d5ac4ffd1a8f8be270e2aff25dee367258ce，并视觉核验第 1、2、3、15 页。",
+    "ideaZh": "ARGenSeg 让 MLLM 直接自回归生成 visual tokens，再经 universal VQ-VAE 解码 dense mask，以 generation interface 统一理解与 segmentation。 作者报告：在多个 segmentation datasets 上超过所列 MLLM baselines，同时减少 segmentation training data 并提高推理速度。 证据边界：核心任务仍是 2D segmentation，且依赖既有 VQ-VAE 的 mask tokenization；对生成质量、开放域类别和更高分辨率的迁移边界尚不充分。",
+    "methodFlow": [
+      "连续图像特征与文本进入 MLLM",
+      "MLLM 预测量化 mask image tokens",
+      "next-scale prediction 并行生成多尺度 tokens",
+      "universal VQ-VAE 将 tokens 解码为 dense masks"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：ARGenSeg 让 MLLM 直接自回归生成 visual tokens，再经 universal VQ-VAE 解码 dense mask，以 generation interface 统一理解与 segmentation。",
+    "evidenceZh": "方法流程：连续图像特征与文本进入 MLLM -> MLLM 预测量化 mask image tokens -> next-scale prediction 并行生成多尺度 tokens -> universal VQ-VAE 将 tokens 解码为 dense masks。（Method / system description, p. 3; visual overview, p. 1）；作者报告：在多个 segmentation datasets 上超过所列 MLLM baselines，同时减少 segmentation training data 并提高推理速度。（Experiments / results, p. 8; abstract, p. 1）；适用边界与风险：核心任务仍是 2D segmentation，且依赖既有 VQ-VAE 的 mask tokenization；对生成质量、开放域类别和更高分辨率的迁移边界尚不充分。（Limitations / discussion / reviewed scope, p. 15）",
+    "caveatZh": "核心任务仍是 2D segmentation，且依赖既有 VQ-VAE 的 mask tokenization；对生成质量、开放域类别和更高分辨率的迁移边界尚不充分。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "ARGenSeg 让 MLLM 直接自回归生成 visual tokens，再经 universal VQ-VAE 解码 dense mask，以 generation interface 统一理解与 segmentation。 不同于 point/boundary token 或专用 segmentation head，方法把 dense mask 当作可生成图像，探索统一 visual output vocabulary。 作者报告：在多个 segmentation datasets 上超过所列 MLLM baselines，同时减少 segmentation training data 并提高推理速度。 核心任务仍是 2D segmentation，且依赖既有 VQ-VAE 的 mask tokenization；对生成质量、开放域类别和更高分辨率的迁移边界尚不充分。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "不同于 point/boundary token 或专用 segmentation head，方法把 dense mask 当作可生成图像，探索统一 visual output vocabulary。 方法流程：连续图像特征与文本进入 MLLM -> MLLM 预测量化 mask image tokens -> next-scale prediction 并行生成多尺度 tokens -> universal VQ-VAE 将 tokens 解码为 dense masks。",
+    "experimentsZh": "覆盖 semantic、instance、interactive、zero-shot reasoning segmentation 与 anomaly detection，比较 MLLM segmentation baselines 并分析 next-scale 加速。 作者报告：在多个 segmentation datasets 上超过所列 MLLM baselines，同时减少 segmentation training data 并提高推理速度。（Experiments / results, p. 8; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：核心任务仍是 2D segmentation，且依赖既有 VQ-VAE 的 mask tokenization；对生成质量、开放域类别和更高分辨率的迁移边界尚不充分。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "ARGenSeg 让 MLLM 直接自回归生成 visual tokens，再经 universal VQ-VAE 解码 dense mask，以 generation interface 统一理解与 segmentation。 作者报告：在多个 segmentation datasets 上超过所列 MLLM baselines，同时减少 segmentation training data 并提高推理速度。 证据边界：核心任务仍是 2D segmentation，且依赖既有 VQ-VAE 的 mask tokenization；对生成质量、开放域类别和更高分辨率的迁移边界尚不充分。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
+

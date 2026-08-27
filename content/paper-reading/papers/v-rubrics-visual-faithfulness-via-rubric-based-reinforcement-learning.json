@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2608.25580",
+  "slug": "v-rubrics-visual-faithfulness-via-rubric-based-reinforcement-learning",
+  "title": "V-Rubrics: Visual Faithfulness via Rubric-Based Reinforcement Learning",
+  "authors": [
+    "Shulin Tian",
+    "Minglun Li",
+    "Yuhao Dong",
+    "Hao Ding",
+    "Jiarui Yao",
+    "Haiwen Diao",
+    "Jingkang Yang",
+    "Hongyuan Zhu",
+    "Ziwei Liu"
+  ],
+  "publishedAt": "2026-08-26",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.25580"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Rubrics",
+    "Visual",
+    "Faithfulness",
+    "Rubric",
+    "Based",
+    "Reinforcement",
+    "Learning"
+  ],
+  "abstract": "Vision-language models can produce fluent answers that are insufficiently grounded in the visual evidence: a single unsupported object, chart value, or intermediate inference can undermine an otherwise plausible response. We argue that this is a credit-assignment failure in multimodal post-training. Scalar outcome rewards indicate whether an answer is acceptable, but do not identify which visual facts are grounded, which reasoning steps are valid, or which instruction constraints are missed. We introduce Visual Rubrics-Based Reinforcement Learning, which decomposes reference responses into atomic propositions and scores generated answers along Visual Faithfulness (VF), Reasoning Consistency (RC), and Instruction Following (IF). The resulting rubric items provide structured partial credit and localize rubric credit when supporting evidence spans are available. We first obtain an SFT checkpoint by fine-tuning Qwen3-VL-8B-Instruct on the public OpenMMReasoner-SFT-874K corpus, adapting OpenMMReasoner's cold-start data recipe. We construct V-Rubrics 50K, a 50,248-example training set from 17 visually grounded sources, by applying rule-based filters before deriving example difficulty from rejection-sampling scores and then annotating every example with Gemini-3-Pro under the same structured prompt and protocol. We train our model based on the same SFT checkpoint using component-wise, prefix-localized rubric credit. Experiments show that our rubricbased GRPO improves over both the shared SFT baseline and answer-only GRPO, with the largest gains on knowledge-oriented and visually grounded reasoning benchmarks. The results show rubrics as a useful reward abstraction for visual post-training.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.25580v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.25580v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/shulin16/v-rubrics"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.25580v1 全文整理；本地 PDF 共 20 页，SHA-256 afc97b220ba5fe562b0778d7ebbf89274f50246b2f9df82a75735ebe6f3ac559，并视觉核验第 1、2、3、14 页。",
+    "ideaZh": "V-Rubrics 将 visual faithfulness、reasoning consistency 与 instruction following 拆成 atomic rubric items，用 prefix-localized partial credit 做 multimodal GRPO。 作者报告： rubric-based GRPO 整体优于 shared SFT 与 answer-only GRPO，最大收益在 knowledge-oriented 和 visually grounded reasoning。 证据边界：rubrics 由强闭源模型自动生成，错误或偏好会进入 reward；17 个 source datasets 的覆盖和 prefix localization 也可能导致 reward gaming。",
+    "methodFlow": [
+      "从 17 个 visually grounded sources 筛选 50K examples",
+      "将 reference 分解为 VF/RC/IF atomic rubrics",
+      "用 Gemini-3-Pro 标注 criteria 与可选 evidence spans",
+      "component-wise prefix-localized rewards 训练 GRPO"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：V-Rubrics 将 visual faithfulness、reasoning consistency 与 instruction following 拆成 atomic rubric items，用 prefix-localized partial credit 做 multimodal GRPO。",
+    "evidenceZh": "方法流程：从 17 个 visually grounded sources 筛选 50K examples -> 将 reference 分解为 VF/RC/IF atomic rubrics -> 用 Gemini-3-Pro 标注 criteria 与可选 evidence spans -> component-wise prefix-localized rewards 训练 GRPO。（Method / system description, p. 3; visual overview, p. 2）；作者报告： rubric-based GRPO 整体优于 shared SFT 与 answer-only GRPO，最大收益在 knowledge-oriented 和 visually grounded reasoning。（Experiments / results, p. 6; abstract, p. 1）；适用边界与风险：rubrics 由强闭源模型自动生成，错误或偏好会进入 reward；17 个 source datasets 的覆盖和 prefix localization 也可能导致 reward gaming。（Limitations / discussion / reviewed scope, p. 20）",
+    "caveatZh": "rubrics 由强闭源模型自动生成，错误或偏好会进入 reward；17 个 source datasets 的覆盖和 prefix localization 也可能导致 reward gaming。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "V-Rubrics 将 visual faithfulness、reasoning consistency 与 instruction following 拆成 atomic rubric items，用 prefix-localized partial credit 做 multimodal GRPO。 把 multimodal post-training 的单一 outcome reward 改为可定位 grounded facts 与 reasoning steps 的 fine-grained credit assignment。 作者报告： rubric-based GRPO 整体优于 shared SFT 与 answer-only GRPO，最大收益在 knowledge-oriented 和 visually grounded reasoning。 rubrics 由强闭源模型自动生成，错误或偏好会进入 reward；17 个 source datasets 的覆盖和 prefix localization 也可能导致 reward gaming。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "把 multimodal post-training 的单一 outcome reward 改为可定位 grounded facts 与 reasoning steps 的 fine-grained credit assignment。 方法流程：从 17 个 visually grounded sources 筛选 50K examples -> 将 reference 分解为 VF/RC/IF atomic rubrics -> 用 Gemini-3-Pro 标注 criteria 与可选 evidence spans -> component-wise prefix-localized rewards 训练 GRPO。",
+    "experimentsZh": "Qwen3-VL-8B SFT checkpoint，比较 shared SFT、answer-only GRPO 与 rubric variants，覆盖 grounded reasoning、chart、knowledge tasks。 作者报告： rubric-based GRPO 整体优于 shared SFT 与 answer-only GRPO，最大收益在 knowledge-oriented 和 visually grounded reasoning。（Experiments / results, p. 6; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：rubrics 由强闭源模型自动生成，错误或偏好会进入 reward；17 个 source datasets 的覆盖和 prefix localization 也可能导致 reward gaming。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "V-Rubrics 将 visual faithfulness、reasoning consistency 与 instruction following 拆成 atomic rubric items，用 prefix-localized partial credit 做 multimodal GRPO。 作者报告： rubric-based GRPO 整体优于 shared SFT 与 answer-only GRPO，最大收益在 knowledge-oriented 和 visually grounded reasoning。 证据边界：rubrics 由强闭源模型自动生成，错误或偏好会进入 reward；17 个 source datasets 的覆盖和 prefix localization 也可能导致 reward gaming。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
+

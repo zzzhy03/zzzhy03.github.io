@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2608.25659",
+  "slug": "gaussiandream-plus-plus-efficient-3d-gaussian-world-modeling-for-robotic-manipulation",
+  "title": "GaussianDream++: Efficient 3D Gaussian World Modeling for Robotic Manipulation",
+  "authors": [
+    "Yuqing Jiang",
+    "Zijian Zhang",
+    "Weitao Zhou",
+    "Jiawei Wang",
+    "Junjie He",
+    "Lei Yang",
+    "Haifang Qing",
+    "Si Liu",
+    "Ding Zhao",
+    "Ping Luo",
+    "Haibao Yu"
+  ],
+  "publishedAt": "2026-08-26",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.25659"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "GaussianDream",
+    "Efficient",
+    "Gaussian",
+    "World",
+    "Modeling",
+    "Robotic",
+    "Manipulation"
+  ],
+  "abstract": "Vision-Language-Action (VLA) policies have advanced language-conditioned robotic manipulation, yet action-imitation objectives provide only weak supervision for metric 3D structure and short-horizon physical evolution. Geometry-enhanced policies mainly improve current-scene grounding, whereas predictive policies often model future dynamics in RGB or latent spaces and may incur substantial deployment cost. GaussianDream demonstrates that training-time current Gaussian reconstruction and future Gaussian prediction provide effective 3D supervision, but its dense VGGT/TGE-based prefix jointly carries state, dynamics, and action-conditioning information. We present \\textbf{\\methodname}, a compact, policy-native extension that inserts \\textbf{World State Tokens} and \\textbf{World Prediction Tokens} directly into the VLA backbone. A training-only \\textbf{World Representation Head} decodes these tokens into a Current World and coupled Future Prediction over shared Gaussian primitives, while static--dynamic factorization preserves persistent structure and focuses residual motion on interaction-relevant regions. At inference, the head, renderer, auxiliary objectives, and VGGT/TGE pathway are removed, leaving only 20 world tokens without online Gaussian decoding or rollout. \\method achieves \\textbf{98.6\\%} on LIBERO and \\textbf{87.8\\%} on LIBERO-Plus, with clear gains under Camera and Layout shifts. Real-robot experiments further improve average success from 29.2\\% to 52.5\\% over reproduced $π_{0.5}$ while maintaining efficient closed-loop control.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.25659v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.25659v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/TuojingAI/GaussianDream"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.25659v1 全文整理；本地 PDF 共 17 页，SHA-256 3f8c3b18431fe15060637035b52093b1f0d4d08eab09f8c680acd848c248e84e，并视觉核验第 1、5、8、14 页。",
+    "ideaZh": "GaussianDream++ 在 VLA prefix 中加入 20 个 world state/prediction tokens，并以训练期 Gaussian current/future world head 提供 metric 3D supervision。 作者报告： LIBERO 98.6%、LIBERO-Plus 87.8%，真实机器人相对复现 π0.5 从 29.2% 到 52.5%。 证据边界：Gaussian head 和 dense supervision 只在训练期降低部署成本但仍增加训练复杂度；结果集中于 manipulation 与特定 VLA backbone，world tokens 是否显式可解释仍有限。",
+    "methodFlow": [
+      "将 world state/prediction tokens 插入 VLA backbone",
+      "训练期 head 解码 current/future shared Gaussians",
+      "static-dynamic factorization 约束短期演化",
+      "部署时移除 head/renderers，仅保留 tokens 与 action expert"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：GaussianDream++ 在 VLA prefix 中加入 20 个 world state/prediction tokens，并以训练期 Gaussian current/future world head 提供 metric 3D supervision。",
+    "evidenceZh": "方法流程：将 world state/prediction tokens 插入 VLA backbone -> 训练期 head 解码 current/future shared Gaussians -> static-dynamic factorization 约束短期演化 -> 部署时移除 head/renderers，仅保留 tokens 与 action expert。（Method / system description, p. 5; visual overview, p. 5）；作者报告： LIBERO 98.6%、LIBERO-Plus 87.8%，真实机器人相对复现 π0.5 从 29.2% 到 52.5%。（Experiments / results, p. 8; abstract, p. 1）；适用边界与风险：Gaussian head 和 dense supervision 只在训练期降低部署成本但仍增加训练复杂度；结果集中于 manipulation 与特定 VLA backbone，world tokens 是否显式可解释仍有限。（Limitations / discussion / reviewed scope, p. 14）",
+    "caveatZh": "Gaussian head 和 dense supervision 只在训练期降低部署成本但仍增加训练复杂度；结果集中于 manipulation 与特定 VLA backbone，world tokens 是否显式可解释仍有限。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "GaussianDream++ 在 VLA prefix 中加入 20 个 world state/prediction tokens，并以训练期 Gaussian current/future world head 提供 metric 3D supervision。 把昂贵的显式 Gaussian prefix 转为 policy-native compact tokens，在不在线解码 3D world 的情况下保留结构监督。 作者报告： LIBERO 98.6%、LIBERO-Plus 87.8%，真实机器人相对复现 π0.5 从 29.2% 到 52.5%。 Gaussian head 和 dense supervision 只在训练期降低部署成本但仍增加训练复杂度；结果集中于 manipulation 与特定 VLA backbone，world tokens 是否显式可解释仍有限。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "把昂贵的显式 Gaussian prefix 转为 policy-native compact tokens，在不在线解码 3D world 的情况下保留结构监督。 方法流程：将 world state/prediction tokens 插入 VLA backbone -> 训练期 head 解码 current/future shared Gaussians -> static-dynamic factorization 约束短期演化 -> 部署时移除 head/renderers，仅保留 tokens 与 action expert。",
+    "experimentsZh": "LIBERO、LIBERO-Plus 七类 shifts 与 real robot，对比 VLA/geometry/world-model policies 并做 world-token、supervision terms 与 latency ablation。 作者报告： LIBERO 98.6%、LIBERO-Plus 87.8%，真实机器人相对复现 π0.5 从 29.2% 到 52.5%。（Experiments / results, p. 8; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：Gaussian head 和 dense supervision 只在训练期降低部署成本但仍增加训练复杂度；结果集中于 manipulation 与特定 VLA backbone，world tokens 是否显式可解释仍有限。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "GaussianDream++ 在 VLA prefix 中加入 20 个 world state/prediction tokens，并以训练期 Gaussian current/future world head 提供 metric 3D supervision。 作者报告： LIBERO 98.6%、LIBERO-Plus 87.8%，真实机器人相对复现 π0.5 从 29.2% 到 52.5%。 证据边界：Gaussian head 和 dense supervision 只在训练期降低部署成本但仍增加训练复杂度；结果集中于 manipulation 与特定 VLA backbone，world tokens 是否显式可解释仍有限。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
+

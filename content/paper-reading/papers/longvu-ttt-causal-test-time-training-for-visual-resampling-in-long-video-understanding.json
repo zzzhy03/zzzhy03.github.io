@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2608.25729",
+  "slug": "longvu-ttt-causal-test-time-training-for-visual-resampling-in-long-video-understanding",
+  "title": "LongVU-TTT: Causal Test-Time Training for Visual Resampling in Long Video Understanding",
+  "authors": [
+    "Mahmoud Ahmed",
+    "Sameh Abdulah",
+    "Olatunji Ruwase",
+    "Sam Ade Jacobs",
+    "Mathis Bode",
+    "Mohamed Elhoseiny"
+  ],
+  "publishedAt": "2026-08-26",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.25729"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "LongVU",
+    "Causal",
+    "Test",
+    "Time",
+    "Training",
+    "Visual",
+    "Resampling",
+    "Long",
+    "Video",
+    "Understanding"
+  ],
+  "abstract": "Long-video MLLMs must model temporal change before a limited visual-token budget removes most frame evidence. We introduce LongVU-TTT, which inserts a convolutional Test-Time Training (TTT) resampler with causal fast-weight updates between the vision encoder and the LLM. Its grouped 2D fast weights adapt to each video and contextualize frame features before compression, while a hybrid uniform-and-change-aware selector retains explicit visual evidence for downstream reasoning. Under controlled conditions, TTT-Conv improves over TTT-MLP by up to +2.12 and bidirectional Mamba2 by up to +3.04 on MLVU, and it is stronger than attention- and fixed-state recurrent resamplers across three benchmarks. Analysis shows that the fast weights behave as a temporal aggregation state rather than a reliable long-horizon episodic memory: their benefit attenuates as evidence becomes more distant, motivating explicit frame retention. LongVU-TTT processes up to 512 frames before reducing them to 128 LLM frames and achieves competitive performance across five video understanding benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.25729v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.25729v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.25729v1 全文整理；本地 PDF 共 17 页，SHA-256 dcba46e9a8dfa35a3ad956aef350be7eb6097a29e3407f399a2fd352802ad2e4，并视觉核验第 1、2、3、7 页。",
+    "ideaZh": "LongVU-TTT 在 vision encoder 与 LLM 之间加入 convolutional test-time-training resampler，先因果聚合 512 帧，再选择 128 帧证据。 作者报告：在 MLVU 上相对 TTT-MLP 最高 +2.12、相对 bidirectional Mamba2 最高 +3.04，512→128 帧设置在五个 benchmarks 有竞争力。 证据边界：作者明确发现 fast weights 更像 temporal aggregation 而非长时 episodic memory，远距 evidence 收益衰减；训练需 A100 级 512-frame setup，code/models 仍仅承诺发布。",
+    "methodFlow": [
+      "逐帧编码 video features",
+      "TTT-Conv 以 grouped 2D fast weights 因果更新",
+      "uniform/change-aware selector 保留显式 frames",
+      "spatial pooling/projector 将 128 帧送入 LLM"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：LongVU-TTT 在 vision encoder 与 LLM 之间加入 convolutional test-time-training resampler，先因果聚合 512 帧，再选择 128 帧证据。",
+    "evidenceZh": "方法流程：逐帧编码 video features -> TTT-Conv 以 grouped 2D fast weights 因果更新 -> uniform/change-aware selector 保留显式 frames -> spatial pooling/projector 将 128 帧送入 LLM。（Method / system description, p. 3; visual overview, p. 3）；作者报告：在 MLVU 上相对 TTT-MLP 最高 +2.12、相对 bidirectional Mamba2 最高 +3.04，512→128 帧设置在五个 benchmarks 有竞争力。（Experiments / results, p. 7; abstract, p. 1）；适用边界与风险：作者明确发现 fast weights 更像 temporal aggregation 而非长时 episodic memory，远距 evidence 收益衰减；训练需 A100 级 512-frame setup，code/models 仍仅承诺发布。（Limitations / discussion / reviewed scope, p. 17）",
+    "caveatZh": "作者明确发现 fast weights 更像 temporal aggregation 而非长时 episodic memory，远距 evidence 收益衰减；训练需 A100 级 512-frame setup，code/models 仍仅承诺发布。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "LongVU-TTT 在 vision encoder 与 LLM 之间加入 convolutional test-time-training resampler，先因果聚合 512 帧，再选择 128 帧证据。 在 visual-token bottleneck 之前以 per-video fast weights 建模 temporal change，同时保留显式 frame evidence，避免把 fast state 当万能记忆。 作者报告：在 MLVU 上相对 TTT-MLP 最高 +2.12、相对 bidirectional Mamba2 最高 +3.04，512→128 帧设置在五个 benchmarks 有竞争力。 作者明确发现 fast weights 更像 temporal aggregation 而非长时 episodic memory，远距 evidence 收益衰减；训练需 A100 级 512-frame setup，code/models 仍仅承诺发布。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "在 visual-token bottleneck 之前以 per-video fast weights 建模 temporal change，同时保留显式 frame evidence，避免把 fast state 当万能记忆。 方法流程：逐帧编码 video features -> TTT-Conv 以 grouped 2D fast weights 因果更新 -> uniform/change-aware selector 保留显式 frames -> spatial pooling/projector 将 128 帧送入 LLM。",
+    "experimentsZh": "MLVU、LongVideoBench、Video-MME 等五个 benchmarks，固定 token/frame budget 比较 TTT-MLP、Mamba2、attention/recurrent resamplers。 作者报告：在 MLVU 上相对 TTT-MLP 最高 +2.12、相对 bidirectional Mamba2 最高 +3.04，512→128 帧设置在五个 benchmarks 有竞争力。（Experiments / results, p. 7; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：作者明确发现 fast weights 更像 temporal aggregation 而非长时 episodic memory，远距 evidence 收益衰减；训练需 A100 级 512-frame setup，code/models 仍仅承诺发布。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "LongVU-TTT 在 vision encoder 与 LLM 之间加入 convolutional test-time-training resampler，先因果聚合 512 帧，再选择 128 帧证据。 作者报告：在 MLVU 上相对 TTT-MLP 最高 +2.12、相对 bidirectional Mamba2 最高 +3.04，512→128 帧设置在五个 benchmarks 有竞争力。 证据边界：作者明确发现 fast weights 更像 temporal aggregation 而非长时 episodic memory，远距 evidence 收益衰减；训练需 A100 级 512-frame setup，code/models 仍仅承诺发布。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
+

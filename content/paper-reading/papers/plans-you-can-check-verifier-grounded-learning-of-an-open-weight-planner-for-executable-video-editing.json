@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2608.25622",
+  "slug": "plans-you-can-check-verifier-grounded-learning-of-an-open-weight-planner-for-executable-video-editing",
+  "title": "Plans You Can Check: Verifier-Grounded Learning of an Open-Weight Planner for Executable Video-Editing",
+  "authors": [
+    "Haoyu Wang",
+    "Cheng Feng",
+    "Liuyang Bian",
+    "Ruiyang Huang",
+    "Lei Wei",
+    "Yafei Wen",
+    "Xiaoxin Chen",
+    "Xiaoying Tang"
+  ],
+  "publishedAt": "2026-08-26",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.25622"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "video-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "video-generation",
+    "Plans",
+    "Check",
+    "Verifier",
+    "Grounded",
+    "Learning",
+    "Open",
+    "Weight",
+    "Planner",
+    "Executable",
+    "Video"
+  ],
+  "abstract": "Practical video editing is not only pixel generation: an editor must turn a brief, a clip pool, music metadata, and hard constraints into an executable timeline. We study this decision layer as \\emph{executable video-editing planning} and introduce RefineCut, which, unlike workflow systems that wrap a prompted frontier model, trains a compact open-weight planner for it. The planner edits a typed timeline through structured patches covering clip selection, trimming, ordering, transitions, and duration and music alignment; a deterministic verifier applies each patch and checks it against an explicit constraint ledger. Because editing has no single ground-truth repair, we do not imitate teachers directly: RefineCut replays every multi-teacher branch through the verifier and keeps verifier-best repairs as supervision. A second stage, RefineCut-Evo, lets the student score its own repairs with the verifier and a task rubric and trains on high-margin preference pairs, so the final $8$B planner runs in a closed verifier loop with no teacher calls at inference. On RefineCut-Bench ($3{,}578$ tasks, $7{,}971$ captioned clips, $499$ music tracks, explicit ledgers), verifier-replayed distillation lifts the planner from $0.620$ to $0.858$ on the protocol-specific Video-Editing Score and RefineCut-Evo reaches $0.924$; the gain transfers to Llama-3.1-8B and GLM-4-9B, and in the same closed loop the $8$B planner matches or exceeds its frontier teachers. Code and RefineCut-Bench are publicly released; see the Data Availability statement.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.25622v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.25622v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Lancelot-wy/RefineCut"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.25622v1 全文整理；本地 PDF 共 24 页，SHA-256 751da5712174acb229a7a9d1c7b939220b5804e1812e915c16d9e9a661ae560d，并视觉核验第 1、2、3、24 页。",
+    "ideaZh": "RefineCut 训练 open-weight planner 用 typed timeline patches 编辑 clip pool，并由 deterministic constraint ledger/verifier 闭环检查可执行视频剪辑计划。 作者报告： protocol score 从 0.620 经 replayed distillation 到 0.858，RefineCut-Evo 达 0.924，8B planner 在闭环中匹配或超过 teachers。 证据边界：planner 主要读 captions/metadata 而非 raw pixels，得分依赖作者 verifier 与 rubric；训练使用 frontier teachers，真实编辑审美和未编码 constraints 仍可能漏检。",
+    "methodFlow": [
+      "读取 brief、captioned clips、music metadata 与 hard constraints",
+      "planner 生成 RFC6902-style RefinePatch",
+      "verifier 执行 patch 并逐项更新 ledger",
+      "replay 多 teacher branches 后做 verifier-grounded DPO self-evolution"
+    ],
+    "whyRelevantZh": "visual-design-agents 方向的直接证据：RefineCut 训练 open-weight planner 用 typed timeline patches 编辑 clip pool，并由 deterministic constraint ledger/verifier 闭环检查可执行视频剪辑计划。",
+    "evidenceZh": "方法流程：读取 brief、captioned clips、music metadata 与 hard constraints -> planner 生成 RFC6902-style RefinePatch -> verifier 执行 patch 并逐项更新 ledger -> replay 多 teacher branches 后做 verifier-grounded DPO self-evolution。（Method / system description, p. 3; visual overview, p. 1）；作者报告： protocol score 从 0.620 经 replayed distillation 到 0.858，RefineCut-Evo 达 0.924，8B planner 在闭环中匹配或超过 teachers。（Experiments / results, p. 7; abstract, p. 1）；适用边界与风险：planner 主要读 captions/metadata 而非 raw pixels，得分依赖作者 verifier 与 rubric；训练使用 frontier teachers，真实编辑审美和未编码 constraints 仍可能漏检。（Limitations / discussion / reviewed scope, p. 24）",
+    "caveatZh": "planner 主要读 captions/metadata 而非 raw pixels，得分依赖作者 verifier 与 rubric；训练使用 frontier teachers，真实编辑审美和未编码 constraints 仍可能漏检。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "RefineCut 训练 open-weight planner 用 typed timeline patches 编辑 clip pool，并由 deterministic constraint ledger/verifier 闭环检查可执行视频剪辑计划。 把 video editing 的 decision layer 从 prompted workflow 提升为可训练、可执行、可验证且推理时不依赖 frontier teacher 的 planner。 作者报告： protocol score 从 0.620 经 replayed distillation 到 0.858，RefineCut-Evo 达 0.924，8B planner 在闭环中匹配或超过 teachers。 planner 主要读 captions/metadata 而非 raw pixels，得分依赖作者 verifier 与 rubric；训练使用 frontier teachers，真实编辑审美和未编码 constraints 仍可能漏检。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "把 video editing 的 decision layer 从 prompted workflow 提升为可训练、可执行、可验证且推理时不依赖 frontier teacher 的 planner。 方法流程：读取 brief、captioned clips、music metadata 与 hard constraints -> planner 生成 RFC6902-style RefinePatch -> verifier 执行 patch 并逐项更新 ledger -> replay 多 teacher branches 后做 verifier-grounded DPO self-evolution。",
+    "experimentsZh": "RefineCut-Bench 3578 tasks、7971 clips、499 music tracks；比较 8B planner、frontier teachers、distillation 与 Evo stage。 作者报告： protocol score 从 0.620 经 replayed distillation 到 0.858，RefineCut-Evo 达 0.924，8B planner 在闭环中匹配或超过 teachers。（Experiments / results, p. 7; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：planner 主要读 captions/metadata 而非 raw pixels，得分依赖作者 verifier 与 rubric；训练使用 frontier teachers，真实编辑审美和未编码 constraints 仍可能漏检。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "RefineCut 训练 open-weight planner 用 typed timeline patches 编辑 clip pool，并由 deterministic constraint ledger/verifier 闭环检查可执行视频剪辑计划。 作者报告： protocol score 从 0.620 经 replayed distillation 到 0.858，RefineCut-Evo 达 0.924，8B planner 在闭环中匹配或超过 teachers。 证据边界：planner 主要读 captions/metadata 而非 raw pixels，得分依赖作者 verifier 与 rubric；训练使用 frontier teachers，真实编辑审美和未编码 constraints 仍可能漏检。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
+

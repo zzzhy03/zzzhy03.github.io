@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2605.18359",
+  "slug": "rave-re-allocating-visual-attention-in-large-multimodal-models",
+  "title": "RAVE: Re-Allocating Visual Attention in Large Multimodal Models",
+  "authors": [
+    "Xi Leng",
+    "Xinhong Ma",
+    "Ziqiang Dong",
+    "Feng Zhang",
+    "Xiaoying Tang",
+    "Yang Yang",
+    "Guanjun Jiang"
+  ],
+  "publishedAt": "2026-05-18",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2605.18359"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "RAVE",
+    "Allocating",
+    "Visual",
+    "Attention",
+    "Large",
+    "Multimodal",
+    "Models"
+  ],
+  "abstract": "Large multimodal models (LMMs) inherit the self-attention mechanism of pretrained language backbones, yet standard attention can exhibit suboptimal allocation, including cross-modal misallocation between textual and visual evidence and intra-visual imbalance among visual tokens. We propose RAVE (Re-Allocating Visual Attention), a lightweight pair-gating mechanism that adds a learned query-key bias to pre-softmax attention scores over visual keys, derived from pre-RoPE query and key features. RAVE requires no architectural modification to the backbone and can be trained end-to-end with the rest of the model. Across a suite of multimodal benchmarks, RAVE improves over standard attention by an average of 3 points, with the largest gains on perception-intensive tasks -- including multilingual OCR, chart understanding, document VQA, and scene text VQA -- where accurate visual grounding is critical.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.18359v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.18359v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.18359v3 全文整理；本地 PDF 共 14 页，SHA-256 ff229ef90c61ed92ae497d722c070897904ffc84156631d81e77c6c6c1e9a8fd，并视觉核验第 1、2、3、9 页。",
+    "ideaZh": "RAVE 在 decoder self-attention 的 pre-softmax visual keys 上加入 input-adaptive pair gate，纠正 cross-modal 与 intra-visual allocation imbalance。 作者报告：相对 standard attention 平均约 3 分提升，最大增益出现在 perception-intensive grounding tasks。 证据边界：作者指出主要验证 pretrained decoder-only LMM，未覆盖 scratch/native multimodal pretraining，且 SDPA 实现尚未集成 FlashAttention kernels；强起点模型增益较小。",
+    "methodFlow": [
+      "从 pre-RoPE query/key features 生成 pairwise bias",
+      "仅对 visual keys 重新校准 pre-softmax scores",
+      "与原 backbone 端到端训练而不改主架构",
+      "在 perception/reasoning benchmarks 分析 attention redistribution"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：RAVE 在 decoder self-attention 的 pre-softmax visual keys 上加入 input-adaptive pair gate，纠正 cross-modal 与 intra-visual allocation imbalance。",
+    "evidenceZh": "方法流程：从 pre-RoPE query/key features 生成 pairwise bias -> 仅对 visual keys 重新校准 pre-softmax scores -> 与原 backbone 端到端训练而不改主架构 -> 在 perception/reasoning benchmarks 分析 attention redistribution。（Method / system description, p. 3; visual overview, p. 2）；作者报告：相对 standard attention 平均约 3 分提升，最大增益出现在 perception-intensive grounding tasks。（Experiments / results, p. 9; abstract, p. 1）；适用边界与风险：作者指出主要验证 pretrained decoder-only LMM，未覆盖 scratch/native multimodal pretraining，且 SDPA 实现尚未集成 FlashAttention kernels；强起点模型增益较小。（Limitations / discussion / reviewed scope, p. 9）",
+    "caveatZh": "作者指出主要验证 pretrained decoder-only LMM，未覆盖 scratch/native multimodal pretraining，且 SDPA 实现尚未集成 FlashAttention kernels；强起点模型增益较小。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "RAVE 在 decoder self-attention 的 pre-softmax visual keys 上加入 input-adaptive pair gate，纠正 cross-modal 与 intra-visual allocation imbalance。 用可学习、input-adaptive 且轻量的 native-attention gate 替代手工 inference intervention 或额外 cross-attention module。 作者报告：相对 standard attention 平均约 3 分提升，最大增益出现在 perception-intensive grounding tasks。 作者指出主要验证 pretrained decoder-only LMM，未覆盖 scratch/native multimodal pretraining，且 SDPA 实现尚未集成 FlashAttention kernels；强起点模型增益较小。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "用可学习、input-adaptive 且轻量的 native-attention gate 替代手工 inference intervention 或额外 cross-attention module。 方法流程：从 pre-RoPE query/key features 生成 pairwise bias -> 仅对 visual keys 重新校准 pre-softmax scores -> 与原 backbone 端到端训练而不改主架构 -> 在 perception/reasoning benchmarks 分析 attention redistribution。",
+    "experimentsZh": "LLaVA/Qwen-VL 系列，多语言 OCR、chart/document VQA、scene text 和 reasoning benchmarks，对比 attention intervention/architecture methods并做 gate ablation。 作者报告：相对 standard attention 平均约 3 分提升，最大增益出现在 perception-intensive grounding tasks。（Experiments / results, p. 9; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：作者指出主要验证 pretrained decoder-only LMM，未覆盖 scratch/native multimodal pretraining，且 SDPA 实现尚未集成 FlashAttention kernels；强起点模型增益较小。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "RAVE 在 decoder self-attention 的 pre-softmax visual keys 上加入 input-adaptive pair gate，纠正 cross-modal 与 intra-visual allocation imbalance。 作者报告：相对 standard attention 平均约 3 分提升，最大增益出现在 perception-intensive grounding tasks。 证据边界：作者指出主要验证 pretrained decoder-only LMM，未覆盖 scratch/native multimodal pretraining，且 SDPA 实现尚未集成 FlashAttention kernels；强起点模型增益较小。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
+

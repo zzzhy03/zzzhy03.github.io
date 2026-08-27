@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2608.25332",
+  "slug": "not-all-attention-heads-contribute-to-critical-visual-token-selection-head-aware-pruning-matters-more",
+  "title": "Not All Attention Heads Contribute to Critical Visual Token Selection: Head-Aware Pruning Matters More",
+  "authors": [
+    "Chaofang Ma",
+    "Lin Jiang",
+    "Carol Jingyi Li",
+    "Xingyu Liu",
+    "Zeyu Li",
+    "Jiang Xu",
+    "Wei Zhang"
+  ],
+  "publishedAt": "2026-08-26",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.25332"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Attention",
+    "Heads",
+    "Contribute",
+    "Critical",
+    "Visual",
+    "Token",
+    "Selection",
+    "Head",
+    "Aware",
+    "Pruning"
+  ],
+  "abstract": "Vision-Language Models (VLMs) have exhibited impressive performance across diverse visual scenarios. However, this success comes at the cost of explosive growth in visual tokens, which imposes substantial memory and computational overhead during inference, ultimately increasing latency. To improve VLM inference efficiency, a typical class of visual token pruning methods estimates token importance by aggregating attention scores across all heads in the pruning layer of the Large Language Model (LLM) backbone and prunes tokens based on aggregated scores. However, in this paper, we reveal a compelling phenomenon: the capability to pinpoint critical visual tokens is concentrated within a small fraction of heads. Aggregation exclusively on these heads can improve task performance. Inspired by this observation, we propose ProViP, a training-free progressive visual token pruning framework. ProViP first removes redundant visual tokens based on the embedding similarity of input tokens before reasoning of the LLM backbone, and then further prunes tokens during reasoning via head-aware pruning. Experiments demonstrate that ProViP delivers outstanding task performance and inference efficiency. For instance, when applied to LLaVA-1.5-7B, ProViP retains 95.9% of the original performance and achieves 1.62x inference speedup under an 88.9% pruning ratio.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.25332v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.25332v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.25332v1 全文整理；本地 PDF 共 17 页，SHA-256 5c54c8558708b729903857169dfa371b039649cc490d878b3ad3d1b01ef4b85a，并视觉核验第 1、2、6、13 页。",
+    "ideaZh": "ProViP 先做 visual-embedding similarity 去冗余，再只聚合少量 visual heads 的 attention 做 progressive token pruning。 作者报告： LLaVA-1.5-7B 在 88.9% pruning ratio 下保留 95.9% 原性能并实现约 1.62x speedup。 证据边界：visual-head heuristic 与 pruning layers 需要按 architecture 调整；accuracy retention 不等于在长上下文、生成任务或真实 serving 上获得同等 wall-clock 收益。",
+    "methodFlow": [
+      "用 input-token similarity 做首轮 redundancy pruning",
+      "以视觉选择性 heuristic 找出 visual heads",
+      "在 shallow/middle LLM layers 聚合这些 heads 的 attention",
+      "逐层删除低重要度 visual tokens"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：ProViP 先做 visual-embedding similarity 去冗余，再只聚合少量 visual heads 的 attention 做 progressive token pruning。",
+    "evidenceZh": "方法流程：用 input-token similarity 做首轮 redundancy pruning -> 以视觉选择性 heuristic 找出 visual heads -> 在 shallow/middle LLM layers 聚合这些 heads 的 attention -> 逐层删除低重要度 visual tokens。（Method / system description, p. 6; visual overview, p. 1）；作者报告： LLaVA-1.5-7B 在 88.9% pruning ratio 下保留 95.9% 原性能并实现约 1.62x speedup。（Experiments / results, p. 6; abstract, p. 1）；适用边界与风险：visual-head heuristic 与 pruning layers 需要按 architecture 调整；accuracy retention 不等于在长上下文、生成任务或真实 serving 上获得同等 wall-clock 收益。（Limitations / discussion / reviewed scope, p. 9）",
+    "caveatZh": "visual-head heuristic 与 pruning layers 需要按 architecture 调整；accuracy retention 不等于在长上下文、生成任务或真实 serving 上获得同等 wall-clock 收益。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "ProViP 先做 visual-embedding similarity 去冗余，再只聚合少量 visual heads 的 attention 做 progressive token pruning。 发现关键视觉 token 选择能力集中于少量 heads，并把这一 diagnosis 转成 training-free head-aware pruning。 作者报告： LLaVA-1.5-7B 在 88.9% pruning ratio 下保留 95.9% 原性能并实现约 1.62x speedup。 visual-head heuristic 与 pruning layers 需要按 architecture 调整；accuracy retention 不等于在长上下文、生成任务或真实 serving 上获得同等 wall-clock 收益。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "发现关键视觉 token 选择能力集中于少量 heads，并把这一 diagnosis 转成 training-free head-aware pruning。 方法流程：用 input-token similarity 做首轮 redundancy pruning -> 以视觉选择性 heuristic 找出 visual heads -> 在 shallow/middle LLM layers 聚合这些 heads 的 attention -> 逐层删除低重要度 visual tokens。",
+    "experimentsZh": "LLaVA-1.5、LLaVA-NeXT 与 Qwen2.5-VL，多种 VQA/OCR/hallucination benchmarks，对比 12 个 pruning baselines。 作者报告： LLaVA-1.5-7B 在 88.9% pruning ratio 下保留 95.9% 原性能并实现约 1.62x speedup。（Experiments / results, p. 6; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：visual-head heuristic 与 pruning layers 需要按 architecture 调整；accuracy retention 不等于在长上下文、生成任务或真实 serving 上获得同等 wall-clock 收益。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "ProViP 先做 visual-embedding similarity 去冗余，再只聚合少量 visual heads 的 attention 做 progressive token pruning。 作者报告： LLaVA-1.5-7B 在 88.9% pruning ratio 下保留 95.9% 原性能并实现约 1.62x speedup。 证据边界：visual-head heuristic 与 pruning layers 需要按 architecture 调整；accuracy retention 不等于在长上下文、生成任务或真实 serving 上获得同等 wall-clock 收益。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
+

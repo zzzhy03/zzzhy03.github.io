@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2602.00686",
+  "slug": "learning-to-accelerate-vision-language-action-models-through-adaptive-visual-token-caching",
+  "title": "Learning to Accelerate Vision-Language-Action Models through Adaptive Visual Token Caching",
+  "authors": [
+    "Yujie Wei",
+    "Jiahan Fan",
+    "Jiyu Guo",
+    "Ruichen Zhen",
+    "Rui Shao",
+    "Xiu Su",
+    "Zeke Xie",
+    "Hongxun Yao",
+    "Shuo Yang"
+  ],
+  "publishedAt": "2026-01-31",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2602.00686"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Learning",
+    "Accelerate",
+    "Vision",
+    "Language",
+    "Action",
+    "Models",
+    "through",
+    "Adaptive",
+    "Visual",
+    "Token"
+  ],
+  "abstract": "Vision-Language-Action (VLA) models have demonstrated remarkable generalization capabilities in robotic manipulation tasks, yet their substantial computational overhead remains a critical obstacle to real-world deployment. Improving inference efficiency is therefore essential for practical robotic applications. Existing acceleration methods often rely on heuristic or static strategies--such as rule-based token caching or pruning--that are decoupled from task objectives and fail to adapt to dynamic scene changes. In this work, we reformulate inference acceleration as a learnable policy optimization problem and propose a novel framework that integrates a dynamic, task-aware decision-making process directly into the VLA model. At its core are two lightweight, cooperative modules: a Cached Token Selector, which determines which tokens should be reused, and a Cache Ratio Predictor, which controls how many tokens to reuse. Training these modules is non-trivial due to their discrete decisions. We address this by adopting a differentiable relaxation that allows gradient-based end-to-end optimization. Extensive experiments on the LIBERO and SIMPLER benchmarks, as well as real-robot evaluations, show that our method achieves a 1.76x wall-clock inference speedup while simultaneously improving the average success rate by 1.9 percentage points (from 75.0% to 76.9%) on LIBERO and by 5.0 percentage points on real-world tasks, significantly outperforming existing baselines. This work highlights the potential of learning task-aware computational allocation policies, paving the way for VLA models that are both powerful and efficient.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2602.00686v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2602.00686v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/JiahanFan/LAC"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2602.00686v2 全文整理；本地 PDF 共 15 页，SHA-256 891c33c439def12b48b564056067236fcc83b37452c2748ec3cb71196201bf49，并视觉核验第 1、2、5、12 页。",
+    "ideaZh": "LAC 用可学习 token selector 与 cache-ratio predictor 动态决定 VLA 在每个时刻复用哪些视觉 tokens、复用多少。 作者报告： 1.76x wall-clock speedup，LIBERO 平均成功率从 75.0% 到 76.9%，真实任务提高 5.0 个百分点。 证据边界：作者指出 optical-flow prior 在快速全局变化与 ego-motion 下会失效，且实验主要为静态场景；训练附加模块和 cache state 管理也不是零成本。",
+    "methodFlow": [
+      "从当前视觉 features 预测 scene motion 与 token importance",
+      "cache-ratio predictor 选择动态复用比例",
+      "token selector 生成可微 hard mask",
+      "只重算 active tokens 并增量更新 KV states"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：LAC 用可学习 token selector 与 cache-ratio predictor 动态决定 VLA 在每个时刻复用哪些视觉 tokens、复用多少。",
+    "evidenceZh": "方法流程：从当前视觉 features 预测 scene motion 与 token importance -> cache-ratio predictor 选择动态复用比例 -> token selector 生成可微 hard mask -> 只重算 active tokens 并增量更新 KV states。（Method / system description, p. 5; visual overview, p. 2）；作者报告： 1.76x wall-clock speedup，LIBERO 平均成功率从 75.0% 到 76.9%，真实任务提高 5.0 个百分点。（Experiments / results, p. 6; abstract, p. 1）；适用边界与风险：作者指出 optical-flow prior 在快速全局变化与 ego-motion 下会失效，且实验主要为静态场景；训练附加模块和 cache state 管理也不是零成本。（Limitations / discussion / reviewed scope, p. 12）",
+    "caveatZh": "作者指出 optical-flow prior 在快速全局变化与 ego-motion 下会失效，且实验主要为静态场景；训练附加模块和 cache state 管理也不是零成本。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "LAC 用可学习 token selector 与 cache-ratio predictor 动态决定 VLA 在每个时刻复用哪些视觉 tokens、复用多少。 把 VLA token caching 从 rule-based heuristic 变成与 manipulation task loss 联合训练的 adaptive compute-allocation policy。 作者报告： 1.76x wall-clock speedup，LIBERO 平均成功率从 75.0% 到 76.9%，真实任务提高 5.0 个百分点。 作者指出 optical-flow prior 在快速全局变化与 ego-motion 下会失效，且实验主要为静态场景；训练附加模块和 cache state 管理也不是零成本。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "把 VLA token caching 从 rule-based heuristic 变成与 manipulation task loss 联合训练的 adaptive compute-allocation policy。 方法流程：从当前视觉 features 预测 scene motion 与 token importance -> cache-ratio predictor 选择动态复用比例 -> token selector 生成可微 hard mask -> 只重算 active tokens 并增量更新 KV states。",
+    "experimentsZh": "LIBERO、SIMPLER 与 real-robot，比较多种 caching/pruning baselines，并分析 success、wall-clock、FLOPs 与 cache ratio。 作者报告： 1.76x wall-clock speedup，LIBERO 平均成功率从 75.0% 到 76.9%，真实任务提高 5.0 个百分点。（Experiments / results, p. 6; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：作者指出 optical-flow prior 在快速全局变化与 ego-motion 下会失效，且实验主要为静态场景；训练附加模块和 cache state 管理也不是零成本。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "LAC 用可学习 token selector 与 cache-ratio predictor 动态决定 VLA 在每个时刻复用哪些视觉 tokens、复用多少。 作者报告： 1.76x wall-clock speedup，LIBERO 平均成功率从 75.0% 到 76.9%，真实任务提高 5.0 个百分点。 证据边界：作者指出 optical-flow prior 在快速全局变化与 ego-motion 下会失效，且实验主要为静态场景；训练附加模块和 cache state 管理也不是零成本。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
+

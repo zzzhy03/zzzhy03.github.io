@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2603.16558",
+  "slug": "segmentation-based-attention-entropy-detecting-and-mitigating-object-hallucinations-in-large-vision-language-models",
+  "title": "Segmentation-Based Attention Entropy: Detecting and Mitigating Object Hallucinations in Large Vision-Language Models",
+  "authors": [
+    "Jiale Song",
+    "Jiaxin Luo",
+    "Xue-song Tang",
+    "Kuangrong Hao",
+    "Mingbo Zhao"
+  ],
+  "publishedAt": "2026-03-17",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.16558"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.MM"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Segmentation",
+    "Based",
+    "Attention",
+    "Entropy",
+    "Detecting",
+    "Mitigating",
+    "Object",
+    "Hallucinations",
+    "Large",
+    "Vision"
+  ],
+  "abstract": "Large Vision-Language Models (LVLMs) achieve strong performance on many multimodal tasks, but object hallucinations severely undermine their reliability. Most existing studies focus on the text modality, attributing hallucinations to overly strong language priors and insufficient visual grounding. In contrast, we observe that abnormal attention patterns within the visual modality can also give rise to hallucinated objects. Building on this observation, we propose Segmentation-based Attention Entropy (SAE), which leverages semantic segmentation to quantify visual attention uncertainty in a semantic space. Based on SAE, we further design a reliability score for hallucination detection and an SAE-guided attention adjustment method that modifies visual attention at inference time to mitigate hallucinations. We evaluate our approach on public benchmarks and in real embodied multimodal scenarios with quadruped robots. Experiments show that SAE reduces hallucinations without additional training, improving LVLM reliability.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.16558v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.16558v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.16558v2 全文整理；本地 PDF 共 10 页，SHA-256 99571db52a65fd47f40ab38495512b06aece919501e92a719df478b0dff7d407，并视觉核验第 1、2、3、8 页。",
+    "ideaZh": "SAE 将 visual attention 按 segmentation regions 聚合成 semantic entropy，用于检测并在 inference time 下调 LVLM hallucinated-object logits。 作者报告： SAE 在不额外训练下减少 object hallucinations，并在 embodied single/multi-target scenarios 保持较低开销。 证据边界：依赖稳定 segmentation partition 和特定 decoder attention；分割错误、开放词汇对象与多物体拥挤场景会直接影响 entropy 与干预质量。",
+    "methodFlow": [
+      "外部分割器产生 semantic regions",
+      "按 region 汇聚生成 token 的 image attention",
+      "计算 segmentation-based attention entropy/reliability",
+      "以 SAE-guided attention/logit adjustment 抑制高风险 object words"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：SAE 将 visual attention 按 segmentation regions 聚合成 semantic entropy，用于检测并在 inference time 下调 LVLM hallucinated-object logits。",
+    "evidenceZh": "方法流程：外部分割器产生 semantic regions -> 按 region 汇聚生成 token 的 image attention -> 计算 segmentation-based attention entropy/reliability -> 以 SAE-guided attention/logit adjustment 抑制高风险 object words。（Method / system description, p. 3; visual overview, p. 1）；作者报告： SAE 在不额外训练下减少 object hallucinations，并在 embodied single/multi-target scenarios 保持较低开销。（Experiments / results, p. 8; abstract, p. 1）；适用边界与风险：依赖稳定 segmentation partition 和特定 decoder attention；分割错误、开放词汇对象与多物体拥挤场景会直接影响 entropy 与干预质量。（Limitations / discussion / reviewed scope, p. 10）",
+    "caveatZh": "依赖稳定 segmentation partition 和特定 decoder attention；分割错误、开放词汇对象与多物体拥挤场景会直接影响 entropy 与干预质量。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "SAE 将 visual attention 按 segmentation regions 聚合成 semantic entropy，用于检测并在 inference time 下调 LVLM hallucinated-object logits。 把 visual-attention dispersion 从 pixel/token 空间映射到 semantic regions，并将同一 signal 用于 hallucination detection 与 mitigation。 作者报告： SAE 在不额外训练下减少 object hallucinations，并在 embodied single/multi-target scenarios 保持较低开销。 依赖稳定 segmentation partition 和特定 decoder attention；分割错误、开放词汇对象与多物体拥挤场景会直接影响 entropy 与干预质量。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "把 visual-attention dispersion 从 pixel/token 空间映射到 semantic regions，并将同一 signal 用于 hallucination detection 与 mitigation。 方法流程：外部分割器产生 semantic regions -> 按 region 汇聚生成 token 的 image attention -> 计算 segmentation-based attention entropy/reliability -> 以 SAE-guided attention/logit adjustment 抑制高风险 object words。",
+    "experimentsZh": "LLaVA-1.5-7B 的 public hallucination benchmarks 与 quadruped navigation，比较 decoding/attention baselines并做 region/layer/runtime ablation。 作者报告： SAE 在不额外训练下减少 object hallucinations，并在 embodied single/multi-target scenarios 保持较低开销。（Experiments / results, p. 8; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：依赖稳定 segmentation partition 和特定 decoder attention；分割错误、开放词汇对象与多物体拥挤场景会直接影响 entropy 与干预质量。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "SAE 将 visual attention 按 segmentation regions 聚合成 semantic entropy，用于检测并在 inference time 下调 LVLM hallucinated-object logits。 作者报告： SAE 在不额外训练下减少 object hallucinations，并在 embodied single/multi-target scenarios 保持较低开销。 证据边界：依赖稳定 segmentation partition 和特定 decoder attention；分割错误、开放词汇对象与多物体拥挤场景会直接影响 entropy 与干预质量。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
+

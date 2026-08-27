@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2601.16296",
+  "slug": "memory-v2v-memory-augmented-video-to-video-diffusion-for-consistent-multi-turn-editing",
+  "title": "Memory-V2V: Memory-Augmented Video-to-Video Diffusion for Consistent Multi-Turn Editing",
+  "authors": [
+    "Dohun Lee",
+    "Chun-Hao Paul Huang",
+    "Xuelin Chen",
+    "Jong Chul Ye",
+    "Duygu Ceylan",
+    "Hyeonho Jeong"
+  ],
+  "publishedAt": "2026-01-22",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2601.16296"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Memory",
+    "Augmented",
+    "Video",
+    "Diffusion",
+    "Consistent",
+    "Multi",
+    "Turn",
+    "Editing"
+  ],
+  "abstract": "Video-to-video diffusion models achieve impressive single-turn editing performance, but practical editing workflows are inherently iterative. When edits are applied sequentially, existing models treat each turn independently, often causing previously generated regions to drift or be overwritten. We identify this failure mode as the problem of cross-turn consistency in multi-turn video editing. We introduce Memory-V2V, a memory-augmented framework that treats prior edits as structured constraints for subsequent generations. Memory-V2V maintains an external memory of previous outputs, retrieves task-relevant edits, and integrates them through relevance-aware tokenization and adaptive compression. These technical ingredients enable scalable conditioning without linear growth in computation. We demonstrate Memory-V2V on iterative video novel view synthesis and text-guided long video editing. Memory-V2V substantially enhances cross-turn consistency while maintaining visual quality, outperforming strong baselines with modest overhead.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2601.16296v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2601.16296v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/DoHunLee1/Memory-V2V"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2601.16296v3 全文整理；本地 PDF 共 38 页，SHA-256 c6333275045f15524f6643bbed9ff70a9f451d213a9f19d764b5d2c5e1459984，并视觉核验第 1、2、3、27 页。",
+    "ideaZh": "Memory-V2V 用 task-aware external memory 保存历史编辑，把已生成区域作为后续 video diffusion 的结构约束以减少多轮漂移。 作者报告： Memory-V2V 明显提高 cross-turn consistency 且保持视觉质量，计算开销相对温和。 证据边界：memory 仍来自模型自己的输出，错误可能累积；长视频训练使用合成扩展且依赖 base generator，极长轮次和复杂交互编辑尚未充分验证。",
+    "methodFlow": [
+      "将先前 edited outputs 写入 external memory",
+      "按 FOV/semantic relevance 检索相关历史片段",
+      "对 memory tokens 做 spatially varying tokenization 与 adaptive merging",
+      "以检索 memory 条件生成下一轮 V2V edit"
+    ],
+    "whyRelevantZh": "video-generation 方向的直接证据：Memory-V2V 用 task-aware external memory 保存历史编辑，把已生成区域作为后续 video diffusion 的结构约束以减少多轮漂移。",
+    "evidenceZh": "方法流程：将先前 edited outputs 写入 external memory -> 按 FOV/semantic relevance 检索相关历史片段 -> 对 memory tokens 做 spatially varying tokenization 与 adaptive merging -> 以检索 memory 条件生成下一轮 V2V edit。（Method / system description, p. 3; visual overview, p. 1）；作者报告： Memory-V2V 明显提高 cross-turn consistency 且保持视觉质量，计算开销相对温和。（Experiments / results, p. 27; abstract, p. 1）；适用边界与风险：memory 仍来自模型自己的输出，错误可能累积；长视频训练使用合成扩展且依赖 base generator，极长轮次和复杂交互编辑尚未充分验证。（Limitations / discussion / reviewed scope, p. 38）",
+    "caveatZh": "memory 仍来自模型自己的输出，错误可能累积；长视频训练使用合成扩展且依赖 base generator，极长轮次和复杂交互编辑尚未充分验证。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "Memory-V2V 用 task-aware external memory 保存历史编辑，把已生成区域作为后续 video diffusion 的结构约束以减少多轮漂移。 将 multi-turn video editing 明确建模为带选择性历史约束的 diffusion，而不是每轮独立生成或线性拼接全部历史。 作者报告： Memory-V2V 明显提高 cross-turn consistency 且保持视觉质量，计算开销相对温和。 memory 仍来自模型自己的输出，错误可能累积；长视频训练使用合成扩展且依赖 base generator，极长轮次和复杂交互编辑尚未充分验证。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "将 multi-turn video editing 明确建模为带选择性历史约束的 diffusion，而不是每轮独立生成或线性拼接全部历史。 方法流程：将先前 edited outputs 写入 external memory -> 按 FOV/semantic relevance 检索相关历史片段 -> 对 memory tokens 做 spatially varying tokenization 与 adaptive merging -> 以检索 memory 条件生成下一轮 V2V edit。",
+    "experimentsZh": "iterative video novel-view synthesis 与 text-guided long-video editing；比较无 memory、single-turn baselines，并分析检索、tokenization 与训练数据扩展。 作者报告： Memory-V2V 明显提高 cross-turn consistency 且保持视觉质量，计算开销相对温和。（Experiments / results, p. 27; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：memory 仍来自模型自己的输出，错误可能累积；长视频训练使用合成扩展且依赖 base generator，极长轮次和复杂交互编辑尚未充分验证。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "Memory-V2V 用 task-aware external memory 保存历史编辑，把已生成区域作为后续 video diffusion 的结构约束以减少多轮漂移。 作者报告： Memory-V2V 明显提高 cross-turn consistency 且保持视觉质量，计算开销相对温和。 证据边界：memory 仍来自模型自己的输出，错误可能累积；长视频训练使用合成扩展且依赖 base generator，极长轮次和复杂交互编辑尚未充分验证。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
+

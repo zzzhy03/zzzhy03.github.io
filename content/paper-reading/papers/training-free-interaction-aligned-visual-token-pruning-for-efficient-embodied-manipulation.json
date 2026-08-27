@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2603.22991",
+  "slug": "training-free-interaction-aligned-visual-token-pruning-for-efficient-embodied-manipulation",
+  "title": "Training-Free Interaction-Aligned Visual Token Pruning for Efficient Embodied Manipulation",
+  "authors": [
+    "Jintao Cheng",
+    "Weibin Li",
+    "Haozhe Wang",
+    "Gang Wang",
+    "Yipu Zhang",
+    "Xiaoyu Tang",
+    "Jin Wu",
+    "Xieyuanli Chen",
+    "Yunhui Liu",
+    "Wei Zhang"
+  ],
+  "publishedAt": "2026-03-24",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.22991"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Training",
+    "Free",
+    "Interaction",
+    "Aligned",
+    "Visual",
+    "Token",
+    "Pruning",
+    "Efficient",
+    "Embodied",
+    "Manipulation"
+  ],
+  "abstract": "Efficient visual representation is a central image-processing challenge in embodied manipulation, where policies repeatedly process dense visual-token sequences during closed-loop control. Existing methods rank or prune tokens using semantic relevance, VLM attention, cross-frame redundancy, or motion in the action space. These signals may discard task-relevant regions when instruction-related appearance and observed image motion are not yet spatially aligned. We introduce Interaction-Aligned Pruning (IAprune), a training-free method that treats per-frame budget setting and within-budget token selection as two linked decisions. Semantic--motion spatial agreement guides the choice between Conservative and Aggressive coverage, and the resulting region size is mapped to a calibrated dynamic budget. Continuous semantic and motion responses rank the existing tokens, while geometric residual correction redirects fixed selection slots toward under-represented boundaries without increasing the sequence length. Across four embodied manipulation policies, three simulation benchmarks, and a real-robot platform, IAprune provides a favorable accuracy--efficiency trade-off, matching the unpruned policy on LIBERO with a \\(1.54\\times\\) speedup and reaching \\(1.48\\times\\) acceleration on a real robot. Phase-wise analysis shows that retention gains are largest under tight budgets early in an episode, while fixed-budget analysis confirms that geometry replaces low-priority tokens with boundary and contact-region evidence rather than retaining more tokens. Our project website is: \\href{https://chengjt1999.github.io/VLA-IAP.github.io/}{IAprune.com}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.22991v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.22991v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.22991v2 全文整理；本地 PDF 共 13 页，SHA-256 07a2bd32a4d7ed13f273eba40d63a53583d0487f1521b7db9af597f32d8da083，并视觉核验第 1、2、3、13 页。",
+    "ideaZh": "IAprune 以 semantic-motion spatial agreement 同时选择每帧 token budget 与 budget 内的 visual tokens，并用 geometry residual 补回边界/接触区域。 作者报告： LIBERO 约 1.54x、真实机器人约 1.48x 加速，紧预算下保持或接近 unpruned success。 证据边界：效果依赖 motion cue 与 instruction appearance 对齐；早期弱 motion、遮挡或相机运动仍可能误删证据，且只在所选 manipulation policies 验证。",
+    "methodFlow": [
+      "估计 instruction semantics 与 observed motion maps",
+      "根据 spatial IoU 选择 conservative/aggressive budget",
+      "联合 semantic/motion response 排序 tokens",
+      "固定槽位做 geometry residual correction"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：IAprune 以 semantic-motion spatial agreement 同时选择每帧 token budget 与 budget 内的 visual tokens，并用 geometry residual 补回边界/接触区域。",
+    "evidenceZh": "方法流程：估计 instruction semantics 与 observed motion maps -> 根据 spatial IoU 选择 conservative/aggressive budget -> 联合 semantic/motion response 排序 tokens -> 固定槽位做 geometry residual correction。（Method / system description, p. 3; visual overview, p. 2）；作者报告： LIBERO 约 1.54x、真实机器人约 1.48x 加速，紧预算下保持或接近 unpruned success。（Experiments / results, p. 7; abstract, p. 1）；适用边界与风险：效果依赖 motion cue 与 instruction appearance 对齐；早期弱 motion、遮挡或相机运动仍可能误删证据，且只在所选 manipulation policies 验证。（Limitations / discussion / reviewed scope, p. 13）",
+    "caveatZh": "效果依赖 motion cue 与 instruction appearance 对齐；早期弱 motion、遮挡或相机运动仍可能误删证据，且只在所选 manipulation policies 验证。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "IAprune 以 semantic-motion spatial agreement 同时选择每帧 token budget 与 budget 内的 visual tokens，并用 geometry residual 补回边界/接触区域。 把视觉 token pruning 从 perception-first ranking 改为 interaction-first 的 budget scheduling 与 structural reallocation。 作者报告： LIBERO 约 1.54x、真实机器人约 1.48x 加速，紧预算下保持或接近 unpruned success。 效果依赖 motion cue 与 instruction appearance 对齐；早期弱 motion、遮挡或相机运动仍可能误删证据，且只在所选 manipulation policies 验证。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "把视觉 token pruning 从 perception-first ranking 改为 interaction-first 的 budget scheduling 与 structural reallocation。 方法流程：估计 instruction semantics 与 observed motion maps -> 根据 spatial IoU 选择 conservative/aggressive budget -> 联合 semantic/motion response 排序 tokens -> 固定槽位做 geometry residual correction。",
+    "experimentsZh": "四种 embodied policies、三个 simulation benchmarks 与真实机器人，比较 fixed/dynamic pruning 并做 tight-budget、phase、latency 和 memory 分析。 作者报告： LIBERO 约 1.54x、真实机器人约 1.48x 加速，紧预算下保持或接近 unpruned success。（Experiments / results, p. 7; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：效果依赖 motion cue 与 instruction appearance 对齐；早期弱 motion、遮挡或相机运动仍可能误删证据，且只在所选 manipulation policies 验证。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "IAprune 以 semantic-motion spatial agreement 同时选择每帧 token budget 与 budget 内的 visual tokens，并用 geometry residual 补回边界/接触区域。 作者报告： LIBERO 约 1.54x、真实机器人约 1.48x 加速，紧预算下保持或接近 unpruned success。 证据边界：效果依赖 motion cue 与 instruction appearance 对齐；早期弱 motion、遮挡或相机运动仍可能误删证据，且只在所选 manipulation policies 验证。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
+

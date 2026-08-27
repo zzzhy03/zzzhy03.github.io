@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2608.25356",
+  "slug": "where-to-look-matters-on-policy-self-distillation-for-long-video-understanding",
+  "title": "Where to Look Matters: On-Policy Self-Distillation for Long-Video Understanding",
+  "authors": [
+    "Kaishen Wang",
+    "Dongdi Zhao",
+    "Yijun Liang",
+    "Dingqiang Ye",
+    "Ruibo Chen",
+    "Heng Huang",
+    "Di Fu"
+  ],
+  "publishedAt": "2026-08-26",
+  "updatedAt": "2026-08-26",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.25356"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Where",
+    "Look",
+    "Matters",
+    "Policy",
+    "Self",
+    "Distillation",
+    "Long",
+    "Video",
+    "Understanding"
+  ],
+  "abstract": "Vision-language models (VLMs) have made substantial progress in long-video understanding, with standard backbone models typically answering questions from frames sampled across the full video. However, as videos become longer, the full-video context inevitably contains more question-irrelevant temporal content, which can distract the model from the evidence needed to answer a specific question. We empirically find that focusing the visual input on short annotated clue intervals containing question-relevant evidence consistently improves prediction accuracy across model scales compared with using the corresponding full videos, while requiring fewer input frames. Based on this finding, we introduce Clue-OPSD, a clue-privileged on-policy self-distillation framework for long-video understanding. During training, a full-video student learns from a self-teacher conditioned on the corresponding clue interval by aligning their next-token distributions along student-generated trajectories. Clue-OPSD thus uses clue intervals as privileged supervision without relying on ground-truth answer labels, while requiring no clue annotations or additional modules at inference time. Extensive experiments across multiple long-video understanding benchmarks and Qwen3.5 model scales demonstrate consistent improvements over the corresponding backbone models and strong performance against supervised post-training baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.25356v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.25356v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.25356v1 全文整理；本地 PDF 共 15 页，SHA-256 0cba105d49835251aae72f6d15ff551769b5e6005b3be16bdf51d49316b342b5，并视觉核验第 1、2、3、15 页。",
+    "ideaZh": "Clue-OPSD 让 full-video student 沿自身输出轨迹蒸馏只看 annotated clue interval 的 EMA self-teacher，以训练期 privileged evidence 改善 long-video reasoning。 作者报告：不同 model scales 和 benchmarks 均较对应 backbone 稳定提升，并接近或超过所列 supervised post-training baselines。 证据边界：训练仍需要 clue-interval annotations，质量与覆盖决定 teacher 信号；同 backbone self-teacher 不能补足其未知能力，极长视频证据缺失仍可能失败。",
+    "methodFlow": [
+      "从 full video 与 question 采样 student trajectories",
+      "teacher 仅接收 question-relevant clue interval",
+      "在 student-generated prefixes 上对齐 next-token distributions",
+      "训练后移除 clue/teacher，student 仍处理 full video"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：Clue-OPSD 让 full-video student 沿自身输出轨迹蒸馏只看 annotated clue interval 的 EMA self-teacher，以训练期 privileged evidence 改善 long-video reasoning。",
+    "evidenceZh": "方法流程：从 full video 与 question 采样 student trajectories -> teacher 仅接收 question-relevant clue interval -> 在 student-generated prefixes 上对齐 next-token distributions -> 训练后移除 clue/teacher，student 仍处理 full video。（Method / system description, p. 3; visual overview, p. 2）；作者报告：不同 model scales 和 benchmarks 均较对应 backbone 稳定提升，并接近或超过所列 supervised post-training baselines。（Experiments / results, p. 7; abstract, p. 1）；适用边界与风险：训练仍需要 clue-interval annotations，质量与覆盖决定 teacher 信号；同 backbone self-teacher 不能补足其未知能力，极长视频证据缺失仍可能失败。（Limitations / discussion / reviewed scope, p. 15）",
+    "caveatZh": "训练仍需要 clue-interval annotations，质量与覆盖决定 teacher 信号；同 backbone self-teacher 不能补足其未知能力，极长视频证据缺失仍可能失败。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "Clue-OPSD 让 full-video student 沿自身输出轨迹蒸馏只看 annotated clue interval 的 EMA self-teacher，以训练期 privileged evidence 改善 long-video reasoning。 把 temporal clue 当作仅训练可见的 privileged context，不用 answer labels 或外部 teacher，直接监督模型在长视频中过滤干扰。 作者报告：不同 model scales 和 benchmarks 均较对应 backbone 稳定提升，并接近或超过所列 supervised post-training baselines。 训练仍需要 clue-interval annotations，质量与覆盖决定 teacher 信号；同 backbone self-teacher 不能补足其未知能力，极长视频证据缺失仍可能失败。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "把 temporal clue 当作仅训练可见的 privileged context，不用 answer labels 或外部 teacher，直接监督模型在长视频中过滤干扰。 方法流程：从 full video 与 question 采样 student trajectories -> teacher 仅接收 question-relevant clue interval -> 在 student-generated prefixes 上对齐 next-token distributions -> 训练后移除 clue/teacher，student 仍处理 full video。",
+    "experimentsZh": "多个 Qwen3.5 scales 与 long-video benchmarks，比较 backbone、supervised post-training 与 self-distillation variants。 作者报告：不同 model scales 和 benchmarks 均较对应 backbone 稳定提升，并接近或超过所列 supervised post-training baselines。（Experiments / results, p. 7; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：训练仍需要 clue-interval annotations，质量与覆盖决定 teacher 信号；同 backbone self-teacher 不能补足其未知能力，极长视频证据缺失仍可能失败。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "Clue-OPSD 让 full-video student 沿自身输出轨迹蒸馏只看 annotated clue interval 的 EMA self-teacher，以训练期 privileged evidence 改善 long-video reasoning。 作者报告：不同 model scales 和 benchmarks 均较对应 backbone 稳定提升，并接近或超过所列 supervised post-training baselines。 证据边界：训练仍需要 clue-interval annotations，质量与覆盖决定 teacher 信号；同 backbone self-teacher 不能补足其未知能力，极长视频证据缺失仍可能失败。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
+

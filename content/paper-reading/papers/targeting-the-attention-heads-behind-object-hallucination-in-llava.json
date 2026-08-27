@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2608.24966",
+  "slug": "targeting-the-attention-heads-behind-object-hallucination-in-llava",
+  "title": "Targeting the Attention Heads Behind Object Hallucination in LLaVA",
+  "authors": [
+    "Armaan Sandhu",
+    "Abhilasha Senapati",
+    "Hima Kammachi"
+  ],
+  "publishedAt": "2026-08-25",
+  "updatedAt": "2026-08-25",
+  "collectedAt": "2026-08-28",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.24966"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Targeting",
+    "Attention",
+    "Heads",
+    "Behind",
+    "Object",
+    "Hallucination",
+    "LLaVA"
+  ],
+  "abstract": "Vision-language models such as LLaVA-1.5-7B often hallucinate objects absent from the image when generating captions. We ask whether an interpretability diagnosis of this failure can guide a targeted fix, and we measure what that fix actually changes. We rank attention heads by how much their image attention drops around hallucinated object words, then screen the shortlist by ablating candidate heads and measuring the change in hallucination-token log probability, yielding a 32-head set. We restrict two interventions to these heads: a head-sliced LoRA adapter and an inference-time grounding controller. On 400 held-out COCO images, the combined method lowers CHAIRs (the fraction of captions with a hallucinated object) from 0.370 to 0.230 and CHAIRi (the fraction of hallucinated object mentions) from 0.156 to 0.096 (p < 0.001, paired sign-flip tests). Two controls sharpen attribution. A random-head LoRA control, matched layer-for-layer and trained identically, performs no better than the matched baseline on a separate 200-image control split, supporting the role of head selection rather than LoRA capacity. Under fixed decoding budgets, the CHAIR reduction persists and grows with budget (23% at 64 tokens to 58% at 128), arguing against a pure max-token or truncation artifact, although the method remains shorter and more conservative. The resulting behavior reduces unsupported object mentions while also lowering object recall (0.78 to 0.70). We present a diagnosis-to-intervention pipeline for object hallucination, and, more importantly, a controlled account of what acting on the diagnostic signal actually does: it localizes intervention sites with real, non-random leverage, reported as a behavioral profile rather than a single score.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.24966v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.24966v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.24966v1 全文整理；本地 PDF 共 10 页，SHA-256 e73586c9821af8b7b6f9a5ae6f6e4c2cd2d359b187e0258b3102623bb0859944，并视觉核验第 1、2、4、8 页。",
+    "ideaZh": "该工作先以 hallucinated object words 周围的 image-attention drop 排名 heads，再对筛出的 32 heads 做 head-sliced LoRA 与 inference grounding control。 作者报告： CHAIRs 从 0.370 降到 0.230、CHAIRi 从 0.156 降到 0.096，但 object recall 从 0.78 降到 0.70。 证据边界：实验集中于单一 LLaVA/COCO captioning；方法生成更短更保守 captions，hallucination 降低与 recall/coverage 损失需共同解释。",
+    "methodFlow": [
+      "从 COCO hallucination events 计算 head-level image-attention drop",
+      "逐头 ablation 验证对 hallucination logits 的影响",
+      "只在筛选 heads 上训练 LoRA",
+      "同一 heads 运行 inference-time grounding controller"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：该工作先以 hallucinated object words 周围的 image-attention drop 排名 heads，再对筛出的 32 heads 做 head-sliced LoRA 与 inference grounding control。",
+    "evidenceZh": "方法流程：从 COCO hallucination events 计算 head-level image-attention drop -> 逐头 ablation 验证对 hallucination logits 的影响 -> 只在筛选 heads 上训练 LoRA -> 同一 heads 运行 inference-time grounding controller。（Method / system description, p. 4; visual overview, p. 4）；作者报告： CHAIRs 从 0.370 降到 0.230、CHAIRi 从 0.156 降到 0.096，但 object recall 从 0.78 降到 0.70。（Experiments / results, p. 8; abstract, p. 1）；适用边界与风险：实验集中于单一 LLaVA/COCO captioning；方法生成更短更保守 captions，hallucination 降低与 recall/coverage 损失需共同解释。（Limitations / discussion / reviewed scope, p. 8）",
+    "caveatZh": "实验集中于单一 LLaVA/COCO captioning；方法生成更短更保守 captions，hallucination 降低与 recall/coverage 损失需共同解释。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "该工作先以 hallucinated object words 周围的 image-attention drop 排名 heads，再对筛出的 32 heads 做 head-sliced LoRA 与 inference grounding control。 形成 diagnosis-to-intervention pipeline，并用 layer-matched random-head control 隔离 head selection 与 LoRA capacity。 作者报告： CHAIRs 从 0.370 降到 0.230、CHAIRi 从 0.156 降到 0.096，但 object recall 从 0.78 降到 0.70。 实验集中于单一 LLaVA/COCO captioning；方法生成更短更保守 captions，hallucination 降低与 recall/coverage 损失需共同解释。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "形成 diagnosis-to-intervention pipeline，并用 layer-matched random-head control 隔离 head selection 与 LoRA capacity。 方法流程：从 COCO hallucination events 计算 head-level image-attention drop -> 逐头 ablation 验证对 hallucination logits 的影响 -> 只在筛选 heads 上训练 LoRA -> 同一 heads 运行 inference-time grounding controller。",
+    "experimentsZh": "LLaVA-1.5-7B，400 held-out COCO images（另 200 control），比较 baseline/LoRA/grounding、random heads 与 fixed decoding budgets。 作者报告： CHAIRs 从 0.370 降到 0.230、CHAIRi 从 0.156 降到 0.096，但 object recall 从 0.78 降到 0.70。（Experiments / results, p. 8; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：实验集中于单一 LLaVA/COCO captioning；方法生成更短更保守 captions，hallucination 降低与 recall/coverage 损失需共同解释。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "该工作先以 hallucinated object words 周围的 image-attention drop 排名 heads，再对筛出的 32 heads 做 head-sliced LoRA 与 inference grounding control。 作者报告： CHAIRs 从 0.370 降到 0.230、CHAIRi 从 0.156 降到 0.096，但 object recall 从 0.78 降到 0.70。 证据边界：实验集中于单一 LLaVA/COCO captioning；方法生成更短更保守 captions，hallucination 降低与 recall/coverage 损失需共同解释。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
+
