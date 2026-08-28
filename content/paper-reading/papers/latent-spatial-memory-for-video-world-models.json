@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2606.09828",
+  "slug": "latent-spatial-memory-for-video-world-models",
+  "title": "Latent Spatial Memory for Video World Models",
+  "authors": [
+    "Weijie Wang",
+    "Haoyu Zhao",
+    "Yifan Yang",
+    "Feng Chen",
+    "Zeyu Zhang",
+    "Yefei He",
+    "Zicheng Duan",
+    "Donny Y. Chen",
+    "Yuqing Yang",
+    "Bohan Zhuang"
+  ],
+  "publishedAt": "2026-06-08",
+  "updatedAt": "2026-08-27",
+  "collectedAt": "2026-08-29",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2606.09828"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Latent",
+    "Spatial",
+    "Memory",
+    "for",
+    "Video",
+    "World",
+    "Models"
+  ],
+  "abstract": "Video world models that maintain 3D spatial consistency across generated frames typically rely on explicit point cloud memory constructed in RGB space. This design is both computationally expensive, requiring repeated rendering and VAE encoding, and inherently lossy, as the round trip through pixel space discards rich features of the learned latent representation. In this paper, we introduce \\emph{latent spatial memory} for video world models, a persistent 3D cache that stores scene information directly in the diffusion latent space, avoiding pixel-space reconstruction. Building on this, we propose Mirage, a latent-space spatial memory framework that constructs the memory by lifting latent tokens into 3D via depth-guided back-projection and queries it by synthesizing novel views through direct latent-space warping. This unified formulation eliminates both the information loss of pixel-space reconstruction and the computational burden of repeated encoding and rendering. Experiments show that latent spatial memory achieves up to \\textbf{10.57}$\\times$ faster end-to-end video generation and \\textbf{55}$\\times$ reduction in memory footprint relative to explicit 3D baselines. Leveraging the geometric prior of the diffusion model, Mirage attains state-of-the-art performance on WorldScore and strong reconstruction quality on RealEstate10K.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.09828v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.09828v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.09828v2 全文整理；本地 PDF 共 21 页，SHA-256 f2ac23bb1443aa5b655da52d8c2fdc1efe9ed4055d6b79d1f2c32bc0bcadcccd，并视觉核验第 1、2、3、7、11 页。",
+    "ideaZh": "LSM-World 把 video world model 的 persistent 3D memory 直接存入 VAE latent space，避免 RGB point-cloud cache 的 render-and-reencode 往返。 作者报告：相对显式 RGB 3D cache 可达 10.57x end-to-end speedup 和 55x memory reduction，同时提升 world-consistent generation。 证据边界：persistent memory 排除动态区域，因此不能保持 moving entities 的跨 chunk state；效果依赖 depth 和 camera geometry。",
+    "methodFlow": [
+      "把当前 frame 编码为 diffusion latent tokens",
+      "借助 depth back-projection 将 latent tokens 提升到 world-space cache",
+      "按目标 view 直接 warp/read latent memory 作为 conditioning",
+      "用 dynamic-region filter 与 chunk update 维护 persistent scene state"
+    ],
+    "whyRelevantZh": "video-generation 方向的直接证据：LSM-World 把 video world model 的 persistent 3D memory 直接存入 VAE latent space，避免 RGB point-cloud cache 的 render-and-reencode 往返。",
+    "evidenceZh": "方法流程：把当前 frame 编码为 diffusion latent tokens -> 借助 depth back-projection 将 latent tokens 提升到 world-space cache -> 按目标 view 直接 warp/read latent memory 作为 conditioning -> 用 dynamic-region filter 与 chunk update 维护 persistent scene state。（Method / system description, p. 2-3; visual overview, p. 3）；作者报告：相对显式 RGB 3D cache 可达 10.57x end-to-end speedup 和 55x memory reduction，同时提升 world-consistent generation。（Experiments / results, p. 7; abstract, p. 1）；适用边界与风险：persistent memory 排除动态区域，因此不能保持 moving entities 的跨 chunk state；效果依赖 depth 和 camera geometry。（Limitations / discussion / reviewed scope, p. 11）",
+    "caveatZh": "persistent memory 排除动态区域，因此不能保持 moving entities 的跨 chunk state；效果依赖 depth 和 camera geometry。 所有数字与比较均为作者报告，本项目未独立复现。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "LSM-World 把 video world model 的 persistent 3D memory 直接存入 VAE latent space，避免 RGB point-cloud cache 的 render-and-reencode 往返。 把当前 frame 编码为 diffusion latent tokens -> 借助 depth back-projection 将 latent tokens 提升到 world-space cache -> 按目标 view 直接 warp/read latent memory 作为 conditioning -> 用 dynamic-region filter 与 chunk update 维护 persistent scene state。作者报告：相对显式 RGB 3D cache 可达 10.57x end-to-end speedup 和 55x memory reduction，同时提升 world-consistent generation。 persistent memory 排除动态区域，因此不能保持 moving entities 的跨 chunk state；效果依赖 depth 和 camera geometry。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "LSM-World 把 video world model 的 persistent 3D memory 直接存入 VAE latent space，避免 RGB point-cloud cache 的 render-and-reencode 往返。 方法流程：把当前 frame 编码为 diffusion latent tokens -> 借助 depth back-projection 将 latent tokens 提升到 world-space cache -> 按目标 view 直接 warp/read latent memory 作为 conditioning -> 用 dynamic-region filter 与 chunk update 维护 persistent scene state。",
+    "experimentsZh": "WorldScore 与 RealEstate10K，对比 RGB-cache video world models、显式 3D memory 和无 memory baselines。 作者报告：相对显式 RGB 3D cache 可达 10.57x end-to-end speedup 和 55x memory reduction，同时提升 world-consistent generation。（Experiments / results, p. 7; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：persistent memory 排除动态区域，因此不能保持 moving entities 的跨 chunk state；效果依赖 depth 和 camera geometry。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "LSM-World 把 video world model 的 persistent 3D memory 直接存入 VAE latent space，避免 RGB point-cloud cache 的 render-and-reencode 往返。 作者报告：相对显式 RGB 3D cache 可达 10.57x end-to-end speedup 和 55x memory reduction，同时提升 world-consistent generation。 证据边界：persistent memory 排除动态区域，因此不能保持 moving entities 的跨 chunk state；效果依赖 depth 和 camera geometry。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

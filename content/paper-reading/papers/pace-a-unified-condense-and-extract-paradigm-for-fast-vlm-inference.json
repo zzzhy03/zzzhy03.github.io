@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.27206",
+  "slug": "pace-a-unified-condense-and-extract-paradigm-for-fast-vlm-inference",
+  "title": "PACE: A Unified Condense-and-Extract Paradigm for Fast VLM Inference",
+  "authors": [
+    "Junjie Liu",
+    "Shengyuan Ye",
+    "Xu Chen"
+  ],
+  "publishedAt": "2026-08-27",
+  "updatedAt": "2026-08-27",
+  "collectedAt": "2026-08-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.27206"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "PACE",
+    "Unified",
+    "Condense-and-Extract",
+    "Paradigm",
+    "for",
+    "Fast",
+    "VLM",
+    "Inference"
+  ],
+  "abstract": "Vision-Language Models (VLMs) demonstrate exceptional visual reasoning capabilities, yet their inference costs escalate rapidly with the proliferation of visual tokens. Existing visual token pruning methods exhibit two fundamental limitations. First, most approaches operate exclusively post-vision encoder, leaving the substantial latency of the visual encoding phase unoptimized. Second, under strict token budgets, these methods often fail to jointly preserve holistic visual contexts and fine-grained details, leading to performance degradation. To address these bottlenecks, we propose PACE (Pixel-Adaptive Condense and Extract), a training-free inference framework that accelerates both the vision encoder and the Large Language Model (LLM) via a unified Condense-and-Extract paradigm. During the Condense stage, an Adaptive Pixel Compressor (APC) evaluates visual information density prior to encoding, adaptively downsampling redundant inputs, curtailing encoder computation while preserving global context and essential visual cues. In the Extract stage, a Dynamic Dual-Attention Extractor (DDAE) selectively retains visual tokens via a fusion of internal visual signals from the encoder and semantic signals from the LLM, safeguarding task-critical details. By integrating PACE into Qwen2.5-VL-7B, the model retains 93.8% of its original performance while utilizing only 10% of the visual tokens, yielding a 3.1x speedup in time to first token (TTFT). Our code is available at https://github.com/jjL357/PACE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.27206v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.27206v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/jjL357/PACE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.27206v1 全文整理；本地 PDF 共 22 页，SHA-256 e4dec94c93c27bc630144f6bb99ee52327a7092a10c784a7849b5bc14c3903e6，并视觉核验第 1、2、3、6、22 页。",
+    "ideaZh": "PACE 用 pre-encoder pixel condensation 与 post-encoder semantic extraction 同时减少 VLM vision encoder 和 LLM prefill 的计算。 作者报告：10% visual-token budget 下保留原性能的 93.8%，并取得约 3.1x TTFT speedup。 证据边界：APC 主要按 image intrinsic density 而非 query 工作，极细粒度证据仍可能丢失；跨架构需要适配。",
+    "methodFlow": [
+      "APC 在编码前估计 image information density 并自适应 downsample",
+      "vision encoder 处理压缩但保留全局结构的输入",
+      "DDAE 融合 encoder visual signals 与 LLM semantic signals",
+      "按严格 token budget 保留 task-critical details"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：PACE 用 pre-encoder pixel condensation 与 post-encoder semantic extraction 同时减少 VLM vision encoder 和 LLM prefill 的计算。",
+    "evidenceZh": "方法流程：APC 在编码前估计 image information density 并自适应 downsample -> vision encoder 处理压缩但保留全局结构的输入 -> DDAE 融合 encoder visual signals 与 LLM semantic signals -> 按严格 token budget 保留 task-critical details。（Method / system description, p. 2-3; visual overview, p. 3）；作者报告：10% visual-token budget 下保留原性能的 93.8%，并取得约 3.1x TTFT speedup。（Experiments / results, p. 6; abstract, p. 1）；适用边界与风险：APC 主要按 image intrinsic density 而非 query 工作，极细粒度证据仍可能丢失；跨架构需要适配。（Limitations / discussion / reviewed scope, p. 22）",
+    "caveatZh": "APC 主要按 image intrinsic density 而非 query 工作，极细粒度证据仍可能丢失；跨架构需要适配。 所有数字与比较均为作者报告，本项目未独立复现。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "PACE 用 pre-encoder pixel condensation 与 post-encoder semantic extraction 同时减少 VLM vision encoder 和 LLM prefill 的计算。 APC 在编码前估计 image information density 并自适应 downsample -> vision encoder 处理压缩但保留全局结构的输入 -> DDAE 融合 encoder visual signals 与 LLM semantic signals -> 按严格 token budget 保留 task-critical details。作者报告：10% visual-token budget 下保留原性能的 93.8%，并取得约 3.1x TTFT speedup。 APC 主要按 image intrinsic density 而非 query 工作，极细粒度证据仍可能丢失；跨架构需要适配。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "PACE 用 pre-encoder pixel condensation 与 post-encoder semantic extraction 同时减少 VLM vision encoder 和 LLM prefill 的计算。 方法流程：APC 在编码前估计 image information density 并自适应 downsample -> vision encoder 处理压缩但保留全局结构的输入 -> DDAE 融合 encoder visual signals 与 LLM semantic signals -> 按严格 token budget 保留 task-critical details。",
+    "experimentsZh": "Qwen2.5-VL 3B/7B、InternVL3.5-4B，覆盖九个 VQA/OCR/document benchmarks 与多档 token budgets。 作者报告：10% visual-token budget 下保留原性能的 93.8%，并取得约 3.1x TTFT speedup。（Experiments / results, p. 6; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：APC 主要按 image intrinsic density 而非 query 工作，极细粒度证据仍可能丢失；跨架构需要适配。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "PACE 用 pre-encoder pixel condensation 与 post-encoder semantic extraction 同时减少 VLM vision encoder 和 LLM prefill 的计算。 作者报告：10% visual-token budget 下保留原性能的 93.8%，并取得约 3.1x TTFT speedup。 证据边界：APC 主要按 image intrinsic density 而非 query 工作，极细粒度证据仍可能丢失；跨架构需要适配。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

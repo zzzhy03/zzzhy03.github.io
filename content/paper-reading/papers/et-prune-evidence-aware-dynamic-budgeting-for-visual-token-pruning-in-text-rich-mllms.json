@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2608.01979",
+  "slug": "et-prune-evidence-aware-dynamic-budgeting-for-visual-token-pruning-in-text-rich-mllms",
+  "title": "ET-Prune: Evidence-Aware Dynamic Budgeting for Visual Token Pruning in Text-Rich MLLMs",
+  "authors": [
+    "Zizhong Ding",
+    "Junxian Li",
+    "Kai Liu",
+    "Shaoqiu Zhang",
+    "Xiao Xiao",
+    "Linghe Kong",
+    "Yulun Zhang"
+  ],
+  "publishedAt": "2026-08-03",
+  "updatedAt": "2026-08-27",
+  "collectedAt": "2026-08-29",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.01979"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "ET-Prune",
+    "Evidence-Aware",
+    "Dynamic",
+    "Budgeting",
+    "for",
+    "Visual",
+    "Token",
+    "Pruning",
+    "Text-Rich",
+    "MLLMs"
+  ],
+  "abstract": "Visual token pruning reduces the inference cost of multimodal large language models, but a fixed token ratio is poorly matched to text-rich inputs. In OCR-centric tasks, decisive evidence can be a small number, label, or field whose relevance is specified by the question; indiscriminate pruning can erase that evidence while retaining visually salient but irrelevant regions. We present ET-Prune, a training-free framework that casts pruning as evidence allocation. It derives question-conditioned evidence from a decoder-side partial query-key block, safeguards text-like spatial regions, and converts evidence uncertainty and density into a sample-specific token floor. Three progressive middle-layer events then move the sequence toward this budget, retaining more tokens for diffuse or text-dense evidence and pruning concentrated evidence more aggressively. At the observed point estimates from one deterministic pass per configuration, ET-Prune leads or ties among pruned methods in all six backbone-benchmark comparisons at roughly half tokens. On OCRBench-v2, it leads the strongest pruned baselines by 1.80 and 0.68 percentage points on Qwen3-VL-8B and InternVL3.5-8B, respectively, while retaining about half of the visual tokens; on MMBench v1.1, it reaches 0.8467 circular exact-matching accuracy versus 0.8437 for Vanilla at 54.45% average visual-token retention. These results show a favorable observed quality-cost trade-off for evidence-aware dynamic budgeting in text-rich multimodal inference.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.01979v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.01979v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Labyrinth0419/ET-Prune"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.01979v2 全文整理；本地 PDF 共 9 页，SHA-256 985399014a75efeeb17156ef190113bb4620c39b460dd6beff96acfbdd9fa1ff，并视觉核验第 1、2、3、7、9 页。",
+    "ideaZh": "ET-Prune 把 text-rich MLLM pruning 改成 question-conditioned evidence allocation，以文字区域保护和动态 token floor 避免删掉细粒度答案证据。 作者报告：约半数 visual tokens 下在六个 backbone-benchmark 对比中领先或持平，并在 OCRBench-v2 超过最强 pruned baselines。 证据边界：当前实现需要 model-specific bookkeeping；核心结果是单次 deterministic pass 的 point estimates，没有统计显著性声明。",
+    "methodFlow": [
+      "从 decoder partial query-key block 读取问题相关视觉证据",
+      "把 text-like spatial prior 映射为 protected regions",
+      "根据 evidence uncertainty/density 计算 sample-specific token floor",
+      "在多个中层 pruning events 渐进逼近预算"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：ET-Prune 把 text-rich MLLM pruning 改成 question-conditioned evidence allocation，以文字区域保护和动态 token floor 避免删掉细粒度答案证据。",
+    "evidenceZh": "方法流程：从 decoder partial query-key block 读取问题相关视觉证据 -> 把 text-like spatial prior 映射为 protected regions -> 根据 evidence uncertainty/density 计算 sample-specific token floor -> 在多个中层 pruning events 渐进逼近预算。（Method / system description, p. 2-3; visual overview, p. 3）；作者报告：约半数 visual tokens 下在六个 backbone-benchmark 对比中领先或持平，并在 OCRBench-v2 超过最强 pruned baselines。（Experiments / results, p. 7; abstract, p. 1）；适用边界与风险：当前实现需要 model-specific bookkeeping；核心结果是单次 deterministic pass 的 point estimates，没有统计显著性声明。（Limitations / discussion / reviewed scope, p. 9）",
+    "caveatZh": "当前实现需要 model-specific bookkeeping；核心结果是单次 deterministic pass 的 point estimates，没有统计显著性声明。 所有数字与比较均为作者报告，本项目未独立复现。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "ET-Prune 把 text-rich MLLM pruning 改成 question-conditioned evidence allocation，以文字区域保护和动态 token floor 避免删掉细粒度答案证据。 从 decoder partial query-key block 读取问题相关视觉证据 -> 把 text-like spatial prior 映射为 protected regions -> 根据 evidence uncertainty/density 计算 sample-specific token floor -> 在多个中层 pruning events 渐进逼近预算。作者报告：约半数 visual tokens 下在六个 backbone-benchmark 对比中领先或持平，并在 OCRBench-v2 超过最强 pruned baselines。 当前实现需要 model-specific bookkeeping；核心结果是单次 deterministic pass 的 point estimates，没有统计显著性声明。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "ET-Prune 把 text-rich MLLM pruning 改成 question-conditioned evidence allocation，以文字区域保护和动态 token floor 避免删掉细粒度答案证据。 方法流程：从 decoder partial query-key block 读取问题相关视觉证据 -> 把 text-like spatial prior 映射为 protected regions -> 根据 evidence uncertainty/density 计算 sample-specific token floor -> 在多个中层 pruning events 渐进逼近预算。",
+    "experimentsZh": "Qwen3-VL-8B 与 InternVL3.5-8B，在 OCRBench-v2、MMBench 及跨 benchmark transfer 上与多种 pruners 比较。 作者报告：约半数 visual tokens 下在六个 backbone-benchmark 对比中领先或持平，并在 OCRBench-v2 超过最强 pruned baselines。（Experiments / results, p. 7; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：当前实现需要 model-specific bookkeeping；核心结果是单次 deterministic pass 的 point estimates，没有统计显著性声明。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "ET-Prune 把 text-rich MLLM pruning 改成 question-conditioned evidence allocation，以文字区域保护和动态 token floor 避免删掉细粒度答案证据。 作者报告：约半数 visual tokens 下在六个 backbone-benchmark 对比中领先或持平，并在 OCRBench-v2 超过最强 pruned baselines。 证据边界：当前实现需要 model-specific bookkeeping；核心结果是单次 deterministic pass 的 point estimates，没有统计显著性声明。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

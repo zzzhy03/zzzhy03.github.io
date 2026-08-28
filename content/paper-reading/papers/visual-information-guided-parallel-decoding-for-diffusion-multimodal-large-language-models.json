@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2608.26580",
+  "slug": "visual-information-guided-parallel-decoding-for-diffusion-multimodal-large-language-models",
+  "title": "Visual Information-Guided Parallel Decoding for Diffusion Multimodal Large Language Models",
+  "authors": [
+    "Insu Lee",
+    "Wooje Park",
+    "Wonseok Shin",
+    "Jinwoo Son",
+    "Byonghyo Shim"
+  ],
+  "publishedAt": "2026-08-27",
+  "updatedAt": "2026-08-27",
+  "collectedAt": "2026-08-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.26580"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Visual",
+    "Information-Guided",
+    "Parallel",
+    "Decoding",
+    "for",
+    "Diffusion",
+    "Multimodal",
+    "Large",
+    "Language",
+    "Models"
+  ],
+  "abstract": "Diffusion multimodal large language models (dMLLMs) have recently emerged as a new decoding paradigm for multimodal generation. Starting from a fully masked sequence, dMLLMs progressively decode the sequence by unmasking a subset of the remaining masked positions at each step. Since the selected tokens serve as the prediction context for subsequent steps, deciding which tokens to decode is crucial to the quality of the final output. The most common strategy prioritizes tokens based on a certainty measure that tends to favor tokens frequently observed in the training data. Recent approaches instead order tokens according to their influence on subsequent predictions, but do not explicitly account for the input image. We propose the Visual Information-Guided Sampler (VIG-Sampler), which prioritizes tokens based on their attention to image tokens. We further impose a constraint that penalizes candidate tokens whose image-attention distributions are similar to those of previously selected tokens, thereby increasing the information gain of the decoded subset. Extensive experiments on 7 captioning and VQA benchmarks with 3 open-source dMLLMs demonstrate the effectiveness of VIG-Sampler, which outperforms the Info-Gain Sampler by an average of 19.3 CIDEr points across the captioning benchmarks and surpasses it on COCO Caption while using only half as many decoding steps.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.26580v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.26580v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.26580v1 全文整理；本地 PDF 共 15 页，SHA-256 10efd488a68a16296e7f640d070dadbaf751558e16bfaeacd5ed9224f4de1301，并视觉核验第 1、2、3、6、15 页。",
+    "ideaZh": "VIG-Sampler 用 token-to-image attention 衡量 visual information，再惩罚与已选 tokens 重复的 attention distributions，安排 diffusion MLLM parallel decoding。 作者报告：caption benchmarks 相对 Info-Gain 平均提高 19.3 CIDEr，并在 COCO 用一半 decoding steps 取得更好结果。 证据边界：attention-to-image 是 proxy，未必对应事实 grounding；caption metrics 和 step count 不能直接代表复杂 reasoning 或 end-to-end latency。",
+    "methodFlow": [
+      "读取 masked candidate tokens 对 image tokens 的 attention",
+      "按 visual attention 估计当前 token information",
+      "用 distribution-similarity penalty 增加 decoded subset diversity",
+      "并行 unmask 高信息、低冗余 tokens 并迭代生成"
+    ],
+    "whyRelevantZh": "vlm-mllm 方向的直接证据：VIG-Sampler 用 token-to-image attention 衡量 visual information，再惩罚与已选 tokens 重复的 attention distributions，安排 diffusion MLLM parallel decoding。",
+    "evidenceZh": "方法流程：读取 masked candidate tokens 对 image tokens 的 attention -> 按 visual attention 估计当前 token information -> 用 distribution-similarity penalty 增加 decoded subset diversity -> 并行 unmask 高信息、低冗余 tokens 并迭代生成。（Method / system description, p. 2-3; visual overview, p. 3）；作者报告：caption benchmarks 相对 Info-Gain 平均提高 19.3 CIDEr，并在 COCO 用一半 decoding steps 取得更好结果。（Experiments / results, p. 6; abstract, p. 1）；适用边界与风险：attention-to-image 是 proxy，未必对应事实 grounding；caption metrics 和 step count 不能直接代表复杂 reasoning 或 end-to-end latency。（Limitations / discussion / reviewed scope, p. 15）",
+    "caveatZh": "attention-to-image 是 proxy，未必对应事实 grounding；caption metrics 和 step count 不能直接代表复杂 reasoning 或 end-to-end latency。 所有数字与比较均为作者报告，本项目未独立复现。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "VIG-Sampler 用 token-to-image attention 衡量 visual information，再惩罚与已选 tokens 重复的 attention distributions，安排 diffusion MLLM parallel decoding。 读取 masked candidate tokens 对 image tokens 的 attention -> 按 visual attention 估计当前 token information -> 用 distribution-similarity penalty 增加 decoded subset diversity -> 并行 unmask 高信息、低冗余 tokens 并迭代生成。作者报告：caption benchmarks 相对 Info-Gain 平均提高 19.3 CIDEr，并在 COCO 用一半 decoding steps 取得更好结果。 attention-to-image 是 proxy，未必对应事实 grounding；caption metrics 和 step count 不能直接代表复杂 reasoning 或 end-to-end latency。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "VIG-Sampler 用 token-to-image attention 衡量 visual information，再惩罚与已选 tokens 重复的 attention distributions，安排 diffusion MLLM parallel decoding。 方法流程：读取 masked candidate tokens 对 image tokens 的 attention -> 按 visual attention 估计当前 token information -> 用 distribution-similarity penalty 增加 decoded subset diversity -> 并行 unmask 高信息、低冗余 tokens 并迭代生成。",
+    "experimentsZh": "3 个 open-source diffusion MLLMs、7 个 captioning/VQA benchmarks，并与 confidence、entropy、Info-Gain 等 samplers 比较。 作者报告：caption benchmarks 相对 Info-Gain 平均提高 19.3 CIDEr，并在 COCO 用一半 decoding steps 取得更好结果。（Experiments / results, p. 6; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：attention-to-image 是 proxy，未必对应事实 grounding；caption metrics 和 step count 不能直接代表复杂 reasoning 或 end-to-end latency。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "VIG-Sampler 用 token-to-image attention 衡量 visual information，再惩罚与已选 tokens 重复的 attention distributions，安排 diffusion MLLM parallel decoding。 作者报告：caption benchmarks 相对 Info-Gain 平均提高 19.3 CIDEr，并在 COCO 用一半 decoding steps 取得更好结果。 证据边界：attention-to-image 是 proxy，未必对应事实 grounding；caption metrics 和 step count 不能直接代表复杂 reasoning 或 end-to-end latency。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-skim；保留作者报告、未复现与适用范围边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

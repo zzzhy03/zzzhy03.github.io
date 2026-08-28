@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2608.26671",
+  "slug": "recap-forcing-retaining-content-appearances-for-long-video-generation",
+  "title": "RECAP-Forcing: Retaining Content Appearances for Long Video Generation",
+  "authors": [
+    "Haiyang Xu",
+    "Zheng Ding",
+    "Zhuowen Tu"
+  ],
+  "publishedAt": "2026-08-27",
+  "updatedAt": "2026-08-27",
+  "collectedAt": "2026-08-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2608.26671"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "RECAP-Forcing",
+    "Retaining",
+    "Content",
+    "Appearances",
+    "for",
+    "Long",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Long autoregressive video generation faces a fundamental memory challenge: with a finite attention window, a model must decide which information from an ever-expanding history to retain. Existing methods organize memory temporally, preserving recent frames while compressing or discarding older ones. We instead propose RECAP-Forcing, organizing memory by appearance novelty. A long video is not merely a sequence of frames, but an evolving cast of subjects, objects, and scenes whose identities must remain consistent over time. We organize memory by retaining the KV cache associated with newly appearing content--such as entering subjects, disoccluded regions, and newly introduced scenes--at the moment it first becomes visible, prioritizing novelty over recency. Memory should scale with the amount of newly introduced content, rather than with video length. This appearance-indexed memory makes long-range consistency an explicit property of the memory structure. Our framework unifies two mechanisms under this single principle. At the beginning of a video, when all visible content is novel, an attention sink preserves the initial scene. As the video evolves, an optical-flow-based novelty bank extends the same principle by selectively retaining newly revealed content. As a training-free inference method with no additional learnable parameters, RECAP-Forcing consistently improves visual quality and semantic fidelity across multiple strong baselines and outperforms existing memory methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.26671v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.26671v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.26671v1 全文整理；本地 PDF 共 15 页，SHA-256 990e11c80d10f625f532e78ae3787abec33f1bcfaf17282fb44695fa461dcd77，并视觉核验第 1、2、3、7、15 页。",
+    "ideaZh": "RECAP-Forcing 把 long-video memory 从 recency index 改为 appearance novelty index，优先保存新出现对象、场景和 disoccluded regions 的 KV cache。 作者报告：training-free RECAP-Forcing 在多 backbone 上提高 visual quality、semantic fidelity 与 long-range consistency。 证据边界：optical-flow novelty 会漏掉语义变化或吸收 artifacts；memory 随新内容而非时长增长，复杂叙事仍可能膨胀。",
+    "methodFlow": [
+      "attention sink 固定 initial scene memory",
+      "optical flow 与 residual cues 检测 newly appearing content",
+      "novelty bank 保存首次出现时的 KV states",
+      "autoregressive chunks 从 appearance-indexed bank 读取 long-range identity"
+    ],
+    "whyRelevantZh": "video-generation 方向的直接证据：RECAP-Forcing 把 long-video memory 从 recency index 改为 appearance novelty index，优先保存新出现对象、场景和 disoccluded regions 的 KV cache。",
+    "evidenceZh": "方法流程：attention sink 固定 initial scene memory -> optical flow 与 residual cues 检测 newly appearing content -> novelty bank 保存首次出现时的 KV states -> autoregressive chunks 从 appearance-indexed bank 读取 long-range identity。（Method / system description, p. 2-3; visual overview, p. 3）；作者报告：training-free RECAP-Forcing 在多 backbone 上提高 visual quality、semantic fidelity 与 long-range consistency。（Experiments / results, p. 7; abstract, p. 1）；适用边界与风险：optical-flow novelty 会漏掉语义变化或吸收 artifacts；memory 随新内容而非时长增长，复杂叙事仍可能膨胀。（Limitations / discussion / reviewed scope, p. 15）",
+    "caveatZh": "optical-flow novelty 会漏掉语义变化或吸收 artifacts；memory 随新内容而非时长增长，复杂叙事仍可能膨胀。 所有数字与比较均为作者报告，本项目未独立复现。；所有实验数字均为作者报告，本项目没有独立复现。",
+    "motivationZh": "RECAP-Forcing 把 long-video memory 从 recency index 改为 appearance novelty index，优先保存新出现对象、场景和 disoccluded regions 的 KV cache。 attention sink 固定 initial scene memory -> optical flow 与 residual cues 检测 newly appearing content -> novelty bank 保存首次出现时的 KV states -> autoregressive chunks 从 appearance-indexed bank 读取 long-range identity。作者报告：training-free RECAP-Forcing 在多 backbone 上提高 visual quality、semantic fidelity 与 long-range consistency。 optical-flow novelty 会漏掉语义变化或吸收 artifacts；memory 随新内容而非时长增长，复杂叙事仍可能膨胀。 所有数字与比较均为作者报告，本项目未独立复现。",
+    "methodZh": "RECAP-Forcing 把 long-video memory 从 recency index 改为 appearance novelty index，优先保存新出现对象、场景和 disoccluded regions 的 KV cache。 方法流程：attention sink 固定 initial scene memory -> optical flow 与 residual cues 检测 newly appearing content -> novelty bank 保存首次出现时的 KV states -> autoregressive chunks 从 appearance-indexed bank 读取 long-range identity。",
+    "experimentsZh": "多种 long-video baselines、1/2/5-minute generation、ablation 与 9 位参与者的 pairwise human study。 作者报告：training-free RECAP-Forcing 在多 backbone 上提高 visual quality、semantic fidelity 与 long-range consistency。（Experiments / results, p. 7; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：optical-flow novelty 会漏掉语义变化或吸收 artifacts；memory 随新内容而非时长增长，复杂叙事仍可能膨胀。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
+    "insightZh": "RECAP-Forcing 把 long-video memory 从 recency index 改为 appearance novelty index，优先保存新出现对象、场景和 disoccluded regions 的 KV cache。 作者报告：training-free RECAP-Forcing 在多 backbone 上提高 visual quality、semantic fidelity 与 long-range consistency。 证据边界：optical-flow novelty 会漏掉语义变化或吸收 artifacts；memory 随新内容而非时长增长，复杂叙事仍可能膨胀。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}
