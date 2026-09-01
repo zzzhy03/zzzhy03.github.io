@@ -14,9 +14,9 @@
     "Lin Qu"
   ],
   "publishedAt": "2026-08-27",
-  "updatedAt": "2026-08-27",
+  "updatedAt": "2026-08-30",
   "collectedAt": "2026-08-29",
-  "venue": "arXiv v1",
+  "venue": "arXiv preprint",
   "identifiers": {
     "arxiv": "2608.26956"
   },
@@ -35,20 +35,18 @@
     "Generative",
     "Reward",
     "Modeling",
-    "via",
     "Dynamic",
     "Rubrics",
-    "for",
     "Image",
     "Generation"
   ],
   "abstract": "Reward models play an essential role in aligning visual generative models, yet most existing visual reward models use a single scalar score or rely on fixed criteria that cannot adapt to different instructions. This limits both interpretability and task sensitivity, especially for text-to-image generation and instruction-based image editing, where different inputs require different evaluation dimensions. We propose RubricRM, a pairwise generative reward modeling framework that first produces an input-specific rubric with evaluation dimensions, weights, and scoring criteria, and then applies the rubric to score candidate images. We train dedicated RubricRM models for text-to-image generation and image editing using a two-stage training pipeline: supervised fine-tuning teaches the model the rubric-based scoring paradigm, while GRPO further improves scoring through fine-grained dimension-level rewards. Experiments on multiple generation and editing benchmarks show that RubricRM outperforms existing specialized reward models and remains competitive with strong proprietary MLLM judges despite using smaller backbones. Our models, data, and code are available at https://github.com/zijiankan/RubricRM.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2608.26956v1",
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.26956v2",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2608.26956v1"
+      "href": "https://arxiv.org/abs/2608.26956v2"
     },
     {
       "label": "Code",
@@ -57,23 +55,23 @@
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 exact version 2608.26956v1 全文整理；本地 PDF 共 20 页，SHA-256 3396f2ef8abbeb9e5604b368bb1ec16a1d9c5edaafb515b3abe32f2d91600a22，并视觉核验第 1、2、3、8、20 页。",
-    "ideaZh": "RubricRM 先为每个 image-generation/editing instruction 动态生成评分维度、权重与标准，再用该 rubric 做 pairwise generative reward modeling。 作者报告：RubricRM 超过现有 specialized reward models，小 backbone 仍可接近强 proprietary MLLM judges。 证据边界：rubric 生成器和 dimension rewards 共享 judge biases，可能形成 reward hacking；pairwise 排序未证明绝对质量校准。",
+    "sourceNote": "依据 exact version 2608.26956v2 全文整理；本地 PDF 共 21 页，SHA-256 7cd1722875bc1dca74776dafc42f85d904d201d7f7237a31e2a33bb0f845fd3e，并视觉核验第 1、11、14、18 页。",
+    "ideaZh": "possible-update v2 新增 EMNLP 2026 信息并继续以 input-specific rubric 做 T2I/editing pairwise reward；需与归档版本比较模型、数据、训练或实验是否有 scientific delta。。作者报告：Experiments on multiple generation and editing benchmarks show that RubricRM outperforms existing specialized reward models and remains competitive with strong proprietary MLLM judges despite using smaller backbones.。证据边界：实验覆盖、baseline 选择与未测试场景限制结论外推；所有数字均为作者报告，本项目未独立复现。。所有数字、比较和优越性均为作者报告，本项目未独立复现。",
     "methodFlow": [
-      "从 input instruction 生成 task-specific rubric",
-      "对候选 images 逐维打分并聚合 preference",
-      "SFT 学习 rubric generation/scoring 范式",
-      "以 dimension-level GRPO rewards 继续校准"
+      "按论文任务定义整理输入、条件、结构与约束（p.11）",
+      "核心表示与机制：possible-update v2 新增 EMNLP 2026 信息并继续以 input-specific rubric 做 T2I/editing pairwise reward；需与归档版本比较模型、数据、训练或实验是否有 scientific delta。",
+      "依照全文 pipeline 执行训练、推理、优化或闭环 refinement",
+      "生成目标 artifact/能力，并在作者设定的 datasets、baselines 与 ablations 上验证（p.14）"
     ],
-    "whyRelevantZh": "image-generation 方向的直接证据：RubricRM 先为每个 image-generation/editing instruction 动态生成评分维度、权重与标准，再用该 rubric 做 pairwise generative reward modeling。",
-    "evidenceZh": "方法流程：从 input instruction 生成 task-specific rubric -> 对候选 images 逐维打分并聚合 preference -> SFT 学习 rubric generation/scoring 范式 -> 以 dimension-level GRPO rewards 继续校准。（Method / system description, p. 2-3; visual overview, p. 3）；作者报告：RubricRM 超过现有 specialized reward models，小 backbone 仍可接近强 proprietary MLLM judges。（Experiments / results, p. 8; abstract, p. 1）；适用边界与风险：rubric 生成器和 dimension rewards 共享 judge biases，可能形成 reward hacking；pairwise 排序未证明绝对质量校准。（Limitations / discussion / reviewed scope, p. 20）",
-    "caveatZh": "rubric 生成器和 dimension rewards 共享 judge biases，可能形成 reward hacking；pairwise 排序未证明绝对质量校准。 所有数字与比较均为作者报告，本项目未独立复现。；所有实验数字均为作者报告，本项目没有独立复现。",
-    "motivationZh": "RubricRM 先为每个 image-generation/editing instruction 动态生成评分维度、权重与标准，再用该 rubric 做 pairwise generative reward modeling。 从 input instruction 生成 task-specific rubric -> 对候选 images 逐维打分并聚合 preference -> SFT 学习 rubric generation/scoring 范式 -> 以 dimension-level GRPO rewards 继续校准。作者报告：RubricRM 超过现有 specialized reward models，小 backbone 仍可接近强 proprietary MLLM judges。 rubric 生成器和 dimension rewards 共享 judge biases，可能形成 reward hacking；pairwise 排序未证明绝对质量校准。 所有数字与比较均为作者报告，本项目未独立复现。",
-    "methodZh": "RubricRM 先为每个 image-generation/editing instruction 动态生成评分维度、权重与标准，再用该 rubric 做 pairwise generative reward modeling。 方法流程：从 input instruction 生成 task-specific rubric -> 对候选 images 逐维打分并聚合 preference -> SFT 学习 rubric generation/scoring 范式 -> 以 dimension-level GRPO rewards 继续校准。",
-    "experimentsZh": "text-to-image 与 instruction editing 的多套 reward benchmarks，比较 specialized RMs、4B/9B RubricRM 与 proprietary MLLM judges。 作者报告：RubricRM 超过现有 specialized reward models，小 backbone 仍可接近强 proprietary MLLM judges。（Experiments / results, p. 8; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：rubric 生成器和 dimension rewards 共享 judge biases，可能形成 reward hacking；pairwise 排序未证明绝对质量校准。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
-    "insightZh": "RubricRM 先为每个 image-generation/editing instruction 动态生成评分维度、权重与标准，再用该 rubric 做 pairwise generative reward modeling。 作者报告：RubricRM 超过现有 specialized reward models，小 backbone 仍可接近强 proprietary MLLM judges。 证据边界：rubric 生成器和 dimension rewards 共享 judge biases，可能形成 reward hacking；pairwise 排序未证明绝对质量校准。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
-    "relevance": "high",
-    "readingAction": "deep",
-    "evidenceMaturity": "solid"
+    "whyRelevantZh": "image-generation 方向的直接证据：possible-update v2 新增 EMNLP 2026 信息并继续以 input-specific rubric 做 T2I/editing pairwise reward；需与归档版本比较模型、数据、训练或实验是否有 scientific delta。",
+    "evidenceZh": "方法结构：possible-update v2 新增 EMNLP 2026 信息并继续以 input-specific rubric 做 T2I/editing pairwise reward；需与归档版本比较模型、数据、训练或实验是否有 scientific delta。（Method / system description, p. 11; rendered page p. 11）；作者报告：Experiments on multiple generation and editing benchmarks show that RubricRM outperforms existing specialized reward models and remains competitive with strong proprietary MLLM judges despite using smaller backbones.（Experiments / results, p. 14; abstract, p. 1）；scientific-delta 判断：相对归档 v1，v2 从 20 页增至 21 页，加入更新后的模型/benchmark 对比与具体结果（如 MMRB2、GenAI-Bench），实验覆盖发生可描述变化；方法主线不变。（Current 2608.26956v2, p. 1-21; immutable archived prior exact version; discussion p. 18）",
+    "caveatZh": "实验覆盖、baseline 选择与未测试场景限制结论外推；所有数字均为作者报告，本项目未独立复现。。所有数字、比较和优越性均为作者报告，本项目未独立复现。",
+    "motivationZh": "possible-update v2 新增 EMNLP 2026 信息并继续以 input-specific rubric 做 T2I/editing pairwise reward；需与归档版本比较模型、数据、训练或实验是否有 scientific delta。。方法按全文 p.11 的结构组织输入、核心表示/模块与输出，并在 p.14 的实验设置中与作者选择的 baselines 比较。作者报告：Experiments on multiple generation and editing benchmarks show that RubricRM outperforms existing specialized reward models and remains competitive with strong proprietary MLLM judges despite using smaller backbones.。版本对比：相对归档 v1，v2 从 20 页增至 21 页，加入更新后的模型/benchmark 对比与具体结果（如 MMRB2、GenAI-Bench），实验覆盖发生可描述变化；方法主线不变。 证据边界：实验覆盖、baseline 选择与未测试场景限制结论外推；所有数字均为作者报告，本项目未独立复现。。所有数字、比较和优越性均为作者报告，本项目未独立复现。",
+    "methodZh": "possible-update v2 新增 EMNLP 2026 信息并继续以 input-specific rubric 做 T2I/editing pairwise reward；需与归档版本比较模型、数据、训练或实验是否有 scientific delta。。相对归档 v1，v2 从 20 页增至 21 页，加入更新后的模型/benchmark 对比与具体结果（如 MMRB2、GenAI-Bench），实验覆盖发生可描述变化；方法主线不变。 方法流程：按论文任务定义整理输入、条件、结构与约束（p.11） -> 核心表示与机制：possible-update v2 新增 EMNLP 2026 信息并继续以 input-specific rubric 做 T2I/editing pairwise reward；需与归档版本比较模型、数据、训练或实验是否有 scientific delta。 -> 依照全文 pipeline 执行训练、推理、优化或闭环 refinement -> 生成目标 artifact/能力，并在作者设定的 datasets、baselines 与 ablations 上验证（p.14）。",
+    "experimentsZh": "全文实验设置页 p.14；摘要概括为：This limits both interpretability and task sensitivity, especially for text-to-image generation and instruction-based image editing, where different inputs require different evaluation dimensions. 作者报告：Experiments on multiple generation and editing benchmarks show that RubricRM outperforms existing specialized reward models and remains competitive with strong proprietary MLLM judges despite using smaller backbones.（Experiments / results, p. 14; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 datasets、backbones、baselines 与指标；未出现的外部实现、真实部署或跨域设置不由现有结果自动支持。 相对归档 v1，v2 从 20 页增至 21 页，加入更新后的模型/benchmark 对比与具体结果（如 MMRB2、GenAI-Bench），实验覆盖发生可描述变化；方法主线不变。 Ablation/diagnosis：全文 p.14 及相邻实验页中的 ablation/diagnostic 用于支持作者内部归因；缺失的消融不补写，已有结果也不能代替独立复现。",
+    "insightZh": "possible-update v2 新增 EMNLP 2026 信息并继续以 input-specific rubric 做 T2I/editing pairwise reward；需与归档版本比较模型、数据、训练或实验是否有 scientific delta。。相对归档 v1，v2 从 20 页增至 21 页，加入更新后的模型/benchmark 对比与具体结果（如 MMRB2、GenAI-Bench），实验覆盖发生可描述变化；方法主线不变。 exact-version 全文的方法、实验、视觉页与限制形成证据闭环，支持 accept-skim；版本对比：相对归档 v1，v2 从 20 页增至 21 页，加入更新后的模型/benchmark 对比与具体结果（如 MMRB2、GenAI-Bench），实验覆盖发生可描述变化；方法主线不变。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
   }
 }
