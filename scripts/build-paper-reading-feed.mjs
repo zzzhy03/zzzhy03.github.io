@@ -9,6 +9,8 @@
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { isPaperWithdrawn, publicDigest } from "./paper-reading/lib/withdrawal.mjs";
+import { parseArxivIdentifier } from "./paper-reading/lib/identity.mjs";
 
 const root = process.cwd();
 const contentRoot = path.join(root, "content", "paper-reading");
@@ -30,8 +32,37 @@ function readJsonDirectory(directory) {
 const topics = readJson(path.join(contentRoot, "topics.json"));
 const researchConfig = readJson(path.join(contentRoot, "research-config.json"));
 const venueRegistry = readJson(path.join(contentRoot, "venue-registry.json"));
-const papers = readJsonDirectory(path.join(contentRoot, "papers"));
-const digests = readJsonDirectory(path.join(contentRoot, "digests")).sort((left, right) =>
+const canonicalPapers = readJsonDirectory(path.join(contentRoot, "papers"));
+const withdrawnVersions = new Map(canonicalPapers.filter((paper) => paper.withdrawal)
+  .map((paper) => [paper.id, parseArxivIdentifier(paper.withdrawal.arxivVersion)?.version ?? Infinity]));
+const receiptsByDate = new Map(readJsonDirectory(path.join(contentRoot, "runs"))
+  .map((receipt) => [receipt.digestDate, receipt]));
+const acceptedVersions = new Set([...receiptsByDate.values()].flatMap((receipt) =>
+  (receipt.fulltext?.reviews ?? [])
+    .filter((review) => review.decision === "accept-deep" || review.decision === "accept-skim")
+    .map((review) => review.arxivVersion),
+));
+const papers = canonicalPapers
+  .filter((paper) => {
+    if (isPaperWithdrawn(paper)) return false;
+    if (!paper.withdrawal) return true;
+    const reviewed = parseArxivIdentifier(paper.links.find((link) => link.label === "Paper")?.href);
+    return reviewed && paper.id === `arxiv:${reviewed.id}` &&
+      acceptedVersions.has(`${reviewed.id}v${reviewed.version}`);
+  })
+  .map((paper) => {
+    const publicPaper = { ...paper };
+    delete publicPaper.withdrawal;
+    return publicPaper;
+  });
+const visiblePaperIds = new Set(papers.map((paper) => paper.id));
+const digests = readJsonDirectory(path.join(contentRoot, "digests")).map((digest) =>
+  publicDigest(digest, visiblePaperIds, withdrawnVersions, new Map(
+    (receiptsByDate.get(digest.date)?.fulltext?.reviews ?? [])
+      .filter((review) => review.decision === "accept-deep" || review.decision === "accept-skim")
+      .map((review) => [review.paperId, review.arxivVersion]),
+  )),
+).sort((left, right) =>
   right.date.localeCompare(left.date),
 );
 const papersById = new Map(papers.map((paper) => [paper.id, paper]));

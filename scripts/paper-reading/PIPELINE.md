@@ -164,6 +164,41 @@ npm run validate:paper-screening -- \
    “本次版本事件无可发布更新”，不是否定原论文。该 exact version 仍进入 decision ledger，
    但不得更新 canonical Paper link，也不得重复进入当日 digest。
 
+#### 撤稿事件
+
+官方 exact-version 页面明确标记该版本撤稿时，这是可终结的版本事件，不是等待 PDF 的
+未完成全文任务。PDF 返回 404 本身不能证明撤稿；必须获取并保留官方撤稿页面到该 run 的
+`fulltext/sources/<version>.withdrawal.html`，记录 exact-version URL、获取时间及 SHA-256。
+不能用旧版或后续版 PDF 代替，也不能把页面转成 PDF 冒充论文全文。
+
+该事件使用 schemaVersion 3 的 review，`source.scope: "withdrawal_notice"`，
+`source.noticePath`、`noticeSha256`、`noticeUrl`、`retrievedAt` 固定页面证据；
+`decision: "reject"`、`readingAction: "skip"`。不填写未读的 method、experiment、figure
+证据。validator 只对经验证的撤稿事件豁免 PDF 要求，普通 reject/defer 仍要求全文。
+既有 schemaVersion 2 reviews 继续按原规则验证，无需重写。
+
+所有选择内的 review 验证后，先检查并应用公开移除：
+
+```sh
+npm run pipeline:papers -- withdraw --run-dir local-assets/paper-reading/runs/<run-id> --selection all-full-text
+npm run pipeline:papers -- withdraw --run-dir local-assets/paper-reading/runs/<run-id> --selection all-full-text --apply
+```
+
+这会在原 canonical record 写入撤稿事件，公开 build 从 library、历史 daily bundles 和
+paper JSON 中移除该版本及此前版本；保留 canonical 审计记录、历史 digest/receipt 与
+immutable run archive，不改历史 hashes。Promotion 验证事件已应用，receipt 另行固定
+撤稿页面、review 与受影响 canonical 的 hashes；ledger 将该 exact version 记为
+terminal fulltext-reject。新的 policy fingerprint 使用 full-text schemaVersion 3。
+
+移除边界包含所有较早版本和撤稿版本本身：例如 v3 撤稿时，v1、v2、v3 全部退出公开
+收录。只有后来出现的 v4 或更高版本重新审阅并接受后才能恢复；旧版历史日报条目仍不恢复。
+
+后来出现更高版本（例如 v3）时，discovery 将其作为 `new` candidate 重新筛选、获取
+精确全文并判断，不复用旧版接受决定，不要求用 v1 的 scientific delta 才能收录。
+重新接受后仍使用同一个 canonical ID，并保留原 collectedAt 与 withdrawal 事件；
+只有 Paper link 指向已审阅且高于撤稿版本的 exact version 才恢复公开收录。
+旧版本事件不能再次移除已审阅的新版本。
+
 ```sh
 npm run validate:paper-fulltext -- \
   --run-dir local-assets/paper-reading/runs/<run-id> \

@@ -12,7 +12,7 @@ import { parseArxivIdentifier } from "./lib/identity.mjs";
 
 export const DECISION_LEDGER_SCHEMA_VERSION = 1;
 export const DECISION_LEDGER_POLICY_VERSION = 1;
-export const DECISION_LEDGER_FULLTEXT_SCHEMA_VERSION = 2;
+export const DECISION_LEDGER_FULLTEXT_SCHEMA_VERSION = 3;
 export const DECISION_LEDGER_KIND = "paper-reading-decision-ledger";
 export const DECISION_LEDGER_DELTA_KIND = "paper-reading-decision-ledger-delta";
 export const DECISION_LEDGER_SNAPSHOT_KIND =
@@ -965,6 +965,13 @@ function receiptBindsDelta(receipt, imported, errors) {
   return true;
 }
 
+function verifyWithdrawalNotices(receipt, root, errors) {
+  for (const event of receipt.withdrawals ?? []) {
+    resolveArtifactInsideRoot(root, event.notice, `Withdrawal '${event.arxivVersion}' notice`, errors);
+    resolveArtifactInsideRoot(root, event.review, `Withdrawal '${event.arxivVersion}' review`, errors);
+  }
+}
+
 function verifyLegacyDeltaAgainstRun({ delta, root, label, errors }) {
   const candidateRecord = delta?.sourceArtifacts?.candidates;
   const candidateFile = resolveArtifactInsideRoot(
@@ -1038,8 +1045,10 @@ export function verifyDecisionLedgerImports({ ledger, root, runIds = null }) {
     }
     if (receiptFile) {
       try {
+        const receipt = JSON.parse(readFileSync(receiptFile, "utf8"));
+        verifyWithdrawalNotices(receipt, root, errors);
         const pinned = receiptBindsDelta(
-          JSON.parse(readFileSync(receiptFile, "utf8")),
+          receipt,
           imported,
           errors,
         );
@@ -1121,6 +1130,7 @@ export function verifyLedgerSnapshotMatch({ entry, root }) {
   if (receiptFile) {
     try {
       const receipt = JSON.parse(readFileSync(receiptFile, "utf8"));
+      verifyWithdrawalNotices(receipt, root, errors);
       const pinned = receiptBindsDelta(
         receipt,
         imported,

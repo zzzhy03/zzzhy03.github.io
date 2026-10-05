@@ -1,4 +1,5 @@
-export const FULLTEXT_SCHEMA_VERSION = 2;
+export const FULLTEXT_SCHEMA_VERSION = 3;
+export const SUPPORTED_FULLTEXT_SCHEMA_VERSIONS = [2, 3];
 
 export const FULLTEXT_DECISIONS = [
   "accept-deep",

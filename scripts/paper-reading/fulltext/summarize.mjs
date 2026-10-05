@@ -69,6 +69,7 @@ const reviewedPapers = [...result.reviews]
     arxivVersion: review.arxivVersion,
     title: review.title,
     decision: review.decision,
+    sourceScope: review.source.scope,
     primaryTopicId: review.primaryTopicId,
     secondaryTopicIds: review.secondaryTopicIds,
     relevance: review.relevance,
@@ -95,7 +96,7 @@ const summary = {
   scopeNoteZh:
     options.screeningRunDirectory && options.selection === "high-deep"
       ? "本汇总只覆盖 abstract screening 中 preliminary relevance=high 且 readingAction=deep 的全文候选；其它较低优先级 full-text-review 候选不在本轮内。"
-      : "本汇总覆盖本次校验选择中的全部全文候选。",
+      : "本汇总覆盖本次校验选择中的全部候选决定；withdrawal_notice 仅验证官方撤稿事件，不表示读过该版本全文。",
   noteZh:
     "该文件只汇总全文审阅决定，不推断 promotion 或发布状态；canonical、digest 与发布边界必须由独立 validator 判断。",
 };

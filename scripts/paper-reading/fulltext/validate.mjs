@@ -7,6 +7,8 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { validateWithdrawalSource } from "../lib/withdrawal.mjs";
+
 import {
   ACCEPT_DECISIONS,
   CODE_STATUSES,
@@ -14,6 +16,7 @@ import {
   EVIDENCE_SUPPORT,
   FULLTEXT_DECISIONS,
   FULLTEXT_SCHEMA_VERSION,
+  SUPPORTED_FULLTEXT_SCHEMA_VERSIONS,
   READING_ACTIONS,
   RELEVANCE_LEVELS,
 } from "./contract.mjs";
@@ -244,8 +247,8 @@ function collectExpectedPaperIds(root, screeningRunDirectory, selection, errors)
 function validateReview(review, filePath, topicIds, root, errors) {
   const label = path.basename(filePath);
   if (!requireObject(review, label, errors)) return;
-  if (review.schemaVersion !== FULLTEXT_SCHEMA_VERSION) {
-    errors.push(`${label}.schemaVersion must be ${FULLTEXT_SCHEMA_VERSION}.`);
+  if (!SUPPORTED_FULLTEXT_SCHEMA_VERSIONS.includes(review.schemaVersion)) {
+    errors.push(`${label}.schemaVersion must be one of ${SUPPORTED_FULLTEXT_SCHEMA_VERSIONS.join(", ")}.`);
   }
   if (review.kind !== "paper-reading-fulltext-review") {
     errors.push(`${label}.kind must be 'paper-reading-fulltext-review'.`);
@@ -316,6 +319,21 @@ function validateReview(review, filePath, topicIds, root, errors) {
     minimum: ACCEPT_DECISIONS.has(review.decision) ? 2 : 0,
   });
   if (methodFlow.length > 6) errors.push(`${label}.methodFlow must contain at most 6 steps.`);
+
+  if (review.source?.scope === "withdrawal_notice") {
+    if (review.schemaVersion !== FULLTEXT_SCHEMA_VERSION) {
+      errors.push(`${label} withdrawal notices require schemaVersion=${FULLTEXT_SCHEMA_VERSION}.`);
+    }
+    errors.push(...validateWithdrawalSource(review, root, filePath));
+    if (methodFlow.length || review.evidence?.length || review.experiments?.keyResults?.length ||
+        review.visuals?.methodFigure || review.visuals?.conceptFigure) {
+      errors.push(`${label} withdrawal notices must not claim unread methods, experiments, or figures.`);
+    }
+    return decisionValid
+      ? { paperId: review.paperId, candidateId: review.candidateId, runId: review.runId,
+          arxivVersion: review.arxivVersion }
+      : null;
+  }
 
   let inspectedPages = new Set();
   let pageCount = 0;
@@ -427,7 +445,8 @@ function validateReview(review, filePath, topicIds, root, errors) {
   }
 
   return decisionValid
-    ? { paperId: review.paperId, candidateId: review.candidateId, runId: review.runId }
+    ? { paperId: review.paperId, candidateId: review.candidateId, runId: review.runId,
+        arxivVersion: review.arxivVersion }
     : null;
 }
 
@@ -492,6 +511,8 @@ export function validateFulltextReviews(options) {
   }
 
   if (expectedByPaperId) {
+    const candidates = readJson(path.join(resolveFrom(root, options.screeningRunDirectory), "candidates.json")).candidates;
+    const candidateById = new Map(candidates.map((candidate) => [candidate.discoveryId ?? candidate.candidateId, candidate]));
     for (const [expectedId, candidateId] of expectedByPaperId) {
       const metadata = reviewMetadataByPaperId.get(expectedId);
       if (!metadata) {
@@ -507,6 +528,10 @@ export function validateFulltextReviews(options) {
         errors.push(
           `Full-text review '${expectedId}' belongs to run '${metadata.runId}', expected '${expectedRunId}'.`,
         );
+      }
+      const candidate = candidateById.get(candidateId);
+      if (candidate?.arxivVersion && metadata.arxivVersion !== `${expectedId.slice(6)}v${candidate.arxivVersion}`) {
+        errors.push(`Full-text review '${expectedId}' does not match the screening exact version.`);
       }
     }
     for (const paperId of paperIds) {
@@ -532,6 +557,7 @@ export function validateFulltextReviews(options) {
       expected: expectedByPaperId?.size ?? null,
       byDecision,
       byTopic,
+      withdrawalEvents: reviews.filter((review) => review.source?.scope === "withdrawal_notice").length,
     },
   };
 }

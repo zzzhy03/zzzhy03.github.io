@@ -27,6 +27,8 @@ import {
 import { validateFulltextReviews } from "./fulltext/validate.mjs";
 import { validatePromotion } from "./fulltext/validate-promotion.mjs";
 import { writeJsonAtomic } from "./lib/io.mjs";
+import { withdrawalRecord } from "./lib/withdrawal.mjs";
+import { parseArxivIdentifier } from "./lib/identity.mjs";
 import { validateScreeningReviews } from "./screening/validate.mjs";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -55,7 +57,7 @@ function parseArguments(argv) {
     else if (argument === "--apply") options.apply = true;
     else throw new Error(`Unknown argument: ${argument}`);
   }
-  if (!new Set(["status", "verify", "backlog", "receipt", "ledger", "finalize", "cleanup"]).has(options.command)) {
+  if (!new Set(["status", "verify", "withdraw", "backlog", "receipt", "ledger", "finalize", "cleanup"]).has(options.command)) {
     throw new Error(`Unknown command '${options.command}'.`);
   }
   if (options.help) return options;
@@ -66,8 +68,8 @@ function parseArguments(argv) {
   if (new Set(["verify", "receipt", "ledger", "finalize"]).has(options.command) && !options.digest) {
     throw new Error(`${options.command} requires --digest <content digest JSON>.`);
   }
-  if (options.apply && !new Set(["backlog", "receipt", "ledger", "finalize", "cleanup"]).has(options.command)) {
-    throw new Error("--apply is only valid for backlog, receipt, ledger, finalize or cleanup.");
+  if (options.apply && !new Set(["withdraw", "backlog", "receipt", "ledger", "finalize", "cleanup"]).has(options.command)) {
+    throw new Error("--apply is only valid for withdraw, backlog, receipt, ledger, finalize or cleanup.");
   }
   return options;
 }
@@ -77,6 +79,7 @@ function helpText() {
 
 Usage:
   npm run pipeline:papers -- status  --run-dir <run> [--selection <mode>] [--digest <file>] [--json]
+  npm run pipeline:papers -- withdraw --run-dir <run> --selection all-full-text [--apply] [--json]
   npm run pipeline:papers -- backlog --run-dir <run> --selection high-deep [--apply] [--json]
   npm run pipeline:papers -- verify  --run-dir <run> --selection <mode> --digest <file> [--json]
   npm run pipeline:papers -- receipt --run-dir <run> --selection <mode> --digest <file> [--apply] [--json]
@@ -86,6 +89,7 @@ Usage:
 
 Commands:
   status    Recompute discovery, screening, full-text, backlog and promotion state.
+  withdraw  Remove collected older versions from public feeds using verified withdrawal notices.
   backlog   Record screened full-text candidates intentionally deferred by this run's selection.
   verify    Run every read-only gate through canonical content validation.
   receipt   Build a compact, checked-in audit receipt; --apply writes it after verification.
@@ -95,7 +99,7 @@ Commands:
 
 Defaults and safety:
   --selection defaults to all-full-text. high-deep is allowed only with an explicit backlog.
-  backlog, receipt, ledger, finalize and cleanup are dry-runs unless --apply is present.
+  withdraw, backlog, receipt, ledger, finalize and cleanup are dry-runs unless --apply is present.
   A run must be one direct child of local-assets/paper-reading/runs; symlinks are rejected.
   Source PDFs, reviews, manifests, canonical content, digests and publication state are never
   cleanup targets. This tool does not call a model, promote content, commit, push, or publish.`;
@@ -103,6 +107,40 @@ Defaults and safety:
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, "utf8"));
+}
+
+export async function runWithdraw(options, root, runDirectory) {
+  await validateScreeningReviews({ root, runDirectory });
+  const result = validateFulltextReviews({
+    root,
+    reviewDirectory: path.join(runDirectory, "fulltext", "reviews"),
+    screeningRunDirectory: runDirectory,
+    selection: options.selection ?? "all-full-text",
+    researchConfig: "content/paper-reading/research-config.json",
+  });
+  if (result.errors.length) throw new Error(`Full-text decisions must validate before withdrawal: ${result.errors.join("; ")}`);
+  const canonicalDirectory = path.join(root, "content", "paper-reading", "papers");
+  const canonicalById = new Map(listJsonFiles(canonicalDirectory).map((file) => [readJson(file).id, file]));
+  const changes = [];
+  for (const review of result.reviews) {
+    if (review.source?.scope !== "withdrawal_notice") continue;
+    const file = canonicalById.get(review.paperId);
+    if (!file) continue;
+    const paper = readJson(file);
+    const previousVersion = parseArxivIdentifier(paper.withdrawal?.arxivVersion)?.version ?? 0;
+    const eventVersion = parseArxivIdentifier(review.arxivVersion).version;
+    if (previousVersion >= eventVersion) continue;
+    changes.push({ file, beforeSha256: sha256File(file), paperId: review.paperId,
+      paper: { ...paper, withdrawal: withdrawalRecord(review) } });
+  }
+  if (options.apply) {
+    for (const change of changes) {
+      if (sha256File(change.file) !== change.beforeSha256) throw new Error("Canonical paper changed after withdrawal planning.");
+    }
+    for (const change of changes) await writeJsonAtomic(change.file, change.paper);
+  }
+  return { apply: Boolean(options.apply), count: changes.length,
+    changes: changes.map(({ file, paperId, paper }) => ({ file: path.relative(root, file), paperId, withdrawal: paper.withdrawal })) };
 }
 
 function sha256File(file) {
@@ -298,6 +336,7 @@ function fulltextStatus(root, runDirectory, selection, screeningState) {
     expectedCount: result.counts.expected ?? null,
     decisionCounts: result.counts.byDecision ?? {},
     topicCounts: result.counts.byTopic ?? {},
+    ...(result.counts.withdrawalEvents ? { withdrawalEventCount: result.counts.withdrawalEvents } : {}),
     errors: result.errors,
   };
 }
@@ -452,6 +491,7 @@ export function receiptStatus(root, runId, digest, runDirectory = null) {
       receipt.screening?.decisionLedgerSnapshot,
       ...(receipt.screening?.reviews ?? []),
       ...(receipt.fulltext?.reviews ?? []),
+      ...(receipt.withdrawals ?? []).flatMap((event) => [event.review, event.notice]),
       ...(backlogHasFile || backlogHasHash ? [receiptBacklog] : []),
       receipt.decisionLedger?.delta,
     ].filter(Boolean);
@@ -827,6 +867,16 @@ function buildRunReceipt(root, runDirectory, digest, status, deltaFile = null) {
       ...hashedArtifact(root, file),
     };
   });
+  const withdrawals = listJsonFiles(path.join(runDirectory, "fulltext", "reviews"), (name) => name !== "summary.json")
+    .map((file) => ({ file, review: readJson(file) }))
+    .filter(({ review }) => review.source?.scope === "withdrawal_notice")
+    .map(({ file, review }) => ({
+      paperId: review.paperId,
+      arxivVersion: review.arxivVersion,
+      review: hashedArtifact(root, file),
+      notice: hashedArtifact(root, repositoryPath(root, review.source.noticePath)),
+      ...(canonicalById.has(review.paperId) ? { canonical: hashedArtifact(root, canonicalById.get(review.paperId)) } : {}),
+    }));
   let backlogRecord = { candidateIds: [] };
   if (status.closure.backlogCandidateCount > 0) {
     const backlogFile = path.join(runDirectory, "fulltext", "backlog.json");
@@ -882,6 +932,7 @@ function buildRunReceipt(root, runDirectory, digest, status, deltaFile = null) {
     },
     digest: hashedArtifact(root, digestPath),
     canonicalPapers,
+    ...(withdrawals.length ? { withdrawals } : {}),
     ...(deltaFile
       ? {
           decisionLedger: {
@@ -1164,6 +1215,7 @@ async function main() {
     return;
   }
   if (options.command === "verify") result = await verifyPipeline({ ...options, root, runDirectory });
+  else if (options.command === "withdraw") result = await runWithdraw(options, root, runDirectory);
   else if (options.command === "backlog") result = await runBacklog(options, root, runDirectory);
   else if (options.command === "receipt") result = await runReceipt(options, root, runDirectory);
   else if (options.command === "ledger") result = await runLedger(options, root, runDirectory);

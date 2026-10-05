@@ -4,6 +4,8 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { isPaperWithdrawn } from "../lib/withdrawal.mjs";
+import { parseArxivIdentifier } from "../lib/identity.mjs";
 
 function parseArguments(argv) {
   const options = {
@@ -136,6 +138,20 @@ export function validatePromotion(options) {
   const papersById = new Map(paperEntries.map(({ value }) => [value.id, value]));
   const digestPaperIds = new Set(digest.paperIds ?? []);
 
+  for (const { value: review } of reviewEntries) {
+    if (review.source?.scope !== "withdrawal_notice") continue;
+    const paper = papersById.get(review.paperId);
+    if (!paper) continue; // No previously collected version to remove.
+    const recorded = parseArxivIdentifier(paper.withdrawal?.arxivVersion);
+    const expected = parseArxivIdentifier(review.arxivVersion);
+    if (!recorded?.version || recorded.id !== expected.id || recorded.version < expected.version) {
+      errors.push(`${review.paperId} withdrawal event must be applied to the canonical record before promotion.`);
+    }
+    if (isPaperWithdrawn(paper) && digestPaperIds.has(review.paperId)) {
+      errors.push(`${review.paperId} withdrawn versions must not appear among accepted digest papers.`);
+    }
+  }
+
   for (const review of acceptedReviews) {
     const paper = papersById.get(review.paperId);
     const versionlessArxivId = review.arxivVersion?.replace(/v\d+$/, "");
@@ -147,13 +163,24 @@ export function validatePromotion(options) {
       errors.push(`Accepted review '${review.paperId}' has no canonical paper record.`);
       continue;
     }
+    const previousWithdrawal = parseArxivIdentifier(candidate?.existingMatch?.withdrawal?.arxivVersion);
+    if (previousWithdrawal) {
+      const retainedWithdrawal = parseArxivIdentifier(paper.withdrawal?.arxivVersion);
+      if (!retainedWithdrawal || retainedWithdrawal.id !== previousWithdrawal.id ||
+          retainedWithdrawal.version < previousWithdrawal.version) {
+        errors.push(`${review.paperId} reacceptance must preserve its previous withdrawal event.`);
+      }
+    }
+    if (isPaperWithdrawn(paper)) {
+      errors.push(`${review.paperId} is still withdrawn; acceptance requires a reviewed later version.`);
+    }
     if (!digestPaperIds.has(review.paperId)) {
       errors.push(`Accepted review '${review.paperId}' is missing from digest '${digest.date}'.`);
     }
-    if (candidate?.disposition === "new" && paper.collectedAt !== digest.date) {
+    if (candidate?.disposition === "new" && !candidate.existingMatch?.resubmission && paper.collectedAt !== digest.date) {
       errors.push(`${review.paperId}.collectedAt must equal first digest date '${digest.date}'.`);
     } else if (
-      candidate?.disposition !== "new" &&
+      (candidate?.disposition !== "new" || candidate.existingMatch?.resubmission) &&
       (typeof paper.collectedAt !== "string" || paper.collectedAt > digest.date)
     ) {
       errors.push(`${review.paperId}.collectedAt must preserve its original date on updates.`);

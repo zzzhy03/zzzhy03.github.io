@@ -582,6 +582,20 @@ for (const { file, value: paper } of paperEntries) {
   requireDate(paper.publishedAt, `${file}.publishedAt`);
   if (paper.updatedAt !== undefined) requireDate(paper.updatedAt, `${file}.updatedAt`);
   requireDate(paper.collectedAt, `${file}.collectedAt`);
+  if (paper.withdrawal !== undefined) {
+    const context = `${file}.withdrawal`;
+    requireObject(paper.withdrawal, context);
+    requireText(paper.withdrawal.arxivVersion, `${context}.arxivVersion`);
+    const match = paper.withdrawal.arxivVersion.match(/^(\d{4}\.\d{4,5})v([1-9]\d*)$/);
+    if (!match || paper.id !== `arxiv:${match[1]}`) fail(`${context} must identify an exact version of this paper.`);
+    requireText(paper.withdrawal.runId, `${context}.runId`);
+    requireTimestamp(paper.withdrawal.recordedAt, `${context}.recordedAt`);
+    requireText(paper.withdrawal.reasonZh, `${context}.reasonZh`);
+    if (paper.withdrawal.noticeUrl !== `https://arxiv.org/abs/${paper.withdrawal.arxivVersion}`) {
+      fail(`${context}.noticeUrl must identify the official exact-version notice.`);
+    }
+    requireSha256(paper.withdrawal.noticeSha256, `${context}.noticeSha256`);
+  }
   requireText(paper.venue, `${file}.venue`);
   if (paper.identifiers !== undefined) {
     requireObject(paper.identifiers, `${file}.identifiers`);
@@ -839,6 +853,26 @@ for (const { file, value: receipt } of runReceiptEntries) {
     requireSha256(artifact.sha256, `${context}.fulltext.reviews[${index}].sha256`);
   }
   requireObject(receipt.fulltext.backlog, `${context}.fulltext.backlog`);
+  if (receipt.withdrawals !== undefined) {
+    requireArray(receipt.withdrawals, `${context}.withdrawals`);
+    for (const [index, event] of receipt.withdrawals.entries()) {
+      const eventContext = `${context}.withdrawals[${index}]`;
+      requireText(event.paperId, `${eventContext}.paperId`);
+      requireText(event.arxivVersion, `${eventContext}.arxivVersion`);
+      for (const key of ["notice", "review", ...(event.canonical ? ["canonical"] : [])]) {
+        requireObject(event[key], `${eventContext}.${key}`);
+        requireText(event[key].file, `${eventContext}.${key}.file`);
+        requireSha256(event[key].sha256, `${eventContext}.${key}.sha256`);
+      }
+      const review = receipt.fulltext.reviews.find((item) => item.paperId === event.paperId && item.arxivVersion === event.arxivVersion);
+      if (!review || review.decision !== "reject" || review.file !== event.review.file || review.sha256 !== event.review.sha256) {
+        fail(`${eventContext} must reference this receipt's rejected exact-version event.`);
+      }
+      if (event.canonical && event.canonical.file !== path.relative(root, paperFilesById.get(event.paperId) ?? "")) {
+        fail(`${eventContext}.canonical must point to the retained canonical audit record.`);
+      }
+    }
+  }
   requireUniqueTextArray(
     receipt.fulltext.backlog.candidateIds,
     `${context}.fulltext.backlog.candidateIds`,

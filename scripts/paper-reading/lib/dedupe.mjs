@@ -7,6 +7,7 @@ import {
   parseArxivIdentifier,
 } from "./identity.mjs";
 import { buildVenueAliasIndex, matchVenueIds } from "./venue.mjs";
+import { isPaperWithdrawn } from "./withdrawal.mjs";
 
 function unique(values) {
   return [...new Set(values.filter((value) => value !== null && value !== undefined))];
@@ -289,15 +290,19 @@ export function matchCanonicalCandidates(candidates, canonicalIndex) {
     const existing = canonicalIndex.byId.get(paperId);
     const strongestMatch = matches.find((match) => match.paperId === paperId);
     const changes = detectedMetadataChanges(candidate, existing);
+    const withdrawnVersion = parseArxivIdentifier(existing.withdrawal?.arxivVersion)?.version;
+    const resubmission = isPaperWithdrawn(existing) && withdrawnVersion &&
+      candidate.arxivVersion > withdrawnVersion;
     return {
       ...candidate,
-      disposition: changes.length ? "possible-update" : "duplicate-existing",
+      disposition: resubmission ? "new" : changes.length ? "possible-update" : "duplicate-existing",
       existingMatch: {
         ambiguous: false,
         paperId,
         matchType: strongestMatch.matchType,
         matchKey: strongestMatch.matchKey,
         detectedChanges: changes,
+        ...(existing.withdrawal ? { withdrawal: existing.withdrawal, resubmission: Boolean(resubmission) } : {}),
       },
     };
   });
