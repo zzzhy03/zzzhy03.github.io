@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.00206",
+  "slug": "distributed-implicit-harm-video-moderation",
+  "title": "Distributed Implicit Harm: A Compositional Safety Blind Spot in MLLM-Based Video Moderation",
+  "authors": [
+    "Ruotong Wang",
+    "Zihao Zhu",
+    "Siwei Lyu",
+    "Xin Tao",
+    "Baoyuan Wu"
+  ],
+  "publishedAt": "2026-08-31",
+  "updatedAt": "2026-08-31",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00206"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "compositional reasoning",
+    "video moderation",
+    "DIH",
+    "multimodal safety"
+  ],
+  "abstract": "Despite their growing use in video moderation, multimodal large language models (MLLMs) exhibit a compositional safety blind spot: videos composed of seemingly benign components can convey harmful meaning when interpreted as a whole. We refer to this phenomenon as Distributed Implicit Harm (DIH), where harm arises from relations among components distributed along a decomposition axis of the video, rather than from any single explicit cue. Among many possible axes, we study two representative cases: temporally distributed harm across visual segments (DIH-T) and cross-modal harm between audio and visual streams (DIH-M). Studying and mitigating DIH at scale requires data that is difficult to collect: such videos lack compositional harm annotations, evade retrieval based on local visual cues, keywords, or single-modality signals, and are consequently absent from existing safety datasets. To bridge this gap, we develop a multi-agent synthesis framework that composes individually benign components into harmful scenarios and generates diverse DIH videos with explicit reasoning annotations, yielding a dataset of over 9,000 videos spanning visual-only and audio-visual settings. Benchmarking over 30 MLLMs spanning frontier proprietary models and leading open-source systems reveals substantial and consistent deficits in detecting both DIH-T and DIH-M. Notably, this failure persists even among the strongest frontier models: they often correctly assess individual components in isolation but fail to recognize the harmful meaning that emerges from their composition. We further evaluate these models on a manually collected set of real-world DIH videos from social media and observe the same failure mode, highlighting DIH as a practical and underexplored challenge for video moderation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00206v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00206v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00206v1 全文及 2026-09-02T21:31:57.000Z 的审阅记录整理；PDF 13 页，SHA-256 991a64361ad51a98225dea248adb1fc47f28fb02b02bffaeb8fbc7d197510b42；原审阅已视觉核验第 1、5、7、9、10 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。",
+    "ideaZh": "论文把视频中“各局部都 benign、组合后才 harmful”的现象形式化为 Distributed Implicit Harm，先研究时间片段组合 DIH-T 和音视组合 DIH-M，再用五类 agents 生成 narrative、逐组件/组合安全判断、video prompt 与 reasoning annotation，得到 9725 个 videos。作者报告 30+ MLLMs 对 harmful samples 的 detection 均低于 45%，在 178 个真实 DIH videos 上同样失败；SFT+GRPO targeted post-training 能在不明显损伤 benign accuracy 下大幅提升 detection。它揭示真实的 temporal/cross-modal reasoning 缺口，但 safety/cultural label 高度主观、real set 小，评测又用 Gemini-3-Flash judge，适合 medium/skim。",
+    "methodFlow": [
+      "形式化 decomposition axis、local safety 与 compositional harm，定义 temporal DIH-T 和 audio-visual DIH-M",
+      "Narrative Planner 设计局部 benign 但组合 harmful 的 components，Individual/Compositional Assessors 分别验证两级安全性",
+      "Video Director 调用 text-to-video/audio tools 合成一致场景，Reasoning Analyst 生成逐组件到组合含义的 structured rationale",
+      "过滤 local/global safety 或 reasoning consistency 不合格样本，并以反向 target 生成同主题 benign controls，构建 DIH-Bench",
+      "对 MLLMs 做 zero-shot/taxonomy-guided/CoT 评测，再以 reasoning SFT 和 composite-reward GRPO 进行 targeted post-training"
+    ],
+    "motivationZh": "视频的各局部可能都安全，只有时间或音视组合才呈现 harmful meaning；该工作定义 Distributed Implicit Harm 并构建数据、诊断与 targeted post-training。",
+    "methodZh": "DIH 定义要求某 decomposition axis 上每个 component 单独安全，但至少两个 components 的 recomposition 有害；论文实例化 successive visual segments 与 audio-visual streams。数据 pipeline 由 Narrative Planner、Individual Safety Assessor、Compositional Safety Assessor、Video Director 和 Reasoning Analyst 协同，既生成 harmful composition 也反转目标构造 topic-matched benign controls，并以 consistency filtering 保留 9725 samples。实验覆盖 proprietary/open video/omni MLLMs、真实 TikTok/YouTube/Instagram reference set、CoT prompting、0.8B–27B Qwen3.5 两阶段 post-training 与 frame/resolution ablations。所有结果均为作者报告，未独立复现。",
+    "experimentsZh": "实验设置：synthetic held-out DIH Dataset 上评测 8 proprietary 与 30 open-source video/omni MLLMs，分 zero-shot 与 taxonomy-guided；Gemini-3-Flash 独立判断 binary verdict 与 rationale。真实 reference set 含 128 DIH-T、50 DIH-M、122 related benign videos。20 participants 对 144 videos 做 full-vs-isolated component perception study；Qwen3.5 0.8B–27B 进行 SFT+GRPO。\n作者报告：synthetic DIH 上 strongest taxonomy-guided harmful accuracy 仍低于 45%；例如 Gemini 3.1 Pro 在 DIH-T 为 44.3%、在 DIH-M 为 36.4%。（Table 3, p. 7）\n作者报告：real-world reference set 上所有选定 models 的 harmful accuracy 低于 40%，例如 Gemini 3.1 Pro taxonomy-guided 在 DIH-T/DIH-M 为 35.16%/36.00%。（Table 4, p. 8）\n作者报告：targeted post-training 在 strongest scales 上将 harmful detection 提升超过 60 percentage points，并在真实集上保持 safe accuracy。（Figs. 5–6 and Sec. 5.5, p. 9）\n比较范围：模型覆盖大、包含 video-only 和 omni audio-visual systems，并用 topic-related benign controls 与真实社媒 reference set检查 false alarms；但主 evaluation 使用单一 Gemini judge 评判 rationale correctness，且不同 proprietary APIs 的 video preprocessing/frames 可能不完全一致。\n消融与诊断：比较 taxonomy prompt 与 CoT prompting、SFT 与 SFT+GRPO、五个 model scales、2–64 frames、240P–1080P resolution。缺少各 synthesis agent/consistency filter 的消融，也没有与人工全量 ground truth 或独立多个 judges 对照。",
+    "insightZh": "新意是把隐式 harm 的“分布式组合”而非显式局部 cue 作为可操作定义、数据生成约束和训练目标，并同时覆盖 temporal 与 audio-visual axes；数据 pipeline 让每个 synthetic sample 带组成逻辑。它主要是 safety benchmark/data/training recipe，不是通用 video architecture，且依赖生成/评判模型对文化语境的编码。",
+    "whyRelevantZh": "它揭示 video MLLM 在跨时间、跨模态语义组合上的系统性 blind spot，并提供 reasoning-labeled data 与 targeted post-training；对长视频理解和 agent memory/compositional reasoning 有参考价值，但与 visual creation/design 的直接联系较弱。",
+    "evidenceZh": "DIH 同时要求每个分解 component 局部安全，以及某个多 component recomposition 有害；论文实例化 temporal 与 modal axes。（Sec. 3.1–3.2, Definition 1, pp. 3–4；形式化定义将任务边界从普通 explicit-harm moderation 中分离出来。）\n五角色 multi-agent pipeline 分别规划 narrative、检查 individual/compositional safety、生成视频并产生 reasoning annotation，最终数据含 9725 samples。（Sec. 4.1–4.2 and Fig. 2, pp. 4–6；pipeline 图已视觉核验；数据包含 6742 DIH-T 与 2983 DIH-M，初始样本过滤 4.75%。）\n作者报告：zero-shot/taxonomy-guided 条件下，所测 MLLMs 对 harmful DIH-T/DIH-M 的平均 detection 均低于 45%，同时 benign accuracy 多数很高。（Table 3 and Sec. 5.2, pp. 7–8；大表已视觉核验；该现象也可能部分来自 conservative moderation thresholds，需结合 benign rows 理解。）\n作者报告：SFT+GRPO 在五个 Qwen3.5 scales 上提升 DIH-T detection，并在真实视频上保持 benign accuracy；frame 数超过 8、resolution 超过 480P 后收益趋于饱和。（Secs. 5.5–5.6 and Figs. 5–7, p. 9；post-training 和 ablation 图已视觉核验，支持瓶颈更偏 compositional reasoning 而非简单采样/分辨率不足。）",
+    "caveatZh": "只研究 temporal 与 audio-visual axes，尚未覆盖 speaker、viewpoint、on-screen text 等其他 composition axes。\nDIH 判断依赖社会和文化 context，未来数据/benchmark 需纳入更广 contextual knowledge。\n尚未将 DIH-aware reasoning 集成到 real-time streaming moderation pipeline。\nsynthetic harmful scenarios 与 chain-of-thought 都由模型 pipeline 生成，可能带入 stereotyped harms、generator artifacts 和 label leakage。\n真实 harmful set 仅 178 videos，20 人 perception study 只看 144 videos；对文化敏感语义的覆盖和一致性仍有限。\n评测与 GRPO reward 均依赖 LLM-as-a-judge，可能将 judge preference 当作 compositional reasoning；安全任务还需关注误报、政策差异与人工申诉机制。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

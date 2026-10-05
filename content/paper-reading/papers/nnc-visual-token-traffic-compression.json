@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.01200",
+  "slug": "nnc-visual-token-traffic-compression",
+  "title": "Compressing AI Traffic: Standardized Neural Network Coding of Visual-Token Representations in Split Vision-Language Inference",
+  "authors": [
+    "Reza Heidari",
+    "Hamed R. Tavakoli",
+    "Juho Kannala"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01200"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "split VLM inference",
+    "neural network coding",
+    "visual tensor compression",
+    "rate-performance curve"
+  ],
+  "abstract": "When the visual encoder and the language decoder of a vision-language model (VLM) run on different compute nodes, the intermediate visual-token embeddings become a communicated payload rather than an internal activation. We call such machine-consumed intermediate tensors AI traffic and ask how far they can be compressed with a standardized, training-free codec. We insert ISO/IEC 15938-17 Neural Network Coding (NNC) round trips on the complete visual interface of a Qwen3-VL-8B-Instruct video question answering pipeline, comprising the main visual-token representation and the DeepStack feature streams, while leaving weights, prompts, and generation untouched, and sweep the quantization parameter (QP) over a wide rate range. Closed-ended Video-MME accuracy remains close to the uncompressed reference up to a 98% reduction of the transmitted BF16 tensor and only then collapses; open-ended MLVU generation shows the same plateau-and-collapse profile under an LLM judge. This robustness is not due to near-lossless reconstruction: the decoded tensor is heavily discretized, carries substantial row-wise relative L2 error, and has a visibly steeper singular-value decay than its source. Downstream reasoning therefore depends on coarse structure and relative geometry rather than exact floating-point values, which argues for rate-task rather than rate-distortion optimization of AI traffic codecs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01200v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01200v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01200v1 全文及 2026-09-02T21:38:00.000Z 的审阅记录整理；PDF 4 页，SHA-256 d50bc23ace4e2951e0ca4a0e1f471f645e078f39891e00fcbd1ceb4a6ae446aa；原审阅已视觉核验第 1、2、3、4 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：4 pages, 6 figures, 1 table",
+    "ideaZh": "论文把 split VLM 中 encoder→decoder 的 main/DeepStack visual tensors 定义为 AI traffic，用标准 ISO/IEC NNC 做逐流、training-free 编解码。作者在 Qwen3-VL-8B 的 Video-MME/MLVU 各 100 样本上报告 BF16 payload 减少约 98% 前性能基本维持，之后突然 collapse；重建张量并非近无损，说明下游依赖粗结构/相对几何。证据很短，尚未测 latency 或更多模型。",
+    "methodFlow": [
+      "在 split Qwen3-VL 的 main visual tokens 与三路 DeepStack features 上截获 AI traffic",
+      "对每路 tensor 独立执行 ISO/IEC NNC quantize/encode/decode",
+      "将重建 tensors 原位送回未改动 decoder",
+      "扫 QP 并联合 task score、bitrate 与 representation distortion 找 operating range"
+    ],
+    "motivationZh": "Split VLM 的视觉 encoder 与语言 decoder 之间传输大量中间张量；该工作研究标准 NNC codec 能否在不改模型的条件下压缩这类 AI traffic。",
+    "methodZh": "方法不改 weights、prompt、decoder 或 generation，仅在完整视觉接口插入 NNC round trip，并用 identity/zero-token controls 边界化 useful operating region。rate curve 与 tensor histogram/singular-value analysis 支持 plateau-and-collapse，而不是传统 rate-distortion 平滑退化。贡献是一个有趣系统观察，不能由单模型/两个小样本 benchmark 推断普遍 98% 可压缩。",
+    "experimentsZh": "实验设置：Qwen3-VL-8B-Instruct，Video-MME 100 closed-ended samples 与 MLVU summary 100 open-ended samples；identity/zero-token controls，QP sweep，按完整 visual interface BF16 size 计 compression。\n作者报告在 QP=0 时 compression=98.09%、Video-MME accuracy=0.72，相对 identity 0.74；更高 QP 后出现 collapse。（Table I and Fig. 2, p. 3）\n比较范围：有 identity 与 zero-token sanity checks，但没有其他 codec、learned compressor、模型架构、图像任务或端到端网络/计算成本 baseline。\n消融与诊断：通过 tensor histogram、scatter 与 singular spectra 排除近无损解释；没有逐 DeepStack stream、量化模块或 task type 的消融。",
+    "insightZh": "将 machine-consumed multimodal intermediate tensor 明确定义为 AI traffic，并用标准 neural-network codec 展示 task-aware rate curve 与传统 numerical distortion 脱钩。",
+    "whyRelevantZh": "直接揭示 MLLM visual-token interface 的冗余、粗结构与系统传输成本，是多模态 representation/efficiency 的可迁移观察。",
+    "evidenceZh": "实验在 main visual tokens 和全部 DeepStack streams 插入相同 NNC round trip，模型其他部分保持不变。（Secs. III-IV, Fig. 1, p. 2；pipeline 图和 intervention description 已视觉核验。）\n作者报告 Video-MME accuracy 在 payload 缩减约 98% 前接近 identity baseline，随后在高 QP 快速下降。（Sec. V, Fig. 2 and Table I, p. 3；仅 100 个 closed-ended samples；百分比相对 BF16 tensor。）\n作者报告 MLVU open-ended judge score 出现相似 plateau/collapse，而重建 tensor 有明显 L2 error 与更陡 singular-value decay。（Figs. 3-6, pp. 3-4；MLVU 依赖 LLM judge；表示分析是相关性证据，不是因果机制证明。）\n单一 backbone、两项 benchmark、固定 intervention point 且未测 encode/decode latency，限制部署结论。（Discussion and Conclusion, p. 4；论文明确将这些列为 future work。）",
+    "caveatZh": "仅一个 backbone、两个 benchmarks、一个 architecture/tokenization/task/interception point。\nOpen-ended evaluation 依赖 LLM judge，未测 encode/decode latency。\n100-sample 结果不足以建立通用 98% compression 规律，NNC compute 可能抵消通信节省。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

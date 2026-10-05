@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2609.01004",
+  "slug": "sinkpruner-sink-free-visual-token-pruning",
+  "title": "SinkPruner: Sink-Free Visual Token Pruning for Multimodal Large Language Models",
+  "authors": [
+    "Shiyu Li",
+    "Zi-Yuan Hu",
+    "Shijia Huang",
+    "Yanyang Li",
+    "Yiwu Zhong",
+    "Liwei Wang"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01004"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "attention sinks",
+    "visual token pruning",
+    "query-aware selection",
+    "VLM efficiency"
+  ],
+  "abstract": "Despite their strong multimodal understanding ability, multimodal large language models (MLLMs) incur substantial computational overhead when processing long visual token sequences. To reduce inference costs, recent studies have explored visual token pruning through vision-centric or text-guided strategies. However, these methods often overlook high-norm outlier tokens, i.e., tokens with abnormally large feature norms, leading to suboptimal pruning decisions. In this work, we show that such high-norm outlier tokens are highly redundant in both feature and spatial dimensions, yet are often mistakenly preserved as informative cues by existing methods. Motivated by this observation, we propose SinkPruner, a training-free visual token pruning framework for efficient MLLM inference. SinkPruner follows a coarse-to-fine design with two key modules: a visual sanitizer that filters high-norm redundancies and alleviates attention sink and attention dispersion, and a text-guided pruner that further retains tokens semantically aligned with the text query. Extensive experiments on twelve image-language and four video-language benchmarks demonstrate the effectiveness, efficiency, and generalizability of our framework. Notably, SinkPruner preserves 96.5% (91.8%) of the original performance of LLaVA-1.5 (Qwen2.5-VL) under an 89% token reduction. Experiments further indicate that our visual sanitizer exhibits promising transferability in enhancing the performance of existing pruning methods. Our code is available at https://github.com/LaVi-Lab/SinkPruner.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01004v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01004v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/LaVi-Lab/SinkPruner"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01004v1 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 24 页，SHA-256 ce0768300824dca87b90397082a10f3cb9780a9a2afaa6de1f12a2909c44d5a8；原审阅已视觉核验第 1、4、7、9 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：EMNLP 2026 (findings)",
+    "ideaZh": "SinkPruner 的关键观察是 VLM vision encoder 的高范数 tokens 往往彼此高度重复，却因 attention sink 被现有 pruning 错当成重要信息；方法先聚合/清洗这些 outliers，再以 salience+diversity 保留视觉 tokens，最后用累计 text-to-vision attention 做 query-aware pruning。作者报告固定与动态分辨率、图像与视频上均有强 retention/速度折中，但只验证 offline finite inputs，不能直接外推到 streaming perception。",
+    "methodFlow": [
+      "从 vision tokens 的 L2 norms 选 top-rho high-norm outliers，并验证其 feature/spatial redundancy",
+      "Visual Sanitizer 将 outliers 聚合为单一 sink summary，从 low-norm tokens 结合 salience 与 similarity diversity 预筛",
+      "累积多层 text-to-vision attention，为每个 query 计算语义相关性",
+      "Text-Guided Pruner 按目标 budget 保留相关 tokens，再送入 MLLM decoder"
+    ],
+    "motivationZh": "高范数、高 attention 视觉 tokens 可能是重复的 sinks；SinkPruner 研究先清洗 outliers，再以 salience、diversity 与 query relevance 做 token selection。",
+    "methodZh": "Visual Sanitizer 先用 scale-free top-rho norm rule 标记 high-norm outliers，把它们聚成一个 sink token，并从 low-norm pool 综合 CLS-free/CLS salience 与 diversity 选 token；Text-Guided Pruner 再聚合 decoder 多层 text-to-vision attention，保留与 query 相关的视觉证据。作者在 LLaVA-1.5、LLaVA-NeXT、Qwen2.5-VL 的 12 个 image benchmarks 和 4 个 video benchmarks 上报告高比例压缩仍保留性能，并提供 real inference timing、ablation 与 VisionZip plug-in transfer。",
+    "experimentsZh": "实验设置：Backbones 包含 LLaVA-1.5-7B/13B、LLaVA-NeXT-7B、Qwen2.5-VL-7B；图像覆盖 GQA/MMBench/MME/POPE/SQA/VQAv2/TextVQA 与 MMStar/MMMU/AI2D/MM-Vet，视频覆盖 MVBench/SEED/NextQA/VideoMME。\n作者报告 Qwen2.5-VL 在 88.9% pruning 下保留 91.8% average performance，并在 80% video pruning 下保留 98.0%。（Tables 2-3, p. 7）\n作者报告在 VisionZip 前加入 high-norm filter 后，MMBench/POPE 在相同 budgets 下提高 0.9%-2.6%。（Table 7 and Sec. 4.4, p. 9）\n比较范围：比较 FastV、SparseVLM、VisionZip、HoloV、DivPrune、MMTok、DART 等，并报告 fixed/dynamic resolution、hard reasoning、video 与 wall-clock timing；仍缺端到端真实服务的 memory/energy 与在线流式实验。\n消融与诊断：移除 visual sanitizer、text-guided pruner、duplicates、high-norm removal/aggregation，并额外扫描 threshold/schedule/budget split；visual sanitizer 和 high-norm removal 影响最大，支持核心机制。",
+    "insightZh": "它反转了“高 attention=高信息量”的常规 pruning 假设：先把 high-norm/high-attention sink tokens 视为冗余并清洗，再做 query-aware selection；该 norm filter 还能作为现有 pruning pipeline 的前置 plug-in。",
+    "whyRelevantZh": "它直接推进 MLLM visual-token selection/efficiency，并保留 spatially distributed evidence，对高分辨率设计图、文档和视频多模态模型均有迁移意义。",
+    "evidenceZh": "高范数 outlier tokens 的邻域与互相 cosine similarity 显著高于 low-norm tokens，却占据最高 attention ranks。（Figs. 2 and 4, pp. 3-4; Sec. 3.2, pp. 4-5；图示与统计构成 visual sanitizer 的动机证据。）\nSinkPruner 采用 visual sanitizer→text-guided pruner 的 coarse-to-fine cascade，并同时保留 salience 与 diversity。（Fig. 3 and Secs. 3.2-3.3, pp. 4-6；方法图视觉核验了 high-norm aggregation、attention/similarity filtering 和 text attention。）\n作者报告 LLaVA-1.5 保留 64/576 visual tokens 时平均性能保持 96.5%，保留 32 tokens 时为 91.2%。（Table 1 and Sec. 4.2, p. 7；数字为作者报告、未独立复现，以 unpruned model 归一化为 100%。）\n作者报告 90% pruning 时 total inference time 从 19:28 降到 12:59、accuracy retention 为 97.1%。（Table 5, p. 8；该结果来自 POPE 与特定 LLaVA-1.5 实现，不能代表所有 serving workloads。）",
+    "caveatZh": "当前只评测预先可得、固定长度的 offline images/video clips。\n连续机器人感知等无限 streaming 输入无法回看已剪 tokens，动态历史更新仍未解决。\n多数 accuracy retention 以 unpruned performance 归一化，需同时查看 absolute scores 与 workload-specific latency。\nHigh-norm redundancy 的普适性虽跨数个 backbones 验证，仍可能受 vision encoder training recipe 与 layer choice 影响。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

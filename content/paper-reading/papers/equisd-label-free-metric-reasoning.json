@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.00658",
+  "slug": "equisd-label-free-metric-reasoning",
+  "title": "Teaching Vision-Language Models to Use the Scale They Are Given: Label-Free Equivariance Training for Metric Physical Reasoning",
+  "authors": [
+    "Kaizhen Tan",
+    "Yang Feng",
+    "Heqing Du",
+    "Siru Tao",
+    "Xin Xu",
+    "Hanzhe Hong"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00658"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "physical reasoning",
+    "scale equivariance",
+    "label-free training",
+    "metric video reasoning"
+  ],
+  "abstract": "Metric questions about video require vision-language models to use supplied real-world references to convert visual measurements into physical units. Yet we find that current models use this scale information only partially. When every world-space quantity in a prompt is rescaled by a common factor, the video remains equally valid and the correct answer changes by exactly that factor, but model predictions move only part of the way and accuracy remains concentrated near the familiar scale of the depicted objects. Across eight vision-language models, this under-response persists over four orders of magnitude. The same models recover the correct closed-form scaling laws when the identical physics is asked in a scale-free form, indicating that the main deficit lies in metric grounding rather than physical mechanism knowledge. We use this exact scaling relation as supervision without requiring metric annotations. Under a common rescaling of the supplied world-space quantities, the correct metric answer must change by the same factor. EquiSD exploits this constraint by projecting a model's own prediction onto the scale-equivariant family and fine-tuning the model on the resulting targets. It requires no ground-truth answers and only one model query per training video. On held-out simulated videos, EquiSD increases a 3B model's median response slope from 0.66 to 0.94 and improves mean relative accuracy by 9.2 points across scales. The learned relation generalizes to unseen world scales and transfers without adaptation to real QuantiPhy videos, where accuracy increases by 6.4 points. These results show that an exact physical symmetry can provide label-free supervision for improving metric grounding in vision-language models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00658v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00658v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00658v1 全文及 2026-09-02T21:31:57.000Z 的审阅记录整理；PDF 12 页，SHA-256 f4bc8f216b01028ca3c2fccfb64500b42580531a326f5ef8a595496cb081d16c；原审阅已视觉核验第 1、6、7、8 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。",
+    "ideaZh": "EquiSD 抓住 monocular video metric question 的一个精确对称性：若 prompt 中所有 world-space lengths/rates 同乘 α，正确答案也应同乘 α。它只查询一次模型的 nominal-scale 自答，将其除以 reference 投影成 scale-free ratio，再在多个 α 上搬运为无标签 targets。作者报告 Qwen2.5-VL-3B 在 held-out simulator 上 response slope 从 0.66 升至 0.94、MRA +9.2，在真实 QuantiPhy 上 MRA +6.4；但修复仅在一个 3B student、一个 synthetic dynamics corpus 上验证，且 equivariance 不保证答案正确，因此适合 skim。",
+    "methodFlow": [
+      "对同一 monocular video/question 同时缩放 prompt 中全部 world-space lengths/rates，构造物理一致的 Sα intervention",
+      "在 nominal scale 查询一次 VLM，将预测除以 reference，得到模型自身隐含的 scale-free ratio",
+      "把 ratio 乘到多组训练 scales 的 reference 上，生成满足 exact homogeneity relation 的无标签 targets",
+      "以 LoRA 微调 Qwen2.5-VL-3B，只监督 target answer tokens，使输出近似 y(Sαq)=αy(q)",
+      "用 response slope、mean relative accuracy 与 equivariance error 在 unseen scales、held-out dynamics 与真实 QuantiPhy 视频上评估"
+    ],
+    "motivationZh": "VLM 即使获得明确尺度锚点，也可能不随 world-space reference 的变化正确缩放答案；EquiSD 用精确 scale symmetry 构造无需外部标签的诊断与训练目标。",
+    "methodZh": "论文先通过一致 rescaling probe 量化 8 个 VLM 对 supplied metric scale 的 under-response，并用 ratio-form control 说明缺陷更接近 metric grounding 而非物理机制知识。EquiSD 的 E-step 用模型在 nominal scale 的预测除以 reference 得到 scale-free ratio，M-step 将该 ratio 乘回不同 α 下的新 reference 生成 targets，仅训练输出 token，无 ground-truth metric label。IVP-Sim 提供五类 rigid-body videos 和可校验 intervention exponents；训练从 synthetic scene 迁移到 real QuantiPhy，未见 scales 上仍维持改善。所有数字均为作者报告，本项目未独立复现。",
+    "experimentsZh": "实验设置：诊断阶段在 QuantiPhy 159 questions 上评测 8 个 proprietary/open VLM，并用 ratio-form physics control；训练阶段以 IVP-Sim 1000 rendered rigid-body videos 中 400 questions 训练 Qwen2.5-VL-3B LoRA，在 held-out 120 scenes/dynamics family、多组 seen/interpolated/extrapolated α 和真实 QuantiPhy 159 questions 上评估。\n作者报告：IVP-Sim held-out 上 EquiSD mean MRA 30.0，对比 untrained 20.8，paired Δ +9.2 [6.6, 11.9]；median response slope 0.94。（Tables 4 and 8, pp. 6 and 11）\n作者报告：无适配迁移到 QuantiPhy 时 mean MRA 23.4，对比 untrained 17.1，Δ +6.4 [4.6, 8.2]；simulator-label training 为 +6.9。（Table 8, p. 11）\n作者报告：未见世界 scales 上 response slope 为 0.96（IVP-Sim）和 0.65（QuantiPhy），接近各自 seen-scale 的 0.94 与 0.57。（Table 5, p. 6）\n比较范围：包含 untrained、nominal-only self-distillation、rescaled-prompt/fixed-target、single-probe EquiSD、five-probe variant、nominal exact labels 与 transported exact labels，能较好分离 constraint、self-label 和 simulator magnitude distribution；但 repair 只在 Qwen2.5-VL-3B 上做，缺少第二个 trainable backbone。\n消融与诊断：Table 6/8 分离 constraint transport 与普通 self-distillation、比较 one-probe 和 five-probe E-step；source-wise QuantiPhy 分析显示不同 capture domains 的收益不一致。作者还测试 inference-time correction，发现成本和方差使其不优于直接 call。",
+    "insightZh": "贡献不是再做一个 physical-reasoning benchmark，而是把 projective-geometry 的 exact scale symmetry 变成 per-item diagnosis 与 label-free supervision；其 target transport 能与普通 self-distillation、fixed-target training 和 exact simulator labels 分离比较。新意边界在于只覆盖固定视频时间基准、已给长度/长度率 anchor 和 L·T^-k targets 的狭窄对称族。",
+    "whyRelevantZh": "这是 VLM metric physical grounding 的轻量训练原则，可能迁移到 visual/spatial reasoning、fabrication 尺寸约束和设计 agent 的物理量校验；它提供的 symmetry-as-supervision 思路比单一 benchmark 更有方法价值，但当前实验域仍窄。",
+    "evidenceZh": "EquiSD 用一次 nominal-scale query 构造 scale-free ratio，并把模型自己的数值答案沿 α-equivariant family 搬运成训练 targets，不引入 ground truth。（Sec. 4 and Fig. 2, p. 6；方法图清楚展示 Probe–Project–Fit 三步和 targets，已视觉核验。）\n作者报告：held-out IVP-Sim 上 response slope 从 0.66 升至 0.94、mean MRA 提升 9.2 points；real QuantiPhy 上 MRA 提升 6.4 points。（Tables 4–5, p. 6; Table 6 and Fig. 3, p. 7；数值、unseen-scale 曲线和真实视频迁移均由主文表图支持；所有比较为作者报告。）\n普通 self-distillation 在 real video 上仅 +1.4 MRA，而 EquiSD +6.4；把 target 在 rescaled prompt 下保持固定会把 response slope 压到 0.06。（Sec. 5.4 and Table 6, pp. 7–8；对照实验把收益定位到 target transport rule，而非自训练本身，限制页与消融页均已视觉核验。）\n该对称约束只保证不同 scales 的输出关系，不保证任一输出绝对正确；修复实验只覆盖一个 3B student。（Sec. 6 Limitations, p. 8；作者明确陈述 uniform-wrong solution 仍可满足 equivariance，并列出模型与 dynamics coverage 边界。）",
+    "caveatZh": "对称关系只适用于 video 固定 time base、已提供 world-space length/length-rate anchors 且 target 维度为 L·T^-k 的问题。\nEquivariance 只约束回答间关系，模型可以完全等变但整体数值都错。\n诊断覆盖 8 个模型，但 repair 仅在一个 3B student、一个 synthetic corpus 上测；intervention control 也只覆盖两个模型。\n真实 QuantiPhy 的 trained slope 仍只有 0.57，说明 synthetic-to-real 后 scale use 远未完全恢复；MRA 改善不能等同于可靠 metric reasoning。\n该方法依赖可明确识别且物理维度正确的 reference；开放世界 prompt 中单位、多个 anchors 或隐含 dimensional constants 可能破坏约束。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

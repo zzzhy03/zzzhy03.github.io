@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2509.25050",
+  "slug": "advantage-weighted-matching",
+  "title": "Advantage Weighted Matching: Aligning RL with Pretraining in Diffusion Models",
+  "authors": [
+    "Shuchen Xue",
+    "Chongjian Ge",
+    "Shilong Zhang",
+    "Yichen Li",
+    "Zhi-Ming Ma"
+  ],
+  "publishedAt": "2025-09-29",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2509.25050"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "diffusion RL",
+    "advantage weighting",
+    "flow matching",
+    "clean-target estimation"
+  ],
+  "abstract": "Reinforcement Learning (RL) has emerged as a central paradigm for advancing Large Language Models (LLMs), where both pre-training and RL post-training stages are grounded in the same log-likelihood formulation. In contrast, recent RL approaches for diffusion models, most notably Denoising Diffusion Policy Optimization (DDPO), optimize an objective different from the pretraining objectives--score/flow matching loss. In this work, we establish a novel theoretical analysis: DDPO is an implicit form of score/flow matching with noisy targets, which increases variance and slows convergence. Building on this analysis, we introduce Advantage Weighted Matching (AWM), a policy-gradient method for diffusion. It uses the score/flow-matching loss and reweights each sample by its advantage. In effect, AWM raises the influence of high-reward samples and suppresses low-reward ones while keeping the modeling objective identical to pretraining. This simple yet effective design yields substantial benefits: on the GenEval, OCR, and PickScore benchmarks, AWM delivers up to a $34\\times$ speedup over Flow-GRPO (which builds on DDPO), when applied to Stable Diffusion 3.5 Medium and FLUX, without compromising generation quality. Code is available at https://github.com/scxue/advantage_weighted_matching",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2509.25050v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2509.25050v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/scxue/advantage_weighted_matching"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2509.25050v2 全文及 2026-09-02T21:33:46.000Z 的审阅记录整理；PDF 24 页，SHA-256 4e8b236d7e824ebd9f728b1335d9b2e70d2add5fd202025ec3ddcc70d85df54b；原审阅已视觉核验第 1、6、7、8、9 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：Accepted at ICML 2026; updated to the camera-ready version",
+    "ideaZh": "AWM 的关键不是给 DDPO 调参，而是把 diffusion RL 改写为对最终样本做 advantage-weighted clean-target score/flow matching：理论上 DDPO 的 per-step likelihood 对应 noisy-target DSM，方差更大；工程上 AWM 解耦 rollout sampler 与训练 timesteps。作者报告在 SD3.5M/FLUX 的 GenEval、OCR、PickScore 上达到 6.82-34.67 倍 GPU-hour speedup，同时最终指标不低于 Flow-GRPO。",
+    "methodFlow": [
+      "从 rollout diffusion model 为每个 prompt 采样一组最终图像 x0",
+      "用任务 reward 计算组内相对 advantages，并选择 on-policy 或 EMA+importance-sampling rollout",
+      "对最终图像重新加噪得到 xt，用预训练一致的 clean-target score/flow-matching loss 计算梯度",
+      "以 advantage 对 matching loss 加权，并加入 velocity-space reference KL regularization",
+      "更新 diffusion model；sampling steps 与训练 Monte Carlo timesteps 可独立选择"
+    ],
+    "motivationZh": "Diffusion RL 的逐步 likelihood 优化与预训练 score/flow matching 不一致且方差较大；AWM 研究能否用最终样本的 reward 直接优化预训练形式的目标。",
+    "methodZh": "论文先在 fixed-time、population objective 与 frozen rollout policy 条件下，把 DDPO reverse-transition likelihood 等价到 noisy-target DSM，再证明 clean-target estimator 的条件方差更低。AWM 对每个 prompt 采样一组最终 images、计算 reward 和 group-relative advantage，把 clean x0 加噪后直接优化 advantage-weighted FM/DSM loss，并用 velocity-space KL 约束 reference model。实验覆盖 SD3.5 Medium 与 FLUX，奖励包含 compositional GenEval、OCR 和 PickScore。",
+    "experimentsZh": "实验设置：SD3.5M 与 FLUX，LoRA ranks 32/64，group size 24；任务为 GenEval、OCR、PickScore。AWM 采用 6 个 Monte Carlo timesteps、SA-Solver 14 steps、on-policy single-update batches，并与 Flow-GRPO/TempFlow-GRPO 比较 GPU hours。\n作者报告 AWM 在 SD3.5M OCR 上以 21.76 GPU hours 达 0.92，对比 Flow-GRPO 415.9 hours 达 0.89；在 FLUX OCR 上 40.3 hours 达 0.95，对比 343.6 hours 达 0.95。（Table 2, p. 8）\n作者报告 GenEval overall 0.985，高于 Flow-GRPO 的 0.95 与 TempFlow-GRPO 的 0.97，并给出 16.54 倍达到质量速度。（Table 1, p. 7）\n比较范围：核心对比是同类 DDPO-based Flow-GRPO 与 TempFlow-GRPO，并跨两个 backbone 和三个 rewards；尚未覆盖更多新 diffusion RL algorithms、统一 wall-clock implementation audit 或 human preference study。\n消融与诊断：Fig. 7-8 比较 Monte Carlo steps、rollout policy、KL beta 及 ODE/SDE sampler，支持 6 timesteps、on-policy 与 beta=1 的选取；附录还直接测量 clean/noisy target variance。",
+    "insightZh": "核心新意是把 DDPO 的 likelihood policy gradient 与 clean/noisy DSM 的 population minimizer和方差联系起来，并据此把 RL post-training 直接落回预训练的 score/flow matching objective，而非沿 reverse trajectory 做 per-step log-prob optimization。",
+    "whyRelevantZh": "它直接改变 image-generation 的 RL post-training objective，并对 diffusion/flow 训练效率与 sampler 解耦提供可迁移机制。",
+    "evidenceZh": "DDPO per-step likelihood 在作者设定下对应 noisy-target DSM；clean 与 noisy targets 共享 population minimizer，但 noisy target 条件方差更大。（Theorem 2.1, Lemma 2.2 and Theorem 2.3, pp. 4-5；理论页明确说明 fixed time、population level、oracle reverse process 与 discretization caveats。）\nAWM 用最终样本 reward/advantage 加权 clean-target FM loss，并以 velocity-space KL 约束 reference model。（Sec. 3, Fig. 4 and Algorithm 1, p. 6；方法图与伪代码已视觉核验，清楚显示 rollout、reward、re-noising 和 matching update。）\n作者报告 SD3.5M GenEval overall 达 0.985，相对 Flow-GRPO 达相同质量所需 GPU hours 的 speedup 为 16.54 倍。（Table 1 and Fig. 5, p. 7；所有数字为作者报告，本项目未独立复现。）\n作者报告 SD3.5M PickScore 用 27.56 GPU hours 达 23.11，而 Flow-GRPO 用 956.1 hours 达 23.01，对应 34.67 倍 speedup。（Table 2, p. 8；主结果表已视觉核验；speedup 是达到表中所列质量/训练点的作者口径，而非硬件无关复杂度。）",
+    "caveatZh": "理论等价在 fixed-time population objective、frozen rollout policy 与理想 joint law 下成立，实际 discretized reverse transition 还包含额外 bias。\nGPU-hour speedup 依赖实现、采样器、停止质量点和 reward pipeline，不能直接外推到任意 diffusion RL setup。\n评测集中在自动 compositional/OCR/preference proxy rewards，尚不能证明复杂 prompt、真实偏好与 reward hacking 下同样稳定。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

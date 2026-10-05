@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2603.09493",
+  "slug": "evoprompt-guided-prompt-evolution",
+  "title": "Guided Prompt Evolution for Vision-Language Models Adaptation",
+  "authors": [
+    "Enming Zhang",
+    "Jiayang Li",
+    "Yanlong Wang",
+    "Yanru Wu",
+    "Zhenyu Liu",
+    "Yang Li"
+  ],
+  "publishedAt": "2026-03-10",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2603.09493"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VLM adaptation",
+    "prompt tuning",
+    "low-rank trajectory",
+    "knowledge constancy"
+  ],
+  "abstract": "The adaptation of large-scale vision-language models (VLMs) to downstream tasks with limited labeled data remains a significant challenge. While parameter-efficient prompt learning methods offer a promising path, they often suffer from catastrophic forgetting of pre-trained knowledge. Toward addressing this limitation, our work is grounded in the insight that governing the evolutionary path of prompts is essential for forgetting-free adaptation. To this end, we propose EvoPrompt, a novel framework designed to explicitly steer the prompt trajectory for knowledge-preserving fine-tuning. Specifically, our approach employs a Modality-Shared Prompt Projector (MPP) to generate hierarchical prompts from a unified embedding space. Critically, an evolutionary training strategy decouples low-rank updates into directional and magnitude components, preserving early-learned semantic directions while only adapting their magnitude, thus enabling prompts to evolve without discarding foundational knowledge. Extensive experiments demonstrate that EvoPrompt achieves state-of-the-art performance in few-shot learning while robustly preserving the original zero-shot capabilities of pre-trained VLMs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.09493v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.09493v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2603.09493v3 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 10 页，SHA-256 41161d35d8bd3f60dbfa1a6bab86015ab019d22e21d73cd0a16927fedb113211；原审阅已视觉核验第 1、2、6、8 页。数字与比较均为作者报告，本项目未独立复现。原审阅仅确认作者承诺发布代码，不提供未确认的 Code link。",
+    "ideaZh": "EvoPrompt 将 VLM prompt tuning 的 catastrophic forgetting 解释为训练轨迹中的 representation drift，并用 modality-shared hierarchical projector、按阶段冻结的低秩方向/仅更新幅值以及 knowledge-constancy loss 约束演化；作者报告它在 CLIP ViT-B/16 的 base-to-novel、cross-dataset 和 domain-generalization 上稳定领先，但证据仍局限于分类型 CLIP adaptation。",
+    "methodFlow": [
+      "冻结 CLIP image/text backbones，以统一 learnable embedding 表示 prompt source",
+      "MPP 将共享 embedding 投影为视觉与文本多层 prompts，并用 shared matrix+low-rank adapters 降参数",
+      "训练到预设阶段后冻结已学方向并降低 rank，仅继续优化 magnitude 与新低秩分量",
+      "联合 contrastive classification loss 与 knowledge-constancy loss，输出适配后 prompt model"
+    ],
+    "motivationZh": "VLM prompt tuning 的后期 representation drift 会损害预训练知识和泛化；EvoPrompt 研究如何约束跨层、跨模态 prompt 的优化轨迹。",
+    "methodZh": "MPP 从统一 embedding 为视觉/文本 encoder 多层生成 prompts，并以 shared base matrix 加 layer-specific low-rank adapters 建模层间共同与局部信息。Evolutionary Trajectory strategy 在预设 epochs 降 rank 并冻结早期 directional matrices，后续只学 magnitude coefficients；knowledge constancy loss 将 adapted features 锚定在 frozen CLIP semantic space。作者在 11 个 base-to-novel datasets、10 个 cross-dataset targets 与 4 个 ImageNet shifts 上报告提升和效率，但未验证生成式 MLLM 或更大 foundation models。",
+    "experimentsZh": "实验设置：CLIP ViT-B/16 backbone、16-shot default、单 A800、三随机种子；覆盖 11-dataset base-to-novel、ImageNet→10 datasets cross-transfer、ImageNet-V2/Sketch/A/R domain generalization 与 1/2/4/8/16-shot curves。\n作者报告 cross-dataset target average 为 67.41%，高于 MMA 66.61% 与 MaPLe 66.30%。（Table II, p. 6）\n作者报告 full EvoPrompt 在 component ablation 中达到 HM 74.92%，相对 baseline 70.88 提升 4.04 points。（Table IV, p. 7）\n比较范围：比较 CoOp/CoCoOp/ProDA/KgCoOp/MaPLe/PromptSRC/ProVP/MetaPrompt/TCP/MMA，并排除使用外部 LLM prompt priors 或全量 unlabeled distillation 的方法；覆盖面合理但范围限定为 CLIP classification adaptation。\n消融与诊断：有 MPP、shared+low-rank、trajectory training、rank reduction 与 knowledge constancy 的 cumulative ablation，另做 loss weight 和训练动态分析；由于不是完全 factorial design，组件交互仍不清楚。",
+    "insightZh": "相较只约束最终 prompt/feature，EvoPrompt 把 prompt optimization trajectory 本身结构化：跨层/跨模态共享、方向冻结与幅值适配共同抑制后期过拟合，这比普通 regularization 更明确地控制学习路径。",
+    "whyRelevantZh": "它直接推进 VLM parameter-efficient adaptation 与跨域能力保持，对需要小数据定制视觉/设计模型的场景有方法迁移价值。",
+    "evidenceZh": "MPP 由 modality-specific shared matrix 与 layer-wise low-rank adapters 生成 hierarchical prompts。（Sec. III-B, Eqs. 5-7, pp. 3-4; Fig. 2, p. 2；结构图和公式说明 shared/common 与 layer-specific components。）\nEvolutionary strategy 分阶段降低 rank、冻结历史 directional updates，并以 magnitude coefficients 保留后续可适配性。（Sec. III-C and Algorithm 1, pp. 4-5；该训练轨迹控制是论文主要机制。）\n作者报告 11-dataset base-to-novel 平均 Base/Novel/HM 为 85.90/78.35/81.95，HM 比所列最佳 baseline 高 1.82 points。（Table I and Sec. IV-C, p. 6；数字为作者报告，使用 CLIP ViT-B/16 与标准 few-shot protocol。）\n作者报告 cumulative ablation 从 baseline HM 70.88 提升到 full-model 74.92，其中 MPP 与 knowledge-constancy loss 分别带来最大单步收益之一。（Table IV and Sec. IV-G, p. 7；消融为作者报告、未独立复现，且各组件按累积顺序加入。）",
+    "caveatZh": "全部主实验围绕 CLIP ViT-B/16 few-shot image classification，尚不能证明可扩展到生成式 MLLM、video VLM 或更大视觉 backbone。\nRank-reduction epochs 与方向冻结策略包含手工 schedule，跨任务敏感性验证有限。\n论文只承诺接收后发布 code/models，当前不可核验实现。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

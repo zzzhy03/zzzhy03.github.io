@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.01607",
+  "slug": "native-unified-multimodal-understanding-generation-synergy",
+  "title": "Uncovering Understanding-Generation Synergy in Native Unified Multimodal Models: From Representation, Task to System",
+  "authors": [
+    "Penghao Wu",
+    "Haiwen Diao",
+    "Weichen Fan",
+    "Lewei Lu",
+    "Dahua Lin",
+    "Ziwei Liu"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01607"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "native UMM",
+    "understanding-generation synergy",
+    "task-decoupled MoT",
+    "controlled comparison"
+  ],
+  "abstract": "While unified multimodal models (UMMs) jointly perform visual understanding and generation within a single model, functional unification does not guarantee learning synergy: the two objectives may reinforce each other, compete for capacity, or merely coexist. We investigate their relationship at the representation, task, and system levels in a controlled, structurally native setting without pretrained vision priors. At the representation level, we find that each objective provides useful signal to the other: generation enriches the visual features learned for understanding, while understanding strengthens vision--language alignment for generation. However, when both objectives are forced through the same computation path, one tends to dominate. A task-decoupled architecture that specializes conflicting visual computation while preserving semantic interaction avoids this asymmetric degradation. At the task level, through three case studies, we find positive bidirectional transfer when understanding and generation tasks rely on shared knowledge. At the system level, we show that an end-to-end UMM outperforms a matched planner--executor pipeline on complex tasks that explicitly require both image understanding and generation. Together, these results show that the value of UMMs extends beyond a unified interface: appropriate specialization, shared task knowledge, and end-to-end optimization can turn coexistence into synergy.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01607v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01607v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01607v1 全文及 2026-09-02T21:30:00.000Z 的审阅记录整理；PDF 23 页，SHA-256 e2649edf34bcb1a69ca7c488e78dbfd7000a693a840e89ae582b47dd35725168；原审阅已视觉核验第 1、4、5、10、11、12 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。",
+    "ideaZh": "这篇工作用同一底座、数据与训练预算把 unified multimodal model 拆到 representation/task/system 三层：生成监督能增强 understanding 表示，理解监督能增强生成的 vision-language alignment，但共享路径会发生一方支配；task-decoupled MoT 通过保留语义交互并专门化冲突视觉计算缓解这一不对称。作者报告双向迁移与端到端 reasoning-editing 优势，本项目未复现。",
+    "methodFlow": [
+      "把 clean image、noised image 与 text token 接入同一 native UMM 训练框架",
+      "对比 dense sharing、modality-decoupled 与 task-decoupled visual routing",
+      "在 geometry、SVG 与 3D spatial intelligence 上测试 understanding-generation 双向迁移",
+      "用 matched reasoning-intensive image editing 比较端到端 UMM 与 planner-executor"
+    ],
+    "motivationZh": "Understanding 与 generation 共享同一 native multimodal backbone 时，知识协同与计算冲突可能同时发生；该研究通过受控 representation、task 与 system 实验分离两者。",
+    "methodZh": "论文在无预训练 vision encoder 的 native UMM 中比较 dense sharing、modality-decoupled MoT 与 task-decoupled MoT，再用 geometry、SVG、3D spatial intelligence 三组任务检查共享知识的双向迁移，最后将 end-to-end UMM 与同初始化/同数据的 planner-executor pipeline 对照。证据支持“协同取决于架构和共享知识”，不支持 task-decoupling 是唯一最优设计。",
+    "experimentsZh": "实验设置：表示层用 SenseNova-U1 的 understanding/generation data 与 matched training；任务层覆盖 geometry、SVG、3D SI；系统层使用 RISEBench 与 KRIS-Bench 的 matched planner/executor。\n作者报告 task-decoupled MoT 在 Table 1 同时达到 understanding 69.02/72.09/62.38 与 generation 63.96/82.31/7.90/5.50，避免前两种 routing 的单侧退化。（Table 1, p. 5）\n作者报告 end-to-end UMM 在两个 reasoning-intensive editing benchmark 的 overall 均高于 matched pipeline。（Table 6, p. 11）\n比较范围：覆盖三种 sharing/routing 设计与 matched modular pipeline；未穷举 fully discrete/autoregressive 之外的 formulation 或更广的 conditional architecture。\n消融与诊断：routing 结构对照、task data control 和 planner/executor matched initialization 支持内部归因；仍缺更广规模、模型家族与多种统一架构验证。",
+    "insightZh": "新意不只是统一接口，而是用受控架构、任务与系统实验区分表示互补和计算冲突，并给出“保留语义交互、专门化冲突视觉路径”的设计证据。",
+    "whyRelevantZh": "直接回答 VLM/MLLM 中 understanding 与 generation 是否真正协同，并把 SVG、3D spatial intelligence 与 reasoning editing 纳入可迁移的统一模型设计证据。",
+    "evidenceZh": "Dense 与 modality-decoupled sharing 分别出现 understanding 或 generation 支配，而 task-decoupled routing 同时保留两类能力。（Sec. 3.1-3.4, Fig. 2 and Table 1, pp. 4-6；架构图与同预算表格已由 exact PDF 的渲染页和 layout text 交叉核验。）\n作者报告 3D spatial intelligence 联合训练把 understanding 平均分从 57.15 提到 59.01，并同时改善 Spatial-Edit 与 view-sequence completion 指标。（Sec. 4.3, Tables 4-5, p. 10；数字为作者报告；本项目没有训练模型或复现实验。）\n作者报告 matched end-to-end UMM 在 RISEBench overall 18.88 对 16.66、KRIS-Bench overall 68.33 对 66.48，优于 planner-executor。（Sec. 5.1-5.2, Table 6, pp. 10-11；对照固定同一 checkpoint 和数据格式，但只覆盖两个 reasoning-editing benchmark。）\n结论受当前 continuous autoregressive image-token formulation 与有限 architecture search 约束。（Sec. 7 Limitations, p. 12；作者明确未广泛探索其他 unified architectures，不能外推唯一最优。）",
+    "caveatZh": "实验集中在 continuous autoregressive image-token formulation。\n未广泛探索更大的统一架构设计空间与 sharing-specialization 最优平衡。\n多组训练数据与 benchmark 均由作者设定，协同幅度可能随 model/data scale 改变；所有数字为作者报告。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

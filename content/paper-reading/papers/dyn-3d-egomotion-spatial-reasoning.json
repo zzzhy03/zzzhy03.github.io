@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2609.01059",
+  "slug": "dyn-3d-egomotion-spatial-reasoning",
+  "title": "Dyn-3D: Unveiling and Resolving Ego-Motion Ambiguity in Vision-Language Models",
+  "authors": [
+    "Jiayu Ding",
+    "Zhuodong Liu",
+    "Lei Zhang",
+    "Manyu Xiong",
+    "Hongbo Jin",
+    "Haoran Tang",
+    "Hongbo Zhang",
+    "Changen Zhu",
+    "Wenbo Xing"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01059"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "3D spatial reasoning",
+    "ego-motion",
+    "counterfactual video",
+    "kinematic rewards"
+  ],
+  "abstract": "As Vision-Language Models (VLMs) tackle dynamic 3D spatial reasoning, ego-motion perception becomes essential to resolve monocular scale ambiguity. However, current models often overfit to smooth trajectory priors rather than genuinely understanding physical motion. Consequently, their spatial reasoning degrades severely under large displacements, a phenomenon we term Kinematic Collapse. This failure stems from spurious visual-motion correlations in natural videos and a lack of explicit physical supervision. To evaluate this, we introduce Dyn-3D, a benchmark using counterfactual 3D rendering to rigorously decouple visual changes from true kinematic properties. Furthermore, we propose the TempoVista framework, featuring the Kinematic-GSPO algorithm. By embedding metric physical ground truth into policy optimization, TempoVista explicitly grounds visual representations in 3D space. Experiments demonstrate that our approach significantly improves both motion estimation and robust spatial reasoning by utilizing camera dynamics as an effective geometric calibration signal.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01059v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01059v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/InkMind-AI/Dyn-3D"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01059v1 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 21 页，SHA-256 5989b3648e5810065a54704358b80890ca6af2f7c3524f4a68b8890bf74b38de；原审阅已视觉核验第 1、4、9、10、12 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。",
+    "ideaZh": "Dyn-3D 把 video VLM 的 3D spatial reasoning 失败定位为 ego-motion/metric scale ambiguity：用 3DGS 反事实轨迹解耦视觉变化与真实 rotation/translation，再以 scene-derived camera kinematics 对 reasoning trace 做 process reward；作者报告两种 8B VLM 都显著提升，但 oracle SE(3) frame selection、合成室内轨迹和外部 benchmark 上较小且不完全一致的增益，是必须保留的边界。",
+    "methodFlow": [
+      "从 ScanNet++ 重建 3DGS，并控制 camera trajectory 生成视觉路径相似但运动学不同的 counterfactual videos",
+      "从 camera poses/objects 提取 metric 3D metadata，确定性生成并验证 kinematic/spatial/trajectory questions",
+      "以 SE(3) geodesic greedy FPS 选择覆盖 motion trajectory 的关键帧",
+      "在 SFT 后用 Kinematic-GSPO 联合 answer、format 与五项 physical-process rewards 优化 VLM reasoning"
+    ],
+    "motivationZh": "Video VLM 容易混淆视觉变化、相机 ego-motion 与真实 metric motion；Dyn-3D 用可控 3DGS counterfactual trajectories 和物理过程奖励分离这些因素。",
+    "methodZh": "论文从高 displacement 下的 kinematic collapse 与 rotation/translation confusion 出发，基于 ScanNet++ scenes 重建 3DGS，生成 slow/fast/smooth、pure rotation 与 pure translation counterfactual videos，并由结构化 3D metadata 确定性生成 19 类问题。TempoVista 用 SE(3) geodesic farthest-point sampling 选帧，再以 Kinematic-GSPO 对 path length、displacement、direction、rotation 和 speed 五项 reasoning trace 注入过程奖励。Dyn-3D 上两类 base models 均提升，VSI-Bench transfer 对 Qwen3-VL 较明显、对 InternVL 较弱。",
+    "experimentsZh": "实验设置：Dyn-3D test 含 167 scenes、835 rendered videos、16,063 four-option questions；Dyn-3D-Instruct 含 9,600 SFT 与 24,000 RL samples。TempoVista 分别基于 InternVL-3.5-8B 和 Qwen3-VL-8B，并在 VSI-Bench selected MCQ tasks 上做 transfer。\n作者报告 Qwen3-VL TempoVista 在 Dyn-3D kinematic/spatial/trajectory/overall 分别为 62.6/58.3/81.8/61.2%，相对 base 提升 11.6/10.7/10.4/10.9 points。（Table 3, p. 10）\n作者报告 Kinematic-GSPO 相对 Base GSPO 额外提升 1.6 points（InternVL）和 1.1 points（Qwen3-VL），oracle sampling 相对 uniform 各提升 1.5 points。（Tables 5-6, p. 12）\n比较范围：Benchmark 比较 GPT-4o/Qwen-VL-Max 与多种 open VLM；训练方法在两个 8B model families 上验证，并测试 VSI-Bench transfer。缺少真实相机轨迹、outdoor/dynamic-object 场景和不依赖 oracle pose 的完整部署评测。\n消融与诊断：分别比较 SFT、Base GSPO、Kinematic-GSPO，以及 uniform、flow proxy、oracle SE(3) sampling；证明 process reward 有增益，但大部分总提升仍来自普通 GSPO，且 oracle camera pose 在真实应用中未必可得。",
+    "insightZh": "相比只在自然视频上评测空间 QA，Dyn-3D 显式干预 camera kinematics 并让 visual path 与 physical motion 解耦；训练上也不只奖励最终答案，而是把可验证的 metric camera-motion quantities 写入 reasoning process reward。",
+    "whyRelevantZh": "它直接推进 VLM 的 dynamic 3D/metric spatial reasoning，并把可控 3D rendering 转化为模型诊断与 physical process supervision。",
+    "evidenceZh": "Dyn-3D 以 counterfactual 3DGS rendering 构造 smooth/fast/slow、pure rotation 与 pure translation 轨迹，并由 3D metadata 生成答案。（Secs. 4.1-4.3, pp. 6-7; Fig. 1, p. 4；全文给出 scenes、frame counts、trajectory definitions 与多层质量控制。）\nKinematic-GSPO 对 reasoning trace 的 path length、displacement magnitude/vector、rotation angle 与 average speed施加物理一致性 reward。（Sec. 5.2, Eqs. 3-5, pp. 9-10；过程监督来自 scene-derived kinematic annotations，不只是答案 reward。）\n作者报告 Qwen3-VL-8B + TempoVista 在 Dyn-3D overall 从 50.3% 提升至 61.2%，InternVL-3.5-8B 从 50.6% 提升至 57.1%。（Table 3 and Sec. 6.3, pp. 10-11；数字为作者报告、未独立复现；test scenes 与 trajectories 声称和训练严格分离。）\n作者报告在 VSI-Bench 上 Qwen3-VL overall 提升 4.3 points，而 InternVL 仅提升 0.6 points且 relative-direction 降 0.5 points。（Table 4 and Sec. 6.4, p. 11；外部迁移收益明显依赖 base model 与 task。）",
+    "caveatZh": "Benchmark 基于 ScanNet++ 室内场景的 3DGS counterfactual rendering，真实视频中的 motion blur、动态物体和未知 metric scale 未覆盖。\n采用 ground-truth/oracle SE(3) trajectories 做选帧；flow proxy 反而弱于 uniform，说明无 camera pose 时的实用路径尚未解决。\nVSI-Bench transfer 对 InternVL 增益仅 0.6 points且有子任务下降，不能把 Dyn-3D 内增益外推为通用 spatial reasoning 提升。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

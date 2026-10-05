@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2609.01006",
+  "slug": "figtree-recursive-editable-scientific-figures",
+  "title": "Figures as Programs: Recursive Generation of Editable Scientific Figures",
+  "authors": [
+    "Yepeng Liu",
+    "Dasen Dai",
+    "Chengzhi Liu",
+    "Yiren Song",
+    "Hai Ci",
+    "Yu Zhang",
+    "Qi Zhang",
+    "Mike Zheng Shou",
+    "Xin Eric Wang",
+    "Yuheng Bu"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01006"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "2d-design",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "SVG program synthesis",
+    "scientific figures",
+    "layout tree",
+    "localized repair"
+  ],
+  "abstract": "Scientific methodology figures are essential for communicating complex methods clearly, yet creating them remains labor-intensive and typically requires multiple rounds of refinement. Recent image-generation models can synthesize visually appealing raster figures, but producing a human-satisfactory result in a single generation step remains difficult. Moreover, precise edits to raster figures are challenging for both humans and models. We formulate scientific figure generation as recursive SVG program construction and propose \\textsc{FigTree}, a \\textit{multi-agent} system that automatically transforms a scientific paper into a structured vector figure. \\textsc{FigTree} grounds figure content in the source paper, decomposes a figure into a hierarchy of local regions, generates each region as a short SVG program, and assembles the resulting fragments. A render-critic refinement loop jointly inspects the rendered figure and its underlying program, enabling visual defects to be traced to specific statements and accurately repaired. We conduct extensive evaluations of \\textsc{FigTree} on figure quality and editability, showing that \\textsc{FigTree} produces high-quality figures, while also enabling more effective editing than existing raster-based methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01006v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01006v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yepengliu/FigTree"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01006v1 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 24 页，SHA-256 fddd6aa817c5fef06478c863bcafcb68aa349215aa2d954da8b18c72811e2d1a；原审阅已视觉核验第 1、3、7、9 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。",
+    "ideaZh": "FigTree 把 academic methodology figure 从“一次生成整张图”改写为可审计的递归 SVG program synthesis：grounder 先限制内容边界，layout tree 将长程序分解成局部 fragments，parent-owned ports 管跨区连线，render critic 同看代码与渲染后原位修复；作者报告在 292 个案例上显著胜过 raster/vector baselines，但自动 VLM judge、专有模型与单一 ML 论文域仍限制证据强度。",
+    "methodFlow": [
+      "Grounder 从论文提取 paper-supported content plan、components/data flow/notation 与 global style",
+      "将目标图表示为带 canvas、ports、depth 和 style 的 layout tree，递归分解到 atomic SVG fragments",
+      "Leaf agents 画局部程序，parent 根据 returned bounding boxes/ports 合并并负责跨边界 connections",
+      "Render critic 联合检查 SVG code 与 rasterized output，按 verification memory 定位并局部修复 defects"
+    ],
+    "motivationZh": "一次生成长 SVG methodology figure 容易产生坐标耦合、连线错误和全局重写；FigTree 用语义 grounding、递归布局树、局部程序与 render critic 处理长链设计。",
+    "methodZh": "系统把论文方法文本转换为 content plan 与 global style，再建立 layout tree；每个 node 要么直接画短 SVG fragment，要么拆成 2-4 个 child tasks，children 通过 bounding boxes/ports 向上返回，parent 统一放置与连接。Critic 同时检查 SVG code 和 rendered image，依据离线 verification memory 定位 defect 并做局部 edit，未修复问题会上传给 ancestor。PaperBananaBench reference-based、八维 diagnostic、组件消融与 8 轮 iterative-editing 都支持结构化 vector 路径的优势。",
+    "experimentsZh": "实验设置：主要在 PaperBananaBench 的 292 个 NeurIPS 2025 methodology-figure cases 上测试，只给 method text 与 caption，作者图仅作 reference。Baselines 包含 5 个 raster generators、PaperBanana/Crafter agents、AutoFigure-Edit 与同 backbone Direct-SVG。\n作者报告 FigTree overall score 59.59%，高于 Crafter 50.00%、PaperBanana 35.96% 与 Direct-SVG 3.77%。（Table 1, p. 7）\n作者报告 8 轮 iterative editing 后 FigTree quality 为 8.46，高于 GPT-Image-2 raster branch 的 7.85，并接近原图 8.51。（Fig. 2 and Sec. 4.4, p. 9）\n比较范围：有 raster、agentic raster、editable vector 与 same-backbone Direct-SVG，能隔离 recursion/repair 的影响；但模型均为专有或快速变化版本，benchmark 只覆盖 ML methodology figures。\n消融与诊断：移除 render critic、parent-owned connections、paper grounding、recursive decomposition 和 verification memory；verification memory 的降幅最大。消融较完整，但未报告 agent-call variance、失败率分布或人工 blind evaluation。",
+    "insightZh": "主要创新是将 editable figure generation 的 long-horizon code problem 显式分层：语义分解、port-based composition、parent-owned connections 与 dual-space localized repair 共同避免单次长 SVG 生成的坐标耦合和全局重写。",
+    "whyRelevantZh": "它同时直接命中 structured/editable 2D representation 和会规划、生成、观察渲染并修复 artifact 的 visual design agent。",
+    "evidenceZh": "FigTree 用 layout tree 递归生成短 SVG fragments，children 暴露 ports 而跨 child connections 由 parent 唯一负责。（Secs. 3.1-3.3 and Fig. 1, pp. 3-5；该 ownership 规则避免 sibling 重复连边并限制局部坐标错误传播。）\nCritic 同时读取 SVG program 与 rendered image，并按 defect anchors 原位修改单个元素，而非重生成整张图。（Sec. 3.4, p. 5；Verification memory 来自 AutoFigure-Edit Bench 的离线 defect-repair rules。）\n作者报告 FigTree 在 PaperBananaBench 的 faithfulness/conciseness/readability/aesthetics 为 46.23/64.38/51.37/66.78，overall 59.59，比最强 baseline 高 9.59 points。（Table 1 and Sec. 4.2, p. 7；结果为作者报告、未独立复现；评分由 VLM pairwise protocol 产生。）\n作者报告移除 verification memory 后 overall 从 8.38 降至 4.43，移除 grounding 或 recursion 分别降至 5.91 与 6.27。（Table 3 and Sec. 4.3, p. 8；组件消融支持 verification/grounding/recursion，但仍使用自动 judge。）",
+    "caveatZh": "Reference-based 与 diagnostic scores 主要由 VLM judge 产生，缺少规模匹配的人类双盲评测与 inter-rater reliability。\nClaude Sonnet 4.6/Gemini 3.1 Pro 等专有模型版本、价格和策略变化会影响可复现性。\n只测试 NeurIPS-style methodology figures，复杂数学排版、领域图示和 publication workflow 的泛化尚未证明。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.01276",
+  "slug": "reself-egocentric-world-self-reconstruction",
+  "title": "Seeing the World and the Self from Egocentric Video",
+  "authors": [
+    "Kai Guan",
+    "Minchao Jiang",
+    "Ruichen WangLi",
+    "Wentao Zhu",
+    "Lei Zhang"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01276"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "egocentric reconstruction",
+    "human motion diffusion",
+    "metric geometry",
+    "kinematic feedback"
+  ],
+  "abstract": "Complete 3D perception from egocentric video requires recovering the surrounding scene and the wearer's full-body motion in a shared metric frame. Existing methods typically address scene reconstruction and motion estimation separately: scene reconstruction methods ignore the wearer, whereas motion estimation methods lack explicit scene geometry and often depend on external trajectories. Joint recovery is challenging because the two tasks exhibit asymmetric visibility and require different prediction paradigms. The largely visible scene supports deterministic geometric regression, whereas the severely occluded body requires generative motion inference. We therefore propose RESELF (REconstructing the Scene and the sELF), a unified framework that couples deterministic metric geometry reconstruction with geometry-conditioned motion generation. RESELF adapts a geometry foundation model pre-trained on large-scale exocentric data to egocentric video using frame-wise scale and relative-pose consistency objectives. The resulting camera trajectory and latent geometric features condition a diffusion model that recovers the wearer's motion. A subsequent closed-loop kinematic feedback stage further refines the camera head while preserving the reconstructed scene geometry. To support training and evaluation, we curate EE4D-JSM from EgoExo4D by aligning egocentric video, sparse metric scene geometry, camera trajectories, and full-body motion annotations. Experiments show that RESELF outperforms state-of-the-art methods designed for the individual tasks across depth estimation, camera tracking, and full-body motion estimation. Code, models, and datasets will be available at https://ka1guan.github.io/RESELF/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01276v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01276v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01276v1 全文及 2026-09-02T21:36:00.000Z 的审阅记录整理；PDF 13 页，SHA-256 715cbb45245e6e911bdd68237b028192b5990a8e77160359d1f61967cb0ae97c；原审阅已视觉核验第 1、3、6、7 页。数字与比较均为作者报告，本项目未独立复现。原审阅仅确认作者承诺发布代码，不提供未确认的 Code link。",
+    "ideaZh": "RESELF 把 egocentric scene reconstruction 的 self-blind 与 motion estimation 的 world-blind 合并：ego-adapted Pi3X 恢复 metric scene/camera，geometry features 与 trajectory 条件化 diffusion motion head，body kinematics 再反馈校正 camera。作者在新 EE4D-JSM 上报告 scene、camera 与 full-body motion 同时改善；但聚焦单一数据源/人类场景，dataset 与 code 仍未发布。",
+    "methodFlow": [
+      "从 monocular egocentric frames 用 ego-adapted Pi3X 恢复 metric point maps 与 camera trajectory",
+      "以 frame-wise scale/relative-pose losses 稳定动态场景 geometry",
+      "将 trajectory 与 pooled geometry condition 输入 diffusion motion head 恢复 full-body motion",
+      "把 reconstructed body kinematics 反馈到 camera head，闭环细化 world-self alignment"
+    ],
+    "motivationZh": "Egocentric scene reconstruction 看不到完整身体，人体 motion estimation 又缺可靠世界坐标；RESELF 用共享 metric frame 将两者连接并闭环细化相机。",
+    "methodZh": "框架用 frame-wise metric scale 和 relative-pose consistency 适配 exocentric geometry foundation model，再以 attention-pooled geometry 和 metric trajectory 驱动 motion diffusion，最后用 closed-loop kinematic feedback 只更新 camera head。作者从 EgoExo4D 对齐 16,807 train/5,212 test sequences；controlled ablations 支持各连接，但缺跨数据集与实时成本。",
+    "experimentsZh": "实验设置：EE4D-JSM 从 EgoExo4D 对齐 scene point cloud、camera 与 SMPL-X motion；比较 VGGT/CUT3R/Pi3X/EM4D 与 EgoEgo/EgoAllo/UEM，测 trajectory/depth/body/hand/head metrics。\n作者报告 RESELF 在可比 camera/depth 与 body/hand/head metrics 上取得最好结果，包括 ATE=0.012 与 MPJPE=109.8 mm。（Tables 1-2, pp. 5-6）\n比较范围：覆盖 scene geometry 与 egocentric motion 两侧代表 baseline，并做相同 split retraining；但数据集来自单一来源，部分 head-trajectory protocol 不完全可比。\n消融与诊断：Tables 3-5 分离 scale/pose objectives、geometry condition、trajectory 与 closed-loop feedback；feedback 结果跨三次 run 平均，但缺跨 dataset/compute ablation。",
+    "insightZh": "新意是以共享 metric frame 和双向 condition/feedback 把确定性 scene geometry 与生成式 occluded-body motion 组成联合系统，而不是继续独立处理两项任务。",
+    "whyRelevantZh": "联合 metric 3D scene 与 generative human motion，为 dynamic reconstruction 和 geometry-conditioned generation 提供可迁移设计。",
+    "evidenceZh": "RESELF 由 geometry backbone、motion head 与 motion-to-camera feedback 组成，在共享 metric frame 联合输出 scene、camera 和 body motion。（Sec. 3, Fig. 2, p. 3；方法图和 loss 定义已从 exact PDF 核验。）\n作者报告在 similarity alignment 下 ATE=0.012、Abs-R=0.125；absolute metric 下相对 Pi3X 将 RPE-t 从 0.019 降至 0.010。（Sec. 4.2, Table 1, p. 5；所有 baseline 在新 benchmark 上按作者设置微调。）\n作者报告相对 UEM 将 MPJPE 116.1→109.8 mm、H-MPJPE 184.2→174.6 mm、HTE 65.9→50.1 mm。（Table 2 and Sec. 4.2, p. 6；部分 baseline 使用 ground-truth-derived head trajectory，表中并非所有指标完全可比。）\nAblation 显示 geometry feature、trajectory 与 feedback 各自有益，但证据局限于 EE4D-JSM。（Tables 3-5 and Sec. 4.4, p. 7；跨设备、活动和 dataset 的泛化尚未验证。）",
+    "caveatZh": "EE4D-JSM 与代码/模型将在发表后公开，当前不可验证复现。\n只在 EgoExo4D-derived split 上验证；人类 motion、动态遮挡和 heavy diffusion inference 的跨域/效率边界未充分讨论。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

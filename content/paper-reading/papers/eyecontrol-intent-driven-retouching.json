@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2609.01148",
+  "slug": "eyecontrol-intent-driven-retouching",
+  "title": "Dotting the Eye: An Intent-Driven Image Retouching Agent for Visual Focus Enhancement",
+  "authors": [
+    "Chujie Qin",
+    "Zilong Zhang",
+    "Zewei Chang",
+    "Chunle Guo",
+    "Ruixing Wang",
+    "Tao Hu",
+    "Ming-Ming Cheng",
+    "Chongyi Li"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01148"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "image-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual focus",
+    "image retouching",
+    "intent masks",
+    "planner-executor"
+  ],
+  "abstract": "Image retouching is commonly formulated as enhancing overall visual quality through color adjustment, but in practice, it also serves to emphasize visual focus by guiding viewers' attention toward a specific subject or region. Achieving such focus-oriented retouching is inherently challenging, as it requires well-coordinated global and local adjustments to manipulate perceptual saliency while maintaining visual naturalness. This intricate process typically demands substantial professional expertise. In this study, we propose EyeControl, a MLLM-driven agent with a diffusion-based retouching executor that enables visual focus enhancement under weak user intent. With only a few clicks or coarse strokes, EyeControl directs visual attention to the intended region, effectively \"dotting the eye\" of the image. The core idea is to explicitly link the weak user intention with the target editing region and the corresponding tonal adjustment operations during retouching. To achieve this, the system first interprets the intent and image content to infer the visual focus and generate structured intent guidance for the retouching executor. Second, the retouching executor is encouraged to respond more strongly to the target region, explicitly aligning its attention map with a designed pseudo-intent map. We also introduce an operation-consistency constraint to improve coordination between global and local adjustments, achieving more natural and coherent retouching. Additionally, we contribute ControlArt-Bench, a high-quality evaluation dataset for visual focus enhancement. Extensive evaluations demonstrate that EyeControl yields perceptually appealing results with stronger intent alignment. Code can be found in https://github.com/DragonisCV/EyeControl.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01148v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01148v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/DragonisCV/EyeControl"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01148v1 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 31 页，SHA-256 96eebe32a890215bb7662757c615597fb8460b60cc09d928888e9f0c1b3e7191；原审阅已视觉核验第 1、6、11、28 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：Accepted to the European Conference on Computer Vision (ECCV) 2026",
+    "ideaZh": "EyeControl 把“想让哪里成为视觉焦点”从模糊点击/笔划转成可执行的 global/local retouching guidance：MLLM planner 负责 scene/intent reasoning，diffusion executor 以专门 mask projections、pseudo-intent attention alignment 与 operation-consistency loss 落地并支持多轮 refinement；结果有用户研究支撑，但评测仍部分依赖 MLLM metrics，且强构图先验会阻碍反常规焦点重定向。",
+    "methodFlow": [
+      "用户以点击、笔划或区域标记给出弱空间意图，可附加自然语言",
+      "MLLM planner 执行 scene parsing、intent reasoning、mode selection，并拆成 global/local guidance",
+      "Diffusion executor 以 image、intent mask 与 guidance 为条件，通过 LPAA 对齐 pseudo-intent saliency",
+      "OC-loss 协调 global/local 多轮操作，返回 retouched image 并允许下一轮交互"
+    ],
+    "motivationZh": "用户给出的点击或笔划往往只表达弱视觉焦点意图；EyeControl 研究如何将这种意图转成结构化 retouching guidance，并在 diffusion attention 中落实。",
+    "methodZh": "系统先由 planner 解析全局场景、目标区域和弱用户意图，选择 Global/Local/Focus mode 并生成拆分 guidance，再由基于 FLUX.1-Kontext 的 retouching executor 联合 image、mask 和 text conditions 生成结果。训练数据从专业 retouching pairs 的 saliency difference 提取焦点，经过 human validation 和 interaction augmentation；executor 通过 LPAA 让 mask 拥有独立 QKV projection，并让 attention 对齐 pseudo-intent map，同时用 OC-loss 稳定 global/local 操作顺序。ControlArt-Bench、50 人偏好研究与跨数据集实验显示方法有效，但无法任意对抗原图 dominant composition。",
+    "experimentsZh": "实验设置：主要使用作者构建的 ControlArt-Bench，比较 JarvisArt/JarvisEvo/PerTouch、UniWorld-v2、Step1X-Edit、FLUX.1-Kontext、Qwen-Image-Edit、GPT-Image-1.5 和 Nano-Banana 2；另在 MIT-Adobe FiveK、MMArt-Bench 与 multi-round setting 上做 ablation，并招募 50 人偏好评测。\n作者报告 EyeControl 在 ControlArt-Bench 获得最高 PSNR 21.8845、SSIM 0.8517 与 overall score 8.7054，并在若干 saliency 指标接近或优于商业模型。（Table 1, p. 11）\n作者报告加入 OC-loss 后 global PSNR/SSIM 从 17.75/0.7657 提升到 23.34/0.800，四场景平均 PSNR/SSIM 达 24.17/0.8587。（Table 2 and Sec. 4.3, pp. 13-14）\n比较范围：覆盖 retouching agents、open-source diffusion editors 与商业系统；为适配对手，作者提供与意图对齐的长指令和 bounding-box 描述，但 proprietary model 可复现性与版本稳定性有限。\n消融与诊断：Table 2 逐步加入 Planner、PAA 与 OC-loss；PAA 主要改善 focus/local setting，OC-loss 显著改善 global 与 multi-round consistency，但若干 focus metrics 并非单调提升。",
+    "insightZh": "新意不在普通 tone adjustment，而在将弱空间意图显式连接到 planner 的结构化操作与 diffusion attention supervision：LPAA 把意图 mask 从普通空间条件变成 prominence redistribution signal，OC-loss 则约束多轮操作路径一致性。",
+    "whyRelevantZh": "它确实让 agent 解释用户视觉意图、选择编辑模式并操作 raster artifact，连接了 visual design agent、controllable editing 与 perceptual saliency。",
+    "evidenceZh": "EyeControl 由交互界面、VLM planner 和 diffusion retouching executor 构成，结果可再次送回系统做后续交互。（Sec. 3.1 and Fig. 3, pp. 5-6；方法图明确呈现 intent planning、mode selection、executor training 与 NEXT TOUCH 回路。）\nLPAA 为 intent mask 设置独立 projections 并用 pseudo-intent map 监督 attention，OC-loss 约束 global/local 操作顺序。（Sec. 3.3, Fig. 3, pp. 7-10；这是区别于把 mask 仅作空间条件的核心机制。）\n作者报告 EyeControl 在 ControlArt-Bench 的 PSNR/SSIM 为 21.8845/0.8517，Focus Alignment 为 8.2100，整体 O 为 8.7054。（Table 1, p. 11；数字为作者报告、未独立复现；不同指标由 reference、saliency 与 MLLM evaluator 混合构成。）\n作者报告 50 人 blind pairwise study 中，EyeControl 在 aesthetic quality、intent alignment 与 image fidelity 上均优于所列对手。（Sec. 4.2 and Fig. 6, pp. 12-13；图中给出 win/tie 分布，但个人偏好与数据构成限制外推。）",
+    "caveatZh": "当用户意图与输入图像 dominant composition 冲突时，模型难把注意力转移到从属区域。\n训练数据偏向专业 retouching 中自然合理的焦点增强，因此缺少 counter-compositional examples。\nFA/PQ 等关键指标部分由 Qwen3-VL evaluator 给分，作者也承认 MLLM-based evaluation 受语义理解能力与偏差影响。\nPlanner 与 executor 是顺序式 agent pipeline；多轮 refinement 仍依赖用户再次交互，不应描述成完全自主闭环。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

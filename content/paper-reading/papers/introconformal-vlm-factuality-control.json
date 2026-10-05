@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.01375",
+  "slug": "introconformal-vlm-factuality-control",
+  "title": "IntroConformal: Conformal Factuality Guarantees for Large Vision-Language Models via Introspective Signals",
+  "authors": [
+    "Md. Atabuzzaman",
+    "Christian Alexander",
+    "Chris Thomas"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01375"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "conformal risk control",
+    "LVLM factuality",
+    "self-verification",
+    "semantic stability"
+  ],
+  "abstract": "Large Vision-Language Models (LVLMs) have achieved strong multimodal performance, yet ensuring the factual correctness of generated content remains challenging. Existing methods that provide statistical guarantees on factuality typically rely on external verifiers or generation-time confidence signals, which introduce auxiliary dependencies or often fail for confident but incorrect outputs. We argue that reliable factuality control can instead be achieved through introspective signals derived from the model itself. We introduce IntroConformal, a training-free Conformal Risk Control (CRC) framework that provides finite-sample, distribution-free factuality guarantees. We first instantiate it with layer-wise semantic stability, a conformity score derived from hidden-state representations, and then propose verification probability, a stronger score capturing the model's self-administered judgment on claim factuality. Across multiple LVLM architectures, IntroConformal satisfies the conformal risk guarantee while substantially reducing abstention and achieving competitive or superior claim-level discrimination relative to external verifier-based baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01375v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01375v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Atabuzzaman/Introconformal"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01375v1 全文及 2026-09-02T21:35:00.000Z 的审阅记录整理；PDF 18 页，SHA-256 b87ca092ca09a906518c838394d4b8ff8c0870b96d9ebdb9cd327c4299242997；原审阅已视觉核验第 1、3、5、6、9 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：EMNLP 2026 main conference",
+    "ideaZh": "IntroConformal 用 LVLM 自身 introspective signal 做 training-free Conformal Risk Control：Ssem 衡量中/后层 semantic stability，Sprob 让模型自判 claim factuality，再在 calibration set 上选择阈值给出有限样本、分布无关的风险界。作者报告所有设置满足 bound，Sprob 多数情况下显著降低 abstention；但 guarantee 依赖校准分布、二值标注与可访问 hidden/logit。",
+    "methodFlow": [
+      "把 LVLM response 分解为可校准 factual claims",
+      "从 hidden-state stability 或 self-verification logits 构造 conformity score",
+      "在 calibration set 上用 finite-sample CRC 选择 filtering threshold",
+      "保留通过阈值的 claims，并以 abstention 换取受控 factual risk"
+    ],
+    "motivationZh": "LVLM 的自判概率和内部语义稳定性能否用于有限样本 factuality risk control，需要将形式风险保证与 claim-level filtering 效果分开检验。",
+    "methodZh": "方法先把 response 分解为 claims，以 layer-wise hidden similarity 或 Yes/No verification probability 打分，再用 per-threshold Binomial upper bound 校准选择规则。MSCOCO、细粒度 captioning 与 document understanding 上，作者把形式风险与 claim-level filtering 指标分开报告。证据表明 Sprob 比 external CLIP verifier/token probability 更有用，但并不等于事实真值验证器。",
+    "experimentsZh": "实验设置：三个 LVLM 架构，MSCOCO general scene、fine-grained captioning 与 document understanding；比较 CLIP external verifier、token probability、Ssem、Sprob，并分析 target risk、calibration size、annotation noise。\n作者报告 Sprob 在 MSCOCO/LLaVA-1.5 将 abstention 降至 25%，同时 F1 提至 0.581，且 empirical risk 保持在 bound 内。（Table 2 and Fig. 2, pp. 7-8）\n比较范围：覆盖 external verifier、token confidence 与多种 decoding/verification 方法；模型数、任务数与标注来源有限，未覆盖黑盒 API、adversarial input 或长期 distribution drift。\n消融与诊断：比较 Ssem 与 Sprob、不同 risk/calibration size 和对称噪声；未证明 self-verification logits 在系统性偏差或 adversarial prompt 下仍可靠。",
+    "insightZh": "把 model-internal semantic stability/self-verification 与 conformal risk guarantee 结合，避免外部 verifier 或 generation-time perturbation，并清楚区分形式 risk control 与诊断性能。",
+    "whyRelevantZh": "为 MLLM factuality 提供不用外部 verifier 的可校准风险控制，属于模型可靠性和 introspective representation 的通用推进。",
+    "evidenceZh": "框架以 Ssem/Sprob 两类 introspective conformity score 和 CRC threshold 过滤 claims。（Sec. 3, Fig. 1, p. 3；方法框图、risk definition 与 score 公式已视觉核验。）\n作者报告在 α=0.10（concurrent bound α'=0.170）下所有方法满足风险界，Sprob 在多数设置有最低 abstention 与最高 F1。（Sec. 4.3, Table 2, p. 7；这是作者数据上的 selective-prediction guarantee，不是对任意分布的无条件事实保证。）\n在 MSCOCO/LLaVA-1.5 上，作者报告 Sprob 将 abstention 从 CONFLVLM 的 57% 降至 25%，F1 从 0.504 提至 0.581。（Table 2 and Sec. 4.3, p. 7；数字为作者报告，本项目未复现。）\nHidden/logit access、white-box calibration、标注噪声与 distribution shift 都可能削弱实用性或要求重新校准。（Limitations, p. 9；对 closed API 与安全关键 deployment 尤其重要。）",
+    "caveatZh": "Ssem/Sprob 需要 white-box hidden states 或 logits。\nCRC 依赖 exchangeable calibration/test 与二值 factual labels；分布漂移需重新校准。\nSelf-verification logits 可被 adversarial input 偏置并使 bound 失效。\n形式保证控制的是给定 loss/校准协议下的 selective risk，不应表述为 LVLM 输出普遍真实。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

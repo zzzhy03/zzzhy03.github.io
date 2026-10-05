@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2609.01567",
+  "slug": "sage-selective-vlm-teacher-guidance",
+  "title": "Selective Agent Guidance via Entropy: Learning Autonomous Policies from Imperfect VLM Teachers",
+  "authors": [
+    "Matteo Merler",
+    "Giovanni Bonetta",
+    "Davide Zago",
+    "Rossella Cancelliere",
+    "Bernardo Magnini"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "EMNLP 2026 Findings",
+  "identifiers": {
+    "arxiv": "2609.01567"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VLM teachers",
+    "selective guidance",
+    "policy entropy",
+    "PPO distillation"
+  ],
+  "abstract": "Vision-Language Models (VLMs) provide useful priors for interactive decision-making, but using them directly as policies is expensive and brittle: they must be queried at every step, do not improve from environment interaction, and can repeat systematic errors. We study how to learn a cheap autonomous policy from an online, expensive, and imperfect but informative VLM teacher. We propose SAGE (Selective Agent Guidance via Entropy), a framework that queries a VLM only when the learner is uncertain, executes the suggested action during training, and distills guidance into a lightweight Reinforcement Learning (RL) policy. Because VLM advice is not always reliable, SAGE can weight teacher-action distillation using environment-derived advantages rather than treating all suggestions as equally useful. Across sparse-reward visual reasoning and navigation tasks, SAGE learns policies that act without VLM guidance at evaluation time and improves over unguided RL in several environments, including settings where the learned policy exceeds its VLM teacher. The results show that selective guidance is most beneficial when the VLM can help the agent discover high-reward trajectories, and less useful when unguided exploration already succeeds or teacher actions do not lead to informative experience. SAGE also reduces VLM usage by prompting the teacher only on a fraction of training steps and requiring no VLM calls at deployment. Overall, our results suggest that VLMs don't need to be used as fixed policies to be useful; they can instead act as temporary, imperfect sources of guidance whose value is tested and internalized through interaction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01567v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01567v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/giobin/SAGE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01567v1 全文及 2026-09-02T21:32:00.000Z 的审阅记录整理；PDF 27 页，SHA-256 9d703a15c66264c61f2b417475fa2a935d73b1108574e7284ca036985e073485；原审阅已视觉核验第 1、4、7、9 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：9 pages, 3 figures, 4 tables in the main text, 27 pages, 4 figures, 9 tables including Appendix",
+    "ideaZh": "SAGE 不把 VLM 当永久 policy，而只在 student policy entropy 高时在线查询 teacher、执行建议动作并通过分区 PPO + behavioral cloning 内化；可选 AWBC 用环境 advantage 调整蒸馏强度。作者报告只需在 1.2%-13.3% 训练步调用 VLM、部署零调用，但增益依赖 teacher 与环境，AWBC 本身没有稳定收益。",
+    "methodFlow": [
+      "student 依据 normalized policy entropy 决定自主动作或查询 VLM",
+      "高 entropy 状态执行 teacher action，并标记 teacher-guided transition",
+      "分区 PPO 训练 learner transition，BC/AWBC 蒸馏 teacher transition",
+      "部署时仅运行轻量 student policy，不再调用 VLM"
+    ],
+    "motivationZh": "昂贵且不完美的 VLM teachers 不适合永久承担 policy；SAGE 研究如何只在高 entropy 状态调用 teacher，并将有效指导内化到自主 RL policy。",
+    "methodZh": "这是一种把昂贵、不完美 VLM 转为临时探索先验的训练框架。teacher transition 与 learner transition 分库存储，PPO 避免直接用 off-policy teacher action，BC 负责把有效建议蒸馏进轻量 policy。七个 sparse-reward visual decision tasks 表明它有时能超过 unguided RL/teacher，但失败例也说明 entropy 并不估计 teacher usefulness。",
+    "experimentsZh": "实验设置：FrozenLake、EZPoints、CardMaze、MiniGrid 三任务和 ALFWorld；比较 PPO、VLM-as-policy、LVLM2P、RL-VLM-F、DAgger，并做 teacher quality、BC/AWBC 与长时训练分析。\n作者报告 SAGE 在 CardMaze 达 1.000，且 VLM query rate 为 13.3%；其余多数受控环境 query rate 为 1.2%-2.7%。（Table 1 and Sec. 5.1, p. 7）\n比较范围：覆盖多个 VLM guidance 与 imitation/RL baseline，并用 Qwen、Gemma、oracle、random teacher；连续控制与高维真实部署覆盖不足。\n消融与诊断：移除 BC 会跨环境显著退化；AWBC 相对普通 BC 没有一致收益，说明核心证据支持 selective guidance + BC，而非 advantage weighting。",
+    "insightZh": "把 VLM guidance 从固定部署策略改为可选择、经环境回报检验并被 RL policy 内化的训练期 intervention，同时显式处理 teacher action 的 off-policy mismatch。",
+    "whyRelevantZh": "为 VLM 在交互决策中从昂贵在线 policy 转为可蒸馏临时 teacher 提供一条有边界的通用方法。",
+    "evidenceZh": "SAGE 以 entropy gate 选择 teacher query，并用 separate buffers、PPO 与 BC/AWBC 训练 autonomous policy。（Sec. 3.2-3.4, Fig. 2, p. 4；方法图和目标函数已从 PDF 视觉/文本双重核验。）\n作者报告在六个受控环境中仅 1.2%-13.3% 训练步查询 VLM，部署时为零调用。（Sec. 5.1, Table 1, p. 7；节省相对每步 query 的 baseline；未给出统一 wall-clock/货币成本。）\n作者报告 SAGE 的收益不一致：CardMaze 达 1.000，但 Fetch 低于 VLM-as-policy，EZPoints 对 Qwen teacher 为 0。（Table 1 and Sec. 5.1, p. 7；结果按 3 seeds 报告，显示适用条件而非普遍优势。）\nEntropy 会混淆真实不确定性与 action multimodality，方法也不能抵御无信息或系统性错误 teacher。（Limitations, p. 9；该边界直接限制对开放式 visual agent 的外推。）",
+    "caveatZh": "Entropy 不是 teacher usefulness 的直接估计。\n实验主要是 discrete action spaces，连续低层控制表现差。\n无法保证对无信息或系统性误导 teacher 的鲁棒性；ALFWorld 仅为初步压力测试。\n结果高度依赖 task sparsity、teacher competence 与 action interface，不能外推为通用 VLM-agent training recipe。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

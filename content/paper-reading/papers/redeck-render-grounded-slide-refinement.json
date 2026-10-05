@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2609.00194",
+  "slug": "redeck-render-grounded-slide-refinement",
+  "title": "ReDeck: Step-Level Render-Grounded Refinement for Document-to-Slide Generation",
+  "authors": [
+    "Muzhao Tian",
+    "Zezi Zeng",
+    "Yifan Yang",
+    "Xin Gao",
+    "Yan Li",
+    "Zisu Huang",
+    "Xiaohua Wang",
+    "Changze Lv",
+    "Mingxi Cheng",
+    "Bei Liu",
+    "Kai Qiu",
+    "Qi Dai",
+    "Dong Chen",
+    "Yue Dong",
+    "Xiaoqing Zheng",
+    "Ji Li",
+    "Chong Luo"
+  ],
+  "publishedAt": "2026-08-31",
+  "updatedAt": "2026-08-31",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00194"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "slide generation",
+    "render-grounded refinement",
+    "layout validation",
+    "design agents"
+  ],
+  "abstract": "Document-to-slide generation is challenging because slides are dense editable artifacts that require both faithful content selection and precise spatial layout. Recent slide agents adopt iterative reflection, but typically follow a monolithic \"one version, one feedback\" loop: a slide or deck is rewritten, rendered afterward, and critiqued only at the turn boundary. This delayed feedback makes local failures such as overflow, overlap, clipping, and off-canvas placement difficult to attribute and repair. We propose ReDeck, a step-level render-grounded refinement framework that decomposes slide revision into atomic edit actions and returns renderer-derived observations after each step, turning refinement into \"one edit, one observation.\" To balance local repair with global quality, ReDeck uses multi-granular feedback: step-level render feedback for spatial errors, a turn-level adaptive critic for semantic and design guidance, and a submission-level gate for hard layout validation. We further introduce DeckQuiz, a benchmark that decouples content fidelity, spatial correctness, and design quality. Across GPT-5.4, Claude-4.6, and Gemini-3.1, ReDeck consistently outperforms existing slide-generation agents, and ablations confirm that feedback timing and granularity are critical for reliable slide refinement.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00194v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00194v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/microsoft/ReDeck"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00194v1 全文及 2026-09-02T21:31:57.000Z 的审阅记录整理；PDF 31 页，SHA-256 fa70f0935daf6ce9e51d0479105bc8a7226f0f826be11adb9e1a5a0b6e65f98d；原审阅已视觉核验第 1、5、8、11、12 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。",
+    "ideaZh": "ReDeck 把 slide refinement 从“整轮改写后再看结果”改成 edit-level closed loop：agent 每次只做一个 structural/content/attribute action，renderer 立即返回相对 session baseline 的 overflow/overlap/clipping delta 与 bounding boxes；turn-level adaptive critic 从 237 probes 中选择高层 issues，submit boundary 再用 hard gate 阻止 layout regression。作者报告在 GPT-5.4/Gemini-3.1/Claude-4.6、100 tasks×3 seeds 上四个 DeckQuiz modules 全部领先，GPT-5.4 fidelity/SCR 从 initial 80.4/64.1 提至 88.6/91.5；45-task blinded study 以 33/45 偏好 ReDeck。但 full system 比 DeepPresenter 贵 14.5×、慢 8.5×，DeckQuiz 与 critic 共享 constructs，价值高但成本与 evaluator coupling 必须显式保留。",
+    "methodFlow": [
+      "输入 document、editable deck source、rendered slides 与 persistent issue list，turn-level critic 从 237 probes 中选择当前最相关检查",
+      "critic 用 deterministic geometry、document retrieval 和 VLM rubrics 更新 narrative/visual/completeness/correctness/fidelity issues",
+      "agent 从 compositional action space 每次执行一个 structural、content 或 attribute edit，也可 rollback/submit",
+      "每个 action 后重新 render，返回相对 session-start deck 的 violation delta、failing element bbox/text 与 layout anchors",
+      "agent依据 observation 继续 edit→observe→revert/re-attempt；submit 时 hard gate 要求 violation count 不高于 baseline，进入下一 turn 直至结束"
+    ],
+    "motivationZh": "整轮修改后才渲染的 slide agents 难以定位并阻止局部 layout regression；ReDeck 将单次 edit、即时渲染反馈、critic 与提交边界验证连接起来。",
+    "methodZh": "ReDeck 将 editable deck state、rendered geometry 和 compiler diagnostics 建模为 partially observable process，并限制 action 为单个结构、内容或属性编辑，加上 rollback/submit。每次 edit 后 environment 重新编译/渲染，只返回新违反项计数、element ID/bbox 和 layout anchors，作为 soft observation；允许临时变差，但 submit 时相对起始 deck 的 violation delta 必须≤0。外层 critic 同时看 source/render/persistent issue list，从 deterministic geometry、document retrieval 与 VLM rubrics 的 237-probe library 中 adaptive schedule，追踪 narrative、visual、completeness、correctness、fidelity。实验证明 step feedback 和 turn critic 单独都不足，组合与 adaptive scheduling 才同时提升空间/内容/设计质量。",
+    "experimentsZh": "实验设置：主实验在 100 document-to-slide tasks×3 seeds、GPT-5.4/Gemini-3.1/Claude-4.6 上比较 SlideGen、SlideTailor、DeepPresenter 与 ReDeck，matched per-task LLM-call cap；DeckQuiz 分 content fidelity、SpatialCheck clean rate、aesthetics、deck design。另测 PresentBench 五 domains、DECKBench/SlidesGen-Bench、PPTX transfer、45-task blinded human study、judge-human calibration、DOM cross-check 与成本控制。\n作者报告：GPT-5.4 上 ReDeck 在 Fid./SCR/Aes./Des. 达 88.6/91.5/3.64/71.2，并在 Gemini/Claude 上同样四项均列第一。（Table 1, p. 8）\n作者报告：PresentBench 五 domains 的平均 pairwise win rate 为 0.70，全部 domain 居首；跨 domain rank Kendall’s τ=0.87。（Fig. 5 and Sec. 4.5, p. 10）\n作者报告：45-task blinded study 中 overall quality 33/45（0.73, 95% CI [0.59,0.84]）、source faithfulness 31/45（0.69, [0.54,0.80]）偏好 ReDeck。（Table 4, p. 21）\n作者报告：full ReDeck latency 3586 s、cost $1.74，对比 DeepPresenter 420 s/$0.12；ReDeck-Lite 为 1450 s/$0.28，质量小幅下降。（Sec. 4.4, p. 9; Tables 12–13, p. 29）\n比较范围：覆盖三种已发表 slide agents、三个 frontier backbones、shared-start controls、cost-matched DeepPresenter、五 domain external set、两个外部 evaluation suites、HTML/PPTX transfer 与 blinded humans，覆盖较强。native systems 初始 generator 不同，shared-start 只能部分隔离 refinement loop。\n消融与诊断：比较 per-turn NL/screenshot critique、turn critic only、action feedback only、render observation interval N=1/4/8、all 237 probes every turn 与 adaptive scheduler；另有 issue-family trajectories、probe/judge audits。未完全分离 probe library quality、critic model strength 与 edit policy，且 call-count matching 不等于 cost/latency matching。",
+    "insightZh": "核心创新是把 render feedback 从 turn boundary 提前到 atomic edit boundary，并明确区分 step-level objective spatial observation、turn-level semantic/design critic 和 submission-level hard gate；这一 feedback granularity 设计比一般 self-reflection 或 screenshot critique 更可归因。其 probe library/DeckQuiz 较完整，但系统依赖大量 hand-designed checks、LLM calls 与作者自建 evaluation constructs。",
+    "whyRelevantZh": "它是 visual design agent 的直接命中：agent 操作 editable slides、逐 edit 观察 rendering state、回滚和重试，并以 global critic 与 hard validation gate 维护 persistent artifact；feedback granularity 原则可迁移到 SVG、diagram、web/document 与其他 2D design agents。",
+    "evidenceZh": "每次 atomic edit 后 environment 返回 violation delta 与 spatial anchors，外层 adaptive critic 维护 issue list，submit boundary 才执行 hard gate。（Secs. 3.1–3.3 and Fig. 2, pp. 4–6；主 pipeline 图已视觉核验，清楚区分 turn lane、edit lane、soft observation 和 hard submission check。）\n作者报告：GPT-5.4 上 ReDeck 的 Fid./SCR/Aes./Des. 为 88.6/91.5/3.64/71.2，对比 DeepPresenter 76.8/66.8/3.47/55.1。（Table 1, p. 8；三 backbone 主表与 convergence plot 已视觉核验；数值均为作者报告。）\nstep-level feedback 与 turn critic 各自不足：仅 critic 为 78.7/60.8/3.02/63.5，仅 action feedback 为 78.5/80.2/3.12/59.4，组合为 88.6/91.5/3.64/71.2。（Table 2 and Sec. 4.3, p. 9；组件消融支持 local spatial 与 global semantic feedback 的互补性，而非仅增加调用次数。）\n作者报告：45-task blinded human study 在 overall/source-faithfulness 上分别 33/45、31/45 偏好 ReDeck；同时 full system 成本 $1.74、latency 3586 s。（Sec. 4.5, p. 11; Tables 4 and 12, pp. 21 and 29；人类验证缓解但不能消除自建 evaluator coupling；成本数字说明质量不是免费获得。）",
+    "caveatZh": "需要 editable geometry 与 repeatable rendering；未验证 PDF/OCR-only、Keynote、animations、masking、font fallback。\nnative end-to-end comparisons 混合 initial generator 与 refinement，shared-start 也未让所有 native generators 完全相同。\nfull system 比 default DeepPresenter 贵 14.5×、慢 8.5×；routing 只能缓解不能消除。\nDeckQuiz 与 adaptive critic 共享 related quality constructs，45-task human study规模中等，主观 visual harmony 仍难自动化。\nstep feedback 不含 screenshot，只依赖 compiler/DOM-style violations 与 text anchors；对视觉节奏、图像裁切语义和复杂 layering 的局部判断仍可能滞后到 turn critic。\n作者自建 probe library、critic 与 DeckQuiz 可能共同偏好同一种 slide philosophy；外部 benchmarks 和 humans 虽支持方向，但不能完全消除 evaluator dependence。\nmatched LLM-call caps 掩盖模型大小和调用类型差异；实际 8.5× latency/14.5× cost 会显著限制交互式 design workflow。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

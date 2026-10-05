@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2609.00625",
+  "slug": "inverse-rendering-line-primitives",
+  "title": "Inverse Rendering for Modeling with Line Primitives",
+  "authors": [
+    "Kenji Tojo",
+    "Ariel Shamir",
+    "Nobuyuki Umetani",
+    "Bernd Bickel"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00625"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "line primitives",
+    "inverse rendering",
+    "stochastic rasterization",
+    "re-lining"
+  ],
+  "abstract": "Faithfully capturing diverse real-world objects with fuzzy, anisotropic structures, such as hair, fur, fibers, and textiles, for efficient real-time visualization remains challenging. Recent radiance field reconstruction methods capture these structures from multi-view images using translucent volumetric primitives such as 3D Gaussians rather than opaque low-dimensional primitives (e.g., triangles, line segments, and polylines), thereby limiting compatibility with standard depth-tested rasterization, reflection modeling, and physical simulation. We present an inverse rendering method for reconstructing fuzzy geometry using explicit line segments, which are rasterized on a subpixel grid for anti-aliasing to reproduce a semi-transparent appearance. While straightforward to render, optimizing numerous line primitives to match target images poses a significant challenge. We address this by introducing a stochastic differentiable rasterizer for line segments that produces informative gradients with respect to vertex positions, attributes, and discrete connectivity. Experiments on synthetic and real-world datasets show that our method outperforms surface-based approaches in capturing fuzzy boundaries and achieves quality comparable to volumetric representations while relying entirely on explicit geometry. The resulting representation integrates seamlessly with standard graphics pipelines, enabling cross-platform rendering, various shading models, and physical simulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00625v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00625v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kenji-tojo/inverse-line-primitives"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00625v1 全文及 2026-09-02T21:31:57.000Z 的审阅记录整理；PDF 14 页，SHA-256 0e714e4d099fcbbd621410e33184c7e00f0bcb991bc4d5be3e47d1075a2d75fc；原审阅已视觉核验第 1、4、7、11 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：SIGGRAPH Asia 2026. Project page: https://kenji-tojo.github.io/sa26-line-primitives/",
+    "ideaZh": "这篇 TOG 工作把毛发、纤维、织物等 fuzzy appearance 从 Gaussian/volume 拉回显式 1D geometry：用 subpixel Bresenham+MSAA 渲染 opaque line segments，以随机 fragment activation 构造 opacity 的无偏 gradient，并周期性 re-lining（prune/merge/split）共同优化顶点、属性和离散连接。作者报告在 Shelly 六场景上 LPIPS 0.046，优于 3DGS 的 0.057，同时 full-quality 628 FPS；更重要的是输出可进入标准 depth-tested rasterization、hair shading 与 mass-spring simulation。但 2M vertices/409 MB、约 45 分钟优化、遮挡内部 topology 与 microscale connectivity 恢复不足，适合高相关深读。",
+    "methodFlow": [
+      "从多视角图像与 SfM camera poses 出发，以 coarse proxy surface 附近的 1–2M 短 edges 初始化显式 line primitives",
+      "在 subpixel grid 上用 Bresenham-style rasterization 与 MSAA/Gaussian filter 渲染 opaque lines，聚合出 semi-transparent fuzzy appearance",
+      "将 per-edge opacity 解释为 stochastic fragment activation probability，以 score-function estimator 反传 opacity/position/attribute gradients",
+      "持续优化 vertex positions、SH color 与 opacity，并每 100 iterations 做 re-lining：pruning、merging、splitting 离散连接",
+      "导出显式 polyline geometry，用于实时 depth-tested rendering、strand reflectance、cylinder export 或额外 KNN 连接后的物理模拟"
+    ],
+    "motivationZh": "毛发、纤维与织物的 fuzzy appearance 常被体或 Gaussian 表示近似，却难导出显式 1D geometry；该工作研究大规模 subpixel lines 的可微渲染与 connectivity 更新。",
+    "methodZh": "论文针对 NeRF/3DGS 能重建 fuzzy boundary 却缺少低维显式 connectivity 的矛盾，将场景表示为可共享顶点的 polylines。其 stochastic differentiable rasterizer 在 subpixel grid 上以 opacity 作为 fragment activation probability，从 likelihood-ratio estimator 获得 opacity gradient，并通过针对 line endpoint、anti-aliasing 和 Gaussian reconstruction filter 的设计优化位置/颜色/宽度等；re-lining 周期性改变离散 topology。synthetic Shelly 和自采 Fuzzy objects 的结果表明该表示在 perceptual rendering、cross-platform rasterization 和 geometry-centric downstream use 之间取得新平衡。所有数字与比较均为作者报告，未独立复现。",
+    "experimentsZh": "实验设置：synthetic Shelly 六个 furry scenes 上比较 DiffSoup、VolSurfs、AdaptiveShells、3DGS，报告 PSNR/SSIM/LPIPS、memory、geometry parameters 和 FPS；自采 Fuzzy real-world dataset 覆盖 plants、fabric、fur、fruit，展示 multi-view reconstruction、hair shading、mobile/desktop rendering 与 mass-spring simulation。RTX 4090 上通常使用 2M vertices、50k iterations、约 45 分钟/scene。\n作者报告：Shelly 平均 LPIPS 0.046，优于 3DGS 0.057、AdaptiveShells 0.079、VolSurfs 0.109 与 DiffSoup 0.112；SSIM 0.963 为最佳，但 PSNR 37.09 略低于 3DGS 37.73。（Table 1, p. 7）\n作者报告：full-quality 4×-pixel rendering 为 628 FPS/LPIPS 0.046，3DGS default 为 588 FPS/0.057；HW MSAA 可达 814 FPS 但 LPIPS 降至 0.069。（Fig. 8, p. 7）\n作者报告：re-lining 的平均 LPIPS 0.046，优于无离散更新 0.065 和 MCMC relocation 0.051；但 Woolly 上 all-triangles 0.066 优于 line method 0.084。（Tables 2 and 4, pp. 10–11）\n比较范围：同时覆盖 explicit surface、layered surface、volumetric shell 与 3DGS，并控制 3DGS primitive count 以获得相近 rendering speed；AdaptiveShells 只使用原文数字，因为官方实现不可用。real-world Fuzzy 部分主要是 qualitative demonstration，缺少定量 ground truth。\n消融与诊断：消融覆盖 re-lining、opacity optimization、quad-width rasterization、Gaussian vs box reconstruction filter、points/triangles/lines primitive 类型，并给出 per-scene LPIPS。仍缺少初始化 proxy dependence、vertex-count/memory trade-off 和 learned connectivity alternative。",
+    "insightZh": "真正新颖之处是针对大规模 subpixel line primitives 的 stochastic differentiable rasterization，以及在 gradient optimization 中允许显式 connectivity 出现、消失和重组的 re-lining；它不是把 3DGS 再换一种 primitive，而是恢复可由传统 graphics/geometry algorithms 使用的 1D manifold。代价是高 vertex count、内存和不保证物理真实 topology。",
+    "whyRelevantZh": "它直接回应 3D reconstruction 如何从 radiance-like appearance 回到可编辑、可 rasterize、可模拟的 explicit structured representation；对纤维/毛发/织物、未来 embroidery/fabrication assets 和 geometry-centric pipeline 都有明确迁移价值。",
+    "evidenceZh": "pipeline 从 controlled capture/SfM 进入 differentiable line rendering，并通过 re-lining 的 prune/merge/split 共同优化连续属性与离散 connectivity。（Sec. 4 and Fig. 3, p. 4；方法总览图已视觉核验，清楚呈现 capture、optimization 与 explicit output。）\n随机 fragment activation 使 opaque line aggregation 模拟 semi-transparency，并提供对 opacity、位置与属性的 stochastic gradients。（Sec. 4.1–4.2, Eqs. 3–5, pp. 4–6；全文给出概率与 likelihood-ratio gradient 形式，支持方法机理而非仅从 qualitative figure 推断。）\n作者报告：Shelly 六场景上方法 PSNR/SSIM/LPIPS 为 37.09/0.963/0.046，3DGS 为 37.73/0.960/0.057；full-quality rendering 628 FPS。（Table 1 and Fig. 8, p. 7；主表与速度图已视觉核验；方法 LPIPS 更好但 PSNR 略低，且 memory 为 409 MB，对比 3DGS 118 MB。）\nline representation 在 Woolly 场景不如 triangles，且难以恢复重遮挡内部 topology、pixel-scale fiber orientation/connectivity 与真实 line width。（Failure cases and Sec. 6, Fig. 14, p. 11；限制页同时给出反例图、per-scene LPIPS 与作者明确限制，已视觉核验。）",
+    "caveatZh": "重遮挡内部结构需要更强 prior 或 richer capture，不能恢复完整 topology。\npixel-scale fibers 的 microscale orientation/connectivity 与 subpixel line width 难以准确恢复。\n手工 connectivity update、opacity-gradient variance 与跨 viewing-distance representation 仍需改进，可能需要 hybrid triangle–line LOD。\n方法通常需要 1–2M vertices、409 MB representation 与约 45 分钟优化；explicit geometry 并不等于紧凑或立即可制造。\nreal captures 使用 dark environment、coaxial flash、polarization filter 和人工 foreground cleanup，casual capture 泛化仍有限。\n作者演示的 physical simulation 需额外 KNN edges，论文也明确不保证恢复的 polyline connectivity 等同真实材料结构。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

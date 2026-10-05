@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2606.20563",
+  "slug": "janusmesh-cross-space-3d-illusion",
+  "title": "JanusMesh: Fast and Zero-Shot 3D Visual Illusion Generation via Cross-Space Denoising",
+  "authors": [
+    "Siang-Ling Zhang",
+    "Huai-Hsun Cheng",
+    "Tsung-Ju Yang",
+    "Yu-Lun Liu"
+  ],
+  "publishedAt": "2026-06-18",
+  "updatedAt": "2026-08-31",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2606.20563"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D visual illusion",
+    "cross-space denoising",
+    "voxel fusion",
+    "view-conditioned texture"
+  ],
+  "abstract": "Creating 3D visual illusions, a single 3D mesh that reveals entirely different semantics from various viewing angles, is a fascinating but tough challenge. Existing optimization-based methods are slow and can produce oversaturated colors. In contrast, naive stitching approaches fail to produce geometrically coherent objects. This results in visible unnatural seams and semantic leaks. In this paper, we present a fast and training-free framework for generating text-driven 3D visual illusions. Our approach decouples the generation into two stages. First, we propose a cross-space dual-branch denoising process. This process dynamically decodes 3D latents into voxel space for CLIP-guided orientation alignment and Signed Distance Field (SDF) blending, which ensures seamless geometric fusion. Second, we introduce a view-conditioned texture synthesis module that projects and aggregates view-specific 2D diffusion priors onto the fused geometry. Extensive experiments demonstrate that our method generates highly realistic, dual-semantic 3D illusions in just 3-5 minutes. It significantly outperforms existing methods in geometric integrity, semantic recognizability, and efficiency. Project page: https://siang1105.github.io/JanusMesh.github.io/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.20563v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.20563v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2606.20563v2 全文及 2026-09-02T21:31:57.000Z 的审阅记录整理；PDF 20 页，SHA-256 f64090fee23ed3393842e25ae5105e760427e1157b1d9a2b1c8687d2e7d64d12；原审阅已视觉核验第 1、5、12、15 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：ECCV 2026. Project page: https://siang1105.github.io/JanusMesh.github.io/",
+    "ideaZh": "JanusMesh 在不做 per-shape optimization 的前提下，将两个文本语义融合成一张从指定视角呈现不同物体的 3D mesh。Stage 1 对共享 noisy latent 开双分支 TRELLIS denoising，每步 decode 到 voxel、做 CLIP orientation search 与 SDF average/binarization、再 encode 回 latent；Stage 2 从目标视角渲染 depth，用 Stable Diffusion/ControlNet 生成各语义 clean images 并 unproject/聚合纹理。作者报告 50 个 prompt pairs 上 GPT assignment accuracy 84%、3–5 分钟生成、71% user preference；但继承 TRELLIS prompt failure、必须用 voxel latent、三物体 orientation 退回固定角度，且 CLIP/FID/GPT metrics 对 illusion quality 的测量仍有局限。",
+    "methodFlow": [
+      "输入两个 text prompts 与目标 viewing angles，从共享 noise 启动两个 TRELLIS rectified-flow geometry branches",
+      "以 CLIP 对候选 silhouettes 搜索更兼容的相对 orientation，并将两个 clean predictions 对齐到共同 voxel frame",
+      "每个 denoising step 将 latent decode 为 occupancy，计算/平均 SDF 后 threshold 成 fused voxel，再 re-encode 回两个 branch coordinates",
+      "输出统一 mesh 后，从各目标视角渲染 depth，使用 depth-conditioned Stable Diffusion/ControlNet 预测 prompt-specific clean images",
+      "将各视图纹理 unproject 到 mesh 并按 surface normal 聚合，得到指定视角呈不同 semantics 的 textured 3D illusion"
+    ],
+    "motivationZh": "如何在零样本、无 per-shape optimization 的条件下，让同一 textured 3D mesh 在指定视角显示不同语义，是 JanusMesh 的生成与几何融合目标。",
+    "methodZh": "方法把 2D visual-anagram 的 transformed-view synchronization 扩展到 3D。几何阶段在两个 semantics branches 分别估计 clean latent，将第二分支旋转到第一分支坐标系，解码 occupancy 后用 signed-distance fields 平均得到中间 surface，再回编码继续 rectified-flow denoising；Noise Blending/Space Control 针对不同 silhouette conflict 提供初始约束，CLIP-guided search 选对齐角度。纹理阶段从目标 views 渲染 mesh depth，以 depth-conditioned diffusion 预测视图纹理，再按 surface-normal cosine 权重回投到同一 mesh。实验含 optimization baseline、direct concat、TRELLIS/DreamBeast、自动指标、50 人 user study 与组件消融。",
+    "experimentsZh": "实验设置：随机采样 50 个 dual-prompt pairs，与 Shape From Semantics、其 VSD variant、Direct Concatenation、TRELLIS 和 DreamBeast 比较；自动指标含 CLIP/opposite-CLIP、GPT assignment、FID/KID、OWLv2 object count/multi-object rate、boundary seam 与 runtime。50 participants 对 recognizability、method preference、orientation strategy 评分，并消融 voxel fusion、latent-vs-voxel、noise guidance、texture stage、orientation search。\n作者报告：方法 GPT accuracy 84% 为最高，FID 185.555 优于 Shape From Semantic 194.136，但略差于 TRELLIS 174.130；CLIP 28.170 低于 Direct Concat 29.030。（Table 1, p. 12）\n作者报告：boundary-seam score 798.31，低于 Direct Concat 的 1503.42；生成耗时 3–5 min，对比 optimization baseline 约 40 min 或 3–4 hr。（Table 1 and Fig. 11, pp. 11–12）\n作者报告：voxel-space cross-space blend 相对 direct latent blend 将 CLIP 从 22.47 提至 28.17、GPT accuracy 从 58% 提至 84%、FID 从 195.6 降至 185.6。（Fig. 14, p. 13）\n比较范围：覆盖 optimization-based illusion method、简单 mesh stitching、unmodified 3D generation prompts 与 slow 3D optimization baseline，能从语义、realism、geometry seam、速度多角度比较；但不同方法对 dual-view illusion task 的原生适配程度不同，且自动指标依赖 CLIP/GPT/OWLv2。\n消融与诊断：比较 union/blur/Minkowski/polar/SDF voxel fusion、direct latent vs cross-space、两种 noise guidance、去除 view-conditioned texture 和去除 CLIP orientation；展示三物体扩展。部分消融主要 qualitative，noise strategy 又需按 pair 手动/启发式选择。",
+    "insightZh": "新意在于 cross-space denoising：latent 负责依托 pretrained 3D prior 演化，voxel/SDF space 负责几何连续的 multi-semantics fusion，再回到 latent；另以 view-conditioned texture aggregation 防止 fused geometry 上的标准 texture model 语义塌缩。它巧妙重用 TRELLIS 与 2D diffusion，属于 training-free composition framework，而非新的 3D foundation generator。",
+    "whyRelevantZh": "它是明确的 3D mesh generation 方法，以训练-free composition、cross-space geometry fusion 与 view-specific texture control 实现新型可视 artifact；对 3D generation、multi-view controllability 和 geometry-aware composition 有直接价值。",
+    "evidenceZh": "Stage 1 在每个 denoising step 做 latent→voxel→SDF fusion→latent，Stage 2 用视角条件纹理预测与 mesh aggregation 生成最终双义 mesh。（Secs. 3.2–3.4 and Fig. 3, pp. 5–6；主 pipeline 图已视觉核验，双 branch、SDF blending、re-encoding 与 texture projection 均可见。）\nSDF averaging 在共同坐标系中产生两个 occupancy surfaces 的中间几何，并通过 threshold 得到 fused voxel。（Sec. 3.3, Eqs. 3–4 and Fig. 4, p. 6；公式与 circle/triangle 示意共同支持其几何连续性设计。）\n作者报告：50 个 prompt pairs 上方法 GPT assignment accuracy 84%、FID 185.555、multi-object rate 18%、boundary-seam score 798.31、runtime 3–5 min。（Table 1 and Sec. 4.2, p. 12；主结果表已视觉核验；Direct Concat 的 CLIP 更高，论文将其解释为 per-view appearance artifact，故未隐藏该反例。）\n作者报告：50 人研究中 78.5% 将结果评为清晰可识别，71% 更偏好该方法，91% 偏好 CLIP-guided orientation。（Fig. 12, p. 12；三组 user-study 柱状图已视觉核验；参与者规模和问题设计仍限制外推。）",
+    "caveatZh": "继承 TRELLIS 的 text interpretation failure，例如把 bat 误解为 Batman。\n必须依赖 voxel-based latent，不能直接用于 Hunyuan3D 等 token-based 3D generators。\nCLIP orientation search 在三物体 case 上扩展差，因此使用固定 0°/120°/240°。\n任务是特定 target views 的 perceptual illusion，并不保证 mesh 在任意视角语义自然、拓扑可编辑或 fabrication-ready。\n自动评测主要依赖 CLIP、GPT、OWLv2 和 FID/KID，对 dual-semantics 与 geometry integrity 的 construct validity 仍不充分。\nCLIP-guided orientation 对已兼容 pairs 可能因 misclassification 选择更差角度，方法需要 pair-dependent intervention strategy。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

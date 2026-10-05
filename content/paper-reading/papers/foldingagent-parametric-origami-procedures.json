@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.00377",
+  "slug": "foldingagent-parametric-origami-procedures",
+  "title": "FoldingAgent: Inferring Parametric Origami Procedures from Demonstration Videos",
+  "authors": [
+    "Maya Moriya",
+    "Sigal Raab",
+    "Yael Vinker",
+    "Tali Dekel"
+  ],
+  "publishedAt": "2026-08-31",
+  "updatedAt": "2026-08-31",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00377"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "fabrication"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "origami",
+    "inverse design",
+    "executable folding",
+    "visual feedback"
+  ],
+  "abstract": "We present FoldingAgent, an agentic framework for inferring explicit parametric folding programs directly from origami demonstration videos. Our framework leverages the reasoning power of a pre-trained Vision-Language Model (VLM) equipped with a suite of specialized tools that enable the agent to simulate geometric transitions, verify physical plausibility, retrieve and compare visual content, and evaluate its own predictions. To translate visual content into folding programs, we define a parametric space that consists of the paper's geometry and a set of parametric folding actions. Unlike models that predict static crease patterns, our agent operates sequentially and possesses the ability to re-plan its actions, effectively mitigating the compounding errors inherent in multi-step folding. Our approach takes a step toward closing the gap between human origami knowledge, which is primarily shared through unstructured visual demonstrations, and computational methods, which typically rely on structured, parametric representations such as a crease pattern or an executable parametric plan. We evaluate our approach on PurelandFold, a newly curated benchmark of diverse Pureland origami videos with ground-truth geometry and action labels. Our results demonstrate that by combining VLM reasoning with a set of specialized tools and physical simulation, we can successfully transform unstructured visual demonstrations into executable, physically plausible folding procedures.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00377v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00377v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00377v1 全文及 2026-09-02T21:31:57.000Z 的审阅记录整理；PDF 22 页，SHA-256 4efe92439b184f90590d81caa3091ca8a9d455220d9c2c16511e112917089c95；原审阅已视觉核验第 1、3、9、10 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：Project Page: https://maya-moriya.github.io/origami-page/ Accepted to SIGGRAPH ASIA 2026",
+    "ideaZh": "FoldingAgent 把 origami video inversion 变成一个真正可执行的 visual-design loop：VLM 在 FOLD-derived parametric state/action space 中逐帧调用 fold/add_vertex/rotate/unfold/flip，renderer 返回几何图，独立 VLM critic 判定 match，controller 维护 checkpoint/rollback，bounded exploration 防止长链失控。作者报告在 27 条 PurelandFold sequences 上完成率 100%、completed steps compilation validity 96%，并在 600 次人类判断中相对简化 variants 获 80%–84% preference；但数据小、keyframes 手工提取、每序列约 140 queries/400 万 input tokens/$8.9，且仅覆盖 straight-crease Pureland origami。",
+    "methodFlow": [
+      "人工从 instructional origami video 提取 meaningful keyframes，并把纸张表示为带 layer ordering 的 FOLD-style parametric state",
+      "VLM agent 读取前后帧、当前 JSON state 和 render，调用 add_vertex/fold/rotate/unfold/flip 等 simulator tools 预测 transition",
+      "独立 visual critic 比较 source/target photos 与 simulator diagrams，返回 Match、Mismatch 或 Extreme Divergence 及差异描述",
+      "controller 保存 timeline/checkpoints；agent 可查看 movement、重试、回滚早期 state，并重新规划后续 folds",
+      "每 keyframe 最多探索五个 attempts，超限后 selector 选最佳 state；输出完整 executable folding program、states 与 crease pattern"
+    ],
+    "motivationZh": "从 origami demonstration videos 推断可执行折叠程序，需要将遮挡视觉线索映射到长期 parametric state transitions，并允许验证、回滚和重试。",
+    "methodZh": "论文定义一个扩展 FOLD 的 layered paper state，保留 vertices、edges、faces、mountain/valley labels 与 face ordering，并构建执行 parametric actions 的 origami simulator。controller 将视频帧、agent timeline、simulator、renderer、critic 和 checkpoints 组合：agent 观察 source/target frames 与自身 render，提出动作，critic 比较真实照片和 diagram，发生 divergence 时可回滚到早期 checkpoint；超过每 keyframe 五次尝试时由 selector 在候选 states 中选择。主实验以 representation-only、representation+critic 等阶梯消融证明闭环和 rollback 的贡献，并给出跨 GPT/Claude/Gemini 五序列小样本验证。",
+    "experimentsZh": "实验设置：PurelandFold 含 27 条 iPhone 12 自摄视频，平均 12 frames、范围 5–21，actions/parameters 人工标注；主实验用 Gemini 3.1 Pro Preview 作为 agent/critic，比较 VLM-CP、VLM-S、VLM-S+Critic 与完整 agent，报告 completion、compilation validity、topological/geometric/constraint/final-state similarity、crease-pattern dissimilarity 与 600 judgments human study。\n作者报告：FoldingAgent 完成 100% sequences、completed-step CV 96%，而 VLM-S 与 VLM-S-C 完成率均为 85%，VLM-CP 虽完成 96% 但仅 8% outputs 可编译。（Table 1, p. 9）\n作者报告：完整方法 TSS 0.90、CS 0.77、CPD 189，均优于 VLM-S-C 的 0.80、0.49、216；人类相对 VLM-S/VLM-S-C preference 为 84%/80%。（Table 1, p. 9）\n作者报告：随机五序列跨 backbone 小样本中，FoldingAgent 完成 GPT 4/5、Claude 5/5、Gemini 5/5，plain VLM-CP 分别为 0/5、0/5、1/5。（Table 2, p. 15）\n比较范围：由于作者称没有直接 video-to-procedural-origami baseline，主比较是同一系统的 representation/critic/agent ladder；Appendix 另测通用 VIGA，但其 Blender representation 与 origami constraints 不匹配。缺少专用 search/planning solver 或 human-authored action sequence recovery baseline。\n消融与诊断：阶梯消融 VLM-CP→VLM-S→VLM-S-C→full agent，另有跨 backbone 五序列与 few-shot vs zero-shot；能说明 representation、critic 和 agent flexibility 的累积作用，但没有单独移除 checkpoint rollback、selector、movement view 或 bounded budget。",
+    "insightZh": "相较一次预测 crease pattern 或通用 Blender scene-edit agent，该工作将 origami-specific executable representation、physical simulator、separate verifier、persistent checkpoints 与 rollback 组成长时 inverse-design agent；新意主要在 representation/environment 与 error-recovery protocol 的结合。局限是 hand-curated keyframes、专用 action space 和 frontier API model 共同承担大量能力，未形成可训练的通用 folding model。",
+    "whyRelevantZh": "它直接连接 visual design agents 与 generative fabrication：从视觉示范恢复可执行、可编辑、带物理/拓扑约束的参数化制造程序，并把 render feedback、critic 与 rollback 用于长链错误修正；对 LEGO assembly、fabrication planning 和 structured artifact agents 具有高迁移价值。",
+    "evidenceZh": "agent、controller、origami simulator、tool library、independent critic 与 checkpoint/rollback 构成多步 render-grounded refinement loop。（Sec. 4 and Fig. 2, pp. 3–5；pipeline 图和正文已视觉核验，明确区分 proposer、controller 与 critic，而不是单次 VLM code output。）\nbounded exploration 将每 keyframe transition attempts 限为 C=5，失败时 selector 从已探索 states 中选择并冻结此前 checkpoints。（Sec. 4.3, p. 5；这给出了 rollback 与可终止性的具体控制语义，也暴露可能提交局部错误的边界。）\n作者报告：完整 FoldingAgent 在 PurelandFold 上完成率 100%、completed-step compilation validity 96%，TSS/GS/CS/FFS 为 0.90/0.58/0.77/0.39，CPD 189。（Table 1, p. 9；主表及 sequence-progress plot 已视觉核验；所有数值为作者报告，且 metrics 只在 completed sequences/steps 的定义下解释。）\n作者明确指出重遮挡、复合同时动作和超出 Pureland 的高级折法仍困难，并展示错误 candidate 被 selector 固化后传播的失败模式。（Sec. 6, pp. 9–10; Fig. 12, p. 16；限制段与失败案例支持对 action-space、critic 和 bounded exploration 的审慎边界。）",
+    "caveatZh": "性能高度依赖底层 VLM reasoning，重遮挡和复杂 layer accumulation 仍难从 keyframes 识别。\n复合 simultaneous actions（如 rotate 同时 flip）违反 sequential action-space assumption。\n仅覆盖 Pureland origami；扩展到高级技巧需扩充 action space，可能还需要更强视觉推理。\n27 条受控自摄 sequences 且 keyframes/parameters 人工提取，离嘈杂网络 instructional video 的自动端到端任务仍有距离。\n每序列平均 140 queries、约 4M input/68K output tokens、成本 $8.9；长时延与 API model drift 会影响复现和可扩展性。\ncritic 可能错误批准 transition；bounded selector 必须在全坏候选中择一且会冻结 earlier states，错误可继续向后传播。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

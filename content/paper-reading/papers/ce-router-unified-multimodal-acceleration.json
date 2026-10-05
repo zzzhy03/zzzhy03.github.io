@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2608.29291",
+  "slug": "ce-router-unified-multimodal-acceleration",
+  "title": "Accelerating Unified Multimodal Models with Core-Expansion Routing and Unified Computation Scheduling",
+  "authors": [
+    "Wengyi Zhan",
+    "Chenqian Yan",
+    "Songwei Liu",
+    "Mingbao Lin",
+    "Rongrong Ji"
+  ],
+  "publishedAt": "2026-08-29",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2608.29291"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "unified multimodal model",
+    "core-expansion routing",
+    "token compaction",
+    "computation scheduling"
+  ],
+  "abstract": "Unified multimodal models jointly support understanding and generation, but incur substantial redundant computation across tokens, layers, and generation timesteps. Through token-importance probing, we identify an asymmetric core-expansion structure: understanding exhibits a stable importance component, while generation largely shares this component but requires progress-dependent corrections. We therefore propose CE-Router, which uses a task-shared core scorer and progress-conditioned generation expansions, optimized through generation decomposition and cross-task core alignment. At inference, CE-Router compacts token computation and supplies a learned routing signal to Unified Computation Scheduling, which coordinates layer skipping, FFN pruning, diffusion-head cache reuse, and denoising-step early exit. Experiments on two representative UMM architectures demonstrate consistent quality--efficiency improvements across both tasks, retaining 98.03\\% of dense understanding performance with a 1.93$\\times$ end-to-end inference speedup.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.29291v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.29291v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2608.29291v2 全文及 2026-09-02T21:33:46.000Z 的审阅记录整理；PDF 25 页，SHA-256 db4a986bd13e61f0288765a70aa8bea9323ad2becb8a0aec57ad330aed7e6ece；原审阅已视觉核验第 1、5、8、9、10 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。",
+    "ideaZh": "CE-Router 针对同一 unified multimodal backbone 的理解与生成，不再各训独立 router：shared core scorer 捕获跨任务稳定 token importance，generation expansions 随 denoising segment 修正；同一 routing signal 再协调 layer skip、FFN prune、diffusion-head cache 与 early exit。作者报告 Show-o2 上理解保留 98.03%、latency 474→245 ms，但生成仍有质量下降且 BAGEL speedup 较小，适合作为 efficiency architecture skim。",
+    "methodFlow": [
+      "探测统一模型在 understanding layers 与 generation timesteps 的 token importance，识别 shared core 加 generation residual 结构",
+      "在 routed layers 以 shared core scorer 为两任务排序 tokens，并按 denoising segment 添加 generation expansion scorer",
+      "Stage I 用 generation samples 学 core/expansion decomposition，Stage II 加入 understanding samples 对齐 shared core",
+      "推理时按 router top-k compact tokens，并在理解侧压缩 prefill/KV cache、生成侧逐 timestep 更新",
+      "用同一 router signal 动态准入 layer skipping、FFN pruning、diffusion-head cache reuse 与 denoising early exit"
+    ],
+    "motivationZh": "统一多模态模型中 understanding 与 generation 的 token redundancy 并不完全共享；CE-Router 研究共享 core、生成 residual 与多类计算调度如何协同。",
+    "methodZh": "论文先以 attention/probe 分析发现 understanding importance 相对稳定，而 generation top-k sets 随 timestep 漂移，且 generation probe 对 understanding target 的覆盖高于反向覆盖。CE-Router 因此在每个 routed layer 使用 task-shared core MLP 和四个 generation segment-specific residual scorers，先以 generation data 学 decomposition，再联合理解/生成做 cross-task alignment。UCS 以 retained/drop sets 的 redundancy、saliency leakage、temporal Jaccard stability 控制四类 acceleration operators。",
+    "experimentsZh": "实验设置：Show-o2-1.5B shared Transformer 与 BAGEL-7B-MoT；7 个 understanding benchmarks，GenEval 100 steps、DPG-Bench 50 steps、432²；对比 dense、FlashU、UniMoD。Show-o2 用 10K generation+10K understanding 和 LoRA，BAGEL 用 100K+10K。\n作者报告 Show-o2 CE-Router+UCS 在 understanding 上 98.03% relative score、245.25 ms，优于 FlashU 的 83.19%、483.85 ms；生成 GenEval 64.45/10.71 s，也优于 FlashU 64.16/11.37 s。（Table 1, p. 8）\n作者报告 BAGEL CE-Router+UCS 理解 latency 487.68→403.34 ms、relative score 96.44%；DPG-Bench latency 40.01→36.11 s、score 83.95→80.77。（Table 1, p. 8）\n比较范围：覆盖一个 training-free multi-operator baseline 与一个 learned routing baseline，并做跨两种 unified architectures；dynamic method 需要额外 router data/training，和 baseline 的参数/训练成本并非完全对称。\n消融与诊断：Table 2-3 消融 shared/independent/core-expansion router、generation segments、training order、consistency weight 与四类 UCS operators；还报告 threshold profiling 和 matched operating points。",
+    "insightZh": "主要创新是显式建模 understanding/generation redundancy 的 asymmetric sharing boundary，并把 learned token routing signal 扩展为多 operator scheduling interface，而不是简单叠加两个 task-specific pruning modules。",
+    "whyRelevantZh": "它同时作用于 VLM understanding 与 image generation 的统一 backbone，为 multimodal token routing 和生成 trajectory acceleration 提供可迁移设计。",
+    "evidenceZh": "CE-Router 由跨任务 shared core 与 progress-conditioned generation expansions 组成，UCS 复用其决策控制四类 acceleration operators。（Sec. 3 and Fig. 3, pp. 5-7；方法图已视觉核验，显示 shared/independent router 与 core-expansion 设计差异。）\n作者报告 Show-o2 的 CE-Router+UCS 保留 98.03% understanding score，FLOPs 6.37T→2.73T、latency 474.41→245.25 ms。（Table 1, p. 8；对应约 1.93 倍 end-to-end latency speedup；所有数字为作者报告。）\n作者报告 Show-o2 generation 上 CE-Router+UCS 的 GenEval 64.45、latency 10.71 s，相对 dense 71.30、12.46 s，存在明确质量折中。（Table 1, p. 8；不能只报告理解侧 speedup 而隐藏 generation score drop。）\nablation 显示移除 consistency loss 后 UMM average 由 99.36 降至 93.03、GenEval 由 66.33 降至 52.74。（Table 2, p. 9；支持 cross-task alignment 是核心组件，但 router 自身仍增加 185.15M parameters。）",
+    "caveatZh": "只研究以 visual token sequences 为接口的 transformer UMM，迁移到其他 modality interfaces 或 generation paradigms 需要架构适配。\n动态 compaction 与 scheduling 的实际 speedup 会随硬件、kernel 和 runtime stack 改变。\nShow-o2 的 1.93 倍 headline 主要在 understanding latency；generation 与 BAGEL 的端到端加速显著更小并伴随质量下降。\nrouter 额外参数达 185.15M，且需 10K-100K generation samples/two-stage training，部署总成本未纳入主 speedup。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

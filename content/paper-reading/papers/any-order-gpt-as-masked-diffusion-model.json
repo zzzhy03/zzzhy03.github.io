@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2506.19935",
+  "slug": "any-order-gpt-as-masked-diffusion-model",
+  "title": "Any-Order GPT as Masked Diffusion Model: Decoupling Formulation and Architecture",
+  "authors": [
+    "Shuchen Xue",
+    "Tianyu Xie",
+    "Tianyang Hu",
+    "Zijin Feng",
+    "Jiacheng Sun",
+    "Kenji Kawaguchi",
+    "Zhenguo Li",
+    "Zhi-Ming Ma"
+  ],
+  "publishedAt": "2025-06-24",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2506.19935"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG",
+    "stat.ML"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "masked diffusion",
+    "any-order autoregression",
+    "KV cache",
+    "AO-GPT"
+  ],
+  "abstract": "Efficiently scaling Large Language Models (LLMs) necessitates exploring alternatives to dominant autoregressive (AR) methods, with Masked Diffusion Models (MDMs) emerging as candidates. However, comparing AR (typically decoder-only) and MDM (often encoder-only) paradigms is confounded by differing architectures, obscuring true algorithmic and efficiency trade-offs. This research decouples these factors by evaluating MDMs within a decoder-only framework to: (1) Equitably compare MDM (as Any-Order AR) and standard AR paradigms through discrepancies on orders. (2) Investigate MDM architectural impacts on computational efficiency. We show decoder-only MDMs, despite a larger modeling space, can achieve significant inference speedups ($\\sim25\\times$) and comparable perplexity with techniques like temperature annealing, offering a path to reduced inference compute. This work provides insights for developing more computationally efficient foundation models by disentangling core modeling choices from architectural influences. Code is available at https://github.com/scxue/AO-GPT-MDM.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2506.19935v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2506.19935v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/scxue/AO-GPT-MDM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2506.19935v2 全文及 2026-09-02T21:33:46.000Z 的审阅记录整理；PDF 21 页，SHA-256 de32b71d27e0267364a2379840c7789ac26ac30c9423b4d0f979174cc69b7c7e；原审阅已视觉核验第 1、5、8、9 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：ICML 2026 Oral Presentation; updated to the camera-ready version",
+    "ideaZh": "这篇 ICML Oral 的价值是把 masked diffusion 与 encoder-only/full-attention 拆开：AO-GPT 用 decoder-only causal attention 学 any-order factorization，从而保留 KV cache，并用 specialized mask 并行预测本轮 unmask tokens。作者报告相对 encoder-only SEDD 生成约 25 倍加速，温度退火后 generation perplexity 可接近；但实验最多 350M、只看 perplexity/无条件生成，尚不能外推到 7B+ 或 downstream reasoning。",
+    "methodFlow": [
+      "将 masked diffusion 重写为任意 factorization order 下的 autoregressive conditionals",
+      "以 sigma-GPT 风格 target-position injection 构建 decoder-only AO-GPT，并混入 10% left-to-right orders",
+      "训练时对随机 order 的 observed context 与 target positions 做 causal prediction，并以 EMA 稳定优化",
+      "生成时固定一个 order，复用 causal KV cache，并用特殊 attention mask 并行预测本轮多个 masked tokens",
+      "通过 temperature/top-p annealing 在速度与 unconditional generation perplexity 间折中"
+    ],
+    "motivationZh": "Masked diffusion 是否必须采用 encoder-only/full-attention，以及 any-order objective 与 decoder causal cache 能否兼容，是这项工作要拆开的两个问题。",
+    "methodZh": "论文把 MDM 视为 Any-Order Autoregressive model，在同一 decoder-only architecture 中对比固定 left-to-right 与随机 order objectives，发现任何顺序训练收敛更慢，而混入 10% L2R data 可同时改善 L2R 与 any-order loss。架构对比显示 encoder-only conditional 对 context order invariant，而 causal decoder 对 order sensitive、建模空间更大；decoder 的固定 generation order 允许 KV cache，并通过单次 forward 的特殊 mask 同时预测多个待 unmask positions。",
+    "experimentsZh": "实验设置：OpenWebText，GPT-2 small/medium（约 125M/350M），context 1024；在 LAMBADA、WikiText2/103、PTB、1BW 上评 likelihood/perplexity，并与 GPT-2、sigma-GPT、SEDD、RADD 比较；生成由 GPT-2-Large 评 perplexity。\n作者报告 AO-GPT-Medium 在 1024 generation steps 的时间约为 SEDD-Medium 的 1/25；在 top-p 0.95、temperature 0.7 下 generation perplexity 为 4.6，对比 SEDD 5.1。（Fig. 5 and Table 1, p. 8）\n作者报告 350M any-order validation 中 AO-GPT 单次 evaluation 仍落后 encoder SEDD/RADD；64-order ensemble 后 WikiText2 达 30.16，接近 SEDD 31.04，但 ensemble 仅用于诊断。（Table 4, p. 17）\n比较范围：在同数据/规模下覆盖 encoder-only masked diffusion、decoder AR 与 any-order baselines，并明确处理 Gumbel precision；没有 7B+ foundation model、instruction tuning、downstream task、long-form质量或端到端 serving benchmark。\n消融与诊断：附录消融 target-position injection、EMA、AdaLN、10% L2R mixing 与 context-order ensemble；这些分析解释了 AO-GPT 改善来源，也显示 order-invariance gap 仍存在。",
+    "insightZh": "关键贡献是把 formulation 与 architecture 正交化：证明/实证 masked diffusion 不必绑定 encoder-only full attention，并揭示 decoder order-sensitivity 带来的更大 conditional space、likelihood gap 与 cache-friendly O(n) generation trade-off。",
+    "whyRelevantZh": "它属于 LLM landmark radar 中少数直接挑战 AR-vs-diffusion 建模边界的工作，并对视觉 autoregressive/diffusion architectures 也有方法论迁移价值。",
+    "evidenceZh": "同一 decoder-only 架构下，AO-GPT 的 any-order objective 比 standard L2R GPT 初期收敛更慢，混入 10% L2R orders 可改善两种 evaluation order。（Sec. 4 and Figs. 2-3, pp. 5-6；视觉核验的训练曲线与正文共同支持 order inductive bias，而非架构差异。）\n固定 generation order 后，decoder-only AO-GPT 通过 KV cache 与并行 unmask mask 将作者分析的总生成复杂度从 encoder-only 的 O(n²) 降为 O(n)。（Sec. 5.3, pp. 7-8; Appendix A.4, p. 15；该复杂度依赖预先固定 order 和作者的采样过程，不表示所有 diffusion decoding 都可直接缓存。）\n作者报告 sequence length 1024、batch 32 时 AO-GPT-Medium 相对 SEDD-Medium 生成约 25 倍更快。（Fig. 5, p. 8；速度图已视觉核验；比较的是 350M 级 decoder vs encoder implementations。）\n作者报告无 annealing 时 AO-GPT generation perplexity 明显更差，top-p 0.95/temperature 0.7 后两者才接近。（Table 1, p. 8；例如 1024 steps 时 AO-GPT/SEDD perplexity 为 136.4/81.6（无 annealing）与 4.6/5.1（强 annealing）。）",
+    "caveatZh": "最大模型约 350M，能否扩展到更大计算规模未知。\n主要评测是 likelihood/perplexity 与 generation efficiency，没有验证 downstream tasks、infilling、editing 或 constrained generation。\n结论聚焦自然语言的强 left-to-right structure，对其他 discrete modalities 的适用性未知。\n25 倍速度收益主要来自 decoder causal cache 相对 encoder full recomputation，不能单独归因于 masked diffusion formulation。\n强 temperature annealing 后的 external-model perplexity 接近不等价于语义质量、diversity 或 instruction following 已追平。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

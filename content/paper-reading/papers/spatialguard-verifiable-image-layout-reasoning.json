@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.01582",
+  "slug": "spatialguard-verifiable-image-layout-reasoning",
+  "title": "SpatialGuard: Harness-Guided Verifiable Spatial Reasoning for Text-to-Image Generation",
+  "authors": [
+    "Ziyun Qian",
+    "Zizhi Chen",
+    "Yizhou Liu",
+    "Mingyang Sun",
+    "Dingkang Yang",
+    "Lihua Zhang"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01582"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "text-to-image",
+    "spatial layout",
+    "verifiable reasoning",
+    "layout harness"
+  ],
+  "abstract": "Complex 3D spatial text to image generation requires models to convert natural language into stable visual geometry, not merely semantic appearance. Existing prompt-driven or layout-conditioned methods improve controllability, but often lack an optimizable and verifiable spatial intermediary before visual sampling. As a result, object relations, occlusion, visibility, and camera constraints can decay during multi-round generation. This paper presents SpatialGuard, a structured layout-guided framework for complex 3D spatial text-to-image generation. SpatialGuard parses prompts into image synthesis-oriented 3D layouts through a Spatial Layout Architect, realizes them as visual conditions and candidate images through a Visual Realizer, and uses a Visual Alignment Critic to validate consistency among prompt, layout, and image. To keep constraints stable across iterations, SpatialGuard introduces a Layout Harness that organizes rule constraints, tool invocation, shared knowledge, and feedback loops around the editable layout state. This design turns complex spatial generation from implicit prompt following into a verifiable process of planning, realization, validation, and repair. Comprehensive experiments show that SpatialGuard achieves state-of-the-art performance in complex 3D spatial layout generation and improves spatial faithfulness over existing text-to-image and layout control baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01582v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01582v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01582v1 全文及 2026-09-02T21:31:00.000Z 的审阅记录整理；PDF 11 页，SHA-256 edda8366f7ab724b6c5c716de692c2d7e5f1f2f91ed1b8cb56aa107efbe9ca6d；原审阅已视觉核验第 1、4、7、9 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。",
+    "ideaZh": "SpatialGuard 把复杂空间文生图改写为可核验的 layout-state program：Spatial Layout Architect 生成带 object/relation/scale/support/visibility/camera 的 3D layout，Visual Realizer 产出条件与图像，Visual Alignment Critic 把失败约束转为可执行 repair plan；Layout Harness 保存规则、工具、知识和反馈。作者报告总体 spatial faithfulness 9.37，但评测依赖 VLM judges。",
+    "methodFlow": [
+      "从 prompt 解析 objects、relations、scale、support、occlusion、visibility 与 camera",
+      "Spatial Layout Architect 构建并维护 editable 3D layout",
+      "Visual Realizer 将 layout 转为 mask/token condition 并生成 candidate image",
+      "Visual Alignment Critic 核验 prompt-layout-image 并调用工具修复，直至约束通过"
+    ],
+    "motivationZh": "复杂文生图中的空间关系、遮挡与相机约束容易在多轮生成中漂移；SpatialGuard 用显式 3D layout state 与可执行验证、修复循环保存这些约束。",
+    "methodZh": "论文针对多轮生成中空间关系、遮挡与相机约束逐步漂移的问题，用显式可编辑 3D layout 作为跨轮共享状态，并把 plan-realize-validate-repair 组织为 harness。定量结果和 ablation 支持各模块对空间一致性的贡献，定性图也显示相对位置和对象完整性更稳定；但没有真实 3D geometry ground truth，最终图像质量仍受底层 generator 限制。",
+    "experimentsZh": "实验设置：固定 prompt set，每个方法每 prompt 生成三张图；三个 VLM judges 按 presence/position/relation/depth/scale/support/framing 打分，并做模块 ablation。\n作者报告 SpatialGuard Overall=9.37，所有七个空间维度均为表中最高。（Table 1, p. 7）\n比较范围：覆盖 HunyuanImage、SD3.5、FLUX、Self-Cross、T2I-R1、Janus-Pro-R1、NextStep-1 等 prompt/layout/control baseline；没有人工排序、真实 geometry 或统一底层 generator 的完整控制。\n消融与诊断：Table 2 分别移除 Layout Architect、Visual Realizer、Visual Alignment Critic 和 Harness；完整模型最佳，但缺少工具调用次数、失败率和成本敏感性分析。",
+    "insightZh": "关键新增是围绕显式 layout state 的 harness：规则约束、工具调用、共享知识和反馈循环共同防止多轮 spatial intent 遗失，而不是仅增加一次 layout conditioning。",
+    "whyRelevantZh": "显式 3D layout 与闭环 repair 可直接迁移到 controllable image generation、3D-aware creation 和 visual design agents。",
+    "evidenceZh": "系统以 Layout Architect、Visual Realizer、Alignment Critic 和可执行 repair tools 形成闭环。（Sec. 3.1, Fig. 2, p. 4；方法图已视觉核验，明确显示共享 layout state、constraint checks 与 feedback loop。）\n作者报告 SpatialGuard 在七个空间维度及 Overall 上均领先所列 baseline，Overall 为 9.37。（Sec. 4.2, Table 1, p. 7；分数来自 Gemini/Qwen/Grok 三个 VLM judges，不等同于人工或几何 ground truth。）\n作者报告去掉 Architect、Realizer、Critic 或 Harness 都降低 Overall，其中完整系统为 9.37。（Table 2, p. 9；Ablation 支持闭环组件有效，但系统各组件仍高度耦合。）\n方法只覆盖可由 object list、relation、visibility 与 camera parameter 表达的空间场景。（Limitations, p. 9；抽象艺术意图、复杂物理交互与底层生成器能力不由现有框架解决。）",
+    "caveatZh": "只能处理 object list、relation、visibility 和 camera parameter 可表达的场景。\n抽象艺术意图、复杂物理交互与最终图像质量仍受底层 generator 限制。\n核心分数完全依赖 VLM judges，且系统编排与底层模型差异可能共同贡献收益；所有比较为作者报告。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

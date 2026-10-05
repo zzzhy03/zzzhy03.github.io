@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2606.20131",
+  "slug": "triflow-artist-like-mesh-topology",
+  "title": "TriFlow: Generating Artist-Like 3D Mesh Topology via Nearest-Vertex Vector Fields",
+  "authors": [
+    "Haoxuan Li",
+    "Ziya Erkoç",
+    "Daniele Sirigatti",
+    "Vladislav Rosov",
+    "Lei Li",
+    "Angela Dai",
+    "Matthias Nießner"
+  ],
+  "publishedAt": "2026-06-18",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2606.20131"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "mesh topology",
+    "nearest-vertex vector field",
+    "flow matching",
+    "constrained QEM"
+  ],
+  "abstract": "We present TriFlow, a new generative approach for producing compact 3D meshes with artist-like triangle topology directly from input geometry conditions such as signed distance fields. Our key insight is to represent mesh topology as a nearest-vertex vector field (NVF) defined over the surface, where each point encodes its association to the nearest triangle vertex in the local barycentric frame. We train a latent flow-matching model to synthesize this field, enabling topology generation conditioned on the input geometry. To extract a coherent mesh, we cluster surface regions using the generated NVF and guide a constrained quadric error metric (QEM) mesh simplification with topology-aware optimization. This yields output meshes that closely match the input geometry while exhibiting structured, artist-like connectivity. Experiments demonstrate that TriFlow achieves stronger generalization and significantly improved topology quality compared to state-of-the-art learning-based approaches, alongside 90% lower Chamfer Distance and an 8x speedup.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.20131v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.20131v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2606.20131v3 全文及 2026-09-02T21:40:00.000Z 的审阅记录整理；PDF 30 页，SHA-256 38b6a3a216fb3bba7fe2cd26198381f63d8d1cd89e02ef6675fba29e616aae07；原审阅已视觉核验第 1、4、5、12、14 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：Project page: https://derkleineli.github.io/triflow/ Video: https://www.youtube.com/watch?v=Nl57QcuKkeA",
+    "ideaZh": "TriFlow 不直接自回归 triangles，而把 artist-like topology 表示为 surface nearest-vertex vector field：每点指向局部 barycentric frame 最近 vertex，latent flow model 由 SDF+face-count/quad-ratio 生成 NVF，再以 watershed grouping 与 constrained QEM 提取 mesh。作者报告 topology perceptual scores、Chamfer 与速度优于 baselines；但依赖 voxelized SDF，large-scale scene 和编辑稳定性未验证。",
+    "methodFlow": [
+      "从 target mesh 定义 surface NVF，并离散为 sparse voxel grid",
+      "用 SDF encoder、face-count/quad-ratio condition 与 latent flow matching 生成 NVF",
+      "对预测 field 做 watershed grouping 得到 vertex-associated regions",
+      "用 constrained QEM 仅在同 group 内合并，输出 compact artist-like triangle mesh"
+    ],
+    "motivationZh": "直接自回归 triangle sequences 带来长序列与可变 connectivity 难题；TriFlow 将 artist-like mesh topology 转为可生成的 nearest-vertex vector field。",
+    "methodZh": "NVF 把 variable-cardinality connectivity 变成 regular voxel field，使 topology 可以用 flow matching 建模；生成结果同时含 vertex positions 与 triangle formations，后处理不引入新的 topology，只吸收 prediction noise/voxel aliasing。Objaverse/TRELLIS 和 Geometry set 的几何、VLM/human topology preference 与 ablation 支持三部分设计，但指标仍偏 proxy，缺真实 artist workflow/user editing。",
+    "experimentsZh": "实验设置：Objaverse generated shapes、TRELLIS geometry 与单独 Geometry set；比较 QEM、QuadriFlow、MeshMosaic、TreeMeshGPT 等，评估 Chamfer/FID、VLM/human geometric/topology preference、速度与 ablation。\n作者报告相对 state-of-the-art learning baselines 可实现约 90% 更低 Chamfer Distance 与 8× speedup，并在多数 topology preference 指标领先。（Abstract and Tables 1-2, pp. 1, 12）\n比较范围：覆盖 classical simplification、field-based 和 autoregressive learned mesh generation；未覆盖工业 retopology artists、交互编辑、动画 deformation 或大场景。\n消融与诊断：去掉 watershed、QEM geometry constraint 或 augmentation 的 controlled results 支持三部分互补；face-count/quad-ratio condition 与 voxel resolution sensitivity 仍可更充分。",
+    "insightZh": "NVF 把 mesh connectivity/vertex association 编成可生成的局部向量场，避开长 triangle sequence，再用 topology-aware extraction 保留几何，形成新的 mesh-topology generation representation。",
+    "whyRelevantZh": "直接推进可编辑/紧凑 3D mesh topology generation，对 CAD、asset creation 与结构化 3D 表示高度相关。",
+    "evidenceZh": "TriFlow 的三个核心组件是 NVF representation、conditional latent flow generation 与 watershed+constrained QEM extraction。（Sec. 3, Fig. 2, p. 5；方法 overview 已在 exact PDF 视觉核验。）\n作者报告在 Objaverse/TRELLIS 上同时取得强 Chamfer/FID 与 topology preference，且 human/VLM preference 多数高于 baselines。（Sec. 4, Tables 1-2, p. 12；topology quality 部分由 VLM/human preference proxy 衡量。）\nAblation 显示去掉 watershed、constrained QEM 或 augmentation 会恶化 geometry/topology/generalization。（Fig. 7 and Table 3, p. 14；三项对照支持 extraction constraints 与数据增强的作用。）\nVoxelized representation 限制扩展到 large-scale scenes，autoregressive baseline 的 editing/artifact 风险也未被真实 workflow 评测。（Limitations, p. 14；作者明确将 multi-resolution/coarse-to-fine 作为未来方向。）",
+    "caveatZh": "依赖 voxelized representation，扩展到 large-scale scenes 困难。\n未来需 multi-resolution coarse-to-fine generation。\nVLM preference 不是 production topology validity；artist-like 仍缺专业建模者的编辑、deformation 与 downstream pipeline 评测。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

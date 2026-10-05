@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2609.00355",
+  "slug": "glance-one-pass-vlm-speculative-decoding",
+  "title": "Vision Is Not Overhead: One-Pass Block Drafting for Lossless Speculative Decoding in Vision-Language Models",
+  "authors": [
+    "Jungseob Lee",
+    "Seongtae Hong",
+    "Dongyub Jude Lee",
+    "Chanjun Park",
+    "Jaehyung Seo",
+    "Sugyeong Eo",
+    "Heuiseok Lim"
+  ],
+  "publishedAt": "2026-08-31",
+  "updatedAt": "2026-08-31",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00355"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "speculative decoding",
+    "block diffusion",
+    "wide-tree verification",
+    "VLM inference"
+  ],
+  "abstract": "Speculative decoding accelerates generation without changing its output, yet on vision-language models (VLMs) it has been caught in a self-defeating cycle. The drafter stays autoregressive, so it must stay small. A small drafter cannot afford the image at every step, so vision is compressed, pruned, or hidden. A drafter cut off from the image is then least reliable exactly where the image makes text predictable. We present GLANCE, the first one-pass block drafter that is lossless on an unmodified VLM target, and it breaks the cycle at both ends. A block-diffusion head reads the target's already-fused vision-language state, so vision costs the drafter nothing, and fills a whole block in one forward pass, so depth costs no sequential steps. A wide candidate tree is verified in one target pass, and every audited prompt reproduces greedy decoding exactly. Grounded workloads reward this most, entering a verbatim-copy regime whose long runs cost an autoregressive drafter a pass for every token and a block drafter one in total. Under one engine and one round budget, GLANCE decodes up to 2.93x faster than autoregression, from one draft pass a round where the production EAGLE3-VL head takes eight, and accepts 2.7x longer blocks than an EAGLE-3 head trained on the same corpus. One law organizes these results. Accepted length is set by the target's next-token entropy, with a fitted slope that steepens with grounding across all five tasks. The law transfers across targets and modalities and names its own boundary, since free-running text still favors a chain. Our code is available at https://github.com/js-lee-AI/GLANCE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00355v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00355v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/js-lee-AI/GLANCE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00355v1 全文及 2026-09-02T21:31:57.000Z 的审阅记录整理；PDF 18 页，SHA-256 1898bb7329fdfef822672801a1eff55d2363465d3217775f0cf5844fee2267c8；原审阅已视觉核验第 1、3、5、10 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：18 pages, 9 figures, 17 tables. Code: https://github.com/js-lee-AI/GLANCE",
+    "ideaZh": "GLANCE 用一个 1.05B、5-layer block-diffusion head 读取 frozen Qwen3-VL-8B 的多层 fused vision-language states，一次 forward 同时预测 15 个 offsets；再把高分 prefixes 组装成 prefix-closed wide tree，用一个 ancestor-masked target pass 验证并提交 target 自己的 greedy path。作者报告固定 engine/card/32-token round budget 时，在 grounded InfographicVQA/DocVQA/ChartQA 上比 production EAGLE3-VL 快 7.6%/5.4%/6.0%，ChartQA 达 2.93× autoregression；但 caption/TextVQA 反而慢 16.2%/19.1%，bitwise guarantee 主要是 fp32 greedy audit、batch-one decode-only，小样本与 cross-attention architecture 还会反转其 entropy ordering。",
+    "methodFlow": [
+      "冻结 target VLM；从多个 decoder layers 读取已经融合图像信息的 vision-language hidden states",
+      "5-layer block-diffusion head 在一次 forward 中并行输出未来 block 各 offset 的 token marginals",
+      "按 marginal plug-in score 选出高概率 prefixes，构造固定 node budget 的 prefix-closed wide candidate tree",
+      "将树打包为 ancestor-masked target pass，使每个 node row 对应原 target 的 autoregressive conditional",
+      "提交与 target greedy continuation 一致的最长 path，再从最后验证 row 取 bonus/root token，循环解码"
+    ],
+    "motivationZh": "VLM speculative decoding 的顺序 draft passes 和浅候选树可能浪费 fused multimodal states；GLANCE 研究 one-pass block drafting 与 wide-tree target verification 的效率边界。",
+    "methodZh": "GLANCE 针对 VLM speculative decoding 的矛盾：autoregressive drafter 深度昂贵，压小后又无法持续看到 image。其 block head 不读取 raw visual tokens，而重用 target 已融合的 hidden states，以单 pass 输出多个 future-position marginals；tree builder 用 plug-in prefix score 选择固定 budget 的宽树，target 通过 packed ancestor mask 得到每个 node 的正确 conditional，并只提交自身 greedy continuation。实验同时比较 production EAGLE3-VL、ViSpec、Medusa、n-gram、classic two-model drafts，并以 matched-training、same-head tree-vs-chain、same-engine timing 和 entropy intervention 分离 architecture/head/data/engine 因素。所有结果均为作者报告。",
+    "experimentsZh": "实验设置：主 target 为 Qwen3-VL-8B，tasks 从 open-ended captioning/TextVQA 到 grounded InfographicVQA/DocVQA/ChartQA；比较 n-gram、三种 classic drafts、production EAGLE3-VL、ViSpec、Medusa 与 GLANCE。包含 matched-training OCR corpus、same-head tree/chain、same-engine CUDA graph/eager、2K/6.7K context、T=1 sampling、Qwen2.5-VL 与 Llama-3.2-Vision transfer，以及 entropy/image mismatch interventions。\n作者报告：GLANCE 在 ChartQA 达 8.26 ms/token、2.93× autoregression，并比同条件 EAGLE3-VL 快 6.0%；DocVQA 快 5.4%，而 captioning 慢 16.2%。（Table 1, p. 5）\n作者报告：matched-training GLANCE 在五任务 acceptance τ 为 4.05/3.97/3.90/4.13/7.44，EAGLE3 depth-3 为 1.62/1.59/1.55/1.58/1.87。（Table 2, p. 6）\n作者报告：fp32 audit 中 GLANCE 60/60 prompts 与 target greedy tokens 完全一致；bf16 同一 no-drafter target 自身只 25/60 与 fp32 reference 一致，说明 arithmetic identity 必须单独处理。（Table 7, p. 15）\n比较范围：覆盖 production EAGLE3-VL、已发表 VLM drafter ViSpec、Medusa、n-gram、classic two-model SD，并用 matched-training/same-engine controls 尽量消除 confounds；但有些 cross-harness speedups、sample counts 与 hardware 不同，作者将完整 timing ledger 放在 appendix。\n消融与诊断：消融 zero fused conditioning、text-only states、same head tree-vs-chain、tree budget、OCR-targeted retraining、correct vs mismatched image，并检验 entropy-law 跨 target/modality transfer。仍缺更大 batch、长生成、更多 production targets 和 end-to-end prefill+decode workload。",
+    "insightZh": "核心创新是把 one-pass block drafting 与 wide-tree verification 组合到 unmodified VLM target，并利用 fused multimodal states 免费继承 vision conditioning；相较 autoregressive EAGLE-style head，它把 tree depth 的 sequential draft passes 消掉。论文还以 target entropy 建模 accepted length，但该规律更多是经验 characterization，architecture-dependent 且附录明确有近似假设。",
+    "whyRelevantZh": "它直接推进 VLM/MLLM grounded generation 的 decoding architecture，并说明何时 image-conditioned context 能转化为更长 speculative blocks；对 OCR/document/diagram understanding 与多轮 visual agents 的 inference cost 有直接参考价值。",
+    "evidenceZh": "block head 从 frozen target 的五层 fused states 一次生成整个 block，wide tree 再由一个 packed target pass 验证。（Secs. 3.2–4.2 and Fig. 2, pp. 3–4；方法图已视觉核验，明确显示不读取 raw visual tokens、one draft pass、wide tree 与 target-greedy commit。）\n在 unique argmax 且 packed/unpacked perturbation 小于 top-2 gap 时，tree 只改变一次提交长度，不改变 greedy token sequence。（Theorem 1, Sec. 4.2, p. 4; full proof, Appendix B.1, p. 10；限制页同时说明 fp32/bf16 和 near-tie 条件，不能把 lossless 无条件外推到所有 production arithmetic。）\n作者报告：same-engine/card/round-budget 下，GLANCE 在 InfographicVQA、DocVQA、ChartQA 比 production EAGLE3-VL 快 7.6%、5.4%、6.0%，但 captioning/TextVQA 慢 16.2%、19.1%。（Table 1, p. 5；主表已视觉核验，保留赢/输两种 regime，不只摘录最大 2.93×。）\n作者报告：matched-training 时 GLANCE budget-63 tree 的 pooled acceptance 相对 depth-3 EAGLE3 head 更长，且 same-head tree-vs-chain forward harness 给出 1.36×。（Sec. 5.3–5.5 and Table 2/Fig. 3, pp. 5–6；这些 controls 支持收益主要来自并行 block+tree width，而不只是更大的 drafter head。）",
+    "caveatZh": "所有 headline claims 都是 batch-one、decode-only，不声称适用于更大 batch。\nbitwise guarantee 是 greedy regime；sampled decoding 只保 target distribution，不定义 byte identity，且样本量较小。\nbitwise proof/audit 以 fp32 为主，production bf16 依赖 tie-aware gate；部分 cross-target fits 使用 two-model proxies。\ngrounding–entropy ordering 依赖 architecture，在 cross-attention fusion 的 Llama-3.2-Vision 上会反转。\n主表在 open captioning 与 TextVQA 上比 EAGLE3-VL 更慢，方法的实际价值依赖输出 entropy、copy regime、tree packing 与 CUDA graph capture。\n1.05B drafter 比 EAGLE3-VL head 大 2.6×；one-pass 节省需要硬件/engine 能将宽树 verification 和大 head 有效摊销。\n部分 same-engine gains 只有几十个 prompts，长 context 置信区间可跨零，不能把最大 2.93× 当作普遍生产收益。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

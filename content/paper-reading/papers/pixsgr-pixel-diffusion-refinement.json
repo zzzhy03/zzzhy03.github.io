@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2609.00798",
+  "slug": "pixsgr-pixel-diffusion-refinement",
+  "title": "Advanced Pixel Diffusion Model with Guided Sparse Global Refinement",
+  "authors": [
+    "Weiyi You",
+    "Jinhua Zhang",
+    "Xingyu Zhou",
+    "Wei Long",
+    "Junyu Lou",
+    "Shuhang Gu"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00798"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "pixel diffusion",
+    "sparse global refinement",
+    "channel bottleneck",
+    "ImageNet generation"
+  ],
+  "abstract": "Pixel-space diffusion has recently emerged as a promising direction for high-fidelity image generation by modeling images directly in the original pixel domain. However, pixel-space diffusion is computationally demanding due to the extremely high dimensionality of natural images. For efficiency, existing pixel diffusion models either compromise fine details with large-patch tokenization or confine subsequent refinement within individual patches. Such intra-patch refinement inevitably restricts structural continuity across patch boundaries and long-range token interactions, limiting refinement quality. To address these issues, we propose PixSGR, a novel Pixel diffusion framework with Sparse Global Refinement tailored for modeling the distribution of natural images directly in pixel space. PixSGR starts from a supervised low-channel bottleneck to efficiently capture the low-dimensional manifold of natural images. It then progressively expands the channel dimensionality and spatial resolution to recover increasingly fine-grained structures. At the spatial refinement stage, coarse-scale attention maps preselect globally relevant interactions to pre-sparsify fine-scale attention, enabling non-local refinement beyond isolated patches without the quadratic cost of dense attention. Extensive experiments on ImageNet validate the effectiveness of PixSGR. It achieves an FID of 1.51 at 256$\\times$256 and maintains performance when scaled to 512$\\times$512, attaining an FID of 1.60.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00798v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00798v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/CVL-UESTC/PixSGR"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00798v1 全文及 2026-09-02T21:33:46.000Z 的审阅记录整理；PDF 15 页，SHA-256 3f3eb344d72add679d11188bf44ea23a996aa5cbf507467a0c13308d4bd531ad；原审阅已视觉核验第 1、3、5、7 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：Code: https://github.com/CVL-UESTC/PixSGR",
+    "ideaZh": "PixSGR 针对 pixel-space diffusion 的高维成本与 patch seam，把早期 blocks 压成 supervised low-channel bottleneck，再扩 channel/空间分辨率，并用 coarse attention 的 top-k pattern 预稀疏化 fine-scale global attention。作者报告 875M 模型在 ImageNet 256²、320 epochs 达 gFID 1.51，在所列 pixel baselines 中最佳；但证据仍限 class-conditional ImageNet，未证明 text-to-image 与开放域扩展。",
+    "methodFlow": [
+      "输入 noisy pixels、diffusion time 与 ImageNet class condition，直接预测 clean image/flow velocity",
+      "用低通道 Transformer bottleneck 与 auxiliary clean-image head学习 compact coarse representation",
+      "扩展 channel 容量并把 feature 上采样到更细 spatial resolution",
+      "将 coarse attention top-k 通过 hybrid mapping 转成 fine-scale sparse global attention indices",
+      "用 convolutional upsampling 重建局部细节，并以 bottleneck weak prediction 做 internal guidance 输出图像"
+    ],
+    "motivationZh": "Pixel-space diffusion 的高维计算与 patch seams 阻碍高质量生成；PixSGR 研究低通道 bottleneck、渐进扩展与 coarse-to-fine sparse global attention 的组合。",
+    "methodZh": "模型以 x-prediction/flow matching 直接在像素空间训练：低通道 bottleneck 先学习 compact global representation，并用 auxiliary clean-image loss监督；后续 channel expansion 提升容量，在最高分辨率 stage 通过 coarse-to-all/coarse-to-one hybrid mapping 把上一尺度 attention pattern 变成 fine-token sparse index，保留跨 patch 的 global receptive field；最后用 convolutional upsampling 修复局部连续性，并以 bottleneck prediction 做 internal guidance。",
+    "experimentsZh": "实验设置：ImageNet-1K class-conditional 256×256 为主，50K generated samples 评 FID/sFID/IS/precision/recall；PixSGR-H batch 1024、AdamW、200/320 epochs、50-step Heun solver，并给 512×512 与 no-CFG supplement。\n作者报告 320-epoch PixSGR-H/16 的 gFID 1.51，优于同表 FrequencyBooster-H/16 1.60、PixelDiT-XL 1.61 和 AsymFlow-H/16 1.57；但 latent RAE-XL 报告 1.13。（Table 1, p. 5）\n比较范围：表格广泛覆盖近期 latent 与 pixel-space models，并区分 denoiser/autoencoder parameters；不同论文的 epochs、NFE、training loss 与复现状态不完全统一，不能把单一 gFID 排名视为严格同算力竞赛。\n消融与诊断：Table 2-3 分析 bottleneck supervision、window/neighborhood/sparse attention、top-k size/mapping、convolutional upsample 与 internal guidance；训练目标 ablation 显示 LPIPS/REPA 也贡献很大。",
+    "insightZh": "核心是将 pixel diffusion 的 coarse bottleneck supervision 与跨尺度 attention pre-sparsification 组合：不是在固定 windows 内 refine，而是用低分辨率 attention 选择高分辨率全局 token interactions，在可控成本下跨 patch。",
+    "whyRelevantZh": "它是 image-generation 的重要 pixel-space architecture advance，尤其把跨尺度稀疏 global interaction 与 coarse-to-fine design 结合，可迁移到高分辨率生成系统。",
+    "evidenceZh": "PixSGR 由 supervised low-channel bottleneck、channel expansion、coarse-guided sparse global refinement 和 convolutional upsampling 组成。（Fig. 3 and Secs. 3.2-3.3, pp. 3-4；方法总览和 mapping 公式说明了 coarse attention 如何约束 fine token connectivity。）\n作者报告 PixSGR-H/16 在 ImageNet 256×256、320 epochs 达 gFID 1.51、IS 311.0、recall 0.65。（Table 1, p. 5；主表已视觉核验；这是所列 pixel-space models 中最低 gFID，但部分 latent models 的 gFID 更低。）\n在 50-epoch ablation 中，coarse-guided sparse attention 将 FID 从 supervised bottleneck 的 74.7 降到 70.3，仅增加 5.50 GFLOPs 和 2.9M parameters。（Table 3 and Sec. 4.3, p. 7；ablation 页已视觉核验，支持 sparse refinement 是独立贡献而非只靠 loss/upsampler。）\n作者报告 512×512 class-conditional generation 达 gFID 1.60、IS 317.9，使用 879M parameters 与 300 epochs。（Table 5, p. 10；高分辨率结果位于 supplement；所有数值为作者报告，未独立复现。）",
+    "caveatZh": "验证仅限 ImageNet class-conditional generation，尚无 text-to-image、editing、开放域数据或主观偏好证据。\n875M 模型、batch 1024 与 320 epochs 仍是大规模训练；论文强调 attention efficiency，但主表未直接给完整 training wall-clock、memory 或端到端 throughput。\n最终 FID 同时受 pseudo-Huber、LPIPS、REPA、CFG 和 internal guidance 影响，架构收益不能只由最终排名归因。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

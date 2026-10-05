@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.00919",
+  "slug": "hypersketch-controllable-vector-video-sketching",
+  "title": "HyperSketch: Controllable Video Sketching in a Style Hyperspace",
+  "authors": [
+    "Xinding Zhu",
+    "Xinye Yang",
+    "Yingping Yang",
+    "Mengjian Li",
+    "Fei Gao",
+    "Jiazhou Chen"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00919",
+    "doi": "10.1145/3767308.3835664"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "vector sketch animation",
+    "Bernstein functions",
+    "style hyperspace",
+    "editable curves"
+  ],
+  "abstract": "Vector sketch animation offers tremendous advantages for multimedia and creative design through concise line expressions and flexible editing. Learning-based generation methods of sketch animation have made significant progress in the last decade, but still suffer from limited style diversity and controllability. This paper presents a controllable video sketching method that automatically converts videos into multi-style vector sketch animations. A continuous style hyperspace is constructed by multi-dimensional sketch styles (fidelity, simplicity, text guidance strength) and the timeline. With this hyperspace, stroke control points are parameterized as 4-variable Bernstein polynomials, ensuring smooth and differentiable style transitions. A multi-task, multi-stage optimization framework is designed to learn stroke hyperparameters accurately and efficiently. We further developed a web-based interactive interface that allows real-time style manipulation via editable curves. Experiments show the style controllability, high-quality, and user-friendliness of our method, which outperforms SOTA methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00919v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00919v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00919v1 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 9 页，SHA-256 3c68864a8079ba9900d64566a738320b07981d84f77d4d6775d3bef6caebe6d7；原审阅已视觉核验第 1、3、7、8 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。",
+    "ideaZh": "HyperSketch 不把每帧/每种风格的 strokes 独立存储，而是让 Bézier control points 成为 time、fidelity、simplicity、text-guidance 四维 style hyperspace 上的 multivariate Bernstein functions；配合 tracking/semantic/density/text/cross-style losses 与 progressive dimension optimization，可用 editable curves 连续操控 vector sketch animation。表示很契合结构化 2D 设计，但定量仅 10 个 DAVIS videos、用户研究仅 20 名图形学背景参与者，且 DiffVG 优化成本高。",
+    "methodFlow": [
+      "从输入视频提取 dense trajectories，并初始化 cubic Bézier vector strokes",
+      "把每个 control-point coordinate 参数化为 time/fidelity/simplicity/text-guidance 上的 multivariate Bernstein polynomial",
+      "以 semantic、ink-density、text-guidance、temporal 与 cross-style losses 通过 DiffVG 联合优化",
+      "按维度 progressive expansion/freeze coefficients，最终由 editable curves 实时查询 style hyperspace 并渲染动画"
+    ],
+    "motivationZh": "独立为每帧和每种风格优化 strokes，难以获得连续、可编辑的 sketch animation；HyperSketch 用多变量函数统一时间与多维风格控制。",
+    "methodZh": "输入视频先用 CoTracker 得到 dense point trajectories，初始 strokes 经 DiffVG 可微渲染；每个 cubic Bézier control-point coordinate 都由四变量 Bernstein basis coefficients 表示，因此任意 hyperspace location 对应一个 frame/style。五类 loss 约束 semantic fidelity、ink density、text style、temporal tracking 与 cross-style geometry，训练按 time→fidelity→simplicity→text guidance 逐维扩展并冻结旧系数。交互界面通过 editable curves 控制四维轨迹，实现实时 render；实验显示风格解耦和用户可控性，但规模较小。",
+    "experimentsZh": "实验设置：定量使用 10 个 DAVIS videos、每个最多 50 frames；比较 UPDG、CLIPasso、SketchVideo、DMTSketch、CLIPascene。指标含 CLIP/LPIPS、text-guidance sweep、multivariate-vs-additive 与 progressive-vs-one-stage ablations，另有 20 人界面 user study。\n作者报告 HyperSketch 的平均 CLIP error 6.91、LPIPS error 1.57；CLIP error 最优，但 LPIPS 高于 DMTSketch 1.43 与 CLIPasso 1.37。（Table 1, p. 7）\n作者报告所有 style controllability 用户评分均超过 4.4/5，overall 为 4.60±0.49。（Fig. 10 and Sec. 4.4, p. 8）\n比较范围：覆盖 bitmap、single-style vector、video sketch 与 discrete multi-style baselines，并有 representation/optimization ablation；但仅 10 videos、单一主展示 style 和小型同背景用户群，缺少大规模时序/编辑任务评测。\n消融与诊断：Multivariate Bernstein 比四个 univariate additive model 产生更丰富且解耦的组合；同总时间下 progressive optimization 比 one-stage 约 150 iterations 的未收敛结果更稳定。Supplement 中另有 loss ablations，但主文未给完整定量表。",
+    "insightZh": "核心新意是用单个多变量 polynomial field 同时编码 temporal motion 与多种可解释 style controls，而不是离散训练多个风格或把维度做可加和叠加；progressive optimization 使高维控制可训练且相互较少耦合。",
+    "whyRelevantZh": "这是显式、可编辑 vector strokes 的生成与多维连续控制方法，直接服务 structured 2D design、sketch animation 与交互式 visual authoring。",
+    "evidenceZh": "每个 Bézier control point 的 x/y 都表示为四变量 Bernstein basis，对应 time、fidelity、simplicity 与 text-guidance strength。（Sec. 3.1 and Fig. 2, pp. 3-4；方法图视觉核验了 hyperspace inputs、polynomial coefficients 与 vector render。）\n训练联合五类 losses，并按 time→fidelity→simplicity→text guidance 逐维优化、传播系数和冻结旧参数。（Secs. 3.2-3.3 and Fig. 3, pp. 3-5；该 progressive schedule 是避免一次优化完整 4D nonconvex space 的关键。）\n作者报告 10 个 DAVIS videos 上，HyperSketch 平均 CLIP error 为 6.91，优于 CLIPascene 7.09、DMTSketch 7.69、SketchVideo 8.27 与 CLIPasso 7.78。（Table 1 and Sec. 4.2, p. 7；数字为作者报告、未独立复现；LPIPS 并非对所有单风格 baselines 最优。）\n作者报告 20 人用户研究中 overall satisfaction 为 4.60/5，temporal coherence 与 interface usability 均为 4.85/5。（Sec. 4.4 and Fig. 10, p. 8；参与者均有 computer graphics 背景且 session 约 10 分钟，外部效度有限。）",
+    "caveatZh": "CoTracker 在快速运动或严重遮挡下会使 trajectory consistency 失效。\nDiffVG 不支持 batched differentiable rendering，遍历大量参数组合导致总体计算成本高。\n当前只有三个 style dimensions 加时间，扩展更高维交互尚未验证。\n10-video 定量与 20-person user study 规模不足以证明跨内容、长视频或普通用户的稳定性。\nCLIP/LPIPS 与感知 sketch quality/编辑效率并不完全一致，且作者结果中 LPIPS 低于若干 baselines。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

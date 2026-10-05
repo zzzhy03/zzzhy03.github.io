@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2605.05593",
+  "slug": "causal-probing-visual-representations",
+  "title": "Causal Probing for Internal Visual Representations in Multimodal Large Language Models",
+  "authors": [
+    "Zehao Deng",
+    "Tianjie Ju",
+    "Zheng Wu",
+    "Liangbo He",
+    "Jun Lan",
+    "Huijia Zhu",
+    "Weiqiang Wang",
+    "Zhuosheng Zhang"
+  ],
+  "publishedAt": "2026-05-07",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.05593"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "activation steering",
+    "visual representations",
+    "causal probing",
+    "perception-to-procedure gap"
+  ],
+  "abstract": "Despite the remarkable success of Multimodal Large Language Models (MLLMs) across diverse tasks, the internal mechanisms governing how they encode and ground distinct visual concepts remain poorly understood. To unravel these mechanisms, we propose a causal framework based on activation steering to actively probe and manipulate internal visual representations. Through systematic intervention across four visual concept categories, our results reveal a divergence in concept encoding: entity knowledge is distinctively localized, whereas abstract concepts are globally distributed across the network. Critically, this divergence uncovers a mechanistic driver of scaling laws: increasing model depth is indispensable for encoding distributed and complex abstract concepts, whereas entities maintain a consistently high degree of localization. Furthermore, reverse steering uncovers that blocking explicit output triggers a surge in latent activations, exposing a compensatory mechanism between perception and generation. Finally, by extending our analysis to visual reasoning, we expose a disconnect between perception and reasoning: although MLLMs successfully recognize geometric relations, they treat them merely as static visual features, failing to trigger the procedural execution necessary for solving problems.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.05593v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.05593v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2605.05593v2 全文及 2026-09-02T21:33:46.000Z 的审阅记录整理；PDF 22 页，SHA-256 9e8ec6c0958c65098e2a2f61438c114fbd5d2e72b5236746e2d8d8582ed51b37；原审阅已视觉核验第 1、3、4、8、9 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。",
+    "ideaZh": "论文用 paired images 的 activation difference 构造 entity/style/emotion/abstract concept vectors，再逐层注入六种 MLLM 的 residual stream，以 causal intervention 比较表示分布。作者报告 entity effect 高度局部、abstract concept 更分散；但把这种层分布进一步解释为 scaling mechanism 仍偏推断。最有价值的负结果是：auxiliary-line vector 能提升关系词 logit，却几乎不提升几何解题，暴露 perception-to-procedure gap。",
+    "methodFlow": [
+      "为 entity、style、emotion、abstract concept 构造只改变目标概念的 positive/negative image pairs",
+      "在每个 MLLM layer 计算两组 last-token activations 的 difference-in-means concept vector",
+      "把该 vector 以系数 alpha 逐层注入 residual stream，观察生成与 target-token logits 的因果变化",
+      "用 peak steering effect 与 DUI 比较概念的局部/分布式编码",
+      "对 geometry auxiliary-line vectors 分别检查关系词、动作词、construction rate 与 answer accuracy"
+    ],
+    "motivationZh": "MLLM 是否真正使用视觉概念、这些概念如何分布于层间，以及可操纵表示是否会转化为推理步骤，是这项 causal probing protocol 要区分的问题。",
+    "methodZh": "框架为每个 concept 构造 positive/negative image pairs，在相同 prompt 下取各层 last-token hidden-state 均值差作为 concept vector，再以固定 alpha 注入 query inference。评价用 generation success rate、sentence-BERT similarity、target-token logit boost 和 Distribution Uniformity Index；数据覆盖 10k entity pairs、22 styles、EmoSet 与 20 abstract concepts，模型覆盖 Qwen2.5/3-VL、Gemma3、LLaVA-OneVision。另以 geometry auxiliary lines 测视觉关系表示能否触发程序化 reasoning。",
+    "experimentsZh": "实验设置：六个 MLLMs（Qwen2.5-VL-7B、Qwen3-VL-8B/32B、LLaVA-OneVision-1.5-8B、Gemma3-4B/27B）；每 concept 100 pairs 提取 vector，5,000 samples steering，alpha=1；另在三模型上做 geometry reasoning。\n作者报告跨模型平均 success peak：entity 0.587、style 0.257、emotion 0.754、abstract 0.253；对应 DUI 为 0.071、0.338、0.341、0.429。（Table 2, p. 4）\n作者报告 auxiliary-line steering 后 Qwen3-VL-32B/LLaVA-OV/Gemma3-27B answer accuracy 分别为 46.2/45.9/53.1%，未接近直接提供辅助线图像的 55.1/52.6/61.5%。（Fig. 7, p. 8）\n比较范围：跨六个开源模型家族和四类 concepts，规模优于单模型 probe；缺少不同 probing/causal mediation 方法对照、训练级 intervention 与更广泛 visual reasoning tasks。\n消融与诊断：附录包含 alpha、样本数、layer distribution、reverse steering 与 faithfulness diagnostics；但核心 linear-direction 假设和 last-token extraction choice 没有与 nonlinear/subspace probes 做充分对照。",
+    "insightZh": "不是新的 MLLM，而是把 activation steering 变成跨概念类别、跨架构的视觉表示 probing protocol，并把静态 concept encoding 与是否能触发 reasoning procedure 区分开。",
+    "whyRelevantZh": "它直接讨论 MLLM 内部视觉概念与视觉逻辑推理的机制边界，对选择 VLM representation、probing 与 reasoning interventions 有参考价值。",
+    "evidenceZh": "方法通过 paired-image activation difference 提取逐层 concept vector，并独立注入各层 residual stream。（Sec. 2.2 and Fig. 2, p. 3；方法图已视觉核验；它依赖 linear representation assumption 与 last-token mean difference。）\n作者报告六个模型平均 entity DUI 为 0.071，而 abstract concept DUI 为 0.429，解释为前者局部、后者分布式。（Table 2 and Sec. 3.1, pp. 4-5；DUI 是作者定义的 steering-effect 分布指标，不能直接等同完整 causal circuit 范围。）\n作者报告 geometry auxiliary-line steering 对三种 MLLM 的 answer accuracy 没有显著改善，最佳 Gemma3-27B 只增 1.6%，construction rate 最高 15.3%。（Sec. 5 and Fig. 7, p. 8；结果页已视觉核验，支持 perception signal 不会自动触发 reasoning action 的边界结论。）\n作者承认高度抽象概念可能不满足线性表示假设，补偿机制是从行为干预推断，且模型家族覆盖仍有限。（Limitations, p. 9；这些限制直接约束 scaling-mechanism 与 universal encoding pattern 的表述强度。）",
+    "caveatZh": "linear representation assumption 可能不能充分描述高度抽象概念。\nlatent compensation 等内部机制来自行为 intervention 推断，需要额外 observational techniques 验证。\n主要在特定 mainstream architectures 上验证，跨更多 model families 的普适性未知。\n将 deeper models 的更高 abstract DUI 解释为 scaling-law mechanism 是相关性解释，模型规模、架构和训练数据没有严格控制。\n极大的 logit boost 与实际生成 success 不一致，说明单一 logit magnitude 不能直接代表可用概念表示。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

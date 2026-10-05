@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2511.22228",
+  "slug": "3d-consistent-multi-view-editing",
+  "title": "3D-Consistent Multi-View Editing by Correspondence Guidance",
+  "authors": [
+    "Josef Bengtson",
+    "David Nilsson",
+    "Dong In Lee",
+    "Yaroslava Lochman",
+    "Fredrik Kahl"
+  ],
+  "publishedAt": "2025-11-27",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2511.22228"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "multi-view editing",
+    "correspondence guidance",
+    "3D Gaussian splatting",
+    "training-free"
+  ],
+  "abstract": "Recent advancements in diffusion and flow models have greatly improved text-based image editing, yet methods that edit images independently often produce geometrically and photometrically inconsistent results across different views of the same scene. Such inconsistencies are particularly problematic for editing of 3D representations such as NeRFs or Gaussian splat models. We propose a training-free guidance framework that enforces multi-view consistency during the image editing process. The key idea is that corresponding points should look similar after editing. To achieve this, we introduce a consistency loss that guides the denoising process toward coherent edits. The framework is flexible and can be combined with widely varying image editing methods, supporting both dense and sparse multi-view editing setups. Experimental results show that our approach significantly improves 3D consistency compared to existing multi-view editing methods. We also show that this increased consistency enables high-quality Gaussian splat editing with sharp details and strong fidelity to user-specified text prompts. Please refer to our project page for video results: https://3d-consistent-editing.github.io/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2511.22228v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2511.22228v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2511.22228v3 全文及 2026-09-02T21:33:46.000Z 的审阅记录整理；PDF 29 页，SHA-256 a914348be098579236f8ce078c117fb41b7a23a9a3a3eae1cb43baad71aa2083；原审阅已视觉核验第 1、3、10、14、15 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：Accepted to LoViF at ECCV 2026",
+    "ideaZh": "这是一个实用的 training-free multi-view editing 层：用 RoMa correspondence 上的 pixel L1 与 patch LPIPS loss 在 denoising 中约束不同视图，使 InstructPix2Pix、pix2pix-Turbo 和 FLUX edits 更一致，并可直接更新 3D Gaussian splat。作者报告其 InstructPix2Pix 设置把 MEt3R 从 per-image 的 0.243 降到 0.212，但 prompt alignment 并未同步提高，说明核心收益是 consistency 而非更强编辑。",
+    "methodFlow": [
+      "输入同一场景的多视图图像、文本 edit prompt 与预训练单图编辑器",
+      "用 RoMa 在原始或已编辑视图之间建立 dense correspondences",
+      "在对应点上计算 pixel L1 加 patch LPIPS consistency loss",
+      "把 loss 注入 diffusion、one-step 或 flow-matching sampling，逐视图生成一致 edits",
+      "用 edited dense views，或 sparse edits 加 ViewCrafter 补视图，更新 3D Gaussian splat"
+    ],
+    "motivationZh": "单图编辑器逐视图处理同一场景时会产生跨视图不一致；该工作研究如何用 correspondence guidance 保持一致性，并将编辑结果更新到 3DGS。",
+    "methodZh": "方法顺序编辑多视图：当前视图的 denoising 由先前已编辑视图约束，刚性/近刚性编辑使用原图 correspondence，非刚性编辑还可在 edited pairs 上重新匹配。loss 由对应点颜色 L1 与局部 patch LPIPS 组成，并分别接入 universal/backward diffusion guidance、one-step noise optimization 和 flow-matching trajectory approximation。最终用一致的 edited views 继续训练 Gaussian splat；密集和 3-4 sparse-view 设置均有实验。",
+    "experimentsZh": "实验设置：8 个测试场景来自 IN2N、Mip-NeRF360 与 BlendedMVS，共 21 个 edit prompts；场景含 65-350 张图，单 A100。比较 EditSplat、DGE、独立 per-image editing，并测试 InstructPix2Pix、pix2pix-Turbo、FLUX.1 及 3-4 sparse views。\n作者报告 InstructPix2Pix 组合下 MEt3R 从 per-image 的 0.243 降到 0.212，PSNR 从 21.19 升至 23.46；CLIPdir 基本持平且略低，表明收益主要来自跨视图一致性。（Table 1, p. 10）\n作者报告 sparse 3-4 view 设置下最终 3DGS render 的 PSNR 从 22.20 提升到 24.49、MEt3R 从 0.404 降到 0.364。（Table 3, p. 12）\n比较范围：覆盖两种近期 3D editing baseline 与独立编辑，并跨三类 image editor；InterGSEdit 因无代码未纳入。场景数量仍小，且不同方法编辑强度不一致使 consistency 与 prompt fidelity 存在混杂。\n消融与诊断：Table 4 消融 matched image 数、backward steps 与 LPIPS weight，验证两视图 loss 与 patch term 的贡献，也暴露 universal guidance 的明显 per-image 时间开销。",
+    "insightZh": "新意不在新的编辑 backbone，而在一个跨不同 generative samplers 的 correspondence-guided consistency objective，并把编辑前 correspondence preservation 与编辑后 semantic correspondence 分开处理刚性和非刚性变化。",
+    "whyRelevantZh": "它把成熟的 2D generative editing 变成可用于 3D Gaussian asset editing 的一致性工具，对 3D Generation/Edit 与 image-generation guidance 都有直接迁移价值。",
+    "evidenceZh": "方法按顺序用先前 edited views 指导当前视图 denoising，并把一致 edits 用于 Gaussian splat 更新。（Fig. 2 and Sec. 3.1, p. 3; Sec. 3.3, pp. 5-6；方法总览页和公式页共同确认了数据流、guidance 插入点与 3D 输出。）\n作者报告 InstructPix2Pix 下 MEt3R 为 0.212，优于 per-image 0.243、DGE 0.224 和 EditSplat 0.329，同时 PSNR 为 23.46。（Table 1, p. 10；主表已视觉核验；同时 CLIPdir 0.152 并不优于 DGE 0.173，故只主张 consistency 改善。）\n同一 consistency loss 可迁移到 FLUX.1，并在 rigid、near-rigid 与一个 non-rigid edit 上展示跨视图一致性。（Sec. 4.5 and Fig. 7, pp. 13-14；渲染的 Fig. 7 可见不同视角下 makeup、曝光、材质和帽子颜色的一致性示例。）\n两张 matched images 与 3 个 backward steps 是作者选择的质量/耗时折中，更多 steps 只带来有限一致性改善并显著增时。（Sec. 4.6 and Table 4, pp. 14-15；ablation 表显示 3 到 6 backward steps 的耗时从 36 增至 57 秒/图，而指标变化较小。）",
+    "caveatZh": "一致性 loss 依赖 correspondence matcher；non-rigid edits 若 edited-image matching 错误可能把错误对应关系反馈进 sampling。\n测试只有 8 个场景/21 prompts，且作者明确指出更强编辑会降低 CLIPimage，使不同方法间 consistency 与 edit magnitude 难完全解耦。\nInstructPix2Pix 完整场景编辑约 22 分钟、pix2pix-Turbo 约 17 分钟，尚非交互式 3D editing。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

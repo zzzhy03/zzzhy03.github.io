@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2604.04646",
+  "slug": "fds-divergence-based-flow-sampling",
+  "title": "Training-Free Refinement of Flow Matching with Divergence-based Sampling",
+  "authors": [
+    "Yeonwoo Cha",
+    "Jaehoon Yoo",
+    "Semin Kim",
+    "Yunseo Park",
+    "Jinhyeon Kwon",
+    "Seunghoon Hong"
+  ],
+  "publishedAt": "2026-04-06",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2604.04646"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "flow matching",
+    "divergence",
+    "training-free sampling",
+    "Hutchinson trace"
+  ],
+  "abstract": "Flow-based models learn a target distribution by modeling a marginal velocity field, defined as the average of sample-wise velocities connecting each sample from a simple prior to the target data. When sample-wise velocities conflict at the same intermediate state, however, this averaged velocity can misguide samples toward low-density regions, degrading generation quality. To address this issue, we propose the Flow Divergence Sampler (FDS), a training-free framework that refines intermediate states before each solver step. Our key finding reveals that the severity of this misguidance is quantified by the divergence of the marginal velocity field that is readily computable during inference with a well-optimized model. FDS exploits this signal to steer states toward less ambiguous regions. As a plug-and-play framework compatible with standard solvers and off-the-shelf flow backbones, FDS consistently improves fidelity across various generation tasks including text-to-image synthesis, and inverse problems.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.04646v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.04646v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2604.04646v2 全文及 2026-09-02T21:39:00.000Z 的审阅记录整理；PDF 35 页，SHA-256 16c394c0a42edc279c71412eba60d19e9aad03eaed801d51dca8445292c6bb87；原审阅已视觉核验第 1、3、5、9、12、15 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：ECCV 2026",
+    "ideaZh": "FDS 从 flow matching 的 sample-wise velocity conflict 出发：marginal velocity 在轨迹交叉处取平均，可能把 ODE 推向低密度区；作者证明该不可见 discrepancy 可由 marginal-field divergence 表达，并用 Hutchinson trace 在每个 solver step 前把 state training-free 地移向低 divergence 区。作者报告它跨 CIFAR/ImageNet/T2I/inverse tasks 提升 fidelity，但增加每步导数计算且缺 speed 结果。",
+    "methodFlow": [
+      "在 flow trajectory 中识别 sample-wise velocities 冲突导致的 marginal averaging",
+      "用定理把 conditional velocity discrepancy 写成 marginal-field divergence 的函数",
+      "用 pretrained flow 与 Hutchinson trace 估计 divergence",
+      "每个 solver step 前迭代细化 state 到低 divergence 区，再按原 ODE 更新"
+    ],
+    "motivationZh": "Flow matching 中样本速度冲突导致的 marginal averaging 可能把采样轨迹推向低密度区域；FDS 研究能否用 pretrained field 的 divergence 在推理时细化轨迹。",
+    "methodZh": "方法不微调 flow backbone，而把 divergence 作为 inference-time local reliability surrogate；通过 first-order approximation 构造可优化 state refinement，之后继续标准 solver。2D synthetic 显示 surrogate 与 ground-truth discrepancy 对齐，多种 pretrained flow models 上的结果支持 plug-and-play 性。证据边界是 divergence-model error、额外 NFE/trace variance 和对高维真实速度分布的近似。",
+    "experimentsZh": "实验设置：2D synthetic surrogate validation；CIFAR-10 与 ImageNet-256 pretrained EDM/SiT/DiT-style flow models；text-to-image 与 deblurring/super-resolution inverse problems；同 NFE 或相近 budget 比较。\n作者报告 FDS 在所测数据集、模型与 ODE solvers 上一致改善 generation metrics，并在 inverse problems 同时降低 FID/LPIPS。（Tables 1-4, pp. 10-12）\n比较范围：覆盖多种 standard/high-order solver、CFG 与 inverse guidance；未充分比较其他 training-free trajectory correction、wall-clock、memory 或非常大模型部署。\n消融与诊断：分析 divergence 与 ground-truth discrepancy correlation、iteration count、per-step iterations 与 surrogate reliability；计算开销/trace estimator variance 仍缺系统量化。",
+    "insightZh": "核心是把难以观测的 sample-wise velocity disagreement 转成无需训练数据、可由现有 flow model 计算的 divergence surrogate，并把它变成通用 sampler refinement。",
+    "whyRelevantZh": "这是可直接迁移到 image/3D flow generative models 的 training-free sampling 机制，连接理论 discrepancy 与实际 controllable sampler。",
+    "evidenceZh": "轨迹交叉时 marginal velocity average 可指向低密度区，FDS 先把 state 移到低 conflict 区再积分。（Sec. 2, Fig. 1, p. 3；方法动机图已视觉核验。）\nTheorem 1 将最优 CFM residual discrepancy 与 marginal velocity divergence 联系，并据此构造 data-free surrogate。（Sec. 3.1, Theorem 1, p. 5；理论关系依赖理想/近似 marginal velocity 与 schedule assumptions。）\n作者报告 FDS 在 CIFAR-10、ImageNet-256、text-to-image 与 inverse problems 上跨 solver/backbone 改善多项指标。（Sec. 5, Tables 1-4, pp. 9-12；结果为作者报告，本项目未运行 sampler。）\n增加 refinement iteration 通常改善性能，但收益饱和且每步 trace/gradient 带来额外计算。（Ablations and conclusion, Fig. 7, p. 15；论文未给出充分 wall-clock/speed tradeoff。）",
+    "caveatZh": "Surrogate 使用 learned marginal field 近似，模型误差与 Hutchinson variance 可能误导 refinement；额外 gradient/trace computation 的真实 latency 未充分报告。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

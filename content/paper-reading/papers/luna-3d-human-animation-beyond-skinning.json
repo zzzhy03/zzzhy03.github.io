@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2606.31981",
+  "slug": "luna-3d-human-animation-beyond-skinning",
+  "title": "LUNA: Learning Universal 3D Human Animation Beyond Skinning",
+  "authors": [
+    "Peng Li",
+    "Rawal Khirodkar",
+    "Junxuan Li",
+    "Yuan Dong",
+    "Chen Cao",
+    "Yuan Liu",
+    "Wenhan Luo",
+    "Yike Guo",
+    "Shunsuke Saito"
+  ],
+  "publishedAt": "2026-06-30",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2606.31981"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D human animation",
+    "Gaussian deformation",
+    "2D controls",
+    "LBS-free inference"
+  ],
+  "abstract": "Creating photorealistic, animatable 3D human avatars from monocular images still largely depends on Linear Blend Skinning (LBS) and parametric body models, which constrain expressivity and often introduce artifacts due to imperfect fitting. We propose LUNA, an LBS-free universal neural animation model that directly maps multiple 2D controls like images, keypoints, sketches, and unseen characters into 3D Gaussian deformations, bypassing explicit body fitting. At its core, a transformer-based motion regressor disentangles global rigid motion from fine-grained local dynamics to capture both coherent movement and subtle non-rigid effects. To resolve the inherent ambiguity of 2D-to-3D lifting while scaling beyond fitted datasets, we introduce hybrid supervision that distills soft structural priors from an LBS teacher and a loss that supports training on both limited fitted data and large in-the-wild unlabeled videos. Extensive experiments show LUNA achieves competitive visual fidelity compared to LBS-based approaches, while delivering realistic human motion and zero-shot cross-identity generalization across diverse driving modalities. To the best of our knowledge, LUNA is the first end-to-end 3D animatable model that supports implicit 2D driving.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.31981v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.31981v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2606.31981v2 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 21 页，SHA-256 211a35d058ef5ac6f965108539c2db9493c207dab1bf39e2984d1040bc655098；原审阅已视觉核验第 1、5、11、15 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：ECCV 2026, Project page: https://penghtyx.github.io/LUNA/",
+    "ideaZh": "LUNA 的真正价值不是再改一套 SMPL/LBS deformation，而是让 canonical 3D Gaussians 直接接受 RGB、keypoints、sketch 等 2D driving signals，并用 global/local motion disentanglement 与混合监督维持几何稳定；作者报告其在非刚性衣物和跨身份驱动上更稳，但仍依赖 LBS teacher 软先验、私有数据与大算力。",
+    "methodFlow": [
+      "输入少量 identity images 与单帧 RGB/keypoint/sketch driving signal",
+      "Identity Encoder 融合 semantic template queries 与多视图图像 tokens，解码 canonical 3D Gaussians",
+      "DINOv3 编码 driving signal，Animator 解耦预测 global rotation/translation 与 local Gaussian residuals",
+      "以 photometric、LBS distillation、rotation 和 2D projection losses 混合训练，输出可 novel-view render 的 posed Gaussians"
+    ],
+    "motivationZh": "依赖显式 pose fitting/LBS 的人体动画不易统一 RGB、keypoint、sketch controls 与非刚性衣物；LUNA 研究直接从异质 2D driving signals 生成 3D Gaussian deformation。",
+    "methodZh": "论文先由 Identity Encoder 从少量无姿态参考图像恢复 canonical 3D Gaussians，再由 DINOv3 motion tokens 驱动 Implicit Neural Animator，分别预测全局刚体变换和 per-Gaussian position/rotation/color residual。训练同时使用 photometric loss、LBS teacher distillation、rotation supervision 与 2D projection loss，并以固定比例混合有标注和无标注视频。全文实验覆盖 Cloth10K、iPhone、Dome 与 NeuMan，显示非刚性衣物、运动平滑和跨身份驱动收益；但极端遮挡、姿态/体型错配和显式时序建模仍是边界。",
+    "experimentsZh": "实验设置：训练数据包括作者整理的 Video35K/Cloth10K、iPhone1K 与 200-camera Dome；评测使用 100 个 Cloth10K clips、100 个 iPhone sequences 和 NeuMan，并比较 Vid2Avatar、ExAvatar、IDOL、LHM、UP2YOU 与 MV-LHM。\n作者报告在 Cloth10K 上 LUNA 的 PSNR/L1/LPIPS 为 22.072/0.027/0.131，优于所列 baselines。（Table 1, p. 11）\n作者报告跨身份 NeuMan 驱动的 keypoint error 为 17.3%，并在 motion-quality 表中取得 MSJ 0.0032、MAE 0.0225。（Table 2, p. 11; Table 3, p. 13）\n比较范围：同时覆盖 optimization-based 与 feed-forward human avatar baselines，但主要非刚性评测来自作者构建/私有数据；没有对开放世界动物或非人形角色作系统定量验证。\n消融与诊断：作者分别移除 structural distillation、multiview finetuning 与 global-rotation decoupling；Table 4 与 Figs. 6-7 支持三者对几何稳定和图像质量的贡献，但没有拆分 DINOv3/Identity Encoder 初始化与数据规模影响。",
+    "insightZh": "相较把神经残差附着在 LBS/SMPL 上，LUNA 在最终动画路径中移除显式 LBS 与 pose fitting，并以统一 transformer 从异质 2D controls 直接产生 3D Gaussian deformation；其折中是训练时仍用 template queries 与 LBS teacher 作为结构软约束，因此是 LBS-free inference/animation，而非完全无人体先验。",
+    "whyRelevantZh": "它把多种 2D 控制信号统一映射为 dynamic 3D Gaussian content，对 3D human/avatar generation、跨模态 animation control 和非刚性 deformation representation 具有明确迁移价值。",
+    "evidenceZh": "Animator 将 motion 分为全局刚体变换和 per-Gaussian 局部 residual，并固定 scale/opacity 以稳定动画。（Sec. 3.2, Eqs. 2-5, pp. 6-7; Fig. 2, p. 5；方法图与公式共同界定 motion tokenization、global transform 和 local Gaussian deformation。）\n混合监督用 LBS teacher 提供结构软目标，同时从大量无标注视频吸收非刚性动态。（Sec. 3.3, Eqs. 6-10, pp. 7-8；全文明确给出 labeled/unlabeled 混合比例与 distillation reweighting。）\n作者报告 LUNA 在 Cloth10K 达到 PSNR 22.072、LPIPS 0.131，并在 NeuMan 跨身份驱动将归一化 2D keypoint error 降至 17.3%。（Tables 1-2, p. 11；这些数字为作者报告，未独立复现；NeuMan photometric 结果与若干 baseline 接近。）\n作者报告其 MSJ 为 0.0032，相对最强 MV-LHM baseline 0.0144 约降低 4.5 倍。（Sec. 4.2 and Table 3, pp. 12-13；该指标测量 Gaussian trajectories 的 jerk，结果仅在作者设定与数据上成立。）",
+    "caveatZh": "严重遮挡会破坏 2D semantic cues 并引入时序不稳定。\n极端姿态或大体型差异仍会降低跨身份动画质量，因为 motion 与 shape 未显式解耦。\n未来仍需显式 temporal sequence modeling 与更广泛动作、服装和视角数据。\n核心训练依赖多套私有/派生数据、64 A100 预训练与 16 A100 微调，外部复现和数据审计难度高。\n“LBS-free”仅指最终 animator 路径；训练使用 LBS teacher 和 template topology，应避免解读为完全去除 parametric-body prior。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2609.00948",
+  "slug": "scigram-scientific-diagram-instructions",
+  "title": "From Terminology to Diagrams: Visual-Instruction Generation for Scientific Diagram Understanding",
+  "authors": [
+    "Raul Ortega",
+    "José Manuel Gómez-Pérez"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.00948"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "2d-design"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "scientific diagrams",
+    "instruction data",
+    "curriculum terminology",
+    "diagram grounding"
+  ],
+  "abstract": "Vision-language models (VLMs) have demonstrated strong performance in visual question answering with natural images. However, they continue to struggle with scientific diagrams, which are designed to convey functional or relational meaning rather than literal scenes. We therefore introduce a framework for generating large-scale diagram-grounded instruction data by leveraging terminology derived from scientific curricula. Our approach systematically extracts domain concepts, synthesizes atomic facts, retrieves relevant diagrams from the web, and generates multimodal supervision in the form of diagram captions and multiple-choice questions. Using this pipeline, we construct SciGram, a dataset of over 194K diagrams and 1.4M visual instructions across life, earth, and physical sciences. Despite relying on noisy web data and synthetic annotations, models fine-tuned on SciGram achieve substantial improvements on diagram-centric benchmarks, including TQA, ScienceQA, and AI2D, outperforming or matching state-of-the-art VLMs while using fewer training instances. Furthermore, augmenting existing models such as LLaVA OneVision with SciGram establishes new state-of-the-art performance on diagram question answering. Our results highlight the effectiveness of terminology-grounded instruction generation as a general strategy for improving vision-language reasoning in scientific domains. To support future research in scientific diagram understanding, we release both the SciGram dataset and models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.00948v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.00948v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/expertailab/scigram"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.00948v1 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 37 页，SHA-256 fe6af794c2122427d4430ab205a52bb7e5ee18747a13998f95390c8ca4af80a2；原审阅已视觉核验第 1、3、7、10、11 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：Published as a conference paper at COLM 2026",
+    "ideaZh": "SciGram 的实质贡献是把 curriculum terminology 变成 atomic facts，再以这些 facts 检索 diagrams 并合成 captions/MCQs，形成适配 alignment→instruction tuning→domain finetuning 的分层数据；作者报告 7B LLaVA 在 TQA/SQA/AI2D 上明显提升，但数据审计显示 24% 图像并非 diagram、16% MCQ 有标签不一致且 61% 可绕过视觉作答，因此更像有效但高噪声的数据 recipe，而非已解决 diagram grounding。",
+    "methodFlow": [
+      "从结构化科学教材提取 noun phrases，以 weirdness score、lemmatization 与 embedding clustering 构建术语表",
+      "让 LLaMA3-8B 将术语组合转成 middle-school atomic facts",
+      "用 facts+diagram 检索 web images，按 fact support、perceptual hash 与文件有效性轻量过滤",
+      "Qwen2-VL 生成 captions 与 visual MCQs，结合现有数据形成 Align/VIT/M3 三阶段 instruction corpus"
+    ],
+    "motivationZh": "扩展 scientific-diagram instruction data 需要可控语义骨架和图像 grounding；SciGram 从课程术语与 atomic facts 构建分层数据，同时暴露 synthetic noise 和视觉捷径。",
+    "methodZh": "Pipeline 从 middle-school textbooks 抽取 noun phrases，以 weirdness index 和 embedding clustering 得到术语，再用 LLaMA3-8B 生成 atomic facts。每条 fact 用于 web image retrieval，经过轻量过滤与 perceptual dedup 后，Qwen2-VL-7B 生成三类 captions 和 diagram-grounded MCQs；加上现有 diagram/text QA 构成 SciGram-Align/VIT/M3。两种 LLaVA 7B 按三阶段训练，并排除 benchmark test diagrams。全文既报告 TQA/SQA/AI2D 提升，也提供 600-item human audit、licensing/link-rot 和 external API 风险。",
+    "experimentsZh": "实验设置：训练 LLaVA-SciGram 7B 与 LLaVA-SciGram OV 7B，每个约 450 A100 GPU-hours；评测 TQA、ScienceQA 与 AI2D，并比较同规模 VLM、frontier models 与旧专用方法。另对 200 个 TQA diagram questions 分析知识/推理类型和 visual support。\n作者报告 LLaVA-SciGram OV 7B 在 TQA overall 为 85.57%、diagram MC 为 80.12%，后者高于所列 baselines。（Table 2, p. 7）\n作者报告 full SciGram subset combination 在 TQA DQ/SQA IMG/AI2D opaque 上为 80.12/97.62/83.45。（Table 6, p. 9）\n比较范围：覆盖 prior diagram models、Phi-3 Vision/MOLMo/Pixtral/Qwen2-VL、GPT-4o/Gemini 与 LLaVA OV；部分数字来自文献、部分由作者 pipeline 复现，frontier models 仍可能有 pretraining-test overlap。\n消融与诊断：分别替换 Align/VIT/M3 三个阶段并组合子集，显示三者均贡献；但 web retrieval/filter、teacher choice 与 factual verification 没有充分拆分，数据量也与内容质量同时变化。",
+    "insightZh": "不同于自由网页 caption 扩充，SciGram 用 curriculum-derived terminology→atomic facts 作为可控语义骨架，再将数据组织为与 VLM alignment/instruction/domain tuning 对应的三层子集；亮点是 scalable data construction，而不是新 VLM architecture。",
+    "whyRelevantZh": "它提供 VLM 学习 scientific diagrams/structured visual knowledge 的大规模 instruction-data construction recipe，并直接暴露 visual grounding 与 synthetic-data quality 的关键边界。",
+    "evidenceZh": "数据流程依次执行 terminology extraction、atomic fact generation、diagram retrieval 与 caption/MCQ instruction generation。（Sec. 3 and Fig. 1, pp. 1, 3-5；方法页给出 4,820 terms、5,508,218 facts 与 255,657 retrieved images 的中间规模。）\nSciGram 含 582,213 Align、737,887 VIT 与 47,506 M3 instructions，并按 LLaVA 三阶段使用。（Secs. 4.1 and 5, pp. 5-6；子集分别对应 caption alignment、diagram MCQ tuning 与高质量 domain finetuning。）\n作者报告 LLaVA-SciGram OneVision 7B 在 TQA diagram MC 上由 77.08% 提升到 80.12%，在 SQA visual support 上由 87.31% 提升到 97.62%。（Table 1, p. 7；数字为作者报告、未独立复现；同表还显示不同 question types 收益差异很大。）\n600-item human audit 报告 24% retrieved images 非 diagram、16% MCQs 有 label inconsistency，且 61% MCQs 可用 prior knowledge 回答。（Sec. 4.2, p. 5；这些作者报告的审计数字直接限定数据质量与视觉 grounding 结论。）",
+    "caveatZh": "Web-crawled 数据包含显著 non-diagram、caption/MCQ noise 与 label inconsistencies。\n大量 MCQs 可依赖 prior knowledge，图像 ablation/diagram swapping 尚留待未来。\n仅分发图像 URL 导致 link rot，外部 proprietary APIs 与大算力限制长期复现。\n版权归原图所有者，数据使用和自动内容生成存在 licensing/misuse 风险。\n结果不能证明模型总在使用 diagram evidence；作者自己的 audit 与未完成的 image ablation 明确留下捷径风险。\n主要覆盖 middle-school natural sciences，向工程图、复杂学术图或一般 structured 2D design 的迁移仍是推测。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

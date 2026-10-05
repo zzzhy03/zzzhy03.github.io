@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2510.14980",
+  "slug": "besiegefield-compositional-machine-design",
+  "title": "Compositional Machine Design as Program Synthesis with LLMs",
+  "authors": [
+    "Wenqian Zhang",
+    "Yangyi Huang",
+    "Weiyang Liu",
+    "Zhen Liu"
+  ],
+  "publishedAt": "2025-10-16",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2510.14980"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV",
+    "cs.GR",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "program synthesis",
+    "machine design",
+    "physics simulation",
+    "design agents"
+  ],
+  "abstract": "Large language models (LLMs) have shown strong abilities in writing and revising programs, yet many program-synthesis benchmarks still evaluate programs in symbolic or digital environments. We introduce compositional machine design, a physically grounded form of program synthesis where machines are written as programs that compose standardized parts, and success is determined by simulated physical behavior. To study this problem, we present BesiegeField, a testbed built on the machine-building game Besiege. In BesiegeField, LLM agents generate machine programs from textual functional demands, execute the resulting machines in simulation, and receive rewards and state feedback. We benchmark LLM agents across representative machine-design tasks under single-agent generation, iterative editing, and hierarchical workflows. Strong models recover task-relevant structures and sometimes achieve nontrivial physical performance, but often struggle with spatially precise assembly, mechanism-level planning, and translating feedback into useful structural edits. We further finetune Qwen2.5-14B, an open-source LLM, with reinforcement learning from simulation-derived rewards. We find that, under a fixed generation budget, RL improves the best machine discovered. We additionally evaluate human performance to provide a reference point for task difficulty. These results establish compositional machine design as a testbed for studying LLM agents that synthesize executable machine programs and improve them through physical feedback.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2510.14980v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2510.14980v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://besiegefield.github.io"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2510.14980v3 全文及 2026-09-02T21:33:46.000Z 的审阅记录整理；PDF 75 页，SHA-256 8201d5f92bb53c2817a4356132fa89555b738d93a250c7852971d539c7e398ac；原审阅已视觉核验第 1、6、7、8、9、46 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：75 pages, 31 figures, Project Page: https://besiegefield.github.io, accepted at EMNLP 2026 Main Conference",
+    "ideaZh": "BesiegeField 把 machine design 变成可执行 program synthesis：LLM 写由标准部件、attachment、orientation、actuation 组成的 construction-tree DSL，物理 simulator 返回 reward 与 state feedback，agent 再 inspection/refinement；hierarchical workflow 还拆分 mechanism plan 与低层 construction。作者报告 RL 最稳健的收益是提高 fixed budget 下 best machine，而非平均可靠性；这正好揭示当前 design agents 在空间 grounding、机制级重构与 diversity 上的真实瓶颈。",
+    "methodFlow": [
+      "输入功能需求、场景约束、标准部件库与 construction-tree DSL 规则",
+      "meta-designer 可选地拆分 chassis/actuation 等功能模块，designer 并行生成 candidate machine programs",
+      "parser/inspector 检查 syntax、attachment、orientation 与结构问题并做局部修复/筛选",
+      "在 physics simulator 执行机器，收集轨迹、破损、方向、距离等 task-specific reward/state feedback",
+      "refiner 基于现有程序、edit history 与 simulation feedback 提出修改并经 search 选优",
+      "用 valid machine-CoT cold start 与 simulation reward 对开源 LLM 做 SFT/RL post-training"
+    ],
+    "motivationZh": "功能性的 3D machine design 不只需要语义相关外形，还需要正确 attachment、orientation 与可执行机制；BesiegeField 将这些约束放入 program synthesis 和 simulation feedback。",
+    "methodZh": "环境构建在 Besiege 上，提供 structural blocks、wheels、hinges、springs、cogs 等部件和七类主要任务，并用 construction-tree DSL 避免坐标式输出的脆弱性。论文比较 single-agent、simulation-guided iterative editing 与 meta-designer→designer→inspector→refiner hierarchical search；再用 simulation rewards 对 Qwen2.5-14B 做 cold-start SFT 与 GRPO/Pass@k-style RL。附录给出任务定义、agent prompts、search ablations、置信区间、human study 与公开资产声明。",
+    "experimentsZh": "实验设置：七类主要 machine-design tasks；多种 frontier/open LLMs；single、iterative、hierarchical workflows。RL 重点评 Movement/Throwing，Qwen2.5-14B，50 generations/setting，并报告 bootstrap mean CI、Wilson validity CI、cross-task transfer；另有 57 人短时 human reference study。\n作者报告 Movement 的 cold-start+RL 为 42/50 valid、mean 5.05、max 45.72，base 为 46/50、4.97、19.10；说明 RL 提升探索到的最佳设计，但没有稳定提高平均分或 validity。（Table 19, p. 46）\n作者报告 Throwing 的 cold-start+RL mean 0.14、max 7.14，base mean 0.06、max 2.41；mean 95% CI 高度重叠且 sparse rewards 明显。（Table 19, p. 46）\n比较范围：覆盖多种 LLM、三类 workflows、no-LLM DSL search、表示/feedback/search-depth ablations、human reference 与 RL variants；环境是单一商业游戏 simulator，不能替代真实 CAD/robotics/fabrication baselines。\n消融与诊断：附录消融 coordinate vs construction-tree、meta-designer、inspector、simulation feedback content、edit history、parsed spatial info、search depth、Pass@k 与 cold start/KL；证据显示 representation 与可操作 feedback 比纯 scalar reward 更关键。",
+    "insightZh": "新意是把 3D machine artifact 作为可执行 construction program，并把 functional intent、spatial assembly、physical rollout、feedback refinement 与 model-level RL 放进同一可审计 benchmark；不是仅生成 Blender/CAD code 或在符号环境做 generic program synthesis。",
+    "whyRelevantZh": "它精确命中 Visual Design Agents，并以 3D composition、physics feedback 与 executable programs 连接 3D Generation；对未来 LEGO/assembly/fabrication agent 具有直接方法迁移价值。",
+    "evidenceZh": "hierarchical agent 由 meta-designer、并行 designers、inspector、simulator query 与 refiner 构成，反馈直接作用于现有 machine program。（Sec. 4.2 and Fig. 4, pp. 5-6；方法图已视觉核验，满足 planning、tool execution、observation 与 iterative correction 的设计闭环。）\n作者报告 current LLMs 能产生 task-relevant structures，但主要失败来自 attachment/orientation/support 与 mechanism plan 到 construction program 的 grounding gap。（Sec. 4.3 and Figs. 5-7, pp. 5-7；主结果页同时展示不同 workflow/model 的均值与 best score，不能只看单个最佳样本。）\n作者报告 cold-start+RL 将 Qwen2.5-14B 的 Movement best score 从 base 19.10 提升到 45.72，Throwing 从 2.41 提升到 7.14。（Fig. 8, p. 8; Table 19, p. 46；完整置信区间表已视觉核验；Movement mean 只从 4.97 到 5.05，Throwing mean 从 0.06 到 0.14，说明 best-of-budget 是主要收益。）\n作者明确指出 RL 主要在既有 strategy family 内做局部 refinement，并随 entropy 下降而收窄 mechanism diversity。（Sec. 5.2 and Discussion, pp. 8-9；该负面证据对理解 design-agent exploration 与 exploitation 的边界尤其重要。）",
+    "caveatZh": "Besiege physics、部件与任务均简化，缺少材料、制造工艺、公差、安全裕量与成本，不能视为真实工程能力证据。\n当前 agent 是 text-only，缺少 visual inspection、sketching 与 embodied manipulation。\nhierarchical workflows 会传播早期错误并偏向局部 patching；RL 对 mean score/validity 的收益依任务而变，且主要收窄到已有策略。\n把 best-of-N 提升解释为模型普遍设计能力提升会过度外推；平均表现与置信区间显示可靠性仍低。\n公开 environment 与 game-specific DSL 很有价值，但向 CAD-compatible representation、fabrication constraints 和 real simulator 迁移仍需单独验证。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

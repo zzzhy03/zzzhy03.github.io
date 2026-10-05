@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2606.05142",
+  "slug": "gem-nr-nonrigid-multi-view-editing",
+  "title": "GeM-NR: Geometry-Aware Multi-View Editing for Nonrigid Scene Changes",
+  "authors": [
+    "Josef Bengtson",
+    "Yaroslava Lochman",
+    "Fredrik Kahl"
+  ],
+  "publishedAt": "2026-06-03",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2606.05142"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "nonrigid editing",
+    "multi-view geometry",
+    "dynamic reconstruction",
+    "3DGS"
+  ],
+  "abstract": "Recent developments in multi-view image editing with generative models have brought us a step closer toward general 3D content generation and customization. Most existing works focus on rigid or appearance-only edits by utilizing the geometry of the unedited scene. This naturally limits these methods to edits that preserve the underlying scene structure. Current nonrigid approaches are limited to object removal and insertion, reflecting the data they are trained on. General nonrigid edits, i.e., edits that substantially and arbitrarily change the scene geometry, remain challenging for existing methods. We propose GeM-NR, a fast and flexible training-free approach for general multi-view consistent image editing, including edits that drastically change the geometry and appearance of the scene. Given an anchor image edited with a chosen 2D editor and a query unedited image, GeM-NR edits the query image consistently with the anchor edit. The method incorporates multiple stages: (i) depth map estimation, where we propose a strategy to maximize the alignment between the 3D point clouds of the edited and unedited scenes, (ii) projection onto a query viewpoint, and (iii) refinement of the obtained image conditioned on the unedited query. We demonstrate the ability of our method to handle edits with significant changes in geometry and appearance, something that existing methods struggle with. We perform an extensive evaluation showing that GeM-NR improves consistency for a wide variety of edit tasks, including generating 3D representations of the edited scene. Both quantitative and qualitative results indicate the state-of-the-art performance of our method in terms of edit quality as well as geometric and photometric consistency across multiple views.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.05142v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.05142v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2606.05142v2 全文及 2026-09-02T21:31:29.000Z 的审阅记录整理；PDF 28 页，SHA-256 b5ec7b28568ec97a8c9ceb68a663958e8e49c366b94f3fc1044c839342c8950c；原审阅已视觉核验第 1、5、12、16 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：BMVC 2026. Project page: https://gem-nr.github.io/",
+    "ideaZh": "GeM-NR 抓住 nonrigid multi-view editing 的关键矛盾：旧场景几何在大幅结构编辑后已失效，因此它把原 anchor、edited anchor 与 query 视作一个 dynamic scene 联合估计对齐后的编辑几何，再 warp 到目标视角并交给 multi-reference editor 补全；这是训练免、可换 2D editor 的实用 3D scene customization pipeline，但单-anchor 设计在大视差场景会失稳。",
+    "methodFlow": [
+      "选一个 source view 作为 anchor，由任意 2D editor 根据文本生成 edited anchor",
+      "用原 anchor、edited anchor 与 query 联合做 dynamic depth/pose estimation，使编辑几何与原场景全局对齐",
+      "将 edited point cloud 投影到 query viewpoint，产生带空洞的 geometry-guided warp",
+      "multi-reference editor 联合原 query、warp 与 edit prompt 生成一致 query；重复后可重建 edited 3DGS"
+    ],
+    "motivationZh": "Nonrigid scene edits 会让原场景的 depth/correspondence 失效；GeM-NR 研究如何联合估计编辑前后几何，并将编辑传播到其它视角。",
+    "methodZh": "方法先独立编辑一个 anchor view，再用 Depth Anything 3 对未编辑 anchor、edited anchor 和 query 做 joint dynamic reconstruction，使编辑前后几何处于同一全局坐标。edited point cloud 被投影到 query camera 得到 warp，随后 FLUX.2 multi-reference editor 同时参考原 query、warp 与文本完成补洞和一致编辑；对多视图序列逐 view 扩展后可由 AnySplat 重建 edited 3DGS。作者在 15 scenes、38 prompts 和四类编辑上比较 Omni-3DEdit/MVInpainter/independent editing，并在 image pairs 上比较 Edicho，结果显示 nonrigid geometry change 的一致性优势，但 query views 之间没有直接一致性约束。",
+    "experimentsZh": "实验设置：General multi-view test 使用 15 个来自 SPIn-NeRF、IN2N、Mip-NeRF 360、BlendedMVS 的 scenes，共 38 prompts，覆盖 general nonrigid、addition、removal、appearance；pair-edit test 使用 DreamBooth/Mip-NeRF 360 的 38 pairs。\n作者报告全编辑类型、FLUX.2 anchor 下，GeM-NR 获得 MEt3R 0.190、mAA 38.58% 和 3D reconstruction PSNR 21.96，优于所列 independent/Omni-3DEdit 的多数一致性指标。（Table 1, p. 12）\n作者报告 edited 3DGS 在全部类型的 text alignment 为 0.258/0.212，高于 Omni-3DEdit 的 0.229/0.130。（Table 2, p. 14）\n比较范围：按不同能力边界比较 Omni-3DEdit、MVInpainter、Edicho 与 independent editing，并用 Qwen/FLUX.2 两种 anchor editors；但稀疏 view 场景缺少更多通用 3D editor 直接对比，部分指标会偏好较弱编辑。\n消融与诊断：Table 4 检查 reference text、original/edited/warp inputs 与 relative pose refinement；完整配置 balanced score 9.50，去 pose refinement 为 9.28，说明组件有效但 pose refinement 边际收益较小。",
+    "insightZh": "不同于用未编辑场景 depth/correspondence 约束 rigid edit，GeM-NR 直接估计 edited-scene geometry，并用 joint dynamic reconstruction 避免显式 3D alignment；warp 只提供几何初始化，生成模型再利用原 query 补充不可见内容，因此能覆盖 arbitrary nonrigid change。",
+    "whyRelevantZh": "它直接解决会改变 scene geometry 的 multi-view/3D editing，并能把结果转成 3DGS，和 3D content generation、editable scenes 与设计迭代高度相关。",
+    "evidenceZh": "方法通过 joint dynamic reconstruction 让 edited 与 unedited geometry 自动共享全局对齐，而非事后注册两个独立 3D 表示。（Sec. 3.2 and Fig. 2, pp. 5-7；方法图和文字明确列出 depth estimation、aligned reconstruction、projection 与 refinement。）\nWarp 由 edited point cloud 投影得到，再与原 query 一同输入 multi-reference image editor 以补全遮挡区域。（Sec. 3.2, Eq. 1, p. 8；该设计同时保留 anchor edit details 与 query-view content。）\n作者报告在 general nonrigid、FLUX.2 anchor 设置下，GeM-NR 的 MEt3R 为 0.216、mAA 为 32.35%，优于 independent 的 0.291/24.91% 与 Omni-3DEdit 的 0.288/21.56%。（Table 1, p. 12；数字为作者报告，未独立复现；不同指标之间存在 trade-off。）\n作者报告 GeM-NR 平均约 3.4 秒/图，接近 Edicho 的 3.5 秒并快于 Omni-3DEdit 的 8.3 秒；复杂 nonrigid 编辑下后者约 16.6 秒。（Implementation details, pp. 11-12；运行时间来自作者的单 A100 设置，依赖具体 foundation models。）",
+    "caveatZh": "当前只以单个 anchor edit 条件化所有 query，并未显式约束 query-query consistency。\n在大场景或极端 viewpoint change 下单-anchor conditioning 效果下降。\n假设编辑不改变全局 camera pose；改变视角类指令会违反假设。\nPipeline 依赖 Depth Anything 3、FLUX.2 和 AnySplat，收益可能随闭源/快速变化的 foundation components 改变。\n文本一致性与几何一致性指标并非总是同向，不能把单一最优数字等同于全面编辑质量。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

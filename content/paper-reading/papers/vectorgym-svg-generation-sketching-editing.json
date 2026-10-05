@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2603.29852",
+  "slug": "vectorgym-svg-generation-sketching-editing",
+  "title": "VectorGym: A Multi-Task Benchmark for SVG Code Generation, Sketching and Editing",
+  "authors": [
+    "Joan Rodriguez",
+    "Haotian Zhang",
+    "Abhay Puri",
+    "Haoran Dai",
+    "Tianyang Zhang",
+    "Meng Lin",
+    "Rishav Pramanik",
+    "Xiaoqing Xie",
+    "Marco Terral Rodriguez",
+    "Darsh Kaushik",
+    "Aly Shariff",
+    "Perouz Taslakian",
+    "Spandana Gella",
+    "Sai Rajeswar",
+    "David Vazquez",
+    "Christopher Pal",
+    "Marco Pedersoli"
+  ],
+  "publishedAt": "2026-02-22",
+  "updatedAt": "2026-08-31",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2603.29852"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "2d-design",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "SVG",
+    "Sketch2SVG",
+    "editable design",
+    "rendering feedback"
+  ],
+  "abstract": "We introduce VectorGym, a comprehensive benchmark suite for Scalable Vector Graphics (SVG) that spans generation from text and sketches, complex editing, and visual understanding. VectorGym addresses the lack of realistic, challenging benchmarks aligned with professional design workflows. Our benchmark comprises four tasks with expert human-authored annotations: the novel Sketch2SVG task (VG-Sketch); a new SVG editing dataset (VG-Edit) featuring complex, multi-step edits with higher-order primitives; Text2SVG generation (VG-Text); and SVG captioning (VG-Cap). Unlike prior benchmarks that rely on synthetic edits, VectorGym provides gold-standard human annotations that require semantic understanding and design intent. We also provide a multi-task reinforcement learning baseline that jointly optimizes across all four tasks using rendering-based rewards. This baseline, built on GRPO with curriculum learning, trains a Qwen3-VL 8B model that achieves state-of-the-art performance among open-source models, surpassing much larger models including Qwen3-VL 235B and matching GPT-4o. We also introduce a VLM-as-a-Judge metric for SVG generation, validated through human correlation studies. Our evaluation of frontier VLMs reveals significant performance gaps, positioning VectorGym as a rigorous framework for advancing visual code generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.29852v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.29852v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2603.29852v2 全文及 2026-09-02T21:31:57.000Z 的审阅记录整理；PDF 28 页，SHA-256 fd76fff7b8c96e4989e798b73862cb270b6546f9feab9952ab4e9c16f53bbc3f；原审阅已视觉核验第 1、5、8、9 页。数字与比较均为作者报告，本项目未独立复现。原审阅未确认公开代码，不提供 Code link。作者 submission comments：Accepted to EMNLP 2026. Camera-ready version. Updated author list and author order",
+    "ideaZh": "VectorGym 把 SVG 从简单 icon/Text2SVG 扩成四个相互补充的 structured-design tasks：rough Sketch2SVG、human-authored multi-step SVG editing、Text2SVG 与 SVG captioning；约 7000 个 in-the-wild SVG 保留 text/gradient/animation 等高级 primitives，20 余名专业 annotators 提供真实设计意图。它还用 render-based rewards 做四任务 RLRF/GRPO，使 Qwen3-VL-8B 的总体 VectorGym score 从 58.74 升至 66.05，作者报告超过 GPT-4o 64.93 和 Qwen3-VL-235B 62.32。价值很高，但 300-sample test 仅来自 SVG-Stack、均为 point estimates，VLM judge 与训练 reward 存在耦合，需在结论中保留边界。",
+    "methodFlow": [
+      "从 SVG-Stack 的真实 GitHub SVG 中按 token length、color entropy、内容质量和人工检查筛选高阶 primitives 样本",
+      "由专业 annotators 为同一 SVG 生成人工 sketch、complex multi-step edit/target 和 detailed caption，形成四任务训练与评测集",
+      "模型接收 text、sketch、source SVG 或 SVG code，并输出完整 SVG program 或 caption",
+      "将预测 SVG 渲染后以 perceptual/pixel/VLM-judge signals 评分，caption task 使用 BGE-M3 text similarity",
+      "以 batch-normalized GRPO 和 response-length curriculum 联合优化 Qwen3-VL-8B，再按四任务 metric aggregation 评测"
+    ],
+    "motivationZh": "简单 icon 或 synthetic SVG edits 无法充分代表复杂可编辑设计；VectorGym 以真实高阶 SVG 和人工 sketch/edit intent 构建四任务评测及 render-grounded RL baseline。",
+    "methodZh": "数据侧，VectorGym 从 SVG-Stack 的 GitHub-derived files 筛出 token length 2k–8k、较高 color entropy 的候选，经人工 visual inspection 后保留 6.5k train、100 validation、300 test SVG；vendors 生成 hand-drawn sketches、复杂编辑及详细 captions。任务侧统一评估 SVG code 的 semantic fidelity、structure validity 与 render quality。方法侧以 Qwen3-VL-8B 在四任务上进行 Reinforcement Learning from Rendering Feedback：生成/编辑任务通过渲染后的 perceptual/pixel rewards，captioning 用 text embedding reward，并用 batch-normalized GRPO 与按 response length 的 curriculum。主表显示任务专用小模型可接近或超过更大的通用模型，但跨 corpus/tool export 尚未验证。",
+    "experimentsZh": "实验设置：评测 closed-source Gemini 2.5/3 Pro、GPT-4o/5.1、Claude 4.5 与多种 Qwen/GLM open VLM；300-sample test 上分别用 VLMAJ、MSE/DINO/LPIPS、CLIP、BGE-M3、ROUGE 等构成任务分与 overall。RL 以 Qwen3-VL-8B、每 prompt 8 rollouts、每 iteration 1344 rollouts、600 iterations、8×H200、约 384 GPU-hours。\n作者报告：联合 RL 将 Qwen3-VL-8B overall VectorGym score 从 58.74 提升到 66.05（+7.31）。（Sec. 3.4, p. 5; Tables 2–3, pp. 8–9）\n作者报告：Qwen3-VL-8B Gym 在 Sketch2SVG/Editing scores 达到 70.72/82.81，对比 base 8B 的 64.82/77.89；Editing 略高于 GPT-4o 82.35。（Table 2, p. 8）\n作者报告：Text2SVG score 为 63.60，接近 GPT-4o 63.09；SVG Captioning score 为 47.05，但低于 Gemini 3 Pro 55.50。（Table 3, p. 9）\n比较范围：模型覆盖较广，并包含 open/closed frontier VLM 与同 backbone base/fine-tuned 对照；但没有对比其他专门 SVG training recipes，test set 仅 300 个且所有 scores 是 point estimates，没有置信区间。\n消融与诊断：论文提供 VLM-judge/human correlation、multi-task RL 前后对照和广泛 qualitative failure figures，但缺少 curriculum、batch-level normalization、各 reward component 与 single-task vs multi-task 的系统消融，因此 RL 增益归因不完整。",
+    "insightZh": "主要新意是把 expert-human、in-the-wild、higher-order SVG structure 与 Sketch2SVG/复杂编辑合并为一个 multi-task benchmark，并配套 render-grounded multi-task RL baseline；相较 synthetic edit 或简单 icon 数据，它更贴近 editable design workflow。RL 算法本身是 GRPO 变体，方法新意弱于数据/任务设计，且 metric/reward 都部分依赖 VLM judge。",
+    "whyRelevantZh": "它直接命中 structured/editable 2D design：SVG program、sketch abstraction、complex editing 和 code-aware VLM training 都是核心贡献；同时可为 visual design agents 的 action/evaluation、embroidery/vector path generation 提供任务与度量参考。",
+    "evidenceZh": "VectorGym 由同源真实 SVG 派生 Sketch2SVG、SVG Editing、Text2SVG 与 Captioning 四任务，并保留可编辑 program structure。（Fig. 1 and Sec. 3.1, pp. 1 and 3–4；首页数据—标注—任务总览图与任务定义相互对应，已视觉核验。）\nRLRF baseline 在四任务上共同训练 Qwen3-VL-8B，生成类 reward 来自 SVG render similarity，并使用 batch-normalized GRPO 与 curriculum。（Sec. 3.4, Eqs. 1–2, pp. 5–6；全文列出 rollout batch、GPU、iterations 与 score change，方法页已视觉检查。）\n作者报告：Qwen3-VL-8B Gym 的 overall score 为 66.05，高于 base 8B 的 58.74、Qwen3-VL-235B 的 62.32 与 GPT-4o 的 64.93。（Tables 2–3 and Sec. 5.5, pp. 8–9；主结果表已视觉核验；分数是多个 task metrics 的 arithmetic mean，均为作者报告。）\nheld-out test 只有 300 samples、仅测 SVG-Stack 内分布，论文明确未验证其他 corpora 或 design-tool exports。（Sec. 3.2, p. 5; Limitations, p. 9；这是作者明确的数据边界，不应把 benchmark 内优势外推为一般 professional SVG workflow 成功。）",
+    "caveatZh": "held-out split 测量的是 SVG-Stack 内 generalization，没有验证其他 corpora 或 design-tool exports。\nSketch2SVG 与 complex editing 仍有明显性能缺口，模型很少为无色 sketch 补充合理颜色。\n生成内容可能继承训练模型的 demographic、cultural 与 artistic-style biases。\n训练 reward 与主要 evaluation 都使用渲染相似度/VLM judge，可能奖励视觉近似而非简洁、语义正确、真正可编辑的 SVG program structure。\ntest 仅 300 samples 且只报告 point estimates；四任务不等权难度与 metric scaling 会影响 overall ranking。\n384 GPU-hours 的 baseline 成本较高，且 PDF 未明示公开代码或数据 URL，复现可用性尚不能确认。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

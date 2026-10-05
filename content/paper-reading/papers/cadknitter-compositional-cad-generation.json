@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2512.11199",
+  "slug": "cadknitter-compositional-cad-generation",
+  "title": "CADKnitter: Compositional CAD Generation from Text and Geometry Guidance",
+  "authors": [
+    "Tri Le",
+    "Khang Nguyen",
+    "Baoru Huang",
+    "Tung D. Ta",
+    "Anh Nguyen"
+  ],
+  "publishedAt": "2025-12-12",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2512.11199"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "fabrication"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "B-rep",
+    "complementary CAD",
+    "contact constraints",
+    "diffusion guidance"
+  ],
+  "abstract": "Computer-aided design (CAD) defines 3D models as compact, precise, and editable representations, making it directly useful for several fields. Recently, CAD generation has been gaining more attention in both the research community and industry. Crafting CAD models has long been a painstaking and time-intensive task, demanding both precision and expertise from designers. Prior works have achieved early success in single-part CAD generation, which is not well-suited for real-world applications, as multiple parts need to be assembled under semantic constraints and geometric compatibility. In this paper, we propose CADKnitter, a compositional CAD generation framework with geometric-guiding cues to steer diffusion sampling. CADKnitter is able to generate a complementary CAD part that follows both the geometric constraints of the given CAD model and the semantic constraints of the desired design text prompt. We also curate a dataset, so-called KnitCAD, containing over 310,000 samples of CAD models, along with textual prompts and assembly metadata that provide semantic and geometric constraints. Intensive experiments demonstrate that our proposed method outperforms other state-of-the-art baselines by a clear margin. Our project page is available at https://cadknitter.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2512.11199v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2512.11199v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2512.11199v2 全文及 2026-09-02T21:33:46.000Z 的审阅记录整理；PDF 20 页，SHA-256 d5ae51d07280645bf71636ec2fbc83df857454fc3a551cd0d823500be2fd39c1；原审阅已视觉核验第 1、4、6、9 页。数字与比较均为作者报告，本项目未独立复现。原审阅仅确认作者承诺发布代码，不提供未确认的 Code link。作者 submission comments：Accepted to SIGGRAPH Asia 2026 Conference",
+    "ideaZh": "CADKnitter 不再孤立生成单个 CAD，而是给定已有 B-rep、目标 contact faces 与文本要求，生成语义互补且能装配的新 part。它用 31.3 万 KnitCAD samples 训练 conditional diffusion，再以 contact geometry 的 derivative-free scoring/guiding cues 修正采样；作者报告 CD/penetration/intersection volume 均明显优于 PivotMesh、BrepGen、MatchMaker，但复杂 freeform contacts 与 multi-part conditioning 仍是边界。",
+    "methodFlow": [
+      "从已有 B-rep assembly 提取 part pairs、接触面与装配状态，并用 MLLM 生成互补部件文本条件",
+      "编码文本、condition CAD entities 和指定 contact faces，注入 sequential B-rep diffusion denoiser",
+      "在后期 denoising 为每步采样多个 candidates，并抽取其 contact-face point sets",
+      "用局部 geometry alignment、全局 semantic preservation 与 guiding-cue predictor 评分选择轨迹",
+      "经 BrepGen 后续 face/edge stages 与 OpenCASCADE topology recovery 输出可编辑 complementary CAD part"
+    ],
+    "motivationZh": "单部件 CAD generation 难以生成能与已有部件互补并配合接触的新几何；CADKnitter 将 B-rep、文本和 contact faces 纳入条件生成。",
+    "methodZh": "KnitCAD 从 Fusion 360 Joint 和 AutoMate 构造 156,654 个 assembled pairs，双向形成 313,308 条 target-condition samples，并带 text prompts、pair/contact-face labels。CADKnitter 以文本 embedding、condition B-rep 与 contact-face tokens cross-attend 到 BrepGen-style sequential B-rep diffusion；后期采样用 face point extraction、Fused Gromov-Wasserstein semantic preservation、contact position/edge-length/angle cues 做 zero-order candidate selection。输出保持 B-rep 可编辑性，并展示串行生成多个配合部件的初步 workflow。",
+    "experimentsZh": "实验设置：在 KnitCAD 上训练 BrepGen-based conditional diffusion，测试 1,000 条 AutoMate hold-out，并做 AutoMate→Fusion 360 cross-set；指标为 CD、penetration ratio、intersection volume、valid ratio，另有 20 人人评与 noisy/complex-contact robustness。\n作者报告 guidance 将自家 unguided 模型的 CD 从 88.69 降至 83.38、IV 从 9.42 降至 7.59，但 VR 从 0.45 降至 0.44，体现几何适配与 validity 的小幅折中。（Table 2, p. 6; Sec. 5.3, p. 8）\n作者报告 cross-set 测试中完整方法 CD 82.00、IV 13.90、VR 0.48，优于列出的 PivotMesh、BrepGen 和 MatchMaker。（Table 4, p. 6）\n比较范围：覆盖 mesh、unconditional B-rep 与 assembly-completion baselines，并报告 unguided 版本和跨数据源测试；由于方法建立在 BrepGen 四阶段 pipeline 上，尚缺与更新 text-to-CAD/assembly foundation models 的统一训练预算比较。\n消融与诊断：Table 5-7 分别消融 semantic preservation、guiding-cue position/shape costs 与 naive cues；附录还表明 boundary-edge equality 不成立时 guidance 可能弱于 unguided variant。",
+    "insightZh": "核心创新是把 CAD generation 从单 part 变为受已有 geometry/contact constraint 约束的 complementary-part generation，并同时提供规模化 paired B-rep/text/contact dataset 与适合非可微 CAD pipeline 的 sampling guidance。",
+    "whyRelevantZh": "它直接命中 3D Generation 与 Fabrication：输出是可编辑 B-rep complementary part，assembly/contact constraints 实际进入数据、conditioning 与 sampling objective。",
+    "evidenceZh": "KnitCAD 包含 156,654 个独立装配对、172,265 个 B-rep models，双向形成 313,308 个带文本与 contact metadata 的生成样本。（Sec. 3 and Fig. 2, p. 3；数据构造页说明来源、contact labeling、GPT-4.1 prompt synthesis 和 1,000 条人工抽查。）\nCADKnitter 将文本与 condition B-rep/contact-face tokens 融合进 diffusion，并用 derivative-free geometric scoring 在采样后期挑选 candidates。（Fig. 3 and Secs. 4.1-4.3, pp. 4-5；方法图已视觉核验，区分 learned conditional denoiser 与 sampling-only geometric enforcement。）\n作者报告主测试中 CADKnitter 的 CD 83.38、PR 0.23、IV 7.59，优于 MatchMaker 的 102.15、0.42、18.95。（Table 2, p. 6；主表已视觉核验；VR 为 0.44，略低于 BrepGen 0.47，故不把所有指标概括为全面领先。）\n作者报告 20 人、1,000 次 pairwise comparisons 中，相对 MatchMaker 的 semantic win/tie 为 0.49/0.37，geometry compatibility win/tie 为 0.67/0.19。（Table 3 and Sec. 5.4, pp. 6 and 8；人评补充了自动几何指标，但参与者规模和年龄范围有限。）",
+    "caveatZh": "每个新 part 只 condition 于一个此前 part，尚不能联合多 part 条件生成。\ncontact-face cues 不能表达所有配合关系；mixed/freeform surfaces 数据不足，boundary-edge length equality 不成立时 guidance 会退化。\n文本由 GPT-4.1 基于 renders 自动生成，仅人工抽查 1,000 条，语义多样性和噪声可能受生成器偏差影响。\n作者报告的 sequential multi-part demo 仍需人工选择 contact faces 和 duplicate/position 操作，距离全自动 fabrication-ready assembly 尚有差距。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

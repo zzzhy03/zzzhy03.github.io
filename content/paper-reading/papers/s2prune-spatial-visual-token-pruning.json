@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.01224",
+  "slug": "s2prune-spatial-visual-token-pruning",
+  "title": "S$^2$Prune: Spatially Structured Visual Token Pruning for Multimodal Large Language Models",
+  "authors": [
+    "Yuanyuan Jia",
+    "Shunpu Tang",
+    "Qianqian Yang"
+  ],
+  "publishedAt": "2026-09-01",
+  "updatedAt": "2026-09-01",
+  "collectedAt": "2026-09-03",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.01224"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "spatial coverage",
+    "visual token pruning",
+    "early representation change",
+    "adaptive scaffold"
+  ],
+  "abstract": "Visual token pruning reduces the inference overhead of multimodal large language models (MLLMs) by retaining only a subset of visual tokens. Existing methods usually select tokens based on importance or redundancy. However, we observe that these criteria produce stable spatial biases across inputs and do not always outperform simple Uniform Grid sampling, highlighting the value of broad spatial coverage. Motivated by this, we propose S$^2$Prune, a training-free pruning method that preserves spatial coverage while adapting token density to local image structure. We first divide the image into regions and assign at least one token to each region to preserve coverage. The remaining token budget is then distributed according to Laplacian variation, giving more tokens to regions with richer structure. We then use Early Representation Change (ERC), computed from the first decoder block, to select representative tokens within each region. We evaluate S$^2$Prune across diverse settings and two MLLM architectures. On Qwen2.5-VL-7B-Instruct, it achieves the highest average accuracy among the evaluated training-free pruning methods. With only 32 of the original 576 visual tokens, it still retains 79.3% of the full-model performance. Code is available at https://github.com/yuanyuanjia71-spec/S2Prune.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.01224v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.01224v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yuanyuanjia71-spec/S2Prune"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据已归档 exact version 2609.01224v1 全文及 2026-09-02T21:37:00.000Z 的审阅记录整理；PDF 18 页，SHA-256 6a1f472325d1229636afa735bd0d9065c508c118aea27e0d019e27c47facfa7f；原审阅已视觉核验第 1、5、6、8、9 页。数字与比较均为作者报告，本项目未独立复现。Code link 依据原审阅确认的 public repository。作者 submission comments：18 pages, including supplementary material. Code is available at https://github.com/yuanyuanjia71-spec/S2Prune",
+    "ideaZh": "S2Prune 重新解释 visual-token pruning：现有 importance/redundancy selector 有稳定空间偏置，简单 uniform grid 反而常更稳；它先给每个 region 至少一个 token，再按 Laplacian variation 分配密度，最后用第一 decoder block 的 Early Representation Change 选代表 token。作者报告 32/576 tokens 时保留 79.3% full-model 性能，但 OCR/细节任务仍明显下降。",
+    "methodFlow": [
+      "把 visual grid 划分为 coarse regions，每区保留至少一个 token",
+      "用 Laplacian variation 衡量局部结构复杂度并分配剩余 token budget",
+      "在每个 region 内用 first-block ERC 选择代表 token",
+      "将稀疏 token sequence 送入原 MLLM，无需再训练"
+    ],
+    "motivationZh": "全局 importance/redundancy pruning 可能留下稳定的空间覆盖缺口；S2Prune 研究先保证 region coverage，再按局部复杂度与 early-decoder response 分配 token budget。",
+    "methodZh": "这是 training-free MLLM pruning。Adaptive Spatial Scaffold 确保覆盖，局部结构复杂度分配剩余 budget，ERC 用 early-decoder response 而非静态视觉 attention 选择 cell 内 token。Qwen2.5-VL-7B 与另一架构、多项 VQA/OCR benchmark 的结果显示平均性能和 efficiency tradeoff 有竞争力；论文也承认有效 pruning 不只应追求高分 token，而要避免空间覆盖缺口。",
+    "experimentsZh": "实验设置：Qwen2.5-VL-7B-Instruct 等两种 MLLM，32-288 token budgets，11 个 VQA/OCR/grounding benchmark；在 RTX 5090 测 FLOPs、TTFT、memory，并做 region/selector ablation。\n作者报告在 32-token budget 下保留 79.3% full-model 平均性能，并在多个 budget 上取得最佳 average relative performance。（Table 1, p. 6）\n比较范围：覆盖 FastV、DART、GPrune、VisionZip、VisPruner、GridPrune、HoloV 等 training-free pruning；未比较 end-to-end learned compression、视频/多图长序列或真实服务吞吐。\n消融与诊断：分离 random/uniform/structure-based region allocation 和 ERC/CLIP/attention selector，支持 coverage 与 ERC 的互补；局部 structure score 仍可能错过语义重要区域。",
+    "insightZh": "把 pruning 从全局 token importance 转为 coverage-constrained spatial allocation，并用 early representation change 解决 cell 内选择，方法简单且无需训练。",
+    "whyRelevantZh": "直接涉及 MLLM visual-token representation、推理成本与空间信息保真，对长视觉上下文和设计理解有用。",
+    "evidenceZh": "S2Prune 由 Adaptive Spatial Scaffold 与 ERC 两部分组成，先分配空间 coverage，再选局部代表。（Sec. 4, Fig. 1 and method equations, pp. 1, 5-6；方法示意和公式页均已视觉核验。）\n作者报告 32/576 visual tokens 时平均相对性能为 79.3%，为同 budget 所列 training-free 方法最高。（Table 1, p. 6；相对性能按作者选择的 11 个 benchmark 平均。）\n作者报告 64 tokens 时 FLOPs 从 61.1T 降至 18.11T、TTFT 从 56.97 ms 降至 24.94 ms。（Table 3, p. 8；硬件为单张 RTX 5090，部署收益可能随实现改变。）\n细节/OCR task 在激进 pruning 下退化明显，固定 grid/结构指标也不保证 semantic relevance。（Tables 1, 4 and conclusion, pp. 6, 8-9；这是空间 coverage 方法在 fine-grained content 上的主要边界。）",
+    "caveatZh": "平均分掩盖 OCR 与细节任务的高损失，单 GPU TTFT 不等于端到端服务收益；只验证有限 MLLM 家族。\n证据限于该 exact version 的作者实验与分析，本项目未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
