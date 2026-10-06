@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.01973",
+  "slug": "token-level-video-reinforcement-learning-2610-01973",
+  "title": "Token-Level Video Reinforcement Learning",
+  "authors": [
+    "Yifan Wang",
+    "Gordon Guocheng Qian",
+    "Yanyu Li",
+    "Anil Kag",
+    "Yun Fu"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01973"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Token-Level Video Reinforcement Learning",
+    "Video Generation"
+  ],
+  "abstract": "Reinforcement learning (RL) for video generation usually assigns one scalar reward to an entire sampled video. Yet a video is not uniformly flawed: some visual tokens may already satisfy the prompt, whereas others require correction. A scalar reward cannot localize errors, causing optimization to perturb satisfactory tokens while under-targeting the tokens that actually need to change. We introduce Token-Level Video Reinforcement Learning, TVRL, a framework that derives token-level credit from the reward being optimized. Our key insight is that the answer likelihood of a frozen vision-language model provides both signals: its outputs contribute to the video-level reward, while magnitudes of its video-input gradients reveal which generated video tokens most affect that score. We instantiate TVRL in Group Relative Policy Optimization by averaging prompt-derived question rewards into one group-relative advantage and using detached, question-conditioned token-credit maps to reweight dense denoising-transition log-probabilities inside the clipped policy ratio. On VBench-2.0, TVRL achieves an Overall score of 57.69, outperforming the base model by 3.60 points. TVRL also improves matched GRPO baselines across three SDE samplers (SAGE, Flow, and Dance) by 2.68--3.15 points and across four reward models (VideoAlign, VideoScore2, UnifiedReward2, and Qwen3.5-9B) by 1.33--3.15 points.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01973v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01973v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/YFWang1999/TVRL"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01973v1 全文及 2026-10-06T15:46:15.533278+00:00 审阅记录；PDF 26 页，SHA-256 690329da21d7a93a7a2932441a949329a4013a8696bfadc1bb6e01cdc7c4e6a3，视觉核验第 1、4、7、9、18、24、25 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF p.1 GitHub annotation 指向官方仓库。已确认实际 post_train.py、hyvideo reward/GRPO utils 和 train_tvrl.sh，不仅静态项目页；读取公开 grpo_utils.py 可见 shared advantage 与 credit tensors 实现。未运行训练或复现。仓库 description 的 coming soon 不代表当前文件缺实现，状态依据实际内容。",
+    "ideaZh": "TVRL 将 prompt 拆为 Yes/No checks，以冻结 VLM 的 answer likelihood 形成整体 advantage，再用同 likelihood 对视频输入的绝对梯度分配 denoising 更新。值得借鉴的是 reward 对齐的时空 routing，而非 causal credit。作者报告 matched SAGE-GRPO Overall 54.54→57.69；frame routing 已贡献大部分收益，细到未经平滑的 cell 会不稳定。shared advantage 可强化单个失败 check，低分辨率 sensitivity 也不提供精确 object mask。",
+    "motivationZh": "整段视频的 scalar reward 难以说明具体哪些帧或区域需要改进。目标是把 prompt 中可观察的要求与视觉证据关联，为生成更新提供更局部的信用分配。",
+    "methodZh": "针对整段 scalar reward 无法分配更新的问题，离线解析每 prompt 的五项可观察要求，全部固定 reference 为 Yes；teacher-forced likelihood 同时提供 reward 和 input-gradient maps。跨 checks 平均 reward 后 group-normalize，所有 checks 共用整体 advantage；detached map 归一化并映射至 latent units，先加权 local log-probability 再形成每 check 的 clipped ratio，KL 仍全局。没有 reward 梯度穿过 VAE/denoising generator 的完整链。",
+    "methodFlow": [
+      "明确语义 checks：只读文本生成五个 binary checks，采样视频后用冻结 VLM 同一 teacher-forced sequence 计算固定 Yes likelihood。",
+      "奖励与敏感度分流：平均 checks 得 rollout reward/advantage；分别求 likelihood 对 processed video input 的绝对梯度，detach 后聚合和平滑。",
+      "局部 log-prob routing：将 maps 映射到 latent 时空 units，加权 denoising transition log-probs，再计算每 check 的 clipped ratio。",
+      "整体正则更新：共享 advantage 决定方向，maps 决定分配；old/reference KL 继续全局约束，更新 shared generator parameters。"
+    ],
+    "experimentsZh": "实验设置：作者在 HunyuanVideo-1.5 上固定 100 optimizer steps，用 10K prompt、group4、81-frame 低分辨率 rollout，64×A100；评测 121-frame480p，SAGE/Flow/Dance 与四种 reward models。主结果三 seeds，Dance baseline 只有两 completed runs；独立盲人类研究覆盖 200 prompts×3 seeds/模型，8 judges。\n作者报告 SAGE/Qwen3.5-9B GRPO Overall 54.54±0.38，TVRL 57.69±0.13；control 31.57→31.64 几乎不变，common sense 64.88→64.31。（Table 1, p.7; Table A1, p.15）\n作者报告人类对 matched GRPO 的 win/loss/tie 为 36.3%/23.3%/40.4%。（Table 2, p.8; Appendix A.1, p.13）\n作者报告 DINO reward-agnostic map 为 55.48，gradient 3×3 为 57.69；shuffled map 53.70。（Table 3, p.9）\n比较范围：同 sampler/evaluator 的 uniform GRPO 控制较明确，另有 DINO routing、generic question、averaged map、per-frame ratio 与 human preference。shuffling 在 smoothing 之前，会改变 final entropy/coherence，不能单独证明 semantic alignment。只有单 video backbone 和短 training budget，未建立长视频或 creation session 的稳定性。\n消融与诊断：granularity、critic、checks/frame count、ratio form 有实验。critic 替换同时改变 reward 与 map，非 map-only 因果控制。18% timing 是历史 VideoAlign runs，reward weights、prompt files/frame sampling 均不完全匹配，不代表 default Qwen cost 或普遍效率结论。",
+    "insightZh": "将同 reward likelihood 的 detached sensitivity 与 GRPO weighted-logprob routing 连接，而非直接 differentiable reward backprop，有可迁移的 token-level visual post-training 方法价值。已存在 perceptual credit 路线，新增核心是 reward/question 对齐。unsigned sensitivity 不证明 signed causal contribution，weighted ratio 也不是 exact trajectory likelihood ratio。",
+    "whyRelevantZh": "以明确 prompt checks 组织时空视觉 post-training，可用于 creation generator 的证据驱动更新，属于视频方向核心生成机制的直接方法 transfer；不扩大为逐对象锁定、物理模拟或长期叙事控制。",
+    "evidenceZh": "check likelihood 与 map 同源，但共享 advantage 并非每 check 独立纠错。（Sec.3.2–3.4, Eqs.2–6, p.5; Appendix B.6, p.23；failed check 仍可得到 positive shared advantage；later answers teacher-forced 于前面 Yes tokens，非统计独立。）\n主要收益来自时间路由，细空间路由提供较小增量。（Table 3, p.9; Appendix A.6, Table A7, p.18；作者报告 uniform/frame/3×3 为 54.54/56.47/57.69；构造 split panels 中 queried mass 52.70%，仅比 uniform 高 2.70 points。）\n理论只在已声明 idealized assumptions 下解释，不保证真实 generator causal credit 或低 variance。（Appendix B.7, pp.23–25；shared parameters 下的 gradient direction 和 sensitivity alignment 未由线性 allocation 推导得到。）\n更细并不总更好，raw 1×1 有 instability。（Appendix B.8, Fig.B1, p.25；作者报告 1×1 55.10 低于 frame 56.47；PPO clipping 不会修正长期 mislocalized weights。）",
+    "caveatZh": "gradient 是 local/model-dependent unsigned sensitivity，不是 causal attribution。\nweighted logprob 是 biased surrogate，理论只是条件直觉。\nraw cell routing 有 evaluator-dependent instability。\n低 critic resolution 的 split-panel diagnostic 不验证精确 object segmentation。\n固定 Yes 且 teacher-forced predecessor answers 易产生 evaluator/syntax/semantic 偏置。\nshared positive advantage 可能强化某项失败，需要与 task-specific reward 冲突区分。\n3×3 在 interpolated grid 上，不等于 native VLM high-resolution evidence。\n没有相同配置的主 Qwen wall-clock benchmark，不能以历史 18%覆盖所有成本。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

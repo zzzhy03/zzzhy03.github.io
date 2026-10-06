@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2610.03512",
+  "slug": "progressnet-sketching-and-prompting-with-a-frozen-text-to-image-model-2610-03512",
+  "title": "ProgressNet: Sketching and Prompting with a Frozen Text-to-Image Model",
+  "authors": [
+    "Arkaprabha Basu",
+    "Chaitat Utintu",
+    "Yi-Zhe Song"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03512"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "ProgressNet",
+    "Image Generation"
+  ],
+  "abstract": "Humans draw progressively: a few strokes, a look at the result, a stroke erased, a prompt revised. Image generators do not work this way. They typically take a finished sketch and produce the image in a single pass, so every edit starts the picture again, and the models that do keep state across turns are driven by text, cannot take a stroke, and are too slow to draw with. We present ProgressNet, a training-free framework that lets a frozen text-to-image model follow a drawing session as it unfolds: strokes are added and erased, the prompt is revised, and the image keeps up at about a second per turn. It needs no new parameters because the frozen model already has what a progressive generator needs, a pathway through which the previous turn can be remembered, layers that can carry appearance forward without freezing structure, and an internal signal of how far to trust an unfinished sketch; three inference-time mechanisms (Previous-Concept Memory, Layer-Selective K/V Injection and Banded Adaptive Control) use each in turn. As a sketch fills in, every existing method degrades, the FID of the FLUX+ControlNet baseline doubling between 10% and 100% completion on FS-COCO, while ProgressNet's barely moves; it maintains strong fidelity and progressive coherence across three sketch domains and is preferred by users over five competitors, most widely on erasure.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03512v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03512v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03512v1 全文及 2026-10-06T12:21:41.079450Z 审阅记录；PDF 47 页，SHA-256 9503337286234e896939dc07a7089a7c454b5867e81cf2cc96afb7b707c8ab4d，视觉核验第 1、4、7、9、19、23、28 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文/PDF annotations 未提供本方法 public repo/projectURL，只有他文引用，不能以作者机构猜 Code。",
+    "ideaZh": "ProgressNet 用 operation-aware memory、部分层 K/V reuse 与 retrospective ControlNet，让冻结 FLUX 跟随加笔、擦除和改 prompt。作者报告快速 progressive sketch generation 与质量改善。可精读交互生成控制；memory 贡献较大，擦除清 cache 会改变区域外内容，人类评分也不是原始投票比例。",
+    "motivationZh": "交互式 sketch 会不断加笔、擦除和修改 prompt，独立重生成容易遗忘既有内容或冻结错误结构；目标是让冻结生成模型持续跟随用户编辑。",
+    "methodZh": "PCM 以 UnionControlNet tilebranch 接 previousRGB：addition 保持，erasure 白填区域并清 KV，promptupdate 保留 stroke/floodfillcommitmask 并灰填其他区。LS-KVI 仅在 residualbypass 影响较小六 layers 加上旧 KV，避免冻结关键 structurelayers。BAC 读前两 completedturn 的 memoryfeaturechannelJSD 分 early/late/solverstep 调 memorystrength，当前 sketchcontrol 固定；是 inferenceheuristic，未学或显式预测真实用户意图。输出仍 rasterimage，不是 SVG/strokes/nativeeditablelayers。",
+    "methodFlow": [
+      "依据 add/erase/promptupdate 处理 previousRGBmemory，以 stroke/enclosed-regionmask 保护 committedcontent。",
+      "当前 binarysketch 与 RGBtilememory 共同调 UnionControlNet，structurecontrol 固定。",
+      "只在六 low-vitalitytransformerlayers 加入 previousKV，erasure 前清 cache。",
+      "从两 previouscompletedturn 的 ControlNetmemoryJSD 求 band/stepfactors，调当前 memoryresidual。",
+      "两步 FLUX 生成新 rasteroutput 并刷新 RGB/KV/ControlNetfeature 状态，继续手工 drawingturn。"
+    ],
+    "experimentsZh": "实验设置：FLUX1schnell+UnionControlNet、two-step1024²BF16singleH200，λstructure.5/memory.65、KV.3、BACclip.05–1，sixfixedlayers。FSCOCO10K/PhotoSketch500/Sketchy1250 共 11750pairs，sevencompletionstates；BACdiagnostics 另 SD3.5 及四 domains52368samples，two-onlineblindstudies 小 sample 集。\n作者报告 fulllatency0.829 对 Flux0.761/+0.068s，SDXS0.049 更快但 fidelity 弱；不是消费级 deviceperformance。（Table1, p.7）\n作者报告 clearKV 改善 93/100erasurecycles、Wilcoxonp7.1e−15；仅 50→70→50return 而非任意 destructiveedit。（Table8/AppendixB.2, pp.19–20）\n作者报告 PhotoSketchmeanPFC-DINO1.101 低于 StableFlow1.131；composites 把 temporalDINO 或 LPIPS 除 FID，受 quality 分母驱动。（Table2, p.7; AppendixA.2/Eqs.9–10, p.15）\n比较范围：Sketch-a-Sketch/SDXS/ConditionalBalance/FluxControlNet/StableFlow，不同 backbones/conditioning 和 steps；NanoBanana 仅 publicchatqualitative 未控 benchmark。SD3.5 只是 controlfeaturediagnostic，不是完整 methodqualitytransfer。\n消融与诊断：PCM→KV→BAC、vital/least-vital、erasecache、divergencevariants 及 multidomainbandpatterns。不能从 JSD/cornerfeaturevisuals 证明是用户意图信号；未验证 depth/pose、多 seed 及所有 operationruntime。",
+    "insightZh": "previousimagecondition、attentionreuse、adaptivecontrol 已有基础，新意在区分不同 stroke 操作、progression 下反用 low-vitalitylayers 与 memorystream 的 causalretrospective 调节。core 是 incrementalvisual creation 方法，不只是 GUI；对 structuredsketchcontrol 有直接迁移价值但非自动 designagent。",
+    "whyRelevantZh": "明确面向 progressivesketch-drivenvisual creation 与可撤销 editing，memory/operation 机制能为 structured2Ddesign 的 rasterfeedback 直接提供方法启发；未生成 vector/stitch/fabricationinstructions。",
+    "evidenceZh": "PCMoperationmemory、least-vitalKVlayers 与 retrospectiveBAC 分别控制保存/更新；erase 清 cache 防 stalefeatures。（Sec.4/Eqs.1–5/Fig.4, pp.4–6; AppendixB.1–B.2, pp.18–20；方法图和 erasure 页已查看；BAC 使用 t−2→t−1，不直接计算 currentupdate 或 future，核心 fixedboundsheuristic。）\n作者报告 FSCOCO10/100%FID36.5/37.3，对 Flux32.9/67.9；PhotoSketch 初期 FluxFID66.0 优于 ours76.2。（Table1, p.7；主表实际查看；晚期保持质量而非各 completion/metrics 全面最优。）\n作者报告 PCMfullFID36.6/DINO.414，full37.3/.413；BAC 改善 FIDC/.text 但全系统 FID 不是组件单调变好。（Table4, p.9; Table7, p.17；消融页已查看；大部分 fidelitygain 来自 PCM，不把所有收益归 BAC/LSKVI。）\n作者报告 clearKV ReturnLPIPS.295→.204、erasedL1.121→.085，但 OutsideChange.096→.123。（Table8, p.19; AppendixB.2, p.20；擦除 table 实际查看，恢复与 outsidepreservation 存在 trade-off，不称其他区域完全不变。）\nstudy 总体 Pref71.8/Erase85.2 为 criterionwise 归一化得分，未给 participants 数量或 CI。（Table3, p.9; AppendixD, pp.22–23；userprotocol 已查看，不能写 71.8%users 或 85.2%pairedvotes。）",
+    "caveatZh": "主要 sketchcontrol，depth/pose 等 modalityextension 未验证。\nfixedlayerbands/modulationbounds，自适应找 control-sensitive regions 留待 future。\nheavyoverlapstroke 在 gallery 最后阶段仍困难。\npixelmemory 保存误解释也会传播，commitmaskmorphology 与 white/grayfill 没有 explicitsemanticeditable 结构。\nBAC 对前一 transition 反应有一 turnlag，突然 prompt/stroke 改动及初始化不足两 history 时规则未明确。\nKV 全 tensorcache 在 promptlength 变化可能需 shape/position 处理，源码未提供足够核验。\nPFC 除 FID 的 composite 可因 distributionquality 主导，不是精确 strokeadherence/唯一 temporalmeasure。\nuserstudyN/rawscaling/CI 未报，不能当多人比例；full 与 PCM 的 FIDtradeoff、eraseoutsidechange 不可隐藏。\n本项目未运行或复现；非手工 stroke 自动设计/制造产物。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

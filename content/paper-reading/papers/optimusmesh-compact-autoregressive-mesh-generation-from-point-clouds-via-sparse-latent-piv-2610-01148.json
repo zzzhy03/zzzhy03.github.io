@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.01148",
+  "slug": "optimusmesh-compact-autoregressive-mesh-generation-from-point-clouds-via-sparse-latent-piv-2610-01148",
+  "title": "OptimusMesh: Compact Autoregressive Mesh Generation from Point Clouds via Sparse Latent Pivots",
+  "authors": [
+    "Mazhar Iqbal",
+    "Xuanmeng Sha",
+    "Naoya Chiba",
+    "Yuki Uranishi",
+    "Tomohiro Mashita"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01148"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "OptimusMesh",
+    "3D Reconstruction"
+  ],
+  "abstract": "Generating compact and geometrically faithful 3D meshes directly from point clouds remains a fundamental challenge. Point clouds are unordered and sparse, whereas meshes exhibit irregular structure and varying topology. As a result, many existing approaches rely on implicit representations followed by surface extraction or reconstruction. Although effective, these pipelines can produce dense or over-smoothed meshes, often requiring computationally expensive post-processing and simplification. We present OptimusMesh, a framework for direct compact triangle mesh generation from point clouds using sparse latent pivot conditioning. Our key idea is to compress $2{,}048$ oriented input points into only $16$ sparse latent pivots, reducing the geometric conditioning set by $128\\times$. These pivots provide a compact structural representation shared across a two-stage autoregressive framework that first generates mesh vertices and then predicts triangular faces conditioned on the generated vertices and the same pivots. Compared with the evaluated recent point-cloud-conditioned autoregressive methods, which use $257$ decoder-conditioning tokens, OptimusMesh uses only $16$, yielding a $16.1\\times$ shorter conditioning sequence. Experiments show that OptimusMesh produces the most compact outputs among the compared recent autoregressive methods, using $25.7\\%$--$94.1\\%$ fewer faces while maintaining competitive geometric fidelity and distributional quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01148v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01148v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01148v2 全文及 2026-10-06T13:06:10.000Z 审阅记录；PDF 13 页，SHA-256 17447fd23dbcda4b6ed8ac2d21cb60a63839cd6f68f9cf082016ed90313ea0c4，视觉核验第 1、3、7、8、12、13 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDFp1 官方 project 已访问，明确 Code Coming soon 且无 publicrepo 实现链接。",
+    "ideaZh": "OptimusMesh 将 2048 oriented points 压成 16 个 SLIDE-style latent pivots，复用到 PolyGen-style vertex→face AR 模型，直接预测≤800-face 三角 mesh。作者报告 249faces 平均、15.75s 和更好 CD/HD，但 F1 低于四个 AR 基线，且 compactness 受训练/输出预算控制。可略读 point-to-editablemesh 的稀疏 conditioning 接口，非 128×完整系统加速。",
+    "motivationZh": "从点云恢复 mesh 时，高 token 数与复杂 connectivity 增加 autoregressive 成本；论文希望以少量 latent pivots 保留形状，并生成较紧凑的顶点与面结构。",
+    "methodZh": "目标是忠实保留输入形状并以低复杂度 mesh 重建，因此按 Reconstruction 分类。稀疏 encoder 训练后冻结，vertex 模型生成 8-bit 坐标，face 模型 pointer 预测 vertices/connectivity 并加入 grammar、stop 与 edge/area biases。Sharedconditioning 减少 geometrycontext，但 face 阶段仍需要 generatedvertexmemory。真正有价值的是固定预算下 16vs32/denseconditioning 消融；完整 pipeline 不是新 meshgrammar，也没有高分辨率拓扑保证。",
+    "methodFlow": [
+      "在 mixedShapeNet/Objaverse/Toys4K 训练 SLIDE/PDR-styleencoder，FPS+SA/FT 抽 16×48latents",
+      "冻结 encoder，12-layerARvertexdecoder 以 pivotscross-attention 预测 8-bit z/y/x+EOS",
+      "Contextualvertexencoder 与 samepivots 作为 facepointerdecoderconditioning",
+      "Grammar 在 triangleboundary 只允许 NEW_TRI/STOP，三 pointer 不能重复 vertex",
+      "Frozenstop/edge/area samplingbias 与≤800faces/≤900vertices 上限",
+      "Dedup/degenerateface/invalidindexcleanup 后直接导出 trianglemesh，不作 surfaceextraction 或 simplification"
+    ],
+    "experimentsZh": "实验设置：Encoder62,846point clouds，meshdecoder35,907compacttargets，ShapeNetprimaryquantitative 与 450commonpairedobjects，Objaverse/Toys4Kmixedtraining 且 Toysqualitative。DistributionMMD/COV/1NNA、pairedCDHDNCF1、faces/tokens/time；16/32/densecondition 固定 decoder/train split/D48/facebudget。\n作者报告平均 141vertices/249faces，MMD.0813/COV.5657，而 MeshAnything.0659/FastMeshCOV.6659 更好。（Table 1, p. 7）\n作者报告 pairedCD.1421/HD.2705/NC.5956 最佳，但 F1@2%.3570 低于 baselines.3881–.4245。（Table 2, p. 7）\n作者报告 inference15.75s，fastestFastMesh8.58；16v32/dense 消融 time15.81vs28.10/34.66。（Tables 3–4, p. 8）\n比较范围：Baseline 输出、inputpointcount 和训练 budget 不齐，MeshRipple10Kvsown≤800faces；不能将 facecount 直接等于 same-qualityefficiency。主要 ShapeNet，完整 OODscan/noisepartialinput 泛化未给，inferencehardware 和 failurerate 未清楚报告。\n消融与诊断：Fixeddecoderbudget 比较 16/32/denseconditioning 支持稀疏 interface，32encoder 重训；无 repeatedseed/CI、samefacecountfidelity 或 decoderwithoutpivots 控制。",
+    "insightZh": "主推进在稀疏空间 conditioning 复用于 vertex/face 两阶段，来自 SLIDE 加 PolyGen 组合。不是新的 latentpoint 理论或输出 tokenization；小预算 mesh 资产接口有 directtransfer，但 controlledbenchmark 和 topology 证据有限。",
+    "whyRelevantZh": "Directpoint-to-compacttriangleasset 和 sparseconditioning 对 editable3Dasset、meshgeneration 管线有直接接口参考，满足 selectiveReconstruction 的 assettransfer；不是 genericencoder 小指标归入 Segmentation。",
+    "evidenceZh": "16pivots 各 3Dlocation+45features，vertex/face 共享 conditioning。（Figs. 2–3, Sec. 3.2–3.4, pp. 3–5；Facecross-attention 也读 encodedvertices，16 不是全模型 context 长度。）\nTargets/decoder 限制≤800faces/900vertices，supp 详细定义 filter/aug/bias。（Sec. 4.1, p. 6; Supp. 7–9, pp. 11–13；Reducedfacecount 部分由 training/decodingbudget，不能当统一 fidelity 约束最小 mesh 证明。）\n作者报告 249faces 与 CD/HD/NC 较好，F1 却最低。（Tables 1–2, p. 7；MMD/COV 也逊于 someARbaselines；不说全指标最优。）\n作者报告 16pivots15.75s，FastMesh8.58s 更快；controlleddensecondition34.66vs16pivots15.81s。（Tables 3–4, p. 8；16.1×/128×是 geometryconditioningtokenratio，不是 wallclockspeedup。）\nEarly/lateEOS、incompleteconnectivity 和 thinstructurequantizationfailures 真实展示。（Supp. 11, Fig. 8, p. 13；没有 manifold/watertightness/selfintersection/LOD 编辑成功率。）",
+    "caveatZh": "AR 过早/晚终止、连接缺失、局部 distortion；8-bit 与 dedup 会伤 thin structures。\nCompacttargets 和 decodingcap 影响 headlinecompactness；F1/MMD/COV 不全面更好。\nSourcefullpoints 不是 16pivots 重建 point cloud，featurecapacity 仍存在；ratio 非完整 speedup。\nMeshexport 确有 invalid/degeneratecleanup，不能写完全无 postprocessing。\nPoint-to-mesh 是 faithfulassetreconstruction，不因 AR 就改成新 objectcreation；本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.06611",
+  "slug": "lens3d-target-conditioned-visual-foveation-for-fine-grained-3d-understanding-2610-06611",
+  "title": "Lens3D: Target-Conditioned Visual Foveation for Fine-Grained 3D Understanding",
+  "authors": [
+    "Junming Huang",
+    "Zini Chen",
+    "Shuaiying Hou",
+    "Chi Wang",
+    "Qiang Dai",
+    "Weiwei Xu"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06611"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Lens3D",
+    "VLM / MLLM"
+  ],
+  "abstract": "Existing 3D large language models often overlook fine-grained attributes and less visually salient objects and parts, even when relevant evidence is present in scene videos. We introduce Lens3D to improve fine-grained object understanding through external visual assistance and knowledge transfer. Its LensUnd pipeline adopts 3D localization to select informative, complementary views for an external 2D vision-language model, supporting fine-grained object captioning, small-object grounding, and fine-grained object question answering. LensDistill transfers the resulting fine-grained knowledge to 3D LLMs through detailed caption supervision, enabling captioning from native inputs without external VLM calls. We also construct LensBench, a held-out evaluation set of 2,068 objects with three silver-standard reference descriptions per object. Experiments with Video-3D LLM and 3DRS demonstrate that LensDistill substantially improves fine-grained object captioning while preserving existing grounding and scene-level QA performance. These results establish the feasibility of transferring externally acquired fine-grained knowledge into native 3D LLMs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06611v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06611v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06611v1 全文及 2026-10-06T11:07:37.307419Z 审阅记录；PDF 20 页，SHA-256 484b62fc9471044fdd61acd52377d089138c6af5d6767fb02025c6f3a512ed21，视觉核验第 1、4、9、16、19、20 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 PDF 未提供该方法 public code repository URL；引用文献网址不代表本方法代码。",
+    "ideaZh": "Lens3D 用目标 3D box 选择互补 RGB-D views，让外部 2D VLM 生成细粒度描述，再将监督迁回 native 3D LLM。作者报告描述质量提高而原 grounding/QA 基本保留。值得精读表面覆盖与 privileged-view supervision；主要证据仍是 ScanNet captioning，小物体 QA 示例不等于系统性能力验证。",
+    "motivationZh": "现有 3D LLM 能定位室内物体，却常漏掉材质、部件和状态；需要利用互补 RGB-D 视图补足细粒度描述，并保留原有 grounding 能力。",
+    "methodZh": "已有 3D LLM 能定位物体但常遗漏材质、部件与状态。LensUnd 从 calibrated RGB-D 和目标 box 出发，以质量锚点加 marginal occupied-voxel coverage 选四个互补视图，投影 wireframe 供外部 VLM 理解。LensDistill 用三个 teacher 生成的 structured captions 替换短描述，与原 grounding/QA 数据混合全参训练；部署时只保留 32-view native student 输入及目标中心。LensBench 用银标多参考描述与小规模人评验证细粒度 caption 收益，保持能力只在现有室内任务验证。",
+    "methodFlow": [
+      "输入 calibrated RGB-D、camera poses 和 language query；3D grounder 预测目标 box。",
+      "估计 frame quality 与 box 内 occupied voxels，以质量初始化后贪心覆盖增益选四个有间隔视图。",
+      "在所选视图投影目标 wireframe，外部 2D VLM 生成 parts/materials/state 等 structured descriptions。",
+      "用 privileged-view teacher captions 监督接收 native 32 views、target-center token 与任务 prompt 的 3D LLM。",
+      "保留原 grounding 和 scene-QA 训练数据；部署移除外部 VLM 和 focus path，直接输出细粒度描述。"
+    ],
+    "experimentsZh": "实验设置：两学生 Video-3D LLM/3DRS 在 561 ScanNet 训练 scenes 的 7854 targets 取得 23560 teacher captions，与原四任务数据混合一 epoch。LensBench 严格 scene-disjoint，标准 ScanRefer/Multi3DRefer/ScanQA/SQA3D 检验原能力；captioning 含 100-object blind human study。\n作者报告 Lens3D(3DRS) Summary F1=0.489、Attr.Mean=0.538、人评 3.86/4；原 3DRS Summary F1=0.230、人评 1.92/4。（Table1, p.9）\n作者报告四视图预算下 unique covered voxels 为 2057.7 vs ExCap3D1564.6，redundancy38.0% vs47.8%；90.3% union-normalized coverage 不是完整真实表面覆盖率。（Table4, p.18）\n作者报告 ScanRefer Acc@0.5 为 3DRS56.0→56.4、Video-3D LLM51.8→53.7；scene-QA 指标基本保持而非全面提升。（Table2, p.10）\n比较范围：含 Chat-3D/ChatScene、原生 3DRS/Video-3D LLM、Qwen3-VL LensUnd 及 temporal/quality/ExCap3D view selectors；未验证非 ScanNet 域、不同传感输入或机器人操作。\n消融与诊断：wireframes、互补 selection、teacher 规模、GT/predicted boxes 和 target masking 支持聚焦与视觉依赖。蒸馏只定量验证 captioning，small-object grounding/细 QA 主要为 Fig.3/4 示例。",
+    "insightZh": "把 target-conditioned surface-coverage view selection 与细粒度描述蒸馏整合进通用 3D LLM；与 ExCap3D 等已有多视图 caption/privileged learning 共享基础，创新主要是互补证据接口、通用学生目标和任务能力保持，并非首次提出知识蒸馏。",
+    "whyRelevantZh": "直接服务 3D object/part 的细粒度视觉理解，可为 part-aware design 和 render-grounded agents 提供外部观察与蒸馏范式；向设计/LEGO 任务迁移尚是启发，并非论文实验。",
+    "evidenceZh": "Focus 选择目标 box 内的新 occupied voxels 而非仅按独立可见性排名，teacher views 带 wireframes、student views 不带。（Sec.3.2–3.4, Algorithm1, Fig.2, pp.4–8；方法图已视觉核验；Appendix A.2 给出具体质量与训练设置。）\n作者报告 3DRS Summary F1 由 0.230 提升至 0.489，Video-3D LLM 由 0.228 至 0.483；属性分数只比较产生 structured fields 的模型。（Table1, p.9; Table6, p.20；主表与完整表均已查看；本项目未独立复现。）\n作者报告目标像素 masking 将 3DRS Summary F1 从 0.489 降至 0.369，支持图像证据依赖，但 attention 集中不等于完整因果解释。（Sec.4.3, p.11; Appendix A.4, Table5, p.19；masking 表和实验协议已视觉核验；删除投影矩形也可能遮住相邻上下文。）\nLensBench 由 141 ScanNet validation scenes 的 2068 objects 构成，三参考为独立 VLM 生成，100 objects 的 300 reference ratings 平均 3.85/4。（Sec.4.1, p.8; Appendix A.1–A.2, pp.16–17；为 silver-standard references 而非穷尽人工真值；每 reference 只获一个独立 rating。）",
+    "caveatZh": "没有单独 limitations 章节；方法依赖 calibrated depth/poses 与目标 box，focus 失败可传播至 teacher 描述。\n银标 teacher 可能共享视觉误判；set-token F1 和 embedding similarity 不是逐属性真实性证明，原 free-form baselines 无对应属性分数。\nsmall-object grounding 与细粒度 QA 缺少系统定量 benchmark，native 学生只验证 caption-based transfer。\nmasking 改变整个投影矩形，attention 比值不能单独证明每个描述事实正确 grounded。\n证据限定该 exact PDF 与作者报告；本项目未执行代码或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

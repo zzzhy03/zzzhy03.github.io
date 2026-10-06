@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.01910",
+  "slug": "robot-learning-on-discrete-surfaces-theory-and-applications-2610-01910",
+  "title": "Robot Learning on Discrete Surfaces: Theory and Applications",
+  "authors": [
+    "Matteo Dalle Vedove",
+    "Fares J. Abu-Dakka",
+    "Luigi Palopoli",
+    "Daniele Fontanelli",
+    "Matteo Saveriano"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01910"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "fabrication"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "Robot Learning on Discrete Surfaces",
+    "Generative Fabrication"
+  ],
+  "abstract": "All the objects composing our world are enclosed within surfaces. Yet, most robot learning and motion generation frameworks treat surfaces as constraints ignoring their intrinsic geometry. This gap is acute for polyhedral meshes--the standard output of CAD and 3D reconstruction--whose discrete geometric structure remains unexploited. In this paper, we propose a unified discrete Riemannian framework that enables robot learning directly on polyhedral surface meshes. Using discrete differential geometry, we define logarithmic and exponential maps, parallel transport, and ambient-space projections that remain well-defined across faces, edges, and vertices. We instantiate the framework in three learning paradigms: (i) Dynamic Movement Primitives (DMPs), an improved exponential-map computation and a fixed-tangent-cone forcing-term encoding with parallel transport yield better cross-surface generalisation and stability over prior mesh-based approaches. (ii) Gaussian Process (GP), a geodesic-based kernel with practical admissibility control, enables regression at arbitrary mesh locations without smoothness assumptions. (iii) Riemannian Flow Matching (RFM), mesh-native operators improve generative quality over spectral baselines while reducing training time. The framework is validated in simulation against state-of-the-art methods and demonstrated on two real-robot scenarios: generalising user-drawn trajectories across different surfaces and planning polishing motions on RGB-D-reconstructed surfaces.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01910v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01910v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01910v1 全文及 2026-10-06T14:24:12.000Z 审阅记录；PDF 16 页，SHA-256 033aa88c33f537f886e8def34961e834a1acd8196a95e09d0827f296add06970，视觉核验第 1、5、6、8、9、10、11、12、13、14、15 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文称 C++/CGAL 实现并重用 RFM 官方实现，但未给本 framework public code/projectURL 或 release promise。",
+    "ideaZh": "在 polyhedral mesh 上用 tangent cones、straightest-geodesic Exp 与 parallel transport 直接生成 surface-bound trajectories，DMP 的 forcing 在 fixed goal cone 学习后迁移到新表面。真实 drawing 和 RGB-D 重建后 polishing 使它可作为曲面 toolpath 接口略读；GP 的κ安全检查仅有限点集，RFM 生成的是 surface 采样密度，不是新 3Dobject。",
+    "motivationZh": "机器人表面动作常在欧氏空间学习后再投影，忽略 polygon mesh 的边、顶点与内在几何；论文希望直接在离散表面定义运动学习与跨表面迁移算子。",
+    "methodZh": "主贡献是统一 mesh-nativeoperators 并接入 DMP/GP/RFM。针对 surfacefabricationpath，fixed-anchorforcing 与 parallel transport 避免 movingframeencoding 的漂移，位置轨迹沿 mesh 积分，绘画/抛光应用再用 normal-basedorientation 及外部 forceimpedancecontroller。GeodesicGP 和 RFM 是同 operator 层的应用，GP 非全局 PSD 保证、RFM 只已知表面 pointdensity；不能把 syntheticNLL 进步等同 manufacturingquality。",
+    "methodFlow": [
+      "在 manifoldmesh 上定义 face/edge/vertextangent cones，并由 CGAL shortestpath 得到 Log/distance",
+      "按 straightest-geodesic 规则跨 edge/vertex 传播 Exp，构造 parallel transport 和 ambientprojection",
+      "DMPdemoforcing 统一 transport 到 fixed goal cone 学 2Dbasis，再在目标 mesh 重建/transport 执行",
+      "GP 替换为 geodesicSEkernel 并对有限 pointset 检查κ；RFM 以 shortestgeodesic 提供 flowtargets",
+      "Fabricationpath 应用把 flatstroke/circularprimitive 迁移到 known/reconstructedmesh，沿 polynomialcentre 生成 polishingpositions",
+      "Offline 轨迹法向配 orientation、slidingwindow 平滑，再由 hybridforceimpedancecontroller 物理执行"
+    ],
+    "experimentsZh": "实验设置：DMPsame 八字 demo/params 比较 MeshDMP；3cube-face 和 DragonGP100repeated48/70points、finiteκ；Bunny/Cow RFM 各 500Ksyntheticdensitypoints，80/10/10split、same6×512network/seeds/100Kupdates/RTX5090。Franka3 对 4printedheightfields 绘画，D405RGB-D→2617facemesh，circleDMP 沿 chalkpolynomial 移 centre 并真实 polishing。\n作者报告 Bunnyi50NLL.76±.5 vsdiffusionpremetric1.48±.01，其他 fiveconditions 亦优；样本是 surfacepoints。（Table IV, p. 13）\n作者报告 trainingbaseline30h→20h，而不是减半。（Sec. V-C, p. 13）\n作者报告 drawing40Kposition samples<5s；polishingreconstruction1–10s、offline100Hztrajectory<5s，然后 upsample1kHz/orientationfilter。（Sec. VI-A/B, pp. 13–14）\n比较范围：DMP/GP/RFM 有 method-specificbaseline，DMPqualitative/GPnoise-freeknowngeodesicsine/RFMsyntheticdensities 限制 scope。真实 polishing 不比较其他 toolpathplanner，nohardware repeat/processquality 成功率。CGAL 离线 setup 与 querytime 需分开，globalcoveragepath 只是 chalkline+manualrhythmicprimitive。\n消融与诊断：比较 fixedvslocalforcing 和 Exp 路径、GPresolution/κ与 geodesicvsspectralpremetrics。未拆全部 operator 的 causaleffect、force/orientationlearning 或 toolpathcoverage/quality 优化。",
+    "insightZh": "离散奇异点 operators 与 fixed-anchorDMPforcing 提供具体 surface-constrainedpathgeneration 方法，超出单 GUI/硬件 demo。Straightestgeodesic、DMP 和 GP/flow matching 为已有基础，贡献为统一 formulation/transfer；不是完整 fabricationprocessoptimizer 或 generative3Dshapeprior。",
+    "whyRelevantZh": "纳入 Fabrication 的 surface-boundtoolpathgeneration 参考：geometry 直接进入路径生成/迁移，而非仅把输出打印成 demo；真实 drawing/polishing 提供接口证据。Medium 相关，未研究新的 shape/assembly/stitchdesign，RFM 不是 3Dassetcreation。",
+    "evidenceZh": "Tangentcones 和 straightestExp 显式处理 edges/vertices，DMPforcing 固定 goalcone 后 transport。（Sec. IV-A/B, Algorithms 1–2, Eqs. 11–23, pp. 5–8；ShortestLog 与 straightestExp 在 singular/cut-locus 处不能不加条件视作 globalbijectiveinverse；fixedcone2Dembedding 需要局部选择。）\nGeodesicSEkernel 仅有限点κadmissibility/MonteCarlosafeguard，非 allfuturepointsPSD 证明。（Sec. IV-C, Eq. 25, Algorithm 3, pp. 8–9; Sec. VII, p. 15；Algorithm3 写 D=distance 却 exponential 不平方、以≺0 描述 badcovariance；literalnegative-definite 不可能有 positive diagonal，应核对实现，不能重复完整理论保证。）\nDMP 八字曲线 sameparameters/newBunny surface 减少 drift，GP 有 100samplerepeats。（Figs. 8–11, Sec. V-A/B, pp. 10–12；DMP 主要质性，GP 比较 truncatedspectral 实现不证明所有 LBO 方法失败。）\nRFM 仅 twofixedmeshes 的 syntheticeigenfunctiondensities，train30→20h。（Sec. V-C, Fig. 12, Table IV, pp. 12–13；不是结论所称 approximatelyhalf，实际约 33%减少；无新 meshgeometry 生成。）\nRobotdrawingfourheightfield surfaces，polishing 为 RGB-D+chalkline+circleDMP 路径，外部 constantforcecontroller。（Sec. VI, Figs. 13–14, pp. 13–14；真实执行但 noquant roughness/removal/coverage/forceerror，position-only 方法需 orientationfilter。）",
+    "caveatZh": "GeodesicprecomputationO(N²logN)，超过 10Kfaces 明显瓶颈。\nGeodesickernelκcriticalvalue 受 curvature/topology/pointset 影响，需更好理论 characterization。\nForcepathlearning 和 time-varyingsurfaces 为 future work。\nGPfinite-setadmissibility 不保证更换 querypoints 后的 jointcovariance；Algorithm3notation 和 branchconditions 需源码澄清。\nExp/log 与 cones 不是无条件 global smoothRiemannianstructure，不把全 mesh/nonsmoothprobability 保证扩大。\n绘画 4heightfields 与 singlechalk-polishdemo 不是任意工业 surface/加工 quality 验证。\n当前只产生 positions，orientation 平滑/constantforce 为外部步骤，forceconstraints 未学习；本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

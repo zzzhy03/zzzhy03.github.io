@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2605.23508",
+  "slug": "drawvideo-grounded-and-faithful-multi-shot-video-generation-from-storyboard-keyframe-sketc-2605-23508",
+  "title": "DrawVideo: Grounded and Faithful Multi-Shot Video Generation from Storyboard Keyframe Sketches",
+  "authors": [
+    "Chuanzhi Xu",
+    "Huiqi Liang",
+    "Bang Shi",
+    "Huiming Zhang",
+    "Guangcheng Lin",
+    "Yifan Xiao",
+    "Haodong Chen",
+    "Qiang Qu",
+    "Zhicheng Lu",
+    "Weidong Cai"
+  ],
+  "publishedAt": "2026-05-22",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.23508"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR",
+    "cs.MM",
+    "eess.IV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "DrawVideo",
+    "Video Generation"
+  ],
+  "abstract": "Long video generation requires high-fidelity visual synthesis, coherent narrative organization, shot-level structure, and explicit user control. Existing text-to-video methods typically generate videos from a single long-form prompt, making it difficult for creators to directly control character pose, camera composition, spatial layout, and local motion. We propose DrawVideo, a sketch-guided and storyboard-driven framework that grounds multi-shot video generation in creator-provided spatial structure, appearance, and motion. Each shot is specified by a black-and-white sketch, an appearance prompt, and a motion prompt. DrawVideo first generates a structure-aligned reference keyframe, expands the motion description into derivative keyframes representing ordered action states, and then synthesizes local video clips between adjacent keyframes. We further introduce SketchLongVideo, to the best of our knowledge the first evaluation dataset of ordered multi-shot storyboards with aligned sketch, appearance, and motion conditions. Extensive experiments demonstrate strong structural controllability, appearance consistency, intra-shot visual stability, and motion alignment, providing an effective solution for director-oriented video creation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.23508v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.23508v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/LouckXu/DrawVideo"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.23508v2 全文及 2026-10-06T15:17:03.132084+00:00 审阅记录；PDF 22 页，SHA-256 07591d9c496a98d0c4180091cced5af47a929417bc33013090270e254cc80b8f，视觉核验第 1、5、6、17、18、19、20、22 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 的 Project Page annotation 指向该公开仓库；访问确认 src/drawvideo、configs、evaluation 和实际 pipeline modules。公开模型依赖需单独配置，存在代码不等于已复现论文。",
+    "ideaZh": "DrawVideo 将 storyboard sketch 与 appearance/motion prompts 转成彩色 reference、五个 action keyframes 和五段 first-last-frame 视频，再按 shots 拼接。作者报告，相对直接 sketch+text 的 Wan2.2，Edge-F1 从 0.3541 升至 0.4664、Event Completion 从 0.6667 升至 0.7778。它是适合借鉴的可检查、可局部重生成创作流程；但没有新的生成 backbone，长视频一致性主要证明在单个 shot 内，事件指标又是稀疏帧 CLIP 代理。",
+    "motivationZh": "storyboard sketch 能表达构图，却未必说明外观和动作如何连续变化；需要将草图、状态与转场条件对齐，生成便于检查和局部重做的多镜头视频。",
+    "methodZh": "这是 training-free 的四阶段组合系统。Qwen2.5 将每 shot 的 motion 分成五个目标状态和对应 transition prompts；FLUX.1-dev+Canny-ControlNet 从 sketch 生成彩色参考；FLUX.1 Kontext 从同一个参考独立生成五张衍生 keyframes；Wan2.2-I2V-A14B 在相邻 keyframes 间生成 clips。每 shot 可独立修改并重新插入 storyboard，数据集 SketchLongVideo 用来自动画视频与 AI keyframes 的自动派生 sketch/text conditions 评价该流程。",
+    "methodFlow": [
+      "组织 shot 条件：Qwen2.5 增强 appearance prompt，并将 motion 分成恰好五组 conversion/dynamic prompts；每组分别指定目标姿态与达到它的动作。",
+      "建立结构与外观参考：Canny sketch condition 进入 FLUX.1-dev ControlNet，生成彩色 reference keyframe。",
+      "显式生成 action states：五个 FLUX.1 Kontext keyframes 都独立读取同一 reference，而不串行复用前一个生成结果，减少递归外观误差。",
+      "生成并拼接局部 transitions：Wan2.2 在相邻 keyframes 和对应 dynamic prompts 下生成 clips；先拼成 shot，再按 storyboard 顺序拼接，修改时只重生成指定 shot。"
+    ],
+    "experimentsZh": "实验设置：作者在单 RTX 5090 上用全 SketchLongVideo 评价；数据包含 1,233 个 aligned triplets、126 个 sequences，主要来自 AnimeShooter 和在线动画，sketch 由 keyframes 确定性转换，text 由 LLaVA-OneVision/Qwen2.5 派生。自动指标使用每 shot 六个均匀采样帧；人评为十位有视觉媒体经验的参与者盲排匿名输出。\n作者报告，相对 Wan2.2 sketch+text，Edge-F1 0.3541→0.4664、Temporal CLIP 0.8796→0.9225、Event Completion 0.6667→0.7778、Dynamic Controllability 0.6542→0.6973。CLIP image similarity 则为 0.7806，低于直接 conditioning 的 0.7848。（PDF p.6, Table 1）\n作者报告 text-only Wan2.2 的 Temporal LPIPS 0.3651 优于 DrawVideo 0.3830，但 Event Completion 仅 0.3333；StoryDiffusion 的 Dynamic Progression 0.4452 高于 DrawVideo 0.2493。静态稳定、可见变化和请求事件应分开理解。（PDF pp.6–7, Table 1 and Sec.5.2）\n作者报告人评 overall 为 3.69/5，相对 Wan2.2 sketch+text 的 3.35/5；motion naturalness 为 3.56，低于后者 3.63。未给置信区间或完整样本/重复评分分布。（PDF p.18, Appendix F, Table 5）\n比较范围：覆盖 SketchVideo 1KF/2KF、VidSketch、FlipSketch、StoryDiffusion 和两种 Wan2.2。输入接口与 image/video backbones 不完全一致；StoryDiffusion 也用 Wan2.2 动画化。直接 Wan2.2 对照共享视频 backbone，但完整方法多出多阶段模型调用、端点 keyframes 与 prompts，未提供同算力比较。\n消融与诊断：所谓 ablation 比较 text-only、sketch+text 与完整 staged system，支持整体设计；没有分别移除 common reference、prompt decomposition 或 derivative keyframes 的独立消融。",
+    "insightZh": "贡献是 sketch-grounded storyboard intermediate representation、共同参考的 action-state 展开和配套评价集，属于现有模型的 inference-time 创作流程整合。没有新训练目标或闭环视觉 critic；各 shot 独立生成，不能从局部共享 reference 推导跨 shot identity consistency。",
+    "whyRelevantZh": "Sketch/storyboard 到可检查 intermediate states 再到视频的流程，直接服务视觉创作和 shot-level 修改，满足 video-generation 的控制工作流迁移门槛。输出仍是 raster/video，不能据此归入可编辑 SVG/矢量设计或自动视觉设计 agent。",
+    "evidenceZh": "每 shot 的五个衍生 keyframes 独立读取同一参考，随后由首末帧条件生成五段局部视频。（PDF pp.4–6, Sec.4, Fig.3; pp.16–17, Appendix C；完整阅读 exact PDF 和实现附录，实际查看方法图；未执行生成。）\n直接 conditioning 与完整分阶段系统的主表支持结构和事件代理指标改善。（PDF pp.6–7, Table 1；作者报告；这是整体系统比较，不能分离 appearance anchoring、motion decomposition 与 keyframe expansion 各自贡献。）\nEvent Completion 依赖六个采样帧的最大 CLIP similarity 与固定阈值，Dynamic Controllability 是成功率、顺序与置信度的加权组合。（PDF p.17, Appendix D；这些代理不等同于完整视频人工事件完成标注或物理动作正确性。）",
+    "caveatZh": "没有显式 limitations section；不能把作者未讨论的弱点写成作者声明。\n主要 consistency 指标在每 shot 内计算，独立 shot 拼接不证明跨镜头身份、背景或 narrative continuity。\nSketched inputs 主要由现成彩色 keyframes 产生，实际自由手绘、稀疏/含糊用户 sketch 的泛化尚无独立评价。\n六个采样帧与 CLIP 阈值只能提供事件代理，不能证明所有中间动作、时间顺序或物理合理性。\n附录可见 appearance/motion 文本的性别和状态不一致，例如 p.19 女角色 appearance 配 man motion；自动生成条件可能含噪声，不能推断全部数据错误。\n未报告完整生成时间、不同长度成本、用户修订实验或 seed 方差；本文没有观看实际视频或复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

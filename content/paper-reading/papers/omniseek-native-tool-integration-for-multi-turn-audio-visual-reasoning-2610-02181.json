@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.02181",
+  "slug": "omniseek-native-tool-integration-for-multi-turn-audio-visual-reasoning-2610-02181",
+  "title": "OmniSeek: Native Tool Integration for Multi-turn Audio-Visual Reasoning",
+  "authors": [
+    "Haibo Wang",
+    "Jiteng Mu",
+    "Jialu Li",
+    "Jingru Yi",
+    "Yuanjun Xiong",
+    "Jianming Zhang",
+    "Lifu Huang",
+    "Mingze Xu"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02181"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "OmniSeek",
+    "VLM / MLLM"
+  ],
+  "abstract": "We present OmniSeek, an agentic framework that transforms an Omni Large Language Model (Omni-LLM) into an active, multi-turn reasoning agent with native tool use. Rather than passively processing an entire audio-visual sequence in a single forward pass, OmniSeek makes evidence acquisition part of the reasoning process: it dynamically decides whether to look or listen, and over which temporal window, to retrieve sparse but critical evidence across different modalities within long contexts. Through an iterative multi-turn protocol, the retrieved raw audio or visual segments are appended back into the context to support subsequent reasoning. To cold-start this capability, we build a data engine that synthesizes OmniTraj-170K, a corpus of multi-hop Chain-of-Thought trajectories with interleaved audio and visual evidence. We first supervise the model on these trajectories to instill multi-turn tool-use behavior, and then further optimize the policy via a two-stage reinforcement learning with verifiable rewards. Moreover, we introduce an Audio-Visual Necessity objective that explicitly rewards successful trajectories whose reasoning depends on both modalities, discouraging single-modality shortcuts. Extensive experiments across a wide range of benchmarks demonstrate that OmniSeek learns adaptive cross-modal evidence seeking and consistently improves audio-visual reasoning performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02181v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02181v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02181v1 全文及 2026-10-06T13:04:49.907678Z 审阅记录；PDF 18 页，SHA-256 a887570917cad8c5099d58d206b07d7227817f727beb0d46a37714bcd035e79f，视觉核验第 1、2、3、5、6、7、12、17 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 PDF 无本文 project/codeURL 或 release 承诺；参考论文链接不作为本方法 Code。",
+    "ideaZh": "OmniSeek 将原始 audio/video clip retrieval 作为多轮 reasoning action，以合成 trajectories 和 GSPO 训练。作者报告长视频与多模态任务改善。主动证据检索值得速读；masking necessity 是固定轨迹 likelihood proxy，小时级 audio 仍可能超出 context，不能认定因果必要性已验证。",
+    "motivationZh": "长 audio/video 的关键证据可能分散在不同时间段，一次性粗观察容易遗漏；目标是让模型原生调用局部 clip retrieval，逐轮获取所需证据。",
+    "methodZh": "Qwen3Omni 先看 coarseglobalAV，按 think→call→rawobserve 选择独立 audio/video 时间段，局部 video 可提高 fps/resolution。Qwen3.5large 把 FineVideo 的 scenevisualcaptions/ASR 组织为 2–7spanQA，再 goldanswer-conditioned 生成 thoughts 并确定性拼入 clipactions。SFT90%singleturn+10%tool；RL 广泛探索再 hard8K、G16，以 correctness/format/tool 及两模态 maskedlogprob 下降的 min 奖励。",
+    "methodFlow": [
+      "scene 分割+visualcaption/ASR 构 timestampaligneddualtracks。",
+      "合成需要 audio/video 的 QA/evidencechain，基于 goldanswer 生成 interleavedthoughts。",
+      "混合 singleturnQA 与 tooltrajectoriesSFT，冻结 audio/vision encoders。",
+      "GSPO 训练 independentaudio/video retrieval，rawclips 追加到 context。",
+      "hardexample 阶段用固定 trajectory 的两模态 attentionmasklogprobproxy 奖励 successfuljointdependence。",
+      "累积证据后 answer，最多 8interactionturns。"
+    ],
+    "experimentsZh": "实验设置：Qwen3Omni30BA3B、SFT170K/32H200 与 twoGSPOphases31K/8K、128H200，G8→16，clip45frames/60saudio、turnmax8，train65Kcontext 而 limit 讨论 native32K。10AVbench+4general video，数据 split 声明 video/questiondisjoint。\n作者报告 fullvs 同 RLtextonlyCoT：OmniVideoTest69.5 对 56.0、WorldSense62.4 对 54.3、LVOmni44.2 对 40.5，尚非 matchedtotalinput/latency。（Table4, p.8）\n作者报告 SFTonly 多数下滑，Phase2RL 恢复；100KsingleturnOmniTraj 数据也使 DailyOmni71.9→75.8，显示数据本身有贡献。（Tables2/5, pp.7–8）\n比较范围：openOmniReasoner/OmniVideoR1/QwenOmni 等与 closed models，backbones/data/inputs 不同；samebase/phase/reward/textonlycontrols 更可信。Figure5 按实际 toolcount 分组的 accuracy 关联非随机多 call 干预，不能推出 optimalcallbudget。\n消融与诊断：phase/G/reward、textonlyRL、matched100Ksingleturndata；没有强制 singlemodalityre-generation/answer-onlynecessity、latency/token/computeequalbudget 或 seedsCI。",
+    "insightZh": "延伸既有 pixel/videotooluse，具体新点是 asynchronous 原始 audio/visual 证据、interleavedtrajectorydata 和 necessityproxy；跨多个 AVreasoningbench 能力改善有价值，非纯 promptwrapper。没有证明 universallycausalgrounding，工具更多/追加高分辨率 input 及 RL 预算仍共同影响收益。",
+    "whyRelevantZh": "直接推进 MLLM 主动跨模态 reasoning/evidenceinspection 能力，对未来视觉 toolagents 的 rawobservation 与 modalcredit 有方法参考；不是 visual-design-agent 本身，未生成视觉设计产物。",
+    "evidenceZh": "nativeclipobservations 直接 append，模态/time 可 decouple；数据 thoughts 已知 goldanswer 且固定 evidencecalls。（Secs.3–4/Figs.1–2, pp.2–5; Listing3 pp.16–17；方法及案例图已查看，goldtrajectory 非真实 online 探索记录。）\n作者报告 MMOU70.4 对 base54.1、VideoHolmes74.6 对 59.1，DailyOmni80.0 低于 OmniVideoR1 的 82.8。（Table1, p.6；maintable 实际查看；MMOU 部分†baseline 为 differenttestsplit，不能直接全排名。）\n作者报告 necessityreward 在 sameG16 额外 WorldSense+3.2/VideoHolmes+2.9/FutureOmni+.2/LVOmni+.6。（Table2, p.7；消融表已查看；全 pipelinegain 不能归 needreward。）\ngeneral videoevalsingleturndirectanswer 无 tool，hourlongaudiooverflow 出现 hallucinatedthinkloop。（App.A.2 p.12 / App.A.7 p.17；protocol 与 limitations 页实际查看，不声称所有 benchmark 证实 activeagent 优势。）",
+    "caveatZh": "audio tokens 随 duration 线性增，extremelongvideo 会越 context 造成重复 thought/伪证据/无答案。\nspeedupplayback 可能改变 pitch/texture，longcontext 与 compression 未来研究。\nfixedtrajectoryteacher forcingmask 仍保留含 sensorycontent 的 previous text，测 logprob 依赖不等 finalanswer 必须两模态；thoughttokens 可能奖励 surfaceevidencelanguage。\n合成 QA 的 prompt 约束不是独立必要性验证；Fig.1runningroutine 问题的答案可由最后 audio 直接获得，visualrole 未证明。\nRL 包含额外 toolcalls 与 higherresolutionclips，textonly 对照不能独立归功于 reasoningparadigm；无 endtoendcost。\ngeneral video 分数无 tools，不能据此证明 clipagenttransfer。\nonlyonebasefamily 与无 multiseed/errorbars；closedmodel 版本表/文字存在不一致，不据此宣称 beats 所有 frontiermodels。\n原始 audio 全局输入依然昂贵，native32Klimit 与 RL65K 配置适用边界未充分解释；本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

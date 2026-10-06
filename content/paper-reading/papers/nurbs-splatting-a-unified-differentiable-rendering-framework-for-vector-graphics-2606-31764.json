@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2606.31764",
+  "slug": "nurbs-splatting-a-unified-differentiable-rendering-framework-for-vector-graphics-2606-31764",
+  "title": "NURBS Splatting: A Unified Differentiable Rendering Framework for Vector Graphics",
+  "authors": [
+    "Jingye Qiu",
+    "Shizhe Zhou"
+  ],
+  "publishedAt": "2026-06-30",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "ECCV 2026",
+  "identifiers": {
+    "arxiv": "2606.31764",
+    "doi": "10.1007/978-3-032-37461-5_7"
+  },
+  "venueIds": [],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "NURBS Splatting",
+    "2D Design",
+    "NURBS"
+  ],
+  "abstract": "Differentiable rendering of planar rational splines remains largely underexplored, despite their widespread use in vector graphics and design. Existing differentiable vector renderers primarily focus on Bézier curves and rely on analytic rasterization, which can suffer from gradient instability and limited flexibility. We propose NURBS Splatting, a unified framework that represents planar rational curves as continuous Gaussian fields. By sampling Gaussians along the curve parameter domain and inside closed regions, rendering is reformulated as a smooth accumulation process with stable gradients. Our method naturally supports long splines, rational weights, non-uniform knots, and closed-region filling. We demonstrate its effectiveness in calligraphy reconstruction, vectorization frameworks, and long-spline image abstraction, showing improved stability and reconstruction quality over existing approaches.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.31764v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.31764v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AnicoderAndy/nurbs-splatting"
+    },
+    {
+      "label": "DOI",
+      "href": "https://doi.org/10.1007/978-3-032-37461-5_7"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.31764v2 全文及 2026-10-06T15:16:49.841Z 审阅记录；PDF 24 页，SHA-256 af771dbb2fdc089b21380a037c99f1e1825cd91d1b5ebad9ba4267a1f6204a15，视觉核验第 1、2、5、6、9、10、11、13、19、22 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFp10 与 S1 给官方 repo；实际公开 apps/dataset/nsplat 源码含 nurbs.py、scene.py、geom.py、losses 等模块，超出 READMEplaceholder。虽 S1 写 publication 后 release，当前已确认有实现；未运行复现实验。",
+    "ideaZh": "NURBS Splatting 用沿 rational splines 的 isotropic Gaussians 和 SDF 调制的 fill grid，将 weights、knots、widths 与 control points 接入可微图像优化。作者报告 191 个有效字形的 PSNR26.32 vs24.72dB、优化 8.73 vs10.65s，值得深读 editable rational-vector backend。速度优势针对长 splines 及整任务，简单 curves 明显慢于 Bézier Splatting；extract 另需 13.8s，未验证真实笔绘/制造或主流编辑器导入。",
+    "motivationZh": "可微 vector renderers 多处理 Bézier curves，难优化有理权重和非均匀 knots；论文希望将 NURBS 接到图像空间损失，保留可编辑曲线表示。",
+    "methodZh": "方法保留 NURBS 有理权重、nonuniform knot intervals 和变宽 stroke，局部 Cox–de Boor 递归计算位置/derivatives。按估计总弧长决定 splat 数量，但参数 u 均匀采样；filled curves 在 bbox grid 上以离散 winding sign 和到 polyline 的距离控制 opacity，并逐步细化 grid。GaussianImage tile rasterization 的 image gradients 更新曲线；实验包含书法重建、LIVE 式逐层 vectorization 和 diffusion-guided longstroke abstraction。不是新基础生成器，3D NURBS surface extension 仍为未来工作。",
+    "methodFlow": [
+      "由 keypoints 构造 open clamped 或 closed periodic NURBS，学习 rational weights/knots 并附 stroke width",
+      "用弧长估算 splat 总数，在 uniform parameter samples 上以 span-local 递归求 curve 位置、宽度和 derivatives",
+      "open strokes 放 isotropic Gaussians 并复制 endpoints；filled curves 用 paddedbbox grid 与 polyline SDF opacity",
+      "tile-basedfront-to-back alpha compositing 生成图像，image/geometric loss 反传至 curve parameters",
+      "filledgrid 从 4px anneal 至 1px；bookcalligraphy 用第三阶 fairing，LIVE 用 crossingpenalty",
+      "接 SLDVec 初始化/逐层路径添加/TSP 长 stroke 或 ControlNet+IPAdapter SDS 完成不同应用"
+    ],
+    "experimentsZh": "实验设置：singleRTX4090；192 字体字形 SLDVec 初始化，一失败后 191 评价，150Adamiterations/degree5。100NotoEmoji480px、10rounds 各 300iterations/12pointsdegree3。longstrokeSDS512px300iterations；simplecurveforward/backwardprofiling 与参数/anneal 消融。\n作者报告 calligraphy PSNR+1.6dB、Hausdorff15.26→10.69px、优化 10.65→8.73s；extract13.8s 另计。（Table 1, p. 11; Table S3, p. 23）\n作者报告 LIVE MSE.0025→.0017、LPIPS.0576→.0339、time590→410s；无 weights/knots 版本 354s 更快。（Table 2, p. 13）\n比较范围：identicalinitialization/iterations，但独立 lossweights/widthLR 与 CPU/GPUloss 不同。官方 BS 只 simplecurvetiming/diagnosticrender，downstream 用自有 prototype，不能宣称全面超过 BS。无复杂自然图大规模或编辑用户研究。\n消融与诊断：weights/knots、contourdensity、gridanneal；backend-onlyw/o w&k PSNR25.92/5.12s，表明多数 speedup 来自 backend。higherdensity 恢复 SSIM；无 globalgradientaccuracy 或 topology/physical tests。",
+    "insightZh": "贡献是 rational/nonuniform spline 参数直接进入 2D splatting，以及 isotropic contour 和 SDF fill 策略。Gaussian rasterization 与既有应用继承已有组件。不是精确 analytic rasterizer：splat 数量 ceil、knot span 及 winding sign/grid selection 均有离散部分，不能把 fullydifferentiable 当全局光滑保证；uniform u 不等于均匀弧长分布。",
+    "whyRelevantZh": "直接 editable2D vector representation/differentiable design optimization；rational splinebackend 可借鉴 design-to-vector 生成。没有本方法实际 fabrication 结果，不交叉标成制造进展。",
+    "evidenceZh": "NURBS/contour/fill/render 及参数优化接口。（Sec. 3, Eqs. (1)–(12), pp. 4–7; Supplement S2/S3, pp. 19–20；winding sign 明确 detach，τclamp 允许 0；Cp−1 continuity 仅简单内部 knots 成立，不是任意 learned repeatedknots 保证。）\n作者报告 calligraphy PSNR26.32 与 8.73s，191 字形有效样本。（Table 1, pp. 11–12; Supplement S4.3/Table S3, pp. 22–23；192 中 1 个 initialextraction 失败被排除；13.8s extraction 另计，defaultSSIM.9793 略低 baseline.9813。）\n作者报告 LIVE 式 100emoji 重建 410vs590s，gridanneal 换质量。（Table 2, p. 13; Supplement S4.4, p. 23；去 anneal527s 的 MSE.0015/SSIM.9839 优于 full.0017/.9803；GPUloss 相对 baselineCPU 也改变成本。）\nsimple curves 速度比 Bézier Splatting 明显更差，longcurve 有优势。（Table S2/Fig. S1, p. 21; S4.5, pp. 23–24；512px16open curves106.33ms vsBS7.41ms；downstreamBSProto 是自有近似，不是官方方法受控比较。）\neditable demonstration 只是 controlpoint 可视化，无 editor 或 hardware 实测。（Fig. S2, Sec. S4.2, p. 22；制造/robot handwriting 是动机，不是本项目成果。）",
+    "caveatZh": "SDFgrid fill 对 regulargeometry 优势有限，复杂度增加 Gaussian 内存；3DNURBSsurfaces/analyticfill/直接生成待扩展。\nGaussian approximation 的 softboundary、离散 samples/winding 及 minsegment 切换无 globalstability 保证。\nuniformu 虽按总弧长设 count，不等于 localarc-lengthuniform；复杂权重/knots 可能采样不足。\ndefaultSSIM 略差、gridanneal 损质量、简单 curves 比 BS 慢；速度不能外推所有 vectorgraphics。\ncode 本身可编辑不等于 nativeSVG 支持 NURBS、主流 editorroundtrip 或真实 fabrication；字体 dataset 部分授权不能直接重分发。\n本项目未复现，数字均为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

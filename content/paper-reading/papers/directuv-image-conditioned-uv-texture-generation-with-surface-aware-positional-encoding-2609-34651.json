@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.34651",
+  "slug": "directuv-image-conditioned-uv-texture-generation-with-surface-aware-positional-encoding-2609-34651",
+  "title": "DirectUV: Image-Conditioned UV Texture Generation with Surface-Aware Positional Encoding",
+  "authors": [
+    "Jiantao Lin",
+    "Yingjie Xu",
+    "Mingzhi Sheng",
+    "Yangkai Wei",
+    "Hao Chen",
+    "Ying-Cong Chen"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.34651"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "DirectUV",
+    "3D Generation",
+    "UV"
+  ],
+  "abstract": "Generating high-quality UV textures for 3D meshes remains challenging. Multi-view projection pipelines suffer from occlusion and view inconsistency, and recent methods that generate textures directly in UV space still rely on auxiliary modules to supply 3D information, leaving the attention mechanism tied to UV-grid positions rather than to the underlying surface geometry. This mismatch limits coherence across seams and disconnected UV islands. We propose DirectUV, an image-conditioned UV texture diffusion framework that operates in the latent UV space of a pretrained image VAE, in which a Diffusion Transformer denoises the UV latent given a single input image and a coarse UV map. At its core, Surface-Aware Positional Encoding (SAPE) replaces the standard 2D-grid positional encoding with encodings derived from per-token 3D surface coordinates obtained via UV-to-surface correspondence. As positional encodings define the distance metric used by attention, SAPE enables tokens to interact according to 3D positional proximity derived from surface correspondence rather than UV-grid distance, restoring coherence across seams and disconnected islands. A multi-level extension further assigns different attention heads to progressively finer subdivisions of the same latent UV patch, allowing the model to reason about surface structure at multiple granularities. Experiments show that DirectUV produces sharper and more globally consistent textures than other baselines, with the largest improvements in occluded and view-unseen regions where projection-based methods leave gaps or stretched textures.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.34651v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.34651v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.34651v2 全文及 2026-10-06T13:29:58.000Z 审阅记录；PDF 15 页，SHA-256 9ae70f06e13aba645d60d24665c963f6d47ce166dcebeb22a15d59952198aedf，视觉核验第 1、4、6、8、9、12、13、14 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact15 页 PDF 未提供本方法 public code/project 或 release promise。FLUX 与 Kiss3dGen 引用不是 DirectUV 实现。配置对照只读官方 https://raw.githubusercontent.com/black-forest-labs/flux/main/src/flux/util.py 的 flux-dev VAE16channels/DiT64，packing 解释为 reviewer inference，未改论文结论。",
+    "ideaZh": "DirectUV 直接生成 latent UV texture，把 UV-to-surface CCM 的 3D 坐标放进 Q/K RoPE，以 24heads 的多层 sub-patch 坐标跨 UV seams 传递表面信息。作者报告 GSO PSNR25.13、去 SAPE23.82，值得深读 geometry-aware attention 接口。最终 UV 从噪声生成，但 coarse condition 仍经过 multi-view 生成/投影；ambient 3D RoPE 不是 geodesic 或 attention 正确性保证。",
+    "motivationZh": "直接 UV texture generation 的注意力常按二维网格邻近关系工作，忽略断开的 UV islands 在真实表面上的联系；需要把 mesh surface 信息纳入位置编码。",
+    "methodZh": "已知 mesh/UV 与 singleimage 作为输入，CLIP pooled 调 AdaLN、DINOpatches 进入 jointattention，coarseUVlatent 与 noisytargetchannelconcatenate。创新主要是把 surfacecorrespondence 放进 positionalpath，按 heads 分 1×1/2×2/4×4granularity，减少 UVatlas 邻近与表面邻近不一致。Matchedarchitecture 消融支持该表示，GSO 为跨 dataset 资产评测；依赖已知 geometry、UVquality 与生成 coarseviews，不生成 meshgeometry 或 physicalmaterials。",
+    "methodFlow": [
+      "已知 mesh 与 UV correspondence rasterize CanonicalCoordinateMap",
+      "参考 image 编码为 CLIPglobal 与 DINOv2patchcondition；Kiss3dGenmulti-viewproject 为 coarseUV",
+      "FrozenFLUXVAE 编码 coarse/GTUV，targetnoise 与 coarse conditionconcat",
+      "CCM 按 token 及 3subdivisionlevels 生成 head-specificambient 3DRoPE，24heads 分 4:4:16",
+      "Flowmatching 训练 6MMDiT+12singleblocks，以 28Eulersteps 生成 UVlatent",
+      "FrozenVAEdecode1024²UV 并 wrapmesh；coarseRGB 可被 prior 覆盖，碎 UV 仍可能 blur/leak"
+    ],
+    "experimentsZh": "实验设置：约 100Kfilteredtexturedmeshes、1024²UV/CCM、4canonicalrenderedviews；训练 coarseviews 随机 0/1/2/4 且 mixlighting/albedo，8A800170Ksteps。GSO 全 dataset OOD、samefrontreference、full-directionalalbedorenders；PSNR/SSIM/FID/KID，samearchitectureRoPE/multilevelablation，generatedmeshandfragmentedUV 案例。\n作者报告 GSO25.13dB/.9527，Hunyuan3D2.124.74/.9450，TEXGen24.45/.9417。（Table 1, p. 8）\n作者报告 noSAPE23.82/.9376/FID58.42，singleSAPE24.36/.9462/40.86，multi25.13/.9527/39.17。（Table 2, p. 9）\n比较范围：已知 meshandfrontimage，zero-shotreftextures 不是 independentrecoveredhiddenGT 保证；coarseviews 来自另一 generativepipeline。未报告 viewcount/mask/backgroundaggregation 精细配置、runtime/VRAM/seed variance、specificseam/occlusionmetrics。\n消融与诊断：RoPEreplacement 与 headsubdivision 保持 restunchanged 提供主证据；coarseoverride/completeness/generatedmeshes 只质性，不能说所有 occludedregions 均正确。",
+    "insightZh": "Surfacecoordinates 从 auxiliaryfeaturecondition 转到 Q/Kpositionalpath，多 headsubdivision 建立 surface-awareUVgenerator 的具体接口。3DRoPE 本身已有，贡献是 UVcorrespondence 与多 granularity 安排；没有额外 parameter 不表示 training/preprocessing 免费。",
+    "whyRelevantZh": "在 knownmesh 上创造全 surfaceappearance 而非 faithfulgeometry 恢复，直接属于 3DGeneration。NativeUVgeometry-awareattention 与多粒度 surfacealignment 可用于 assettexturing/appearanceediting；UVraster 不是 explicit2Dvector 设计。",
+    "evidenceZh": "DirectUV 的生成 target 为 UV，但 conditioning 仍含 multi-viewgeneration/projection。（Fig. 1, Sec. 3.1–3.3/3.5, pp. 4–7；不能写完全取消 multi-viewprojection，取消的是将 projectedviews 作为最终 texture 的硬 copy。）\nCCM-derivedambient 3DrelativeoffsetRoPE，24heads 按 4:4:16subdivision 配置。（Eqs. 1–2, Fig. 2, Sec. 3.4/4.2, pp. 5–7；Positional 项依赖 relativeoffset，fullattention 还取决 Q/Kcontent；Euclidean 不是 geodesic。）\n作者报告 GSO25.13PSNR/.9527SSIM/FID39.17/KID30.03。（Table 1, Fig. 3, p. 8；Sameinputmesh/reference 但 baseline 训练/compute 未匹配，无 seam-specific 量化或 repeatCI。）\n保持架构替换 RoPE 及去 multi-level 有清楚消融。（Table 2, Fig. 4, p. 9；Baseline23.82→singleSAPE24.36→multi25.13；不将相邻 attention 的定性解释当 formal guarantee。）\nCoarseUV 可覆盖、0view 可生成、Tripo/Rodin 资产可接入均有例图，fragmentedUV 失败也展示。（Appendices A–E, Figs. 1–5, pp. 12–15；这些都是质性，不是统一 robustness 成功率/production-ready 证据。）",
+    "caveatZh": "Fragmented/sliverUV 导致 coarseCCM 与 blur/colorleak，需要 UV-awarepreprocess/tokenization。\nAmbientproximity 可跨不相邻 surface，RoPE 与 content 共同决定 attention，论文'compelledmetric/onlyrelativeoffset'表述过强。\nTrainingcoarse 由真实 renderedviews 构造，inferenceKiss3dGenview 质量不同；少 viewrobustness 未定量。\nSec4.1 称 TexVerse 但 ref27 为 ObjaverseXL，数据来源需澄清；Sec4.2 把 FLUXVAE latent 写 64channels，官方配置 z_channels16/DiTin64，可能混用了 2×2packing 维度，未有本方法代码确认。\n论文称 VAEnegligibleerror 却无 reconstructionablation，tokenizationalias 在碎 UV 上未解决。\n无 generationtime/cost、PBRphysics/userproduction 验证；数字为作者报告，本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

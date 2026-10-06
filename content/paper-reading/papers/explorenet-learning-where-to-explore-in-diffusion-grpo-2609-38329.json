@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2609.38329",
+  "slug": "explorenet-learning-where-to-explore-in-diffusion-grpo-2609-38329",
+  "title": "ExploreNet: Learning Where to Explore in Diffusion GRPO",
+  "authors": [
+    "Shuyue Stella Li",
+    "Xiaochuang Han",
+    "Yulia Tsvetkov",
+    "Luke Zettlemoyer"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38329"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "ExploreNet",
+    "Image Generation",
+    "GRPO"
+  ],
+  "abstract": "Group-relative RL methods such as Flow-GRPO post-train image generators by exploring with isotropic Gaussian noise added at every denoising step. This noise decides which rollouts the model learns from, yet it perturbs every channel and spatial position of the latent equally. In this paper, we instead show that latent elements differ in how much they change the generated image, so exploration should adapt to these differences. We introduce EXPLORENET to learn an adaptive exploration distribution. EXPLORENET is a policy that predicts a noise scale for every latent element from the current latent, the denoising step, and the prompt, before any reward is observed; it is trained on the reward spread of each rollout group and discarded after training, leaving inference unchanged. On Stable Diffusion 3.5 Medium, EXPLORENET improves held-out GenEval2 by 14% over Flow-GRPO, transfers to two independent compositional benchmarks and five preference and image-quality models, and reaches a 67.2% human preference win-rate. Overall, across our group-relative diffusion RL experiments, we find that exploration is learnable, the shape of the exploration distribution outweighs its magnitude, and rollout quality is more effective than rollout quantity.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38329v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38329v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38329v1 全文及 2026-10-06T15:14:16.157668Z 审阅记录；PDF 23 页，SHA-256 9e4fe5d03cab90f0ed79d4cd7c347aa2693f357f1427c6933a16bf2405c110dc，视觉核验第 1、2、6、7、8、10、16、19、21 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact PDF p.1 指向 https://github.com/stellalisy/ExploreNet；已实际访问，页面显示 repository is empty。论文声称代码释放不能替代真实实现存在证据。",
+    "ideaZh": "ExploreNet 学习每个 latent element 的探索噪声尺度，并用 rollout group 的 reward spread 训练这份策略；训练后移除辅助网络，推理仍用原 flow sampler。跨 seed、独立构图评价和真实偏好研究支持其方法价值；关键审阅点是 anisotropic rollouts 仍按 isotropic denoiser density 更新，收益同时包含探索和梯度加权。",
+    "motivationZh": "diffusion GRPO 的固定 Gaussian noise 对所有 latent elements 等量探索，未利用局部生成难度；目标是学习空间与通道相关的探索尺度。",
+    "methodZh": "固定 Gaussian exploration 对所有 latent channels/positions 一视同仁，作者用第二份预训练 diffusion transformer 预测 scale map，标准化后限制 log scales，再逐元素扰动 denoising transition。Denoiser 使用组内相对 reward，ExploreNet 则使用不同 prompt groups 的相对 reward spread，两套 LoRA 联合训练。方法改善既有生成器的 composition/alignment，未改变推理接口或产生新的 editable design representation。",
+    "methodFlow": [
+      "当前 latent、timestep 与 prompt 输入第二份 transformer，预测每元素噪声尺度",
+      "标准化并 clip log scales，构造 diagonal Gaussian transition noise",
+      "用 learned scale map 生成全部 rollout groups，再测终端 reward",
+      "组内 relative reward 更新 denoiser，跨 prompt reward spread 更新 ExploreNet",
+      "用独立 KL/clipped objectives 训练两份 LoRA",
+      "训练后移除 ExploreNet，以标准 deterministic flow sampler 生成图像"
+    ],
+    "experimentsZh": "实验设置：SD3.5-M 上使用 GenEval2 reward 训练，并与同 denoiser settings 的 Flow-GRPO 比较。主方法三个 training seeds，其他多数 allocation/rollout-count controls 仅一个 seed。独立评价包含 detector-based GenEval、model-free VVR-Fast、多个 preference proxies 与 blinded human ratings。\n作者报告 heldout GenEval2 从 Flow-GRPO 0.4957±0.0025 升至 0.5661±0.0318，增量 0.0704，约 14%相对提升；不是 14 个百分点。该评价采用 80 个 heldout prompts。（p.6 Table1; p.18 Appendix B.1）\n作者报告 GenEval 0.6955→0.7350、VVR-Fast 0.7646→0.7902；后者 cardinality family 0.6790→0.6644，不能称每类约束都提升。（p.6 Table1; p.21 Table12）\n作者报告相比 Flow-GRPO 的人类 tie-adjusted preference 为 66.4%，95% prompt CI[58.6,74.1]；headline67.2%为与两个 baselines 比较的汇总。（p.19 Table6）\n作者报告每 optimizer update 151.7→189.4 秒，约 1.25 倍；对应 equal-time checkpoint GenEval2 仍有优势，但完整训练成本不低。（p.7 §4.2; p.16 Appendix A.1）\n作者报告较少 rollouts/group 的实验保持每 iteration1536 images，只增加 prompt groups；不能据 8 对 24 的组大小推出总生成预算降低三倍。（p.16 Appendix A.1）\n比较范围：平均 variance 对齐 scalar control、额外 rollouts 的 post-hoc selection 和同训练配置比较有参考价值。Scalar control 只匹配 late-training aggregate variance，未逐 state/timestep 匹配。低步数 setting 的部分 preference metrics 退步；外推更长训练必胜或其他 backbones 尚无证据。\n消融与诊断：有 noise parameterization、spread selection、isotropic magnitude、rollout-count/steps 和 latent-channel interventions。多数 controls 单 seed；没有 actual anisotropic density 更新、inverse variance credit、随机固定/重排 scale maps 或仅 channel vs spatial 学习的完整消融。Channel correlation 不证明所有高敏感方向都带来 useful exploration。",
+    "insightZh": "将探索分布作为可学习策略，并把 group-level informativeness 与 denoiser 的 rollout credit 分开，是 diffusion RL 的方法推进。不是只调整 scalar noise schedule；但 denoiser 的 isotropic likelihood ratio 与实际 anisotropic sampling 不同，不能解释为真实行为分布下无偏的标准 GRPO。机制既改变样本，也按尺度改变 gradient credit，现有对照未完全分开两者。",
+    "whyRelevantZh": "Diffusion RL 的探索与 credit assignment 是可迁移到 controllable visual generation 的基础方法；没有直接验证 native 3D、editable paths 或 manufacturing constraints。",
+    "evidenceZh": "ExploreNet 的 action 为每元素 noise，回报为 group reward spread；它在得知 reward 前设置 noise。（pp.2–5 Fig.1, Eqs.5–11；已核看图/公式；reward spread 是探索 proxy，不等价 group 的 mean quality。）\nDenoiser 仍在 isotropic density 下计算 ratio，rollouts 实际来自 diagonal anisotropic noise。（p.4 §3.1, Eq.8 后说明；这造成有意的 update weighting，理论 on-policy/importance correction 边界需保留。）\n主对照跨独立训练 seeds，并有未用作训练 reward 的构图与偏好评价。（p.6 Table1; pp.18–21 Appendices B–C；已核看完整表；GenEval2 为该文划分的 heldout subset，不是全部 official prompt suite。）\n人类偏好有具体采样和标注协议，训练成本则包含第二个完整 transformer。（p.16 Appendix A.1; p.19 Table6；偏好 rate 含 half-credit ties；headline aggregate 与单独 Flow-GRPO comparison 不同。）",
+    "caveatZh": "目前只用 diagonal Gaussian，correlated noise 与其他探索来源未验证。\n辅助网络为第二份完整 transformer，轻量 head 替代与跨 reward reuse 尚未实证。\nVideo、autoregressive/discrete generators 的推广仍是未来方向，理论机制尚未完善。\n实际 sampling covariance 与 denoiser likelihood ratio 不一致，收益不能当作 exact on-policy GRPO 保证。\nReward spread 可被制造好/坏两极样本提高；没有保证 mean reward、所有约束或 diversity 同时改善。\nShape 与 denoiser gradient weighting 的作用耦合，matched scalar control 未完全隔离。\nHeldout GenEval2 较小，主要 validation 用同基础模型；多数关键 controls 单 seed。\n少 rollouts/group 保持每 iteration 总 images，较多 prompts 也是改变；不能直接归为低总算力。\nHuman study panel 较小，preference proxies 相关，cardinality 和低步数指标存在退步。\nExact PDF 的 public GitHub 目前是 empty repository，尚无公开实现可确认。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

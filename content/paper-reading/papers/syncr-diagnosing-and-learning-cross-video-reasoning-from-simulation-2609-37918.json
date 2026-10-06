@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.37918",
+  "slug": "syncr-diagnosing-and-learning-cross-video-reasoning-from-simulation-2609-37918",
+  "title": "SYNCR: Diagnosing and Learning Cross-Video Reasoning from Simulation",
+  "authors": [
+    "Sara Ghazanfari",
+    "Siddharth Garg",
+    "Prashanth Krishnamurthy",
+    "Farshad Khorrami"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37918"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "SYNCR",
+    "VLM / MLLM"
+  ],
+  "abstract": "Reasoning across videos requires aligning events, matching identities, comparing motion, and integrating partial observations. Evaluating these capabilities and testing how to improve them requires both reliable labels and targeted supervision. We introduce SYNCR, a simulator-grounded framework that connects these two needs through shared task generators. Built on Habitat, Kubric, and CLEVRER, SYNCR derives answers from environment state and provides 4,000 evaluation questions and 15,960 training questions over disjoint videos, spanning eight cross-video reasoning tasks. Visual ablations and human evaluation assess dependence on the supplied evidence and answer recoverability. Evaluation of 22 multimodal large language models reveals persistent difficulties in physical comparison and scene integration that increasing model size does not consistently resolve. Supervised fine-tuning raises Qwen3-VL-8B's average SYNCR accuracy from 32.6% to 61.6%, with gains extending to task configurations and video sources absent from training for those tasks. Transfer to real footage is most consistent for temporal ordering: accuracy improves by 9.0-20.5 percentage points on constructed Assembly101 and Panoptic ordering sets across three checkpoints spanning two model families and two model sizes, with additional gains on existing temporal reasoning benchmarks. These results establish SYNCR as a controlled setting for diagnosing cross-video reasoning failures, testing their learnability, and identifying where synthetic supervision transfers.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37918v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37918v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37918v1 全文及 2026-10-06T15:39:49.219899Z 审阅记录；PDF 34 页，SHA-256 df2830abaf66a85309d7d56f21fd6b898a6f0cd652486373c66fb741d1dd88fa，视觉核验第 1、3、5、7、8、10、20、26、29、31、33 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF p.10 链接的官方 Hugging Face dataset CrossVideoReasoning/SYNCR 可访问并提供数据；检查该官方数据页及 Files 后未确认公开训练或评测软件实现，数据公开不记为 Code available。",
+    "ideaZh": "SYNCR 用 simulator 的状态生成需要联合多段视频才能解答的任务，并以 answer-only SFT 检验这些能力能否训练出来。作者报告 Qwen3-VL-8B 在匹配评测子集上从 32.6% 提升到 61.6%，部分真实视频排序与既有跨视频 benchmark 也改善。值得精读的是数据构造和迁移控制；它没有提出新架构，真实场景增益并不覆盖全部任务，部分路线题还能利用文本捷径。",
+    "motivationZh": "现有视频训练对跨片同步、身份和空间关系的覆盖有限，真实标注也难扩展；目标是用 simulator states 构造需要联合多段视频的可验证监督。",
+    "methodZh": "论文将 Habitat、Kubric 与 CLEVRER 的可追踪状态转成跨视频同步、时间排序、ReID、空间距离、速度、计数和路线题。模型只看到 RGB clips 与选项，状态用于生成标签；训练和评测视频分离，Habitat 测试场景也独立。标准 LoRA SFT 后，作者用 held-out camera rigs、任务与 simulator 的新组合、真实视频排序及已有 benchmark 检查迁移，再以 no-video、错误标签、其他空间数据和 RL 配方对照探查替代解释。证据支持训练数据能改善特定跨视频技能，但不足以证明通用跨视角空间理解或可靠物理推理。",
+    "methodFlow": [
+      "从 simulator 状态与可见性过滤器生成多视频问题、正确选项及干扰选项，模型输入只保留 RGB 与问题。",
+      "分离训练视频、测试视频及 Habitat 场景，平衡答案位置并移除可泄露原时间的 clip 信息。",
+      "冻结视觉编码器，对 VLM 进行 answer-only LoRA SFT；比较单任务和多任务训练。",
+      "在匹配的题目子集上评估，并测试新 camera rig、任务与 engine 的组合、真实视频排序和既有 benchmark。",
+      "使用 no-video、错误标签、其他空间数据及 RL 对照，检查文本捷径、格式适应和训练配方的影响。"
+    ],
+    "experimentsZh": "实验设置：作者在程序化训练题上做标准 answer-only SFT，并对 Qwen3-VL 与 InternVL 模型进行匹配子集评测。附录覆盖独立 SFT seeds、训练任务子集、held-out camera rig、跨任务与 engine 组合、真实视频排序、已有 benchmark、no-video 和训练监督替代对照。真实排序题来自单条真实视频的分段，不能当作跨摄像机同步验证。\n作者报告 Qwen3-VL-8B 在匹配的每任务 200 题子集上从 32.6% 到 61.6%；三个 SFT seeds 的平均为 62.6%±1.7%。（pp.7–8; pp.26–28, Tables 9–11）\n作者报告该模型在 Assembly101 排序从 35.5% 到 44.5%，Panoptic 排序从 28.5% 到 47.5%；绝对正确率仍有限。（pp.8–9; pp.29–31）\n作者报告 MVUEval 的 temporal reasoning 从 68.0% 到 75.5%，CrossVid spatial subtask 从 74.5% 到 84.5%；另一些模型和真实任务出现下降。（pp.9–10; pp.30–33）\n作者报告路线题在 no-video 下从 22.5% 到 39.5%，说明部分监督收益可由文本捷径解释；跨留出任务的改善也不稳定。（pp.8–9; pp.29–30）\n比较范围：比较多种基础 VLM、同基座的单任务与多任务 SFT、no-video、错误标签、其他空间监督及 RL。SFT 与 RL 的视频帧数、训练配方和计算分配不同，因此差距不能证明 SFT 普遍优于 RL。\n消融与诊断：camera rig、分段数量、答案格式与任务组合控制有助于排除单一格式记忆，但真实排序窗口来自少量源录制，置信区间未按录制聚类；错误标签对照会主动损害模型，也不能独立隔离格式适应。",
+    "insightZh": "贡献主要是具有程序化状态标签的跨视频训练与诊断数据，以及较完整的迁移和捷径分析。标准 SFT、LoRA 与单选答案监督本身并非新方法。任务跨 simulator 的构造和 camera rig 控制有可迁移价值，但多任务增益与更多训练样本混杂，不能将其解释为已隔离的技能协同效应。",
+    "whyRelevantZh": "直接研究 VLM 跨视频的时间、身份与空间能力如何通过有状态监督训练，以及哪些迁移收益经得起控制。数据与诊断设计比一般 VQA benchmark 包装更有研究价值。",
+    "evidenceZh": "模型只接收 RGB；状态、可见性和场景分割约束用于生成监督。（pp.3–5, §§2–3; pp.15–20, Appendix A；全文与附录核验；任务标签可计算不等于所有题目都能从投影画面无歧义恢复。）\n匹配子集上的 SFT 改善明显，并有独立训练 seed 和真实视频迁移评测。（pp.7–9, §§4–5; pp.26–31, Tables 9–14；作者报告；headline 使用每任务前 200 道题，不能与完整每任务 500 道题的 baseline 混算。）\nno-video 路线题改善、留出任务迁移有限及部分真实任务退步限制了通用能力结论。（pp.8–10; pp.29–33, Appendix C；作者报告；主结果不是所有任务和所有真实场景均提升。）",
+    "caveatZh": "模拟数据存在到真实视频的域差异；一些计数、空间测量及迁移任务依旧困难。\n观测到的基准相关性不能单独证明测到的是孤立的跨视频能力。\n真实视频排序只是同一源视频的分段重排，不能外推为跨摄像机身份、同步或真实三维理解。\n正确状态标签仍可能在 RGB 投影中有歧义；速度与距离题的可观测性需要进一步审计。\n多任务训练与更多样本混杂，路线题有文本捷径，真实任务改善并不普遍。\n真实窗口重复取自少量录制；逐题统计未处理录制相关性，CLEVRER 公共原视频也可能为预训练所熟悉。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2605.16813",
+  "slug": "quadlink-autoregressive-quad-dominant-mesh-generation-via-point-relation-learning-2605-16813",
+  "title": "QuadLink: Autoregressive Quad-Dominant Mesh Generation via Point-Relation Learning",
+  "authors": [
+    "Yiheng Zhang",
+    "Zhe Zhu",
+    "Tingrui Shen",
+    "Zhuojiang Cai",
+    "Tianxiao Li",
+    "Zixing Zhao",
+    "Qiujie Dong",
+    "Zhiyang Dou",
+    "Jiepeng Wang",
+    "Le Wan",
+    "Yuwang Wang",
+    "Wenping Wang",
+    "Yuan Liu",
+    "Cheng Lin"
+  ],
+  "publishedAt": "2026-05-16",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.16813"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "QuadLink",
+    "3D Generation"
+  ],
+  "abstract": "The generation of production-ready quad-dominant meshes is a cornerstone of modern 3D content creation. Generating anisotropic quad-dominant meshes from point clouds is challenging, as existing methods are typically limited to producing either pure triangular meshes or pure quadrilateral meshes with isotropic densities. In this paper, we present QuadLink, a unified framework consisting of three stages for quad-dominant mesh generation by linking points into structured faces. QuadLink formulates polygonal mesh generation as a hybrid centroid-conditioned vertex linking model: it first predicts a unified set of anchors (vertices and face centroids), then learns centroid-conditioned links that associate vertices with face centroids, and finally assembles polygonal faces with a quad-first strategy guided by robust geometric verification strategies. This link-based formulation enables efficient generation of sparse and anisotropic quad-dominant meshes with coherent edge flow and meanwhile supporting hybrid polygonal topology. To construct training data for this model, we further introduce a Tri-to-Quad Operator that converts artistic triangle meshes into quad-dominant training data via global merge selection. Extensive experiments show that QuadLink produces production-ready quad-dominant meshes from point clouds and achieves improved geometric fidelity and topological quality compared to prior baselines. Our method natively supports hybrid polygonal topology, generalizing to arbitrary n-gon meshes without architectural changes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.16813v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.16813v4"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Graphic-Kiliani/QuadLink"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.16813v4 全文及 2026-10-06T15:35:29.478Z 审阅记录；PDF 28 页，SHA-256 bbdd391da85842c46cd1e40eb10ea13f4a1059c6bb14915a76d5d1e682e89543，视觉核验第 1、4、7、9、17、21、22、25、27、28 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFofficialproject→publicQuadLinkrepo，README 主模型 code/checkpoints 未 release。实际 submoduleTri2Quadoperator 公开 cp311/cp312Linuxbinarywheels 及 test.py；仅确认数据转换 operator 可获取与调用示例，核心 AR/linkmodel 源码/weights 未公开，也不称完整 open-source 复现。",
+    "ideaZh": "QuadLink 先自回归生成 vertices 与 face centroids，再用 contrastive links 检索顶点并 quad-first 验证组面；400K 训练资产由 geometry-filtered global Tri-to-Quad matching 构建。作者报告 100 模型的 CD0.021、EFR0.714，值得深读可编辑 artist mesh topology generation。局部 face 合法不保证 whole mesh manifold/watertight 或 genus；Goldberg 扩展另加 topology conditioning 并 fine-tune。主模型代码/weights 未发布，仅数据转换 operator 的 binary 与示例已公开。",
+    "motivationZh": "现有 autoregressive mesh 模型多偏向三角面或各向同性纯四边形，难生成紧凑、可编辑的 quad-dominant topology；论文研究点与面关系的联合表示。",
+    "methodZh": "representation 将每 uniquevertex 与 facecentroid 一次编码，Axis-aware coordinate vocabulary 减少输入歧义；1Bhourglass transformer 以 point cloud 条件生成 anchors。StageII 训练 centroid/incidentvertices 接近的 latentspace，StageIII 枚举 top20 候选先 quad 再 triangle，局部几何/centroid 容差通过即接收。Tri-to-Quad dataoperator 用 globalweightedmatching 而非 greedypairing，保护 UV seams 及检测到的 symmetryplaneedges。目标是给同 shape 生成多种可编辑 polygonlayouts，不只是固定 mesh 复制；没有严格宏观拓扑/面数/对称保证。",
+    "methodFlow": [
+      "清理 licensedartisttriangleassets，预过滤 angle/convexity/dihedral 并保护 UV/symmetryedges，globalmaximumweightmatching 构造 quad-dominant 训练 mesh",
+      "编码 point cloud，1BhourglassAR 输出 lexicographicvertices、separator 及 facecentroids，1024 级 axis-awarecoordinates",
+      "finetuneMichelangeloencoder，以 progressivehardnegative tripletloss 学习 centroid-vertexincidentlinks",
+      "每 centroid 检索 latenttop20vertices，按 featuredistance 排序候选 quad，检查局部 geometry 及 Euclideancentroidtol",
+      "无 quad 时 fallbacktriangle，独立组 face 得到 mixedpolygonmesh；本阶段没有全局 adjacency/topologyconstraints",
+      "n-gon 实验另用 Goldberg-indexMLP contexttokens、fine-tuning 与 hexagon/pentagon assembly 替换"
+    ],
+    "experimentsZh": "实验设置：400Klicensedinternalquad-dominantassets、100held-outObjaverse/artistmodels。ARbaselines 经 sameTri-to-Quadoperator 后比较，另 fieldremesh。CD/HD/IoU、QR 及 GTfeaturelineEFR；26professionalcreators 评 8assets/9methods。assemblygeometry/centroid/latent-space 与 mergeoperatorcontrols，2Ksubsettokenizationtests，Goldberg95/5topology。\n作者报告 CD.021/HD.056/IoU.995、quad79.4%/EFR.714；QuadWild.022/.086/.978、quad100%/EFR.547。（Table 1, p. 7）\n作者报告 StageIIIlatent+geometry+centroid 的 CD.0109、reconrate.9971/602.64s，相比去 geometry.0211/.9995/258.02s，验证换成本。（Table 2, p. 9）\n比较范围：ARmodels 按不同 releasedrecipes/训练数据，同 operator 对各输出误差响应不同；非同 400Kdatasetretrain 或 samefacebudget。private 训练/少量 creator 样本限制泛化；QR 非唯一 quality 标准，没有 realtime 全 pipeline 对照。\n消融与诊断：centroids、featurevsEuclideanretrieval、geometry/centroid checks、globalmergeweights/prefilter、axisvocab 均有 controls。tokenizationperaxis 并非所有模式更好；n-gon 扩展有 finetuning/extraMLP，理论 token 数不隔离 AR/assembly 总代价。",
+    "insightZh": "独立 pointanchors 加 centroid-conditionedlinks 适应 hybridpolygon 类型和 anisotropic 密度；globaldataoperator 以有质量权重的非 perfectmatching 保留部分 triangles。核心创新是 representation/linklearning/data 组合。ARtoken 数降低不是全部 pipeline 加速；局部几何合法和 trainingsymmetry 保护不自动保证 generatedmesh 全局有效/对称。",
+    "whyRelevantZh": "创建新的 editableartistpolygonlayouts 与 mixedtopology 是方法目标，直接 3Dgeneration 主方向；没有 physics/fabrication 保证，不因 production-ready 措辞归为制造。",
+    "evidenceZh": "三阶段 representation、linkretrieval 与 quad/triangle 局部验证。（Secs. 3–4, Fig. 4, pp. 4–6; Appendix A.1–3/B.4, pp. 14–16/19–20；100cases 来自 holdout 但 400Kprivateassets 约 300categories 不可复核；局部 validation 不约束共享 edgeincidence。）\n作者报告 geometry 与 creatorratings 优势。（Table 1, p. 7；100geometrycases、26creators 评 8samplemodels；3/2/1top3points 不是 0–5quality 或 26×100 评估。）\nEFR 是 GTfeaturelines 与 outputchains 的平均 alignment score。（Appendix B.7, pp. 21–22；不是符合 edgeflow 的 edge 比例或拓扑 validity。Table4dual-separateaxisvocab65epochs 比 59 更慢，不复述 allmodes 改善。）\nn-gon 可行性是 Goldberg95train/5unseentopologies，需另 conditioning 和 assembly。（Appendix C.4, pp. 24–25；500rotatedmeshes，transformer 未改但加入 MLPcontext 并 fine-tune；不是 zero-shotarbitraryn-gon 或普通 assetstrictfacecountcontrol。）\n无 watertight/manifold/genus/symmetry/targetcount 保证。（Appendix C.5/D, pp. 25–28；tokenratios 基于 genus0closedassumptions 而 actualtargets 未强制；faceassembly602.64s 仅 Table2setting，不等于 E2Elatency。）",
+    "caveatZh": "不保证 macro-topologygenus，strictwatertight/manifold 非目标；ARsymmetry 与 targetpolygoncount 难控制。\n各 centroid 独立 validface 不能保证 globalmesh 连通、无重复/自交/洞或 edgeincidence 合法。\nTri-to-Quaddataoperator 的 UV/seam 保护不等于 generatedassets 已经拥有 UV/rigging 或无缝 mfgvalidity。\n400K 数据未公开，human8models 小样本与训练监督偏好；未量化可编辑动画/制造成功率。\nGoldberg 示例是 specialfamily 且需 fine-tune，不能宣称通用 zero-shotarbitrarypolygons。\nAR 压缩理论对 genus0closedmesh 有效，assembly 几百秒 setting 需要独立总成本；本项目未复现，数字为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

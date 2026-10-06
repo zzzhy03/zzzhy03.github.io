@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2609.37055",
+  "slug": "spatial-opsd-self-improving-spatial-reasoning-via-label-free-self-distillation-2609-37055",
+  "title": "Spatial-OPSD: Self-Improving Spatial Reasoning via Label-Free Self-Distillation",
+  "authors": [
+    "Zhenyu Liu",
+    "Zhangquan Chen",
+    "Keyi Chen",
+    "Mingze Sun",
+    "Xiang An",
+    "Haodong Jing",
+    "Ruqi Huang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37055"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Spatial-OPSD",
+    "VLM / MLLM",
+    "OPSD"
+  ],
+  "abstract": "Vision-language models (VLMs) increasingly operate in embodied and spatially grounded settings, where accurate understanding of depth, viewpoint, and three-dimensional relations is essential. However, improving spatial reasoning typically relies on ground-truth answers, answer-derived rewards, or other forms of task-specific supervision. We introduce Spatial-OPSD, a label-free self-improvement framework that instead exploits spatial structure naturally available from perception and reconstruction tools. During training, a privileged teacher receives automatically obtainable spatial priors, such as depth, reconstructed 3D relations, and camera geometry, while the student observes only the original visual-language input. On trajectories sampled by the student itself, the teacher provides dense token-level supervision, allowing the student to internalize spatial knowledge without ground-truth answer labels or privileged information at inference time. To extend this supervision beyond a single round, we adopt a round-wise recursive training scheme: the teacher remains frozen within each round to provide a stable learning target, and the improved student initializes both teacher and student in the next round, where privileged spatial priors re-establish an informative teacher--student asymmetry. This enables repeated self-improvement while avoiding a rapidly moving teacher during optimization. Across four VLM families, a single round of Spatial-OPSD consistently improves the five-benchmark average, while three rounds further push a strong spatially specialized model to the open-source frontier, achieving the highest average among the open models and the best results on three of five spatial reasoning benchmarks. Our code is available at https://github.com/vermouth599/Spatial-OPSD.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37055v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37055v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/vermouth599/Spatial-OPSD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37055v1 全文及 2026-10-06T11:48:44.068098+00:00 审阅记录；PDF 14 页，SHA-256 4a36d8b8001421eb42844c7b7f838a427d2d5bdeb6487457795f2e9bc2c44d29，视觉核验第 1、4、6、7、9、13 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页给此 URL，已访问 public GitHub 并确认 kdflow 与 train_opsd/train_roundwise scripts；README 说明 spatial-prior construction 不在 repo 内，未运行或审计实现。",
+    "ideaZh": "Spatial-OPSD 用同 checkpoint 但可见 depth/3D/camera scaffold 的 frozen teacher 监督 student 自身 rollout，再逐 round 刷新 teacher；部署时仅 RGB+question。作者报告 Qwen4B 五 bench 均值 36.432→40.406，强 8B 三轮 53.54→54.78。值得精读 geometry→token distillation，但 answer-label-free 仍依赖 native annotations/外部 tool，Gemma 均值只增 0.424 且 ViewSpatial 下降，不能称全任务或无限自进化。",
+    "motivationZh": "VLM 在空间问答中难以仅靠 RGB 形成稳定几何判断，而部署时调用工具又增加成本。目标是把训练阶段可用的几何证据蒸馏为模型自身能力。",
+    "methodZh": "把 SPAR/VSI/SenseNova 的 native geometry 或 GroundingDINO+SAM2+VGGT pseudo geometry 整理成 object-camera graph，按 question 检索 subgraph 作为 teacher 额外文字 context。Teacher 和 student 同 architecture/初始化、共享 student-generated prefix，以 completion masked reverse KL 更新全部 student 参数，teacher 在一轮内固定，一轮结束复制改进 student 到下一 teacher/student。它将额外几何信息转为部署时无需 tools 的模型能力，创新主要是可复用 spatial privileged supervision 与稳定刷新方案，而非新的 3D reconstruction 或无监督从零学习。",
+    "methodFlow": [
+      "按 source 读取 native depth/poses/boxes 或经 detector、SAM2、VGGT 生成 pseudo geometry，过滤低置信 mask/point/reprojection",
+      "在 scene 构建一次 object-camera graph；question noun phrases 检索相关 frames/entities/geometry，保留 confidence 与有 scale 的 metric 值",
+      "student 仅看 visual+question 并采样 response，same-checkpoint frozen teacher 再看检索 geometry、沿同 prefix 输出 token distribution",
+      "completion-only reverse KL 全参数训练，无 answer crossentropy 或 answer-derived reward；teacher 每 round 冻结",
+      "结束 round 后将 student checkpoint 复制为下一 teacher/student，重复训练；部署仅 student 无需 privileged scaffold"
+    ],
+    "experimentsZh": "实验设置：作者报告四 4B families 单轮与 SenseNova-SI-Qwen3-VL-8B 三轮，五空间 bench accuracy；同训练 examples 和 visual preprocessing 对照 SFT/GRPO，thinking mode 关闭、零 shot deterministic evaluation。Appendix 声称 6.2k 但各 source3.1k+1.9k+1.1k=6.1k，视为 approximation 未自行修正。\n作者报告 Qwen 五 bench 均值 36.432→40.406，InternVL36.806→39.741，Gemma30.568→30.992，LLaVA34.225→34.642。（Table 1, p. 6）\n作者报告强 8B 三轮 SPAR40.8→45.8、MindCube73.7→74.4、MMSI37.7→38.1，overall53.54→54.78。（Table 2, p. 7）\n作者报告 20% relative numeric prior noise 后 Qwen 均值 38.855 仍高于 base36.432，但 MMSI/VSI 均低于 base。（Fig. 5, p. 9）\n作者报告 Qwen reverseKL avg40.41、forwardKL39.00、JSD39.72，RKL 并非每个 benchmark 最高。（Fig. 4a, p. 8）\n比较范围：多 family 和同 example answer-supervised 基线有价值，但 supervised 配方/学习率/batch/步数不同，不能归因完全 label 类型；Appendix SFT/GRPO 在部分模型更强，没有普遍 beat 监督训练。未见 dataset leakage 审计、多 seed CI、compute matching 或真实 robot 试验。\n消融与诊断：比较 refresh frequency、KL 类型、prior 类别和乘性 numeric 噪声，支持稳定 target 与 geometry 价值。noise 仅数值扰动，未覆盖错 object association、detector failure、camera frame 错误或缺失 geometry。",
+    "insightZh": "实质贡献是 geometry scaffold 作为 OPSD teacher privileged context 及 round-wise refresh，不是泛泛 self-training 口号。Reverse KL/on-policy distillation 和 geometry tools 继承已有方法；三轮结果说明有限迭代可用，不能推导持续无界 recursive improvement。",
+    "whyRelevantZh": "直接命中 VLM 空间推理与 post-training，把可计算 3D 中间证据压入 tool-free 模型，并提供可复用 privileged-distillation 结构；无新 3D 生成或分割方法，不额外分类。",
+    "evidenceZh": "teacher geometry 来自 native annotated datasets 或 GroundingDINO/SAM2/VGGT，metric scale 不足时只给 ordinal/normalized relations。（Secs. 3.3.1–3.3.3, pp. 4–5；Fig2 已视觉核验，label-free 只排除 downstream answers，并非没有标注或外部监督。）\n同 student prefix 上的 reverse KL、teacher 每 round 固定、全参数更新且部署不看 geometry。（Secs. 3.4–3.5, pp. 5–6; Appendix B, pp. 13–14；细节含 AdamW2e-6、单 H20/96GB 及 262144pixels，作者报告未运行。）\n作者报告四 families 平均均升，但 Gemma ViewSpatial31.90→24.74、VSI25.86→25.74，LLaVA ViewSpatial31.83→29.88。（Table 1, p. 6；主表已视觉核验，保留各任务退化。）\n作者报告强 8B 三轮均值 53.54→54.78，其中 VSI64.3→64.2；只是所比较 open models 最优平均。（Table 2, p. 7；不是当前全领域 SOTA 认证，未独立复现。）\n作者报告 step-wise refresh collapse 为 0，fixed teacher 三轮 43.168、round-wise47.636 SPAR。（Table 3, p. 7; Fig. 3, p. 8；schedule 结论限此模型/配方，无多 seed 统计。）\n作者承认训练依赖外部 perception/reconstruction tools，autonomous tool use 与 model-generated scaffold 仍是 future work。（Limitation & Future Work, p. 9；limitation 页已视觉核验，不能称完全自主自我演化。）",
+    "caveatZh": "训练 spatial scaffold 依赖外部 perception/reconstruction tools；自主 tool 使用和 model 生成 scaffold 尚未实现。\nanswer-label-free 不等于 annotation-free：native geometry、marker-associated regions 和已有训练 datasets 均提供强先验。\n多模型均值改善很小且部分 bench 下降，不将 consistently average 提升改写为每项均提升。\n三轮有限实验不能证明长期递归稳定性，step-wise collapse 结论限具体训练 setting。\n单 seed 与未知训练样本去重/benchmark contamination 边界影响小幅 gain 可信度。\n乘性 numeric noise 不等同复杂真实工具误差。\n公开 repo 为 training core，spatial-prior construction 位于其 upstream，完整 geometry/data pipeline 可复现性尚未确认。\n仅 exact14 页全文作者报告，未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

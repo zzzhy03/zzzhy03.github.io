@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2603.12064",
+  "slug": "dense-dynamic-scene-reconstruction-and-camera-pose-estimation-from-multi-view-videos-2603-12064",
+  "title": "Dense Dynamic Scene Reconstruction and Camera Pose Estimation from Multi-View Videos",
+  "authors": [
+    "Shuo Sun",
+    "Unal Artan",
+    "Malcolm Mielle",
+    "Achim J. Lilienthal",
+    "Martin Magnusson"
+  ],
+  "publishedAt": "2026-03-12",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "ECCV 2026",
+  "identifiers": {
+    "arxiv": "2603.12064"
+  },
+  "venueIds": [],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Dense Dynamic Scene Reconstruction and Camera Pose Estimation from Multi-View",
+    "3D Reconstruction"
+  ],
+  "abstract": "We address the challenging problem of dense dynamic scene reconstruction and camera pose estimation from multiple freely moving cameras -- a setting that arises naturally when multiple observers capture a shared event. Prior approaches either handle only single-camera input or require rigidly mounted, pre-calibrated camera rigs, limiting their practical applicability. We propose a two-stage optimization framework that decouples the task into robust camera tracking and dense depth refinement. In the first stage, we extend single-camera visual SLAM to the multi-camera setting by constructing a spatiotemporal connection graph that exploits both intra-camera temporal continuity and inter-camera spatial overlap, enabling consistent scale and robust tracking. To ensure robustness under limited overlap, we introduce a wide-baseline initialization strategy using feed-forward reconstruction models. In the second stage, we refine depth and camera poses by optimizing dense inter- and intra-camera consistency using wide-baseline optical flow. Additionally, we introduce MultiCamRobolab, a new real-world dataset with ground-truth poses from a motion capture system. Finally, we demonstrate that our method significantly outperforms state-of-the-art feed-forward models on both synthetic and real-world benchmarks, while requiring less memory.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.12064v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.12064v4"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ljjTYJR/Multiple-view-Dynamic-Reconstruction"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.12064v4 全文及 2026-10-06T11:10:30.101470+00:00 审阅记录；PDF 18 页，SHA-256 6e7413e1e49ec3bd3b432460807f2615adf2b4acd038acc98edcab22456efafa，视觉核验第 1、5、12、13、14、15 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1/p.9 打印该 URL；已访问官方 GitHub 并确认 Public repository 及 pipeline 源码目录，未执行或验证复现。",
+    "ideaZh": "用 VGGT 初始化统一 scale，再把 MegaSAM 扩展为同步自由多相机 spatiotemporal graph，最后以 UFM flow 交替精修 depth/poses；作者报告实拍 robot/human 场景的跨 view 一致性优于 feed-forward baselines。价值是从固定 rig 或单 camera 扩展动态多 camera 恢复；并非 generative model，低 overlap 会退化，pose/depth 评价还使用 GT 对齐。",
+    "motivationZh": "多台自由移动相机拍摄动态场景时，独立 monocular tracking 容易产生尺度和位姿冲突。目标是联合恢复跨视角一致的逐帧深度与相机运动。",
+    "methodZh": "多台自由移动 camera 观看同一 dynamic scene 时，独立 monocular tracking 容易 scale 不一致。方法用 VGGT 初始化 pose 和 global affine depth，维护 temporal、同时间 spatial 与历史 cross-camera edges，再以 MegaSAM weighted BA 追踪；随后用 wide-baseline UFM 估计 dense correspondence，先优化 per-frame scale/shift，后交替优化 pixel depth 和 camera perturbation。输出同步多 view 逐帧 depth 与 poses，并非 mesh、Gaussian 或可编辑 part。作者在新 MultiCamRobolab 和 Unreal 同步数据验证 tracking、depth 及 scene consistency；支持输入设置扩展和动态 capture pipeline，外部泛化证据仍有限。",
+    "methodFlow": [
+      "输入时间同步 RGB streams 及已知 camera intrinsics，允许 camera 独立运动",
+      "首批 frames 经 VGGT 得到 global-consistent 初始 pose/depth；拟合 UniDepth 预测的 global scale/offset",
+      "构建同 camera temporal、同步 cross-camera spatial、历史 cross-camera spatiotemporal edges，重叠不足时不连边",
+      "以 MegaSAM flow/confidence 做 active-window BA 并加 aligned monocular depth prior，控制最大 edge 数",
+      "UFM 提供 dense wide-baseline flow，先固定 pose 优化每 frame scale/shift 及 flow confidence",
+      "固定 affine 参数后交替更新 dense depth 与 smoothness-regularized poses，输出多 camera 逐时 3D 恢复"
+    ],
+    "experimentsZh": "实验设置：作者报告新 MultiCamRobolab 共 24 条 150–300frame、30FPS 同步 Azure Kinect RGB streams，19 条双 camera robotdog/arm/human 和 5 条三 camera；Qualisys 提供 GT poses，RGB-D depth 只用于评价。另从 Unreal MultiCamVideo 随机 50clips、各取 3camera；输入已知 intrinsics。\n作者报告 Unreal camera ATE/RTE/RRE 为 0.005/0.001/0.011，FastVGGT 为 0.023/0.008/0.080。（Table 1, p. 12）\n作者报告 RoboDog-overlap depth Abs.Rel 0.011、δ1.25 0.989、Md 0.091；FastVGGT 对应 0.026/0.978/0.128。（Table 4, p. 14）\n作者报告 peak GPU memory20.04GB，对照 Fast3R39.20GB、FastVGGT22.08GB；设备与 sampling 策略不同，不能作为同硬件 runtime 优势。（Table 2, p. 12; Sec. 5.1, p. 10）\n作者报告去除 wide-baseline initialization 使 DynamicHuman ATE 增加 0.130m，去除 ST graph 增加 0.141m。（Table 5, p. 15）\n比较范围：比较 COLMAP/GLOMAP 及 dynamic masks/NetVLAD 变体、VGGT/FastVGGT、Fast3R 和 CUT3R。VGGT 因 OOM 用 interval8，其余 all frames；Fast3R/FastVGGT 在 A100-40GiB，其余 RTX4090。未报告统一设备端到端时长或更广野外多 camera 设置，也未对新 dynamic mesh/GS 资产 pipeline 做 downstream 验证。\n消融与诊断：移除 VGGT wide-baseline initialization、ST graph，以及分离 per-frame affine 与 pixel/pose refinement；噪声初始化和低 overlap 分析支持各 stage 互补。PDF 提到额外 supplementary refinement/edge-count 消融，但这份 18 页 exact PDF 未包含，未据此补写结果。",
+    "insightZh": "新贡献是自由移动、同步多 camera 动态场景设置，以及以 scale anchor 和 spatiotemporal edges 把单 camera tracking 与 dense depth refinement 连接成可运行系统。VGGT、MegaSAM、UniDepth、UFM、BA 和视频 depth 优化均继承既有工具；不能描述为新 foundation model，也不把 camera 自由运动解释为无 intrinsics 或无同步要求。",
+    "whyRelevantZh": "自由同步多 camera 动态恢复可为 4D/3D 内容 pipeline 提供一致 depth 和 pose，输入自由度比单 camera 或固定 rig 更大。对生成资产的迁移是合理方法用途，论文未实测 3D generation、part segmentation 或 fabrication。",
+    "evidenceZh": "输入是时间同步 monocular streams 与 camera intrinsics，输出 per-frame poses/depth；VGGT 初始化、graph tracking 和 dense flow refinement 连接三 stage。（Sec. 3.1–3.3, Fig. 2, pp. 4–9；Fig.2 已视觉核验，实际输出非 mesh 或 Gaussian 资产。）\ncross-camera 连接以投影像素是否在 frame 内判断 overlap，并以 active edge cap 与删除 old edges 控制 memory。（Sec. 3.2, pp. 5–7; Fig. 3, p. 6；可跨同步 dynamic objects 建立瞬时空间约束；并非显式分离 object trajectory 模型。）\n作者报告 RoboDog-overlap 的 Abs.Rel 为 0.011、scene Md 为 0.091，对照 FastVGGT 为 0.026/0.128；DynamicHuman Md 为 0.112 对 0.185。（Table 4, p. 14；结果表高分辨率渲染核验；作者报告，本项目未复现。）\n作者报告 3-camera 实拍 ATE 0.020，FastVGGT 为 0.032；低 overlap 场景 spatiotemporal 连接退化，优势最小。（Table 3 and Sec. 6.1, p. 13; Table 5, p. 15；已视觉核验结果及低 overlap 边界，不宣称全部指标最佳。）\ndepth 评价逐 frame 拟合 GT scale/offset，scene consistency 以 GT trajectory 求 global scale；绝对 metric 恢复不能由这些表直接推断。（Sec. 5.2, p. 11; Fig. 4 caption, p. 13；评价对齐方式与 source 方法必须分开；图 caption 使用 SIM(3)，正文 pose reference 描述并非完全一致。）",
+    "caveatZh": "低或无 view overlap 时 cross-camera edges 退化为各 camera 纯 temporal，改善最小。\nMono depth 全局 affine alignment 不能消除 per-frame drift 和 pixel 误差，需要后续优化。\nVGGT 全 frame 输入内存溢出，对比中需稀疏 sampling。\n要求时间同步且已知 intrinsics；未验证不同 frame 率、明显不同时间偏移或 intrinsic 估计误差。\n真实数据主要 robot/human lab 环境，单 benchmarkdepth 结果不能说明开放场景泛化。\npose/depth 均有 GT alignment，不能把结果称为无额外参照的绝对 metric 恢复。\n同时间 dynamic 可提供对应，但高速非刚性、occlusion 和 flow 错误未专门量化。\n文章无独立 limitations section，边界来自正文/实验；全部结论按作者报告，未独立运行。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

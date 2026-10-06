@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.04225",
+  "slug": "flashgaze-training-free-multi-scale-patch-pruning-for-efficient-video-understanding-2610-04225",
+  "title": "FlashGaze: Training-Free Multi-Scale Patch Pruning For Efficient Video Understanding",
+  "authors": [
+    "Ziye Zhu",
+    "Yanghao Zhou",
+    "Lixing Tan",
+    "Jialiang Kang",
+    "Shuxuan Li",
+    "Xiao Yang"
+  ],
+  "publishedAt": "2026-10-03",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.04225"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "FlashGaze",
+    "VLM / MLLM"
+  ],
+  "abstract": "Multimodal Large Language Models (MLLMs) have demonstrated strong performance in video understanding, yet efficiently processing long, high-resolution videos remains challenging. Such videos often contain substantial spatiotemporal redundancy, and processing redundant visual tokens can incur avoidable computational overhead. Many existing methods prune visual tokens during or after vision transformer (ViT) encoding, leaving much of the encoding cost unaddressed. Some approaches prune patches before encoding but rely on learned auxiliary networks for patch selection, incurring additional training and inference overhead. To address these limitations, we propose FlashGaze, a training-free method that reduces spatiotemporal redundancy before ViT encoding without introducing auxiliary networks. FlashGaze uses pixel-space differences as a proxy for information loss and employs Quadtree Dynamic Programming to jointly optimize patch dropping, merging, and keeping under a fixed budget. Experiments on two MLLM backbones across multiple benchmarks demonstrate substantial efficiency gains while largely preserving accuracy. On Qwen3-VL-8B, FlashGaze retains 98% of the full-input baseline accuracy on LongVideoBench while achieving up to 5.4x and 17x speedups in ViT encoding and MLLM prefill, respectively, and reducing peak GPU memory usage by a factor of 1.8. These efficiency gains enable the model to process videos with more frames and higher resolutions on the same GPU hardware, unlocking video understanding at scales previously out of reach.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.04225v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.04225v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.04225v1 全文及 2026-10-06T11:37:21.642211+00:00 审阅记录；PDF 15 页，SHA-256 c16443192aa89d4ad1a5c7d879f50d1b854d19a01b3d0421fddd987c64b80ec2，视觉核验第 1、4、7、8、14 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Reproducibilitystatementp10 承诺 supplementarysourcecode，PDF 未给可核验 public URL。",
+    "ideaZh": "FlashGaze 在 ViT 前按 pixel-space 变化分配 Drop/Merge/Keep，以三层 QuadtreeDP 省去先编码再剪枝的成本。作者报告 LongVideoBench20%ratio 准确率 65.5 对 66.7，TTFT 5.4s 对 71.7s；98% 保留率只对这个设置，HLVid 同 ratio 降 71.6→68.2。是可迁移的视觉预算表示方法，pixel cost 最优不等于语义证据无损。",
+    "motivationZh": "长视频包含大量静止区域，逐帧完整运行 vision encoder 浪费计算；需要在视觉编码之前按变化与尺度分配 patch budget，同时保留关键动态证据。",
+    "methodZh": "首帧全保留，记忆每空间位置最近 retainedpatch；后帧比较历史 difference 与 down/up-samplingmergeerror，DP 在 budget＋countpenalty 下选多尺度 patch，按 centerpositions 编码。两个 8Bbackbones、六 benchmarks 与 inputscale 实验支持 resource/context 收益，实际能力增量有限；不含训练 selector。",
+    "methodFlow": [
+      "完整首帧初始化 last-retainedpatchmemory，首帧豁免 budget",
+      "Pixel-localalignment 差异估 Drop，2×/4×down-up 误差估 Merge",
+      "三层 quadtreeSCM 合并 costarrays，budget＋λN 下 backtrackactions",
+      "Fine/coarsepatch 赋 centerposencoding 进 ViT，更新 memory",
+      "OriginalMLLM 读取 prunedvisualtokens 答题"
+    ],
+    "experimentsZh": "实验设置：Qwen3-VL8B 与 NVILA8BVideo；LongVideoBench、VideoMMMU、HLVid 主表，另 VideoMME/NExTQA/MLVU；H200。Qwen50%、NVILA10%matchedfinalretention；ratio20–50%、scalability 到 1536frames/3840resolution。\n作者报告 Qwen50%LongVideoBench66.7/20.7s、NVILA10%59.0/13.7s，matchedretention 下低 TTFT。（Table1,p.7）\n作者报告扩大 input 后 QwenLongVideoBench66.7→66.9、HLVid71.6→73.2，最多 1536frames/3840res。（Table2,p.7）\n比较范围：ToMe/FastV/VisionZip/FlashVID/AutoGaze；retention 取最终 visualtoken 比例，各 methodencoder 负载不同，正是 preencoding 研究点。Generalmodel 表非同输入/compute 匹配。\n消融与诊断：Pixelproxy 胜 patchfeature/SigLIP/LPIPS；DP 胜 random/single/multi-scalegreedy，支持给定 surrogate。20videosattention/representationanalysis 是相关性，不能证明新增 attention 致因收益。",
+    "insightZh": "主要贡献是 pre-ViT 无 learnedselector 的 jointtemporal/spatialbudgetoptimization，区别于 late-tokenpruning。QuadtreeDP 只针对定义的 pixel-actioncost 实现最优，不证明 downstreamsemantic grounding 或所有输入速度/accuracy 无损。",
+    "whyRelevantZh": "通用 video evidence 预算与 preencoderrepresentation 可服务长过程观察/设计 agent 输入，实际 CAD/SVG/LEGO 应用未验证。更值得借鉴先定义 task-compatible 信息损失再优化 allocation 的方式。",
+    "evidenceZh": "首帧保留并豁免 budget；memory 保存最近 retainedcontent，pixelproxy 决定 drop/merge/keep。（Sec.3.2–3.3,Fig.3,pp.4–5；方法图已实际查看。）\n作者报告 LongVideoBench20%ratio65.5 对 66.7，peak58.2 对 106.4 GiB，TTFT 5.4 对 71.7s。（Table3,p.8；主 efficiency 表已核验，作者报告不是本项目复现。）\n作者报告 HLVid20%ratio68.2 低于 vanilla71.6；50%ratio73.2 高于 71.6。（Table3,p.8；不能将 98% 保持解读为全部 benchmark/ratio。）\n全部 timing 用 H200batch1/BF16/PyTorchnativeSDPA，warmup1、连续 3 次均值。（AppendixC,p.13; Table5,p.14；包含 pre-ViT overhead 但不是 optimizedFlashAttentionproductionstack。）",
+    "caveatZh": "无显式 limitations section；pixelredundancy 可能漏掉小/静态语义细节，DP 不保证 queryevidence 保留。\n首帧 budget 豁免与 camera-localsearch 影响 realstreamingcost，未报更广 motion/lightingfailure。\n98% 仅特定 LongVideoBench 设置；低 ratioHLVid 明显下降。\nH200/nativesdpa 结果不能直接承诺 consumerGPU/FlashAttentionstack 相同加速。\n完整 15 页含 DP、integration 和 latencyappendix 已读；数字为作者报告，未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

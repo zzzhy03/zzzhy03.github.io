@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2508.16644",
+  "slug": "countloop-training-free-high-instance-image-generation-via-iterative-agent-guidance-2508-16644",
+  "title": "CountLoop: Training-Free High-Instance Image Generation via Iterative Agent Guidance",
+  "authors": [
+    "Anindya Mondal",
+    "Sauradip Nag",
+    "Ayan Banerjee",
+    "Josep Llados",
+    "Xiatian Zhu",
+    "Anjan Dutta"
+  ],
+  "publishedAt": "2025-08-18",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2508.16644"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "image-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "CountLoop",
+    "Visual Design Agents",
+    "Image Generation"
+  ],
+  "abstract": "Diffusion models excel at photorealistic synthesis but struggle with object count fidelity, especially in high-density settings. We introduce COUNTLOOP, a training-free framework that achieves structured instance and count control through iterative, structured feedback. Our method alternates between synthesis and evaluation: a VLM-based planner generates structured scene layouts, while a VLM-based critic provides explicit feedback on object counts, spatial arrangements, and visual quality to refine the layout iteratively. Instance-driven attention masking and cumulative attention composition further prevent semantic leakage, ensuring clear object separation even in densely occluded scenes. Evaluations on COCO-Count, T2I-CompBench, and two newly introduced high instance benchmarks show that COUNTLOOP reduces counting error by up to 57% and achieves the highest or comparable spatial quality scores across all benchmarks, while maintaining photorealism. Project page is at https://mondalanindya.github.io/CountLoop/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2508.16644v5",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2508.16644v5"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2508.16644v5 全文及 2026-10-06T11:57:00.999782+00:00 审阅记录；PDF 17 页，SHA-256 ef83475b028993ab6a05526006f0342ae73bb7fd0d34f7dab58ffce2c84b9837，视觉核验第 1、4、6、10、11、14 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF p.2 印出作者 project page，实际访问其 Code 链接确认 public mondalanindya/CountLoop repository；但 README 明确 Release Status under preparation / fully released following publication，且 exact PDF 未印出 repository URL，故保守记 promised，不将其视为已验证完整复现代码。",
+    "ideaZh": "CountLoop 用可修改 planning graph、per-instance attention composition 与 detector-assisted critic 闭环生成 30–200 instances 的 raster scenes。作者报告 CountLoop-S MAE 7.59 对 3DIS 14.55，但 exact-match 仅 20%（CountGD++ critic 29%），不是精确计数保证。可借鉴点是 agent 把检测反馈变成显式节点/布局修正；其计数仍受 detector、occlusion 和 canvas resolution 限制，且每 instance 顺序合成增加推理成本。",
+    "motivationZh": "高密度图像中的实例数量容易偏离要求，遮挡还会使计数反馈不可靠；需要显式规划实例与布局，并把检测结果转成可执行修改，而非重复同一生成提示。",
+    "methodZh": "Design VLM 将数量、属性、位置、depth 与关系写成 graph/JSON；GLIGEN layout tokens、shape-aware masking 与 far-to-near cumulative features 约束生成，IP-Adapter 保持 appearance。Critic 将外部 detector count 和 aesthetic score 转成文字 feedback，再修改 graph/prompt 并生成下一轮。它并非单次 LLM 包装：attention composition 与显式设计状态的反馈控制有组件对照。17 页 exact PDF 全文已读，实际查看 graph loop、attention diagram、主表、ablations、limitations。文中多次指向 supplementary 的完整 prompts/implementation，但不在该 PDF，未假装读过。",
+    "methodFlow": [
+      "解析并规划实例 graph：VLM 把 prompt 拆成带 category/position/size/depth/color 的 instance nodes 与 relation edges，转成具体布局。",
+      "逐实例累计生成：GLIGEN tokens 与 shape-aware attention masks 限定各实例，far-to-near 覆盖 latent features；IP-Adapter 传递前景 appearance，最终组成 image。",
+      "观察检测与美学反馈：GroundingDINO 或 CountGD++ 提供 proxy counts，外部 scorer 提供 aesthetics，Critic VLM 给出结构化修改建议。",
+      "修改 graph 并再合成：text refinement operator 修改 nodes/relations/layout，而非训练模型参数；达到 composite threshold 或 round limit 停止。"
+    ],
+    "experimentsZh": "实验设置：COCO-Count、T2I-CompBench Count、新 CountLoop-S/M 各 200 prompts、30–200 instances；OWLv2 MAE、CountGD++ exact match、VQAScore spatial。默认 SDXL、Qwen3-VL、GroundingDINO critic、Q-Align；另换 SD1.5/SD3.5。30 人盲评每人 15 sets，count 用 0–5 rating，非逐图逐实例精确人工标注。\n作者报告 CountLoop-S MAE 7.59，对最优外部 3DIS 14.55；exact 20% 对 6%。（PDF p.10, Table 1）\n作者报告 N=100 约 150s、MAE≈13，SLD 约 200s、MAE≈50；one-shot baselines <10s，成本不可忽略。（PDF p.11, Fig.7b and Runtime Analysis）\n作者报告 small-object N=200 MAE 26.5，仍不是精准输出；human overall rating 4.5 对 SLD4.0。（PDF pp.11–13, Table 2d and Fig.8）\n比较范围：涵盖 T2I、layout-conditioned 与 agentic methods，自纠正 baseline loops 开启；box-only methods 用 LMD layout，不是 CountLoop graph。Different layout generators 与 synthesis budgets 使比较同时包含规划和生成差异。\n消融与诊断：PG/CA/IR、random retry、critic detector/aesthetics、design/critic models 与 backbone swaps。本文没有完整 supplementary，不能从中声称精确 hyperparameters、schema 或 per-stage runtime 已核实。",
+    "insightZh": "主要增量是 persistent planning graph 的闭环修正与 instance-wise cumulative attention 的组合，dense counts 上有独立组件、random-retry、critic/backbone swaps。所谓 textual gradient 是 LLM 操作类比，不是数值可微目标或收敛证明；不是新的 TTI/VLM foundation model。",
+    "whyRelevantZh": "直接命中生成/观察/修改视觉产物的 agent 窄任务；显式 design state 加实例控制可用于复杂 visual creation workflow。计数本身不是 LEGO/fabrication 贡献，不额外挂这些 topic。",
+    "evidenceZh": "Agent 实际修改 design graph/prompt，并观察 rendering 后迭代，attention composition 为独立方法组件。（PDF pp.4–8, Figs.3–5 and Sec.3；实际查看 Fig.3/4；支持 visual-design-agents 分类，输出为 raster image 而非 SVG/CAD。）\n作者报告高密度 MAE 改善，但 exact counts 仍是少数。（PDF pp.9–10, Table 1；CountLoop-S MAE/exact 7.59/20%，CountGD++ critic 5.33/29%；CountLoop-M 2.13/33%。表已实际查看，未复现。）\n组件实验支持 guided feedback 不仅是多次换 seed。（PDF pp.10–11, Table 2b–c；作者报告 PG+CA 11.27、random retry 10.90、完整 7.59 MAE；VLM-only critic 29.59，对 detector+aesthetic 7.59。）\n作者明确 dense detector results 不是物理计数 ground truth。（PDF pp.8–9, evaluation boundary; p.14, Limitations；统一 detector 不自动保证不同 image distributions 的误差相同；limitations 已实际查看。）",
+    "caveatZh": "PDF p.14：继承 frozen VLM/detector limitations，dense/human occlusion 退化。\nPDF p.14：缺显式 3D priors，pose/perspective 困难，layout guidance 可降低 intra-class diversity。\nPDF p.14：N>30 exact-match 低，极密情况下精确计数仍是 open challenge。\nDetectors 对不同布局、canonical poses、object sizes 的 bias 可不同，使用同 evaluator 不证明误差 identical。\nHuman count rating 是偏好尺度而非 true counts 标注，不能据其 ranking 推断 detector bias 已排除。\nDefault GDINO critic/evaluation OWLv2 独立有帮助；CountGD++ critic 的 exact-match evaluator 同为 CountGD++，该配置有重叠风险。\n逐实例生成与迭代成本随 count 增长；没有 manufacture 或真实 3D 约束验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

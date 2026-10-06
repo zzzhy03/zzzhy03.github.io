@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2609.40362",
+  "slug": "multimodal-flow-unified-flow-modeling-of-language-and-vision-in-embedding-spaces-2609-40362",
+  "title": "Multimodal Flow: Unified Flow Modeling of Language and Vision in Embedding Spaces",
+  "authors": [
+    "Hongyuan Tao",
+    "Xinggang Wang",
+    "Lianghui Zhu",
+    "Yongkang Li",
+    "Yunchao Wei",
+    "Bin Feng",
+    "Shaoyu Chen",
+    "Qian Zhang",
+    "Chang Huang",
+    "Kai Yu"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.40362"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Multimodal Flow",
+    "VLM / MLLM",
+    "Image Generation"
+  ],
+  "abstract": "We present Multimodal Flow, a fully continuous generative model of language and vision. Most unified multimodal models either model both language and quantized images as discrete tokens or combine discrete language prediction with continuous image generation. The former introduces a visual quantization bottleneck. The latter requires modality-dependent objectives and sampling procedures. Fully continuous modeling avoids these trade-offs and enables a shared generative process, but remains underexplored for multimodal pretraining. Multimodal Flow introduces a unified continuous architecture that integrates multimodal continuous representations with a shared chunk-causal flow backbone. It organizes text blocks and images as ordered continuous hyperchunks, preserving textual token order and visual spatial structure. The backbone learns a single vector field over these hyperchunks through Flow Matching. Joint attention enables cross-modal interaction, while modality-specific feed-forward networks process each modality. The model predicts multiple target chunks in parallel during training and generates hyperchunks sequentially at inference. We instantiate MF-1 and pretrain it on multimodal data. Across 0.6B, 1.2B, and 1.6B scales, continued pretraining consistently improves multimodal modeling. With only 150B pretraining tokens, MF-1 achieves an average score of 82.8 across GenEval and DPG-Bench and 75.3 across VQAv2, MMBench, and POPE, remaining competitive with unified models trained on substantially more data. Under matched data, optimization, and parameter budgets, Multimodal Flow further outperforms representative hybrid and discrete models. These results establish continuous chunk-based embedding flow modeling as a new fully continuous paradigm for unified multimodal modeling. The related code and model are publicly released at https://github.com/hustvl/Multimodal-Flow.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.40362v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.40362v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/hustvl/Multimodal-Flow"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.40362v1 全文及 2026-10-06T13:47:02.614512Z 审阅记录；PDF 18 页，SHA-256 28d6f6bb4fa18e4ccb2ab80b22352685158842d55ac043484ce6cfe112c109ed，视觉核验第 1、3、5、7、8、16、18 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页/abstractexactrepoURL 确认 public repo 含 src/configs/docs 实现；未执行或下载 checkpoints。",
+    "ideaZh": "Multimodal Flow 将文字 embeddings 与 image grid 排成 causal hyperchunks，用同一 flow backbone 统一多模态生成。作者报告 matched hybrid 对照和生成结果支持该路线，值得精读。参数与训练数据计数只覆盖部分 backbone，frozen codecs 继承预训练，文字解码也有多步与 CFG 成本。",
+    "motivationZh": "文字与图像通常采用不同生成目标和模型接口，限制统一建模；目标是将两者组织为 embedding hyperchunks，用共享 flow backbone 生成。",
+    "methodZh": "text 按 8tokens 独立 T5 编码、image224²→256semanticpatchstates，normalization/projections 到共同 width1600。jointchunkcausalattention+modalFFNs 预测 cleanendpoint 并转 velocity，训练各 target 独立 t 且仅可见 cleanpast；推理按 taskdefinedmodalorder 逐 chunkintegrate/cache，frozendecoders 转 text/raster。mixedpretrain70%text/20%understanding/9%T2I/1%image，150B+5Bjointfinetune。",
+    "methodFlow": [
+      "frozenT5 与 SigLIP 将文本 blocks/imagegrid 编码并 normalize 为 hyperchunks。",
+      "按 task 排列 modalchunks，cleanpast 与 noisytarget 构 chunkcausalmask，pack 不同 seq 隔离。",
+      "jointattention+modalFFNs 预测 endpoint，以 FlowMatchingvelocityloss 训练所有 modaltarget。",
+      "推理当前 chunk 从 noise 积分、CFG，完成后加入 KVcache 再生成下一 chunk。",
+      "frozen codecs 解码为离散 text 或 rasterimage，同 flow objective 适配 VQA/T2I。"
+    ],
+    "experimentsZh": "实验设置：0.6/1.2/1.6Bbackbones、frozenT5small/SigLIP2so400m+separatelytrainedtextdecoder/RAEimagecodec。GPIC/LLaVAOneVision1.5/UltraFineWebPT，T2I syntheticBLIP3o/DALLE3/4o-image+LLaVA1.5VQAFT。main150B+5B、matchedarchitecture50B+5B、transferrandom155Bdownstream；seedCI/hardwareGPUhours 未给。\n作者报告 mixedpretrainvsrandom155BdownstreamGenEval.821 对.527、SEED62.4 对 31.6；支持数据 mixture/学习阶段效益，不等所有 pretraining 皆 optimal。（Table5, p.8）\n作者报告 50B0.6B 视觉 codecDINOimagegeneration 更强，SigLIPcaption 更强；sharedFFN CIDEr42.02 弱于 specific，CFG 最佳 scale 按 modality 不同。（Table6/Fig.5, pp.8–9）\n比较范围：publishedunified/understanding/generationmodels 非同 data/totalcompute；Transfusion-stylevisualcodec 一致是最接近 control，textlatents 有 T5prior 而 AR 只 tokenIDs。frozen codecs 和 VQimagepositions576vsMF256 改变实际 compute，不做 intrinsicparadigmsuperiority 结论。\n消融与诊断：modelcapacity/trainingprogress、codec、jointattentionproj/FFN、CFG/transfer；没有 T5semanticfeatures+ARcontrol、blocklength、longinterleaved/video/native3D、latency/CIFLOPs 或 languagegeneralreasoning 对照。",
+    "insightZh": "ELFcontinuouslanguage、RAEsemanticimage 与既有 crossmodalflows 是基础；新整合是 tokenordered/spatialhyperchunks 的 causalpretrainfactorization 和共同目标。与 hybrid/discrete 的 matcheddata/params 实证支持设计可行，不能独立归因于 continuousobjective，因为 T5semanticcodec 与 AR tokenIDs 的预训练内容也不同。",
+    "whyRelevantZh": "直接推进 unifiedmultimodalunderstanding+generation 的架构/训练范式，continuoushyperchunks 为未来 visual creation/structuredmodalmodeling 提供重要基础；未将未来 SVG/3D 迁移说成本文已实现。",
+    "evidenceZh": "generativestatecontinuous，但 input 仍 texttokenization，output6layertextdecoderCE 预训后冻结；imagepretrainedRAEdecoder 与 SigLIP 冻结。（Secs.2.2–2.3 pp.3–5 / App.B.2 p.16；architecture/trainingmask 图与 codec 页实际查看，不说 allcomponents 从零或不含 categoricaldecoding。）\n作者报告 matched1.6B50BPT+5BFT MFGenEval.7134/MMB46.74，hybrid.6693/33.68，discrete.3744/38.40。（Table4 p.8 / Tables8–9 pp.17–18；control 表实际查看，params 只 trainablebackbones，frozen codecs 排除。）\n作者报告 mainGenEval.821、DPG83.44、VQAv272.6/MMB67.2/POPE86.1，generation 强但理解部分弱于 JanusFlow/Pro。（Tables1–3, p.7；完整 main 表查看，DPG 低于 genonlySD3 的 84.08，不称全面 SOTA。）\n作者报告 VQA SDE16steps/8-tokenchunk/CFG3，T2IODE64steps/CFG5；GPT2PPL 为 externalfluency。（App.C.2–C.3, pp.17–18；采样页实际查看，flowlikelihood/cost 不可由 GPT2PPL 或 chunk 并行性推断。）",
+    "caveatZh": "longerinterleaving、video 与其他 structuredmodalities 留作 future work。\n各 modalrepresentation/decoder 不同，CFG 最佳 strength 也不同。\nfromscratch 仅 flow backbone，T5/SigLIP/RAEdecoder 的知识、预训练 tokens 与 params 未计入 150B/1.6B，不能泛称比所有 LLMinit 方案训练更省。\nsameparam/token budget≠sametotalFLOPs/latency，VQA 多 step+CFG 可能显著耗时，textdecoder 额外成本未知。\ncontinuoussemanticrepresentations 仍会丢图像细节，avoidvisualquantization 不等 losslessreconstruction，224²image 理解限制 fineprecision。\n只常规 VQA/T2I/captioning，spatial/compositionalgainsGenEval 非 nativeCAD/SVG 或 advancedreasoning 保证。\ntask 指定 chunktype/order，未证明自主 longmixedmodalcomposition；cleanprefixteacher forcing 推理误差累积未系统测。\nvelocityendpointclamp.05 与 modality 不同 timestepshift 有工程差异；无 multiseed/CI 与 decontam 详述，本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.03543",
+  "slug": "duomatching-joint-marginal-distribution-matching-for-few-step-video-generation-2610-03543",
+  "title": "DuoMatching: Joint-Marginal Distribution Matching for Few-Step Video Generation",
+  "authors": [
+    "Jiahao Zhan",
+    "Yan Wang",
+    "Yongrui Ma",
+    "Qunliang Xing",
+    "Ruchang Yao",
+    "Runtao Liu",
+    "Shijie Zhao",
+    "Tianfan Xue"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03543"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "DuoMatching",
+    "Video Generation",
+    "Image Generation"
+  ],
+  "abstract": "Streaming video generation has benefited from distribution matching distillation (DMD), which matches the joint distribution of video frames to a video teacher's approximation of the real video distribution. Although this joint matching mitigates drift during autoregressive rollouts, limitations remain in visual quality and semantic alignment. To address these limitations, we propose DuoMatching, a distribution matching framework that approximates the real video distribution through a unified joint-marginal formulation. On top of existing joint matching formulations, the additional marginal matching objective provides dedicated frame-level supervision from an image generator, transferring complementary visual and semantic priors from it. To apply this frame-level supervision in video generation, we introduce LatentBridge to resolve the latent representation mismatch between the video student and the image teacher. Latent Variation Sampling further distributes such frame-level supervision across distinct temporal segments, reducing redundancy. Experiments demonstrate that DuoMatching improves visual quality, composition, and semantic alignment while largely preserving motion dynamics. Human evaluations show overall preference rates above 80% against all evaluated baselines. The project page is available at https://johnzhan2023.github.io/DuoMatching/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03543v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03543v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/JohnZhan2023/DuoMatching"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03543v1 全文及 2026-10-06T13:12:24.607080+00:00 审阅记录；PDF 19 页，SHA-256 f67192ad7dedd38702651f419d0decc64f53a238dbf3f4e63ba5f9593614a8d9，视觉核验第 1、4、8、9、16、17、18、19 页。数字均为作者报告，本项目未独立复现。代码状态 available：证据链：exactPDF p.1 作者 project https://johnzhan2023.github.io/DuoMatching/ → 官方 Code 链接 → publicrepo。实际可见 latent_bridge/model/trainer/pipeline、train.py/inference.py 与 LatentBridgescripts，非 README-only；未运行或复现 checkpoint。",
+    "ideaZh": "DuoMatching 给 video joint-DMD 补充独立 image-teacher marginal-DMD；LatentBridge 用前后 video latent slices 与 local frame index 对齐单帧 image latent，LVS 将有限监督预算分给变化较大的时间段。作者报告同 frame-wise 2-step 设置 VBench Total 80.67→83.53、Semantic 68.42→72.84，而 Dynamic 94.44→93.61；human overall preference 对 Causal Forcing++ 为 80.87%，Temporal&Motion 为 49.57%。值得略读跨 image/video prior 的训练接口与 latent mapping，不能概括为 motion 全面改善或理论保证实际训练优于 teacher。",
+    "motivationZh": "few-step 视频蒸馏的整体监督难以补足局部画质。目标是连接 image 与 video teachers，让学生同时学习视频联合分布和单帧边缘分布。",
+    "methodZh": "系统沿用 few-step video generator 和 frozen video teacher/fake-score DMD，额外采样 generated latent slices，经 pretrained frozen LatentBridge 映射到 image latent，再用 image teacher 与第二 fake-score estimator 做 marginalDMD。LatentBridge 有 localframeindex 以解除一个 temporal slice 对应多帧的混淆，并读取 preceding slice 解释 causalVAE context。LVS 根据相邻 cleanlatentMSE 的峰值切为 segments、每段随机选 slice，避免连续静止帧重复监督。bridge 与 image teacher 只用于训练，不增加 studentinference 模块；评测因果 frame/chunk 与 bidirectionalfull generation。附录明确推导理想分布、marginalteacher 优势与 bridge loss 转移的条件。",
+    "methodFlow": [
+      "保留 videojointDMD：用 video teacher 与 onlinefake score 对完整 generated 视频做 jointdistributionmatching，保留跨帧一致性约束。",
+      "学习 frame-specificLatentBridge：对 pairedvideo/image VAE latents 训练小 FiLMresidualmapper，输入 previous/current slice 与 localframeindex，输出对应 image latent；DMD 阶段冻结但保留对 student 的梯度。",
+      "按 latent 变化分配样本：计算相邻 slicesMSE，最大变化位置构成 K 个 segments，每段随机选一 slice 及 localframe，以覆盖不同 temporalregions。",
+      "联合 marginal 与 joint 目标：image teacher 与独立 fake estimator 给 sampledframe latentsDMDgradient，按 warmup 后的ω与 jointloss 相加；image/videofake estimators 都在新 generatedsamples 上更新。"
+    ],
+    "experimentsZh": "实验设置：作者报告 causal 从 Causal Forcing++consistencycheckpoint 在 VidProM 做 1,000stepsDMD；bidirectional 从 Wan2.1-1.3B 在 Mixkit 做 1,200steps。video81frames、480×832，defaultQwen-Image teacher、ω=.4、K4；八张 80GBGPU。LatentBridge 用 29,400curatedOpenVidvideos，八 FiLMblocks/256channels，10.75Mparams、batch32、3,000iterations，作者报告约 15min。评测 officialVBench 及 400challengingprompts；23participants 每人 40 个 promptmatchedpairs。\n作者报告 frame-wise2NFE：CausalForcing++→Duo Total80.67→83.53、Semantic68.42→72.84、Imaging69.82→73.48、Dynamic94.44→93.61。（p. 8, Table 1）\n作者报告 chunk-wise4NFE Total82.79→83.51，Dynamic80.56→76.67；bidirectional4NFE Total80.63→81.45、Dynamic36.67→39.17、Smoothness98.84→98.82。（p. 8, Table 1）\n作者报告 pairwiseoverallpreferences：vsCausVid91.30%、vsCausalForcing++80.87%、vsOneForcing94.35%、vsRewardForcing83.91%；Temporal&Motion vsCausalForcing++49.57%，仅近 parity。（p. 8, Table 2）\n作者报告 peakallocatedmemory joint-only56.49GB、Direct59.40GB、LatentBridge59.41GB、DecodeEncodeOOM；是具体训练配置，不代表所有 memoryoptimizeddecodeencode 不可行。（p. 9, Table 4）\n作者报告 K4 LVS Total83.53/Dynamic93.61，uniform82.61/91.39、stratified82.68/91.67；LVS K8 Total82.55/Dynamic92.22。（p. 10, Table 5）\n比较范围：组内匹配 generationmode 和 NFE，包含 CausVid、SelfForcing、RewardForcing、CausalForcing++、OneForcing；跨 frame/chunk/full 的 NFE 是每 generationunit 而非全视频总 compute，不能合并 speedquality 排名。同 video teacher humancomparison 与不同 image teachers(Wan/SDXL/FLUX/Qwen)支持 transfer，但所有 students 主要同 Wanfamily，缺训练 time/teachercompute 全面 budgetmatch。\n消融与诊断：比较 noimageprior、同 video teacher 的 frameprior、不同 image priors、Direct/Bridge/DecodeEncode、K2/4/8 与 samplingstrategies、ω.1/.4/.8；桥接 reconstructionerror 在 generator 训练中 100samples 上稳定。理论 conditionalcomparison 不是实测 truevideomarginalKL。",
+    "insightZh": "核心方法价值是将 independentframeprior 显式并入 video DMD，并用 frame-index-conditionedlatentmapping 适配 temporallycompressedVAE；图像 priors 用于视频本身已有先例，作者也引述 MCM/AVDM2 等。它在 cross-priortransfer 与 score-supervision 接口上超过仅 DMD 调参，但仍是 post-trainingobjective 扩展。理论假设 image distribution 在 forwardKL 上已更接近 realvideo marginals、所有分布 common support、固定 samplingoperator、无限 distributionfamily 和局部小ω；并不保证 actualfinitegenerator/ω=.4 或 motion 正确。",
+    "whyRelevantZh": "跨 image/videoprior 的显式 matching 与 temporallycompressedlatent 接口对可控视觉生成、图像 prior 迁移到动态表示有直接方法价值；当前没有 SVG/CAD/3D 实验，相关性不延伸到已验证 manufacturing 或 geometryconsistency。",
+    "evidenceZh": "LatentBridge 让 temporal latent 对应不同单帧 image latents，并承载 imageDMDgradient。（pp. 4–6, Figure 3, Eqs. 6–10; p. 19, Algorithm 1；两 slices+localindex、L1pretrain、冻结 mapper 与两 fakeestimators 均核对；未将它称为真实视频直接监督训练全部 student。）\n直接对 compressedlatents 施加 imageDMD 会明显损失 motion，bridge 减少该损失。（p. 9, Table 4；作者报告 DirectDynamic76.94 vsBridge93.61，但 joint-only 为 94.44；bridge 并非完美保留全部 motion。）\nLVS 在相同 K 下优于 uniform/stratifiedsampling，监督加太多反而恶化 dynamic。（pp. 9–10, Table 5; p. 14, Table 6；K=8 和ω=.8 均造成 motion/totaltradeoff，不能以更多 frames 或更大 weight 宣称单调改善。）\ntheory 为 idealdistribution 空间的小权重 localimprovement，bridge theorem 是 fixedLipschitzloss 与 mappingerror 的 endpointbound。（pp. 14–19, Appendices C–F, Eqs. 17–30；mapping L1 小不直接保证 Jacobian/gradient fidelity；100generatedsampleserrorplot 也未量化实际 DMDlossLipschitzconstant 与δ条件。）",
+    "caveatZh": "作者说明 jointmatching 也约束 marginals，marginal/conditional 质量可能有 tension；额外 objective 是补充而非 jointDMD 完全不学单帧。\n高ω或大 K 会压制 dynamic，附录ω=.8 与 K8 给出退步。\njoint-marginaltheory 和 loss-transferproof 列出明确 positive-density、differentiability、teacher-marginal 优越与 boundederror/Lipschitz 条件。\nimage teacher 的 higherHPS 不证明它的 distribution 更接近 realvideo frames；精致静态 prior 可抑制真实动作，部分 Dynamic 及 humanmotion 已退步。\nLVS 是 latent-dependentdiscretesampling，theory 使用 fixedlinearframekernel；实际 sampling 与 finiteDMDsurrogate 不能直接套用 distribution-spaceoptimalproof。\nbridgeL1reconstruction 不保证 gradient/Jacobian 对真实 decodeencode 完全一致；smallseterrorplot 和 qualreconstruction 仅提供局部支持。\nhumaneval 共 920judgments 且重复 participants/有限 prompts，未给 confidenceinterval、seedvariability 和分组 protocol 细节；80%overall 不是 motion 均优。\n八 80GBGPU 与额外 largeimage/fake score 提高 training 成本，未给总 walltime 对照；不增加 inference 模块也不是实际 FPS 新测量。\n作者没有独立限制节；结果限于 Wanbased81frames480p，不足支持 longinteractiveworldsimulation、physics 或结构化 CAD 生成。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.06813",
+  "slug": "less-context-better-geometry-masked-geometric-encoder-for-robust-3d-foundation-models-2610-06813",
+  "title": "Less Context, Better Geometry: Masked Geometric Encoder for Robust 3D Foundation Models",
+  "authors": [
+    "Zhimin Shao",
+    "Xijun Liu",
+    "Zhaoliang Zhang",
+    "Yutao Tang",
+    "Abhay Yadav",
+    "Rama Chellappa",
+    "Cheng Peng"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06813"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Less Context, Better Geometry",
+    "3D Reconstruction"
+  ],
+  "abstract": "Recent progress in 3D foundation models has enabled rapid 3D reconstruction and camera calibration by leveraging learned 3D priors from vast amount of spatial data. However, the all-to-all global attention design leads to quadratic complexity and limits long-sequence inference; unconstrained cross-view interactions also can propagate unreliable evidence from occluded or visually similar but geometrically distant views. In this paper, We introduce a Masked Geometric Encoder (MGE), which promotes the learning of robust geometric representations under incomplete cross-view context. During training, MGE strategically drops frame tokens from global attention and distills from a pretrained full-context teacher model. This allows the model to learn an intrinsically richer per-frame representation while providing sufficient intermediate supervision to avoid performance degradation. Through extensive experiments, we show that MGE leads to much stronger performance under occlusion and doppelganger views while retaining high performance on standard benchmarks. Such a richer frame representation also leads to more effective token reduction during inference. To this end, we develop a novel Anchor-Guided Adaptive token merging technique that preserves representative anchor frames while jointly merging redundant tokens from the remaining views. Compared to other efficient inference approaches, we can achieve inference speedup while consistently maintaining higher reconstruction quality, particularly in limited-view settings.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06813v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06813v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06813v1 全文及 2026-10-06T11:14:27.000Z 审阅记录；PDF 21 页，SHA-256 5362a7736b5c387c977911e65c62dcc6253a36a3b2386d6957028adb9083e547，视觉核验第 1、4、7、8、9、17、18、19、20 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：此 exact PDF 未提供可确认 public code URL；不猜测 repo。",
+    "ideaZh": "MGE 在训练中随机屏蔽 frame-to-frame global-attention connections，以完整 π3 teacher 的 geometry/features 蒸馏 student；AGA 再保留完整 anchor views、按 appearance redundancy 压缩其它视图。作者在 ETH3D 大遮挡下报告 point accuracy error 从 π3 的 0.278 到 0.171，RPE-r 从 7.969 到 2.043。值得略读的是跨视图通信正则化，而非把它当新 3D 生成模型；速度主张缺少 wall-clock 对照。",
+    "motivationZh": "多视图重建的 global attention 容易把模糊、遮挡和异常视图传播到其他视图；论文希望用受控 masking 与几何蒸馏保留共享信息，同时降低坏 context 的干扰。",
+    "methodZh": "任务是从特定 multi-view images 恢复 camera 与 point maps，并降低模糊/遮挡视图对 global attention 的污染。MGE 保留 intra-frame attention 和 diagonal self-links，随机改变 cross-frame connectivity，同时匹配 frozen teacher 的 scale-aligned point/normal/camera 与 register/image features。AGA 用 DINO mean-pooled appearance 决定 non-anchor token merging，unmerge 后继续原 prediction heads。方法在π3 和 VGGT 上测试，核心证据是受控 corruption 下的 reconstruction robustness 和 fixed-token-budget 质量；不是直接制造或 editable-mesh 输出。",
+    "methodFlow": [
+      "输入 multi-view images，由冻结 image encoder 得到每帧 tokens；teacher 保持 dense global attention",
+      "Student 保留 intra-frame/self connections，以 Bernoulli frame-pair mask 限制 global attention；不同训练迭代采样不同图",
+      "蒸馏 scale-aligned point maps、normals、camera poses 与 register/image features，随后单独训练 confidence head",
+      "推理均匀选取 full-resolution anchor frames；DINO pooled descriptors 估计其余视图相对 anchors 的 appearance redundancy",
+      "按整体 token budget 分配 merging ratios，对 non-anchor patch tokens 做 ToMe-style matching/merging",
+      "Global attention 处理 anchors 与 compressed tokens；unmerge 恢复 patch 布局，再输出 camera 与 geometry"
+    ],
+    "experimentsZh": "实验设置：以π3 为主要 teacher，13 个 real/synthetic、object/scene、static/dynamic datasets distillation；encoder 冻结，24frames/batch、max edge518、4H200 训练 6 天（作者报告）。评价含 43 组 15 reference+5doppelganger views、ETH3D 受控白块遮挡、NRGBD 不同 keyframe strides、Sintel/TUM/ScanNet/7Scenes 等；point maps 经 similarity+ICP，pose/depth 亦有 scale alignment。\n作者报告 ETH3D large-occlusion Acc 为 MGE0.171、π3 0.278、VGGT0.327；MGE+AGA 为 0.182，压缩仍有质量成本。（Table 2, p. 8）\n作者报告 NRGBD stride200 CD 为 Ours0.0215、FastVGGT0.0595、VGGT+AGA0.0475；dense stride3 为 0.0105、0.0130、0.0120。（Table 7, p. 18）\n作者报告 VGGT masked student large-occlusion RPE-r2.111 对 VGGT4.673；其 clean Acc0.158 略差于 VGGT0.149。（Table 6, p. 17）\n比较范围：含π3/VGGT dense teachers、FastVGGT/Fast-π3、TTT3R/StreamVGGT、LoFTR 及多标准 feed-forward models。Custom visual-ambiguity pseudo GT 和合成遮挡限定有效性；部分 standard data 为 seen。速度/内存主要以 compression 设计与 OOM 现象论证，没有足以核对 abstract speedup 主张的完整 runtime table。\n消融与诊断：比较ρ0.3/0.5/0.7、random vs sliding-window masks、GT vs geometry/features distillation、anchor/adaptive merge 设计，后者固定总体 tokenratio。支持 moderate connectivity regularization；若要实际复现 AGA，anchor 数、budget 与相关配置在此 PDF 中描述仍不够完整。",
+    "insightZh": "不是新的 point-map 输出或 token-merging 算子；贡献在于将 frame-level connectivity perturbation 与 dense-teacher 双层监督结合，以学出在缺失 cross-view context 下较稳健的表示，再以 anchor-frame 保护和 frame-wise adaptive budget 利用它。对 2 种 feed-forward backbones 和多类 corruption 的验证比单个 benchmark 小调参更有方法迁移价值。",
+    "whyRelevantZh": "直接关联 feed-forward 3D reconstruction 在重复结构、缺失/误导视图下的表示可靠性，以及稀疏观察与效率的折中。可作为 3D priors 与 asset recovery 流程的表示设计参考；没有 LEGO 专用 representation、part segmentation 或 fabrication-ready 输出验证。",
+    "evidenceZh": "Mask 针对 frame-pair global-attention links，不是删除图像内容；diagonal 及 intra-frame attention 保留。（Sec. 3.1–3.2, Fig. 1, pp. 4–5；图 1 和 mask 公式已核验；避免照抄 abstract 的 frame-token dropping 为整帧丢弃。）\nStudent 从 full-context teacher 学习 geometry 与 features；AGA 用 mean-pooled DINO descriptors 和 full anchor frames 分配 merging budget。（Sec. 3.3–3.4, Eqs. 6–12, pp. 5–6；几何输出仍是 teacher pseudo targets，appearance 相似不构成几何冗余证明。）\n作者报告 ETH3D 大遮挡下 MGE Acc0.171 对π3 的 0.278，RPE-r2.043 对 7.969；clean completeness 未优于π3。（Table 2, p. 8；表已视觉核验，作者数字，未独立复现；不同几何指标不可混称全面提升。）\n作者报告 43 组 doppelganger test 中 MGE all-pair AUC58.68 对π3 的 51.23，但 LoFTR reference-pair AUC88.22 高于 MGE70.51。（Sec. 4.3, Table 1, p. 7; Appendix A.5, p. 18；该 benchmark 基于 COLMAP+Doppelgangers++ pseudo ground truth，并非独立真值大型通用测试。）\n固定 retained-token ratio 的 ablation 支持 anchor 与 adaptive allocation；mask 过强会损害质量，VGGT 迁移也有 corruption 增益。（Tables 4–5, p. 9; Table 6, p. 17；两个 backbone 及 mask/merging 对照提供支持；未见 wall-clock latency 或 peak-memory 数值对照。）",
+    "caveatZh": "Sec.4.7 明确过强 mask 去掉有用 geometry context，连 full-token inference 也退化；过弱 mask 则不利后续 compression。\nAGA 压缩与 robustness 存在取舍；表 2 clean 几何质量并非压缩后完整保留。\nDoppelganger benchmark 使用 pseudo poses，且无现成官方 multi-view benchmark。\nTeacher pseudo targets 可能传递自身 bias；confidence target 衡量 student–teacher agreement，不等于真实 geometry correctness。\nDINO appearance redundancy 只是 heuristic，相似建筑纹理可能处于不同 3D 位置，anchor coverage 亦非保证。\n白块 corruption 不能等同真实遮挡、低光、动态或 arbitrary corrupted viewpoints。\n评价依赖 Sim3/ICP/scale alignment，不能据此声称 metric-scale geometry 或 camera 绝对精确。\n缺少 wall-clock/peak-memory 对照和若干 AGA 数值设置；无需把 abstract 速度收益写成已核实的定量加速。\n本项目未训练、部署或独立复现；数字均是作者报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

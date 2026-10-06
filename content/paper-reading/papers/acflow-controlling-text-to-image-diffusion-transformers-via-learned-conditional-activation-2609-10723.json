@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2609.10723",
+  "slug": "acflow-controlling-text-to-image-diffusion-transformers-via-learned-conditional-activation-2609-10723",
+  "title": "AcFlow: Controlling Text-to-Image Diffusion Transformers via Learned Conditional Activation Flow",
+  "authors": [
+    "Junran Wang",
+    "Zehao Jin",
+    "Tianyu Luan",
+    "Ruixuan Deng",
+    "Tian Qiu",
+    "Xinjie Shen"
+  ],
+  "publishedAt": "2026-09-09",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.10723"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "AcFlow",
+    "Image Generation"
+  ],
+  "abstract": "Text-to-image diffusion transformers (DiTs) are powerful generators, yet direct prompting provides limited control interface for style intensity and can fail to suppress unwanted concepts. To enable these controls, we introduce AcFlow, an inference-time controller that transports intermediate layer image-token activations through a learned concept-conditioned velocity field while keeping the base DiT frozen. A textual concept description specifies the desired intervention, while the integration horizon provides a continuous control parameter. The field produces token-varying, activation-dependent updates. With parameters shared across concepts within each task family, one field covers over 15,000 style descriptions or over 1,000 suppression concepts, and generalizes to concepts unseen during training without per-concept fitting. On style control, AcFlow achieves the best style--content trade-off among the evaluated baselines in the high-style-alignment regime. At a fixed operating point, AcFlow attains style--content alignment of 0.5365/0.2860, compared with 0.4397/0.2684 for the baseline with the highest style alignment. On concept suppression, AcFlow reduces the fraction of images showing the concept from 95.3%/82.1% to 41.6%/40.5% on held-in/held-out concepts, including cases where deleting them from the prompt fails to remove them. Our analyses support the learned velocity field as an adaptive control mechanism, with update directions varying across tokens and depending on their activation states. Our code is available at https://github.com/Nove1yst/AcFlow.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.10723v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.10723v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Nove1yst/AcFlow"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.10723v2 全文及 2026-10-06T16:29:13.080012+00:00 审阅记录；PDF 36 页，SHA-256 f3a7fbc326cfe0954f3ffb38866958a5425a22850a56a6cfbeacf7680391d29d，视觉核验第 1、2、6、9、10、15、18、21 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF 给出官方 repository；已确认 public src/acflow、train/eval/interactive scripts 与配置实际存在，公开 style checkpoint。未执行代码，也未确认所有抑制 field 权重均已公开。",
+    "ideaZh": "AcFlow 在 frozen DiT 的 image-token activations 上训练概念条件 velocity field，用 flow horizon 连续调节风格强度或概念抑制。共享 field、逐 token 的状态依赖更新和可关闭的接口，对视觉创作控制值得深读。作者报告 suppression 的 held-out 概念 presence 从 82.1% 降至 40.5%，同时 CLIP 与质量下降；风格固定点也未胜过直接写 styled prompt。价值在可调接口及 norm-matched 干预证据，而非精确保留构图或无损概念移除。",
+    "motivationZh": "固定向量式 activation steering 难以适应不同视觉 tokens 和去噪状态。目标是为风格与概念控制建立可连续调强度的状态依赖接口。",
+    "methodZh": "现有 activation steering 常把概念映射为固定向量，难以适应各 image token 和 denoising state。AcFlow 冻结 FLUX.1-dev，在一个 image-token residual site 接入小型 Transformer field，以独立于 denoising time 的 flow integration 改写 activations。训练让 source-conditioned prediction 靠近 target-conditioned teacher；风格和抑制分别训练共享任务家族 field，不是一个 field 完成所有任务。改变 horizon 可调强度，设为零恢复原 generator；Z-Image 实验重新训练 backbone-matched field。",
+    "methodFlow": [
+      "选择 activation site：保留 frozen DiT，在 FLUX single-stream block 的 image-token residual stream 接入 field；概念文本作为 cross-attention 条件，field 同时感知 activation、denoising time 与 flow time。",
+      "蒸馏目标行为：在相同 noisy latent 上，以 target prompt 的 frozen teacher prediction 为目标，对 source prompt 经 field 改写后的 prediction 做回归；梯度穿过 frozen downstream layers，target 端 stop-gradient。",
+      "积分可调更新：每个 denoising step 从当前 image activations 重新初始化独立 flow，进行 Euler integration；horizon 控制施加强度，零 horizon 不施加修改。",
+      "检查控制机制：对比 image/text token swaps、逐 trajectory 重拟合的 rank-one update 与 norm-matched residual controls，区分位移能量集中和实际控制效果。"
+    ],
+    "experimentsZh": "实验设置：作者在 FLUX.1-dev 上用 MegaStyle 的训练风格与 held-out families 评估风格控制，并用 IP2P 的 held-in/held-out 概念评估抑制；原图与干预保持初始 noise。另训练 Z-Image field 检查接口可迁移性，以及分别训练的角色和 NSFW 抑制 field。阅读了主文与全部 substantive appendix；本项目未复现。\n作者报告 IP2P held-out presence 为 base 82.1%、AcFlow horizon 2 为 40.5%；在原图存在概念的条件子集中 suppression 为 54.2%，CLIP 0.283→0.267，MUSIQ 72.6→70.4。（Table5, p.18）\n作者报告 horizon 3 的 held-out presence 37.6%，MUSIQ 降至 64.6；直接删除 prompt 概念的 reference presence 为 15.6%。接口并非比 prompt editing 全面更强。（Table5, p.18）\n作者报告 field 0.25B parameters，三次 field evaluation 增加 5.0% denoising FLOPs；A100-80GB 单图预计算文本条件计时 3.58→3.80 秒。（Table4, p.15）\n作者报告 image-only oracle token swap 可复现直接风格 prompt 的 93.4% style gain；这是该 swap 路径的充分性证据，不是 learned field 的准确率或 image tokens 的必要性证明。（Table1, p.3）\n比较范围：风格与 StyleReFT、ReFT、vector/LoRA 类干预对比，也报告 direct styled prompt。主 fine-grained 测试和八 family 的 baseline 比较不应混合为同一覆盖范围；一些 baseline 是本地 backbone port。suppression 的 prompt-editing reference 与 field 保持原 prompt 的问题设置不同，均值得保留。\n消融与诊断：检查 site、field architecture、Euler steps、token swap、norm-matched rank-one/residual、axis robustness 和 horizon。Euler step variants 单独训练，不能归因于纯推理步数；energy-optimal direction 控制并不证明所有 rank-one 方法必然失败。",
+    "insightZh": "更有意义的贡献是 concept-conditioned、token-dependent activation flow 作为连续视觉控制接口，配合能量匹配干预检查固定方向假设。不是新的基础生成器，也不证明 universal concept direction；同任务家族 field 可共享，但跨 backbone 需要重新训练。它直接对应风格编辑和概念控制，满足 image-generation 的创作 transfer 门槛。",
+    "whyRelevantZh": "直接提供风格强度与概念抑制的连续创作控制接口，且用 token-level 干预检查 representation 的实际作用。对研究控制信号应放在哪里、如何避免把大位移误读为有效控制尤其有用；其验证不延伸到精确几何、物理或构图保持。",
+    "evidenceZh": "可调 field 作用于 image tokens，flow time 与 denoising time 是不同变量。（Sec.3, Eqs.1–11, pp.4–5; Fig.1, p.2; Appendix I, pp.26–28；训练 horizon 固定，测试可调整；它不是对 base weights 的永久 concept erasure。）\n直接 styled prompt 的固定点指标仍优于本文风格控制的一些指标。（Table2, p.6; Appendix I baseline protocol, pp.27–28；作者报告 held-in direct styled prompt style/content 0.548/0.294，AcFlow 0.537/0.286。干预 baseline 的严格比较只覆盖八个固定风格 family，不能等同全细粒度测试。）\n较大的 suppression horizon 带来更强移除和明显内容、质量损失。（Appendix C, Table5 and Fig.12, p.18; Sec.7, p.10；主判断是 VLM 的可见性二元评分；个别概念并不随 horizon 单调变化。）\n能量最大的 shared rank-one direction 未复现完整 field 的抑制效果。（Sec.6, pp.8–10; Appendix E, Table9 and Fig.13, pp.20–22；作者报告 rank-one 捕获 held-out suppression 90.7% displacement energy，却仅保留完整 field 29.1% 的相对效应。该百分比是效应比，不是绝对 suppression rate；也未排除其他优化方向。）\n计算开销较小的结论依赖预计算文本条件和指定硬件。（Appendix A, Table4, p.15；计时包括 denoising 与 VAE decode，排除预计算 text embeddings 和额外 concept encoding，不能写成完整用户工作流的通用成本。）",
+    "caveatZh": "干预可能改变物体位置、姿态与 scene layout，不能保证原 composition。\nfield 带来 inference overhead；特定概念的精确控制仍是开放问题。\n受测的有害内容抑制不建立全面的安全保证。\n风格和抑制是不同 field；跨 backbone portability 是重新训练，不能写成一个 checkpoint 的 zero-shot transfer。\nVLM presence judge 对部分削弱仍判 failure，负例控制也有误报；不等于人类对语义编辑的完整评价。\nsuppression 主表与 PCA 诊断附录采用不同病例数量，效果比应限制在各自 protocol，不能直接嫁接主表绝对移除率。\n没有严格 pixel preservation、3D geometry 或多概念组合控制验证；horizon 的单调性只在 aggregate 上成立。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

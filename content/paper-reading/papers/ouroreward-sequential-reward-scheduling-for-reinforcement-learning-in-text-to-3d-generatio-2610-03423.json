@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2610.03423",
+  "slug": "ouroreward-sequential-reward-scheduling-for-reinforcement-learning-in-text-to-3d-generatio-2610-03423",
+  "title": "OuroReward: Sequential Reward Scheduling for Reinforcement Learning in Text-to-3D Generation",
+  "authors": [
+    "Bingyang Cui",
+    "Yujie Zhang",
+    "Yiling Xu",
+    "Yunfeng Guan"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03423"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "OuroReward",
+    "3D Generation"
+  ],
+  "abstract": "Reinforcement learning (RL) for Text-to-3D (T23D) generation requires optimization across multiple quality dimensions such as semantic alignment and texture clarity. Existing methods typically optimize these dimensions simultaneously through multiple reward aggregation, without explicitly modeling inter-dimension dependencies. This can cause imbalanced optimization and persistent interference among conflicting dimensions. To address this limitation, we propose OuroReward, an interference-aware sequential reward scheduling strategy for T23D RL. OuroReward first estimates pairwise dependencies among dimensions and constructs a cyclic optimization path that minimizes cumulative interference. By incorporating the tail-to-head dependency, the cycle captures global compatibility across the entire schedule. Then, OuroReward converts the cycle into a one-pass sequence, and starts optimization from the dimension with the lowest aggregate interference. Rather than assigning a fixed optimization budget to each dimension-wise reward, training adaptively determines when to advance to the next reward according to the remaining optimization headroom of the current one. We further introduce AdaSelect, an adaptive prompt selection strategy that identifies reliable and informative prompts aligned with the model's current capability. By focusing policy updates on these prompts, AdaSelect effectively improves training stability. Extensive experiments across different T23D models and RL algorithms demonstrate that our framework consistently improves generation quality across multiple dimensions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03423v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03423v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03423v1 全文及 2026-10-06T14:53:10.342Z 审阅记录；PDF 17 页，SHA-256 8ca5c0270d26ae73642cd51c148365ec8ef7ccd9bb910d9c6db5d76a9f6ac994，视觉核验第 1、6、7、9、11 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：17 页全文未找到本方法公开实现链接；已有 generator/RL 引用不等于 OuroReward 实现。",
+    "ideaZh": "OuroReward 以独立 warm-up 估计 alignment、geometry、texture、overall rewards 的有向兼容性，再按最优循环顺序和 headroom 混合相邻 rewards；AdaSelect 同时挑选能力相近且 rollout 分数有差异的 prompts。作者报告 TRELLIS 的 Rank2Score 从 4.253 升至 4.525，未参与训练的 ImageReward 从 0.483 升至 0.678，值得深读多目标 3D post-training。收益来自两个模块组合；总训练成本、多 seed 和公开实现证据仍不足。",
+    "motivationZh": "Text-to-3D 中语义、几何和纹理 rewards 会互相干扰，固定联合权重容易偏向某些维度；论文希望根据依赖关系安排优化顺序并选择有学习价值的 prompts。",
+    "methodZh": "问题是 text-to-3D 的语义、几何与纹理 rewards 联合优化时发生干扰。AdaSelect 在 reward space 结合能力距离、组内差异、朝最大分数的方向及选择频率，定期刷新训练子集。OuroReward 将 warm-up 的梯度 cosine 与验证集 reward-change correlation 转为有向边，求最大兼容循环，从总外向兼容性最大的维度开始训练。实际 reward 是相邻维度的 headroom 加权混合；走完末维后回到起点训练至结束。实验是特定代理 reward 和两种 generator 上的经验改进，不是消除 negative transfer 的证明。",
+    "methodFlow": [
+      "从 8K 训练 prompts 均匀取 800 个，用降低 NFE、分辨率、视角及 rollout 数量的探索生成估计四维 reward",
+      "结合能力中心距离、rollout discriminability、reward-space 方向和访问频率，选 200 prompts 供后续 5 步训练",
+      "从同一初始化分别对四个 reward warm-up 5 步，记录梯度 cosine 和验证集 reward 增量相关性",
+      "求包含尾首连接的最大有向兼容循环，并选总外向兼容性最大的起点",
+      "以 Gibbs 加权的归一化 reward 估计 headroom，混合相邻 reward；headroom 变化小于阈值时推进",
+      "用 DiffusionNFT 或 GRPO 更新 generator LoRA，末尾转回起点继续训练"
+    ],
+    "experimentsZh": "实验设置：GPT 扩展并过滤 10K prompts，随机 8K/1K/1K 划分。8 RTX4090，150 RL steps，batch8，LoRA rank32；TRELLIS/Hunyuan3D-2.1、DiffusionNFT/GRPO，HyperScore 或 Rank2Score 训练代理。测试 8 次生成取均值，另用 CLIPScore、ImageReward、Uni3D、Qwen3-VL 及 300prompt 人类排序。Hunyuan 使用统一 Hunyuan-DiT 参考图。\n作者报告 TRELLIS+DiffusionNFT 完整框架 Rank2Score4.525（baseline4.253）、ImageReward0.678（0.483）、人类 win rate0.653。（Table I, p. 9）\n作者报告仅 AdaSelect/仅 OuroReward/组合的 Rank2Score4.374/4.496/4.525；O→A→G→T 优于测试的随机、逆序与旋转顺序。（Tables IV–VI, pp. 11–12）\n比较范围：有平均 reward、FocalReward 及两 generator/RL 组合；没有 PCGrad/MGDA 等更广的冲突消解。四组 warm-up、周期探索和维度 reward 重训未完整成本对齐。Table I 是两模块组合，不全归于 scheduler。\n消融与诊断：模块、梯度/PLCC、顺序、代理模型均有控制；无多 seed 误差、路径动态重估、headroom 阈值敏感性及独立 OOD 家族测试。",
+    "insightZh": "贡献是 prompt curriculum 与依赖感知 reward scheduling 的组合；warm-up 决定顺序，尾首兼容性也参与选路。四维只有有限排列，最大权重循环易计算。AdaSelect 的方向是 reward 向量到上界的差，不等同参数梯度；有向统计不构成后续训练的因果兼容性或 Pareto 保证。",
+    "whyRelevantZh": "直接针对 3D generation 多目标 post-training，可借鉴同时维持语义、几何和纹理质量。没有验证 asset-ready、fabrication-ready 或拓扑有效率。",
+    "evidenceZh": "AdaSelect 综合四类指标排序 prompts 并定期刷新。（Sec. III-A, Eqs. (6)–(17), pp. 4–6；方向是 reward-space cosine；减半探索预算仍有额外生成成本。）\n依赖来自独立 warm-up 的梯度 cosine 与 reward-change PLCC；相邻 reward 实际混合。（Sec. III-B, Fig. 4, Eqs. (18)–(30), pp. 6–7；虽然称 one-pass，明确规定末尾回到起点；不能写成每步只优化单一 reward 或反复完整循环。）\n作者报告代理、未见 evaluator 和人类偏好均改善。（Table I, Sec. IV-A–C, pp. 8–10；测试 1K 随机划分 prompts，每个 8rollouts 取均值；人类 300prompts 各 10 次独立排序。）\n两个模块、依赖指标与优化顺序都有消融。（Tables III–VII, pp. 11–12；Table III Average 的 4.374 含 AdaSelect，Table IV 纯 baseline 为 4.253，应区分组合贡献。）",
+    "caveatZh": "未来扩展更多 reward 配置、RL algorithms 与 3D architectures。\nwarm-up 的静态兼容性会随策略更新改变；reward 增量相关不是 negative-transfer 保证。\n同一生成模板和 benchmark 种子随机划分不能证明组合式 OOD 泛化。\ngeometry/texture 主要用 rendered views 和学习评分，无 mesh 拓扑、制造或真实物理验证。\n人类 win rate 缺少置信区间与独立参与者总数；额外探索/warm-up/reward 重训预算未完全对齐。\n本项目未复现，数字均为作者报告；全文没有本方法公开代码 URL。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

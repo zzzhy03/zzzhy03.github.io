@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.00691",
+  "slug": "soundwich-video-generation-with-layered-and-controllable-audio-2610-00691",
+  "title": "Soundwich: Video Generation with Layered and Controllable Audio",
+  "authors": [
+    "Zhuo Ning",
+    "AmirHossein Naghi Razlighi",
+    "Sagi Polaczek",
+    "Daniel Cohen-Or",
+    "Ali Mahdavi-Amiri"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.00691"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.MM",
+    "cs.SD"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Soundwich",
+    "Video Generation"
+  ],
+  "abstract": "Recent joint audio-video generative models can synthesize realistic videos with synchronized sound, but typically generate audio as a single mixed track. This limits source-level control and differs from practical audiovisual workflows, where speech, music, sound effects, and ambient sounds are represented as separate editable tracks. We introduce Soundwich, a training-free framework that transforms a frozen joint audio-video flow-matching model into a generator of multiple synchronized, independently editable audio stems coupled to a shared video. Soundwich generates separate audio stems with explicit control over their temporal activity. To keep separately generated sounds coherent, we introduce a shared scene representation that communicates global audiovisual context across stems while preserving their source-level separation. We further route cross-modal interactions between each audio stem and its corresponding visual source, improving audiovisual consistency. The resulting stems remain synchronized with the video and can be independently retimed, muted, replaced, or remixed. Experiments and human evaluations show improved temporal control, source separation, and naturalness, while enabling flexible source-level editing within coherent audiovisual generation. Code is available at https://github.com/CodyNing/Soundwich.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.00691v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.00691v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/CodyNing/Soundwich"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.00691v2 全文及 2026-10-06T15:14:18.066809+00:00 审阅记录；PDF 34 页，SHA-256 6cf4d45ce7d3a7b6f884cc33e5b73062f1f1f6bb22ed87f5ed7529d17b45e6e7，视觉核验第 1、4、5、6、8、9、10、18、27、29、32、33、34 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 给出该仓库 URL；实际访问确认公开 common、ltx-2.5、minimax-h3、ovi-1.1 implementation 与 generation/edit modules，不是 README-only。公开实现和权重依赖存在不等于本文已复现；附录量化主要对应 LTX-2.5。",
+    "ideaZh": "Soundwich 把联合 audio-video diffusion 的单条混合音轨改造成可独立编辑的 source stems，并用共享视频、scene stem、时间 carrier 和 entity masks 协调声音与画面。作者报告，15 个场景中 requested-window WER 为 0.060、window success 为 93.1%；但相对 Gemini Omni 的这两项差值置信区间均含零。真正值得读的是显式分层、跨层协调和保留其余音轨的编辑接口；代价是人工 source/reference 配置、可人工修正的 SAM masks，以及未计入预处理的分钟级运行时间。",
+    "motivationZh": "单条混合音轨难以独立修改某个角色的声音、事件时间或内容；需要将声音分层，并协调时间窗口、可见实体与视频生成，让局部编辑保留其余音轨。",
+    "methodZh": "方法冻结现有联合 audio-video flow model，在每个 denoising step 并行维护 N 条 source audio、共享 video 和一条用于上下文协调的 scene audio。Stem Formation 使用 positive/negative source prompts、类别 sound/silence carriers 和可选时间窗约束各 stem；Scene Integration 在更高分辨率重加噪后，让源音轨读取 scene context，并用 SAM 实体 masks 限制 audio-video cross-attention。输出既是成片，也是可以 retime、replace、mute、remix 的分离音轨。论文量化主要来自 LTX-2.5；OVI 和 MiniMax-H3 的迁移范围及失败部件另行呈现。",
+    "methodFlow": [
+      "定义声音层与时间约束：为每个 source 给出 positive prompt、其他声音的 negative prompt、可选时间窗和可见实体描述；人工预选类别 references，并缓存 sounding/silence attention carriers。",
+      "生成独立 stems 与共享视频：Stem Formation 保持 source audio self-attention 独立，共享 video states，并组合各 source 的 audio-to-video features；时间 carrier 在窗内激活、窗外抑制，scene stem 前半程汇集 source context。",
+      "提取实体 masks：SAM3.1 从初步视频追踪实体，作者允许检查与 point-prompt 修正，再将 masks 重采样到 latent grid；重叠位置按 mask 权重选择所属 source。",
+      "协调分层声音与画面：Scene Integration 上采样并以 σ=0.95 重加噪，用 8 个 Euler steps 细化。Source audio 读取 scene context，audio-to-video 与 video-to-audio 分别按实体 masks 和时间窗路由。",
+      "保留并编辑生成状态：Retime 重排已保存的 utterance latents，replace 仅重生成目标 stem；视频在固定编辑后 audio latents 下重新细化。其他 stems 保留，mute/remix 可在输出音轨上操作，但画面其他位置并无严格不变保证。"
+    ],
+    "experimentsZh": "实验设置：主 benchmark 为 15 个场景、40 个 sources，每场景 2–4 个声音；五个 open methods 各三 seeds，Gemini Omni 每场景一条，共 240 个视频。评价包含 Whisper/wav2vec2 的 speech alignment、音频活动检测、CLAP assignment、盲排用户研究及组件消融。作者同时检查了 alignment 和 post-hoc SAM Audio extraction 的误差。本文仅核验 PDF 文本和可见图表，未试听或复现。\n作者报告 Soundwich 的 WER 0.060、window success 93.1%、non-speech presence 100%、order 100%、off-window activity 1.7%、source assignment 90%；naive layering 分别为 0.779、15%、93.3%、79.3%、69.7%、82.2%。Order 仅在已检测且请求时段不重叠的事件对上统计。（PDF p.8, Table 1; pp.26–28, Appendix D）\n作者报告对 Omni 的 WER 差值为 −0.008，95% CI [−0.156, 0.175]；window-success 差值 +8.1 pp，CI [−2.8, 22.8]。Onset error 差值 −0.541 秒，CI [−1.323, −0.068]。前两项不支持统计显著优越，后一项支持时点改善。（PDF p.27, paired bootstrap results）\n作者报告 18 份完成的主研究问卷产生每任务每方法 270 次场景排名；Soundwich 的 naturalness 第一名比例 87%、timeline 95.2%。Separation 的 74.4% 是将 ties 各计一半后的份额，并非所有回答中明确偏好的比例。主研究未纳入 Omni。（PDF pp.8–9; pp.28–29, human-study protocol）\n作者报告 timing carriers 的配对 window success 从 15.6% 升至 93.3%；十个 routing 场景中 target/ownership yes 比例从 40.7%/34.7% 升至 96%/95.3%。这些指标分别检验活动时窗与对象归属，不保证 utterance 完整或音素级同步。（PDF pp.9–10, Tables 2–4; pp.29–32, Appendix E）\n作者报告单 RTX 5090 32 GB、约 10 秒视频、1–4 个 stems 的运行时从 106.6 到 184.7 秒、peak memory 从 20.7 到 28.9 GiB；五 stems OOM。该计时排除 carrier/SAM/人工预处理。（PDF pp.33–34, Appendix G）\n比较范围：覆盖 standard LTX-2.5、naive layering、OVI-1.1、MiniMax-H3 和 Gemini Omni。单混合轨与分离轨的 speech/off-window 判据存在 union-window 与 source-window 差别，non-speech extraction 又会丢失部分原有声音；附录的 common subset、missing-as-failure 和阈值敏感性分析缓解但未消除评价边界。各模型总算力和 sampler 并非严格相同。\n消融与诊断：有 timing carrier、quiet versus zero features、source CFG、scene broadcast、entity routing 和 activation profiles 消融。Source CFG 使用预先筛出的六个可听泄漏场景；broadcast 和 routing 研究各采用有限场景与选定 seed。Quiet 消融从各自初步视频提取 masks，不能视为 masks 完全固定的单变量对照。",
+    "insightZh": "创新主要是冻结联合生成模型上的 layered state 与双阶段 attention coordination，而非新的 foundation model。分离 source trajectories、scene context 和显式时间/实体约束，使编辑接口比单一混合输出更清楚。Carrier 是类别 feature 统计而非原音频复刻，scene participation 与部分聚合方式由人工配置；论文关于直接共享导致干扰的 RoPE 解释属于假设，不能当作已证明机制。",
+    "whyRelevantZh": "对结构化视觉生成工作流，显式可编辑 layers、跨层 context 和可定位的控制 handles 具有直接方法迁移价值。尤其适合研究生成状态如何保留、局部修改如何与全局一致性协调；并非关于 SVG/3D 几何结构或制造约束的直接证据。",
+    "evidenceZh": "共享视频与独立 source/scene audio trajectories 构成双阶段生成接口。（PDF pp.4–6, Sec.3, Figs.2–3; pp.18–25, Appendix A；完整阅读方法和实现附录，并查看对应图；未运行模型或试听音频。）\n时间 carriers、source guidance、scene broadcasting 和实体 attention routing 分别有组件证据，但控制质量不等于逐音素 lip-sync 或严格局部视频编辑。（PDF pp.9–10, Tables 2–4; pp.29–33, Appendices E–F；作者报告；entity routing 是人工回答的正确对象/正确时段判据，不是 lip-sync distance。）\n主表中分层方法优于 naive separation，但相对 Omni 的 WER 和 window-success 差值区间包含零。（PDF p.8, Table 1; pp.26–28, Appendix D, paired bootstrap；作者报告；onset error 差值区间不含零，支持该项改善。）\n运行时随 stem 数增加，且测量排除了 carrier construction、SAM segmentation 和人工 mask 修正。（PDF pp.33–34, Appendix G；作者报告；计时使用缓存 carriers 和确定性分离 masks，不能解释成完整系统端到端延迟。）",
+    "caveatZh": "依赖显式 source decomposition、timeline 和类别 references；自动发现 sources 尚未完成。\n短时窗、弱 carriers 或过强 activation 会导致不完整语音、延迟、重复或机械感。\n小实体、遮挡和 masks 错误可能破坏实体绑定；source 数增加会提高显存与运行成本。\nOVI 上 visual routing 和部分 refinement 失败，不能认定所有部件跨模型普适。\nSAM masks 可人工修正，scene participation/reference assignments 为人工预选，自动控制能力不能由最终 benchmark 直接推断。\nActivity 包含率、CLAP assignment 和人工 ownership 判据不分别等同于精确 onset、独立 stem purity、人物身份或 lip-sync fidelity。\n相对 Omni 的 WER/window-success 区间含零；主用户研究未比较 Omni，不能宣称全面优于闭源模型。\nEditing 保留非目标 audio latents，但高噪声视频细化可能改变非目标画面；局部编辑和内容保真尚无严格量化保证。\n本文没有试听、代码执行或独立复现；音频质量判断依赖作者的客观代理指标与用户研究。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

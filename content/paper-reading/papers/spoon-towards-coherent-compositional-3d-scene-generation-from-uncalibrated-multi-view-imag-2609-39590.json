@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2609.39590",
+  "slug": "spoon-towards-coherent-compositional-3d-scene-generation-from-uncalibrated-multi-view-imag-2609-39590",
+  "title": "SPOON: Towards Coherent Compositional 3D Scene Generation from Uncalibrated Multi-view Images",
+  "authors": [
+    "Guibiao Liao",
+    "Mochu Xiang",
+    "Heng Li",
+    "Ken Deng",
+    "Zijie Wang",
+    "Guanbin Li",
+    "Ping Tan",
+    "Shenghua Gao",
+    "Yizhou Yu"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39590"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "SPOON",
+    "3D Generation"
+  ],
+  "abstract": "Compositional 3D scene generation aims to recover complete 3D object shapes and their spatial arrangement from visual observations. Recent image-conditioned 3D generators provide strong priors for producing high-quality object geometry, making the generation of complex scenes increasingly practical. A central challenge is therefore to spatially organize these generated assets into a globally coherent scene while remaining consistent with multi-view observations. Existing approaches either entangle scene layout with object generation or separately estimate spatial placement from view-specific observations, where pose hypotheses may remain ambiguous and inconsistent across views, often resulting in an incoherent object-camera soup. We introduce SPOON, a framework that reformulates multi-view compositional 3D generation as scene-level, geometry-grounded pose reasoning. Rather than treating view-specific object pose hypotheses independently, SPOON coordinates them using reconstruction-derived multi-view geometry through a Guide-Route-Reconcile paradigm. This progressively organizes object poses and camera configurations into a coherent scene-level spatial arrangement. Extensive experiments on ARSG-110K and MIDI-3D-Front demonstrate consistent improvements in object placement and scene composition across varying numbers of input views. On ARSG-110K, SPOON reduces scene-level and object-level Chamfer distances by 12.7% and 17.7%, respectively, compared with a strong baseline.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39590v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39590v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39590v1 全文及 2026-10-06T12:14:43.478583+00:00 审阅记录；PDF 17 页，SHA-256 8d0ed34544970e9499225c56b36febbea04233366f10db31844a0b3655be65e1，视觉核验第 1、5、7、9、14、15、16 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 17 页 PDF 无 SPOON 公开 code/project URL；SAM3D/MV-SAM3D/VGGT 实现不能冒充本方法。",
+    "ideaZh": "SPOON 保留 SAM3D canonical objects，用 VGGT-Ω表面 bridge 给 poseflow endpoint guidance，按 visibility/truncation 路由 view，再联合优化 objectSim3 与 camera。作者报告 4view ARSG scene/objectCD 少 12.7/17.7%，layout IoU.585→.662。适合精读可组合 3Dasset 空间协调；输入有 GTinstance masks，bridge 需 up-axis 与至少 4validviews，评估全局 GTcamera 对齐，5object runtime195→326.5s，非自动语义分割/物理可行保证。",
+    "motivationZh": "多视图对象生成得到完整形状后，各视角估计的摆放仍可能互相冲突。目标是在未标定图像中协调对象 pose 与 cameras，形成可独立操作的组合场景。",
+    "methodZh": "多 viewfusion 生成 canonicalshape 但 camera-relativeposes 仍会互相冲突。SPOON 将 reconstructedobjectmaskedpoints 与 generatedsurface 独立 center/scale 规范，alignupaxis 后 coarse-to-fine yaw 求 bridge，用 SAM3Dposeencoder 构造 flowtime 匹配的 cleanendpointguidance。Projectedaggregateobjectcoverage/framecompleteness 衡量观测质量，选择最可靠 view 的 worldplacement。固定 generatedGaussians/geometry，以 photometric+predicteddepth regularizer 联合调 objectSim3/cameras。方法推进 scene-level 摆放与独立对象保持，不训练新 shapeprior，不保证观察不到的完整形状真值。",
+    "methodFlow": [
+      "多 unposedRGB+crossview object masks 经 VGGTΩ恢复 sharedcameras/pointmaps",
+      "每 object 多 viewshapevelocityfusion 得 sharedcanonicalasset，viewposes 保持各自 flowtrajectory",
+      "t≥.6 时 decodecleanshape、sample surface；maskedworldpoints 与 canonicalsurface 规范化/upaxis+yawTrimRMSbridge，≥4validviews/RMSE<.15 才启用",
+      "以当前 noiseendpoint 和 geometrycleanpose 组成同 flowtime reference，αP.8 引导 poseflow",
+      "将 aggregateobjectpoints 投影各 view，framecompleteness≥.5 并 F²×coverage 最高 view 路由 worldplacement",
+      "photometric 与 maskdepthregularizer 共同优化 objectSim3/camera，保留 objectgeometry/Gaussianappearance"
+    ],
+    "experimentsZh": "实验设置：作者报告 singleH100、VGGTΩ+defaultSAM3D，ARSG110K/MIDI3DFront 测试 4/6/8views。CD/Fscore 包含 predictedobjectposes，Fthreshold.1 及 boundingboxIoU；逐 sceneglobalGTcameraSim3，benchmarkmasks，无 perobjectalignment。\n作者报告 ARSG4viewsceneCD 减少 12.7%、objectCD 减少 17.7%，IoU.585→.662；8viewIoU.615→.723。（Table1 p. 7）\n作者报告 MIDI4viewsceneCD.083→.069、objectCD.020→.016、IoU.597→.684；6/8viewsIoU 仍.684。（Table1 p. 7）\n作者报告 routecombinationCD.072/IoU.617，相对 largestmask.075/.611 收益小，fullpipeline.069/.684。（Table2/Table4 p. 9）\n作者报告 object+camera 优化 ARSGsceneCD.055 对 objectonly.062，但 MIDI w/oreconcile objectCD.014 好于 full.016。（Tables3–4 p. 9）\n比较范围：重点 sameviewMV-SAM3D 及 ShapeR，加 singleview 代表作与 component/routecontrols。singleview 证据/scaleprotocol 不同不可当完全等条件比较；缺 generatedsegmentation 输入 robustness、realcaptures 大范围、GTcamera/noisygeometry、shapeprior 替换和 seedCI。\n消融与诊断：三 stage 去除、单 cue/maxmask 与 jointcamera 选择实验能分离部分贡献；full 不是每个 metric 最好，route 小差需更多统计。guidanceα/tstart 及 upaxis 假设未广泛 sweep，reconcileiteration/losstermweights 细节不完备。",
+    "insightZh": "实质贡献是 surface 桥接的 flow-consistentposeguidance、geometry-observabilityroute 和 object/camerajointreconciliation，而非简单把 SAM3Doutputs 拼场景。shapeprior/MVfusion 与 GaussianBA 继承基础工具，创新集中 scenelevelpose 协调；新增 editable 对象结构来自 canonicalassets，不包含新的 semanticpart/mesh 拓扑生成。",
+    "whyRelevantZh": "可分解 canonical objects 在 sharedscene 保持布局一致直接命中 3Dgeneration 与可编辑 asset 工作流，后续 assembly/design 可用 posecoordination 思想；fabrication/物理约束迁移未验证。",
+    "evidenceZh": "surfacebridge 从 generatedcleanshape 和 reconstructedmaskedpoints 建立，并以同 flowtime 保 noise/injectcleanendpoint。（Sec. 4.1, Eqs. 5–8/Fig2, p. 5; Appendix A2 pp. 13–14；method 图已视觉核验，bridge 依赖 upaxis/yaw 和 support 阈值。）\nroute 以 framecompleteness 与 visiblecoverage 选最高 view，之后 camera 与 objectSim3jointrenderrefine。（Secs. 4.2–4.3, Eqs. 9–12, pp. 6–7；可靠性是 geometry proxy 而非 calibratedposeposterior。）\n作者报告 4viewARSG sceneCD.063→.055、objectCD.113→.093、IoU.585→.662；MIDI.597→.684。（Table1 p. 7/Sec.5.2 p. 8；主表已视觉核验，数字作者报告未复现。）\nbenchmarkinstance masks 作为 input，globalSim3 由 predictedcamera centers 对 GTcenters 求，但无 perobjectGTalignment。（Appendix A3, pp. 14–15；不是无任何 annotation 的 rawRGB 端到端，globalgaugealignment 会影响跨 baseline 公平边界。）\n作者报告 5object4viewMV195s→SPOON326.5s，reconcile 占 120s。（Appendix A3, p. 14；source 页已视觉核验，不称 fastfeedforward 整个 pipeline。）\n作者承认对象仍 independentlygenerated、geometry 质量决定效果，jointmultiinstance 生成为 future。（Appendix A5, pp. 15–16；explicit limits 及 qualitative 页已视觉核验，无 collision/physicalsupport 保证。）",
+    "caveatZh": "对象仍独立生成，缺 explicitjointmultiinstance 耦合。\n底层 multi-viewreconstruction 错误/不完整会影响 geometryreasoning。\n输入已给 crossviewinstances/GTmasks，不证明完整 rawcaptureassetpipeline。\nupaxis 对齐后仅 yaw search，至少 4validviews 且 RMSEthreshold，symmetry/partialshape 等可能 disableguidance 或选错 pose。\nreconstructiongeometry 成为 guidance 又作 depthregularizer，系统性偏差可同时影响 initialize/refine。\nglobalSim3 用 GTcameraevaluation，不是 metricworldcoordinates 无需校准；两个 arms 用优化前/后 camera 求 gaugealignment 需保留。\nreconcile 是 per-sceneoptimization，5objects326.5s 不是实时，也无 broadmemory/objectcountscale 测量。\n几何 IoU/CD 不证明碰撞、重力支撑、可制造连接或 occludedshape 真实。\n无 public codeURL 或 CI，作者报告未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.01687",
+  "slug": "architectural-sampling-test-time-scaling-via-computational-diversity-in-frozen-vision-lang-2610-01687",
+  "title": "Architectural Sampling: Test-Time Scaling via Computational Diversity in Frozen Vision-Language Models",
+  "authors": [
+    "Akshit Singh",
+    "Shyam Marjit",
+    "Wei Lin",
+    "Leonid Karlinsky",
+    "M. Jehanzeb Mirza"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01687"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Architectural Sampling",
+    "VLM / MLLM"
+  ],
+  "abstract": "Test-time scaling often seeks better answers by sampling multiple responses from a frozen model, yet conventional temperature sampling generates every candidate along the same fixed computation path. We introduce architectural sampling, a training-free method that generates candidates through distinct forward computations by reusing selected blocks of decoder layers. Varying the block location and repetition count introduces computational diversity without updating model weights or adding auxiliary parameters. Across five Qwen checkpoints and twelve multimodal benchmarks, architectural sampling improves pass@9 over standard-path temperature sampling by 6.58 percentage points on average at the same nine-candidate budget. Reusing early layers yields the strongest gains, and the improvement in candidate coverage persists even under greedy decoding. The resulting candidates show lower lexical overlap and improve accuracy when used as rollouts for label-free test-time reinforcement learning. These findings extend the benefits of our architectural sampling beyond candidate coverage, demonstrating more effective learning from a model's own outputs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01687v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01687v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01687v1 全文及 2026-10-06T12:05:19.559956+00:00 审阅记录；PDF 16 页，SHA-256 61c6a42e3b670ff498b506c167187b2fe2a65d9ec83f37247dd2c56ebce1d207，视觉核验第 1、5、7、9、13、16 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF pp.10/13 明确 implementation/evaluation scripts 将在 final paper/acceptance 公开，code.zip 只为 review 提供；不视为已 public release。",
+    "ideaZh": "Architectural Sampling 在 frozen VLM 内重复不同早期 layer windows，生成同一 checkpoint 的不同计算路径候选。作者报告 5 个 Qwen/12 benchmark 的 oracle pass@9 平均 +6.58 points；这不是最终选出的答案准确率，也不是同 FLOPs 比较：9 候选成本约 10.5 次标准遍历，对温度采样 9 次，53.8s 对 46.1s。方法适合作为多模态候选/rollout diversity primitive，最终选择器和严格等成本收益仍待验证。",
+    "motivationZh": "test-time 多候选通常靠改变采样随机性，但 frozen VLM 还可能有不同计算路径；需要检验复用同一 checkpoint 的层级路径能否增加可解候选及其成本。",
+    "methodZh": "不改权重/参数，只将 decoder 的连续 window 重复 r 次后继续 suffix。主配置四个 3-layer 早期 windows、r=2/4，加 standard path 共 9 candidates，T=0.6；greedy 时也有路径多样性。大多数证据是 candidate coverage，另外以 20 样本 majority-reward TTRV LoRA 训练检查 rollout usefulness，此扩展涉及参数更新，应与 frozen inference method 区别。16 页正文及 appendix 已读，实际查看方法、主表、TTRV 与 limitations、overhead。",
+    "methodFlow": [
+      "构建不同计算路径：固定同一 multimodal checkpoint，选择[1:3]/[2:4]/[3:5]/[4:6]，分别重复 2 或 4 次，保留原 prefix/suffix。",
+      "生成 9 个候选：每条 path 用相同温度/输出长度生成一个 response，另有 standard path；jointly reprocess vision 和 language tokens。",
+      "检验覆盖和 rollout 价值：以 oracle pass@9 测候选至少一个正确；独立 TTRV 实验用 6 个 architectural rollouts、majority reward 与 20 样本 LoRA 更新，再测 held-out greedy pass@1。"
+    ],
+    "experimentsZh": "实验设置：五 Qwen checkpoints×12 multimodal benchmarks，另 InternVL3-2B/Gemma3-4B×五子集。9 候选相同 T0.6/max32 MCQ 或 256 open-ended tokens；五次重复只在 Qwen3-8B 五任务。A100。TTRV 在两 backbones 六 datasets 用 20 训练 samples、剩余 held-outgreedy 测评。\n作者报告主 pass@9 平均+6.58pp；Qwen3-8B12-taskaverage75.00→87.43，Qwen3.5-2B82.00→83.10。（PDF p.7, Table 1）\n作者报告 additionalInternVL3/Gemma3 的五任务 pass@9 平均+1.54/+17.63pp，表明 family 依赖明显。（PDF p.15, Table 8）\n作者报告 TTRV 后 Qwen3.5-2BA-OKVQA68.04→83.38，Qwen3-8B87.40→87.95；需区分 20 样本 adaptation 和 inference-only。（PDF pp.9,13, Table 5 and Appendix B）\n比较范围：temperature、beam/top-k/top-p，early/middle/late windows、vision-only/language-only/all tokens、greedy/temperature diversity。主比较匹配 candidatecount 而非 compute，同成本增加 standard samples 的对照缺失。\n消融与诊断：Early/alltokens 最好；language-only 保留大部分 gain，视觉专属贡献有限。Lexical1−SelfBLEU0.51vs0.22 说明文字差异，但不能替代 semantic correctness/independence 证据。",
+    "insightZh": "Layer reuse 已有先例，主要新意是把不同 reuse configurations 组成候选池，作为 token sampling 之外的多模态 diversity axis。跨模型及 greedy 结果表明不仅来自随机 token draw；但没有实际 frozen 候选选择器、等 FLOPs/latency 候选预算对照，pass@9 不能直接代表 deployable correctness。",
+    "whyRelevantZh": "直接研究 VLMtest-time reasoning 的计算路径与 candidate diversity，提供跨多个 multimodalbackbones 的可复用方法，符合持续关注的能力/方法范围。具体 design/3D 任务仍未验证，不额外挂 topic。",
+    "evidenceZh": "不改参数，以 window 位置和重复次数改变 decoder computation graph。（PDF pp.4–6, Fig.3, Sec.3–4.1；已实际查看 Fig.3；温度采样也会因 prefix 不同产生不同 hidden states，区别应表述为固定 layer graph 而非完全相同 hidden computations。）\n作者报告平均+6.58pp 是 oracle candidate coverage。（PDF pp.6–7, pass@k definition and Table 1；55/60checkpoint–benchmarkpairs 提高，Qwen3.5-2B 若干任务下降；无 frozen final selector accuracy 证明。未复现。）\n固定 9 候选并非固定总计算预算。（PDF p.16, Tables 9–10；作者报告 architecture pool53.8s 对 46.1s，layer applications10.5vs9；实际查看表。）\n最终 pass@1 实验通过额外 test-time learning，而非直接 frozen 候选选择。（PDF p.9, Table 5; p.13, Test-time learning；20 训练 samples、LoRArank32/GRPO、majority vote reward，vision 冻结而 language adapter 更新。）",
+    "caveatZh": "PDF p.9：recursion 增加 per-candidatecost，要求 internaldecoder access，闭源 API 不适用。\nPDF p.14：Qwen 之外仅初步 subsetmodel-family 实验，更广 family coverage 待研究。\nOracle pass@9 需要知道哪个 candidate 正确，尤其 MCQ 在 9 次候选中覆盖答案不能等同真实最终 accuracy。\nCandidatebudget 相同但 architecture 约多 16.7%layercost，收益不能解释为相同计算预算 superiority。\n小 20-sampleTTRVstudy 可能受样本/majorityreward 选择影响，未充分证明广泛 self-learningstability。\nLayerwindow/KV-cache 重复策略与 model-family 适配需要公开代码核对；当前 PDF 细节未覆盖全部工程实现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

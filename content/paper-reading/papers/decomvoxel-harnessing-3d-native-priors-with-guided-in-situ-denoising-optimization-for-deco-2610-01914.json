@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.01914",
+  "slug": "decomvoxel-harnessing-3d-native-priors-with-guided-in-situ-denoising-optimization-for-deco-2610-01914",
+  "title": "DecomVoxel: Harnessing 3D-Native Priors with Guided In-situ Denoising Optimization for Decompositional Scene Reconstruction",
+  "authors": [
+    "Junfeng Ni",
+    "Zirui Zhou",
+    "Yixin Chen",
+    "Yu Liu",
+    "Nan Jiang",
+    "Zhifei Yang",
+    "Song-Chun Zhu",
+    "Siyuan Huang"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01914"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "DecomVoxel",
+    "3D Reconstruction"
+  ],
+  "abstract": "Decompositional scene reconstruction aims to reconstruct high-quality objects and background, yet existing methods still struggle with the level of quality under heavy occlusions. While generative priors offer a potential solution, 2D image-based priors often suffer from multi-view inconsistency due to a lack of 3D awareness. Conversely, 3D-native priors provide stronger structural inductive biases but frequently lead to spatial drift and misalignment within complex scenes. To address these issues, we propose DecomVoxel, formulating object completion as a guided in-situ denoising optimization that bridges 3D-native priors with neural scene reconstruction. Our framework introduces a reformulated epsilon-based distillation loss to ensure stable latent refinement, alongside adaptive spatial guidance that utilizes occupied and vacant anchors with temporal annealing to suppress generative hallucinations and mitigate spatial drift. Experiments on Replica and ScanNet++ show that DecomVoxel significantly outperforms state-of-the-art methods while faithfully preserving the original spatial layout, structural fidelity, and style-consistent texture. Our method pushes the boundary of decompositional reconstruction by delivering high-quality textured meshes with clean topology, geometry, and appearance, providing a robust solution for the decompositional reconstruction of complex real-world scenes. Code is available at https://github.com/DecomVoxel/DecomVoxel.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01914v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01914v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/DecomVoxel/DecomVoxel"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01914v1 全文及 2026-10-06T15:04:32.973Z 审阅记录；PDF 17 页，SHA-256 e0f8557a131edbdfa31f98a12159a4d841d007f45505ffc46fc2f7b5d605948f，视觉核验第 1、4、7、8、12、14、15 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFp2 给官方 public repo；确认实际 pipeline、GeoSVR/TRELLIS、evaluation/demo 与两 stage SDS 代码。阅读 train_demo.py imports 以及 structure1119–1161/1556–1618 和 appearance1210–1227 核验 surrogate/logit pruning；未运行或复现实验。",
+    "ideaZh": "DecomVoxel 将 TRELLIS prior 接入场景坐标中的 object refinement，用 occupied/vacant anchors 与退火约束补全 geometry 和 appearance，再用独立 video inpainting 补背景。作者报告 Replica CD3.95cm、F-score77.87%，但每场景 1.35 小时；不是 sim-ready 或拓扑保证。可略读原位约束的工程设计；epsilon-loss 的“形式梯度等价”不能照搬，公开代码采用 stop-gradient surrogate 且空区重采样在 logits 中进行。",
+    "motivationZh": "逐物体重建容易漏掉遮挡几何，并产生与场景 layout 不一致的结构和外观；论文希望利用 3D-native prior 在原坐标中优化对象补全与分解。",
+    "methodZh": "GeoSVR 初始化稀疏体素，以跨视角 instance masks 分解 objects，体素大小/octree 层级估计 certainty。TRELLIS structure 和 appearance 模块冻结，通过 encoder、learnable 结构 occupancy 和 appearance latents 迭代优化。可靠观测维持初始特征，raycast 确定空区与其他物体占据区抑制 hallucination；约束与 noise 下界逐步放松。Seedream 补全/recenter 条件图，See3D 加平面 depth 监督补背景。实验是 14 室内场景的几何/渲染和人类偏好，没有 physical validity/可制造/关节模拟验证。",
+    "methodFlow": [
+      "GeoSVR 从 posed RGB 重建 sparse voxels，并融合 instance masks 分出 objects/background",
+      "依据 initial geometric uncertainty 构造 occupied anchors，结合 depth raycast 及其他物体区域构造 vacant anchors",
+      "用图像模型补全并 recenter 条件图，将初始 occupancy 经冻结 TRELLIS encoder 映射为 structure latents",
+      "以 epsilon residual 的 SDS surrogate 优化结构变量，加入 certainty 加权 preservation 并周期重分配空区",
+      "退火 noise 范围、preservation weights 及 pruning 强度，完成 geometry 后固定 coordinates",
+      "多视角 DINOv2 初始化 appearance features 并用 TRELLIS refinement；See3D/平面 depth 单独补 background，导出 textured meshes"
+    ],
+    "experimentsZh": "实验设置：8Replica+6ScanNet++室内 scene，每第十视角 held-out；共同 poses/masks，point baselines 用 DA3depth 初始化。geometry5000、appearance3000iterations；compareSimRecon/SAM3D/MV-SAM3D/ShapeR/ReconViaGen/CUPID。CDcm、5cm F-score、NC 及 maskedPSNR/SSIM/LPIPS；44 盲法随机 expert raters。\n作者报告 Replica CD3.95cm/F77.87/PSNR24.21，ShapeR CD6.59cm/F61.76；ScanNet++4.34cm/F77.93/PSNR21.71。（Table 1, p. 7）\n作者报告 Replica 每 scene1.35h、peak20.965GB、average7.450GB；成本换质量，无实时性结论。（Table 4, p. 8）\n比较范围：官方 implementations/defaults 及统一 depth/masks/view selection；object-centric methods 需 FoundationPose alignment。每 object 几何与纹理长期优化且使用补全条件图，非相同 compute/closed-imageprior 信息预算。GT masks 有中度 noise，并非无需 segmentation。\n消融与诊断：geometry/appearance priors 及 spatial guidance、loss/noise/pruning/preservation schedules 有控制。形状改善主要由 structure+guidance 支持；未展示 topology/manufacturability、极端 mask/initialization 失败统计或等预算 eps-vs-timeweighted-velocity 控制。",
+    "insightZh": "主要价值是 3D-native prior 在原 scene 坐标中的受约束优化、occupied/vacant evidence 和逐步放松 guidance，而不是新 generator。对 pointwise literal squared losses，由 residual 恒等式可得 Lε=(1−t)²Lv；论文的(1−t)梯度关系实际上依赖特定 SDS surrogate，不能称精确 objective 导数等价，也不能把 t 权重从期望外提出。公开 code 明确 no_grad 和 detached target，支持工程更新规则而非所写 formal proof。",
+    "whyRelevantZh": "直接属于 compositional3D reconstruction，输出 individualtexturedmeshes 并保持 scene 布局；可借鉴观测证据与生成 prior 平衡。没有验证 simulation/physics/fabrication。",
+    "evidenceZh": "scene 内 object structure/appearance 与 background 为不同阶段。（Fig. 2, Algorithm 1, Sec. 3.1–3.4, pp. 3–7；background 仍依赖 2D/video prior 及 plane depth，不能将整个 scene 写成纯 3D-native generation。）\nepsilon 与 velocity residual 有 pointwise(1−t)关系，gradient 论证是 SDS 近似。（Sec. 3.2, Eqs. (2)–(3), p. 4; Appendix A, Eqs. (9)–(16), p. 14；literal MSE 的精确 gradient scaling 为(1−t)²。官方 score_distillation_sampling_ss.py1119–1161 及 appearance.py1210–1227 采用无模型梯度 detached-target surrogate。）\n作者报告 Replica/ScanNet++的 CD3.95/4.34cm 与 F-score77.87/77.93。（Table 1, p. 7; Appendix C.2–4, p. 16；F-score 阈值 5cm，same poses/masks，baseline 的 posthoc alignment 与 ours 每 object 迭代预算不同。）\n完整 geometry 不是各指标都最佳，成本较高。（Tables 3–4, Fig. 5, p. 8；geometry+spatial guidance 无 appearance 的 CD3.91/F78.16 略优 full3.95/77.87；ours1.35h vsSAM3D0.13h/ShapeR0.37h。）\n44unique expert raters，25questions 各，significance 需关注重复观测。（Table 2, p. 7; Appendix C.5, p. 16；极小 binomial pvalues 未说明 rater/scene 聚类处理，不等于独立 1100 人的研究。）",
+    "caveatZh": "依赖 GeoSVR、masks 和 object-level TRELLIS；严重 occlusion/initialization 错误及 OOD objects 仍可能失败。\n主要室内 well-defined instances，sky/grass 等不可分解区域不在范围；per-object 优化成本高。\n论文 formal loss-gradient 等价不能按 literal MSE 理解；公开实现是 stop-gradient SDS surrogate，t-dependent 期望也不保证同方向。\n论文 vacant feature 均值 sigmoid(−7)≈0.001 与±2 重采样描述含混；实际 demo-imported ss.py 在 ss_param logits 向−7 混合并 uniform 重采样，再 sigmoid/encode，不能直接在 latent 中照公式采样。\nconstraints 最终放松，不提供无碰撞、watertightness、mesh topology 或 sim-ready guarantees。\n闭源条件图模型、同 dataset 视角与生成 prior bias 限制 reproducibility 和未见真实形状忠实度。\n人类问卷重复 rater/scene 相关性未进入所报 binomial tests；本项目未复现，数字是作者报告。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

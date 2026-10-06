@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2609.36380",
+  "slug": "lego-anything-coding-agents-for-3d-scene-reconstruction-2609-36380",
+  "title": "LEGO-Anything: Coding Agents for 3D Scene Reconstruction",
+  "authors": [
+    "Xirui Li",
+    "Peng Shi",
+    "Mingwen Dong",
+    "Sheng Zhang",
+    "Zhuoyan Xu",
+    "Dongkyu Lee",
+    "Shuaichen Chang",
+    "Yi Xiang",
+    "Lin Pan",
+    "Jiarong Jiang"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-09-28",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36380"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "LEGO-Anything",
+    "Visual Design Agents",
+    "3D Reconstruction",
+    "LEGO"
+  ],
+  "abstract": "A 3D scene reconstructed from a single image is most useful when represented not as a rendering or a fixed 3D output, but as an explicit scene program whose execution yields a scene that can be inspected, edited, and queried. We present LEGO-Anything, an Image-to-Code framework in which a coding agent iteratively writes and executes Blender code, inspects scenes and renderings, and revises the program. To evaluate end-to-end scene recovery, we introduce LEGO-Bench, a simulator-grounded benchmark with 208 images from 104 diverse indoor and outdoor scenes. LEGO-Bench separately scores artifact validity, visible-surface geometry, and rendered appearance. Its simulator-grounded design enables extensibility and precise automatic evaluation. Among evaluated agents, GPT-6-astra achieves the strongest overall results, with 53.4% indoor and 39.6% outdoor scores, yet substantial gaps remain between delivering valid scene artifacts and faithfully recovering scene geometry and appearance. Analysis of agent construction trajectories reveals three recurring issues: weak scene initialization, regressive edits during iteration, and unreliable self-evaluation. These findings motivate LEGO-Plugin, a training-free harness plugin for more controlled iterative scene construction, which improves all six evaluated models, with relative gains of up to 62.7% in overall score. Finally, we test whether reconstructed scenes can represent natural images and support vision tasks. In LEGO-World, we derive object detections, instance masks, and relative depth as deterministic queries on scenes reconstructed by GPT-6-astra. These readouts show non-trivial performance across all three tasks but fall well short of specialized vision models, suggesting that program-constructed scenes from current coding agents are a promising but not yet sufficiently precise representation of natural images.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36380v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36380v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36380v1 全文及 2026-10-06T16:21:32.177174Z 审阅记录；PDF 33 页，SHA-256 bdabba87e8cf55a10911d08e105ca8be551788e3c7754e88b6e5c9c7935cca46，视觉核验第 1、4、6、9、21、26、28、31、32 页。数字均为作者报告，本项目未独立复现。代码状态 promised：exact PDF 官方 project page lego-anything.com 已在线核验，Code 显示 Coming soon，未提供本方法 public implementation；论文中上游 Blender-MCP/Harbor references 不记作本方法代码。",
+    "ideaZh": "LEGO-Anything 让 coding agent 反复写 Blender code、执行、render 并验收参考图匹配，输出可编辑 scene program；plugin 用 reference-derived evidence 与 bounded edit transactions 保护已有结果。作者报告更弱 agents 收益明显，强 agent 增益较小。值得精读 artifact validity 与真实 fidelity 的区分、回退控制及评测边界；名称不指 LEGO 积木，visible-surface 分数也不证明完整真实场景或物理机制被恢复。",
+    "motivationZh": "coding agents 虽能生成有效三维文件，图像重建 fidelity 与后续编辑稳定性仍不足；目标是用渲染反馈、参考证据和可回退编辑改进 scene programs。",
+    "methodZh": "从单图与公开 metadata 出发，general coding agents 用 Blender MCP 构建显式几何、camera、materials 和 scene hierarchy。LEGO-Bench 保留 simulator GT，在提交后独立检查文件、可见表面及 rerender。轨迹显示 initialization 慢、后期 edits 退步和 VLM 自评不可靠；LEGO-Plugin 使用 VGGT/SAM/depth providers 的参考 cues、硬约束验收和 transaction rollback。自然图实验从 frozen scenes 读出 boxes、masks 与 relative depth，仍明显落后专用模型。",
+    "methodFlow": [
+      "从 reference image 和公开 metadata 解释 scene，生成并执行 Blender program。",
+      "render 当前 artifact，比较图像与显式 scene properties 后迭代 code。",
+      "plugin 从 reference 提取 camera/layout、regions 和 ordinal depth，提供受控 initialization。",
+      "将 edits 封装为有 protected entities 的 bounded transactions，验收或回退。",
+      "独立 evaluator 检查文件、reference-visible surfaces 与 appearance；从 final frozen scene 查询视觉 readouts。"
+    ],
+    "experimentsZh": "实验设置：simulator scenes 的 indoor/outdoor、复杂度与多次独立运行，比较 coding agents 和已转换的 scene pipelines；plugin 对固定 Office subset 控制相同 execution budgets 和 efforts。diagnostic 包含 intermediate states、read-only model judges、metric sensitivity、人类 A/B/Tie compatibility，以及分别 sampled natural detection/mask/depth tracks。\n作者报告最强 coding-agent 配置的 overall indoor/outdoor 为 53.4%/39.6%，文件 validity 近饱和，但 indoor R 为 52.4%，低于 Gen3DSR 的 65.4%。（p.6, Table 3）\n作者报告 plugin 在 Office subset 的 relative gains 对最弱配置最高 62.7%，最强配置为 2.1%；不可把最高比例外推为所有 models/scenes。（p.9, Figure 8）\n作者报告 human–metric compatibility 为 83.7%，该定义将 Tie-A 与 Tie-B 都算 compatible，并非严格多数方向一致率。（p.28, Appendix E.5）\n作者报告 scene readout 的 box AP 为 30.14、mask AP 为 14.75、AbsRel 为 0.1554；depth 来自 99 个有效输出，且采用 relative scale/shift alignment。（p.10, Table 5; p.32, Tables 9/H）\n比较范围：end-to-end pipelines 共用 evaluator，但 tools、native outputs、information access 和 inference budgets 不等；VIGA 禁用外部 asset generation，部分 pipelines 不支持 outdoor/appearance。readout confidence 全相同，不能等同 calibrated detector ranking。\n消融与诊断：reasoning effort 与 plugin on/off 支持局部方法效用；没有 initialization、refinement、version control 的独立模块消融，specialist perception providers 也引入额外计算。full-scene human study 的 permissive tie compatibility 比严格 agreement 宽松。",
+    "insightZh": "image-to-code、render-inspect 和 specialized visual priors 已有先例；有价值的贡献是 scene-level executable artifact 的分层评测、construction trajectory 诊断和防退步的 bounded control。plugin 是 method 而非纯 benchmark，但三个模块一起应用，缺少各模块单独因果消融。",
+    "whyRelevantZh": "直接研究 agent 在显式、可编辑 3D artifacts 上规划、执行、观察、校正并防止回退，对视觉设计闭环的验证与版本控制有直接方法价值。",
+    "evidenceZh": "agent 实际迭代 Blender program 和 scene，plugin 的 edits 有状态验收与回退。（pp.3–4, Figure 2; pp.8–9, §5; p.31, Appendix G；闭环直接修改 visual artifact，符合 visual-design-agents；没有自动 LEGO brick design。）\nbenchmark 几何分数限于 reference-visible surfaces，以 private masks 划分 scope。（pp.5–6; pp.25–27, Appendix E.2；GT scope 不匹配预测 semantic instances，mask 外多余 geometry 不进入 headline R。）\nplugin 改善 Office subset，各类 scene readout 仍远落后 specialist models。（pp.9–10, Figures 8/9, Table 5; p.32, Appendix H；作者报告；subset 方法实验与整体模型比较、三个不同 natural-image tracks 要区分。）",
+    "caveatZh": "单图 metric depth/absolute object size 不可靠，plugin plan 仅用 relative/ordinal cues。\nnatural-image readouts 不够精准，articulation pilot 仍失败。\n跨方法共享评分不等于共享预算与信息；natural depth coverage 和 AP policy 需分别说明。\nheadline geometry 只看到 reference view，无法确认遮挡面、完整 object topology、semantic grouping 或 metric scale 真值。\nplugin 依赖可能出错的 VGGT/mask/depth cues，Office subset 未建立 outdoor/非 Manhattan 泛化。\nvalidity 及 pixel hit-rate 不等于物理可交互、可制造或 perceptual correctness。\n三个 natural-image tracks 并非同一场景同时多任务验证；等 confidence AP、不同有效样本 coverage 限制与 specialist 的直接排行。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

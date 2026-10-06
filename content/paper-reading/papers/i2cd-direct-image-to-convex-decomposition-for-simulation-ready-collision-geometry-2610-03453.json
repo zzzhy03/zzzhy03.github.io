@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.03453",
+  "slug": "i2cd-direct-image-to-convex-decomposition-for-simulation-ready-collision-geometry-2610-03453",
+  "title": "I2CD: Direct Image-to-Convex Decomposition for Simulation-Ready Collision Geometry",
+  "authors": [
+    "Qian Wang",
+    "Liam Merz Hoffmeister",
+    "Brian Scassellati",
+    "Daniel Rakita"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03453"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "I2CD",
+    "3D Reconstruction"
+  ],
+  "abstract": "Physics simulators and motion planners require convex collision geometry, yet image-to-3D generative models output dense, frequently non-manifold visual meshes. Bridging the two today takes a slow, brittle reconstruct-then-decompose pipeline of repair, decimation, and approximate convex decomposition. We present I2CD, which predicts a convex decomposition directly from a single RGB image. Rather than train a new image-to-3D model, I2CD freezes the pretrained Hunyuan3D-2 image-conditioned diffusion transformer and shape decoder and trains only a lightweight cross-attention head (38M parameters, under ten GPU-hours) whose learned \"convex-slot\" tokens emit the halfplane parameters of $K$ convex polytopes. The output is compact, convex by construction, and loads into physics engines without any post-processing, in ${\\sim}0.5$s per image. On $227$ held-out OmniObject3D and Google Scanned Objects instances, I2CD attains the highest volumetric IoU among eight reconstruct-then-decompose pipelines while running $6$-$37\\times$ faster end-to-end. In a cross-simulator study in MuJoCo, PyBullet, Genesis, and Isaac Sim, every engine uses I2CD geometry as delivered, whereas raw generated meshes \"load\" everywhere but are silently replaced by a different collision shape in most cases or need seconds to minutes of per-object preprocessing. On a physical xArm7, I2CD produces planner-ready geometry for a $20$-object cluttered scene in $11$s versus $328$s for the strongest baseline, at comparable pick-and-place execution success ($85$ vs. $90$ of $100$ trials).",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03453v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03453v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03453v1 全文及 2026-10-06T11:48:45.000Z 审阅记录；PDF 8 页，SHA-256 8461825673bdbdc14d4b0be8aaf1834d9dd4b5b927e95a7cf55dbb690bf8cfd3，视觉核验第 1、2、4、5、6、7 页。数字均为作者报告，本项目未独立复现。代码状态 promised：p.2 明确称 code/models/benchmark will be released，未提供已确认 public implementation URL。",
+    "ideaZh": "I2CD 冻结 Hunyuan3D-2-mini 的 DiT/ShapeVAE，用 38M convex-slot head 直接读出 halfplane polytopes，免去大 mesh 再 repair/decompose。作者报告 227 对象 pooled IoU65.7%、0.51 秒/对象，真实 20 对象 scene 准备 11 秒对 328 秒，但 pick-and-place85/100 对 90/100，surface F-score 低于最佳 pipeline。重点是从 foundation shape features 读出功能性表示；convex parts 没有 semantic part meaning。",
+    "motivationZh": "视觉生成资产的复杂 mesh 往往不便高效碰撞查询；论文希望从单图直接预测紧凑 convex decomposition，把图像条件几何连接到 simulation collision representation。",
+    "methodZh": "论文从单 RGB 图恢复用于 collision queries 的 compact geometry。训练时由 GT meshes 缓存 ShapeVAE latents，learned slots cross-attend frozen 形状 features，预测每个 convex 的 halfplanes/translation/sharpness；class-balanced occupancy BCE 及 segment-containment contrastive loss 抑制 empty/slab outputs。推理以 image-conditioned DiT latent 替代 GT latent，逐 convex 导出低分辨率 mesh 供物理引擎。四 engine drop/settle 和一场真实 robot 实验检验有效 collision geometry，而不是只报告 asset 可以加载。",
+    "methodFlow": [
+      "从训练 GT meshes 编码/cache 冻结 Hunyuan ShapeVAE latents；推理从单 RGB 图以冻结 DiT 采样 shape latent",
+      "冻结 decoder 展开 512 shape tokens；K learned convex slots 经 cross/self attention 读出 halfplanes、translation 与 sharpness",
+      "以 class-balanced occupancy BCE 和基于线段 containment 的 convex-pair contrastive loss 训练 38M head",
+      "将 K 个 halfplane convexes 的 soft occupancy 取 union；export cube 保证 boundedness，删除低 occupancy 无效 parts",
+      "每 convex 用 32³ marching cubes 导出，作为独立 convex collision hull 交给 simulator",
+      "在 scene 层保持 segmentation/pose/planner 相同，比较 collision geometry 保留、settling 及真实 pick-and-place"
+    ],
+    "experimentsZh": "实验设置：121056 MolmoSpaces artist meshes 训练 head；127 OmniObject3D+100 GSO held-out objects，2generators×4decomposers。几何评价先 centering/scale/PCA 与 ICP alignment，Omni open scans 用 convex-hull proxy，GSO 用 exact mesh。RTX5000Ada/AMD7960X/256GBRAM。四 physics engines 测试 normalized objects drops；一个 RealSense/xArm7 tabletopscene 共 20targets×5plannerseeds。\n作者报告 pooled IoU65.7±13.2%、runtime0.51±0.04 秒；GSO IoU68.9 对其它≤63.8，Omni63.1 对最佳 62.9(p0.10)，其平均优势主要是减少 catastrophic failures。（Table I, Sec. IV-A, p. 4）\n作者报告真实 pick-and-place I2CD85/100、SAM3D+CoACD90/100、auto-hull5/100；scene 准备 11/328/198 秒。差异 Fisher p0.39 且 trials 相关。（Table III, Sec. IV-C, p. 6）\n作者报告 BCE+NCE IoU63.8、balanced BCE62.2、unbalanced54.7；GT-mesh latent 输入 IoU68.9 对 image-sampled65.7。（Tables IV–V, pp. 6–7）\n比较范围：8 条 reconstruct-then-decompose pipelines，含 classicalCoACD/VHACD 及 retrainedCvxNet/officialBSPNet；raw-mesh collider alternatives 另有四 enginecomparison。Omni hull-proxy、different surface budgets 及 BSP pretrained interface 限制解释。机器人只比较 SAM3D-based 方案，不能声称全部 8baselines 都在 robot 上试过。\n消融与诊断：考察 BCE balancing/contrastive term、K/H 容量、head depth、MC export resolution 和 train–test latent gap。小 capacity 差异处于 seednoise 量级；修复 mesh 能缩 IoU gap 但加大 runtime。高 surface 精度 contact tasks、adaptive slot allocation 和多 scene 未测试。",
+    "insightZh": "CvxNet convex representation 和 containment principle 均来自 prior work；关键是复用 open-world frozen3D shape features、换成轻量 convex readout，并把 simulation readiness 定义为 engine-effective geometry 保留与真实操作可用性。不是新的 image-to-3D generator 或 semantic part segmenter。",
+    "whyRelevantZh": "忠实恢复特定物体的 collision surrogate，主方向为 3D Reconstruction。用 pretrained shape features 换 readout 输出功能性 compact geometry，直接关系到 usable/sim-ready3D 资产与设计验证。没有 LEGO-specific、semantic part segmentation 或制造指令验证。",
+    "evidenceZh": "Frozen DiT/ShapeVAE 与 learned convex-slot head 将单图形状 prior 直接转为 convex halfplane representation。（Sec. III, Fig. 2, pp. 2–3；已视觉查看 training/inference 两条路径；head 训练不用 DiT，推理仍需要它。）\nHalfspaces 保证 convex 和非空，boundedness 需 export cube；contrastive loss 依据 segment 能否留在 shape 内部定义 positive/negative。（Sec. III-A/D/E, pp. 3–4；不要将默认参数本身写成无条件 boundedness，也不要把 geometric slots 当 semantic parts。）\n作者报告 pooled IoU65.7，0.51 秒；Omni split 相对 HY3D+CoACD 基本持平，而 surface F15.6 低于 SAM3D+CoACD19.2。（Table I, Sec. IV-A, p. 4；结果表与 split/proxy 定义已视觉核验；volumetric 平均优势不等于每对象或所有 metrics 领先。）\n作者报告四 engine 中 I2CD asset-preserved≥98.4%；该指标是 input-to-engine roundtrip，不是与真实 object 的 fidelity。（Table II, Sec. IV-B, pp. 5–6；表 caption 与正文明确区分两种 fidelity。）\n作者报告 20 对象 scene geometry11 秒对 328 秒、真实 85/100 对 90/100；仅一 scene 和 20configs×5seeds。（Table III, Fig. 4–5, Sec. IV-C, pp. 6–7；并非 100 个独立 scene；HY3D+CoACD 没有上 robot，其 scene 时间只是按 per-object 估算。）",
+    "caveatZh": "继承冻结 backbone 漏掉 thin structures、hallucination 和过平滑的错误。\nSurface F-score 低于最佳 pipeline，MC 分辨率提升不能弥补固定 K 的表示能力。\nConvex slots 按 geometry proximity 组织，不是 seat/legs 等 semantic parts。\n真实实验只覆盖 one tabletopscene/quasi-static pick-and-place；complex support 与 contact-rich tasks 尚未验证。\nOmni hull-proxy 可能隐藏 concavity，alignment 也削弱对 metric pose/scale fidelity 的检验。\n98.4%preserved 是 simulator 没有替换输入 shape，不表示该 shape 真实准确。\n6–37×主要适用 collision-only 输出；若还需 visual mesh，作者报告约 1.6 秒对 7.8 秒，不能沿用最大加速。\nUnder10GPUhours 是轻量 head 训练，不是 backbone 预训练或所有 latent-caching 总成本。\n每物体 12convex/12halfplanes 与一 scene 实验不能保证 thin handles、deformable/articulated 或所有 contact 任务。\n数字均为作者报告，本项目未执行 robot 或复现实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

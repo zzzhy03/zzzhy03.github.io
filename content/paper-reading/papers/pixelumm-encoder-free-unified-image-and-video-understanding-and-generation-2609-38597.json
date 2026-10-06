@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2609.38597",
+  "slug": "pixelumm-encoder-free-unified-image-and-video-understanding-and-generation-2609-38597",
+  "title": "PixelUMM: Encoder-Free Unified Image and Video Understanding and Generation",
+  "authors": [
+    "Cong Wei",
+    "Xuanchi Ren",
+    "Bryan Chu",
+    "Weiming Ren",
+    "Huan Ling",
+    "Jiahui Huang",
+    "Laura Leal-Taixé",
+    "Sanja Fidler",
+    "Wenhu Chen",
+    "Zian Wang",
+    "Jay Zhangjie Wu"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38597"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "PixelUMM",
+    "VLM / MLLM",
+    "Image Generation",
+    "Video Generation"
+  ],
+  "abstract": "Unified Multimodal Models (UMMs) often rely on separate visual representations for understanding and generation, increasing visual context length and complicating integration with established vision-language pretraining pipelines. Recent advances in pixel-space modeling offer an encoder-free alternative, but extending this paradigm from images to videos is non-trivial: video understanding and generation adopt different temporal representations, leaving the design of a unified visual interface an open question. We present PixelUMM, an encoder-free model for unified image and video understanding and generation directly in pixel space. PixelUMM represents images as spatial patches and videos as spatiotemporal tubelets, connecting raw pixels to a shared multimodal backbone through single-layer linear projections. Its Mixture-of-Transformers architecture combines shared attention with task-specific parameters and extends clean-pixel prediction to video generation, jointly supporting autoregressive text prediction and pixel-space flow matching. Experiments show that PixelUMM achieves competitive performance across image and video understanding and generation tasks. We further conduct empirical studies of key design choices, including decoder design and spatial-temporal patch size, providing insights for future pixel-space unified multimodal models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38597v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38597v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/nv-tlabs/PixelUMM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38597v1 全文及 2026-10-06T15:02:46.358020Z 审阅记录；PDF 31 页，SHA-256 760f44d00b077527e02da3875e1c30f510ffa67388b0bc8f93487fa015a4bcae，视觉核验第 1、5、8、12、14、19、20、21、22、23、25 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1 官方 project page 的 Code 按钮指向作者 public repository；已访问确认 modeling、train、eval 及 inference.py 等真实实现，非 README-only。未运行或下载 weights；公开训练示例不代表完整原始训练数据/recipe 均开放。",
+    "ideaZh": "PixelUMM 用 raw image patches 和 video tubelets 直接连接共享 attention 的 understanding/generation experts，移除独立视觉 encoder 和 VAE，并验证四类任务。这个 native pixel interface 是值得深读的模型路线；但并未统一所有参数，理解与生成指标也不全面领先，released linear heads 的 grid artifacts 仍未解决。",
+    "motivationZh": "统一理解与生成模型依赖独立 encoder/VAE，模态接口和像素信息存在额外瓶颈；目标是让 raw image/video pixels 直接进入统一多任务模型。",
+    "methodZh": "模型从 Qwen3 decoder backbone 初始化，以 clean pixels/text 路由到 understanding expert、noisy pixels 路由到 generation expert；各自有 QKV/FFN/normalization，但共享 multimodal attention。Text 用 autoregressive CE，图像/视频用 clean-pixel prediction 与 velocity loss，不向 denoising network 显式输入 timestep。分阶段训练引入 native-resolution 理解、视频与联合任务；另有从中间 checkpoint 开始的 visual-conditioning finetune，定性展示 I2V/video editing。",
+    "methodFlow": [
+      "将图像 patchify、视频 tubeletify；clean/noisy pixels 通过不同单层 projections",
+      "按 clean/text 或 noisy target 将 tokens 路由到 understanding/generation experts",
+      "共享 multimodal attention，采用 blockwise causal/visual bidirectional patterns",
+      "预测 assistant text 与 clean raw pixels，用 CE 和 pixel-flow losses 训练",
+      "分阶段增加分辨率、视频理解和四任务 joint training",
+      "用 linear heads 直接输出图像/视频；额外 multitask stage 学习 visual conditioning"
+    ],
+    "experimentsZh": "实验设置：Joint/Gen/Und stagedtraining 结合图像、视频理解和 generation datasets。八类 controlledfamilies 研究 patch/tubelet、heads、pixel-vs-VAE、规模、distributedcompute、visualconditioning 和 videounderstandinginterfaces。主模型使用 official 理解评价及 GenEval/DPG/VBench，公开 baseline 各保留其原协议。\n作者报告主模型 MMMU41.67、BAGEL55.30、Qwen3-VL69.60；CountBench94.30 和 PixMo-Count73.03 较强，说明理解结果并非普遍领先。（p.21 Table5）\n作者报告 video 理解 MVBench70.53、Video-MME57.33、LongVideoBench59.61、LVBench40.41；专用 VLM 和不同 unifiedmodel 各有更高值。（p.21 Table6）\n作者报告 native GenEval0.77，用 BAGEL-long rewrittenprompts 后 0.83，DPG85.74；应标出 rewriting，不能只报告较高值为无 prompt 变换性能。（p.22 Table7）\n作者报告 VBench total83.24，Lance85.11、TUNA84.06；PixelUMM 使用 GPT-enhancedprompts。（p.23 Tables8–9）\n作者报告 linear head 的 spatialboundary normalized intensity1.078、temporalboundary difference1.160；PixelShuffle 降低边界但增加 headcompute，released model 仍 linear。（pp.12–14 F3, Fig.13）\n作者报告 visual-conditioning finetune 后 SEED-I 下降 5.41points，video 理解多数提高；dense-vs-sparse 在 testedcheckpoint 差异近零或负值。（pp.19–20 Tables3–4）\n比较范围：模型-levelbenchmarks 不能隔离 architecture/data/totalparams/compute，MoT 的 8B 为 expert/backbonescale 而非一定全部参数。F4 在不同 predictionspaces 比较 MSE，数值差异不是效率/质量证据。F5/F6 用 training steps 衡量，未给完整 equal-wall-clock 或算力对照。\n消融与诊断：Patch/head 研究控制接口，其 loss 与 pre-clampboundaryprobe 有实证；不同 patchsize 每步 samplecount 也不同。Visual-conditioning 阶段混合八任务并有具体退步；timestep-free 设计、full parameter sharing 和四任务 cross-transfer 未被独立系统消融。",
+    "insightZh": "不是首个 encoder-free 图像 unified model，主要贡献是将原生 pixel interface 延伸到视频理解/生成，说明 tubelet、mask、decoder 和 conditioning 设计。实现保留任务-specific experts 与输入 projections，统一的是 raw visual interface/shared attention，不是完全共享权重。它提供模型与系统层面的路线推进，非普通 benchmark tuning。",
+    "whyRelevantZh": "重要 native image/video unifiedmodel 与 visualtokenization 路线，对多模态理解/生成接口和 visualconditioning 有直接基础价值；没有 editable2D/3D 或制造指令。",
+    "evidenceZh": "所有 visual inputs/outputs 仅经 patchify、single-layer projections 和 unpatchify，不用外部视觉 encoder/VAE。（pp.4–7 §2.1–2.3, Figs.3–5, Eqs.1–2；已核看 architecture；understanding/generation experts 仍有独立参数，timestep 仍用于 loss/sampler。）\nlinear heads 产生 spatial/temporal boundaries，conv/PixelShuffle 改善但未替换 released checkpoint。（pp.11–15 F3, Figs.10–14；已核看 artifactcrop 与 probe；conv head 成本仅 headforward、不含整个模型。）\nvisual conditioning finetune 后的能力不是一律保持，video 理解 dense mode 也无统一优势。（pp.18–20 F7–F8, Tables2–4, Figs.20–21；已核看 editingexample；F7 为额外中间 checkpoint 试验，不等于所有 released 模型的功能。）\n完整模型覆盖四任务，但理解/生成对照明显混合，不能宣称 architecture 全面胜出。（pp.21–23 Tables5–9；已核看完整结果；datasets/protocols/rewriting 不同，作者明确承認不能比较收敛速度。）",
+    "caveatZh": "仍有独立 understanding/generationexperts，未完全统一参数。\n更大 patches/更长 tubelets 与更多融合 MoE 设计有待探索。\nreleasedlinearheads 保留 patchartifacts，conv head 切换需要进一步训练。\n原生 pixel interface 不自动代表更低 totaltraining/inferencecost，longsequences/sharedattention/experts 仍耗资源。\n主要 understandingmetrics 弱于多种 baselines，不可将 competitive 概括为全面 SOTA。\nGenerationprompts 存在 rewriting，T2V 为短视频，未验证 streaming/long-horizonmemory。\nF7editing 是额外 checkpoint 上的定性展示，无标准编辑 faithfulnessmetrics 和全面 preservation。\nNo-timestepnetwork 需从输入推断 noise，缺少对此设计的独立比较和 OODnoiselevel 验证。\n不同 spacesMSE、增加 GPUs 后的 stepconvergence 和 head-onlyGFLOPs 不能直接推导 overall 效率。\n未给跨 training seedCI、完整 generationdata 规模/训练总成本或统一 architecture-controlledbaseline。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

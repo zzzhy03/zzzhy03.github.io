@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.06324",
+  "slug": "readout-blindness-vlm-scores-miss-the-spatial-direction-their-frozen-encoders-retain-2610-06324",
+  "title": "Readout Blindness: VLM Scores Miss the Spatial Direction Their Frozen Encoders Retain",
+  "authors": [
+    "Guangyuan Li",
+    "Tianming Du",
+    "Yan Jiang",
+    "Bihan Wen",
+    "Jiancheng Yang"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06324"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Readout Blindness",
+    "VLM / MLLM",
+    "VLM"
+  ],
+  "abstract": "CLIP-like vision-language models remain a cornerstone of multimodal systems, yet their scores stay near chance on directed spatial relations, such as whether one object is left of another. We call this failure readout blindness and analyze, theoretically and empirically, why deployed scores miss the direction: when scoring rules treat the subject and object symmetrically, direction cancels regardless of encoder training. Guided by this analysis, we introduce Antisymmetric Displacement Readout (ADR), which aligns caption words with image patches in the frozen features and scores each relation by the signed displacement between matched object centroids. Notably, ADR succeeds without additional training or learned parameters, thereby demonstrating that directional information remains in the frozen encoder. However, text and world priors can inflate accuracy, so we further introduce prior deflation, which measures the benefit of the image-text pairing as the grounded gain over a null that pairs each item with an unrelated image. Extensive experiments across encoder families show that ADR substantially improves over deployed scores, which remain near chance on most direction-balanced sets even for fine-tuned encoders. Compared with more complex readouts, ADR outperforms the evaluated MLLM likelihood readouts and is competitive with their chat inference at a small fraction of the computation. These results support our claim that directional information can be recovered from frozen features by an appropriate readout. Our implementation and evaluation kit will be publicly available.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06324v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06324v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/GarryLarry010131/ADR"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06324v1 全文及 2026-10-06T11:14:58.012724+00:00 审阅记录；PDF 23 页，SHA-256 71f57a973d9f52812a9596e9ce862cec1653deacaec9a307d6a131fadd48c7d5，视觉核验第 1、5、7、9、18、21 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 打印 repo URL；已访问 Public GitHub 并确认 adr、readouts、evalkit 及 scripts 目录。仅确认存在，未复现实验。",
+    "ideaZh": "ADR 从冻结 CLIP/SigLIP patch–word 对齐求 object centroid，以有符号位移读出方向；再用错配 image null 分离真实 grounded gain。作者报告 SigLIP2 在 VG left/right 准确率 92.09%、grounded gain42.6 点，对照 pooled score 约 50%。这是显式空间 readout 的强证据，不是所有 VLM 无空间能力的证明；front/behind 仅用 image height proxy，object-centered 关系会错。",
+    "motivationZh": "VLM score 的空间判断失败，不一定说明 frozen encoder 已丢失方向信息。目标是区分信息保留与 readout 使用，构造能读取对象相对方向的评分接口。",
+    "methodZh": "论文区分 encoder 保留信息与 deployed score 是否读取信息。对 context-free unary score 和固定 coupling/symmetric kernel，形式化 argument swap 不变性；实际 global cosine 则可能无 tie 但仍近 chance，属经验问题。ADR 用 frozen patch 和独立 word features 的 Sinkhorn coupling，减 uniform mass 后求 subject/object centroids，按 parsed relation 轴计算 signed displacement。相同权重上更换 readout 显著改善多种二元方向任务，并公开 reproducible derangement null evaluation。方法适合可解析 noun-pair 关系，主要是 2D viewer-coordinate readout，不能推断通用 3D semantics。",
+    "methodFlow": [
+      "输入 image 及候选 relation captions；以冻结 encoder weights 提取 normalized patch features 和独立 content-word embeddings",
+      "patch–word cosine 经 entropic OT/Sinkhorn 得到 uniform-marginal coupling",
+      "保留超出 uniform baseline 的 excess mass，计算 subject 与 object 的 weighted image-coordinate centroids；可选 dense softmax 版本",
+      "规则 parser 将 relation 映射为(subject,object,axis)，累加 axis dot signed centroid displacement 并 rank captions",
+      "记录 alignment maps、centroids 及 margin 作为可解释输出；用 absolute margin 选择高置信样本",
+      "对同 caption 换无关 image 的 deterministic derangement 重复评分，报告 real/null accuracy 及 grounded gain"
+    ],
+    "experimentsZh": "实验设置：作者报告 8 子集来自 ARO/What'sUp/VSR/VALSE，其中 5 direction-balanced 主集合含 VG L/R3918、COCO404、WU-A408、WU-B354、VSR1201 covered items。9 主 model family 加附录 checkpoints，全部 weights frozen；比较 pooled/ITM、half-crop、LLaVA/Qwen likelihood/chat，统一 same-source exclusion derangement。\n作者报告 SigLIP2 ADR-excess 在 VG L/R、COCO、WU-A、WU-B、VSR 的 grounded gain 为 42.6/44.1/47.3/49.2/27.1 百分点。（Table 2, p. 7）\n作者报告 Qwen3.6 chat 在 WU-A gain66.4、VSR38.3 点，高于 ADR；ADR 不普遍超过强 MLLM chat。（Table 3, p. 8）\n作者报告 CLIP ADR-excess 对 4 binary sets pooled 最高 30%margin 样本准确率 99.8%，coverage 受限且 margin 非校准 probability。（Table 7, p. 17; Sec. 7.3, p. 10）\n作者报告 H200 上 SigLIP2 ADR runtime52.98ms，对照 Qwen3.6 chat611.11ms；CLIP ADR20.78ms 反比原 CLIP9.28ms 更贵。（Table 11, p. 19）\n比较范围：广覆盖 dual encoders/compositional finetunes、cross-encoder matching、half-crop 和两类 MLLM readouts；chat greedy 四 token/无 thinking，未检验 CoT/tool reasoning 或复杂多 object 图。VSR 基线 oracle threshold 分别在 real/null 标签上优化，部分 appendix cells 的 covered 人数不同，应按同集合比较。\n消融与诊断：比较 excess、dense、original OT、argmax weights 及 temperature sweep；localization 失败和 viewer/object frame 分析给出适用范围。没有通过训练/encoder 干预证明所有 global score 的唯一失败原因；null 是一个固定 derangement，gain 不是完整 causal 解释。",
+    "insightZh": "关键是把训练不足与 readout 不表达方向分开，提出 antisymmetric displacement 与 controlled prior-deflation 比较。OT 和 centroid 几何规则已有相关工作，贡献是从同 frozen encoder 自行定位并读出方向及严谨 evaluation 边界。定理只覆盖 context-free unary/symmetric relational score，不覆盖全部 global CLIP、cross-encoder 或 MLLM；整体系统无 learned 新参数但包含手选 axis 与 parser。",
+    "whyRelevantZh": "明确推进 visual spatial grounding 的可解释 readout 和证据对照，对设计 agent 检查 image 中的 object 相对位置、识别视觉 judge 先验有方法参考；未验证 SVG/LEGO/3D 设计产物。",
+    "evidenceZh": "unary 及 symmetric relational score 在规定 argument-swap 条件下对方向不变，实际 global cosine 失败不等于定理所证 exact ties。（Sec. 4, pp. 3–4; Appendix B.2–B.5, pp. 15–16; Table 4, p. 12；已读完整 proof；Table4 显示 caption features 确实不同且 global 无 tie，故不能泛化理论条件。）\nADR 将 OT excess mass centroid 沿 relation axis 的位移设为 direction score，无 encoder fine-tuning。（Sec. 5, Fig. 2, p. 5; Algorithm 1, p. 20；方法图已视觉核验；patch 提取重组 final-block/pooled readout，frozen weights 不等于保留原 pooled computational 路径。）\n作者报告 SigLIP2 ADR-excess 在 VG left/right 真实 92.09%、null49.46%、gain42.6 点；pooled score49.95%/50.54%。（Table 2, p. 7；主表已视觉核验，本项目没有复现。）\n作者报告 CLIP ADR-excess 在 What'sUp-A 仅 31.62%/gain5.9 点，SigLIP2 为 74.26%/gain47.3 点；object 定位能力仍决定结果。（Table 2, p. 7; Appendix C.2, Table 8, pp. 17–18；失败分析及统计页已视觉核验，支持 encoder 差异而非 readout 保证正确。）\n作者报告 VSR viewer-frame 一致率 92.90%，object-frame 仅 22.39%；front/behind 以 vertical image coordinate 而非 3D depth 计算。（Appendix C.3, Table 9, p. 18; Appendix D.5, pp. 20–21；限制页已视觉核验；深度 axis 经 exploratory analysis 手选，训练自由不等于无 handcrafted 先验。）",
+    "caveatZh": "What'sUp-A 上 CLIP 多数 readout 仍弱，定位错误阻碍方向读取。\nADR 沿 viewer image coordinates，object-centered VSR 关系存在 reference-frame mismatch。\nfront/behind 为 image vertical-position proxy，不估计 3D depth；axis 由探索性分析选定。\nnoun-pair parser 限制 coverage，复杂 relation/更多 architectures 仍属 future work。\nabsolute margin 用于排序，不是校准的正确概率；高 coverage precision 以丢弃多数样本为代价。\n定理只覆盖特定 scoring 结构，不能据此声称 encoder 训练对全部 deployed score 无效。\nfrozen features 提取改变 CLIP 最后 attention/normalization 路径，不是直接用原 global embedding 恢复方向。\nrule parser、direction axis 与 benchmark crop 设定都提供结构先验；不等于端到端开放语义理解。\nbalanced subsets 基于既有模型 null 表现筛选，不能外推任意 caption/world distribution。\n所有实验与数值仅为 exact PDF 作者报告，未执行公开代码或独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

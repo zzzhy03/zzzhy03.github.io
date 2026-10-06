@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2605.15141",
+  "slug": "causal-forcing-scalable-few-step-autoregressive-diffusion-distillation-for-real-time-inter-2605-15141",
+  "title": "Causal Forcing++: Scalable Few-Step Autoregressive Diffusion Distillation for Real-Time Interactive Video Generation",
+  "authors": [
+    "Min Zhao",
+    "Hongzhou Zhu",
+    "Kaiwen Zheng",
+    "Zihan Zhou",
+    "Bokai Yan",
+    "Xinyuan Li",
+    "Xiao Yang",
+    "Chongxuan Li",
+    "Jun Zhu"
+  ],
+  "publishedAt": "2026-05-14",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.15141"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Causal Forcing++",
+    "Video Generation"
+  ],
+  "abstract": "Real-time interactive video generation requires low-latency, streaming, and controllable rollout. Existing autoregressive (AR) diffusion distillation methods have achieved strong results in the chunk-wise 4-step regime by distilling bidirectional base models into few-step AR students, but they remain limited by coarse response granularity and non-negligible sampling latency. In this paper, we study a more aggressive setting: frame-wise autoregression with only 1--2 sampling steps. In this regime, we identify the initialization of a few-step AR student as the key bottleneck: existing strategies are either target-misaligned, incapable of few-step generation, or too costly to scale. We propose \\textbf{Causal Forcing++}, a principled and scalable pipeline that uses \\emph{causal consistency distillation} (causal CD) for few-step AR initialization. The core idea is that causal CD learns the same AR-conditional flow map as causal ODE distillation, but obtains supervision from a single online teacher ODE step between adjacent timesteps, avoiding the need to precompute and store full PF-ODE trajectories. This makes the initialization both more efficient and easier to optimize. The resulting pipeline, \\ours, surpasses the SOTA 4-step chunk-wise Causal Forcing under the \\textit{\\textbf{frame-wise 2-step setting}} by 0.1 in VBench Total, 0.3 in VBench Quality, and 0.335 in VisionReward, while reducing first-frame latency by 50\\% and Stage 2 training cost by $\\sim$$4\\times$. We further extend the pipeline to action-conditioned world model generation in the spirit of Genie3. Project Page: https://github.com/thu-ml/Causal-Forcing and https://github.com/shengshu-ai/minWM .",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.15141v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.15141v4"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/thu-ml/Causal-Forcing"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.15141v4 全文及 2026-10-06T12:01:51.274486Z 审阅记录；PDF 18 页，SHA-256 10fe20f307b8373a83e275547c6b642e85a76fd80c9298c66eb7d78a630720d3，视觉核验第 1、3、6、8、10、11 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页 URL 已确认 public source，仓库明确提供 causalCDtraining、few-stepcheckpoints 与 inference；第二 printedrepo minWM 也可访问。仅核验存在，未运行。",
+    "ideaZh": "Causal Forcing++ 用在线 causal consistency 初始化替代存储完整 ODE trajectories，再做 self-rollout DMD。作者报告训练成本和轨迹存储显著下降。值得精读可扩展 few-step 配方；首 latent 仍采用更多 steps，latency 不包含 VAE，action world-model 展示使用另一 chunk 配置。",
+    "motivationZh": "少步 AR video 蒸馏依赖离线完整 ODE trajectories，存储与训练成本较高；目标是用在线 causal consistency 提供初始化监督。",
+    "methodZh": "先将 bidirectionalbase 训练为 ARteacher，在真实视频/ground truthprefix 上采相邻 timesteps，teacher 单步 Euler 获得 targetstate，EMAstudent consistency 对其给 endpointtarget，从而逼近 ARconditionalflowmap。初始化后保留 bidirectionalreal-score teacher 与 ARstudent 的 asymmetricDMD/selfrollout。区别于离线 causalODE 端点回归的成本和长 optimizationgap；与 APTteacher forcingCD 有技术重叠，本文仍留 temporalKV 与 DMD 路线。",
+    "methodFlow": [
+      "将 Wan2.1base 以 teacher forcing 训练 multi-stepARteacher。",
+      "在真实 video/currentframe 与 ground truthprefix 上加噪，抽相邻 timesteps。",
+      "ARteacher 在线一步 Euler 推进，EMAstudent 提供邻近 state consistencytarget。",
+      "训练 few-stepAR 初始化，无需预生成/保存完整 ODE 轨迹。",
+      "以 studentselfrollout 作 asymmetricDMD，首 latent 四步、后续一/二/四步；optionalcamera-posecondition 用于另 chunkworldmodel。"
+    ],
+    "experimentsZh": "实验设置：Wan2.1-1.3B student/ARteacher，Stage3realscore14B；480×832、81videoframes。Stage1/2 80Kvideos 含 OpenVid，Stage3VidProM；20K/5K/1Kstepsbatch64，48timesteps/Eulersquareloss。VBench 与 100CFpromptsVisionReward/Dynamic，singleA800 效率排除 VAE。\n作者报告 2-stepTotal84.14/Quality84.89/VisionReward6.661，对 CF84.04/84.59/6.326；0.1Total 差无 seed/errorbar 统计。（Table1, p.11）\n作者报告 sameframewise2-stepCD 对 ODETotal84.14vs83.77，但 Semantic81.13vs81.19；4-stepDynamic71vsODE75，非所有配置所有指标更优。（Table2, p.14）\n作者报告 1-step20.7FPS 但 Total83.35 与 Instruction38；4-step8.69FPS 且 latency 同 0.27 秒，throughput/quality 存在 trade-off。（Table1, p.11）\n比较范围：CausVid/SelfForcing/CFchunkwise4steps 外部 comparison；sameframewise 不同 initialization 消融含 bidirectionalODE/multi-stepAR/causalODE/causalDMD/CD，APT 因 closedsource 不比较。主要 base 规模限 1.3B，14Bteacher 额外能力不可忽略。\n消融与诊断：一/二/四 step、initialization 前后 DMD 与 Stage2cost。CD 更 modecovering、DMDmode-seeking 的 historydrift 解释为示意/经验，未测真实 conditionalcoverage 或证明 CD 等于 forwardKL。",
+    "insightZh": "将标准 consistencydistillation 推广至 causalconditionalmap 并替换 CF 初始化，贡献偏训练策略和成本可扩展性；ARteacher 必要性主要承继 CF，teacher forcingCD 亦见 APT。没有新增通用 worldrepresentation 或证明无 exposurebias。",
+    "whyRelevantZh": "直接推进 few-stepstreamingvideogeneration 训练效率及 targetalignment，actioncondition 为 worldmodel 扩展提供接口；与 native3D/fabrication 关联仍未验证。",
+    "evidenceZh": "causalCD 目标为同 ARconditionalflowmap，onlineadjacentteacherstep 与 EMAstopgradient 取代 offlinefulltrajectorytargets。（Sec.3.2/Eqs.1–5, pp.5–7; Fig.1, p.3；方法图与公式实际查看；等价论证依理想 consistency 及数值 solver 条件，非有限训练质量保证。）\n作者报告 Stage2causalODE11600A800GPUh/1900GiB，对 CD2900/0，包含 ODE80Kcuration。（Table2, p.14; Fig.3, p.7；仅 Stage2cost，不含 Stage1/3、realvideos 或 checkpointstorage；roundtohundreds。）\n作者报告 2-stepthroughput14.1FPS/firstlatency0.27s，对 CF10.4/0.60，但 Semantic81.13 低于 81.84、Dynamic64 低于 68、Instruction51 低于 56。（Table1, p.11; Sec.4.1, p.10；主表与 implementation 页已查看；不含 VAE，firstlatent 始终四步，非所有 metrics 提升。）\naction-conditioned 示例以 WorldPlaypose 数据及 PRoPE 训练 camera-conditionedgenerator，仍 chunk-wise 四步；frame-wise 二步 future work。（Sec.3.3/Fig.4, pp.7–8；pose 示例实际查看，仅 qualitative，没有 closedloopactionaccuracy、physics 或 long horizonbenchmark。）",
+    "caveatZh": "action-conditionedvariant 尚未降到 frame-wise 二步，留待 future work。\nCD 仍有 gradualautoregressiverolloutqualitydecay，实测比 causalDMD 轻。\n效率测量明确排除 VAE，少步 setting 的首 latent 仍使用四步。\n4×成本仅初始化；“零额外存储”指 ODEpairedtargets，不是训练数据/模型无 storage。\n81frames 短 video 与 qualitativecameraaction，不支持无限 length/物理 worldstate/稳定 interactiveclosedloop。\nfirstlatency 优势同时来自 smallerARunit，不能全部归因 CD；videoFPS 与 latentunit 勿混淆。\ntheoreticalCDerrorbound 未给完整 regularity 与 optimizationproof，finite48grid/EMAdata 训练不保证 exactmap。\n小 quality 差无 multi-seed 或 humanCI；codepresent 不等于本项目复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

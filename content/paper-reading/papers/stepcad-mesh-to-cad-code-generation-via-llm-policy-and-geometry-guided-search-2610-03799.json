@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.03799",
+  "slug": "stepcad-mesh-to-cad-code-generation-via-llm-policy-and-geometry-guided-search-2610-03799",
+  "title": "StepCAD: Mesh-to-CAD Code Generation via LLM Policy and Geometry-Guided Search",
+  "authors": [
+    "Ghadi Nehme",
+    "Faez Ahmed"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03799"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "StepCAD",
+    "3D Reconstruction",
+    "Visual Design Agents",
+    "CAD",
+    "LLM"
+  ],
+  "abstract": "Recovering executable CAD programs from 3D meshes is challenging due to the compositional nature of CAD construction and the interaction between discrete modeling choices and continuous parameters. Many learning-based methods predict complete programs in a single pass and rely predominantly on sketch-extrude representations, limiting operation diversity and opportunities to correct geometric errors during reconstruction. We introduce StepCAD, a generative optimization approach that combines a state-conditioned CAD policy with geometry-guided search. Given an input mesh, the policy predicts construction actions conditioned on both target and intermediate geometry, and an IoU-guided tree search refines the resulting program through local edits. We also introduce ARCADE-1.5M, a large-scale dataset of 1.5M executable CAD programs spanning diverse operations, sequences with a maximum length of 150+ counted operations, and 12.5M intermediate state-action transitions. Experiments across multiple CAD reconstruction benchmarks show that StepCAD achieves state-of-the-art geometric reconstruction accuracy with consistently high validity, yielding up to 87.2% relative IoU improvement over the strongest evaluated baseline, with particularly large gains on complex shapes. Project page: https://ghadinehme.com/stepcad.github.io/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03799v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03799v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03799v1 全文及 2026-10-06T13:29:02.448338Z 审阅记录；PDF 43 页，SHA-256 82b954a53550164916ae1f9315a547d92d86854b95cfca3e1731ad5c69066195，视觉核验第 1、4、6、8、10、17、20、22、35、36 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 首页 project→官方 Code 按钮 https://github.com/ghadinehme/StepCAD，确认 public repo 仅 README/assets 无 implementation；p.39 明确 uponacceptance 计划 release，因此不提供 availableCode link。",
+    "ideaZh": "StepCAD 用 target mesh 与执行后的 intermediate geometry 条件化 CadQuery policy，再通过参数、sketch、cut 和 operation search 修正。作者报告 CAD overlap 明显改善。直接关联 mesh→editable CAD，值得精读；overlap 不等于设计意图或制造约束，数据 operation 数也不等于 policy action 数。",
+    "motivationZh": "从 mesh 恢复可编辑 CAD code 时，长程序容易累积几何误差；目标是将执行后的 intermediate geometry 反馈给 policy，并用几何搜索修正。",
+    "methodZh": "ARCADE1.5M 以 ABCsketchlibrary 和 94workflowheuristics 生成 single-bodysolids，多 extrude/revolve/loft/sweep/finishingoperations 及 12.5Mstate-actionpairs。sharedPointMAE 编码 target/current1024points 并给 bboxmetadata，Qwen2.5Coder1.5Bteacher forcing 训练；inference 每 action 执行 CadQuery 再观察 currentgeometry。seed 后固定 beam2 几何 search 以 BOcontinuousparams、meshplanesketch 替换、overshoot 差集 cut 和 skip 优化完整 program。目标忠实 recover 特定 mesh，variants/image2CAD 为补充演示。",
+    "methodFlow": [
+      "随机 workflow+sketchlibrary 生成/重新执行验证 ARCADE 程序，记录 solidstate-action 轨迹。",
+      "PointMAE 编码 target 与 currentpoint cloud+bboxpose，LLM 预测下一 CadQueryaction。",
+      "执行 action 并 re-encode 真实 currentgeometry，停在 plateau/endtoken/12actions。",
+      "beam2 逐 action 扩展参数 BO、sketchreplacement、complementcut 及 skip 候选。",
+      "每候选 execute 并以 targetIoU 排名，输出最高 geometryfidelityprogram。",
+      "检查局部 features/entitygeometry 与 programlength，区分可执行/可编辑代码和 designintent。"
+    ],
+    "experimentsZh": "实验设置：CADBench 五 sources/ABC 三 difficulty，共多千 samples，policy1.5B+PointMAEpartialfullLLMtune、约 12.5Mtransitions、8H100/12h/100Kstepsbatch32 作者设定。target/current1024points→64tokens 各，beam2/fourtypesedit；validity、IoU/CD、highthreshold/entity/length 补充。\n作者报告 searchwinner-attributionIoU+.142 由 sketch+.059/cut+.043/params+.023/skip+.017，cost66s；这是赢家归因分解不是独立 remove-one 消融。（Table6, p.17）\n作者报告 MechanicalIoU.89/Organic.71，validity99.95–100%但 smallfeatures 与 arbitraryface 选择仍失败。（Table2 p.8 / Fig.11 p.22）\n比较范围：releasedCADRecode/Cadrille/CADEvolve/CADReasoner 训练不同；sameARCADEQwenbaseline 更可信，compatibleCADRecode 后处理可迁移但不支持任意 CADlanguage。未给等总 inferencecompute 强 samplingbaselines 或 realnoisyscansprotocol。\n消融与诊断：target/currentgeom、FPS、PointMAEft、LLMscale 前 10Kvalloss、operatorwinnercredit 与 searchtransfer。无 seeds/errorbars（checklist 明示 cost 原因）、data-sourceABCsketch/evaldecontam 细节有限。",
+    "insightZh": "neuralguidedsearch/programsynthesis、CadQueryoperations 不是新范式；实质贡献在 operationrichstate-actioncorpus、目标/currentgeometryclosedlooppolicy 与可迁移的 programlocaledits。sameARCADEsingle-shot/stateablation 和 CADRecode 后处理实验隔离部分机制，超出 one-shotCADcodewrapper，直接服务 trackedstructured3D 恢复与 toolpolicy 设计。",
+    "whyRelevantZh": "直接命中 mesh-to-executableCAD structured3Dreconstruction，同时为 CADtoolpolicy+geometryfeedback 迭代提供方法基础；可连接生成 mesh 到编辑 workflow，但本任务不把恢复目标误标 3Dgeneration。",
+    "evidenceZh": "dataset40.3countedops 但 8.5solidops，150+不是 policyactions；inference cap12constructionactions。（Sec.3.2 p.5 / App.I.8.4 p.32；方法与数据图实际查看，避免夸大长 programinferencecapacity。）\n作者报告 ABC-HardStepCAD.73/policy.52/bestprior.39；DeepCAD.89 但 CADReasoner.86 而 policy.82。（Table2, p.8；maintable 实际查看，87.2%为(.73−.39)/.39 相对 IoU 提升，非 87.2pp。）\n作者报告 sameARCADEsingle-shot.644、no-currentgeom.632、fullpolicy.682、search.816；search 对 CADRecode1200samples.597→.745。（Table3 p.8 / Table10 p.35；data-matched 与 generatortransfer 表实际查看，checkpoint 跨 data 排名不作 dataonly 因果证据。）\n作者报告 entityvertex/edge/faceaccuracy20.8/12.6/8.1，≥.99IoU 仅 15.3%，search 平均 program16.2→31.7ops。（Tables9/11–12, pp.35–36；entity/compactness 表实际查看，高 validity/meanIoU 不等精准历史或 dimensions。）\n作者明确 coarseselectors、poorseed/limitedbeam、semanticfeaturedelete 与 constraintediting 未知；失败示例仍 missing/extra geometry。（Sec.5 p.10 / Fig.11 p.22；limits/failurepage 实际查看，未承诺 manufacturing-readyCAD 或恢复 designintent。）",
+    "caveatZh": "boundedparams/finitebeam 固定 edits 约一分钟，poorseed 与 12actioncap 限制。\nIoU/CD 不说明原 dimensions/constraints/designintent；删有意义 fillet 也可能提高 score。\ncoarseentities 不能任意 face/edgeaddressing，可执行代码不保证 constraintpreservation 或 userediting 成功。\nsyntheticdomaingap 与不同合法 histories，需 feature/constraintobjectives 和 userstudy。\nARCADE 计数含 sketchprimitives/boolean，宣传 sequence 长度需用正确 unit；modeltrainedlong 数据不等 longinference 验证。\nmeshsection 与 overshoot 差集直接读取 target 几何，searchgain 多于 policygain，端到端成本必须与 one-shotbaseline 区别。\n优化 globalvolume 会漏 tinyholes/thickness/curvature，entityaccuracy 仍低、≥.99IoU 样本少。\nsinglebody/volumevalidity 不是 assembly/制造公差/stabilityconstraint，不能误归 fabrication-ready。\nABCderivedsketchlibrary 与 ABCbenchmark 去重/holdout 未充分描述；metricIoU 实现、noisy/nonwatertightinputs/retries 需公开实现验证。\ncost/训练 12.5Mtransitions 与 100K×batch32 曝光量描述需复核，暂无独立 seedCI；本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

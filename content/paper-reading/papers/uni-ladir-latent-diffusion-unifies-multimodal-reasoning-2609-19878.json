@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.19878",
+  "slug": "uni-ladir-latent-diffusion-unifies-multimodal-reasoning-2609-19878",
+  "title": "Uni-LaDiR: Latent Diffusion Unifies Multimodal Reasoning",
+  "authors": [
+    "Haoqiang Kang",
+    "Yizhe Zhang",
+    "Nikki Lijing Kuang",
+    "Jiatao Gu",
+    "Yian Ma",
+    "Lianhui Qin"
+  ],
+  "publishedAt": "2026-09-17",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.19878"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Uni-LaDiR",
+    "VLM / MLLM"
+  ],
+  "abstract": "Multimodal models increasingly think with different modalities such as images, 3D point clouds, and robot states, not just text. Yet each modality is still encoded into its own representation space, creating a modality-switching gap whenever reasoning moves from one modality to another. In this paper, we introduce Uni-LaDiR (Unified Latent Diffusion Reasoner), a framework that unifies different modalities into a shared latent space for multimodal reasoning. A unified encoder maps teacher reasoning steps from different modalities into latent thought tokens in a shared space, trained to extract the information needed for later reasoning steps and the final output. A diffusion reasoner, trained jointly with the encoder, generates these tokens at inference without teacher reasoning steps. Across eleven vision-language model (VLM) benchmarks and two vision-language-action (VLA) suites, Uni-LaDiR achieves relative gains over the strongest baselines of 7.3% on four mathematical and logical VLM benchmarks and 6.1% on RLBench manipulation tasks. Controlled comparisons show increasing gains as more teacher modalities are unified. These results suggest that unification improves multimodal reasoning by weaving it into a single thread, where the model predicts successive thoughts in a common representation space.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.19878v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.19878v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.19878v3 全文及 2026-10-06T15:06:36.015745+00:00 审阅记录；PDF 24 页，SHA-256 ba23c3f2949adba468c9c60b907599cc8f4345ceced65573c1ed0659cadfa2dd，视觉核验第 1、4、7、9、19、20、21、22、23、24 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 exactPDF 未提供自身 public implementation/projectURL，不能由作者或引用 LaDiR/LaST0 项目猜测 Code。",
+    "ideaZh": "Uni-LaDiR 将文本、图像及机器人 future state 等 teacher 步骤压成共享 thought tokens，用预测后续步骤/输出而非复原当前 modality 来学习表示，再让共享 backbone 以 diffusion 生成这些 tokens。固定 teacher 监督的 shared/separate、continuation/reconstruction 控制与 latent 干预支持其表示设计，值得精读。模型确实依赖 latent 不等于已识别可解释 reasoning；主榜单 recipe 不同，diffusion 收益还需同推理预算检验。",
+    "motivationZh": "多模态推理轨迹形式各异，显式文字过程也未必适合表达视觉或动作信息。目标是用共同的 latent thought 接口学习并生成不同任务的中间推理过程。",
+    "methodZh": "每 teacherstep 先经各 modality feature encoder，再由共享 LLM 的相同 query/projection 形成固定 thoughtblock。continuationpass 只让未来 target 看到许可 latentprefix，diffusionpass 使用 detached cleanblocks 作为 teacher 并隐藏当前/未来 target；两 loss 通过共享 LLM 权重共同塑造 encoder 与 reasoner。推理无 teacher steps，逐 blockflow matching 采样直到不再预测 BOT，然后输出答案或 action。训练 VLA future observations 属于监督，不在推理泄漏给 model。",
+    "methodFlow": [
+      "Encode teacher steps：各 modalityfeatures 附相同 learnablequeryblock，共享 LLM 产生统一 width/length thoughttokens；各 teacherstep 在 encoderpass 隔离。",
+      "Learn useful continuations：latentprefix 预测后续 teacher steps 及最终 answer/action，不让 conditioningstream 读 rawtarget 或 futureblocks。",
+      "Train latent diffusion：加噪当前 thoughtblock，以 taskinput 和 detachedprecedingblocks 预测 flowvelocity；clean 目标与 prefixstopgradient，但共享 LLM 仍接受 diffusionloss。",
+      "Generate thoughts：推理按 block 采样 thoughtchain，BOT 控制是否继续，无 teacherreasoningsteps。",
+      "Read final output：VLM 文本答案或 VLA 独立 flowactionhead 使用完整 generatedlatentchain。"
+    ],
+    "experimentsZh": "实验设置：作者基于 Zebra-CoT 视觉 reasoning 训练，并在多个 VLMfamily 及 simulationmanipulation 上测试。VLM 表报告相同 evaluationexamples、不同 methodrecipe；shared/separate 与 losscontrols 固定监督。VLA 输入有 RGB/point cloud/state，futureteacherobservations 训练专用。\n作者报告四 visualmath/logic 平均 49.0，对比 ILVR45.7，headline 约 7.3%为 relativegain 而非 7.3 百分点；七 vision 任务 78.5，MullTokens74.9 但 SAT72.0 低于 77.0。（p.7 Table 2）\n作者报告 RLBench87.0%对比同 backbone/recipeLaST0 82.0%；LIBERO99.2 vsPearlVLA+PRL98.7 近 saturation，不能视为开放 realworld 成功率。（pp.6–8 Tables 1–3; pp.20–21 protocol）\n作者报告 sharedcontinuation MathVista73.2 与 EMMA35.6，低于 separatecontinuation75.5 和 36.2；整体设计收益并非逐 task 单调。（p.9 Figure 5）\n作者报告 V*latentzeroing89.5→55.8、shuffle65.8、cross-example50.8；保持 input 与 sequencelength 并重新计算 hidden states。（pp.22–23 Table 7）\n作者报告 RLBench16.5Hz 对比 LaST0 15.4，timing 包括 preprocessing/transfer/reasoning/action 但排除 simulatorrender/step，并每四 actiondecision 一次 reasoningupdate。（p.21 Inference speed）\n比较范围：跨 backbone 与 fixedsupervision 控制较广。完整 VLM 榜单 data/recipe 不同，flow matchingvsL2/cosine 未报告严格等 NFE/推理 FLOPs；latent sampler 具体 stepcount 与平均 chainlength 未完整披露，不能由 latenttokens 少直接推总 compute 更低。\n消融与诊断：jointvsstaged、sharedvsseparate、frozen/reconstruction/continuationtargets、directregressionvsflow matching 和 latentinterventions。别把更深/随机多步采样的效果全归因为 latentdistribution 建模，仍需等预算控制。",
+    "insightZh": "实质贡献是以 continuation utility 学习跨 modality 统一 latent 并与其 predictor 联合适配，而非仅把不同 features 串起来。sharedspace/targetlearning/jointtraining 有拆分控制；更少 encoder 参数的 sharedvariant 表现较好，不支持纯增参解释。仍不能从共享维度或平均 score 推出消除了所有 modality-switchinggap。",
+    "whyRelevantZh": "跨视觉/text/3D/state 的 intermediate 表示与 latentgeneration 直接相关于多模态 reasoning 主方向，continuation-trained 统一 target 可为 structuredvisualreasoning 提供思路。当前不宣称设计 asset 或 fabrication 已受益。",
+    "evidenceZh": "三类 attentionmask 在所有 layer 隔离 teacher steps、targetstreams 与 diffusionclean/noisyblocks。（pp.4–5 §3.2–3.4; p.19 Appendix A.1, Figure 7；实际查看完整 mask；continuoustarget 不能读 GTvalues，文本 stream 只读 causal 前缀。）\n固定 teacher/modalities 下比较 shared/separateencoder 及 reconstruction/continuation，收益平均为正但部分 benchmark 下降。（p.9 Figure 5; pp.21–22 Appendix B.3；sharedcontinuation 的 MathVista/EMMA 低于 separatecontinuation，不能宣称每 task 都获益。）\ngeneratedlatentchain 置零/打乱/替换导致较大下降，说明 output 使用 input-specific 且 order-sensitive 表示。（pp.22–23 Appendix B.4, Table 7；test-time 介入也产生 distribution shift；证明使用 latent 而非其每步内容必为真实 reasoning。）\nbenchmark 排行榜基线使用自身训练 recipe，controlledanalyses 才固定 data 与 teacher。（p.20 Appendix B.1 Comparison protocol；主 headline 不作为统一设计单独 causal 效果。）",
+    "caveatZh": "teacherCoT 来源、质量与 stepgranularity 未深入分析，其他 sensor 或 modelgeneratedtrace 可能改变效果。\nVLA teacher 来自 demonstrationfutureobservations，VLM 来自 Zebra-CoT，scope 受这些监督限制。\n统一 space 是 learnedinterface，未直接量化跨 modalitygeometry 或证明 tokens 具有解释性的推理语义。\nlatent 破坏介入说明依赖，不证明每 step 因果 faithfulness；大幅 distribution-shift 也会造成失败。\nlatentNFE 与 chainlength/完整 trainingcost 未详细报告，flow objective 控制不等于 matchedinferencebudget。\nsimulationtask 与 suite-specificpolicy 尚无 realrobot 或制造装配迁移，point cloud 作为 teacher 不构成 3Dgeneration/segmentation 贡献。\nbenchmark 同 recipe 主因果 control 有价值，但部分 task 下降与微小 saturationgain 需要保留。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

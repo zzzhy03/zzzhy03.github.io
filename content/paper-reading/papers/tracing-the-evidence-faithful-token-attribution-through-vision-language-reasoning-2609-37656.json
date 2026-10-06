@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2609.37656",
+  "slug": "tracing-the-evidence-faithful-token-attribution-through-vision-language-reasoning-2609-37656",
+  "title": "Tracing the Evidence: Faithful Token Attribution Through Vision-Language Reasoning",
+  "authors": [
+    "Bowen Yuan",
+    "Danny Wang",
+    "Ruihong Qiu",
+    "Zijian Wang",
+    "Zi Huang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37656"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Tracing the Evidence",
+    "VLM / MLLM"
+  ],
+  "abstract": "Large vision-language models (LVLMs) exhibit strong reasoning capabilities, yet the visual and textual evidence supporting the generated responses remains difficult to identify. Faithful token attribution explains an LVLM's response by assigning scores that rank image and prompt tokens by how much the model relies on them, such that removing higher-ranked tokens causes the likelihood of the generated response to drop more rapidly. However, existing token-attribution methods have been developed mainly for text-based language models, and our empirical study reveals two challenges when complex multimodal sources are involved. First, the joint image-text attribution can underrepresent visual evidence relative to text, obscuring the image regions supporting the response. Second, visual evidence may influence the generated response through multiple intermediate reasoning paths, while existing methods trace only a limited subset of these paths, causing important visual contributions to be underestimated. Motivated by these insights, we introduce VTrace, a multimodal token-attribution framework that traces input contributions through intermediate reasoning and calibrates attribution scores across modalities. VTrace constructs pairwise attributions that highlight token-specific contributions and aggregates all forward attribution paths in closed form to account for both direct and indirect contributions. Cross-modal calibration then rescales image and text attribution scores using modality contributions estimated from response-likelihood changes, enabling a unified ranking of input tokens. Evaluations against seven baselines across six visual reasoning benchmarks demonstrate the superior attribution faithfulness. Project page: https://vtrace-attribution.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37656v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37656v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37656v1 全文及 2026-10-06T16:12:58.537Z 审阅记录；PDF 31 页，SHA-256 3ec1a4e14c1e16fd25146d7aa2dcdeefbcb95d0e8e843cc220da4ece5c77e03a，视觉核验第 1、5、8、16、19、22、27、31 页。数字均为作者报告，本项目未独立复现。代码状态 promised：官方 project page 有互动 attribution 示例，Code 按钮标为 coming soon；只确认网页源码，未确认方法实现公开。",
+    "ideaZh": "VTrace 把 LVLM 的 image/text tokens 到 reasoning 的正向 attribution 建成上三角图，用 Katz 闭式聚合所有 paths，再按 modality masking 的两玩家 Shapley values 校准图文份额。可借鉴 grounded reasoning 的诊断与 credit assignment，但它证明的是所定义图的路径求和，并非真实因果解释；评估依赖冻结 trace 的扰动 likelihood。",
+    "motivationZh": "LVLM attribution 容易低估视觉 tokens，且只追踪少量 reasoning paths 会漏掉间接贡献；需要把图文证据沿生成过程回溯，并校准两种模态的排名。",
+    "methodZh": "方法从 attention values 与 receiver residual update 的投影构建非负 pairwise W，对输入按 modality 均值中心化。严格上三角 W 保证有限幂和，R=(I−γW)⁻¹−I 聚合多跳，再用 incoming/outgoing weights 排序。三次额外 teacher-forced forward passes 估计图文移除损失，校准两种 modality 的总分。六个 benchmark 的扰动排名增益较一致，另用 top40% response tokens 的 1.5 倍权重做 GRPO；其因果解释与训练 credit transfer 仍有边界。",
+    "methodFlow": [
+      "固定 greedy-generated reasoning trace，缓存 attention weights、values 和 attention-block residual updates",
+      "输入 tokens 按 image/prompt 各自均值中心化，投影到 receiver update 并仅保留 i<j 的正贡献",
+      "按全局最大 W 归一化，γ默认 1；上三角矩阵逆聚合所有有限 forward paths",
+      "(1+incoming)×outgoing-to-target 形成 source scores",
+      "image/text/both padding 三次 forward，正贡献时用两玩家 Shapley 重分配 modality 总分",
+      "按 score 扰动 input 评估；另以 response attribution 排名做 GRPO token weighting"
+    ],
+    "experimentsZh": "实验设置：Qwen3-VL8B 主六 benchmarks，Qwen4B 与 InternVL3.5-2B/8B 跨家族；七 attribution baselines。同 trace、不按正确性过滤；RISE/MAS blur/padding 扰动、组件/γ消融、correct/incorrect 拆分。另 4B GRPO 训练 MMR1-RL/ReVisual-R1 两 epochs。\n作者报告 joint RISE .610/.187；主要消融来自多跳，去 calibration .602/.200。（Table2, p.7）\n作者报告 GRPO 八 benchmark 均值 63.99→65.27，但 MathVista77.40→77.20、MMMU-Pro51.68→51.45。（Table4, p.8）\n比较范围：多种内部/gradient/perturbation baselines 及跨家族对照较全；同模型 trace 比较公平。效度仍针对冻结 trace likelihood 与 synthetic perturbations，无 token ground truth/独立 human causal assessment；跨家族并非每 metric 都领先，如 InternVL8B VisualPuzzles image insertion .617<Rollout .622。\n消融与诊断：去 centering、multi-hop、calibration 及γ敏感性，另将 Katz 移植 IFR，支持 aggregation 可复用。γ=1 选择依据 evaluation sensitivity；训练贡献未隔离 response token weighting 本身。",
+    "insightZh": "跨 modal center/calibration 与全 forward-path aggregation 的组合改善已有 limited-hop tracing。闭式 Katz 恒等式成立是因为严格上三角矩阵 nilpotent；它不证明 attention projection 代表全部网络计算、路径具有因果含义或 reasoning 忠实。Shapley 只在两个 modality 级 players 上精确，不是每个 patch/token 的 Shapley attribution。",
+    "whyRelevantZh": "对 MLLM visual evidence reliance、reasoning trace 诊断和 token credit assignment 有参考价值；没有设计生成/编辑任务或长 horizon 视觉 agent 的直接验证。",
+    "evidenceZh": "正贡献 pairwise W 只沿前到后 token，Katz paths 可有限闭式求和。（Eqs. 3–7, Appendix C/D, pp. 4–6, 15–16；忽略负贡献；MLP/residual 等全计算因果图未由此恢复，exact 仅指此 W 的代数聚合。）\ncalibration 仅在两 modality contributions 及 score sums 全部 positive 时应用，否者保持原分。（Eq.9–11, Appendix D, pp. 6,16；正文给 boundary rule，Algorithm1 简写未显式 guard；不能误写负值总被 clamp。）\n作者报告 Qwen3VL8B 的 joint 平均 RISE insertion .610/deletion .187，去 multi-hop 为.470/.273。（Tables 1–2, p.7；image-only 排名不受 modality calibration 改变。）\n评估 input-only 扰动：image patches 用 Gaussian blur 再编码，question tokens 用 padding，generated trace 固定。（Appendix F/G.1–G.2, pp.18–20；20 比例 groups，端点归一化、running min/max 强制 monotonic 并 clip；非自由重新生成的 answer accuracy。）\n作者报告 attribution-guided GRPO 平均 63.99→65.27，MathVista/MMMU-Pro 局部下降。（Table4, Appendix F.1, pp.8,18；同 2epochs、top40% response tokens 权重 1.5；未给 multi-seed CI、额外 attribution 训练成本或同 token-weight random control。）\n作者报告 cached 固定 trace 的 all-token attribution median .26s，3000tokens 约 31GB。（Fig.6, Appendix F, pp.8,18；RTX PRO6000 Blackwell96GB，排除先前 trace 生成；0.26s 不是任意 3000tokens 的统一成本，长序列图约 4s。）",
+    "caveatZh": "当前以 single-image reasoning 为主，multi-image、长 context 与 agentic interaction 仍需验证。\nAttention 正投影与路径聚合是诊断 proxy，非 counterfactual causal proof；负作用及 MLP 非线性未完整追踪。\nBlur/padding 扰动可能 out-of-distribution，冻结 reasoning 前缀保留中间视觉信息，不能当自由生成 grounding 成功率。\nRunning min/max、endpoint/clipping 处理改变原响应曲线，结果依赖具体评估 protocol。\nShapley 是 modality 级两玩家估计，校准内部排序不变；无每 token 因果归因保证。\nAlgorithm receiver 截断与 GRPO response tokens 的具体 receiver 选择未充分展开；训练 gain 只为作者报告，未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

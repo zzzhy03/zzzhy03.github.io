@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2609.14779",
+  "slug": "func-r1-incentivizing-mathematical-function-reasoning-in-multimodal-large-language-models-2609-14779",
+  "title": "Func-R1: Incentivizing Mathematical Function Reasoning in Multimodal Large Language Models",
+  "authors": [
+    "Mingze Yin",
+    "Xiaohan Wang",
+    "Dian Li",
+    "Haichao Yao",
+    "Yilin Zhao",
+    "Youjun Chen",
+    "Gang Liu",
+    "Jintai Chen",
+    "Yiheng Zhu",
+    "Chang-Yu Hsieh",
+    "Aimin Pan"
+  ],
+  "publishedAt": "2026-09-13",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.14779"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Func-R1",
+    "VLM / MLLM",
+    "R1"
+  ],
+  "abstract": "Performing deliberate mathematical reasoning in visual contexts is a hallmark of advanced Multimodal Large Language Models (MLLMs) and requires a sophisticated synthesis of perceptual grounding and symbolic logic. However, in the realm of mathematical functions, our investigation reveals a critical modality interference phenomenon: even advanced models, while performing textual computational reasoning, tend to disregard or misinterpret essential visual cues. To address this challenge, we propose Func-R1, which synergistically harmonizes precise visual perception and rigorous logical reasoning. Concretely, built upon an explicitly decoupled architecture, we employ a hierarchical post-training framework to progressively identify critical visual evidence and conduct in-depth theoretical reasoning. Furthermore, the Perception-Aligned Theoretic Optimization (PATO) strategy is proposed to steer policy updating towards internalizing fundamental theoretical properties while dynamically rectifying heterogeneous visual information throughout the reasoning process. Extensive experiments across diverse benchmarks demonstrate that Func-R1 delivers the optimal performance among open-source MLLMs, even surpassing GPT-5 with an 8.4% improvement on MathVerse's function-oriented tasks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.14779v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.14779v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.14779v2 全文及 2026-10-06T11:08:18.060486+00:00 审阅记录；PDF 17 页，SHA-256 ac778c99f7508463b27d29cc253033b0df12f158c3a671085f5b6dfdec2259da，视觉核验第 1、3、5、9 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Sec3.1 p6 明确说 https://github.com/zju-ai4s/Func-R1 须待 company disclosure review 后公开，不能将承诺链接当 availablecode。",
+    "ideaZh": "Func-R1 把函数图解析与数学求解拆成 Qwen3-VL parser＋Qwen3 reasoner，以结构 caption SFT 和视觉纠错/知识/答案 rewards 作 PATO。作者报告 MathVerse 函数四类平均 63.4% 对 GPT-5 约 58.5%，8.4% 是相对提升；这是可借鉴的感知/逻辑接口，内部 91.4% 不能当独立 held-out 视觉泛化，因为全部 FuncCaption 用于 parser SFT。",
+    "motivationZh": "解答函数图数学题既要读准曲线、交点和坐标，也要完成逻辑求解；视觉解析错误容易传到答案，需要能单独诊断和纠正的感知与推理接口。",
+    "methodZh": "从 10k 网站函数题经多个 LLM 与 5 名数学博士筛出 3,519 题，构成 FuncCaption/FuncReasoning。Parser 把图变 description/property，reasoner 按 SAPO 式 soft gates 与三类 reward 训练。公开 bench 函数 subsets 与另训 Geo/SynSci variants 提供迁移证据；工作验证的是函数图任务的模块化训练，而非通用空间设计可靠性。",
+    "methodFlow": [
+      "数学网站题/图经 MinerU 提取，LLM 交替标注/arbitration 和专家验证",
+      "Qwen3-VL 以 FuncCaption SFT 生成 description 与 function properties",
+      "Qwen3 textual reasoner 接图 caption、question 和 knowledge 作 rollout",
+      "Qwen3-VL judge 给视觉纠错离散 labels，知识 F1/semantic similarity 与 verifiable answer 组成 reward",
+      "SAPO-inspired smooth asymmetric gates 更新 reasoner policy",
+      "输出结构化 reasoning/answers；新领域需重新训练对应 corpus"
+    ],
+    "experimentsZh": "实验设置：3,519 函数题；Reasoning75/10/15split，parser3epochs,batch8,lr1e-5；reasoner5epochs,batch64,lr1e-6,8rollouts。外部 MathVista/Math-Vision/MathVerse/We-Math 函数 subsets；Geo-R1/SynSci-R1 另训 geometry/mixedcorpus。\n作者报告 Pro 内部四类 94.3/92.7/90.0/88.5，平均 91.4%。（Table2, p.6）\n作者报告 Pro MathVerse 四类平均 63.4%，GPT-5 约 58.5%；Math-Vision56.4 反而略低 GPT-557.0。（Table1, p.5; Fig.4, p.8）\n比较范围：涵盖 closed GPT/Gemini 及 openMath/QL/VisionR1；Pro 合计 8B+32B 两模型，单 Qwen3-VL8B ceiling 对照不是 compute/parameter matched。跨学科表是另训 variants，不是 Func-R1 单 checkpoint 普适 transfer。\n消融与诊断：单 modelCoT/SFT/RL、Rs/Rv/Rk 组合与 GRPO/SAPO/DAPO 收敛比较支持模块/rewards 互补。但 Table4 fullrow MathVerse57.5 和主 Pro63.4 未明确对应同 variant，不跨表拼收益；缺 judge 可靠性统计/数据去重细节。",
+    "insightZh": "实质贡献是函数图 modality interference 任务、两模型 structured interface 与多 reward 组合。Soft gating 继承 SAPO；不是全新 RL 基础算法。纠错 reward 仍由 MLLM judge，并非数学求解器验证全部 visual/knowledge 陈述。",
+    "whyRelevantZh": "Visual descriptions 与 formal reasoning 拆开的接口可启发 designagents 检查图形事实后执行 symbolicconstraints；论文没有验证 CAD/SVG/3Ddesign 迁移，函数图能力不等于一般 spatialgrounding。",
+    "evidenceZh": "Lite 为 4B parser＋8B reasoner，Pro 为 8B parser＋32B reasoner；FuncCaption 全部 SFT，Reasoning 才 75/10/15 分割。（Sec.3.1, p.6; AppendixC, p.12；依据该 exact PDF；未独立复现。）\nRv 由 judge 识别引用/忽略/修正 caption，Rk 知识 matching，Rs 答案 correctness/format；weighted combinedreward 加 SAPO-stylegates。（Sec.2.3, Eq.1–8, pp.3–5；依据该 exact PDF；未独立复现。）\n作者报告 Pro MathVerse 四类 66.1/65.7/61.2/60.5%，GPT-561.6/60.4/56.3/55.6%。（Table1, p.5；主表实际视觉核验；8.4% 为相对平均增益，非 8.4 个百分点。）\n作者承认高质量函数数据少且昂贵，parser 错误仍可向 reasoner 传播。（Limitations, p.9；依据该 exact PDF；未独立复现。）\n内部 test 仅 Reasoning 阶段 held-out；全部对应 caption 参加 parser SFT，使 91.4% 不能解读为未见视觉题的端到端 test。（Sec.3.1–3.2, p.6；由训练分割文字推断风险；未断言作者存在未披露 benchmark 泄露。）",
+    "caveatZh": "Function coverage、visualforms 和难度有限，专家对齐标注昂贵。\nParser 到 reasoner 仍存在 error propagation，未来需要更互动的 perception/reasoning。\n内部 test 视觉 parser 已见全部 caption 的训练条件，端到端 held-out 边界不足。\n基于多个 frontier teacher/judge 的 syntheticannotation 与 reward 可能继承 bias；没有可见 interannotatoragreement。\nTwo-modelcost 与 single-modelbaseline 不完全匹配；PATO 温度/rewardcoefficients 细节缺少完整公共实现。\n所有数字为作者报告；已读 17 页包括 prompts、trainingappendix 和 examples，未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

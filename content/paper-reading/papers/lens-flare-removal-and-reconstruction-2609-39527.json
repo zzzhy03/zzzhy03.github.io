@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.39527",
+  "slug": "lens-flare-removal-and-reconstruction-2609-39527",
+  "title": "Lens Flare Removal and Reconstruction",
+  "authors": [
+    "Tarun Yenamandra",
+    "Jonathon Luiten",
+    "Daniel Cremers",
+    "Nathan Matsuda"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39527"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Lens Flare Removal and Reconstruction",
+    "3D Reconstruction",
+    "3D Generation"
+  ],
+  "abstract": "The presence of lens flares in images can significantly reduce the quality of downstream application results for tasks such as 3D scene reconstruction. This is because lens flares are a property of the camera imaging system, and not a part of the underlying scene being modeled. There are previous methods that tackle the removal of small flares focused around a light source. However, existing methods struggle with large flares, such as those that fill the entire image. In this work, we compile a novel dataset for large-flare removal, combining publicly available real-world data with a procedural generation pipeline. We fine-tune a diffusion-based model on our dataset to remove complex, large lens flares. On the other hand, lens flares remain effective artistic tools, widely used in the media. While there are ways to simulate 2D flares, representing and reconstructing lens flares consistently across multiple views has not yet been explored. To achieve this, we introduce a flare representation model that leverages the symmetry of lens flares about the camera's principal point. We propose a computational pipeline to jointly optimize this flare model and a Gaussian splatting model (3DGS). This enables the decomposition of a 3D scene into lens flares and the scene itself, using our flare-removal model. Because the reconstructed flare is explicit and re-renderable, it can be edited and transferred to novel images and new 3D scenes. We evaluate removal on an established benchmark and a new one for large reflective flares, quantify the flare/scene decomposition directly, and show that the pipeline is robust to errors in automatic light-source localization.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39527v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39527v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39527v1 全文及 2026-10-06T14:18:03.432777+00:00 审阅记录；PDF 20 页，SHA-256 cfe4f44e923d7c7b66edb1e4363982cee98eb57f5241ed8b0f1b695662671b6a，视觉核验第 1、5、6、10、14、15、16、19、20 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 exact PDF 和附录仅有引用/数据/基础系统链接，未找到自身 public implementation 链接；supplemental webpage 被提及但未提供可确认 URL，不猜测作者仓库。",
+    "ideaZh": "这项工作把 lens flare 当作 camera-dependent layer，从场景 3DGS 中分离出来：canonical flare 沿 principal-point–light 连线参数化，随相机与光源变化，再与场景共同渲染。相比单纯去 flare，更值得关注的是可编辑、可迁移的表示接口。作者的分解指标使用去 flare 模型生成的参考，迁移时冻结源视角外观；它支持视觉特效复用，不是恢复了真实光学或可任意外推的镜头模型。",
+    "motivationZh": "lens flare 随相机和光源变化，直接纳入 world-space 场景会损伤重建。目标是分离真实场景与相机光学效果，并将捕获的 flare 表示用于后续编辑。",
+    "methodZh": "论文先在包含大面积 reflective flare 的数据上微调单步 diffusion removal，产生 scene-only 监督；然后为每个光源拟合 camera-attached near-plane Gaussians，以 1D canonical 位置、光源投影与相机条件 MLP 控制位置和外观，允许额外 2D 细变形和 light correction。联合优化 scene 与 flare 分支，scene-only 对去 flare 输出、composite 对真实输入。显式 layer 能移植到图像与 3D 场景并缩放编辑；新场景用目标相机/光源放置 layer，但查询源 camera/light 保留 in-distribution 形状颜色。",
+    "methodFlow": [
+      "Train removal prior：使用 scattering、large reflective 与 procedural ring flare 合成监督，微调单步 diffusion 的 UNet 和 VAE，保留光源或 glare 的两种输出策略。",
+      "Locate lights：Grounded-SAM-2 与亮度/重复框过滤得到光源 mask，TRASE 跨视图聚合为稀疏 3D 光源位置。",
+      "Construct flare layer：光源投影和 principal point 定义径向连线；canonical1D Gaussian 由 camera/light 条件网络变形，转换成 camera 近裁剪面后的标准 3DGS primitive。",
+      "Fit decomposition：scene-only render 监督来自去 flare 模型，scene+flare render 监督来自实际拍摄图像；联合优化几何 layer 与变形网络。",
+      "Transfer and edit：在源 camera/light 查询 appearance，以目标光源投影和相机重新放置 layer，做每光源 visibility gating 并与目标合成；显式 Gaussians 可缩放。"
+    ],
+    "experimentsZh": "实验设置：作者比较 Flare7K++与自己 large-flare VFX benchmark，使用 clip-disjoint 数据；另捕获 scene-removal 与 flare-reconstruction 数据集。flare reconstruction test 是在受限 camera sweep 内 interleaved held-out frames，主要检验插值；新场景 transfer 为定性展示。\n作者报告 VFX removal Ours PSNR27.06、FlareX24.17；Flare7K++上 wGlare 为 26.68、Flare7K++基线 26.42，数据和是否保留 glare 影响排序。（p.10 Table 2）\n作者报告真实 clean held-out 视图 scene 重建平均 PSNR23.93，vanilla3DGS18.68，FR-preprocessed22.65；wGlare 在 plant 场景并非最佳。（p.10 Table 3）\n作者报告取消 1D 约束的 flare-proxy PSNR27.77，对比 33.27；scene-proxy31.78 对比 31.79 基本持平。完整 composite33.06，vanilla32.37，unsupervised variant33.67 更高。（p.14 Table 4）\n作者报告单 light、1080p、RTX4090 总 10.79ms，其中变形 3.92ms、rasterization6.86ms；scene-only6.74ms。1.8%只指 rasterization 增加，不是整个 pipeline 开销。（pp.11–12 Rendering speed）\n作者报告固定每光源 3D 偏移对应平均 262px 投影误差时 composite33.82→32.29；同时去除两种校正的变体明显恶化，不能等同真实逐帧抖动或漏检鲁棒性保证。（pp.15–16 §5.5, Figures 15–16）\n比较范围：部分 removal 基线重训相同扩展数据，FlareX/LightsOut 使用 release 模型；LightsOut 原本是 outpainting 辅助流程却作为 standalone remover，需保留 protocol 边界。表示层比较 vanilla3DGS 与多个同 pipeline 变体，无真实 paired optical decomposition GT。\n消融与诊断：包括 VAE encoder 微调、light supervision、VFX 训练数据、1D 约束、scene-only supervision、light detection 和双校正；共同 reference 偏袒采用该监督的分解变体。light correction 与 finer deformation 有冗余，单独删除效果很小。",
+    "insightZh": "重要表示贡献是把无法固定在 world-space 中的相机光学 artifact 重建成 camera-tied Gaussian 分支，以已有 lens symmetry 几何作先验，兼容现成 rasterizer 并支持 captured flare 复用。diffusion removal 本身是领域适配；整体核心仍是 decomposable 3D reconstruction，而非通用 image generation 突破。",
+    "whyRelevantZh": "直接服务 3D scene reconstruction、可编辑 camera-effect 资产与视觉内容创作，可借鉴将 view-dependent artifact 与 scene 表示拆分。与可制造 geometry 关系较弱，也不支持把 flare 分支作为可校准的物理 lens simulator。",
+    "evidenceZh": "flare 的位置是 camera frame 近面上的表示，不是场景真实 3D 几何。（pp.5–7 §3.2, Figures 6–7, Eqs.(3)–(7)；实际查看几何 construction 和公式，区分 1D canonical 坐标与最终 3DGS primitive。）\n去 flare 用于训练 scene-only；分解评分的 scene/flare reference 也来自该模型，存在共享偏差。（pp.8–10 §5.3, What counts as a correct decomposition/What the residual measures；作者明确承认 residual 还吸收遮挡 scene 复原误差，不是纯光学 flare GT。）\n去 flare 后的 scene 重建另有真实 flare-free held-out captures 评估，区别于分解 proxy。（pp.7–8 §4.1.2/§5.2; p.10 Table 3; p.19 Figure 18；这些 test views 特意选为没有 flare 的原始拍摄图像。）\ntransfer 主动解耦 source appearance 和 target placement，不是对目标 camera/light 完全外推的光学预测。（pp.14–15 §5.4, Figure 14; p.3 Table 1 footnotes；二维图像 transfer 无 depth visibility；3D transfer 有 target light occlusion test。）",
+    "caveatZh": "Gaussian 中心高 opacity 的形状不适合 ring-shaped flare，removal 能处理 ring 但重建 layer 仍困难。\n真实 capture 没有 paired flare-free/flare 分层 GT，removal 用合成 composites 训练；超出训练 flare 类型难可靠复原。\ncaptured scene 的 light 遮挡目前隐式拟合，尚无 explicit occlusion-aware reconstruction。\n分解 reference 共享 removal bias，只有 composite 是对直接 capture 评分。\n被强 flare 遮挡的 scene 内容由 diffusion prior 补全，不能当作实际恢复的几何或纹理证据。\ninterleaved 相近 view 插值不能证明任意 camera 外推；target transfer 保持源 appearance，物理光学正确性和 radiance scaling 未被证明。\n每 light 单独模型与近面 alpha 层适合效果资产；广域照明、复杂 lens 或动态光源域外变化尚不覆盖。\n训练速度比较使用已有大型 diffusion 预训练与 from-scratch 基线，不代表总学习成本更低。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2609.36755",
+  "slug": "drag-as-evidence-motion-grounded-latent-recomposition-for-drag-based-editing-2609-36755",
+  "title": "Drag as Evidence: Motion-Grounded Latent Recomposition for Drag-Based Editing",
+  "authors": [
+    "Xinyu Pu",
+    "Hongsong Wang",
+    "Jie Gui",
+    "Pan Zhou"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36755"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Drag as Evidence",
+    "Image Generation"
+  ],
+  "abstract": "Modern image editors excel at semantic manipulation and visual synthesis, yet remain limited in precise spatial control, motivating the development of drag-based editing. However, existing drag-based methods often struggle to balance drag accuracy with natural, plausible, and intent-aligned generation. We propose MoRe-Drag, a motion-grounded drag-based editing method. Our key insight is to treat pixel-space warping as coarse motion evidence, and to inject this evidence into the generative sampling trajectory. Specifically, MoRe-Drag performs region-aware latent recomposition over refinement, inpainting, and anchor regions, coupled with stage-adaptive conditioning that progressively shifts from motion-grounded structure formation to semantic refinement. We further support an instruction-free interface by adapting the MLLM-based text encoder for drag-aware instruction inference. Experiments on DragBench-SR and DragBench-DR show that MoRe-Drag substantially improves drag precision over strong base editors and achieves superior drag accuracy among SOTA drag-based methods, while delivering strong semantic consistency and visually realistic results. Code and dataset will be publicly released.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36755v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36755v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36755v1 全文及 2026-10-06T15:21:25.177147+00:00 审阅记录；PDF 24 页，SHA-256 b4aebfaec2be2fc61070231d740ecac75dbedcebadae8ff24f3e0d27ce876472，视觉核验第 1、4、7、9、16、22、23 页。数字均为作者报告，本项目未独立复现。代码状态 promised：exact PDF abstract 明确称 code/dataset will be publicly released；全文未提供本方法公开实现链接。引用的 Qwen fine-tuning 与基线库不算 MoRe-Drag code。",
+    "ideaZh": "MoRe-Drag 将用户拖拽产生的 warped image 作为生成过程中的空间证据：按拖动、补洞、保持区域重组两条 latent 轨迹，再从早期 motion 条件切换到后期语义修复。这是可直接借鉴的精确图像编辑接口。作者报告 LongCat 上 DragBench-SR 的 MD 从 53.62 降至 18.54，但 prompt following 从 92.08 降至 86.36；保持区域依赖 null reconstruction，不能保证像素不变或真实三维 articulation。",
+    "motivationZh": "文字编辑器难以准确执行 drag 指定的位置变化，直接 warping 又容易留下破损和不自然边界。目标是利用稀疏拖动证据完成位移、补洞和内容保持。",
+    "methodZh": "解决现代文字编辑器空间定位不足、直接 warping 又不自然的问题。稀疏 handle-target pairs 和 mask 被双向 warp 转为 coarse motion observation；将区域分为 transported refinement、disocclusion inpainting 与 preservation，在 flow sampling 中混合 generation 与 null-conditioned evidence reconstruction。早期使用 warped image 加修复提示，后期切换原图和编辑指令。另以 ByteMorph 筛选的 drag-instruction pairs 对同一 MLLM text encoder 做 LoRA，推断指令时启用、生成时关闭。",
+    "methodFlow": [
+      "几何交互转证据：用 handle-target 位移和源 mask 进行 mask-aware 双向像素 warping，推导 transported、hole 和 unchanged 区域。",
+      "双轨迹按区域重组：补洞采用条件生成 latent，保持采用 null reconstruction latent，拖动区域混合两者；只在指定早期区间加入额外 evidence forward。",
+      "分阶段条件切换：前段使用 warped image 与修复提示确定布局，后段切回原图与用户或自动指令修复外观。",
+      "拖拽意图辅助：LoRA text encoder 从原图及拖拽标记生成编辑指令，仅推断指令启用 adapter。"
+    ],
+    "experimentsZh": "实验设置：作者在 DragBench-SR/DR 上比较，三次运行报告均值与标准差；text baseline 接收人工检查过的 Qwen3.5 生成指令，MoRe-Drag 默认自己推断指令。MD 使用点追踪，CP/PF 采用 GPT-4o judgement；默认 30 steps、4090 CPU offload。\n作者报告 LongCat + MoRe-Drag 的 SR MD 为 18.54，对应原编辑器 53.62；DR 为 20.03，对应原编辑器 46.73。（Table 1, p.7）\n作者报告 DR 移除 region recomposition 的 MD 为 25.41，移除 adaptive conditioning 为 29.61，完整为 20.03。（Table 2, p.9）\n作者报告 10 个样本的平均推理从 30.74s 增至 41.31s，峰值显存从 16.05GB 增至 17.18GB。（Table 8, Appendix E.6, p.23）\n比较范围：有优化式 drag、优化 free drag、Inpaint4Drag 与更强 FLUX Fill variant，并在 Qwen/LongCat 两骨干实例化；ContextDrag 结果来自原文、输入格式与骨干不同，不能作为完全 matched 比较。无独立人类自然度/身份保持评测。\n消融与诊断：RAR、GAC、权重 schedule、切换时间、指令 LoRA 与 null reconstruction 有分析；部分 RAR 和 GAC 超参数同步变化，但另有固定 RAR 的 switch ablation。ByteMorph 处理表中点数上限与正文不一致，公开实现仍需确认。",
+    "insightZh": "明确将 warping 变为区域分工与阶段控制的生成证据，而非单次 warp-then-inpaint；这对 creation 的直接交互有实用迁移价值。区域混合和条件切换本身是工程组合，不应提升为通用动力学或几何约束理论。",
+    "whyRelevantZh": "直接提供视觉创作的 point-and-mask 编辑接口与明确的保护/补洞分工，符合 image-generation 的直接 creation transfer 门槛；迁移范围限二维编辑。",
+    "evidenceZh": "区域重组保留的是 evidence reconstruction 而非原图像素。（Sec.3.1, Eqs.6–8, pp.5; Algorithm 1, p.17；保持效果受 backbone 的 null reconstruction 稳定性限制，末段不再硬重组。）\n早期 warped 条件与后期原图条件分别承载布局和语义修复。（Fig.3, p.4; Sec.3.2, Eqs.9–11, p.6；这为拖拽接口提供可解释步骤，但不是几何严格保证。）\n作者报告精度提高同时部分语义指标下降。（Table 1, p.7；LongCat SR MD 53.62→18.54、PF 92.08→86.36；Qwen variant 的 CP/PF 都下降，跨骨干并不均匀。）\n大范围或模糊 warping 会产生合理但不按要求的运动。（Appendix E.4, Figs.13–14, pp.21–22；猫头转动和盖板 articulation 的失败揭示 2D evidence 不等于真实几何。）",
+    "caveatZh": "主要面向 MLLM text encoder 加 MMDiT editor，效果依赖 null reconstruction。\n错误或欠约束 warping 可使合理修复压过期望 motion；近距离点对可能被错误解释。\npreservation branch 不是 source pixel hard lock；不能声称区域外严格不变。\nCP/PF 是 GPT-4o 代理而非独立人类判定，原编辑器 PF 更高。\n额外 MMDiT forward 有实际成本；30 sampling steps 不代表与基础模型相同 NFE。\n单图二维拖拽没有 camera、rigging 或三维物理验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

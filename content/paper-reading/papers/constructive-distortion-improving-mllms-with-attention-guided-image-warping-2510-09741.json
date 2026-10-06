@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2510.09741",
+  "slug": "constructive-distortion-improving-mllms-with-attention-guided-image-warping-2510-09741",
+  "title": "Constructive Distortion: Improving MLLMs with Attention-Guided Image Warping",
+  "authors": [
+    "Dwip Dalal",
+    "Gautam Vashishtha",
+    "Utkarsh Mishra",
+    "Jeonghwan Kim",
+    "Madhav Kanda",
+    "Hyeonjeong Ha",
+    "Svetlana Lazebnik",
+    "Heng Ji",
+    "Unnat Jain"
+  ],
+  "publishedAt": "2025-10-10",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2510.09741"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Constructive Distortion",
+    "VLM / MLLM"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) often miss small details and spatial relations in cluttered scenes, leading to errors in fine-grained perceptual grounding. We introduce AttWarp, a lightweight method that allocates more resolution to query-relevant content while compressing less informative areas, all while preserving global context. At test time, the approach uses an MLLM's cross-modal attention to perform rectilinear warping of the input image, reallocating spatial resolution toward regions the model deems important, without changing model weights or architecture. This attention-guided warping preserves all original image information but redistributes it non-uniformly, so small objects and subtle relationships become easier for the same model to read while the global layout remains intact. Across five benchmarks (TextVQA, GQA, DocVQA, POPE, MMMU) and four MLLMs (LLaVA, Qwen-VL, InternVL, and InstructBLIP), AttWarp consistently improves accuracy, strengthens compositional reasoning, and reduces hallucinations, outperforming four competitive baselines that manipulate raw images at test time. Together, these results show that attention-guided warping prioritizes information relevant to the query while preserving context, and that the same MLLMs perform better when given such warped inputs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2510.09741v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2510.09741v4"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/dwipddalal/Attwarp"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2510.09741v4 全文及 2026-10-06T15:56:17.502495Z 审阅记录；PDF 36 页，SHA-256 cd2e642a90d47099e633abfab13aa2baf8bbdfac056d403259f9cd8c7de5700e，视觉核验第 1、2、7、9、10、26、31、32、36 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 project page 的 Code 指向此 official repository；确认 Attention Guided Warping/main.py、evaluation scripts 与 marginalnet training modules 存在。作者自身 attention extraction utilities 仍标 soon release，使用上游替代；公开部分实现不等于完整 reproduction pack，未执行。",
+    "ideaZh": "AttWarp 用当前 query 的 attention marginals 重分配图像 sampling grid，让小而相关的区域占更多 pixels；还给出迭代与 distilled predictor。作者报告多模型视觉 QA 增益，适合速读其 query-conditioned token allocation。单调 warp 保留轴向顺序，却不会保证相对尺寸、角度或全部像素信息无损；论文的 distribution-preserving 与 attention-causality 表述强于实际证据。",
+    "motivationZh": "固定分辨率的图像输入可能使小而关键的区域分到过少 pixels；目标是依据 query attention 重分配 sampling grid，提高相关细节的可见性。",
+    "methodZh": "先提取生成 token 对视觉 tokens 的 attention，按 heads/layer 平均，再构造横纵边际、inverse CDF 和 bilinear warp；同一冻结 MLLM 再读 warped image。Chain 在已 warped 图上继续迭代，以 attention KL 和硬上限停止；Distill 从图文对预测 marginals，省去 MLLM attention 获取。多项 benchmark 与外部 attention transfer 显示效用，但评测采用限制输入分辨率及 exact-match protocol，无法直接等同官方排名。",
+    "methodFlow": [
+      "原图与 query 经过冻结 MLLM，提取指定 layer 的 output-to-image attention。",
+      "平均 heads 与 output tokens，平滑并变换 attention matrix。",
+      "构造横纵 marginals 及 inverse CDF，定义有序的 rectilinear sampling grid。",
+      "bilinear resample 后由同一 MLLM 回答。",
+      "可迭代 warped input 并按 attention KL/最大深度停止，或训练小型 predictor 直接预测 marginals。"
+    ],
+    "experimentsZh": "实验设置：比较 frozen MLLM、mask/blur、SoM、API、ViCrop 和 AttWarp 系列；包含 external attention、局部 bounding-box expansion、有限 localization pilot、distilled predictor 与 CLIP pooled-feature shift 指标。参数和层选择在 validation 或小样本上确定，主要没有 repeated training/evaluation uncertainty。\n作者报告 LLaVA 的 TextVQA 从 49.3 到 58.1，Chain 为 60.3；Qwen 的 DocVQA 从 77.3 到 84.1，但使用 resized/exact-match protocol。（p.7, Table 1; pp.30–31）\n作者报告 TextVQA Pointing Game 从 37.4% 到 42.4%；这是增加 5.0 个百分点，不能沿用正文的相对增长说法，也不能单独隔离 bbox 放大效应。（p.9, Figure 6）\n作者报告普通 AttWarp 为 13.8 TFLOPs，base 为 8.5，ViCrop 为 24.2；Distill 为 8.7，但需要离线 teacher targets 与 predictor training。（pp.8,31–32, Table 3; Appendix G）\n作者报告 CLIP pooled-feature FID 改善而 KID 相对原图有所增加，属于有限 embedding distribution diagnostic，不能证明数据 manifold 或像素内容完整保持。（pp.35–36, Appendix I）\n比较范围：多种 input interventions、不同 backbones 与 external maps 有覆盖；缺少原生高分辨率 pipeline、等完整算力的重采样/多视图对照及 attention 的因果控制。\n消融与诊断：heads、layers、transform、corruption 和 chain depth 有对照。feature-space 对照是 additive hidden-state bias，不能当作所有 feature-space warping 方法。adversarial robustness 主要是单个展示，不构成总体保证。",
+    "insightZh": "经典 saliency resampling 的 query-conditioned VLM 应用；cross-model attention transfer 与可蒸馏 grid predictor 提供可迁移表示价值。不是几何不变或信息无损的理论机制，也未证明 attention 是因果 explanation 或 KL stopping 的最优性。",
+    "whyRelevantZh": "把有限视觉 token 预算分配到 query-relevant 区域，是 VLM perception interface 的可迁移问题；有跨模型和 distilled tokenizer 证据，但理论与统计边界限制其精读优先级。",
+    "evidenceZh": "实际变换是横纵 marginals 的 inverse-CDF bilinear sampling。（pp.3–5, §3; p.36, Appendix J；覆盖整个图域并不等于保持离散像素信息；不同区域的局部缩放会改变相对几何。）\n多模型、多个 task 的收益在限制分辨率下测得。（pp.7–9, Tables 1–3; pp.25,30–31, Appendices D/G；作者报告；DocVQA 使用 exact-match accuracy 与 resized images，不是原官方设置的完整等价。）\n重复 warp 有退化，classifier 和 stop rule 依赖 learned/empirical choices。（p.10, Figure 7; pp.25–26, Appendix D.3; p.31, Appendix G；稳定 attention 并不保证答案正确，图中及错误分析仍有失败。）",
+    "caveatZh": "attention 错位时基础模型和 warp 都可能失败，边缘上下文可能被压缩。\nsize 比较有退化，过多迭代造成 over-expansion 与性能下降。\n单调坐标保留轴向顺序，却不保持长度比、角度、形状或相对尺寸；不能声称几何完整保真。\nbilinear sampling 固定输出预算会损失被压缩区域的高频信息，并非全部原图信息无损。\n放大 bbox 会改变 attention hit/mass 指标的覆盖基准；未明确 inverse mapping 的控制不足以证明更准确的因果 attention。\n连续 warped coordinates 下 attention KL 的语义对齐及停止最优性未证明；实现、layer index 和部分表述也有不一致。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

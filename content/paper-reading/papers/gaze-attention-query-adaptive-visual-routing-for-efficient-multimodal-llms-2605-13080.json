@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2605.13080",
+  "slug": "gaze-attention-query-adaptive-visual-routing-for-efficient-multimodal-llms-2605-13080",
+  "title": "Gaze Attention: Query-Adaptive Visual Routing for Efficient Multimodal LLMs",
+  "authors": [
+    "Junha Song",
+    "Byeongho Heo",
+    "Geonmo Gu",
+    "Jaegul Choo",
+    "Dongyoon Han",
+    "Sangdoo Yun"
+  ],
+  "publishedAt": "2026-05-13",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.13080"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Gaze Attention",
+    "VLM / MLLM"
+  ],
+  "abstract": "When humans describe a visual scene, they do not process the entire image uniformly; instead, they selectively fixate on regions relevant to their intended description. In contrast, current multimodal large language models (MLLMs) attend to all visual tokens, leading to diluted focus and unnecessary computational overhead. Existing efficiency methods often compress or discard visual information before generation, potentially losing details needed for later predictions. In this work, we introduce Gaze Attention, a mechanism that enables MLLMs to select visual regions according to the needs of each generation step. By grouping visual tokens into spatial regions and selecting those relevant to the current prediction, Gaze Attention reduces attention computation while focusing on relevant visual content. We further introduce learnable context tokens that summarize images or video frames, preserving global context under selective attention. Experiments on 13 image and 6 video understanding benchmarks demonstrate that Gaze Attention matches or surpasses dense-attention baselines while using up to 90% fewer visual KV entries. It also achieves higher average performance than KV-cache eviction baselines under matched visual KV budgets.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.13080v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.13080v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/junha1125/Gaze-Attention"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.13080v2 全文及 2026-10-06T14:52:29.383918+00:00 审阅记录；PDF 21 页，SHA-256 adb70d761a57dd58139babcbdbae9997ed55e7d07b8200d90d2c31737331ec09，视觉核验第 1、4、7、9、10、18、19、20、21 页。数字均为作者报告，本项目未独立复现。代码状态 available：exactPDFp.1Codeannotation 由 pdftohtml 解析为该 publicrepo，实际访问可见 cambrianmodel/training/demo/evalimplementation 及脚本，不是 README-only；未运行。public release 配方与 PDF 配置/成本有差异，链接不代表已验证 exact 实验重现。",
+    "ideaZh": "Gaze Attention 保留完整 visual KV，以每 layer/head 的当前 decoding query 重新选择 spatial regions；learnable context tokens 提供全局信息，因此某区域这一步没读仍能后续回访。作者报告少量 attended entries 下保持图像/视频能力，适合 skim 这种视觉证据路由接口。它没有删除全部 KV，也尚未获得端到端加速：论文 plain PyTorch 实现实际更慢，GPU KV 节省依赖 offloading。",
+    "motivationZh": "高分辨率图像和多帧视频带来大量 visual tokens，而不同问题需要访问的区域不同。目标是随语言 query 动态读取相关视觉证据，并保留全局上下文。",
+    "methodZh": "视觉 keys 按空间/帧 region 分组、mean pooling 为 descriptor，query 打分 topK 后仅对 selected keys/values 及 text/context tokens 进行 attention。新增 perimage/frame context tokens 只能看对应 visual unit，持续提供 summary。训练从 dense 逐步转 sparse，selected tokens 通过常规 next-token loss 接收梯度。核心是动态视觉访问与 representation 接口，不是固定 prefill eviction 或 generic serving scheduler。",
+    "methodFlow": [
+      "Group visual regions：保留完整 visualKV，按空间与时间 grid 分区，以平均 key 形成每 region descriptor。",
+      "Route each query：每 layer/head decodingquery 打分 descriptors 并选 topK，未选 region 不永久删除。",
+      "Keep global summaries：perframe context tokens 在对应 unit 内汇总信息，对所有 text queries 保持可访问。",
+      "Train gradual sparsity：先密集再减少 selectedregion 比例，nexttoken 训练改善 query/key alignment，topK 选择本身不可微。",
+      "Attend selectively：生成时联合 text、context 与 routedvisualKV；offloading 可降低 GPUresidentKV 但完整缓存仍需外部存储。"
+    ],
+    "experimentsZh": "实验设置：作者以 SigLIP2 和两个 QwenfamilyLLM 搭建 Cambrian variants 并进行 nexttoken 视觉训练，比较 dense、trainedgaze 与 training-freeeviction；评估多种 image/videoQA 并给 counting/localizationproxy。token-matched 训练尽可能控制 architecture，但部分 published 方法仍是异构 reference。\n作者报告 image576entries dense 平均 59.7，gaze144+4 为 61.2，72+4 为 60.4；小幅能力变化伴随显著 accessbudget 降低。（p.7 Table 1）\n作者报告 4B video20Kdense VideoMME58.8、NExT-QA77.1；4Kgaze60.4/80.4，但 LongVideoBench57.5→56.8 并非每项更好。（p.9 Table 2）\n作者报告 10K→1.5Kaccess 配置 attentionFLOPs5.52→0.89GFLOPs，另加 routing0.19 和 context0.15；offloadedGPU KV1.37→0.27GB。（p.10 Table 3）\n作者报告 plainPyTorch image/video inference 为 dense 的 1.5–1.6 倍 walltime，当前不能宣称实际加速。（p.10 §4.4）\n作者报告 semanticrouting51.3–57.7%，random11.16%；该 proxy 来自自动 annotation。（p.10 Table 4）\n比较范围：训练后的 gaze 对训练前 eviction 存在 training exposure 差异，作者明确承认；同 Cambrian 与 KV budgets 对照较有参考价值。未与所有现代 optimizedsparsekernels 同部署预算比较，noexplicit human gaze 监督不等于人类 gaze 正确。\n消融与诊断：contexttokens、regionsize、progressiveschedule 与 boundary/distributedevidenceproxy。schedule 正文 66.4/63.5 与引用 Table1 同配置 58.3 口径未解释，避免据其量化归因；route/controlcapacity 可进一步匹配。",
+    "insightZh": "对 VLM 实现可回访的 word-conditioned sparse visual routing 并结合全局 context，有视觉 attention 架构贡献；已有 text/video sparseattention 与经典 captioningattention 提供基础。其意义是证据访问机制，不是人类 gaze 建模或大幅通用 reasoning 突破。",
+    "whyRelevantZh": "动态视觉证据访问机制直接推进 VLM visualrepresentation 与跨 wordgrounding 接口，可与主动 crop 读取互补。作为视觉 attention 方法可满足 continuousgate；避免将其转作 LLMserving 加速 headline 或 video 创作贡献。",
+    "evidenceZh": "visual cache 完整保留且每 query 重选 region，支持未来回访。（pp.4–5 §3.2–3.4, Figure 3；attendedKV count 与 totalretainedKV 必须区分。）\nGPU KV 节省测量采用 CPU/SSD offload，plainPyTorch 相对 dense 更慢。（p.10 §4.4, Table 3；attentionFLOPs 不是模型总 FLOPs，latency 并未改善。）\nsemantic routing proxy 高于 random 但不是 human gaze 或 causalimportance 测量。（p.10 Table 4, Routing quality；自动 captionphrase 及 segmentationmask 提供 proxy，错误可能共享。）\nfixedregions 和 mean descriptors 会错过 semantic boundaries，accuracy 收益相对小。（p.18 Appendix C; pp.19–20 Tables C–E；分布、小物体/边界证据是 benchmarkproxy 而非 exactsize 分组。）",
+    "caveatZh": "固定 region/topK 与 mean descriptor 不总对应 semanticobject，需要 adaptivepartition 和 budget。\n当前主要证明 memory-performance 权衡而非大 accuracy 增益，routing 可能继承视觉/语言偏差。\ngathering 与 routing 工程开销阻止当前端到端加速。\n少 accessentries 不等于总 KV 删除；offloading 的 CPU/SSD 存储、I/O 和 descriptors 仍存在。\nattention 图变尖部分由 hardmask 定义，不能单凭集中度证明更 faithfulreasoning。\n无需 gaze 监督与自动 overlapproxy 不能确认词语真实 causal 依赖；globalcontexttokens 也可能承担 majorityevidence。\n辅助 scheduleaggregate 引用存在未解释口径，public release 训练配置/成本也不同，复现需锁定 paper 实验版本。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

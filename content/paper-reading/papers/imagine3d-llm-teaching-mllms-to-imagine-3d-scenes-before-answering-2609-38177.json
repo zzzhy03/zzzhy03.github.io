@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2609.38177",
+  "slug": "imagine3d-llm-teaching-mllms-to-imagine-3d-scenes-before-answering-2609-38177",
+  "title": "Imagine3D-LLM: Teaching MLLMs to Imagine 3D Scenes Before Answering",
+  "authors": [
+    "Jaewoo Jung",
+    "Hyeonseo Yu",
+    "Honggyu An",
+    "Jisang Han",
+    "Mungyeom Kim",
+    "Minkyeong Jeon",
+    "Heeseong Shin",
+    "Wonjun Moon",
+    "Federico Tombari",
+    "Daniel Barath",
+    "Marc Pollefeys",
+    "Seungryong Kim",
+    "Sunghwan Hong"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38177"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Imagine3D-LLM",
+    "VLM / MLLM",
+    "LLM"
+  ],
+  "abstract": "Reasoning about the 3D world from multi-view images remains a fundamental challenge for Multimodal Large Language Models (MLLMs). While modern MLLMs handle single-image inputs effectively, they struggle to integrate evidence across viewpoints into a coherent 3D understanding. A growing body of work attempts to close this gap by injecting 3D awareness into MLLMs, either by boosting fine-grained pixel-level cross-view correspondence or by fusing features from 3D geometry foundation models, yet a substantial gap to human reasoning persists. In this work, we revisit human spatial reasoning, which suggests that rather than relying on fine-grained geometry cues, humans roughly identify common objects across views, infer the relative geometry between viewpoints, and assemble a coarse 3D layout of the scene. Inspired by this process, we introduce Imagine3D-LLM, an MLLM that learns to assemble a similar compact 3D representation of the scene and conditions its answer on this representation. Concretely, we append a small set of learnable summary tokens after the image tokens, decode them into a compact 3D Gaussian Splatting representation supervised by a photometric reconstruction loss, and train jointly with the standard next-token prediction objective. Notably, although only the summary tokens receive direct reconstruction supervision, this objective also induces stronger cross-frame correspondence within the LLM's underlying image features, suggesting that learning to reconstruct propagates 3D-aware signals throughout the model. As a result, Imagine3D-LLM consistently outperforms prior approaches across multiple spatial reasoning and 3D understanding benchmarks, suggesting that imagining the scene can be more effective than being told its pixel-wise geometry.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38177v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38177v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38177v1 全文及 2026-10-06T12:15:52.992591+00:00 审阅记录；PDF 25 页，SHA-256 9f587da5aae9c80f2f4a24857ae369c4aeefad521bd755bfad2e53a8897ba2ee，视觉核验第 1、4、8、9、10、19、23、24、25 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF p.1 印作者 projectpage；实际跟其 Code 链接确认 public cvlab-kaist/Imagine3D-LLM repository 目前只有 assets/README，What to expect 列 training/evaluation code 与 demo 尚待发布，故记 promised，不提供已可用 Code 链接。",
+    "ideaZh": "Imagine3D-LLM 在 images 与 question 之间插入 Gaussian summary tokens，训练它们在 LLM 中间层解码 3DGS，用 input-view photometric loss 强化跨视角聚合，再由 text tokens 读取这些 scene latents 回答。作者报告 matched baseline SQA3D56.5→63.8、SPAR60.9→68.5，建议深读 reconstruction 如何成为 reasoning supervision。默认还用 ZipSplat teacher 加速；QA 时不必真的 rasterize，且 2,592 额外 tokens 使推理 112.1→176.9 ms，不能写成零成本或已获得精准 object segmentation。",
+    "motivationZh": "多视角空间问答需要把分散图像组织成共同场景，直接读 visual tokens 未必形成几何状态；需要检验内部重建监督能否改善跨视角聚合与后续回答。",
+    "methodZh": "方法核心是在 MLLM 内形成可被显式 geometry decoder 监督的 scene bottleneck，而不是推理前运行外部 3D 模型。每 summary token 解码 32Gaussians，共约 83K；render input viewpoints 的 MSE/LPIPS 与 LM loss 联合训练，teacher token/parameter distillation 辅助收敛。Summary tokens 位于 question 之前，不是 query-conditioned scene generation；QA 可只读取 latent 而不调用 Gaussian head。25 页完整正文和 appendix 已读，方法、主表、ablations、representation probes、真实 reconstruction 图、cost 与 explicitlimitations 已实际查看。",
+    "methodFlow": [
+      "插入 scene summary tokens：LLaVA-Video7B 的多视角 image tokens 后加入 2,592 learnable summary tokens，再放 question/text；causal attention 使 summary 先聚合 images。",
+      "中间层解码 3DGS：第 14/28 层 summary hidden states 经 Gaussian head，每 token 输出 32 个有 center/opacity/covariance/SH 的 Gaussians。",
+      "Joint reconstruction 与 language 监督：在 input cameras rasterizeGaussians 并计算 MSE/LPIPS，联合 answer LM loss；默认 ZipSplat teacher 提供 token cosine 与 Gaussian parameter L2 distillation。",
+      "由 scene latents 支持回答：后续 text layers 读取 summary states，autoregressive 回答；teacher 仅训练使用，Gaussian head 只在明确请求重建时启用。"
+    ],
+    "experimentsZh": "实验设置：LLaVA-Video7B 全模型 finetune，ScanNet SQA3D/ScanQA/Scan2Cap/ScanRefer/Multi3DRefer 加 104K SPAR multi-view subset。通常 32views384×384，2,592summary tokens，G32，16GH200、batch64、1epoch；无 teacher variants 训 1/2/4epochs。七 benchmarks 以 QA/caption/grounding/SPAR metrics 评估，representation probes 在 SQA3D test scenes。\n作者报告 SQA3D EM63.8、Real3DQA39.2；Ross3D63.0/36.6。ScanQA EM29.9 低于 Ross3D30.8，不宣称全部 metrics 领先。（PDF p.8, Table 1）\n作者报告 SPAR68.5，对 matched baseline60.9 和 prior3DThinker63.3；中层 14 优于层 7/21。（PDF p.9, Tables 3–5）\n作者报告 rendering PSNR 17.61/SSIM0.74/LPIPS 0.49，对 teacher20.60/0.76/0.44；不支持高保真 geometry/rendering 结论。（PDF p.19, Table 10; p.24, Fig.8）\n比较范围：Matched backbone/data/schedule 对照最关键；prior tables 含 zero-shot2D、不同 3D inputs/teachers/training data，不将 modelsize 名次当等预算能力证明。部分领域来自同 ScanNet，与 SPAR 训练 subset 也须保留 benchmark 分布边界。\n消融与诊断：Summary budget、decodinglayer、training duration、teacher inputs/distill-only/recon/full。没有报告多 seed 稳定性；cross-view correspondence 为同 voxelpaircosine 一致度，不是排除 nonmatchingpairs 的检索准确率。",
+    "insightZh": "Compact Gaussian tokens 源于已有 feed-forward3DGS 思路，创新是将其重建 loss 接入 MLLM 内部且让后续语言读取 scene states。Teacher-only/distill-only 对照基本无效，纯 reconstruction 四 epochs 接近 full 一 epoch，支持重建约束而非仅 teacherfeature 增强。Object-centric 解释有 probe 支持，但不是一 token 一对象或完整因果机制证明。",
+    "whyRelevantZh": "直接推进多视角 VLM 空间表征与 reasoning，用可 decode3D 的 latent 瓶颈连接理解和重建，对 3D 相关 multimodal 模型训练有明确方法价值；segmentation 只是 probe，generation 不是独立任务，不额外挂 topic。",
+    "evidenceZh": "Gaussian tokens 接受 input-view reconstruction 与默认 teacher distillation 共同监督，QA 可不调用显式 head。（PDF pp.4–6, Fig.1, Eqs.(4)–(8); p.23, Appendix C.6；已实际查看 architecture 与 cost；不能省略默认 ZipSplat teacher，亦不称 QA 先执行 3D rasterization 再回答。）\n作者报告 same-backbone/data/schedule 下空间 QA 改善。（PDF p.9, Table 4；SQA3D56.5→63.8、ScanQA26.2→29.9、SPAR60.9→68.5；未复现。）\nDistillation 加速 reconstruction 训练，单纯 teacher input 或 distill 并不能复现增益。（PDF p.10, Tables 6–7；纯 recon4epochs63.7/67.9，full1epoch63.8/68.5；distill-only56.6/60.5。实际查看表。）\nSemantic probe 使用 ground-truth 类别数和 cluster-label majority 映射，不是实际无监督部署分割。（PDF p.19, Table 9 and Appendix C.3；作者报告 mIoU26.54→35.43；K 按 scene 内 NYU40 类别数设定，GT 映射 oracle，不能称 trainedsegmentation 模型输出。）\nCompact 不等于极少 token 或无开销，QA 推理约多 58%latency。（PDF pp.7,23, M/G settings and Table 12；2,592/6,720≈38.6% 额外 image-token 量，83KGaussians；作者报告 112.1→176.9 ms、17.09→20.43 GB。）",
+    "caveatZh": "PDF p.25：teacher-free training 需要更多 steps，当前 teacher 主要加速。\nPDF p.25：indoor 场景和 fixedrepresentationbudget 限制 larger/outdoorscene，需要 dynamiccapacity。\nPDF pp.19/24：reconstruction 粗糙，主目标是 reasoning 而不是高保真 NVS。\nSummary 位于 question 前，只能 images-conditioned 聚合；不能声称它按问题创造新的 scene 或输出 designer 可控资产。\nK-means 图及 oracle semantic probe 支持 feature 结构化，却不证明所有 tokens 与 objects 一一对应或有效 instance segmentation。\nInput-view photometric 与 teacherparams 约束不能保证遮挡/未观察区域真实 geometry；83KGaussians 仍可能承载 view-dependent shortcuts。\n训练 cost 的 40→44 GB 对照固定相同 sequence length，只隔离 loss/teacher 开销，不是相对无 summary baseline 的全部成本。\n单 LLaVAbackbone、indoordatasets、缺多 seed 与更广域验证，generalization 需要进一步复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

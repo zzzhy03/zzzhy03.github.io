@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2609.38806",
+  "slug": "blackboard-intelligence-can-surpass-autoregressive-on-globally-constrained-problems-2609-38806",
+  "title": "Blackboard Intelligence Can Surpass Autoregressive on Globally Constrained Problems",
+  "authors": [
+    "Woosang Jeon",
+    "Jaeyeon Kim",
+    "Sham Kakade",
+    "Yilun Du",
+    "Amrit Singh Bedi",
+    "Arun Kumar Chithanar",
+    "Chul Lee",
+    "Taehyeong Kim",
+    "Sitan Chen"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38806"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "Blackboard Intelligence Can Surpass Autoregressive on Globally Constrained Problems",
+    "LLM"
+  ],
+  "abstract": "Next-token prediction has driven remarkable progress in large language models, yet a growing body of evidence suggests that they can struggle on problems governed by complex global constraints. In this work, we focus on this regime and ask whether some of these limitations arise from the inference interface induced by next-token prediction itself. We study this question through blackboard intelligence: an inference-time perspective in which a model works on a fixed, revisable canvas and searches over candidate solution states rather than committing to a causal, left-to-right trajectory. We instantiate this idea with diffusion language models, whose any-order prediction interface naturally exposes predictions over partially filled solution states. Our key observation is that mean confidence, a simple model-internal quantity available from the standard masked diffusion objective, provides a useful proxy for global coherence and can guide inference-time search and revision. Empirically, across ZebraLogic, Nurse Rostering, and Job-Shop Scheduling, Blackboard consistently improves inference while holding the fine-tuned LLaDA-8B-Instruct checkpoint fixed and substantially outperforms same-scale autoregressive baselines, reaching 90.4% accuracy on ZebraLogic-Hard, 76.4% exact feasibility on Nurse Rostering, and 80.2% optimality on JSSP. Stronger autoregressive search and refinement also fail to close the gap on ZebraLogic-Hard, while Blackboard surpasses tested frontier LLMs there and on JSSP despite their substantially greater scale and strong test-time reasoning. We open-source our codebase at https://github.com/jwoosang1/blackboard-intelligence.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38806v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38806v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/jwoosang1/blackboard-intelligence"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38806v2 全文及 2026-10-06T16:38:35.524998+00:00 审阅记录；PDF 32 页，SHA-256 8bea342c5b5488997be3c8616098a2aa00dd9541b23c554d872007b0dc94072d，视觉核验第 1、5、7、9、14、17、23、26、27、31、32 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF p.1 直接提供该 URL；已确认 public repository 包含 core、domains、datagen、scripts、configs 和 evaluation sets 的实际 reference implementation。未执行或复现。",
+    "ideaZh": "Blackboard 将解答保存在可任意填充、回退的 fixed canvas 中，用 masked diffusion model 的 mean confidence 决定何时信任、搜索或重试。作者报告同一 task-fine-tuned LLaDA checkpoint 的全局约束解题率明显改善，并给出 stronger AR search/refinement 与成本对照；这是值得深入看的 inference-interface 证据。需要保留 task-specific SFT、one-cell–one-token 表示和 task-dependent correction：JSSP/ATSP 用真实 objective 排候选，理论也不保证任意 high-confidence state 可行，不能写成 dLLM 普遍优于 AR。",
+    "motivationZh": "逻辑网格与排程的答案必须同时满足多个全局约束，早期错误可能拖累后续选择；需要可回退的部分解状态，并判断何时应信任当前轨迹或追加搜索。",
+    "methodZh": "模型在部分解上对所有 masked positions 输出 posterior，平均最高概率形成 mean confidence。先执行 greedy trajectory，用 validation-selected late-phase statistic 判断是否需要追加计算。对 feasibility tasks，重新初始化 canvas，依据 confidence drops 回退并用 lookahead search 选择候选；对 optimization tasks，confidence 只用于分配预算，再通过可计算的 makespan/tour length 选择完整候选。实验将 LLaDA 内部的 inference gains 与分别 fine-tuned LLaMA 的比较分开，使用 programmatic exact feasibility/optimality 而非语言 judge。",
+    "methodFlow": [
+      "适配任务的原子解表示：将 grid cells 规范为 single-token decision variables，对 AR 与 dLLM 分别使用同一任务数据和匹配 LoRA recipe。",
+      "检查初始轨迹：greedy any-order filling 期间记录 masked positions 的 mean confidence，用固定 late-phase trigger 决定保留输出还是追加搜索。",
+      "按任务执行修正：feasibility tasks 使用 confidence-guided lookahead 与回退；optimization tasks 采样多个完整候选，用真实任务 objective 排序。",
+      "验证全局约束：评价时检查完整 assignments 的唯一可行解或 certified optimum，invalid outputs 计入失败；confidence 本身不充当 correctness certificate。"
+    ],
+    "experimentsZh": "实验设置：作者在 ZebraLogic-Hard、Nurse Rostering 和 JSSP 上分别训练 LLaDA-8B-Instruct 与 LLaMA-3.1-8B-Instruct，匹配任务数据、LoRA 与优化设置，评价 exact feasibility 或 certified optimality。数据用不同 generation seeds 和 exact fingerprint 去重；每个 grid decision 使用单 token。额外测试 adapted official ZebraLogic、rotating-shift roster 与 ATSP，并对 trigger 使用独立 validation traces。\n作者报告 ZebraLogic-Hard Blackboard accuracy 90.4%，对应 greedy 78.4%，NFE 从 35 增到 129；always-on 86.8%/280 NFE，说明更高 accuracy 不等于较少于 greedy 的计算。（Table 1, PDF p.9; Table 11, PDF p.24）\n作者报告同 fine-tuned LLaMA 的 greedy/wider beam/perfect-verifier refinement accuracy 为 34.6%/35.0%/36.6%；该诊断的 autoregressive repair 没有 revision-specific supervision，不能证明 AR 永远不能获得同类能力。（Appendix D.5 and Table 10, PDF pp.21–23）\n作者报告 Nurse triggered correction 的 exact feasibility 76.4%，低于 GPT-5.4 Thinking 86.0%；其中 triggered rosters 存在失败修复也有正确解 regression，不能宣称全域 frontier superiority。（Tables 15–16, PDF p.26）\n作者报告 JSSP Blackboard optimality 80.2%、within-5% 95.2%，unconditional BoN within-5% 为 96.2%；trigger 节省预算但略损失质量，最难 grid 的 optimality 仍较低。（Tables 17–19, PDF pp.26–27）\n作者报告 adapted official ZebraLogic accuracy 从 80.9% 提升到 85.6%；这支持较宽分布，但仍使用 single-token alias conversion 和原 task-fine-tuned checkpoint。（Appendix D.7 and Table 13, PDF pp.24–25）\n比较范围：包括同 LLaDA 的 greedy、PRISM、LoPA、always-on 与 search variants，以及匹配下游 SFT 的 AR beam/self-critique/perfect-verifier diagnostics。跨 model pretraining 不匹配，API models 也未做相同任务 SFT；缺少与传统 constraint solvers 的性能竞争及大规模真实业务问题验证。\n消融与诊断：trigger、lookahead depth、candidate width、confidence separation、grid-size controls 和 sparse-GT diagnostic 帮助定位机制。GT revelation 是独立 oracle diagnostic，不属于主 pipeline。confidence-trigger gain 随任务变化，BoN objective 与 confidence 的角色要严格分开。",
+    "insightZh": "mean confidence 和 lookahead 并非首次出现，论文的贡献是把它们组织成 state-level trust/search/backtrack interface，并系统检验 globally constrained reasoning 的准确率与成本。固定 LLaDA checkpoint 的 search/trigger ablations 支持 inference control 的实际作用；跨 backbone 差异同时包含预训练和 architecture，不能将整个差距归为 next-token factorization 的因果必然性。",
+    "whyRelevantZh": "在 persistent partial assignment 上评估、搜索和回退，与 structured creation 中的全局约束决策高度相关。本文对语言模型 reasoning interface 的实质比较具有研究价值；将其用于 design/assembly 仍需要单独实验证据。",
+    "evidenceZh": "mean confidence 控制何时追加计算，实际 corrective action 按 feasibility 与 optimization 区分。（§4.1 and Algorithm 1, PDF p.7; Appendix I, PDF pp.30–32；已实际查看算法；JSSP/ATSP 以真实 task objective 排 completed candidates，rotating-shift roster 才使用 trajectory confidence 排候选。）\n同 task-fine-tuned LLaDA checkpoint 的 confidence-triggered inference 提高了主要任务成绩。（§4.2, PDF p.8; Table 1, PDF p.9; Tables 15/17, PDF p.26；作者报告 ZebraLogic-Hard 78.4%→90.4%、Nurse Rostering 73.0%→76.4%、JSSP 70.0%→80.2%；没有独立复现。）\nselective intervention 对 protection 与 compute 都重要，always-on correction 甚至可以损害正确解。（Tables 11/16/19, PDF pp.24/26/27；作者报告 Nurse always-on 57.4%，低于 greedy 73.0%；triggered 为 76.4%。JSSP 相对 unconditional BoN 减少 NFEs，同时 within-5% rate 略降。）\nGibbs derivation 只约束当前 partial state 可达到的最佳 potential 之上的 excess，且使用真实 conditional probabilities。（§3.2, PDF p.5; Appendix B, PDF pp.13–14；公式中的 V*(z) 可以非零，因此 high C 不证明已有错误 commitments 仍能达到全局可行解；论文也明确 Cθ 没有直接 theoretical bound。）\n主要任务依赖 task-specific SFT 与输出表示适配，frontier references 不具有相同训练/compute 条件。（Appendix C.1/C.2/C.3, PDF pp.14–17; Appendix H, PDF pp.29–30；主要 models 在每个 domain 单独适配；pre-SFT exact success 接近零。API rows 是 black-box references，不是 compute-normalized comparisons。）",
+    "caveatZh": "Gibbs analysis 使用真实 conditionals，不能直接约束实际 SFT model 的 Cθ。\nconfidence 与 corrective action 的关系依赖任务结构，local lookahead 并不适合每种 domain。\nfrontier API latency 与 output tokens 是 practical descriptors，不是可比较的 inference compute。\n主要研究 globally constrained problems，超出该范围的泛化仍待研究。\n单 token aliases、固定 grids、分 domain SFT 使结果不同于未经适配的任意自然语言问题；matched downstream recipe 不能控制两基础模型的全部预训练差异。\nhigh confidence 的理论 bound 只针对 current state's best attainable potential，不能保证 partial assignment 可完成全局最优解。\nNFE 不直接等价于 FLOPs：AR KV cache 与 dLLM full-state passes 工作量不同；paper 的 hardware-matched table 主要列 AR variants，勿将跨 family NFE 直接写成等算力。\n有限 held-out intervals 不包含 independently retrained checkpoints 的方差；最困难 scheduling size 的低成功率表明尚未解决一般 combinatorial optimization。\n与 assembly/CAD constraints 的联系是 reviewer 迁移推断，论文没有直接进行 geometric fabrication 或 visual creation 实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

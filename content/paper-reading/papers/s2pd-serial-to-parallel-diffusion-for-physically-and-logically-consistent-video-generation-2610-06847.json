@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2610.06847",
+  "slug": "s2pd-serial-to-parallel-diffusion-for-physically-and-logically-consistent-video-generation-2610-06847",
+  "title": "S2PD: Serial-to-Parallel Diffusion for Physically and Logically Consistent Video Generation",
+  "authors": [
+    "Jeffrey Hu",
+    "Daniel Olmeda Reino",
+    "Ayush Tewari"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06847"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "S2PD",
+    "Video Generation"
+  ],
+  "abstract": "Bidirectional video diffusion models denoise entire videos in parallel, yet when trained on effectively unlimited in-distribution data from procedural generators, continue to violate physical laws and simple symbolic rules. We introduce Serial-to-Parallel Diffusion (S2PD), which performs autoregressive diffusion at high noise before switching to parallel diffusion at low noise. The autoregressive phase provides the serial computation needed to coordinate interdependent events and produce valid state transitions while the parallel phase jointly refines the entire video and reduces sampling time relative to fully serial generation. We implement S2PD with two architectures: a pixel-space diffusion transformer trained from scratch and a pretrained video model adapted through LoRA fine-tuning with causal attention. Across games, physical simulations, and real video, S2PD follows rules more reliably than matched bidirectional baselines and generates videos with greater temporal stability and sampling efficiency than other serial methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06847v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06847v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06847v1 全文及 2026-10-06T10:59:16.000Z 审阅记录；PDF 19 页，SHA-256 9df7f98caba79b34ee7de5b1b8ac7fd310878c8f1cee361301cdaa3d51515ae5，视觉核验第 1、4、7、8、9、14、15、16 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：作者在 p.2 称 code/datasets/weights 已 release，但此 exact PDF 及 discovery metadata 未给出可确认 repository URL；不提供未核验 Code link。",
+    "ideaZh": "S2PD 将生成分成高噪声 block-autoregressive structure commitment 和低噪声 full-video parallel refinement；混合 block-size 训练支持推理时切换。作者在近似匹配预算的专用模型实验中报告 2048 invalid transitions 从 47.9 降至 0.9，Wan-LoRA 采样约 6.8–7.0 秒、约为其它 serial 方法的一半。值得精读的机制是如何分配 serial computation，但不是无需训练的通用物理保证。",
+    "motivationZh": "并行视频 denoising 难保证依赖先前结果的物理和逻辑规则，而完全串行成本高；论文希望把早期 serial state propagation 与后续 parallel refinement 结合。",
+    "methodZh": "论文用可程序生成的游戏/物理模拟检查 bidirectional video diffusion 的规则失败，再提出 block-causal diffusion 的双阶段扩展。每个 block 先从 noise denoise 到 transition level，缓存该 level 的过去 context；全序列到达阈值后联合 refine 到 clean。训练混合不同 block sizes 与 context noise，可调整串行量。验证涵盖从零训练 132.7M DiT、rank32 Wan5B LoRA、离散规则与复杂视频；主要结论在专用 256×256、10 秒 clip 实验内成立。",
+    "methodFlow": [
+      "将视频 patchify 成 spatiotemporal tubelets，按 raster 顺序分为 blocks，并加入 3D RoPE",
+      "以 block-causal context/target 双序列、随机 context noise 和多种 block sizes 训练；或改变 Wan attention 后 LoRA 适配",
+      "高噪声阶段按 block autoregressively denoise：t=1 到 transition τ，KV 缓存前序 blocks 的τ-noise 状态",
+      "全部 blocks 到τ后，作为 full-video block 同步从τ refine 到 0；默认 10 步分为 4 serial+6 parallel",
+      "以 symbolic parser 检查离散 transition，tracking/simulator 检查连续 dynamics；复杂视频另用 CD-FVD/FVD"
+    ],
+    "experimentsZh": "实验设置：每个 dataset/method 单独训练模型；DiT-B132.7M pixel-space，Wan5B frozen backbone+80.6M LoRA trainables。程序模拟 on-the-fly、validation seeds 与 train 不同；clips 均 10 秒、24fps、256×256。复杂视频用 Kubric MOVi-A/C、MPMWorlds 和 30 分钟 Rubik real footage，train/val footage segments 不重叠但各 split 内 clip 高度重叠。训练 100×1000steps，近似匹配 token/FLOP budgets。\n作者报告 2048 invalid transitions/rollout 由 bidirectional47.9 到 S2PD0.9，Conway9.4 到 0.0；Chess 仍 12.3 且劣于 cDF4.6。（Table 2, p. 7）\n作者报告 Kubric MOVi-C CD-FVD 由 bidirectional512.4 到 S2PD231.7，Rubik real 由 698.7 到 64.4；S2PD 同 block-size 采样约两倍于 serial 对照速度。（Tables 2–3, pp. 7–8）\n作者报告τ=0.6 相对τ=0.0 避免明显 drift 并更快；block-size 减小主要改善离散规则，Hilbert/Zigzag 无持续优势。（Tables 4–6, p. 9）\n比较范围：匹配模型规模与近似训练预算的 bidirectional、causal Diffusion Forcing 及 Block Causal。没有广泛 frontier video generators 或独立 OOD 长时生成对比；不是每项 serial rule metric 均最佳，real Rubik FVD 也不优于其它 serial 方法。\n消融与诊断：对τ、block size、fixed-vs-flex block 训练和 token order 有成体系消融，并补 context-noise sweep。支持 serial allocation 与 parallel refinement trade-off；模型 depth/data scaling 或跨复杂真实物理泛化的因果链未被完全隔离。",
+    "insightZh": "新意是把 seriality 集中在决定事件结构的高噪声阶段，而把低噪声外观一致性与吞吐交给 parallel refinement，并用 multi-block-size 训练支持同一模型的两种 attention 规模。相对 block-causal diffusion 与 causal diffusion forcing，这是一项采样/训练组织贡献；Serial Scaling Hypothesis 是引用的动机，不是本文对真实视频物理正确性的理论证明。",
+    "whyRelevantZh": "视频生成中的逻辑/物理一致性与生成序列结构直接相关，适合关注不同生成阶段的 serial-vs-parallel 计算分配。对 3D/4D 或受约束 design 生成是机制启发，论文没有直接验证 LEGO、Embroidery 或 fabrication。",
+    "evidenceZh": "默认τ=0.6 将 10 个 denoising steps 分成 4 步 serial 与 6 步 parallel；serial context 在τ level 保留，full-video 后续联合 refine。（Sec. 3.2, Fig. 2, pp. 4–5；attention masks 与 two-phase schedule 已渲染核验。）\n方法需要 block-size mixture 训练；Wan5B 版改变 attention mask 并使用 rank32 LoRA，而非冻结模型 training-free sampler。（Sec. 3.3, p. 5; Appendix A, Table 7, p. 13；训练 context/target 结构、batch 补偿及 architecture 设置均来自全文。）\n作者报告 serial 模型显著优于 bidirectional 规则指标，但 S2PD 并非每个离散任务的最佳 serial 方法。（Table 2, p. 7；例如 Chess: bidirectional51.0、cDF4.6、BC6.8、S2PD12.3 invalid transitions；保留对照边界。）\n作者报告 Wan-LoRA 四个视频数据上 S2PD CD-FVD 更低且采样 6.8–7.0 秒，对照 serial 约 13.6–13.8 秒。（Table 3, Fig. 7, p. 8；同 block size64、本文条件下作者数字；未独立复现。）\nRubik3D 的 parser 只检验可见 facelets 局部 quarter-turn，不约束 hidden colors 或 solvability；MPMWorlds 的 unofficial aligned metrics 不适配其 conditioning。（Appendix B.1, p. 14; Appendix C.3, pp. 15–16；不能把局部 parser 一致性/CD-FVD 等同完整物理或长期 object identity 保证。）",
+    "caveatZh": "Parser/tracker 失败会影响规则和 dynamics metrics。\nRubik3D 只检查共同可见面局部运动，不检验 hidden-face identity、颜色数量或 solvability。\n复杂视频退回 CD-FVD/FVD；real Rubik FVD 对照更好，真实数据多样性有限。\nMPMWorlds evaluation code 当时不可得，重实现 metrics 依赖像素对齐；未知刚性/粘性使这些指标不适用于其 condition。\n专用 dataset 模型与 256×256、10 秒 clip 不能证明通用高分辨率或长视频 world-model 能力。\n更小 blocks 增加 sampling 成本；约两倍加速只相对 serial 对照，不是比 full bidirectional 更快。\n预算为 roughly matched FLOPs，BC/S2PD 双序列与其它方法 batch 补偿不等于严格所有计算成本相同。\n理论复杂度引用是动机，本文没有形式化保证 video physical correctness。\n数字和 released-resources 声明均为作者报告，本项目没有训练/复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.35232",
+  "slug": "beyond-selection-token-parameterization-for-extreme-visual-token-compression-2609-35232",
+  "title": "Beyond Selection: Token Parameterization for Extreme Visual Token Compression",
+  "authors": [
+    "Rui Zhong",
+    "Yu Li",
+    "Zheyu Yan",
+    "Cheng Zhuo"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.35232"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Beyond Selection",
+    "VLM / MLLM"
+  ],
+  "abstract": "Visual-token compression is effective for improving the efficiency of vision-language models, but under extreme compression budgets, token pruning can break visual grounding while learned resamplers increase parameter count, attention cost, and training complexity. We revisit compression through a token parameterization lens, separating (i) basis transformation and structured truncation (retained subspace/compressibility) from (ii) coordinate organization (optimization and cross-modal alignment). This view yields two coupled objectives, compressibility and learnability, which we formalize as unified functionals. Guided by these objectives, we design Braco, a lightweight four-step coder that combines transform-basis truncation, input-independent basis-coordinate embeddings, budget-dependent orthogonal re-parameterization, and learned spatial residual tokens from lightweight pooling. Experiments show that Braco forms the favorable empirical accuracy-efficiency frontier under $23\\times$--$64\\times$ compression and remains competitive at $144\\times$, reaching 95.2% accuracy while reducing prefill FLOPs by 84.2%--86.7% relative to the uncompressed upper bound. Against prior methods, Braco matches or improves accuracy while achieving up to approximately 36% end-to-end speedup and using $16.6\\times$/$78.8\\times$ lower compressor latency/FLOPs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.35232v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.35232v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/zrrraa/Braco"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.35232v2 全文及 2026-10-06T15:44:16.226471Z 审阅记录；PDF 26 页，SHA-256 4bc1d2457bd8f325f95c24f005913939e2ab69f6fd8a792a31276ca1a7228922，视觉核验第 1、4、7、9、17、25、26 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 直接给出官方 repository；在线核验可访问，包含 src/braco/compressor.py、LLaVA integrations、training scripts 和 inference example，已超出 README 承诺；未执行或复现。",
+    "ideaZh": "Braco 将极小 visual-token 接口拆成 DCT 低频 backbone、坐标组织和 learned spatial pooling，避免把压缩只当作挑 patch。作者报告在匹配重训练下保留较高的归一化 benchmark 分数，并显著减少 prefill 成本。值得精读其表示与优化的分离；速度证据只覆盖 prefill，spatial residual 实际池化原 tokens，也没有证明视频或密集 grounding 的可靠性。",
+    "motivationZh": "极小 visual-token budget 下，只挑选原 patches 容易损失信息且难优化；目标是同时设计保留子空间和可学习的 token 坐标组织。",
+    "methodZh": "对视觉 token grid 做 DCT 与固定低频截断，注入 input-independent basis-coordinate embeddings，再按 backbone 预算选择 coefficient 或 inverse-DCT 坐标。另一支通过 sparsemax 学习少量原空间 tokens 的加权和；拼接、归一化后投影给 LLM，并按预算重新训练接口与语言模型。论文区分 retained subspace 的信息量与同子空间坐标的可学习性，给出线性 probe、优化轨迹、预算匹配的 VLM 重训练和成本测量。",
+    "methodFlow": [
+      "把视觉 grid 变换到 DCT 基，并截取固定低频区域形成 backbone。",
+      "添加 basis-coordinate embeddings，提供稳定的频率坐标身份。",
+      "在 retained subspace 内选择 coefficient 或 inverse-DCT 坐标组织。",
+      "从原 grid 用 sparsemax pooling 学习少量空间 tokens，补充局部细节。",
+      "拼接并归一化两支输出，投影到 LLM；按预算执行匹配的两阶段训练。"
+    ],
+    "experimentsZh": "实验设置：以 LLaVA 的公开数据混合和两阶段配方重训练各压缩方法，比较相同 retained-token 预算。正文报告多项单图 benchmark 与 full-pipeline prefill；附录补充更大 AnyRes 输入、Qwen 文本基座、接口 calibration 和关键方法的匹配 training seeds。\n作者报告从 576 tokens 压到 25 tokens 时 Acc. 为 95.2、prefill FLOPs 为 1.37T，对应 Vanilla 的 8.67T；该 Acc. 是归一化综合分数。（p.7, Table 1）\n作者报告保留 16 tokens 时 Braco 的 prefill 为 40.59 ms，QueCC 为 63.22 ms；TokenPacker 为 37.87 ms，说明 Braco 并非所有方法中最快。（p.7, Table 1）\n作者报告匹配三个 seeds 下，16-token Acc. 为 94.12±0.10，QueCC 为 93.88±0.12；最小预算下二者基本持平。（p.25, Table 12）\n作者报告较大 Qwen 输入下 Acc. 为 90.8，但仍低于完整接口且没有密集定位或视频验证。（p.21, Table 8）\n比较范围：覆盖 pruning/merging、query interface、TokenPacker 与 Fourier-VLM，均重训练匹配预算。关键对照有多个 seeds，其他设置多为单 checkpoint；没有现代原生视频 VLM、长上下文推理或 decoding 全程性能对照。\n消融与诊断：混合预算、纯 backbone、纯 pooling、basis 替换、PE 和坐标替换都有对照。同子空间训练轨迹支持组织方式会影响优化；跨 encoder 的 calibration 主要检验 surrogate 阈值，不能替代这些 encoder 上的端到端任务结果。",
+    "insightZh": "DCT、TokenLearner 式 pooling 与位置嵌入并非独立新机制；有价值的贡献是将保留子空间与坐标优化分开分析，并用 global transform 与局部 pooling 的混合接口支撑极端预算。learnability functional 是设计 surrogate，阈值与固定基选择有分布依赖，不是对所有旋转或所有任务的最优性证明。",
+    "whyRelevantZh": "提供可迁移的视觉表示压缩视角，能帮助研究小预算 multimodal interface 如何保留证据并降低语言模型 prefill 成本。其受控表示分析超过普通 VQA fine-tuning 增量。",
+    "evidenceZh": "信息保持的正交坐标变化仍能影响下游优化，部署规则按 backbone 预算选择组织方式。（pp.4–6, §3; pp.16–17, Appendices G/H；全文核验；阈值适用于已测接口，不作为普适常数。）\n混合接口在预算匹配、完整重训练的 VLM 对照中有较好的精度与成本取舍。（pp.7–9, Tables 1–2; pp.22–25, Appendices J.5–J.7；作者报告；Acc. 是逐 benchmark 对 Vanilla 的比值平均，不是绝对准确率。）\n作者限定到 LLaVA-family 单图任务，尚无视频或密集定位验证。（p.25, Appendix K；全文实际 limitations；不能把低 token benchmark 结果当作普遍 grounding 保真。）",
+    "caveatZh": "主要限于 LLaVA-family 的单图接口，视频、密集定位、非规则 region tokens 和新 encoder 需要重新 calibration。\n部分精度比较只有单训练 checkpoint。\nprefill 包含视觉 encoder、projector 与 prompt processing，不包含完整生成 decoding，不能称整段回答的等比例加速。\nspatial residual 的实现池化原 X，并非显式减去低频重建后的残差；理论稀疏 residual 动机与实现需区分。\ncompression 与 learnability functionals 是局部 surrogate；任务可读性 probe 和坐标选择可能依赖数据分布。\n仍需预算专属重训练，不能作为即插即用 inference-only 压缩方法。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

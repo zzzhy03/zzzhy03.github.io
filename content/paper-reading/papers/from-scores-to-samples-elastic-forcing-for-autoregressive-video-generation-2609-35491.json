@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2609.35491",
+  "slug": "from-scores-to-samples-elastic-forcing-for-autoregressive-video-generation-2609-35491",
+  "title": "From Scores to Samples: Elastic Forcing for Autoregressive Video Generation",
+  "authors": [
+    "Chi Zhang",
+    "Yueyi Liu",
+    "Shi Haoyang",
+    "Ruichuan An",
+    "Haoyu Li",
+    "Yuhang Wu",
+    "Sen Cui",
+    "Miao Liu"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.35491"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "From Scores to Samples",
+    "Video Generation"
+  ],
+  "abstract": "Few-step autoregressive video generation commonly relies on Distribution Matching Distillation (DMD), requiring a bidirectional diffusion teacher and an online fake-score model. We instead learn the rollout distribution directly from reference videos, eliminating both score models during post-training. Our framework minimizes maximum mean discrepancy (MMD) in frozen self-supervised video representation spaces, using a hybrid Nyström--Monte Carlo estimator to balance approximation bias and sampling variance. Memory-efficient replay and gradient subsampling make this objective practical. Using the same architecture and initialization as Self-Forcing, our 1.3B model improves the VBench Total score from 83.80 to 84.64 while retaining 17 FPS. Removing auxiliary score models also enables 14B post-training on eight H200 GPUs. Beyond distillation, learning from reference videos enables the acquisition of new visual styles, semantic concepts, and spatial priors without a target-specific diffusion teacher.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.35491v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.35491v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://gitee.com/liu-yueyi/elastic-forcing"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.35491v3 全文及 2026-10-06T16:09:01.484501+00:00 审阅记录；PDF 38 页，SHA-256 e2e74a8323536d92b15d4f969dd4feca0977ef15d481caa2aab5e8fdf6e78599，视觉核验第 1、3、7、8、9、11、20、24、26、28、30、33、36、38 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFp.1 Code annotation 明确 Gitee URL。Web 工具无法访问，实际 urllib 公开 HTML200 确认 1.3B/14B code、configs、scripts 及实现文件目录，非 README-only。没有猜 GitHub mirror 或下载执行；Code 存在不等于实际复现。",
+    "ideaZh": "Elastic Forcing 用 frozen video/image features 的 MMD 直接匹配 AR rollouts 与 reference videos，去掉 post-training 的 online diffusion teacher/fake-score models。Nyström＋MC reference estimate 与大 forward batch、小 replay/backward batch 缓解视频训练成本。作者报告 matched 1.3B 设置 VBench83.80→84.64，14B 在 8H200 上 post-train23.2 小时；但初始化和 references 仍来自预训练模型，video-marginal matching 也不保证每个 prompt 的条件分布。",
+    "motivationZh": "少步自回归视频训练的在线 diffusion teacher 与 score estimation 成本高；需要探索直接使用参考视频的分布监督，并扩大有效训练 batch。",
+    "methodZh": "保持 Self-Forcing 的 causal rollout 与初始化，只改变 distributional objective。V-JEPA2/VideoMAE 加可选 DINOv3 构成 frozen matching spaces，Gaussian kernels 给 generated-generated repulsion 与 generated-reference attraction。Reference collection 先 k-means 成 Nyström landmarks 并预计算 kernel mean，更新时混合 sampled MC correction。先前向 256 rollouts 计算所有 feature cotangents，再随机 128 条用保存状态 replay，按 B/b 放大 gradient；generator 是唯一更新网络。",
+    "methodFlow": [
+      "准备 reference distribution：冻结 representation encoders，提取 reference videos features，k-means landmarks 与 regularized kernel summary 预计算，之后混合 MC minibatch estimate。",
+      "收集完整 rollout population：当前 generator 生成 B 条 on-policy 视频，不保留全部生成图，保存可重现的 replay states；所有 features 进入 batch MMD。",
+      "计算 coupled feature gradients：Generated-generated kernels 保留跨 microbatch interactions，reference attraction 加入 hybrid estimates，先求每视频/encoder 的 cotangents。",
+      "只回放选定 gradient contributions：均匀选 b 条，保持同随机数、preprocessing、parameters 和既定 gradient graph，按 B/b 回传 cotangents 并释放图；全部累积后更新 generator。",
+      "换 references 调整目标：更换 monochrome、character 或 panoramic references 后重建 summary，直接调输出 distribution，仍需合适初始化与 feature coverage。"
+    ],
+    "experimentsZh": "实验设置：1.3B 同 Self-Forcing architecture/ODE checkpoint/rollout，references 为 8K+Wan-generated videos，expanded VidProM prompts。VBench946expanded prompts×5seeds＝4,730videos/model；两 encoder100updates、三 encoder150updates，B256/b128。14B 同 Krea ODE init，80updates/8H200，human42participants×20matchedprompts×两 videos。Reference adaptation 另用 0–10task ratings，real-video 与 VACE 实验为 qualitative feasibility。\n作者报告 1.3B two-video-encoder VBench total84.64/quality85.43/semantic81.48，对 Self-Forcing83.80/84.59/80.64；inference 均 17 FPS。三 encoder150steps 主结果 84.25，100steps 消融 83.81，不能混用最高 headline 与所有配置。（PDF pp.8,11,20,26, Tables1,3,6,8）\n作者报告 14B post-training23.2 小时/185.6GPU-hours，不包括 foundation training、ODE initialization 或 reference-cache 准备。Human 独立 1–5ratings 均值 3.354 对 Krea3.054，是 840ratings/method 来自 42 人/20prompt，不是 84% 或 3.354% 的胜出率。（PDF pp.9–10,36–38, Table2, AppendixJ）\n作者报告混合 reference estimator 总分 84.64，pureMC84.06、pureNyström84.59；hybrid 只比后者高 0.05。未提供重复 training seeds CI，不能推导任意 mixture 均更好。（PDF pp.11,27, Table4）\n作者报告 100-step 两 encoderDynamic Degree65.28，三 encoder55.00、DINO-only32.22；三 encoderSpatial Relationship84.01 高于两 encoder82.68，但总分较低。Frozenfeatures 的语义与运动约束存在取舍。（PDF p.26, Table8）\n作者报告 spatial-appearance adaptation task-rating 从 Self-Forcing5.000 至 8.544；这衡量 projection 外观，不是重建 metric geometry。Monochrome 总分 8.942 仍低于 Wan14B8.992。（PDF pp.29–30, Table10）\n比较范围：Self-Forcing 是最接近 matched-init/objective 对照；其他 streamingbackbones 和 publishedFPS 条件不同，不能只按表横比实际部署延迟。14B human 严格同 seed0/initialnoise 但仅 20prompts，无多 seed；VLMablation 是匿名 forced rank points，不能与单视频 absolute ratings/officialVBench 同尺度比较。VLM-human correlation 是 20prompt-level 差值，而不是把 1,680ratings 当独立样本。\n消融与诊断：Encoder combinations、hybrid endpoints、B/b、joint text-video、FIFO/features compensation、denseMMD vs sparseFD、reference types 和 VACE 初始化。Jointloss 稍差不证明 text 冗余；FIFO 不能被当 fresh/on-policy 替代。VACE 无需 separateODE 但先有 100updates regression＋MMD，不能说标准 T2V 从零仅 MMD 即可。",
+    "insightZh": "MMD 本身已有，但针对 few-step AR video 将 persistent hybrid reference statistics 与 estimation/differentiation decoupling 结合，使 sample-defined post-training 可替换在线 score supervision，贡献在目标与系统方法。理论明确区分 finite-reference bias、kernel-mean value MSE 与 conditional finite-batch gradient；不存在无限制 concept acquisition 或真实 3Dgeometry 保证。",
+    "whyRelevantZh": "Reference-defined video post-training、representation constraints 与 memory-efficientgradient 设计，为可控视觉生成/风格和 concept adaptation 提供重要训练方法。Panoramic 外观与 objectconcept 不等于 3D 结构生成或 fabrication 证据，分类保留 video-generation。",
+    "evidenceZh": "在线 post-training 去掉 real/fake diffusion score models，以 frozen-feature MMD 匹配 references。（PDF pp.3–8, Fig.2, Sec.3; pp.19–24, Appendix B–C；完整阅读 exact38 页与证明，实际看方法图/结果；不把 checkpoint 初始化与 reference 生成说成无 teacher 依赖。）\nNyström/MC mixture 降低 bias–variance tradeoff，但 oracle 最优α不是实际训练测出的参数。（PDF pp.6,22–23, Eqs.7–10,23–26；实际固定 Nyström:MC 为 2:1；optimal coefficient 解释 value MSE，不证明 derivative error 最小。）\n随机 backward subset 按 B/b 缩放对 evaluated hybrid finite-batch graph 条件无偏。（PDF pp.7–8, Eqs.12–13; pp.23–24, Eqs.27–29, Algorithm1；不是 exact population MMD，无偏性依赖同 replay 与规定 truncation，不能任意 detach boundaries。）\n两个 encoder 的 VBench 更高，加入 DINO 则细节/subject 稳定与 dynamic-degree 权衡。（PDF pp.8,11, Tables1,3; pp.20,25–26, Tables6–8；作者报告；主 three-encoder150steps 为 84.25，100-stepablation 为 83.81，附录给出训练时长区别。）",
+    "caveatZh": "依赖预训练 generator、frozenencoders 与合适 reference data；features 忽略的信息无法由 MMD 保证。\nFeature-distribution 相等不代表 video distribution 相等；video-marginal matching 不识别每 text condition 的正确分布。\nFinite-rank/regularization bias、sampling variance 和 B²kernels/全部 forward 成本仍存在；更小 b 增加 gradientvariance。\n标准 T2V 仍需要 ODE 初始化，reference adaptation 不证明正确 physical/geometric reasoning。\nRemoved-online-score 模型仍以 Wan-generatedreferences 为主，real references 仅 qualitative；不宜解释为完全无 teacher 或从 scratch 训练。\n理论 conditional-unbiasedness 需 exact replay 和既定 gradienttruncation，本文没有检查实际训练 graph 等价或独立复现。\n14B post-train 资源不涵盖昂贵 init/featurecache/landmark 构建，整体成本与 OOM 对照均有 implementation 环境边界。\nRepresentationweights 大幅偏 DINO 时可降低 motion，MMD 可能改善 featuremetrics 却遗漏视觉细节或 conditionalalignment。\nVBench 小增益未给 training-seed uncertainty；human/VLM0–5、0–10、0–100 与 relative ranks 应分别使用，不能混合。\n已阅读 PDF 及实际查看静态样例，但未运行 code、观看 videos 或复现任何作者结果。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

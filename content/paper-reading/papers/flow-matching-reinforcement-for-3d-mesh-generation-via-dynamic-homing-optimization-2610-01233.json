@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.01233",
+  "slug": "flow-matching-reinforcement-for-3d-mesh-generation-via-dynamic-homing-optimization-2610-01233",
+  "title": "Flow Matching Reinforcement for 3D Mesh Generation via Dynamic Homing Optimization",
+  "authors": [
+    "Zhen Zhou",
+    "Zhiwei Ning",
+    "Puhua Jiang",
+    "Sheng Zhang",
+    "Yifei Tang",
+    "Jie Yang",
+    "Xintong Han",
+    "Wei Liu",
+    "Chunchao Guo"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01233"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Flow Matching Reinforcement for 3D Mesh Generation via Dynamic Homing",
+    "3D Generation"
+  ],
+  "abstract": "Flow matching is central to 3D generation, yet in practice its reinforcement learning (RL) methods are largely adapted from 2D visual generation. Representative DPO-, GRPO-, and NFT-style objectives, when applied to negative trajectories, mainly steer predicted velocities away from the corresponding directions without explicitly specifying a target velocity field toward preferred samples. In 3D generation, constrained by pretrained model capabilities, rollout diversity, and reward-distribution complexity, directly applying these RL methods yields limited gains in geometric quality. We introduce a forward-process RL method \\textbf{Dynamic Homing Optimization (DHO)}, which reformulates negative-trajectory optimization as positive-sample attraction-guided dynamic homing. Specifically, Minimum-Cost Attractive Matching (MAM) assigns each negative sample a distinct positive target, and Time-Aware Dynamic Correction (TDC) then redirects its trajectory toward the target using a remaining-time-aware corrective velocity. Building on asynchronous online DHO, we develop \\textbf{Flow3D-Pro}, an image-to-3D geometry generation framework. Experiments show that DHO outperforms representative DPO-, GRPO-, and NFT-style objectives in 3D generation, while Flow3D-Pro produces higher-quality 3D geometry than existing mesh generation methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01233v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01233v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01233v1 全文及 2026-10-06T13:27:08.563635+00:00 审阅记录；PDF 28 页，SHA-256 a155bca01783bb2d50417bf2842f9af585938a56e2e93cbaf5e03879b5a62466，视觉核验第 1、4、8、9、17、18、21、22、25、26、27、28 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact28pagePDF 未提供本工作 public repository/projectCode 链接或明确 code-release 承诺；不把 Hunyuan/LATTICE 已有 baselinecode 当 Flow3DPro 实现。",
+    "ideaZh": "DHO 为 3D rectified-flow post-training 构造低 reward 样本的正向目标：同 condition 内 Hungarian 匹配 positive endpoints，并按剩余时间校正 velocity，而非只排斥 negative 方向。作者报告同 SFT 初始化/同 Gemini reward 下 StageII ULIP.150、Uni3D.360、人类 rank4.26，优于 GRPO/NFT 对照。值得精读的是 assignment 与 stable forward-regression 设计；homing proof 假设 ideal field/fixed target，不保证有限网络实际收敛或制造有效性，最终细部仍来自冻结 LATTICE refiner。",
+    "motivationZh": "用 reward 改进三维 flow generator 时，简单排斥低质量样本可能导致不稳定更新；需要为这些样本构造有方向的修正目标，同时保留条件与形状分布。",
+    "methodZh": "Flow3D-Pro 以 Hunyuan3D2.1 liftingstage 经 5K curatedmeshesSFT，再用 1Kimage 每组 8rollout/六 canonicalrenders 由 Gemini3.1Pro 给 fidelity/plausibility/orientation1–5reward。Groupadvantages 分 P/N 并 balance 至 mincounts，优先高 Apositives，latentL2mincostone-to-oneMAM；negativeforwardinterpolant x_t^l 的 target=(xw*−x_t^l)/(1−t)，以(1−t)^2 weighting 转为 boundedtarget 的 rescaledvelocityregression。Positiveidentityselfmatch 标准 FM，参考 velocityL2regularization，asyncreplay/snapshot 丢 stalegroups。仅训 StageI，StageII LATTICE 固定作 geometryrefine。完整 28 页含 proof/rewardprompt/pseudocode/SDE 转换、人类 study/多消融/limits 已读，实际查看首面、pipeline、mainresults、idealproof、reward/humanprotocol、MAM/extraresults/gallery 及 p28limits。",
+    "methodFlow": [
+      "建立 geometryprior 与 rankedrollouts：Hunyuan3D2.1 以精选 meshSFT，conditionimage 组 8samples，六 renders+reference 让 Gemini 按 3:2:1fidelity/plausibility/orientationreward 评分。",
+      "每个 negative 分配 positive 目标：Advantages 分组并平衡 P/N，保留高 Apositive、随机 negative，latentL2Hungarian 确保 one-to-one，不只是独立 nearestpositive。",
+      "训练时间校正的 homingvelocity：在 noise-to-negativeforwardline 上目标 positive−current 除 remainingtime，用(1−t)^2 化为 boundedresidual；positiveFM 与 referencevelocityreg 共同优化。",
+      "异步更新并冻结 refiner 输出 mesh：28GPUrollout+4update、boundedreplaystaleness，StageI50ODEsteps，frozenLATTICEStageII5steps 增强 localdetails/extractimplicitfieldmesh。"
+    ],
+    "experimentsZh": "实验设置：SFT5K 手工精选 artist/AI meshes，DHO1Kdiverseimages，held-outGenMesh200referenceimages 和 LATTICEBench。SFT32H20×5Ksteps；DHO28rollout+4trainer/5Ksteps、G8、η.1/β1/CFG3，偏好 SDEκ.2exploration，inference50ODEsteps+StageII5steps/CFG5。ULIP/Uni3Dcondition-shapeembedding 与 blindhuman ranking，不是 trueGTgeometry/parts metrics。\n作者报告 StageI DHO.149/.359/US4.02 vsGRPO.147/.357/3.02、NFT.146/.355/3.07；同 StageII 后 DHO.150/.360/4.26，GRPO.147/.358/3.00，NFT.147/.357/2.80。（PDF p.8, Table1）\n作者报告 GenMeshFlow3DPro .150/.360/US8.64 vsFlow3DOPD .146/.354/7.04、TRELLIS2 .145/.353/6.73；LATTICEBench.140/.326 vsOPD.138/.321，附加没有 human study。（PDF pp.9/26, Tables2/9）\n作者报告 MAMassignmentUS2.40vsnearest1.00/soft1.80；static→dynamicULIP.145→.149/US.31→.69，同 settingcontrolled；US 只能各 comparisongroup 解释。（PDF pp.22–23, Fig.8/Table4）\n作者报告 H20StageI62s+StageII81s 平均每 sample，含各自 preprocess/feature/decode/conversion，不是实时或只 fewsamplingkernelcost。（PDF p.25, Runtimeanalysis）\n比较范围：RepresentativeGRPO/DPO/NFT 同 stage/sharedsetting，其中 DPO 也采用 MAM pairing，增加 fairness；RFT/PFM 补充 positiveonly/extra-flow 对照。Fullgenerator 比较 modelsize/data/compute 不同，commercialModel1/2 匿名仅 qualitative 不能排名归因。NoGTdistance/topology/manifold/partconnectivity 或 fabricationfunctionaltest。\n消融与诊断：Assignment(random/nearest/soft/MAM)、positivechoice、timeweight、staticdynamic、advantage、CFG、η/β、G、ODE/SDE、rewardcomponents，覆盖充分。MainRL 三 seedmean 但无 variance/CI、expertagreement，多数 ablationsGenMesh 重复 select 可能 test-tuning；canonicalorientation 展示统一旋转不独立证明模型轴对齐。",
+    "insightZh": "OT/Hungarian、positiveattraction、forwardprocessRL 与 asynctraining 均已有先例；组合出的具体新目标把 negativebranch 变成 matchedtarget 剩余时间回归，并明确消除 targetsingularity，非仅 rewardwrapper。Sameinit/reward/steps/decoder 的 RLcomparison 和 assignment/time/dynamiccorrectionablation 支持实质 3D generationmethod 价值。数值语义 embedding 改善小、human preference 更强，不能称 overall 几何精度/拓扑 SOTA。",
+    "whyRelevantZh": "直接推进 image-conditioned3Dgeometrygeneration 的 post-training，targetassignment/positiveattraction 可能供结构/parts 约束优化参考；论文仅 renderlevelreward，没有 LEGOassembly/fabrication 验证。",
+    "evidenceZh": "MAM 在同 referencecondition 的 balanced 组做 one-to-oneassignment，negative 继承 assignedpositiveadvantageweight。（PDF pp.4–5, Sec.3.2.1–3.2.2; pp.19–20, Algorithm1；G8 意味着 balancedset 最多 4，零 advantageomit；不是任意跨 image 强制变成别的 object，未复现。）\nStabletrainingtarget 不等于 fullpolicy 保证到达该 positive。（PDF pp.5–6/16–18, Eq.5–7/Propositions1–2；Boundedresidualtarget 避免 1/(1−t)显式奇异；endpointproof 要求已收敛 idealhomingfield，训练 recurrence 是 field-space 假设且 assignment 可变，不是 SGD 参数收敛。）\nRLobjective 比较控制了 SFT、reward、GPU/steps 和 StageII，但 rank 分数是组内相对量。（PDF p.8, Table1; p.21, Appendix B.1–B.2；三 seedsmean；blindmethodrandompresentation、每 reference 三 technicalartexpertsrank0..U−1，不能跨 differenttables 直接比较 USscore。）\nStageI 提升可保留到相同 frozenrefiner，最终精细结构不是本作新 decoder 学习。（PDF pp.7–8, Sec.3.3/Table1; p.21, Appendix B.1；LATTICE refiner 冻结且 5steps，只有 liftingstageSFT/DHO；未独立复现。）",
+    "caveatZh": "PDF p.28 Appendix C：reward 维度不够 finegrained 反映高精度 geometry，需专业艺术家 feedback；StageII rollout diversity 低因此冻结，未来才尝试 RL。\nPDF p.28：2Dvisualgeneration 的 prior/reward 分布不同，尚未验证 DHO 在 2D，不能外推所有 flowmodels。\nPDF pp.6/18：endpoint 分析条件于 fixed assignment/ideal field-spaceupdates，不描述 finite-network 每 SGDstep。\nSixrendersGemini reward 不能可靠量化隐藏拓扑、selfintersection、material/partstructure 或 physicalmanufacturability；human rank 改善也不是几何 ground truthprecision。\nAssignnegative 到已有 positive 可能压缩 diversity；one-to-one 只在 tinybatch，未测全分布 coverage/raretypecollapse。\n异步 SDErollouts 与 forwardinterpolant/ODEinference、有限 modelcoupledtargets 之间无全局一致性保证；discrete1–5reward 全 tie/emptybalancedset 的实际 fallback 需 code 确认。\nNoavailableimplementation/data 公开链，不影响方法收录但复现需补 artifact，resource32H20+Gemini 成本不低。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

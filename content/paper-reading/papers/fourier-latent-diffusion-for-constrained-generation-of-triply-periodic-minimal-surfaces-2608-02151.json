@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2608.02151",
+  "slug": "fourier-latent-diffusion-for-constrained-generation-of-triply-periodic-minimal-surfaces-2608-02151",
+  "title": "Fourier-Latent Diffusion for Constrained Generation of Triply Periodic Minimal Surfaces",
+  "authors": [
+    "Shu Yan",
+    "Ruihong Cen",
+    "Bohan Wang"
+  ],
+  "publishedAt": "2026-08-03",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2608.02151"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Fourier-Latent Diffusion for Constrained Generation of Triply Periodic Minimal Surfaces",
+    "3D Generation"
+  ],
+  "abstract": "We present a generative framework for the constrained design of $D_{2h}$-symmetric triply periodic minimal surfaces (TPMS) with low residual mean curvature. Existing TPMS design pipelines either explore a limited set of canonical analytical families or rely on computationally expensive numerical procedures, making it difficult to efficiently generate diverse candidates under geometric and/or mechanical requirements. Our approach learns a distribution of solver-generated TPMS in a compact Fourier space where periodicity and $D_{2h}$ symmetry are guaranteed by construction. This representation eliminates the need for a learned geometric decoder and enables the training of an effective diffusion model that generates low-mean-curvature candidates conditioned on sparse geometric constraints, selected homogenized elastic properties, or their combination. A subsequent coefficient-space refinement further reduces the residual mean curvature. Experiments show that our approach outperforms trigonometric, SDF-based, and standard Fourier-space baselines and enables controllable, high-quality generation under geometric and low-dimensional mechanical constraints. Overall, the proposed framework provides a compact and efficient design space for generating near-minimal periodic structures under user-specified requirements.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.02151v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.02151v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.02151v3 全文及 2026-10-06T11:16:54.386099+00:00 审阅记录；PDF 23 页，SHA-256 d284438dee2a9cb7fead675a9e9e6eeceafa5e094dd8608fab157ecf1dcae7ca，视觉核验第 1、3、7、9、23 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 未印本方法 public code URL；既有 solver 引用不是 generationimplementation。",
+    "ideaZh": "4,096 个 cosine-product Fourier coefficients 硬编码 periodicity/D2h symmetry，再 diffusion 生成近 minimal TPMS。作者报告最低曲率 150/300 样本均值 0.67，全部 300 均值 1.16；16 点或 elastic-property 条件只是近似控制。约束表示＋learned prior 分工有价值，不能称严格 minimality 或可制造保证。",
+    "motivationZh": "设计周期多孔表面时，直接生成任意几何容易破坏周期性、对称性和低曲率要求；需要把部分约束放进表示，再学习满足性能条件的形状分布。",
+    "methodZh": "18,704 solver-derived TPMS 经 alignment/deduplication 进入 16³spectralspace。UViT denoises512patchtokens，cross-attention 接 points/低维 homogenizedmoduli；analyticfield 无 learneddecoder，DDIM 支持 generation/inversion/editing，80 步 coefficientrefinement 降 curvature。实验测 geometry、bulk/shear/C11 控制和失败，无实物制造。",
+    "methodFlow": [
+      "枚举 FBV boundary loops，solver 生成 patch 并 mirror 成 TPMS",
+      "SDF sign/half-period/cubeorientation canonicalization 和 curvaturefilter",
+      "D2h cosinebasis 编码 16³coefficients，signed-log normalize 并 patchify",
+      "UViT conditional diffusion 生成 points/property-guidedcoefficients",
+      "DDIM inversion/guidance 支持 editing",
+      "Analyticcurvature refinement 后 Marching Cubes 输出 surface"
+    ],
+    "experimentsZh": "实验设置：9:1split；7.8Mmodel、1Msteps、batch128、2H200 约 30h，150³surfacegrid。每 baseline300 取最低 H150。mechanics 为 uniformthickness0.02、Es1、ν0.3，同 periodicFEsolver 标注/验证。\n作者报告 selectedset rawH1.00→0.67、maxgenus17；trigonometric1.23→1.07、maxgenus8。（Table1,p.7）\n作者报告 points+C11 误差 9.3%/距离 0.019，points+bulk6.9%/0.021，均 20samples。（Table2,p.9）\n作者报告单 H200 sampling2.1s＋refinement4.4s，共 6.5s/candidate。（Sec.4,p.7）\n比较范围：Trigonometric、SDF-Diffusion、SDFusion、standardFourier 同 dataset；Fourier/MCF 后处理不同，比较完整 pipeline。MIND 等相关 inverse-design 方法未直接量化对照。\n消融与诊断：Dim24 与 standardFourier 更差、directcoefficientoptimization 失败，支持 representation/prior；refinement 保持 genus/小 CD，properties 通常约 1% 漂移。这些是作者实验，不是定理。",
+    "insightZh": "专用 symmetry-reduced representation 与 solver-data 把硬几何约束从模型学习剥离，联合 geometric/mechanicalconditioning。UViT/DDIM 是已有方法；只有 periodicity/symmetry 硬保证，near-minimality 从 data/refinement 获得。",
+    "whyRelevantZh": "物理性质条件下生成 periodicgeometry 直接命中 3D generation；constraintbasis 可启发 fabricationdesign，但制造可行性与 LEGO/embroidery 迁移未验证。",
+    "evidenceZh": "D2h cosinebasis 将一般 29,791 实 degrees 降为 4,096；任意系数不保证 regularity/zeroH。（Sec.3.2,p.5; AppendixB,p.15；Basis 推导与明确的保证边界。）\nDiffusion loss 无 Eikonal/curvature；refinement 在 coeffspace 用 analyticderivatives。（Sec.3.3–3.4,pp.6–7; AppendixF.4,pp.20–21；学习先验和物理后处理分开。）\n作者报告 300 生成取最低 H150：selectedmean0.67，all300mean1.16。（Sec.4.1,Table1,p.7；主表/protocol 已实际查看；不能把筛后数当 raw 分布。）\n作者报告 points 距离 0.017、bulk/shear 误差 2.8%/9.2%；jointpoints+bulk 距离 0.021、propertyerror6.9%。（Table2,p.9；条件表已视觉核验，samples 仅 20–30。）\nUnseen jointconditions 可能导致 missconstraints、disconnected/degenerategeometry。（AppendixJ,Fig.17,p.23；失败图和说明已查看。）",
+    "caveatZh": "仅 D2h TPMS，不保证 exactminimality。\nUnseenjointconstraints 可冲突产生 degenerate/disconnected 几何。\n只测低维 elasticproperties，高维 fulltensor 稀疏。\nBest150/300 与 smallconditionalN 不能外推 rawsampling/任意 target 成功率。\n同 FEsolver 标注/验证不是实物制造证据，未测 printability/strength/buckling。\nRotationaugmentation 先于 split，未说明按原始 family 分组，held-out 独立性需谨慎。\n完整 23 页含 basis、metrics、homogenization/failureappendix 已读；数字为作者报告，未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

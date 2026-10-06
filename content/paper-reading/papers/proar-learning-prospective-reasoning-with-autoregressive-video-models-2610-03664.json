@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.03664",
+  "slug": "proar-learning-prospective-reasoning-with-autoregressive-video-models-2610-03664",
+  "title": "ProAR: Learning Prospective Reasoning with Autoregressive Video Models",
+  "authors": [
+    "Linghui Shen",
+    "Tinghui Zhu",
+    "Sheng Zhang",
+    "Muhao Chen"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03664"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "ProAR",
+    "Video Generation"
+  ],
+  "abstract": "Autoregressive (AR) video models excel at causal generation, but their reliance on next-chunk prediction confines them to a short-sighted, reactive paradigm. This limitation is particularly consequential for reasoning-oriented generation, where achieving a target outcome through valid intermediate states matters more than local visual plausibility. To address this challenge, we propose Learning Prospective Reasoning with Autoregressive Video Models (ProAR), a novel framework that transforms autoregressive video generation into a goal-oriented reasoning process. ProAR introduces two key components: (1) To anchor generation to the long-range outcome, we integrate goal-frame prediction into the autoregressive loop via an asymmetric attention mask, enabling the predicted goal frame to guide the generation of intermediate states without being disrupted by them. (2) To guide short-range transitions, we introduce future representation self-alignment to encourage current hidden states to anticipate upcoming temporal dynamics. By leveraging teacher-forcing in AR training, we extract clean future representations in a single forward pass and align current representations with them using a lightweight, training-only predictor. Together, these two mechanisms seamlessly combine explicit, sparse target supervision with implicit, dense step-wise guidance, promoting coherent, goal-directed reasoning progress with modest computational cost. Experiments show that ProAR's complementary components consistently improve performance across diverse visual reasoning benchmarks. The framework proves highly training-efficient, surpassing fully trained standard AR baselines using only 25% of the training steps. This paradigm also demonstrates promising applicability to embodied reasoning tasks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03664v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03664v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03664v1 全文及 2026-10-06T12:17:33.916116Z 审阅记录；PDF 23 页，SHA-256 c3620c6302e39f3ffbbb476225b6efa2ec67b00be7a7becb43979bf9f0300bd6，视觉核验第 1、4、7、8、15、17、20 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 给 project https://luka-group.github.io/ProAR/，本轮 web 无法访问；没有可确认 actualpublic repo，不猜测 Code 链接。",
+    "ideaZh": "ProAR 为 AR video 预测每 chunk 的 goal frame，并使用训练期 future feature alignment，让当前段参考后续目标。作者报告部分推理任务改善，真实控制指标增益较小。可借鉴训练监督；尚非通用规划或真实执行突破，额外预测也增加 inference cost。",
+    "motivationZh": "AR video models 通常只依据历史生成当前片段，缺乏对后续目标的提前考虑；希望引入 prospective goal prediction，让当前生成利用未来状态监督。",
+    "methodZh": "Wan2.2-5B 改 causalteacher forcing，history/current/goal 三 streams 并行训练。goal 只 attendcleanhistory/自身，current 可看 goal，避免双向污染；每 step 重新 denoisegoal 而只 current 追加 history。未来 alignment 把 noisycurrent 中层 features 经三 DiT predictor 拟合同 forward 的 clean 下一 chunkstopgradient，predictor 推理删除。目标监督最终 frame，generationvideo 本身作为 tasksolution，未输出符号 plan 或执行 robotcontrol。",
+    "methodFlow": [
+      "causalteacher forcing 一次处理 cleanhistory、noisycurrent 及每 chunk 的 noisyfinalgoal。",
+      "asymmetricmask 允许 current 读取 goal，goal 不读 noisycurrent。",
+      "中层 currentfeatures 经三 blockpredictor 对齐 clean nextchunkstopgradientfeatures。",
+      "合成 currentflow、goalflow 与 cosinealignment 训练，后期加入 alignment。",
+      "推理 jointdenoisecurrent 与 goal，重估 goal 但仅 current 进 history；删除 trainingpredictor。"
+    ],
+    "experimentsZh": "实验设置：Wan2.2-TI2V5Bcausaladapt，globalbatch16/lr5e-6，2–4B200；VBVR10tasks 各 10Ktrain/50test 共 500，VideoRLVR 三 games 各 10K/1K，WorldArena50tasks×50train/20test。chunk4/8，20denoisesteps，λgoal.25/align.01（world.05），predictor236M/threeblocks，middlelayer15，alignmentlateactivate。\n作者报告 VBVR2500steps0.708 超过 AR10000steps0.663，alignment 到 7500 才启用，因此早期 25%steps 证据主要是 Outcome 而非两组件。（Sec.4.3/Fig.4, p.8）\n作者报告 withoutasymmetricmask0.799 对 0.801，earlyalignment0.799 也近 default0.801；缺 multiseedCI 不能声称两小差显著。（Table2, p.7; Table5, p.16）\n作者报告 WorldArena16metricmean60.95 对 60.43、FlowWAM63.71；ActionFollowing1.88 低于 AR2.07，metricjudges/proxies 不等于实际执行。（Table10, p.19）\n比较范围：controlledStandardAR 同 backbone/settings；WanSFT、closedSeedance，部分 VideoRLVR 与 WorldArena 对照是他文 reported 而非本轮重测。不同 outputlength/steps/model/data 使外部 ranking 不能单独解释 prospectiveguidance。\n消融与诊断：Outcome/Transition、alignmentstart/layer/predictordepth、mask、PCAfeatures。PCA 可视化训练 predictor 近 target 不是部署 backbone 因果 futureplanning 证明；缺 milestoneadaptive 与长 horizonclosedloop 验证。",
+    "insightZh": "goalcondition 与 futurealignment 已有路线，贡献是 AR 内部 singlepasscleanfuturetargets 与持续重估 goal 的训练接口，组合使视觉状态演进从局部 continuation 转向 goal-directed。有限任务有方法价值，mask 微小提升和 outcome 主导使其更适合略读。",
+    "whyRelevantZh": "为 goal-directednative videogeneration 提供 Outcome/Transition 训练思路，可能启发 visualplanning 和 future-awaregeneration；无直接 CAD/fabrication 或 structuredediting 验证。",
+    "evidenceZh": "Outcomejointgoaldenoise 与 asymmetricattention，Transition 单 forwardcleanfuturefeature/cosine alignment，训练后移除 predictor。（Sec.3/Eqs.3–7/Fig.2, pp.4–6；方法图实际查看，training 包含 futuregoal/nextchunk 监督，inference 无 GTfuture。）\n作者报告 VBVR10tasks continuousmean0.801 对 AR0.663、Outcome0.786、Transition0.683；Domino/Balancingfull 仍弱于 AR。（Table1, p.7; AppendixA.4, p.18；主表实际查看；0.801 不是 80.1%binarysuccess，10/100tasksselected。）\n作者报告 VideoRLVR 三 gamesmeanSR52.97 对 50.97，Sokoban46.0 低于 Transitiononly49.6，not allcomponentcombinationwin。（Table3, p.8；game 结果已查看，Precision/F1 与严格 validsolution 不同。）\n作者报告 training 增加 12–14%、inferencechunk4 增加约 12%；最终 frame 可能不表达过程任务目标。（AppendixA.1, p.15; A.6, p.20；cost/limitations 页实际查看，singleforward 不等于 zeroadditionalcompute。）",
+    "caveatZh": "finalframe 目标 heuristic，对 postcompletionidle 或 pureprocessdynamics 语义弱。\n未来需 adaptivegoal/milestone，更开放复杂 physical 环境未验证。\n仅单 Wan5B、selectedsynthetictasks，跨 taskfoundation/generalization 证据有限。\n训练 future 监督与 noisygoal 可帮助 current，但 selfrollout 仍 teacher forcingexposuregap，未来 featurealignment 不严格保证 validtransitions。\n小 VideoRLVR/WorldArena 提升及 mask 差无 statisticalCI；moreplanning 宣称需具体 planningaccuracy 证据。\ninference20steps 且额外 goal 增加成本，不能据 AR 称已 real-timeinteractive。\nWorldArenavideojudges/trajectory/depthproxies 不是 robot 真实执行或完整 physics 模型。\n本项目未运行或复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

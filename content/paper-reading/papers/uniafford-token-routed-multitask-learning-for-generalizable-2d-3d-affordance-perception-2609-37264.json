@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2609.37264",
+  "slug": "uniafford-token-routed-multitask-learning-for-generalizable-2d-3d-affordance-perception-2609-37264",
+  "title": "UniAfford: Token-Routed Multitask Learning for Generalizable 2D-3D Affordance Perception",
+  "authors": [
+    "Yuhao Liu",
+    "Yiming Zhong",
+    "Hanqing Wang",
+    "Shaocheng Yan",
+    "Yuhang Zhang",
+    "Wenzhou Lyu",
+    "Ziyang Ding",
+    "Wei Zhang",
+    "Xue Zhao",
+    "Jin Pan",
+    "Yuexin Ma",
+    "Xinge Zhu"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37264"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "UniAfford",
+    "3D Segmentation",
+    "VLM / MLLM"
+  ],
+  "abstract": "Affordance perception aims to localize actionable regions supporting embodied interaction, yet 2D and 3D affordance grounding have evolved as separate problems, with different task definitions, supervision formats, datasets, and evaluation protocols. This fragmentation limits the learning of transferable object-affordance semantics across visual and geometric spaces. We propose Token Router for Tasks, a multitask training paradigm for MLLM-based systems that routes contextual hidden states to task-specific branches without requiring the language head to generate predefined markers. Routed states are supervised directly by branch-specific objectives, enabling dense prediction losses to shape shared MLLM representations. We instantiate this paradigm as UniAfford, a unified framework for generalizable 2D-3D affordance perception, together with UniAfford-Data, a dataset integrating pixel-level 2D annotations, point-level 3D annotations, and language instructions under a shared object-affordance taxonomy, supporting heterogeneous supervision through semantic-level 2D-3D pairing. UniAfford adopts an MLLM as a shared semantic hub and a modality-aware token router to produce image- and point-cloud-affordance queries. These queries respectively condition a SAM-style pixel decoder and a SONATA-based point decoder, enabling flexible 2D, 3D, and joint affordance inference from image-only, point-cloud-only, or paired multimodal inputs. Experiments demonstrate strong zero-shot generalization across 2D and 3D affordance benchmarks without target-specific fine-tuning, alongside state-of-the-art branch-wise performance under modality-isolated protocols. Ablations validate token routing, joint 2D-3D supervision, and decoder coupling, while language-head diagnostics show that routed latent states carry meaningful object-affordance semantics. Project page: https://4dvlab.github.io/UniAfford",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37264v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37264v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/4DVLab/UniAfford"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37264v1 全文及 2026-10-06T16:15:25.212Z 审阅记录；PDF 26 页，SHA-256 3b494cec7543f40a344f546fd929e3ef864b565809808d02bdaa5769c8678265，视觉核验第 1、5、9、16、23、24、25 页。数字均为作者报告，本项目未独立复现。代码状态 available：官方仓库公开 model、train_ds/train_fsdp、validate 和 app 等真实代码；README 数据与 checkpoint 链接仍部分标 placeholder，未确认完整训练资源可用、未运行。",
+    "ideaZh": "UniAfford 以 MLLM hidden-state router 分派 2D/3D affordance queries，接 SAM 与 SONATA dense decoders；联合学习配对仅共享 object–affordance labels，不对应同一实例。值得略读的是无需 language head 生成 task marker 的接口，不能把语义配对写成像素点云几何对齐，也没有真实 manipulation 验证。",
+    "motivationZh": "二维与三维 affordance grounding 的数据和输出监督彼此分离；论文希望让共享 MLLM states 接入各自 dense decoders，学习可跨模态复用的功能语义。",
+    "methodZh": "训练保留通用 anchors 来监督 shifted hidden-state route，却从 language modeling loss 排除 anchors。Router 用 soft CE/existence/sparsity 训练，hard argmax 选择 query，dense losses 更新所选表示而不穿过 hard routing。图像/点云独立 dense features 与 query cosine similarity 产生 mask/point scores。数据整合既有来源，采用相同类与 affordance 的不同实例 pseudo-pairs。跨 dataset transfer 与单 branch target-trained 成绩是两个不同 protocol。",
+    "methodFlow": [
+      "规范既有 2D/3D 数据的 object–affordance labels；按共同语义动态配对不同实例，保留各自 GT",
+      "图文/点云 prefix → 共享 MLLM response hidden states",
+      "anchors 仅监督 router；availability logits mask、hard route 选择并顺序投影 query",
+      "图像 query 与 SAM features 相似度→dense mask prompt→SAM decoder",
+      "点云 query 与 SONATA features 的 scaled cosine 相似度→point-wise affordance logits",
+      "联合 language/dense/router objectives；零 query 训练 fallback 只在训练启用，推理完全依赖 router"
+    ],
+    "experimentsZh": "实验设置：Mixed 训练 UniAfford-Data→AGD20K/GEAL*；另 singlebranch 在 ReasonAff、PIAD/PIADv2 训练评估 unseen。matched architecture 固定 anchor 与 joint/coupling 消融、语言 head readouts、B200 端到端 cost。\n作者报告 GEAL* zero-shot AUC83.55/mIoU14.67；GT labels 明示目标，不是自动发现全部 affordances。（Table2, p.7）\n作者报告 fixed-anchor→learned 2D gIoU62.28→68.79、3D mIoU17.46→34.56；未给多 seed CI。（Table4, p.9）\n比较范围：既有完整 systems 训练配置不完全匹配，3D baselines 保留其辅助 input；内部 route 对照共享 backbones 更有解释力。官网误将 PIAD singlebranch77.33/14.25 称 GEAL* zero-shot，本文记录以 exact PDF83.55/14.67 为准。\n消融与诊断：Route、joint2D3D、similarity coupling 均有控制；coupling 改变对方 branch 也影响 shared 训练，不应仅归 localdecoder。语言 head 词数 N 不是 sample-size-controlled richness，decoded tokens 不是 routing 因果机制。",
+    "insightZh": "把 task dispatch 从 marker vocabulary prediction 移到 hidden-state classifier，允许 heterogeneous dense supervision 塑造共享语义接口。它仍依赖训练 anchor 位置与 fallback，不是完全去除 anchors 或 differentiable discrete dispatch。联合 semantic pseudo-pairing 可减少对实例 aligned data 的需求，但没有几何对应监督。",
+    "whyRelevantZh": "与语言引导 3D affordance segmentation 及 MLLM dense-prediction 接口直接相连，可借鉴 hidden-state dispatch。未直接验证可编辑 3D 生成、设计优化或 fabrication。",
+    "evidenceZh": "语义配对要求 object 与 affordance labels 都相同，两个观察可以是不同实例。（Sec.3.2, Appendix A.1–A.4, pp.4,13–14；25K2D/69K3D 不是 94K 真实 paired captures，不应宣称自动 recover pixel–point correspondence。）\n路由训练 soft objective、query selection hard argmax，dense gradients 不通过 hard assignment。（Sec.4.3–4.5, Appendix B.1–B.2, pp.6,16–18；GT anchor fallback 只在训练零 query 时使用，推理无 fallback，cardinality 可靠性未单独报告。）\n作者报告 AGD20K transfer gIoU27.52，低于 reasoning Affordance-R1 31.78；GEAL* AUC83.55/mIoU14.67。（Table2, Appendix C.1, pp.7–8,18；GEAL*仅 LASO-C Scale/Jitter/Rotate severity2 subset；zero-shot 指不在 target 适配，不保证类别未见。）\n作者报告单 branch trained ReasonAff gIoU71.19/cIoU73.63，PIAD Unseen mIoU14.25。（Table3, pp.8；不能与 mixed-model transfer 混为一张统一 zero-shot 模型成绩。）\n作者报告同 subset learned vs fixed-anchor routing 3D mIoU34.56vs17.46。（Table4, Appendix C.5, pp.9,21–22；joint vs 单 branch 额外数据/损失改变；不是同总样本量或同训练预算的 transfer 纯因果归因。）\n作者报告 2D122.01ms 比 Affordance-R1 快，3D66.27ms 明显慢于 GREAT6.27ms。（Tables8–10, pp.22–23；B200、BF16/3D FP32，batch1 内存 11.6GiB peak；不能概括为所有 dense model 更快。）",
+    "caveatZh": "大 pretrained backbones 带来成本。\nSemantic pairing 没有 instance-level 几何对应，限制 geometry consistency supervision。\nBenchmark grounding 而非 closed-loop real robotics。\n准确目标 object/affordance 由 instruction 给定；结果不能当自主 interaction discovery 或动作可执行保证。\n训练 anchor/fallback 与推理 router 零 query 存在 distribution gap，无 query-count failure breakdown。\nOOD 只指 crossdataset 且 GEAL*只 3 种 corruptions，不能写 unseen 所有 category/severity。\n既有 annotations 跨来源 granularity 不一，mask/point extent 差异影响 IoU；qual“functional plausible”不替代 GT。\n本项目未复现；backbone 具体 size、总 epoch/budget 与 taxonomy overlap audit 披露有限，收益主要作者报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

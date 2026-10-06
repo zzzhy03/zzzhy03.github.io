@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2609.37816",
+  "slug": "wings-reference-free-gaussian-splatting-inpainting-with-3d-native-generative-priors-2609-37816",
+  "title": "WINGS: Reference-Free Gaussian Splatting Inpainting with 3D-Native Generative Priors",
+  "authors": [
+    "Noé Lallouet",
+    "Michael Fischer",
+    "Elie Michel"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37816"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "WINGS",
+    "3D Generation"
+  ],
+  "abstract": "Inpainting 3D Gaussian Splatting scenes, a key challenge in 3D editing, requires generating plausible content within a masked region of 3D space. Prior approaches rely on 2D diffusion models to produce one or several inpainted reference views, making them susceptible to challenges associated with multi-view inconsistency and lengthy optimization times. Departing from these approaches, we introduce a reference-free Gaussian splatting inpainting method operating natively in 3D. Our method leverages the embedding space of a large, pre-trained 3D prior, combined with a structure completion network to feed a generative prior which reconstructs the missing region's geometry and appearance. Performing content generation entirely in 3D, it avoids the need to reconcile inconsistencies of multiple inpainted reference images, and is faster than related 2D-based methods. We demonstrate the effectiveness of our method qualitatively and quantitatively, through extensive experiments and a user study. To the best of our knowledge, this work is the first Gaussian splatting inpainting method to operate in the learned representation space of a 3D-native generative prior without relying on inpainted reference views.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37816v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37816v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37816v1 全文及 2026-10-06T16:08:59.107Z 审阅记录；PDF 29 页，SHA-256 9f3248b5ca7b154a0d96243a361bcc90c72b010ec7ad17528fe758f8e5ada6ce，视觉核验第 1、4、6、8、15、20、23、29 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文未提供 WINGS public implementation URL，按标题/作者搜索也未确认官方代码；TRELLIS 链接属于依赖组件。",
+    "ideaZh": "WINGS 在 TRELLIS 的 structured latents 中完成 3DGS 物体移除后的背景补全：学习 occupancy、以 RePaint 与早期 target-to-target attention mask 补外观，再按场景适配 decoder。无需生成补全参考图，但仍用 context renders 编码和训练 LoRA；作者报告 176.8 秒/次，较最强基线 202.1 秒改善有限，不能称实时。",
+    "motivationZh": "从 3DGS 移除物体后，原先遮挡区域没有可用观测；二维补全参考常引入多视图不一致，论文希望直接在三维生成先验中续写背景结构与外观。",
+    "methodZh": "给定已有 3DGS 与准确的用户 3D mask，方法裁出局部 context、归一化到 64³ grid 并按纹理方向对齐。49.7M U-Net 预测缺失 occupancy，冻结的 TRELLIS flow 通过 context replacement/re-noising 与高噪声后层 attention masking 生成 features。600 步 LoRA decoder adaptation 弥合物体先验与真实场景 appearance，输出 Gaussians 混入原场景。主要解决 disocclusion/background continuation，不是任意 object insertion 或真实隐藏几何恢复。",
+    "methodFlow": [
+      "用户给定 3D mask，移除目标 splats；裁出 context/target voxel 比大于 6 的局部区域",
+      "结构张量估计纹理方向，归一化 64³ grid；36 context renders 的 DINOv2 features 编码 SLATs",
+      "scene-level 训练的 residual 3D U-Net 补 occupancy",
+      "100 步 RePaint-style context replacement/5 次 backward jumps；t=1→0.8 的 18–23 层屏蔽 target-to-target attention",
+      "在 36 合成 context viewpoints 上适配 rank16 LoRA 与 decoder 末层 600 步",
+      "共享 3D decoder 产生 splats，反归一化并在边界五 voxel 做 opacity ramp 后合并"
+    ],
+    "experimentsZh": "实验设置：COR-NeRF11、Inpaint36011、360-USID7，总 29 场景；相同 3DGS 和人工 3D mask，H100。三个 2D-based baselines 与组件消融；29 人 1401 随机匿名 pairwise comparisons，held-out viewpoints，提供 per-scene metrics/preferences 和 participant bootstrap。\n作者报告 LPIPS .235、FID49.96、Local-FID49.21；SSIM .640 低于 Inpaint360GS .644。（Tables 2,4, pp. 7,15）\n作者报告 176.84 秒，其中 decoder adaptation103.02 秒、latent sampling51.20 秒；75 秒 XS 有质量损失。（Table 5, p.16）\n比较范围：比较隔离 inpainting，准确 mask 绕开 segmentation。Baselines 按适用接口改动：InFusion 裁去 mask 外 splats、Inpaint360GS 移除 aux object removal，render resolution 在 COR-NeRF 扫描后选择 512；同一规范并非原始端到端部署。\n消融与诊断：共享 context/structure/sampling budget 的 mask 消融，U-Net 对 TRELLIS/RePaint 和 quadric 对照，以及 scene-LoRA/axis alignment。学习网络 scene-level split 较清楚，但内部数据不公开，attention schedule 的 grid search 未明确单独数据集，须防 test-tuning 解释。",
+    "insightZh": "将 scene 3DGS 编辑转到物体训练的 SLAT prior，并以结构补全、暂时抑制 target self-attention 和 scene-specific decoder adaptation 分别处理几何、条件注入和外观域差。无需 2D-inpainted references 有明确差异，但 conditional sampling 是近似启发式，不是证明从真实条件分布精确采样。",
+    "whyRelevantZh": "直接覆盖 3D scene editing 与 conditional 3D generation，attention routing 和 decoder domain adaptation 可借鉴；对可编辑 3D 资产的背景补全有清楚接口。",
+    "evidenceZh": "生成在 3D SLAT 空间完成，但编码/decoder adaptation 仍使用已有 context 渲染。（Secs. 3.1–3.4, Fig.1, Appendix B.1, pp. 4–6, 17–18；这些图不是补全参考或原始 capture images；reference-free 不等于完全不使用 2D features。）\n屏蔽 target queries 到 target keys 只应用在高噪声 t=1→0.8 与 18–23 层。（Eq.2, Fig.2, Appendix B.1, pp. 6, 17；context keys 仍可被访问；晚期 target self-attention 恢复，value 不是全置零。）\n结构网络使用 900 内部场景、71K+样本，按 650/100/150 场景 split 并排除 benchmark scenes。（Appendix C.1–C.2, pp. 20–22；筛去高 surface variation 或无法由 context quadric 近似的目标；并不支持任意复杂新物体补全。）\n作者报告 29 场景 aggregate LPIPS .235、FID49.96、176.84 秒，Inpaint360GS 为.236/51.17/202.1 秒。（Table 2, Appendix A.3, pp. 7, 16；同 H100 输入/3D mask；decoder adaptation103.02 秒，占最大成本；XS75.39 秒但 FID57.14。）\n作者报告对最强基线的 tie-adjusted 胜率 75.11%；Table2 的 82.9%是拟合模型对 average-skill opponent 得分。（Tables 1–2, Appendix A.2, pp. 7, 15–16；29 人 1401duels 不是 1401 独立人；ours/强基线 231duels，逐场景 21 赢/7 输/1 平。）\n结构、decoder adaptation 和 axis alignment 的消融有效，attention mask 量化增益较小。（Table 3, Figs. 4–5, pp. 8–9；w/o masking LPIPS .236/FID52.806；w/o decoder .250/68.776。）",
+    "caveatZh": "轴对齐偏差仍需 heuristic，复杂 misaligned patterns 困难。\nTRELLIS decoder 不能输出 higher-order spherical harmonics。\n每次约三分钟且 LoRA 成本突出，需要多场景 adapter amortization。\n现有 metrics 与 human preference 相关性有限。\n64³局部 context 与人为准确 mask 限制大区域、任意结构的补全；训练过滤偏向可预测背景。\n共享 3D 表示保证同一 scene 可渲染，不保证隐藏 geometry 真实、表面连续或 collision/manifold validity。\n本项目未复现；LPIPS/FID 的微小 aggregate 差异没有跨 seed 显著性证明；逐场景存在失败。\n82.9%不是对每个基线直接观察胜率；human rankings 和多 view metrics 存在重复样本。\nCode/内部训练 scene corpus 未确认公开，LoRA 与先验依赖影响复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

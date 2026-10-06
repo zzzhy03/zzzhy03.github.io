@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2505.18757",
+  "slug": "todre-effective-visual-token-pruning-via-token-diversity-and-task-relevance-2505-18757",
+  "title": "ToDRE: Effective Visual Token Pruning via Token Diversity and Task Relevance",
+  "authors": [
+    "Duo Li",
+    "Zuhao Yang",
+    "Xiaoqin Zhang",
+    "Ling Shao",
+    "Shijian Lu"
+  ],
+  "publishedAt": "2025-05-24",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2505.18757"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "ToDRE",
+    "VLM / MLLM"
+  ],
+  "abstract": "Visual token pruning, which aims to compress and prune redundant visual tokens, plays a critical role in efficient inference with large vision-language models (LVLMs). However, existing methods fail to disentangle intra-modal visual redundancy from cross-modal redundancy between vision and language. We show that visual token diversity and task-specific token relevance are two crucial yet orthogonal factors that complement each other in conveying useful information and should therefore be treated separately for more effective visual token pruning. Building upon this insight, we design TODRE, a two-stage and training-free framework that incorporates Token Diversity and task RElevance for effective token compression and efficient LVLM inference. Instead of pruning redundant tokens, we introduce a greedy max-sum diversification algorithm that selects and retains a subset of diverse and representative visual tokens after the vision encoder. On top of that, ToDRE leverages an ``information migration'' mechanism to eliminate task-irrelevant visual tokens within certain decoder layers of the large language model (LLM), further improving token pruning and LVLM inference. Extensive experiments show that ToDRE prunes 90% of visual tokens after the vision encoder as well as all visual tokens in certain LLM decoder layers, leading to a 2.6x speed-up in total inference time while maintaining 95.0% model performance plus excellent model compatibility. The code is available at: \\href{https://github.com/Yrdal3910/ToDRE}{this https URL}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2505.18757v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2505.18757v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Yrdal3910/ToDRE/tree/main"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2505.18757v3 全文及 2026-10-06T11:57:41.112294Z 审阅记录；PDF 30 页，SHA-256 ce4d9416a74bf7e7e9d0cdb827af38b07f4c944f46ff6de9fa1aa74640916215，视觉核验第 1、7、9、12、14、26、29 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页 URL 真实；web 入口抓取失败但 GitHubpublic API 确认仓库含 todre_llava、todre_core 的 nativeLLava/decoder 代码及 evaluationlauncher，README 给实现说明。未运行代码。",
+    "ideaZh": "ToDRE 先按 projected visual features 的 diversity 保留少量 tokens，再在后段 decoder 用 attention 阈值继续筛减。作者报告压缩后的综合表现与总推理时间较好。可速读两阶段策略；attention 低不保证关键证据已安全迁移，第二阶段收益及 orthogonality 论证需审慎解释。",
+    "motivationZh": "视觉 tokens 同时存在图像内部重复和相对当前问题的冗余；需要结合 diversity 与 task relevance 压缩推理成本，并检查重要信息是否被保留。",
+    "methodZh": "方法区分 image 内部重复与对当前 query 的冗余：CLS pivot 初始化，逐步选与已选 set 累计 cosine 最低的 token；后半 decoder 测 text-to-visual 及 visual-to-text attention 比例，均低于 0.10 时清空 visual states 与后续 KV。多 family/image/video 测试主要支持压缩 trade-off，不证明 lossless 视觉推理或充分保留小物体证据。PDF 抽取中的 LaTeX 转义经页面查看确认只是 extraction artifact，原页公式正常显示。",
+    "methodFlow": [
+      "vision encoder/projector 产生 visual embeddings，以 global thumbnail 或 video 最高 CLS attention 选 pivot。",
+      "反复选与 retained set 累计 cosine similarity 最低的 token，保留目标 budget 并维持其顺序。",
+      "以稀疏 visual set 和完整 text 执行 LLMprefill。",
+      "在较晚候选 decoder layer 测两个 cross-modal attention 比例，满足阈值后删除全部剩余 visual tokens。",
+      "后续 prefill/decoding 复用 text representations 并减少 visualKV；对 task 整体 trade-off 实测。"
+    ],
+    "experimentsZh": "实验设置：LLaVA-NeXT7/13B、Qwen2.5-VL7B、InternVL2-8B；八 image 和四 video benchmarks，10/25%retention。LLava 基准 2880visual tokens，singleRTX3090 效率、附录多数实验 4RTX3090，greedy 无需模型 training；未报告多 seed 或统计 errorbars。\n作者报告 Qwen/InternVL10%压缩的 12 指标 meanrelative92.0/91.5%；更强 family 仍有明显 performance 成本。（Table3, p.13）\n作者报告 LLaVA7Bstage2alone 四指标 ratio100.0，runtime70:15 对 77:04；10%combined96.0 对 stage1alone95.8，主八指标 95.0 范围不同。（Table5, p.14）\n作者报告早在 L/2 删 visual 会使 GQA64.2→39.0，7L/8 才近似基准；global attention 小本身不足以保障信息完备。（TableA2, p.26）\n比较范围：FastV/SparseVLM/FasterVLM/GlobalCom2/DivPrune；13B 省去 FastV/SparseVLM，video 不含 image-onlyGlobalCom2，Qwen/InternVL 仅报本方法与 unpruned，不能称强 baseline 跨 family 全面验证。\n消融与诊断：pivot 随机/center/farthest、candidate layers、attention 阈值、两阶段分离及 longresponse 单例。long-form 详细 grounding 主要 qualitative，没有 tokenmask 证据干预、confidencecalibration 或长 generation 风险评价。",
+    "insightZh": "diversity selection 和 latevisualpruning 均有前例；相对 DivPrune 的 max–min，本文采用 max-sum 并组合 lateattentiongate。方法增量明确、兼容性及消融有用，但两种 redundancy“统计正交”并未从现实 embedding 得到严格证明，不能以理论标题拔高贡献。",
+    "whyRelevantZh": "可作为通用 MLLMvisual-evidence 压缩的候选对照，兼顾 prefill 与 decoding；与小结构 grounding 和 reliabletokenallocation 相关，未推进 native3D/structuredoutput。",
+    "evidenceZh": "greedymax-sum 低累计 similarity 保留 tokens，crossmodalattention 均小于阈值后删全 visual。（Sec.4/Fig.3, pp.8–11; Algorithm1, p.21；方法图已查看；实际 defaultstarting7L/8 与 tau0.10 由 benchmark 消融选择，并非任意 layer 自动安全。）\n作者报告 LLaVA7B10%tokens 的八指标 meanratio95.0%，对 DivPrune93.5%；不是 95%绝对 accuracy。（Table1, p.12；主表实际查看；13B GQA59.9 低于 DivPrune60.1，POPE83.7 低于 86.5，非各项目都赢。）\n作者报告 POPEthroughput1.5→2.9samples/s 约 1.9×，四任务总 runtime77:04→29:43 约 2.6×；Stage1alone31:18。（Tables4–5, p.14；效率/消融表已查看，两种 speedup 的任务/聚合范围不同，secondstage 只附加约 1 分 35 秒收益。）\n理论依赖 orthogonalsubspace 和 decorrelation 假设，realprojector 近似与 O(epsilon)relaxation 未给足实测/证明。（Sec.3.2/Lemma1/Remark2, pp.6–8；理论页实际查看；uncorrelatedcomponents 一般不能推出任意 nonlinearkernel/function 乘积期望可分解。）",
+    "caveatZh": "论文没有独立 limitations section；理论明确称 strictorthogonality 为 simplifyingassumption，short-answer 任务限制 decoding 收益。\n某些 backbones 无 CLS，以 randompivot 替代；部分 baseline 因 transfer 性或 modality 省略。\nLemma1 由 uncorrelatedcomponents 到任意 nonlinearfunctions 独立乘积的推论不成立于一般分布；O(epsilon)还需 regularity 与 normbounds，不能称现实 redundancy 严格正交。\n低 attention 可漏掉 later-needed 证据；causal 顺序下 visual-to-latertext attention 含结构性零值，双比例的解释需实现核验。\nlayer/threshold 依赖 benchmark 调参，约 7L/8 才近似 lossless，familyadaptive 安全性未证明。\nrelevancegate 的总体收益较小，diversity 主导压缩；smallobject/temporal evidence 与 confidence 风险未测。\n平均 relativeperformance 掩盖个别较大能力下降，longresponse 仅 qualitative，本项目未执行或复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

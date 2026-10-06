@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.00618",
+  "slug": "dirichlet-splatting-differentiable-rendering-for-wave-based-inverse-problems-2610-00618",
+  "title": "Dirichlet Splatting: Differentiable Rendering for Wave-Based Inverse Problems",
+  "authors": [
+    "Xingyu Chen",
+    "Wuqiong Zhao",
+    "Xinyu Zhang",
+    "Tzu-Mao Li"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.00618"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Dirichlet Splatting",
+    "3D Reconstruction"
+  ],
+  "abstract": "Wave-based coherent imaging, including terahertz tomography, synthetic-aperture acoustics, and millimeter-wave radar, forms images by Fourier-processing finite-length signals, with an exact point spread function that is not Gaussian but a Dirichlet kernel: complex-valued, oscillatory, and periodic. However, transplanting 3D Gaussian splatting to coherent sensing fails by construction; Gaussian splats discard the sidelobe energy (10-20% of the total) and the phase that governs coherent interference between reflectors. Our key idea is to replace the learned Gaussian footprint with the physically exact Dirichlet kernel of the finite-window DFT, modulated by a surfel that carries area, normal, and material, so that the rendering primitive matches the measurement physics instead of approximating it. We pair this primitive with a specialized solver, Dirichlet Sliding Frank-Wolfe (DSFW), that combines variable projection, residual dual certificates, and certificate-driven hard replacement of low-utility surfels, with periodic low-resolution coupled Levenberg-Marquardt correction, navigating the rugged loss landscape that breaks generic first-order optimizers. The Dirichlet kernel admits an O(1) closed-form evaluation, so the forward model matches FFT ground truth to machine precision while remaining differentiable end-to-end. On dense terahertz reconstruction, our method recovers reflector centers to 0.018 bin RMSE, 10-50x faster than waveform-level automatic differentiation, where Gaussian splats fail.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.00618v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.00618v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.00618v1 全文及 2026-10-06T13:42:53.999632Z 审阅记录；PDF 19 页，SHA-256 837e12a81fc293c0808975c81e553fa692ffd462a31dcfa5ab699792080abc87，视觉核验第 1、3、5、11、12、19 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：exact19 页 PDF 无本文 public implementation/projectURL 或 release 承诺，引用 RF/Gaussianrepo 不能代替方法 Code。",
+    "ideaZh": "Dirichlet Splatting 以物理匹配的复数 Dirichlet response 代替 Gaussian，并用 variable projection 与残差诊断求逆。作者报告 synthetic support 与可见几何改善。可速读 primitive/measurement matching；真实 THz 主要是信号与平面 support，未完成完整 3D surface 验证。",
+    "motivationZh": "相干波测量含复数相位和结构化谱响应，Gaussian 表示未必匹配其物理成像过程；目标是用可微 Dirichlet responses 改善参数化逆问题求解。",
+    "methodZh": "activecoherentmeasurement 各轴反射响应是 windowedcomplexexponential 的 DFT。位置/velocity 映射 continuousrange/Doppler/azimuth，surfelarea/normal/Fresnel/pathloss 调 complexamplitude，相位相加再平方。DSFW 内层 ridge 解 amplitudes，外层 candidategrid 残差 correlation 找新 center，固定 budget 替低 utilitysurfel 及 periodiccoupledLM。基于已知 calibratedsensor/metalprior，不是 learnedRFchannel 或 pureNVS。",
+    "methodFlow": [
+      "读 knownwaveform/window/apertureconstants，parameterizesurfels 与 continuousFouriercenters。",
+      "用复数 Dirichlet/taperkernel 和物理 amplitude 生成 spectralsplats，coherentadditivecompose。",
+      "给定 centers 内层 VarProridge 求 complexcoefficients。",
+      "residualdualcertificate 全 grid 找 candidate，按 amplitude/cancellationutility 替换一 surfel。",
+      "optionalLM+kernelcontinuation/coarsefine/refit 迭代，输出 support/geometry。"
+    ],
+    "experimentsZh": "实验设置：sameoperatorsignalspace 七 targets/coldstart 十 seeds、independentFMCWrawplanar 模拟、single3Dbunny 多 view、三真实 metalletters/printedbunny、continuouspupilholography。RTXA6000 及 rendererRTX5080timing，2×2kernel/solverfactorial；depthresolution 真实 printed31.25mm 与 lateral2.5mm 差别大。\n作者报告 five-reflectorfactorialDirichlet+DSFW100%success、Gaussian+SFW10%、两 Adamcontrols0%；这是匹配合成数据十 seed 小 test。（Table11, p.18）\n作者报告 continuouspupiloneFWHMwavefronterror.021waves 对 Gaussian.051，但 failure16%对 52%，notalwayssuccess。（Sec.7.8, p.12）\n比较范围：3DGS/GSRF/WRFGS+、rawGS+SFW、backprojection/WaveformAD 与 solvercontrols；部分 baseline 只 backprojection supervision，rawcontrol 重要。13vs58parametercompare 主要 appearance 类型差异，不当作 matchedRFbaseline 固有 4.5×。\n消融与诊断：kernel/solverfactorial、positionvelocity/static、coldbasin/LBFGS、runtime/memory。syntheticsameforwardoperator 分离 solver 误差但不能证明 real-modelaccuracy，dynamicfullsceneoutsidevalidation。",
+    "insightZh": "DFTDirichlet、SFW/VarPro 均经典，新价值是 physicallymatchedcoherent-sensorrenderingprimitive 与适配非凸 sidelobe 的 fixedsupportsolver；比直接搬光学 Gaussian 到 RF 有本质 representation 匹配。3D geometry 实验证明 trackedreconstruction 关系，但并未证明通用闭合 object 恢复或真实全场景材料估计。",
+    "whyRelevantZh": "directgeometryinverseproblem 的新 physicsmatchedsurfel 表示与稀疏优化，对 tracked3Dreconstruction 有方法基础价值；不是 wirelesschannelmodel、pureNVS 或 3Dprintedfabrication 设计。",
+    "evidenceZh": "Dirichlet 是有限 samplewindowpointresponse，coherentadditivecompositing；不是一般 surfel/任意 continuousaperture 的完全 exact 物理。（Secs.3–6/Figs.2–3, pp.3–6; App.A pp.14–16；method/solver 图及完整 derivations 实际查看。）\n作者报告七 planartargetrawimagingmeanIoU.801±.150/supportNMSE.136±.109 对 GS+SFW.740/.294。（Table10, p.19；table 实际查看，误差跨 scene 而非完整未知 object 泛化。）\n作者报告 synthetic3Dbunny3orthogonalviews 全 surfacecoverage.596/recall.439，clusteredviewsrecoverableFscore.647；matchedbudgetrecall.750 对.530。（Sec.7.5/Fig.8, pp.9/11；fig 实际查看，recoverable-onlymetrics 不能换成 wholeobjectrecall；该 fit 用 backprojectioninit。）\n真实 printedtarget4991atoms 固定 lattice，rawNMSE.482/dbcorrelation.74，metalletters 无 pixelGTmask；未实测完整 surface accuracy。（Sec.7.7/Figs.9–10, pp.11–12；realhardware/printedtargetfig 实际查看，打印是测量对象非 fabricationgeneration 贡献。）",
+    "caveatZh": "multipathghosts 无 primarygeometryconstraint，backfacevisibility 不含 opaqueinter-surfelsocclusion。\nrequirescalibratedaperture/response，位置/noisefloor 误差会错放/误筛 surfel。\nDSFWfixedbudget 替换使 classicSFWguarantees 失效；material 与 amplitudesnarrowaperture 不可辨。\nrealprinted 固定 lattice 主要反射 field 恢复，真实 volumetricgeometry 及 holes/backsurface 未验证。\nunitpointDFT exact 不代表 finite-areasurfel 完整散射积分，singlebounce/stop-hop/farfield/separable/constantvelocity 假设限制。\nkernel 截断 8bins 丢少量 tail，opaqueocclusion/多径不靠 phase 自动正确处理。\nsynthetic3Dbunny only 一个 object 和 limitedvisiblecoverage，noise/calibration/realnonmetal 形状泛化未知。\nDSFWstep50–180ms 比 Adam1–9ms 更贵，total16.4s 依 case，不能说单步更快；本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

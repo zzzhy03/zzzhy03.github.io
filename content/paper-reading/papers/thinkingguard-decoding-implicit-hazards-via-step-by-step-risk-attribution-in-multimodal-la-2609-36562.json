@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2609.36562",
+  "slug": "thinkingguard-decoding-implicit-hazards-via-step-by-step-risk-attribution-in-multimodal-la-2609-36562",
+  "title": "ThinkingGuard: Decoding Implicit Hazards via Step-by-Step Risk Attribution in Multimodal Large Language Models",
+  "authors": [
+    "Ruochen Zhang",
+    "Yao Huang",
+    "Yitong Sun",
+    "Jiahe Xie",
+    "Jin Yan",
+    "Jifan Ma",
+    "Yuanfang Guo",
+    "Xingxing Wei"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "In Proceedings of the 34th ACM International Conference on Multimedia(MM '26), November 10-14, 2026, Rio de Janeiro, Brazil. ACM, New York, NY, USA",
+  "identifiers": {
+    "arxiv": "2609.36562",
+    "doi": "10.1145/3767308.3835707"
+  },
+  "venueIds": [],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "ThinkingGuard",
+    "VLM / MLLM"
+  ],
+  "abstract": "While Multimodal Large Language Models (MLLMs) are increasingly deployed in safety-critical domains, their reliability is threatened by multimodal implicit risks. Unlike explicit threats, these hazards emerge when individually benign text and neutral visual entities logically converge to induce unsafe outputs. Current detection methods fail to address this because they overlook the underlying risk activation mechanisms that govern cross-modal risk activation, leading to single-modality shortcut learning and hallucinated rationalizations. To bridge this gap, we first construct TriggerBench, the first dataset explicitly modeling risk compositionality (5,600 instances). By formally isolating Key Elements and Trigger Elements to build counterfactual contrastive pairs, TriggerBench eliminates risk residues and forces models to perform genuine logical deduction rather than superficial pattern matching, which provides a rigorous foundation for both large-scale training and fine-grained evaluation. Building on this, we propose a Step-Supervised Structured Reasoning training framework and employ it to train ThinkingGuard, a specialized guard model. Inspired by Situation Awareness theory, we decouple implicit risk identification into progressive cognitive stages, and utilize a step-reward Monte Carlo Tree Search algorithm to explore optimal reasoning trajectories, which are then distilled into the model through Dual-Constraint Preference Alignment. Extensive experiments across both standard and implicit safety benchmarks demonstrate that ThinkingGuard achieves strong performance. Project resources are available at https://github.com/FroggyChen/ThinkingGuard.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36562v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36562v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/FroggyChen/ThinkingGuard"
+    },
+    {
+      "label": "DOI",
+      "href": "https://doi.org/10.1145/3767308.3835707"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36562v1 全文及 2026-10-06T11:37:18.864551+00:00 审阅记录；PDF 9 页，SHA-256 7d30b3f0cd74562843b8bbaba382cd105b85a8b8b2d29f3ec78f352b1c6dfd87，视觉核验第 1、4、5、7、8 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 打印 URL；已访问 Public GitHub 确认 inference.py 实际存在。只确认 public 推理代码，README 声称更多 pipeline release 而 tree 未显示，未验证完整 training/search 实现。",
+    "ideaZh": "ThinkingGuard 用 key/trigger counterfactual pairs、逐步风险归因 MCTS 及 trajectory/pivot 双 DPO 训练 Qwen3-VL guard。作者报告 TriggerBench 平均 F1-unsafe0.764、recall0.866，并跨多个安全集验证；它提供避免 post-hoc 理由的训练思路，但因果正确仍由模型 judge 和合成 labels 定义。仅安全判别，未验证通用空间/设计能力；图示亦有直接 risk cues，不能保证数据已消灭全部单模态 shortcut。",
+    "motivationZh": "隐式风险常来自普通物体、环境触发条件和用户意图的组合，单次 verdict 难以说明原因。目标是学习分步骤的风险归因与判断。",
+    "methodZh": "隐式 risk 可能由中性物体、环境 trigger 与 text intent 相互作用而产生。论文将 key entity 和 trigger 分开，FLUX 合成 unsafe 与替换 trigger 的 safe counterpart，经人工筛选组成 TriggerBench。Qwen3-VL 生成 intent、entities、attributes、interaction、verdict 五 stage 轨迹，以 model process reward 做 SA-MCTS 搜索/prune；训练 full-trajectory preference 及 unsafe critical-step preference，将 search 结果内化为单模型判断。实际验证为 safety classification/attribution benchmarks，不是 formal proof checker 或 physical simulation，也不是新通用 foundation VLM。",
+    "methodFlow": [
+      "闭源 model 规划 risk tuple 并写 benign text/image description，FLUX2 合成 unsafe image 并人工筛选",
+      "保持 key/text、替换 context trigger 产生 matched safe image，构成 safe/unsafe training pairs",
+      "Qwen3-VL8B 按 intent→entity→attribute→interaction→verdict 阶段生成，stop tokens 分隔各步",
+      "SA-MCTS 用 attribution、context coherence 和 image hallucination 的 model-judge reward 扩展/prune，并按 subtree Max-Q 传播",
+      "取最佳/较差 full trajectory preference；对 unsafe samples 额外取相同 prefix 下关键归因 step preference",
+      "以 2:1full/pivot LoRA-DPO 训 guard，推理不运行 MCTS，只输出 structured attribution 与 safety label"
+    ],
+    "experimentsZh": "实验设置：作者报告 TriggerBench5600pairs、3864train/1736test，九 risk dimensions。Qwen3-VL8B 为 search/guard，MCTS depth5、branch2、30iterations，平均 352s/sample 单 A100；LoRA-DPO 四 A100 约 90min，rank8/alpha16、beta0.1、full/pivot2:1。评价 implicit safety、general safety 和 jailbreak。\n作者报告 TriggerBench Avg F1-unsafe0.764/recall0.866，Claude0.676/0.587、ShieldVLM0.634/0.744。（Table 1, p. 7）\n作者报告 MSSBench Acc0.718/unsafe F10.668，USB Acc0.927、MMSafety0.677、JailbreakV mini0.914。（Table 2, p. 7）\n作者报告 full implicit-group Acc0.784/unsafeF10.810/recall0.749，去 step-DPO0.756/0.779/0.699；这组均值不等于 TriggerBench 单独值。（Table 3, p. 8）\n作者报告推理 3.5s/352tokens，offline MCTS352s/sample；90min fine-tuning 并不包含全部 data synthesis/search 成本。（Sec. 5.1 p. 6; Table 2 p. 7）\n比较范围：比较 closed models、moderation、LlamaGuard、HiddenDetect、JailDam、ShieldVLM、GuardReasoner。不同 models/serving/hardware 及 data exposure，非规模或 compute 完全匹配；paper 专注 guard metrics，没有 general VQA/spatial/creative task retention 评价。\n消融与诊断：去 analysis、无 training、SFT、无 pivotDPO 显示专用分类受益；未单独分离 dataset counterfactual 与 MCTS/search budget、process judge 质量、不同 pair 生成器和 safe-only 拒绝误差。多个 validation/prompt/robustness 细节引用 supplementary，本 exact9 页未含，不补写。",
+    "insightZh": "方法贡献在 counterfactual key/trigger 数据设计、risk-step search 与两粒度 preference 监督；组件 MCTS、LoRA、DPO 已有基础。'causal attribution'在此是合成场景与 model reward 支持的风险解释，不是已验证 SCM、可执行逻辑证明或保证所有 spurious correlations 被消除。意义是 multimodal grounded reasoning 训练思路，影响范围保持专用 guard。",
+    "whyRelevantZh": "counterfactual samples 与 step-grounding 监督提供提升 multimodal 关系归因、抑制 post-hoc explanations 的方法参考。与设计 agent verifier 有关的是监督思想，论文未测试 2D/3D 设计或通用空间能力。",
+    "evidenceZh": "TriggerBench 使用 unsafe tuple 和 safe trigger replacement，图像由 FLUX 重新 render 并 manual filter，不是精确 pixel intervention 的物理仿真。（Secs. 3.1–3.2, Fig. 2, pp. 3–4；dataset 图已视觉核验；视觉/语义一致性主要靠生成与人工筛选，未在本 PDF 给完整审计统计。）\nSA-MCTS 以 model judge 做 step attribution/coherence/grounding 评分，joint trajectory 与 unsafe pivot pairs 训练。（Secs. 4.1–4.3, Fig. 3, pp. 4–6；方法图已视觉核验，preference supervision 本身并非 machine-checked causal 真值。）\n作者报告 TriggerBench 平均 unsafe F1/recall0.764/0.866，但 privacy F1 不超过 GPT、violence F1 不超过 GPT。（Table 1, p. 7；主表已视觉核验，平均领先不写成各维度全部最好。）\n作者报告 MSSBench accuracy0.718、USB0.927、JailbreakV mini0.914，MMIT0.769 低于 ShieldVLM0.898。（Table 2, p. 7；表脚注说明 ShieldVLM 数据重叠，但无法单凭此断言所有差异因 overfit。）\nFig4 直接呈现'Cures HIV within30days'标牌等显著风险线索，数据的 image/text 单独 benign 保证不能从示例确立。（Fig. 4, p. 8；已视觉查看实例；指出可见 risk cue，不对其中医学判断提供独立 clinical 结论。）",
+    "caveatZh": "无独立 limitations section，所谓 rigorous causal attribution 仍依赖合成 labels、human 筛选及未完全命名/展开的 JudgeLLM。\nsafe/unsafe 分别重新 render，除 trigger 外的风格/细节可变；pair-family split 和单模态 shortcut 控制未在本 PDF 充分交代。\nFig4 部分示例含显著单模态 risk cue，与全部 component benign 的强表述存在张力。\n该模型专用 risk 判别，不说明普通视觉空间 reasoning、设计质量或通用 helpfulness 同时进步。\noffline search 数百秒每样本，fine-tune90min 不等于全 pipeline 低成本；多 seed uncertainty 未给。\npublic code 目前确认 inference script，未确认完整 search、训练或数据 pipeline 可复现。\n全部实验为作者报告，未独立复现；风险说明不是 deployability 认证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

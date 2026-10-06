@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2603.07751",
+  "slug": "3viewsense-spatial-and-mental-perspective-reasoning-from-orthographic-views-in-vision-lang-2603-07751",
+  "title": "3ViewSense: Spatial and Mental Perspective Reasoning from Orthographic Views in Vision-Language Models",
+  "authors": [
+    "Shaoxiong Zhan",
+    "Yanlin Lai",
+    "Zheng Liu",
+    "Hai Lin",
+    "Shen Li",
+    "Xiaodong Cai",
+    "Zijian Lin",
+    "Wen Huang",
+    "Hai-Tao Zheng"
+  ],
+  "publishedAt": "2026-03-08",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2603.07751"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "3ViewSense",
+    "VLM / MLLM"
+  ],
+  "abstract": "Current Large Language Models have achieved Olympiad-level logic, yet Vision-Language Models paradoxically falter on elementary spatial tasks like block counting. This capability mismatch reveals a critical ``spatial intelligence gap,'' where models fail to construct coherent 3D mental representations from 2D observations. We uncover this gap via diagnostic analyses showing the bottleneck is a missing view-consistent spatial interface rather than insufficient visual features or weak reasoning. To bridge this, we introduce \\textbf{3ViewSense}, a framework that grounds spatial reasoning in Orthographic Views. Drawing on engineering cognition, we propose a ``Simulate-and-Reason'' mechanism that decomposes complex scenes into canonical orthographic projections to resolve geometric ambiguities. By aligning egocentric perceptions with these allocentric references, our method facilitates explicit mental rotation and reconstruction. Empirical results on spatial reasoning benchmarks demonstrate that our method significantly outperforms existing baselines, with consistent gains on occlusion-heavy counting and view-consistent spatial reasoning. The framework also improves the stability and consistency of spatial descriptions, offering a scalable path toward stronger spatial intelligence in multimodal systems.~\\footnote{https://github.com/Jasaxion/3ViewSense}",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.07751v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.07751v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Jasaxion/3ViewSense"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.07751v3 全文及 2026-10-06T12:12:28.421118Z 审阅记录；PDF 24 页，SHA-256 7489d15953b0e8bb73e1711b89b0b2d9168147af3c7770bee99c5c107c46f169，视觉核验第 1、5、8、9、12、18 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页 repo 确认公开，含 syntheticgeneration、OMS/VGR SFT、GRPO 和 evaluation 代码。未运行或复現模型。",
+    "ideaZh": "3ViewSense 用合成 orthographic JSON 和 teacher 三视图 reasoning 训练 VLM，再用 GRPO 学习计数与方向。作者报告合成域内大幅提升，域外改善有限。值得读显式空间接口；三视图主要是文本监督和 mental descriptions，不是实测重建，也不能外推开放世界空间能力。",
+    "motivationZh": "VLM 从二维观察推断三维结构和他者视角时常缺少投影约束；希望借助 orthographic views 的显式表示与监督改善计数和方向推理。",
+    "methodZh": "OrthoMind3D 区分 uniqueness-filteredgridblocks 和 single-planeobjects，OOD 为 sandbox/Gemini 合成经人工核验；OMS SFT 学习 canonicalview 结构，VGR SFT 用 threeviewderivedCoT 学习答案，strict/slackGRPO 只验最终 count/direction。主要范式为把空间几何组织到显式投影约束的 reasoningcurriculum，非输出 mesh/LEGO 或制造指令。",
+    "methodFlow": [
+      "程序合成 blockstacks/groundplaneobjects，提 front/left/topJSON 并过滤投影歧义。",
+      "OMS SFT 训练 singleimage 到 canonicalorthographic 描述。",
+      "teacher 从 threeview 与 answer 生成 front→left→toptrace，VGR SFT 学整合 views 答题。",
+      "以 strictfinalanswer 或 count/directionpartialcredit 执行 GRPO。",
+      "评估 ID/OOD 与外部单图空间任务，分析描述、promptbaseline 及 response 长度。"
+    ],
+    "experimentsZh": "实验设置：Qwen3-VL4B，OMS19544/VGR21000/GRPO30000（10K 重复+20K 新），SFToneepoch/GRPOfive，KL.01/G8，16Kresponsecap。ID4302、OOD687，externalMindCube1040/CV2D1438/SP306/Omni102/ViewSpatial2769，pass@1count/directionnormalized。syntheticteacherGemini3Flash，OODImageGemini3Pro。\n作者报告 SFT OODobjectcount32.4 低于 base50.9、strict49.1/slack50.9 才恢复；非训练任一 stage 都改善泛化。（Table2, p.8）\n作者报告 DirectQA ID80.3 对 VGR70.3，但 externalSP1.3/View7.2 对 21.2/34.1；输出 reasoning 训练对迁移有作用，需检查 finalanswer 格式影响。（Table4, p.8）\n作者报告 basecount 平均 10218.9tokens 而 trained 约 375，结构监督减少重复；未给 matchedlength/controlruntime cost。（Table3, p.8）\n比较范围：proprietary、spatialtrained、opensourcefamilies；training 主 4B，specializedmodel 格式失败记缺值。比较同 base/DirectQA/OMS/VGR/strict/slack 合理，oraclehintextra 信息不能单独排除 visual encoder 不足。\n消融与诊断：ICL 与 oracleviewhint、stageSFT/RLwarmstart、finalQA vsreasoning、strict/slackreward、frozenencoderMLPprobe。MLP 额外 supervised 训练 55.8 不能证明 encoder 具备完全几何信息；无 generatedprojectionconsistencyaccuracy 或完整 latentcausalintervention。",
+    "insightZh": "orthographicprior/mentalmodel 与 SFT/GRPO 有既有基础，新意为可诊断 projectioninterface、two-stagecurriculum 及对 occlusioncounting 的显式结构化监督。独立能力贡献符合空间 MLLM 关注，但“缺失 interface 是唯一瓶颈”的诊断强度超过实测。",
+    "whyRelevantZh": "显式 projection 与 canonicalframe 为 MLLM 空间推理的可迁移 interface，尤其计数/遮挡/视角转换；能启发 3Ddesign 理解，但本论文未生成/分割/编辑 3Dassets。",
+    "evidenceZh": "OMS 训练 structuredviews，VGRteacher 从 threeview 与内部 knownanswer 产生 reasoning，再以 mathverifiedreward 训练。（Sec.3.3/Fig.3, pp.5–6; Figs.7,9, pp.18,20；方法/表示页实际查看；教师知 GTanswer 筛正确末答案不保证全部中间 views 正确，非 raw3Dsimulation。）\n作者报告 strictIDblockcount95.0 对 base6.2，slackOOD38.7 对 21.2；IDobjectposition92.3 而 OOD76.1。（Tables1–2, pp.6,8；mainresult 页查看，limitedsynthetic 任务上近满分与 OOD 鲁棒性分开。）\n作者报告 slackMindCube38.9 对 27.2，CV2D79.9 对 77.9、ViewSpatial37.1 对 35.5，强 8B 或 SpatialLadder 部分任务更好。（Table2, p.8；transfer 为选定 subsets，非整个 benchmark 或全面 SOTA。）\n作者报告 4layerprobe55.8 与 oraclethreeviewhint 提升；proofnecessity 第一构造却把 occupiedcell 置 0，改变所定义 topoccupancy。（AppendixA.1/TheoremA.2, p.12; Tables10–11, p.15；proof 页查看；指出该构造不足，不等于已推翻 uniquenesscondition 或运行 generation 验证。）",
+    "caveatZh": "三 orthographicviews 不足以涵盖 support、affordance、dynamics 和 semanticpriors。\nviewinductionuncertainty 与 adaptive/hybridviews、openworld 及 continuallearning 待 future work。\n三 view 可唯一恢复的 syntheticconfig 不保证 singleegocentricimage 可识别同一结构；inferencerationale 可能编造 unobservedgeometry。\nteachertrace 含 GTanswer，最终正确筛选不排除中间错误；Fig.10teachingdemo 出现 emptycolumn 又新增该 columnblock 的自相矛盾。\nA.1 第一 necessityconstruction 改变 topoccupancy，现有 proof 不足，generation 实现需独立验证；本项目未跑。\nprobe 与 oraclehint 仅支持结构化监督有用，不证明唯一 modelbottleneck 或普遍充分表示。\nOOD 仍 synthetic/sandbox、objectsnonoverlapgroundplane，external 任务经过 selection；未报 multiseedCI 和 generalMLLMretention。\nblockcubes 不等于 LEGO，textviews 不是 native3D/可制造设计。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

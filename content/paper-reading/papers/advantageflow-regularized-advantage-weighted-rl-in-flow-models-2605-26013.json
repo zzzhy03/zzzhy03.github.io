@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2605.26013",
+  "slug": "advantageflow-regularized-advantage-weighted-rl-in-flow-models-2605-26013",
+  "title": "AdvantageFlow: Regularized Advantage-Weighted RL in Flow Models",
+  "authors": [
+    "Branislav Kveton",
+    "Anup Rao",
+    "Subhojyoti Mukherjee",
+    "Krishna Kumar Singh",
+    "Viet Dac Lai"
+  ],
+  "publishedAt": "2026-05-25",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.26013"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "AdvantageFlow",
+    "Image Generation",
+    "RL"
+  ],
+  "abstract": "We present AdvantageFlow, a forward-process reinforcement learning (RL) algorithm for rectified flow models. The algorithm minimizes an advantage-weighted prediction loss, which maximizes reward, regularized by the rollout policy, which convexifies the objective and makes its optimization stable. Our objective can be viewed as fitting a local reward-improving target distribution. The rollout regularization arises as a variance reduction step. We evaluate AdvantageFlow empirically on text-to-image generation with Stable Diffusion 3.5 Medium and FLUX.1, and compare it to both forward- and reverse-process RL algorithms.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.26013v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.26013v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.26013v2 全文及 2026-10-06T11:54:28.390402+00:00 审阅记录；PDF 16 页，SHA-256 501126a0437b4224144709d4476f67cdcad56e6681c96cdd8efd586895949c1b，视觉核验第 1、4、7、8、9、13 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF p.6 只引用 NVlabs/DiffusionNFT 的 baseline code base，没有印出 AdvantageFlow 自身 public implementation URL；不把 baseline 链接当本方法 Code。",
+    "ideaZh": "AdvantageFlow 用 advantage-weighted prediction loss 加 rollout/reference regularization 做 flow-model post-training，无需把 ODE rollout 改成 SDE 来计算 policy gradient。作者报告 SD3.5 无 CFG GenEval 0.673，对 DiffusionNFT 0.647/AWM 0.637；有 CFG 时 0.734 与 AWM 0.737 相当。它的可借鉴点是负 advantage 的稳定 least-squares 目标；strict convexity 只在逐样本 prediction space，不能写成神经网络训练有全局凸性或单调 reward 保证。",
+    "motivationZh": "flow generator 的 RL 更新需处理负 advantage，但简单负权重回归可能不稳定；需要构造受正则约束的目标，避免依赖额外 SDE 采样。",
+    "methodZh": "先按 prompt 采整张图并计算 batch-normalized/clipped advantages，再把图像重新加噪，用 prediction loss 拉向正 advantage 样本、推离负样本。EMA rollout predictor 和 frozen reference 提供两个 regularization anchors，adaptive gamma 保证总二次系数为正。Population 上解释为 linearly tilted reward-improving distribution 与 Rao–Blackwell variance reduction，实际仍受 finite/clipped advantages、approximate conditional mean 与 LoRA 限制。16 页完整正文/证明/实验 appendix 已读，方法 algorithm、主 curves、GenEval table 与 limitations 均实际查看。",
+    "methodFlow": [
+      "ODE 生成并计算优势：EMA rollout flow model 每 prompt 生成 16 images，reward 减 prompt mean、用 batch std 标准化并 clip 至 [−1,1]。",
+      "前向加噪训练目标：对样本重新选择 time/noise，优化 advantage-weighted clean-image prediction error，以及 rollout/reference prediction 的 squared deviations。",
+      "自适应稳定与重复更新：gamma 按 prompt 最大绝对 advantage 加正 margin；固定批样本可多次 inner optimization，再 EMA 更新 rollout。"
+    ],
+    "experimentsZh": "实验设置：SD3.5 Medium 512×512，Pick-a-Pic 或 OCR prompts，PickScore/HPSv2.1/CLIPScore/OCR 与组合 rewards；32 prompts×16 samples，LoRA rank32，250 iterations，训练 10 denoising steps、测试 40，每 run 最高约 70 A100 GPU hours。另测 FLUX.1 PickScore，主要单 seed42，组合奖励追加 seeds43/44。\n作者报告 no-CFG GenEval Base/DiffusionNFT/AWM/AdvantageFlow 0.273/0.647/0.637/0.673；base with CFG 0.631。（PDF p.8, Table 1）\n作者报告 with-CFG overall 0.734，AWM 0.737；color binding 为 0.655 对 AWM 0.685，非每类最好。（PDF p.8, Table 1）\n作者报告 multi-objective training 达到 DiffusionNFT 最高 combined reward 的成本约一半，追加三 seed 趋势相同。（PDF p.7, Fig.2e/3; pp.13–14, Appendix A/Fig.8）\n比较范围：同实验框架比较 Flow-GRPO、DiffusionNFT、AWM；forward 方法与 reverse 方法采样方式不同，有利于理解成本；GenEval 对 trained preference rewards 的外部检查有用，但无新的 human preference study 或广泛 diversity 保留评估。\n消融与诊断：Fixed gamma0.2 在 HPS 可不稳定，gamma5 保守，adaptive 更好；三 seed replication 仅 combined-reward setting，不覆盖所有任务。",
+    "insightZh": "继承 generate-score-retrain 的 forward-process RL 家族，贡献是明确的局部 tilted target、two-anchor least-squares objective 与稳定 gamma。附录将 DiffusionNFT 在转为 prediction loss 后表示为相关 objective；这也说明新意主要是目标与 regularization 的整理/改进，而非新的生成 foundation model。",
+    "whyRelevantZh": "与 image generation 的 post-training 方法直接相关，优势是稳定且不要求可微 reward 的 flow optimization；对 visual creation 的 reward training 有明确可迁移的 objective。建议 skim Algorithm 1、Sec.3–4 与 CFG 对照表。",
+    "evidenceZh": "严格凸性针对 fθ 的逐样本二次 objective，条件 A+gamma+lambda>0。（PDF pp.3–5, Eq.(5), Algorithm 1 and Sec.3.3；实际查看 Algorithm 1；不能推导非线性模型参数空间全局凸性。）\nPopulation target 的 reward 增益与 variance reduction 有条件假设。（PDF pp.5–6, Propositions 1–2; pp.14–16, Appendix B–C; p.9, Limitations；要求 centered population advantage / positivity 和 rollout predictor 等于 conditional mean；作者明确有限训练不完全满足。）\n作者报告无 CFG GenEval 0.673，但有 CFG 未超过 AWM overall。（PDF p.8, Table 1；有 CFG AdvantageFlow/AWM 为 0.734/0.737；未独立复现，避免只引用较弱的 no-CFG baseline。）\n作者报告 HPSv2.1 达到 DiffusionNFT 最高 reward 的训练成本约四分之一。（PDF pp.6–7, Baseline comparison and Fig.2b；这是特定 reward/SD3.5 training-time curve 比较，不是通用 inference speedup；图已实际查看。）",
+    "caveatZh": "PDF p.9：theory 为 local/population，实际 finite-group normalization、clipping、LoRA 与有限优化不是其精确动力学。\nPDF p.9：reward model 可能 misspecified，rule rewards 只表达图像质量的局部属性，gamma/lambda 仍需选取。\n不能把 prediction-space convexity 表述为 global parameter optimization guarantee，亦无有限样本 reward 单调保证。\n两 backbone 中 FLUX 只测 PickScore；structured 2D/3D assets 尚无直接实验，迁移为 general visual RL objective。\n多数实验单 seed、奖励自身提升仍可能被 reward hacking；GenEval 缓解但未完全排除。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.03510",
+  "slug": "weave-forcing-compositional-memory-routing-for-interactive-long-video-generation-2610-03510",
+  "title": "Weave Forcing: Compositional Memory Routing for Interactive Long Video Generation",
+  "authors": [
+    "Ziyi Wang",
+    "Junchi Yao",
+    "Heqian Qiu",
+    "Wenbo Shi",
+    "Chengjiu Wang",
+    "Jinyang He",
+    "Binkai Hong",
+    "Hongliang Li"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03510"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Weave Forcing",
+    "Video Generation"
+  ],
+  "abstract": "Recent advances in autoregressive video generation have improved temporal consistency over extended durations, yet interactive storytelling requires more than continuous scene extension: a new shot may combine characters and backgrounds from different historical shots. Whole prompt retrieval can overlook the distinct reference needs of individual components, while directly combining all historical memories may introduce unrelated visual content. To address these problems, we present Weave Forcing, a training-free framework for compositional memory reuse in interactive long video generation. First, we use an LLM for semantic slot routing to decompose user prompts into character and background descriptions and explicitly select suitable historical references for each component. To isolate the required content, masked memory weaving uses contrasting attention maps conditioned on semantic slots to construct refined semantic masks, selectively exposing relevant tokens from compressed historical KV memories to guide the generation of the current shot. We further introduce coverage adaptive RoPE to adjust temporal offsets and memory retention according to no, partial, or full reference coverage, addressing visual artifacts observed when incomplete historical references are positioned close to the current generation. Extensive experiments demonstrate that Weave Forcing improves cross-shot subject and background consistency while maintaining competitive visual quality and text alignment.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03510v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03510v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03510v1 全文及 2026-10-06T15:38:42.055991+00:00 审阅记录；PDF 24 页，SHA-256 e11c62f6f08005a65c9a07daebaf738be38edb0e36e0f491299eaac522decafd，视觉核验第 1、4、6、7、9、21、24 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：exact PDF 和附录提供 prompts/implementation details，但未提供本方法 public code/project URL；引用的 Self Forcing 等基础库不是 Weave Forcing 实现。",
+    "ideaZh": "Weave Forcing 按 character/background slots 分别检索历史镜头，再用 contrastive attention mask 从各自 KV memory 取出需要的部分，适合把不同历史人物和场景重组到新镜头。作者报告 cross-shot subject/background similarity 为 0.513/0.811，优于比较方法，但 within-shot consistency 并不领先。值得借鉴 memory 的角色分工；DINO 最大相似度匹配与不等长视频评测不能证明精确身份绑定，真实交互延迟也未实测。",
+    "motivationZh": "长视频续写时，whole-prompt retrieval 容易遗漏不同来源角色，完整历史又混入无关内容。目标是分别检索身份与背景证据，并选择性注入新镜头。",
+    "methodZh": "解决 whole-prompt retrieval 遗漏不同来源角色、整段历史 memory 又引入无关内容的问题。Gemini 将 shot prompt 分解为静态身份/背景并选择 earlier sources；存储 query-weighted、首帧混合的逐层 KV summaries。用目标 slot 与其他 source slots 的 cross-attention score 差构造 binary mask，再形态学清理。根据 no/partial/full coverage 调 temporal RoPE、参考保留区间与 similarity decay，新镜头逐渐改用自身 rolling history。无需新的 backbone training。",
+    "methodFlow": [
+      "语义角色检索：LLM 从当前文本解析角色与背景，分别匹配先前 shot 中的 source slot，允许不同角色来自不同来源。",
+      "压缩并存储历史：每层按 query-key affinity 聚合候选帧 KV，并混合首候选帧，保存到 CPU 等待检索。",
+      "角色 memory 隔离：对同 source 的 target/other 文本 responses 做差、阈值与形态学处理，以 attention bias 屏蔽无关 tokens。",
+      "引导当前镜头：将 independently masked views 放入暂时 reference cache；依据角色/背景 coverage 调 RoPE jump，逐步 decay/evict 后使用本镜头 history。"
+    ],
+    "experimentsZh": "实验设置：作者用 Gemini 生成 100 个六镜头 narratives，每镜头约 10s，Self Forcing/Wan2.1-1.3B，seed 0，RTX PRO6000 96GB。比较 bidirectional 与多类 AR video models，region DINO similarity、VBench quality 和 short-prompt ViCLIP。\n作者报告 inter-shot subject/background 0.513/0.811，Echo Forcing 为 0.431/0.708；intra-shot 为 0.771/0.923，低于 Echo Forcing 0.799/0.935。（Table 1, p.7）\n作者报告未用 LLM routing 的 inter-shot 为 0.442/0.734，完整为 0.513/0.811。（Table 3, p.9）\n作者报告 semantic mask 比 direct concat 的 subject 0.493 提高到 0.513，background 0.809→0.811。（Table 2, p.9）\n比较范围：有多种 historical cache 与 shot generation 基线，包含 direct concat/weighted fusion 控制。不同模型使用 native temporal extent，不统一 clip 长度；前 20 frames 和 transition frames 略去，不能用于证明 transition artifact 改善。没有盲人类身份/绑定评测或同预算 interaction time。\n消融与诊断：routing、semantic separation、decay、intra-shot compression 与 fusion 有消融；未独立详报 RoPE coverage 参数控制。附录约 30s/LLM call 为 total tokens 除 output TPS 的粗估，作者已承认不是 measured end-to-end latency。",
+    "insightZh": "角色级 reference routing 与同一 source memory 的 semantic isolation 针对多镜头重组提供直接创作接口，属于 creation transfer。相较 Echo Forcing 延伸为 compositional memory；attention mask 是 token access control，不是已验证 object-level causal factorization。",
+    "whyRelevantZh": "角色与背景分别回忆、重组是视频创作的直接控制需求，可借鉴 explicit slot-to-memory 接口；没有 3D editable assets 或物理状态恢复证据。",
+    "evidenceZh": "每个角色和背景可以选择不同历史 shot/source role。（Sec.4.1, Fig.2, p.4; Appendix A.3/B.2, pp.17–19；source identity 来自历史文本而非检查已生成内容的独立闭环。）\nsemantic mask 在 KV attention 中排除 token，借此组合历史内容。（Sec.4.2, Eqs.6–11, pp.5–6；保留 token 的 context features 仍可含邻近角色信息，masked access 不等于彻底因素分离。）\nmulti-person attribute binding 有作者显示的失败。（Appendix E, Fig.9, p.24；衣服/帽子在主体间串扰，限制精确 identity guarantee。）\nmetrics 使用 person-only detector 和逐参考最大 feature similarity，并排除 runtime/undefined。（Appendix C.1–C.2, pp.20–21；native shot lengths、有效 sequence 数量不完全相同；高相似度不保证 one-to-one 身份或动物 recall。）",
+    "caveatZh": "邻近主体 mask 不完整与多属性 attention competition 会导致服饰/帽子绑定错误。\nperson-only similarity 对非人主体与复杂 interaction 的覆盖不足，最大相似匹配并非 one-to-one identity tracking。\nruntime failures/undefined sequences 被排除，需要 valid denominator 才能严谨比较总体成功率。\nfixed seed、简单 narrative 模板与文本历史 routing 缺真实用户探索和生成内容检查。\n缺独立 measured latency；training-free 不意味着无 Gemini API 和 CPU/GPU memory 搬运成本。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

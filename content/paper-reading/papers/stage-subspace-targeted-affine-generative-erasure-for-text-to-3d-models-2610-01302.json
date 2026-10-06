@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.01302",
+  "slug": "stage-subspace-targeted-affine-generative-erasure-for-text-to-3d-models-2610-01302",
+  "title": "STAGE: Subspace-Targeted Affine Generative Erasure for Text-to-3D Models",
+  "authors": [
+    "Karol Dziekan",
+    "Przemysław Spurek",
+    "Dawid Malarz"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01302"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "STAGE",
+    "3D Generation"
+  ],
+  "abstract": "Concept erasure suppresses a target concept while preserving behavior on unrelated inputs. Existing closed-form methods were designed for 2D image diffusion and assume a single generative pathway, so one edit must cover geometry and texture at once. Native 3D generators, which synthesize structured 3D representations directly rather than by lifting 2D samples, violate this assumption. We show that shape and object concepts must be erased in the structural stage of the pipeline and material concepts in the appearance stage. We therefore formulate erasure in native text-to-3D as a stage-aware editing problem and introduce STAGE, a training-free, closed-form framework. STAGE confines each edit to the low-dimensional subspace spanned by the differences between erase and anchor embeddings, and relaxes the norm-preserving (orthogonal) constraint of prior editors into a least-squares affine correction that maps target activations onto safe anchors subject to a penalty on the displacement of retained prompts. The correction applies to the structural stage, the appearance stage, or both. We find that the stage an edit must reach is determined by concept type. On TRELLIS, the standard open native 3D generator, across 15 shape, material, and object concepts, STAGE reaches 66.7 on a composite score that balances forgetting the target concept against preserving everything else, aggregating CLIP-based semantic and physical metrics, versus 53.2 for the strongest adapted baseline. Code: https://github.com/gmum/STAGE/ Project Page https://gmum.github.io/STAGE/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01302v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01302v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/gmum/STAGE/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01302v1 全文及 2026-10-06T11:50:43.497040+00:00 审阅记录；PDF 22 页，SHA-256 8104ed3a75dab0a099a1dc64ee24aea9fafd858a7ed07e54ab9edc445160a4af，视觉核验第 1、3、7、8、9、16、19、20、21、22 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 明确印出 Code URL；实际访问确认 public repository，含 unlearning_methods、scripts、metrics、trellis 与 setup 文件。未运行或复现。",
+    "ideaZh": "STAGE 在 TRELLIS 的 structural/appearance 两阶段按概念类型放置 closed-form affine edit：shape 必须改 structural stage，material 优先改 appearance，object 改两者。方法用 erase–anchor token 差分的低秩 subspace 和 retain/null penalty 求修正，再精确折叠到 cross-attention K/V weights 与 bias，无额外推理层。作者报告 3D-US 66.7 对 OCE 53.2；这是 15 概念、单生成器上的自定义识别/保留综合分，不是 66.7% 的通用安全或彻底遗忘保证。",
+    "motivationZh": "从 text-to-3D 模型中删除概念时，形状、材质和物体类别未必由同一阶段负责；需要找到合适的 stage 与编辑子空间，降低误伤保留概念的风险。",
+    "methodZh": "单路 2D concept erasure 不能直接覆盖 native 3D generator 的 voxel support 与 SLat appearance。STAGE 用平行 erase/anchor prompts 的 aligned token states 构建 SVD subspace，拟合带 offset 的 affine correction，把目标概念向 anchor 映射并约束其他概念与 unconditional branch 的漂移。结构与外观阶段分别编辑，主实验所有 baseline 使用同一 stage assignment，隔离编辑算法差异。论文以 4 rendered views、Gaussian-center point clouds 和三种 learned evaluators 检查形状/材质/对象，但没有开放世界 adversarial unlearning 或物理材质测量。22 页全文含 appendix 已读；主方法、主表、stage crossover、limitations 与完整 qualitative appendix 均实际查看。",
+    "methodFlow": [
+      "建立 erase–anchor 与保留状态：每概念 120 paired prompt templates；编码 aligned CLIP token states，并加入 anchor/null states 作为保留集，caption second moment 约束总体漂移。",
+      "限定低秩概念差分：对 erase–anchor token 差分做 SVD，默认 rank 16/768；修正通过该 subspace 读取输入并允许 shared affine offset。",
+      "闭式求解并折叠：解带 retain/null/ridge/corpus penalties 的小型 least-squares system，将 scaled affine correction 精确折叠进 K/V projection weight 与 bias。",
+      "按概念阶段部署与检验：shape 用 structural，material 用 appearance，object 用两阶段；生成 native 3D assets，用图像与 point-cloud/材质分类器联合评分 forgetting 与 non-target preservation。"
+    ],
+    "experimentsZh": "实验设置：TRELLIS-text-xlarge，50 rectified-flow steps/stage；5 shape、5 material、5 object 概念，每个 120 edit pairs 和 30 unseen evaluation prompts。先在 seeds 0–9 搜索 evaluator 可识别的 base asset，并将 prompt/seed 固定给所有方法。CLIP + Uni3D 或 MINC-23 五类闭集分类，4 Fibonacci views 与 10K Gaussian-center points；3D-US 聚合 target forgetting 和同轴 non-target preservation。\n作者报告 overall 3D-US STAGE 66.7、OCE 53.2、UCE 47.5；STAGE default 60.1。（PDF pp.7,9, Tables 1 and 3）\n作者报告 STAGE material 两阶段得分 72.9，高于主设置 appearance-only 56.4；全部概念都改两阶段 overall 72.5。（PDF pp.8–9, Table 2 and continuation）\n作者报告去掉 subspace/offset 的 default overall 3D-US 为 54.1/41.3；last-token pairs 为 59.0，对完整 token pairs 60.1。（PDF p.18, Table 10）\n比较范围：对照 UCE/OCE 的 native-3D adaptation 使用同 prompts、seeds、corpus moment 与 stage assignment，并为各方法调参；原 2D preservation-list 设置已变更，故结果主要说明该统一协议下的相对表现。尚未覆盖训练式 native-3D editing 或其他生成器。\n消融与诊断：覆盖 placement crossover、subspace、offset、rotation、token alignment、rank、overshoot、retain/null/corpus/ridge penalty。Table 13 caption/text 称还包含 tuned OCE，但该 exact PDF 实际表仅三条 default rows；不引用不存在的 tuned row 作为证据。",
+    "insightZh": "价值是 native 3D 的 stage-aware concept intervention，以及 affine subspace edit 避免 orthogonal rotation 不能同时合并 erase/anchor 又固定 anchor 的限制。Exact folding 是线性投影层的代数等价，不能扩大为整个 nonlinear generator 的精确概念遗忘。材料两阶段编辑的实际分数更高也说明概念并非完全局部独立。",
+    "whyRelevantZh": "直接面向 native 3D generation/editing，提供 shape/material/object 的阶段分工分析和可折叠的模型干预，对结构/外观控制研究有明确方法价值；不将未验证的安全保证当主要推荐理由。",
+    "evidenceZh": "Affine correction 可精确折叠进 K/V weight 与 bias，但 shared offset 对所有输入均可能有影响。（PDF pp.4–5, Sec.3 Eqs.(1)–(2); p.14, Appendix B；实际查看 Fig.2；不用任何额外推理 module。Subspace 限定的是读取方向，不意味着 subspace 外所有输入必定不变。）\n作者报告 tuned STAGE/UCE/OCE overall 3D-US 为 66.7/47.5/53.2。（PDF p.7, Table 1; pp.17–18, Appendix E；score 为 learned evaluators 的自定义组合，所有方法同 stage placement；本项目未复现。）\nAppearance-only 对 shape/object 几乎无效，而 material 不仅在 appearance stage。（PDF p.8, Table 2；作者报告 STAGE shape Mode-L 0.0、object Mode-L 2.7；material Mode-S/Mode-L/Mode-SL 31.4/56.4/72.9。实际查看 crossover table。）\n总体分数掩盖个别弱概念和 collateral damage。（PDF p.16, Table 7; pp.20–22, Figs.7–9；作者报告 ceramic forgetting 0.04、cat/teddy-bear preservation 0.22/0.27。已实际检查对应 appendix examples，不能宣称所有非目标行为保持。）",
+    "caveatZh": "PDF p.9 Limitations：评估范围依赖 pretrained generator 与 evaluator 能力，细粒度/领域概念需要区分目标属性去除和近邻属性改变。\nPDF p.8 明确 material 在 voxel structure 中也有痕迹；主 stage assignment 按架构角色而非逐轴最高分选取。\n单 TRELLIS、15 概念、每个 30 个 evaluator-conditioned prompt/seed；不支持开放世界概念、组合擦除或 adversarial paraphrase 下的保证。\n3D-US 的 physical 部分仍是 learned point-cloud/material recognizers；material 由 rendered image 分类，没有真实物理性质验证。\nAny-view 检测却统一以 20% 五类 chance 校正是启发式，不能把 forgetting 直接解释为概率；不同 camera/evaluator 的 bias 仍可能影响结果。\nHyperparameter sweeps 在同 15-concept evaluation 协议上选最优，未展示独立 held-out tuning split；主最优分可能有选择偏差。\nShared offset 与对象轴低 preservation 表明局部编辑仍可造成 collateral changes；没有全局保留行为保证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

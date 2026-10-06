@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.06852",
+  "slug": "one-figure-every-canvas-editable-flowchart-relayout-via-agentic-pipeline-2610-06852",
+  "title": "One Figure, Every Canvas: Editable Flowchart Relayout via Agentic Pipeline",
+  "authors": [
+    "Shih-Chen Tseng",
+    "Chih-Hsuan Chen",
+    "Ryan Yang",
+    "Hsi-An Chen",
+    "Chun-Wei Tuan Mu",
+    "Yu-Lun Liu"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06852"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "One Figure, Every Canvas",
+    "Visual Design Agents",
+    "2D Design"
+  ],
+  "abstract": "Pipeline figures in ML papers must be repurposed across many canvases, including paper columns, 16:9 slides, portrait posters, 1:1 social teasers, 9:16 phone previews. Each format imposes a different aspect ratio on the same computational graph, where any silently broken connection misrepresents the method. We formulate aspect-ratio-adaptive flowchart relayout as a distinct task: given a raster flowchart and a target ratio, produce a structurally faithful, hallucination-free, editable layout. Existing methods fail characteristically: image-to-image models stretch blocks and reject extreme ratios, text-to-image agentic systems hallucinate content, and parse-then-render systems mis-route edges. We propose an agentic pipeline factored into Parse, Style, and Layout stages, each pairing a main agent with a critic that combines deterministic constraint checks with VLM visual feedback so connectivity is explicitly checked and prevented from being silently broken. Outputs are draw.io-editable mxGraph XML. On a curated benchmark of 100 flowcharts at five aspect ratios, evaluated by Gemini 3.1 Pro and validated against human judgments, our method reaches 68.6% Content Fidelity versus 11.2-41.4% for prior work. Project page: https://onefigureeverycanvas.vercel.app/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06852v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06852v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06852v1 全文及 2026-10-06T10:48:35.000Z 审阅记录；PDF 41 页，SHA-256 d84d1ec64e314b86a3734c94f8ee79b6f59fd88a9cfd2efe3da7882ba4a16f11，视觉核验第 1、4、7、9、18、19、21 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 仅给出 project page，尚未确认 public code repository。",
+    "ideaZh": "把 raster flowchart 恢复为 editable mxGraph XML，再用 Parse–Style–Layout 与各阶段 critics 适配画布；SAM3 geometry、PIL colors 和确定性 edge/overlap checks 分担 VLM 弱项。作者报告 100 图×5 比例的 Content Fidelity 为 68.6%，但 hard cases 仅 58.3%，Qwen 替换后 20%；这是有价值的设计反馈范式，尚非可靠的全自动图结构保真器。",
+    "motivationZh": "已有 scientific flowchart 适配新画布时，重绘容易丢失内容、关系与编辑性；论文希望恢复结构、锁定视觉样式并在 render feedback 下调整可编辑布局。",
+    "methodZh": "已有科学流程图跨画布时需要同时保持结构、内容与编辑性。方法先用 SAM3 bounding boxes 辅助 VLM 恢复 blocks/edges/groups，再用像素主色提取锁定 style 修改，最后以 DAG layering 和确定性约束引导 render-grounded feedback。Gemini3.1 Pro Preview 负责各 agents，主 benchmark 为 500 relayout tasks，另有 30 人用户研究与 Qwen 模型迁移。证据支持可执行图表示和外部检查器的价值，不支持普遍严格保真保证。",
+    "methodFlow": [
+      "输入 raster flowchart 与 target aspect ratio；SAM3 提供 bbox/shape priors",
+      "Parse 生成含 blocks、edges、groups 与素材 placeholder 的 mxGraph XML，critic 校正",
+      "PIL 提取 block colors；Style agent/critic 更新外观并锁定结构",
+      "从 XML 提取 source–target graph，用 DAG hierarchical layering 安排容器与组件",
+      "确定性检查 containment、overlap、relative size 及 edge identity，再以 render feedback 迭代至通过或 budget 上限",
+      "输出 draw.io-editable XML；可选 reference-guided palette/style transfer"
+    ],
+    "experimentsZh": "实验设置：100 张来自 ECCV/CVPR/NeurIPS/ICLR/ICCV/ICML oral-level 以上论文的图，25 easy/40 medium/35 hard，五比例形成 500 tasks。Parse/Style/Layout 最多 3/2/5 轮；30 图 complexity-balanced ablation；用户研究 50 cases×5 methods，30 participants 提供 600 image-level judgments。\n作者报告主 benchmark Content Fidelity68.6%，对照 11.2–41.4%，Overall81.85。（Table 2, p. 7）\n作者报告 VLM–human binary agreement83.2%/82.0%，Phi0.671/0.593，Layout/Style Spearman0.620/0.757。（Table 3, p. 9）\n作者报告 Qwen3.6-27B 版将 XML failure 从 16%降到 0%，但 Content Fidelity 只有 20%。（Table 7, p. 21）\n比较范围：覆盖 Nano Banana Pro、GPT Image2.0、PaperBanana、AutoFigure-Edit、Graphviz 替代布局及 Qwen 迁移；若干 baselines 并非 native relayout 并经 adaptation。未证明对所有编辑器、循环复杂图或真实用户文档普遍优越。\n消融与诊断：表 4 支持 decomposition、Parse/Layout critics 和 Style stage 的互补作用。SAM3、color tool、agent budget 与 prompt 工程作用未充分单独分离；Overall 不可跨表比较。",
+    "insightZh": "把跨画布 flowchart relayout 明确为保持已有图结构的任务，并统一 editable graph representation、geometry/color 外部信号与分阶段 critics；主要是任务与系统组织贡献，不是训练新 VLM，也不能声称每个组件首次提出。",
+    "whyRelevantZh": "直接命中 editable 2D diagram design 和 render-grounded design agents。Semantic graph identity 与视觉 layout 分离、局部检查器和可执行输出，可作为 SVG/diagram workflows 的方法参考；向其它 2D/3D 语言迁移尚是启发而非论文验证。",
+    "evidenceZh": "统一 XML 连接 SAM3 辅助 Parse、PIL 辅助 Style 和 DAG/约束辅助 Layout，每阶段均有 critic。（Sec. 3.1–3.4, Fig. 3, pp. 4–6；Fig.3 已视觉核验；Appendix G 给出完整 agent prompts 与规则。）\nR6 固定输出与输入 XML 的 source–target 关系，不能证明解析出的 XML 必然等于 raster 真值。（Appendix G.6, R6, p. 34; Sec. 3.2, p. 5；早期 parse errors 仍依赖 VLM/人工核验；此边界由实际规则推断。）\n作者报告 Content Fidelity68.6%，Relationship Preservation74.2%，Hallucination-free90.6%；hard subset Content Fidelity58.3%。（Table 2, p. 7; Table 5, p. 18；主表与复杂度表已渲染核验，本项目没有独立复现。）\n30 图 ablation 中去掉全部 critics 后 Content Fidelity 从 76.7%降到 46.7%；Qwen 版仅 20%。（Table 4, p. 9; Table 7, p. 21；不同表的 Overall 为各比较集合 rank 归一结果，不能跨表直接比较。）\n作者承认 style gap、闭源模型依赖、无收敛保证、routing failures 和每实例约 10–20 API calls。（Appendix B, pp. 18–19；限制页已视觉核验；checker 不是完整语义/美学正确性证明。）",
+    "caveatZh": "Editable XML reconstruction 存在字体、icons 与 spacing 的 style gap。\n依赖 closed-source Gemini，成本、可复现性及未来模型行为受限。\nCritic loop 有固定 budget，不保证收敛或全局最优。\nDense graphs/extreme ratios 可能仍有 edge crossings 与不自然 routing。\n每实例约 10–20 VLM API calls 加一次 SAM3。\nTopology checks 只约束已解析 XML，不替代 source raster graph ground truth。\nH.1/H.2 对模糊箭头、minor text errors、gray placeholders 有宽容规则；68.6%不是严格完整保真率。\n生成与 judge 使用同一 Gemini family；人评 agreement 虽有支持，仍存在 shared bias。\nAppendix A.2 段落 total iterations 与 Table6 数值不一致，不引用该段均值为关键结论。\n证据限于此 exact PDF 及作者报告，本项目未运行或独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.36496",
+  "slug": "reimagine-video-dynamics-2609-36496",
+  "title": "Reimagine Video Dynamics",
+  "authors": [
+    "Yu Yuan",
+    "Yawen Lu",
+    "Guoxian Song",
+    "Kevin Duarte",
+    "Ratheesh Kalarot",
+    "Di Chang",
+    "Xijun Wang",
+    "Stanley H. Chan"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36496"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Reimagine Video Dynamics",
+    "Video Generation"
+  ],
+  "abstract": "Most video editing methods focus on changing the appearance of the source video, while offering limited control over its dynamics. We introduce Reimagine Video Dynamics (RVD), a framework that disentangles a compact, editable dynamics token from visual context. We learn this token through self-supervised reconstruction: given the first frame as visual context, a renderer must recover the original video from the dynamics token, encouraging it to capture how the scene evolves rather than how it looks. This disentanglement allows video dynamics to be edited directly while preserving visual context. We develop a language-guided dynamics-token editor that transforms source dynamics into target dynamics, and train it with a scalable counterfactual video-pair pipeline and a two-stage training strategy. Extensive experiments show that RVD enables effective video dynamics editing, training-free retiming, and appearance-controlled re-rendering.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36496v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36496v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36496v1 全文及 2026-10-06T15:23:52.358621+00:00 审阅记录；PDF 26 页，SHA-256 d00fa968215450986724fdc8a4e9d508ff65b6dc537b349018f8c406aa1ed433，视觉核验第 1、4、6、9、22、23、24 页。数字均为作者报告，本项目未独立复现。代码状态 promised：exact PDF p.1 官方 project https://yuyuanspace.com/RVD/ 已访问，页面 Code soon 按钮表明实现尚待发布；不把展示网站认作 public code。",
+    "ideaZh": "RVD 把视频运动压成可直接编辑与重采样的 dynamics token，再用首帧和 caption 控制外观；这个接口对改动作、改速度、换外观有直接创作价值。最有说服力的是固定 target context 后只换 dynamics 的干预：作者报告编辑 token 将 Pass 从 90.2% 提升到 95.5%。主表 98.3% 是包含目标规划与首帧编辑的整套系统结果；token 仍泄漏外观、混合 camera/object motion，不能当作独立物理状态。",
+    "motivationZh": "video latent 混合动作和外观，使修改运动时容易连带改变人物或场景。目标是建立较紧凑的 dynamics 表征，支持动作编辑与 retiming 后重新渲染。",
+    "methodZh": "针对动作与外观在 video latent 中混合的问题，冻结 V-JEPA 2 提取视频特征，用可学习时空 bottleneck 压缩为 21×8×8×128 token；Wan I2V renderer 以首帧、caption 和 token 重建。DynCrossAttention 使用共享空间 RoPE、零空间均值、RMS cap 和 denoising gate。再用 Qwen semantic memory 引导小型 transformer 编辑 dynamics token，通过 static-to-real 预训练及 VACE 生成的 counterfactual pairs 学习 17 类有向修改。直接重采样时间轴还可 retiming。",
+    "methodFlow": [
+      "学习运动接口：冻结 V-JEPA 编码完整视频，经时空/channel bottleneck 形成 dynamics token，联合训练条件 renderer 重建源视频。",
+      "约束注入：同时间 DynCrossAttention 将 token 加入 Wan，空间 RoPE 对齐，并用残差中心化、RMS 上限和 noise gate 限制外观覆盖。",
+      "语言修改 token：指令、source/target caption、目标首帧进入 Qwen query memory；小型 transformer 在 token 空间预测目标 dynamics。",
+      "训练与重渲染：static-to-real 预训练后用合成 counterfactual pairs 学习动作变化，再将目标 token 与目标视觉 context 交给 frozen renderer。",
+      "直接时间编辑：对 token 时间轴做重采样和平滑可减速；加速只在前半程读取倍速 token，后段置零，依赖 renderer 补全。"
+    ],
+    "experimentsZh": "实验设置：作者训练 renderer 于约 169K 内部视频，另构造 9,946 可用无向 counterfactual pairs 得到约 20K 有向例子；renderer/editor 分别在 8×H200 训练约 6/5 天。测试使用与训练 raw ID/hash 不同的公共 web clips，600 appearance edits、300 dynamics edits，单次输出无 reranking。\n作者报告完整系统 300-case dynamics Pass 为 98.3%，VINO 为 75.0%，采用 Qwen3-VL-8B 的 12-frame judge。（Table 4, p.9; Appendix D.2, p.22）\n作者报告固定 target context 的 112-case token 干预：无 dynamics 90.2%，unedited source 59.8%，donor 73.2%，edited source 95.5%。（Table 7, p.23）\n作者报告移除 dynamics 令重建 PSNR 从 19.261dB 降至 16.663dB。（Table 2, p.6）\n比较范围：与 Ditto/OmniVideo2/VINO 等整套视频编辑系统比较，并用固定首帧、caption、seed、renderer 的 matched controls 分离 editor 贡献。整体系统增加规划与可选 first-frame editor；主结果不是相同组件预算下的单机制比较。V-JEPA metric 与原 encoder 同源，另用独立 flow/DINO 控制缓解但不消除偏差。\n消融与诊断：dyn input、caption、bottleneck grid/channel、RoPE、centering、injection depth、noise gate、两阶段训练和 token loss 均有消融。retiming 主要是示例，未给系统长时物理或 contact ground truth；加速后的 unused future 置零不代表生成延长已有真实运动。",
+    "insightZh": "贡献是可操作的 dynamics representation、语言 token editor 与对应 paired-data pipeline，超出普通 appearance video editing。双向固定条件干预支持功能上的控制分工；满 rank/entropy 不证明语义纯净或严格独立，作者也承认 donor cues 与 camera motion 混合。",
+    "whyRelevantZh": "可直接操纵 dynamics、retiming 和 appearance re-rendering 的视频创建接口，且包含真正固定条件干预，符合 video-generation 的 creation transfer 门槛。没有可编辑三维资产或真实力学验证，迁移范围限定为视频控制。",
+    "evidenceZh": "运动信息通过专用时空 token 注入，首帧与 caption 保留原生 context 路径。（Fig.2, p.4; Appendix A.1, Eqs.7–9, p.14；残差中心化和上限抑制泄漏，不能保证数学独立。）\n固定 dynamics、改外观仍保留与源运动的关联。（Appendix A.3, Table 5, pp.15–16；作者报告 flow trajectory cosine 0.727，mismatched control 0.312；光流仍会受 egomotion 干扰。）\n主编辑成功率评价整套系统，而非 token editor 的孤立增益。（Table 4, p.9; Appendix D.2, p.22；作者报告 300 cases 中 192 个改变目标首帧，并用规划 caption；基线使用各自原生接口。）\n固定目标条件的 token-only 控制显示额外 source-aware dynamics 贡献。（Table 7, Fig.16, p.23; Table 8, p.24；作者报告 112 matched cases 中 Pass 90.2%→95.5%，不是另一份 300-case 98.3% 估计。）\n快运动、camera/object 混合及复杂接触有明确失败。（Appendix F, pp.23–24; Appendix G Q5, p.25；不能把 plausible endpoint 写成正确物理过程。）",
+    "caveatZh": "只有有限 counterfactual transformations、确定性单轨迹，不能覆盖所有开放编辑。\n快运动 temporal aliasing；camera 与 object motion 未分离。\n多主体、长遮挡和快速拓扑/接触变化会出现身份融合和错误过程。\n残余 donor 外观线索使分解只是功能分工，非严格统计独立。\n98.3% 包含目标规划与 192/300 的首帧编辑；token-only 增益应引用固定条件的 5.3 points。\nQwen judge 与 semantic encoder 同 family；12 sampled frames 会漏掉短时事件。\nVBench background stability 比较输出内部，不验证源背景保持；静止也能有高 smoothness。\n内部训练数据与合成 pair 的筛选偏置、实测 end-to-end 延迟和物理一致性尚不透明。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

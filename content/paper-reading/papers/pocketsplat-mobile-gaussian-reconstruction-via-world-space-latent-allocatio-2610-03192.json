@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.03192",
+  "slug": "pocketsplat-mobile-gaussian-reconstruction-via-world-space-latent-allocatio-2610-03192",
+  "title": "PocketSplat: Mobile Gaussian Reconstruction via World-Space Latent Allocatio",
+  "authors": [
+    "Wenzhi Guo",
+    "Xianda Chen",
+    "Dongxuan Chen",
+    "Guangchi Fang",
+    "Bing Wang"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03192"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "PocketSplat",
+    "3D Reconstruction"
+  ],
+  "abstract": "Mobile Gaussian reconstruction must satisfy two requirements: the reconstruction model must execute within a device resource envelope, and the resulting Gaussian asset must expose a representation size suited to downstream mobile use. Existing feed-forward Gaussian reconstructors commonly decode dense, image-aligned candidates whose final cardinality is implicitly determined by the input resolution and number of views. We present PocketSplat, a feed-forward framework for budgeted mobile Gaussian asset construction. Given a prescribed output budget, PocketSplat organizes dense geometry-aware latent candidates in predicted world space, allocates exact integer capacity across local latent cells, and decodes complete Gaussian attributes only for retained candidates. Cell-conditioned latent fusion aggregates repeated multi-view evidence before decoding, while spatial responsibility decoding adapts Gaussian support after local sparsification. Experiments on DL3DV and out-of-distribution benchmarks establish a strong quality--budget trade-off against feed-forward Gaussian reconstruction baselines. On Mip-NeRF 360, PocketSplat executes directly on a target iPhone and constructs compact, higher-quality Gaussian assets substantially faster than a deployable streamed MVSplat variant; native MVSplat and DepthSplat exceed the device memory budget.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03192v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03192v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03192v1 全文及 2026-10-06T11:54:43.955950+00:00 审阅记录；PDF 15 页，SHA-256 305efb32f726c677128bc50e984a85d3182da1e11db2d43de4c2191c7a445e40，视觉核验第 1、4、7、8、9、13、14、15 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 PDF 无 PocketSplat 公开 code/project release URL，已有 PocketGS/DA3 等引用不等于本论文实现。",
+    "ideaZh": "PocketSplat 把 output Gaussian 预算变成 world-space latent allocation 约束，跨 view cell fusion 后解码并按 local compression 放大 covariance。作者报告 226K DL3DV22.790dB、iPhone 约 10s 重建，适合控制可分享 3Dasset 尺寸。但 sparse 预算 GPU 反而更慢且 peak memory 不变，iOS 固定 N 行再滤 export；不能写成预算降低即同比节省完整推理成本。",
+    "motivationZh": "移动端 Gaussian reconstruction 的表征与计算预算有限，均匀压缩又容易丢失局部细节。目标是按 world-space 分配有限 latent，并控制输出数量。",
+    "methodZh": "四 view 经 frozen geometry backbone 生成 451584 dense latent candidates，predicted world anchors 按 scene-relative voxels 组织。cell 根据 image entropy、view-mean detail 和 zero-detail floor 水填充，corrected stochastic rounding 精确满足 feasible B；within-cell 可靠性加权融合 latent，再为 retained 候选解码 Gaussian 属性，SRD 仅调整 scale/covariance。训练 geometry frozen、GS/fusion/SRD heads 联合。贡献在 quality-cardinality 控制与已报告手机部署，而非新 pose-free geometry 或实时低延迟模型。",
+    "methodFlow": [
+      "四 images+camera 信息经 frozen geometry 模型产生 depth/cameras/features 与 32D dense latent candidates",
+      "unproject predicted world anchors，用 0.02median depth cell 宽分组，统计 7×7 luma entropy、view counts、support floor",
+      "给 feasible B 执行 capacity-capped water filling、zero-detail completion 和 integer rounding 保证 exact counts",
+      "按 reliability/support 对 cell latent 加权融合，选择候选解码 Gaussian attributes",
+      "SRD 按 log(n/k)的 area prior 与 learned residual 只改 covariance；mobile 固定 shape graph 屏蔽 unselected opacity 并在 PLY export 过滤",
+      "四预算用同 trained checkpoint 生成 assets，以 novel-view metrics 及 CoreML/ONNX/Swift/Metal iPhone 路径评价"
+    ],
+    "experimentsZh": "实验设置：作者报告 DL3DV training50k steps，四 context、252×448、50evaluationframes；Tanks&Temples/MegaDepth frozen OOD。Mobile MipNeRF360 frames0/2/4/6 context+20remaining evaluation，FP32 hybrid iOS；GPU4080SUPER 八 scenes warmup/repeats，GPU-resident fourimages/cameras→50RGB exclIO/preprocess。\n作者报告 DL3DV226K22.790dB、338K23.122、Full23.070；226K 仅 pixelSplat Gaussian count16.4%。（Table 1, p. 7）\n作者报告 OOD226K T&T17.965/MegaDepth17.178，best listed baseline15.839/16.213；Full LPIPS 更佳，PSNR 并非更高。（Table 1, p. 7）\n作者报告 SRD at113K +3.3567dB、226K +0.8290，paired scene-bootstrap CI 正，140scenes 均改善；单 training seed。（Table 3, p. 9）\n作者报告 113K projection1.308→0.411ms 而 construction166.089→163.216ms，allocation 约 127ms。（Table 7, p. 15）\n比较范围：含 native count 和近似 matched F4 budgets、uniform random selection、SRD matched parent 训练与 execution-order paired 测试。尚缺同 geometry backbone 下 image-space allocation、fusion 独立消融、camera 扰动、广泛手机型号、export filesize/renderFPS/energy；训练配方与 prior 差异限制跨模型归因。\n消融与诊断：world allocation 相对 random 显著，SRD 重要且 scene-bootstrap 提供不确定性，但 random-to-world+SRD 混合了结构与 scale；SRD 固定 parent/seed 对照较清晰，hidden fusion 未单独剥离。",
+    "insightZh": "明确把跨 view 的 capacity association、latent fusion 和 local responsibility scale 联合到 budget-before-decoding，超出 post-hoc 阈值 pruning。allocator 是 hand-designed integer policy，learned 模块适配压缩；exact cardinality 是 feasible support 下的 count 保证，不是正确 geometry 或任意 B 都合法。",
+    "whyRelevantZh": "直接 3D reconstruction representation 与可控 asset capacity，对终端 visual creation/storage/interactive 处理有实用迁移；实际设计语义、mesh 编辑和 fabrication 没有验证，不追加分类。",
+    "evidenceZh": "world-space cell 配额满足 floor≤k≤capacity 及 sum k=B，仅完整解码 selected 候选，SRD 只改 scale。（Secs. 3.1–3.2, Eqs. 3–13, pp. 4–5; Fig. 2, p. 4；method 图已视觉核验，输出 Gaussian 不是 CAD topology/semantic parts。）\n作者报告 226K DL3DV22.790dB 对 pixelSplat21.231，Full23.070，budget/quality 非严格单调。（Table 1, p. 7；作者报告未复现，baselines native counts 不同。）\n作者报告 iPhone construction10.20–10.95s，MVSplat-Stream42s；Pocket peak2.64–2.89GB 高于 Stream1.99GB。（Table 2, p. 8; Appendix D, pp. 13–14；手机表已视觉核验，未披露 target iPhone 型号，不能泛化所有手机。）\niOS post graph 保留 N 输出行，unused opacity 屏蔽后 PLY 过滤，仅最终 asset 精确 B。（Appendix D, pp. 13–14, Table 5, p. 14；区别算法 selected decoding 与 mobile fixed-shape 执行。）\n作者报告 sparse113K TINFER50601.8ms 对 Full322.3ms，peak 均 2.705GB；BBD 仅 construction 少 1.73%。（Appendix F, Tables 6–7, pp. 14–15；作者明确 allocation/dense features dominate，limitations 文字页已视觉核验。）\nAppendix G 说明 archived OOD panels image provenance/budgets 未指定，不能作为 controlled matched-budget 证据。（Appendix G, p. 15；Fig6 已视觉查看，仅 illustration 不补造 matching protocol。）",
+    "caveatZh": "dense features 与 allocation overhead 主导，sparser 输出 GPU 时间更大、peak 不降。\nmobile fixed-shape decoder 仍有 N 行，asset count 与解码工作不同。\narchived OOD qualitative panels 缺指定 provenance/budget，非 controlledmatched evidence。\npredicted cell grouping 继承 depth/pose errors，camera contract 用 ARKit inputs 和 similarity alignment，不能称无 camera 输入即全面 pose-free。\n手机型号/OS 未给、native 基线 OOM 但 stream baselineCPU path 不同，deploy speed 差不是纯 allocator 因果效果。\n正文称 Quality SSIM 最强 0.6503，但 Table2 Light0.6690 更高；按表保留，不声称所有质量指标最佳。\n输出 budget 减少不保证完整 model RAM 或 latency 下降，mobile Peak 反高于 MVSplat-Stream。\nλselection/LPIPS 详细定义及训练 backbone 精确配置不完整，无公开 code 用于核验。\n这是 radiance Gaussian asset 无表面拓扑或 fabrication guarantee；实际 editable semantics 未实验。\n仅 exact15 页作者报告，未复现或部署手机。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

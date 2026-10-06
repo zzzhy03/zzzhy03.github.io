@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.02160",
+  "slug": "4director-controlling-video-world-models-with-rigid-3d-geometry-2610-02160",
+  "title": "4Director: Controlling Video World Models with Rigid 3D Geometry",
+  "authors": [
+    "Wei Cao",
+    "Hao Zhang",
+    "Vikram Voleti",
+    "Yuqun Wu",
+    "Mallikarjun B R",
+    "Shimon Vainer",
+    "Mark Boss",
+    "Yaoyao Liu"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02160"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "4Director",
+    "Video Generation",
+    "3D Generation"
+  ],
+  "abstract": "Precise control over camera and object motion is essential for professional video production. Existing methods control objects only coarsely, through image-plane cues that are ambiguous in depth and rotation or through 3D tracks and blobs that lack complete geometry and lose consistency across viewpoint changes. We introduce 4Director, a video world model conditioned on an explicit 4D scene representation: each object is reconstructed once from the input image as a canonical mesh and moved by one prescribed rigid transformation per frame. This representation provides an intuitive 3D control interface and prevents unobserved geometry from being regenerated independently in every frame. We render the controlled scene as a depth video and introduce a Motion Adapter that transforms this geometric scaffold into video while synthesizing view-consistent appearance, illumination, and non-rigid dynamics. For training, we construct RealCOD-Rigid, a new dataset of 20,774 clips annotated with rigid 3D scenes by our automatic pipeline. We further introduce Identity-Gated IoU (IG-IoU), which jointly evaluates adherence to prescribed object motion and preservation of object identity. Experiments demonstrate that 4Director consistently outperforms prior methods in visual quality and in camera and object control.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02160v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02160v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/VVeiCao/4Director"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02160v1 全文及 2026-10-06T14:02:00.179936+00:00 审阅记录；PDF 28 页，SHA-256 5d24ee5af7a1d6b94991330b00494d9dd7925eb76ae36b52da90cfd8dbd818ff，视觉核验第 1、5、7、9、10、19、21、23、24 页。数字均为作者报告，本项目未独立复现。代码状态 available：exactPDF p.1officialproject https://stability-ai.github.io/4director/ → observedGitHubCodehref → publicrepo 实含 apps/src/fourdirector/run.py/configs 和 scene/render/inference 接口，非 README-only。未运行、未确认完整 training datarelease；publicavailability 不等于本项目复现。",
+    "ideaZh": "4Director 把单图物体一次补成 canonical mesh，以每帧一个 SE(3) 与 camera path 渲染 depth control，VACE-style adapter 生成外观和未指定动态。作者报告 100 个 held-outclips 的 IG-IoU60.4 vsVerseCrafter54.8，而 recognition94.9% vs94.8%几乎不变，主要改善 placement 而非 identity；same-recipebox/nonrotatingmesh 消融支持完整几何+旋转信息的作用。值得深读其几何创作接口与 datasetpipeline；完整 mesh 含单图 prior hallucination，刚体控制不能指定肢体动作，breakdancer 会锁初始姿态。camera errors 排除估计失败 cases，VLM-gated IoU 也不能检验对称物体的 180°方向或真实物理。",
+    "motivationZh": "文字或二维轨迹难以共同表达物体与相机的三维运动。目标是让创作者在共享 world frame 中编辑 rigid geometry，并用该结构控制最终视频。",
+    "methodZh": "用户点击 SAM2objects，用 MoGe2depth/intrinsics 建立 backgroundcloud，以 Pixal3D 补完整 texturedmesh 并对齐；用户在共享 worldframe 中编排每 object rigidtransform 和 camera，scene 渲染 depthvideo。Wan2.1-VACE14Bbase/VAE/textencoder 冻结，3.049Bcontext MotionAdapter 接受 depth 和 referenceimage，standardflow matching 学习从 rigidscaffold 补 appearance/lighting/nonrigidmotion。RealCOD-Rigid 用 MegaSaM/UniDepth/MoGe 与 TAPIP3D 对真实 clips 估 geometry/tracks，firstframePixalmesh 经 robustSim3 对齐，并以 stablecore robustKabsch 追踪 rigidobjectmotion，保留 20,774clips。IG-IoU 将 SAM3maskplacement 与 Qwen3VLidentity/structuregate 结合。输出是受 scene 控制的 video，worldmodel 在此按 editableconditionedscene 定义。",
+    "methodFlow": [
+      "建立完整 canonical objects 与背景：singleimageSAMmask+depth 构造背景 cloud，Pixal3D 生成含未见面的 canonicalmesh 并 robust 对齐，camera/object 共 frame 而非 metric 真实 reconstruction。",
+      "编排并渲染 rigid4Dscene：每物体一个 SE(3)/frame、用户 camera path，zbufferdepth 固定 occlusion 与 visiblegeometry；newobject 可从 referenceimage 生成 mesh 并先合成到 inputframe。",
+      "恢复真实训练 rigidcontrols：TAPIP3Dtracks 经过 RANSAC/Tukey stablecore 选择，去掉局部 nonrigid 残差，mesh 按 objectrigidpose 移动并 depthrender，与原视频配对。",
+      "适配 video prior 并联合评估：训练 VACEcontextbranch 生成 conditionedvideo；评 cameraSim3-alignedtrajectory 和 SAMmaskIoU×VLMidentitygate，区分 placement 与 recognition。"
+    ],
+    "experimentsZh": "实验设置：作者报告 RealCOD25,318sourceclips、29,338objects，每 clip81frames832×480/16fps，过滤 failedannotation/eval 后 20,774train。fulladapter3.049B 与 rank16LoRA15.3M，两者三 epochs/24GPUs/globalbatch24/seed42；fulladapter 额外一次 NoisyTune 初始化扰动。eval100heldoutRealCODclips，nativebaselineweights/settings/resolutions/lengths，MotionCtrl/PaC 仅 16frames。IGIoU 评 firstobject 最多 16visibleframes，Qwen3VL2B judge448pixelcrops/PASSconfidence≥.5；cameraMegaSaM 估计并 Sim3align，仅 successfulestimationcases。userstudy20participants/ninecases，five anonymizedmodels，每 case1–5 ratings；61re-authored/insertioncases 仅 qual。\n作者报告 FID44.1/FVD370.4 vsSymphoMotion45.8/405.4，cameraRot3.65°/Trans.122 vs3.89°/.132；无 multi-seedCI，camera 是估计成功 subset。（p. 7, Table 1）\n作者报告 IG-IoU60.4 vsVerseCrafter54.8，recognition94.9 vs94.8%；箱体 ablation50.3、nonrotatingmesh53.0、2Dbox48.5。（pp. 7–10, Table 1/Figure 7）\n作者报告 rank16LoRAvariantIGIoU57.3/FVD393.2/Rot4.02°，full60.4/370.4/3.65°；smalleradapter 支持 representation 收益但 fullcapacity 仍更好。（p. 22, Table 4）\n作者报告 userquality/control/consistency4.62/4.82/4.69，nextbest3.69/2.39/3.88；九 cases 中五个 rotation，未给 CI 或评估者一致性。（p. 7, Table 2; p. 24, userstudyprotocol）\n比较范围：MotionCtrl/PaC/SymphoMotion/VerseCrafter 通过同 recoveredmotion 转 nativecontrols；PaC 不吃 text、MotionCtrl 最多 8flows、PaC 最多 16points、clip/nativegenerationbudget 各异，不能视为 matchedcompute 公平排名。full-surface/depth 代表 inputinformation 更强，nativeconverter 需要保留边界。FVD 使用各 nativeframecount 可能混入 temporalprotocol 差异；100clips 小样本 FID/FVD 未报 stability。\n消融与诊断：same-recipe2Dbox/3Dbox/3Dmeshwithoutrotation/fullrigidrepresentation、15.3Mvs3Badapter，以及 outofview/reentry 和 occlusionqual。cameraestimationfailrate、identityjudgehumanagreement、多 objectmetrics、preprocess/runtime 和 samebudgetrenderedproxy controls 未报告。",
+    "insightZh": "实质贡献是将 once-completedcanonicalmesh+singleobjectrigidtrajectory 作为可编辑控制 representation，取代仅 visiblepoints/blobs，并构建 realcliprigidannotation 训练接口；adapter 沿用 VACEbranch 架构。IG-IoU 是可解释的 gatedplacementmetric 但依赖 segmentation/judge，不能视为 independent3Didentity 真值。canonicalhiddengeometry 只保证 controlscaffold 一致，video 生成器仍可偏离或 hallucinate 细节，不证明 physicalworldmodel。",
+    "whyRelevantZh": "直接支持可编辑 3Dscene 驱动的视觉创作、camera/objectjointcontrol 及 assetinsertion；核心 transfer 为 explicitgeometry+renderingcondition 接口，未涉及 fabrication 可行性。",
+    "evidenceZh": "完整 mesh 与逐 objectrigidtransform 在 generation 之前固定 surface/occlusion，image-spaceappearance 由 prior 生成。（pp. 4–6, Figures 3–4, Eqs. 1–5; pp. 19–20, Appendix A；sharedcoordinateframe 是 arbitraryscale，appendix 明确非 metric reconstruction。单图 unobservedmeshsurface 来自 Pixal3Dprior，不是观测。）\nsame-recipecontrols 消融支持 depth/orientation/completegeometry 的联合贡献。（pp. 9–10, Figure 7；3Dmeshcontrol 在此“不旋转”，不是 inferiorcompletegeometryencoder 本身；对不同 information content 的对照，而非 allmethods 同输入 capacity。）\nIG-IoU 提升主要发生在 placement，recognition 率与强 baseline 几乎相同。（pp. 7–8, Table 1, Eq. 6；框架是 maskIoU 乘 identity/structurePASS，uncertain/no-mask 均 zero；对称转向不能由 silhouette 辨识。）\nrigidobjectcontrol 会过度约束 articulatedmotion，failure 真实展示。（p. 10, conclusion; p. 23, Figure 9；breakdancer 保持 handstand rather than dancing，不能以 qualwalkingframe 反推可指定身体动作。）",
+    "caveatZh": "one-rigidtransform 无法指定 finearticulation，nonrigid 由 prior 决定且可被冻结，Figure9failure 展示。\nIGIoU 对 front-backsymmetric 物体 180°rotation 不敏感，需 qual 观察；camera 只在估计成功 cases 平均。\nscenecoordinate 来自 MegaSaM 共享 scale，不是 metric reconstruction；newinsertion/re-authored61cases 无 GT，只 qual。\ncompletecanonicalmesh 的未见面是生成 prior，strongrigidrendering 可以一致地传播错误 shape，不能称真实完整 geometryrecover。\ndepthvideo 缺 explicitidentity/colortracks，且 invalidpixel128 可能与 validmidgray 混淆；appearance 保留仍需 video/imageprior。\ndataset 过滤 stablecore/firstframealignment 成功 cases 偏向可 rigid 解释对象；非 rigid 残差由 prior 补，无 physics/contact/causalinteraction 验证。\nIGIoU 依赖 SAM3 和 Qwen2B confidence 未校准，只 firstobject/可见 frames；controlaccuracy 的 3Dpose/rotation 尤其 symmetry 未独立验证。\ncameraSim3align 吸收 scale/gauge 并排除失败 case，未知 coverage 使平均误差无法直接当 overallfailure-awarecontrol 质量。\n3Badapter+14Bbackbone 训练/inferencepipeline 昂贵，paper 无 runtime/memory；userstudy 偏 rotation 小 case 集无 variationstatistics。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

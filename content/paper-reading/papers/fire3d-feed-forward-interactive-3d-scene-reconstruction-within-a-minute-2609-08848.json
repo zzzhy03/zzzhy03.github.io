@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2609.08848",
+  "slug": "fire3d-feed-forward-interactive-3d-scene-reconstruction-within-a-minute-2609-08848",
+  "title": "FIRE3D: Feed-forward Interactive 3D Scene Reconstruction Within A Minute",
+  "authors": [
+    "Hongchi Xia",
+    "Tianhang Cheng",
+    "Wei-Chiu Ma",
+    "Shenlong Wang"
+  ],
+  "publishedAt": "2026-09-08",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.08848"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "FIRE3D",
+    "3D Reconstruction",
+    "3D Generation"
+  ],
+  "abstract": "We present FIRE3D, a unified framework that transforms a single RGB image or casual video into interactable 3D scene assets for games and interactive applications in under a minute for up to twelve textured instances including preprocessing. At the core of FIRE3D is a feed-forward inference pipeline that predicts a compositional scene representation from posed RGB-D observations estimated from the RGB capture, including the 6-DoF pose, bounding box, mesh, and texture for detected objects. By modeling the scene as a collection of discrete entities, FIRE3D produces amodal object assets that can be independently edited and used in interactive applications. Our framework requires no test-time optimization, runs substantially faster than the compared reconstruction systems, and provides object-level completeness beyond existing feed-forward 3D approaches. We demonstrate leading detection accuracy, strong geometry reconstruction, and competitive rendering quality on the evaluated benchmarks, with substantial runtime gains.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.08848v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.08848v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/xiahongchi/Fire3D"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.08848v2 全文及 2026-10-06T12:43:23.069804+00:00 审阅记录；PDF 22 页，SHA-256 c2427d618bab11ebfb67900b38546b6e74034506843fe290d1fc0255f387bcd8，视觉核验第 1、3、4、8、9、14、18、19 页。数字均为作者报告，本项目未独立复现。代码状态 available：从 PDF 首页 officialproject URL https://xiahongchi.github.io/Fire3D 的 Code 按钮直接访问 publicGitHub，确认 fire3d/models/eval/scripts/training 实际目录；source chain 可追溯非猜 repo，未运行或下载 weights。",
+    "ideaZh": "FIRE3D 从 unsegmentedRGB 经 Pi3X 估 posedRGBD，内部 DINOv3/queryparser 得 instances/poses，HC-VAE 将 TRELLISSC latent 再压到 8³×64，以 12stepflows batch 补 geometry/material 并 export 独立 meshes。作者报告 60frames/12texturedinstances 含 BG 与 preprocess58.4s，适合精读 editable3Dscenes。实时/物理可行不可外推：realShapeRgeometry 仍落后，inferredperception 误差大、单图仅 20tests 且 scenealignment，interactable 只指 independentediting。",
+    "motivationZh": "室内多物体捕获既要恢复遮挡形状，又要保留可独立操作的对象；逐场景优化和逐对象导出成本高。目标是快速生成具有对象结构的完整三维场景。",
+    "methodZh": "训练 sceneparser 而不是依赖 GTmasks 进入 deployment，multi-viewDINOfeatures 由 estimated/nativepointmaps lift 到 worldsparsegrid，queryslots 预测 validity、instance mask 及 Sim3。canonicalinstancepoints 条件化 structure→shape→materialflows，twohierarchicalVAEs 解码到 O-Voxel/mesh，GPUbatchmesh 处理、UV 与 texturebaking 最后按 pose 组 scene。新增 HC-VAE 与 batchedexport 使 compactrepresentation 服务多 objectcapturecompletion，兼顾 foreground/background。方法明确 static indoor 范围，amodalgeneration 不是观测真值，PBR 字段输出不构成 relightability/physicalquality 证据。",
+    "methodFlow": [
+      "nativeposedRGBD 或 rawRGB 经 Pi3X 估 depth/cameras，liftDINOv3/AnyUpfeatures 至 worldpoint cloud",
+      "pointUNet+querytransformer 预测 384candidatevalidity/OBB/pose/3Dmask，validity.2/NMS.4 过滤并 canonicalizeinstancepoints",
+      "TRELLISSC-VAE 上新 HC-VAE 把 shape/material32³×32 压成 8³×64，staticBG 作为 roomcanonicalinstance",
+      "canonicalpoints 条件化 structureoccupancy、shape、material 三 cascadeflows，12steps/CFG3 并行 batchobjects",
+      "HC/SCdecoders→Ovoxel，batchdualcontouring/remesh/UV/baking，按 predictedSim3export 独立 texturedmeshes",
+      "用 GT 和 inferredperception 分开评价，realperception/geometry 与 syntheticrendering 证据分开呈现"
+    ],
+    "experimentsZh": "实验设置：作者报告 80kscenes/217874rendered-augmentedsequences/500kobjects；frozenDINOv3/SCVAE，perception400ksteps/flows200k，pose-depthnoiseaugmentation，12flowstepsCFG3。AEO25realscenes、ShapeR178objects/7scenes、iTHOR67/Imag120synthetics，singleimage3DFront20tests 且 wholesceneSim3alignment。GT 和 inferredgeometry 均报，inferredonlymatchedobjects 与 mAP/mIoU 补 misses。\n作者报告 iTHORGTCD1.38cm/F1.71，inferredCD6.15/F1.29；ImaginariumGT1.08/ .68，inferred6.49/.27，perception 误差不可忽略。（Table3 p. 8）\n作者报告 singleimageCD11.24cm/F1.10 对 SceneGen14.90/.06，20scenealignmenttests。（Table4 p. 8/Appendix A p. 15）\n作者报告 HCautoencodeToysCD.261→.269cm/PSNR26.801→26.635，ImagPSNR21.966→21.665，压缩非无损。（TableA6 p. 18）\n作者报告 FIRE3D 与 HoloScene comparison sceneCD2.24 对 2.63，但 PSNR13.55 对 17.87；geometry 与 appearance 有不同 tradeoff。（TableA2 p. 16）\n作者报告 Pi3Xpose/depth replacingGTmAP.54→.46/CD7.98→8.99cm，completepipeline 依赖 geometryquality。（TableA1 p. 15）\n比较范围：有 task-specificbaselines、GT/inferred、composedBoxer+SAM2+TRELLISpipeline、SC/HCmatchedflowcompute、Pi3Xnoise 及多 heldoutassetdatasets。SAM3D 仅最大 maskframe 无 multiviewfusion，ShapeRgeometryonly，netruntimeexcludeexternalparser/frameselection/export，跨 task 质量不能统一排行；BG 主要 qualitative。\n消融与诊断：compactVAEautoencode、equalflowtrainingbudget、batchvssequentialmatching 与 geometryinputsensitivity 分离部分贡献；fullsystemspeedup 含 parser、representation、export，HC 训练未计 equalbudget。缺 largerealrawRGBcapturebenchmark、objects>16memory/seedCI/physicaltests。",
+    "insightZh": "substantiveadvance 是 internalinstanceparsing+compactlatentbatchedamodalgeometry/materialgeneration 与 sceneassetexport 整合，并有 equalflowcompute 压缩对照。DINO/Pi3X/SC-VAE 继承 pretrained 组件，HClatent32×是 nominalgridcapacity，不等于总 modelRAM、文件或原始 meshlossless 压缩；feedforward 无 testoptimization 仍需要多 flowsteps 和 postprocess。",
+    "whyRelevantZh": "独立 objectmeshes、layout 和 texture 构成可编辑 sceneassets，compactlatent/parallelcompletion 直接 3Dreconstruction-generation 主要方向，也可启发后续可组装 visual creation；连接/物理 simulation 和 fabrication 可靠性未测。",
+    "evidenceZh": "rawRGB 需 Pi3X 几何 preprocessing，网络 interface 为 unsegmentedposedRGBD，内部 parser 预测 poses/masks，BG 一 instance。（Secs3.2–3.5 pp. 4–5/Fig2 p. 3；method 图已视觉核验，‘noexternalinstanceparser’不等于无外部 geometrymodel。）\nHC-VAE8³×64 相对 SC32³×32 nominalcapacity 少 32×，twofloat32grids256KiB excludes sparsemetadata。（Sec3.1/Fig3 p. 4; TablesA6–A7 p. 18；compression 图/表已视觉核验，autoencoding 有小失真。）\n作者报告真实 AEOmAP.25 最佳但 mIoU.11 低于 Boxer.22；realShapeRGTCD1.64 对 ShapeR1.37 较差。（Tables2–3 p. 8；主表已视觉核验，不声称 realperception/geometry 全面超过。）\n作者报告 equalflowtrainingGPUhours HCgeometry/rendering 更好，但 SCflow 在该 budget 未收敛且 excludeHCtraining。（TableA7/discussion p. 18；directablation 是训练 budget/throughput 优势，不是 fullyconverged 表示质量更高。）\n作者报告 net.601s/object，完整 texture4.783s/object；60framePi3X1.05s，12instances 总 58.4s 包含 BG。（TableA8/runtime p. 19；runtime 页已视觉核验，headline 一 min 不扩展 16+任意 scene。）\n作者限定 static indoor、interactable=editable assets，不保证 watertightness/physicalstability/relightability/articulation。（Conclusion & Limitation p. 9/Failuremode p. 19；explicit limits 页已视觉核验，robotics 为 demo 非 simtorealevaluation。）",
+    "caveatZh": "static indoor 范围，rawRGB 网络需 externalgeometrypreprocess。\ndepth/poses/scale 与 instanceparsing 质量决定效果，missedobjects 无法补出。\ninteractable 只是 independentlyeditable，不保证 watertight/physical/relightable/articulated。\nroboticsdemonstration 兼容 simworkflow，systematicstability/simtoreal 留 future。\nrealgeometry 在 ShapeR 与 realmIoU 未最佳，syntheticrendering 不能替代真实 photoappearance 验证。\ninferredgeometry 仅 matchedinstances，不计 missesshape 须一起看 mAP/mIoU，BG 不在主要 matchedmetrics。\nGTposedRGBDvideo 主 bench 与 rawRGBheadline 有 gap，Pi3X 估计 scale 不能证明无条件 metricaccuracy。\n12instances/min 含 BG 固定 60frames/setting；16batchcapacity/30geometryonly 不能换写全部 30texturedperminute。\n256KiBlatent 不包括 sparsemetadata/exportassets，HCnominal32×不是总模型/meshfilesize 比。\nequalflowcompute 不含新 HC-VAEtraining 且 SC 未收敛，不能称压缩表示在任意 compute 同样质量。\nrenderPBRfields 不证明 relighting 或 materialmeasurement，canonical objects 独立不证明碰撞/连接/assemblymanufacturable。\n数字 exact22 页作者报告，未复现或部署。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.39504",
+  "slug": "particam-camera-controlled-video-generation-with-reward-guidance-2609-39504",
+  "title": "PartiCam: Camera Controlled Video Generation with Reward Guidance",
+  "authors": [
+    "Amine Ouasfi",
+    "Runjia Li",
+    "Junlin Han",
+    "Eric Marchand",
+    "Philip H. S. Torr",
+    "Adnane Boukhayma"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39504"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "PartiCam",
+    "Video Generation"
+  ],
+  "abstract": "We present PartiCam, a training-free Particle filtering rooted method for improved Camera controlled video generation. Generating videos that follow a precisely specified camera trajectory remains challenging for large video diffusion models. Training-free approaches are backbone-agnostic and avoid the need to construct large camera-annotated datasets by steering pretrained models toward the desired camera motion at test time. This enables the generation of camera-controlled video data that can subsequently be used to train camera-conditioned video diffusion models. Existing sampling-based guidance approaches often suffer from unstable trajectories: they either explore too broadly and fail to respect the target camera motion or collapse early and lose visual diversity over time. We introduce a global-local refinement framework for diffusion reward guidance, enabling accurate and consistent camera control during video generation. Our method builds on Sequential Monte-Carlo (SMC) guidance, but introduces a local refinement stage based on particle filtered resampling. Experiments show large improvements in camera trajectory adherence, reduced drift, and better visual quality, without requiring model retraining.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39504v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39504v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39504v1 全文及 2026-10-06T12:18:08.533060+00:00 审阅记录；PDF 16 页，SHA-256 3e717e033328d5b35449a54dbc385f4414af241d88cebebf9c7bccd1bcce8547，视觉核验第 1、5、7、9、10、15 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文无 PartiCam 公开 code/project URL，引用 underlyingNVSSolver 等不作为本方法 Code。",
+    "ideaZh": "PartiCam 把 globalSMC aesthetic 重采样与 localcamera-reward noising/denoising restarts 结合，可不用 rewardgradient 改进 videoreshooting。作者报告同 CogVideo ATE.981→.807、FID41.08→31.86；SVD rotation 反差.400→.489，trainedTrajectoryCrafter FID29.86→30.01。可速读几何控制 reward 组合；9static+9dynamic 场景、reward 参数与实际 compute 未齐，不能称所有 backbones 更好、更快或精确 posterior sampler。",
+    "motivationZh": "相机控制的视频仍可能偏离目标路径，单条采样轨迹也容易兼顾不了画质。目标是结合全局探索和局部 camera reward，选择更合适的生成轨迹。",
+    "methodZh": "以 NVS-Solver warped-view scoremodulation 为基线，维护 K2global trajectories；早期 decodedTweedie samples 按 aestheticpotential 差更新 weights/ESSresample。每 particle 在 selectedsteps 生成 Nr2localperturbations，用 VGGT camera-errorreward 选 continuation，重复 4 次。global 负责探索、local 修 camera drift，不需要训练 head 或 backpropthroughreward；实验证明部分 camera-control 任务改善，输出仍 video 而非 explicit3Dscene，reward-model 错误和有限 population 会限制效果。",
+    "methodFlow": [
+      "inputimage 或 monocularvideo 与 targetcamera path，以 NVS-Solver scoremodulation 约束 videodiffusion",
+      "K2particles 常规 reversepropagate，Tweedie 解码中间 candidate 算 aestheticreward",
+      "每四 iterations 用 potentialratio 累积 globalweights，ESS 低时 resample",
+      "iterations8–32 每 particle 两 localnoise-denoiseproposals，以 VGGTcamera reward 随机 resample，local 循环 4 次",
+      "global 指导持续至 iteration40，完成 100iterationgeneration，ParticleSFM 独立估 camera 供评价"
+    ],
+    "experimentsZh": "实验设置：作者报告 NVS-Solverprotocol9static(6TanksTemples+3extra)/9dynamicmonocularvideos，CogVideo 主 baseline，另 SVD/TrajectoryCrafter。ParticleSFM ATE/RPE+FID，staticright-sweep 做 restart/global/local/rewardcontrols，trainedmodelsOOD 案例定性。\n作者报告 static FID165.12→121.56、ATE.767→.526、RPE-T.156→.122。（Table1 p. 6）\n作者报告 matchedCogVideo dynamicFID41.08→31.86、ATE.981→.807、RPE-T.128→.061。（Table3 p. 7）\n作者报告 SVD RPE-R.400→.489 变差，TrajectoryCrafterFID29.86→30.01 小幅变差，不能保证视觉质量总改善。（Table3 p. 7）\n作者报告 right-sweepjoint ATE.37vsbaseline1.56；camera/camera variant.28 但 qualitytradeoff，globalmorebudget 收益非单调。（Fig5/Secs6.2, pp. 8–9）\n比较范围：matchedbackboneTable3、plainrestart/PFrestart/globalonly/joint/SCG controls 支持 sampling 贡献；主要数据仅 18scenes，缺 multiseed/CI、matchedtotalmodelcalls、seconds/RAM/energy、widecamera types 及 human/temporalqualitymetrics，不能认证 worldmodelphysics 或广泛 cameraOOD。\n消融与诊断：global/local 与 camera/aestheticreward 拆分有辨别力；部分 comparison 仅 subset、rewardtemperaturesβ/normalization/ESSthreshold 未披露，定性 ReCamMaster 无数值，generateddata distillation 尚未做。",
+    "insightZh": "将 globalpopulationselection 和 localreward-filteredrestart 组合用于 camerareshooting 是可复用 sampling 控制，非新 foundation model。SMC/restarts/scoremodulation 已有，贡献主要 task-awareglobal/local 分工与实验；局部 biasedselection 后未给充分 proposalcorrection 证明，按 heuristic rewardguidance 理解，不声称精确 twistedposterior。",
+    "whyRelevantZh": "camera-controlledvisual creation 与 3Dguidedreshooting 直接可迁移主要 visual/3Dworkflow，non-differentiablereward 的 global/local 搜索可复用；新几何表示/设计 asset 未验证，不加 3Dgeneration 类别。",
+    "evidenceZh": "global 用 aesthetic、local 用 camera reward，K2/Nr2/100steps/早 8–40 窗口与 local4repeats。（Secs.4.3–5, pp. 5–6; Fig2 p. 5/Algorithm1 p. 15；method/algorithm 已视觉核验，trainingfree 仍有 multipleinferencepasses。）\ncamera reward 用 VGGT，evaluationcamera 用 ParticleSFM，globalpotential 是中间 Tweedie 近似。（Sec6 metrics p. 6/Sec6.2rewarddesign p. 9；独立 poseestimator 减同 reward 自评循环，但两者均可能 fail。）\n作者报告同 CogVideo ATE.981→.807/FID41.08→31.86，与 mainTable2 不同 baselinebackbone 比较应分开。（Tables2–3, p. 7；主表已视觉核验，不把 SVD→CogVideo 差异全归 sampler。）\n作者报告 SVD ATE 改善但 RPER.400→.489，TrajectoryCrafter camera 改善但 FID29.86→30.01。（Table3, p. 7；保留 wins 与 regressions，不写所有 metrics 一致更好。）\n作者报告 right-sweepablation globalonlyFID135.84 差于 baseline133.96，joint103.82/ATE.37；morelocalNr4 并非更好。（Secs6.2/Fig5, pp. 7–9；ablationplot 已视觉核验，subset 结论不是 mainbenchmark 数值。）\n作者承认 multi-particle 可能增加 budget，效果依赖 taskreward 设计/tuning。（Limitations, p. 10；explicit limits 已视觉核验，没有完整 timingtable 确认‘belowNVSSolver’。）",
+    "caveatZh": "multipletrajectories 可能需更大 denoisingbudget，quality/control 优先下 tradeoff。\nreward 设计和 task-specifictuning 影响效果。\nlocalreward-resampling 改变 proposal 后 weightunchanged 是近似 heuristic，不能按 formalexactSMC 采样保证。\nVGGTpose 奖励和 ParticleSFM 评价都依赖可匹配静态 features，dynamic/occlusion/failedpose 比例未报。\nmainTable2 基线与 oursbackbone 不同，应以 Table3matchedpair 为效果大小依据。\nno-gradreward 省反传不等于更少 forward，未给 actualtiming 支持 speedclaim 或 higherdiversitymeasure。\n100steps/twoparticles/4localrepeat 开销非 trivial，K/Nr 提高不单调，模型/scene 依赖。\n输出 camera 估计更接近 target 不证明 occludedgeometry 真实性、physicaldynamics 或 persistent3Dasset。\n仅 exact16 页作者报告，未运行或复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

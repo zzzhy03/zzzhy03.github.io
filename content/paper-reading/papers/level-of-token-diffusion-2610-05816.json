@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.05816",
+  "slug": "level-of-token-diffusion-2610-05816",
+  "title": "Level-of-Token Diffusion",
+  "authors": [
+    "Kiyohiro Nakayama",
+    "Brian Chao",
+    "Jan Ackermann",
+    "Hansheng Chen",
+    "Federico Tombari",
+    "Leonidas Guibas",
+    "Lior Yariv",
+    "Gordon Wetzstein"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05816"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Level-of-Token Diffusion",
+    "Image Generation",
+    "Video Generation"
+  ],
+  "abstract": "Image and video diffusion models allocate equal computation to every region, even when the intended scene calls for varying levels of detail. The spatial distribution of detail can often be anticipated before generation, indicating where computation can be reduced. We introduce Level-of-Token (LoT) Diffusion, a framework that turns this knowledge into an explicit multiresolution token layout (Level-of-Token layout) for adaptive and efficient generation. Tokens represent rectangular patches of varying sizes and shapes, allocating finer tokens where detail is needed and coarser tokens elsewhere. We adapt pretrained diffusion transformers to LoT layouts through a patch-wise asymmetric flow parametrization and embeddings for multiresolution tokens, preserving full-resolution flow prediction at every denoising step while processing only a reduced token sequence. LoT Diffusion enables layout-adaptive generation while preserving pretrained generative priors. We demonstrate LoT with layouts derived from semantic masks, bounding boxes, texture variance, and depth-of-field cues, as well as agentic plans. Across image and video generation, LoT offers favorable quality-efficiency tradeoffs, with significant speedups determined by the layout's token budget. Our project website is at https://georgenakayama.github.io/lotdiffusion/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05816v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05816v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05816v1 全文及 2026-10-06T11:36:59.841173Z 审阅记录；PDF 39 页，SHA-256 50e93a06e4fa1fb1f4b9236f1f40ef84ef9dc93cba0f15cdb2b8ea42f7f761dd，视觉核验第 1、5、8、19、29、33、36、39 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 提供公开 project/supplementary 页面，本轮 projectHTTP200 但未确认 LoT 方法 public source repository；不把第三方代码 URLs 当作自身 Code link。",
+    "ideaZh": "LoT Diffusion 以 variable rectangular token layout 分配计算，再从较短 DiT sequence 恢复 dense latent velocity。作者报告 image/video 在所测预算下加速。这是生成表示和预算接口的实质变化；仍需额外 layout，密集文字和织物结构可能断裂，不能称无损压缩。",
+    "motivationZh": "传统 DiT 对图像和视频各区域分配相同 token 计算，难以按局部细节需求控制预算；目标是用可变空间布局分配计算并恢复完整生成表示。",
+    "methodZh": "传统 DiT 在所有区域等量计算。LoT 在固定 dense latent space 上按 layout 分区，以每 extent 的 Procrustes basis 压缩 patch；DiT 读 size embeddings 与统一 finest-grid 位置，extent-specific output heads 及解析 flow 恢复得到完整 grid 供原 VAE 解码。FLUX2/Wan 用 LoRA 和新 heads 适配，layout 可来自 masks/boxes、variance、depth 或 painting/planning。量化比较使用 reference-derived layout 并匹配 tokens/training，runtime 不包含 layout 制作或额外 reference generation；支持预算与空间 detail 控制，不输出 SVG、native3D geometry 或严谨的 agent 闭环。",
+    "methodFlow": [
+      "从用户/scene cues 得到 detail map，构造完整覆盖且不重叠的 rectangular/quadtree token partition。",
+      "按 extent 固定 semi-orthogonal basis 和 data scale，将 dense noisy latent patches 投成统一宽度的短 token sequence。",
+      "DiT 处理短 sequence，加入 token size/area/aspect embeddings 及 finest-grid-center RoPE。",
+      "extent heads 预测 dense asymmetric velocities，解析恢复每 patch full-rank flow 并在 dense grid 积分。",
+      "使用原 VAE 解码 image/video；layout 改变细节预算与部分 subject placement，速度随 tokens 变化。"
+    ],
+    "experimentsZh": "实验设置：FLUX2-4B 在 Aesthetic-Train-V2 随机 95/5split 以 1024square 训练，5261held-out prompts；另 9B 更多 LAION/DoF 数据。Wan2.1-14B 使用 100K DataVerse81frame720P clips 与 200held-out prompts，spatial extents 不合并 temporal axis。quantitative VRS-onlyLoT/DDiT/Foveated 训练预算匹配，基于 supplied layout 的 H100generation runtime 包括 sampling/VAE。\n作者报告 image 在 1.893×/2.406×/2.935×压缩下 speed1.560×/1.818×/2.040×。（Table1, p.8）\n作者报告 video 在 2×/2.5×/3×tokens 压缩下 speed2.262×/2.909×/3.530×，多数 compressed baselines 的 aesthetic/imaging 较低。（Table2, p.8）\n作者报告 1.52×compression ablation 的 direct-HR FID26.487、binary-grid20.603、no-size14.584、full13.800。（Table3, p.9; Table5, p.37）\n比较范围：覆盖 ToMe-SD、扩展 DDiT/Foveated、同预算训练 dense controls 和低 res+bicubic token-matched baseline；速度排除 layout/ref 准备，reference-derived detail 是额外控制信号。视频仅短 81frameclips，没有 long-horizon causal streaming 或真实 interactive 任务。\n消融与诊断：解析 flow recovery 比直接 HR head 更关键，多 extent 与 size embeddings 改善质量；无 size 的 ImageReward 局部更高，不能称每指标统一 win。mixed-source 控制模型与 VRS-only 定量模型训练不同，需分开解释。",
+    "insightZh": "把 asymmetric flow 的压缩输入/稠密输出扩展为 patch-wise multiresolution，并以 extent-specific scaling/heads 与 size/position 编码兼容 pretrained DiTs。不是简单 token pruning，也不是首次 foveated generation；价值在任意 layout 的细节控制与 compute allocation 统一。",
+    "whyRelevantZh": "把显式可编辑 spatial detail 预算接入 generative prior，可支持 design agents 分配观察/生成资源和 scene-aware 视频创作；对 structured2D 和密集 embroidery 的收益需谨慎，论文未证明 vector/stitch fidelity。",
+    "evidenceZh": "token layout 只改变 DiT sequence 而 velocity/state 保持 full-resolution，通过 extent-dependent basis/heads 和 analytic recovery 适配原 VAE。（Sec.3.1–4.2, Fig.3, Eq.7–13, pp.4–7; Appendix A.2, pp.16–17；方法图已实际查看；exact asymmetric target 才保证公式恢复真实 flow，learned prediction 仍有误差。）\n作者报告 image2.935×token compression 时 2.040×speed，FID13.345；full-resolution controlFID16.748，但 ImageReward0.8326 低于 0.9518。（Table1, p.8；主表已查看，不能用 FID 单项宣称所有质量或 prompt fidelity 提升。）\n作者报告 video3×tokens 压缩时 3.530×speed、imaging0.5650；full-res0.6465，subject consistency0.8687 低于 full-res0.9254。（Table2, p.8；优于 compressed baselines 部分指标，不等于无损保持原视频质量。）\nquantitative video layouts 由 MiniMax-H3 生成 reference videos 导出，runtime 排除 layout construction；image layout 也额外使用 held-out reference luminance。（Appendix A.5, p.19; A.11, p.36；protocol 页已查看；仅供 layout，不输入 reference RGB，但存在额外 side information 与前置计算。）\n作者报告 COCO paired-layout target coverage4B61.17% vsdense45.38%，9B66.83% vs44.94%；dense baseline 无 layout input。（Appendix A.9, Table4, p.33；表格实际查看，证明 additional spatial adaptability 而非优于另一 layout-conditioned 方法。）",
+    "caveatZh": "dense fine structures/texture 遍布画面时几乎无 token 节省空间，强压缩会损害 structural fidelity。\nAppendix A.14 用 music staff 展示 lower budget 更碎裂，不能保证细结构保持。\n计划 layout 成本未计入 speedup；video reference 需另一个生成模型，端到端净成本/收益尚未测量。\n缩短 sequence 不等于 less total memory/state，dense latent 与 VAE 仍存在；所有区域精细时无法保留高速度。\n纹理、文字、embroidery 线条是潜在高 detail 需求，不能把 photo 指标外推为结构化 design 保真。\nagentic plans 主要为 demos，并非 benchmark 验证的设计 agent；输出仍为 raster/video 而非 editable geometric primitives。\n本项目未训练/运行或复现，结果均为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

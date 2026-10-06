@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2604.24586",
+  "slug": "point-mf-stabilizing-one-step-mean-flows-for-single-image-point-cloud-reconstruction-2604-24586",
+  "title": "Point-MF: Stabilizing One-Step Mean Flows for Single-Image Point Cloud Reconstruction",
+  "authors": [
+    "Yuta Baba",
+    "Keiji Yanai"
+  ],
+  "publishedAt": "2026-04-27",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2604.24586"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Point-MF",
+    "3D Reconstruction",
+    "MF"
+  ],
+  "abstract": "Single-image point cloud reconstruction requires recovering complete object-level geometry, including occluded regions, from a single RGB image. Diffusion- and flow-based reconstructors can model this ambiguity, but their iterative sampling requires many network function evaluations, while naive one-step point-space updates often produce outliers and density imbalance. We propose Point-MF, a one-step conditional Mean-Flow framework for geometry-only point cloud reconstruction. Point-MF predicts an interval-averaged velocity field directly in point-cloud space and reconstructs the output with a single network function evaluation, without training a point-cloud autoencoder. To stabilize large Mean-Flow jumps, we introduce Denoised Space Anchor (DSA), a set-distance auxiliary loss that anchors the denoised point set implied by the predicted velocity to the ground-truth geometry. On all 13 ShapeNet-R2N2 categories and Pix3D, Point-MF achieves strong reconstruction quality under the aligned point-set protocol, improving average CD and EMD over the evaluated point-cloud reconstruction baselines. It runs in 40.72 ms per sample on an RTX A4000, within the same latency order as the feedforward RGB2point baseline and substantially faster than iterative diffusion baselines such as PC$^2$ and BDM. These results show that denoised-space geometric anchoring enables stable one-step Mean Flow directly in point-cloud space.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.24586v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.24586v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2604.24586v2 全文及 2026-10-06T16:43:07.000Z 审阅记录；PDF 42 页，SHA-256 5ccdb729dea8e2fc94707e0f5bfc318bf11e32a4f2d93b45dc2b8f0a767e7fe5，视觉核验第 1、7、10、11、23、27、30、33、35、42 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exactv2 全文无 Point-MF 官方 public code URL，按标题/作者检索未确认方法实现；参考代码与实验室 publication listing 不能作为 Code link。",
+    "ideaZh": "Point-MF 将单图 geometry-only 点云重建压成一个 Mean Flow update，并用 APML set loss 锚定预测速度诱导的 clean point set。作者报告 RTX A4000 40.72ms，仍慢于 RGB2point 28.39ms；优势是相对多步 diffusion 的质量/成本折中，不输出 mesh topology/texture，也不保证真实遮挡结构或任意类别泛化。",
+    "motivationZh": "单图点云重建需要推断遮挡几何，多步 diffusion 延迟高，而直接 one-step 更新易产生离群点与密度不均；需要兼顾几何质量和低 NFE 的生成约束。",
+    "methodZh": "Frozen DINOv3 的 global/patch features 分别调制 DiT 与 CTI context，point tokens 不加 index positional embedding。模型预测 t/r interval-averaged velocity，训练含 JVP self-consistency 和 improved CFG target，推理仅一个 conditional generator call。DSA 用 x_t−t u 构造辅助 data-side estimate，以 APML 与 detach batch-loss ratio/time weighting 监督形状。论文补全 13 类 ShapeNet 及 test-only Pix3D 的 aligned point-set 评估、多 NFE 退化和 stochasticity 边界。",
+    "methodFlow": [
+      "RGB 经 frozen DINOv3 获得 global/patch features",
+      "CTI 共享 image MHSA 一次并以各层 MLP 注入 cross-attention，time/interval/global 调 AdaLN",
+      "直接 point-space DiT 预测 u(x_t,r,t|c)，无 point-cloud VAE",
+      "JVP 构造 stop-gradient Mean Flow/CFG regression target，t=r/r<t 各半训练",
+      "辅助 x̂0=x_t−t u 以 APML set loss 锚 GT；detach batch-ratio 与 1/max(t,τ)调 scale",
+      "从 noise 执行 x0=ε−u(ε,0,1|c)一次；可换输出点数但性能不 resolution invariant"
+    ],
+    "experimentsZh": "实验设置：ShapeNet13categorysplit，点云 2048 训练，DINO224，DiT12×512，120Ksteps/8A6000 约 25h。Pix3D 三类 test-only。CD/EMD 点数 1024/2048，F-score1%bbox/direct8192 与 RepKPU 分开；GPUwarm100singleinput、CoreMLdevice。\n作者报告完整 13 类 CD4.376/EMD4.13，RGB2point4.58/7.63，PC25.08/5.04；类别局部仍有其他方法更优。（TablesS3–S4, p.35）\n作者报告 one-step40.72ms，而 RGB2point28.39ms；8192points84.61ms，手机 281.74ms。（Table4, p.11）\n比较范围：Primary point-reconstruction baselines 与 reimplementedRGB2point，BDM category-specific prior/FCM 部分可比类。Asset models 经 samplepoint+GTscale/rotation alignment，训练数据与输出任务不同，不能宣称替代 SAM3D/TRELLIS2；GT 对齐不代表 camera/metric scale 恢复。\n消融与诊断：w/oCTI/w/oDSA/ViTencoder 及 APML/CD/MSE，DSA 主贡献但既有 clean-output 思想；λ在 ShapeNet 而非 Pix3D 定，另多 NFE/60input 随机种子输出变化，不是多训练 seed CI。",
+    "insightZh": "将已有 Mean Flow 和 clean-output geometric supervision 结合到 unordered point-cloud reconstruction；set-distance DSA 与 conditioning 控制支持实用 one-step 结果。DSA extrapolation 对一般 r>0 的 marginal flow 不是精确 data endpoint，作者明确作为辅助估计。没有新 Mesh connectivity、open-category asset 或真实 hidden-shape 识别原则。",
+    "whyRelevantZh": "以 geometry 监督稳定 one-step faithful object reconstruction，set-based denoised-space regularization 可供 generative geometry 参考；当前输出为轻量 point cloud，非完整编辑资产。",
+    "evidenceZh": "DSA 使用 APML、整个 batch loss ratio detach，并在 t=r 停用。（Eqs.6–10, Fig.3, pp.8–9；不是对所有间隔的 exact endpoint 约束；τ1e−5 限制 explicitgradient factor 但不自动提供全 network 梯度稳定定理。）\nCFG 混合进训练 target，ω1/κ.5 对应 effective guidance2，推理不加 unconditional call。（Appendix A, AlgorithmS1, pp.20–23；1NFE 指 point generator，仍有 image encoder；JVP 与额外训练 branches 有成本。）\n作者报告 Pix3D weighted CD×1006.53/EMD6.61；w/oDSA8.57/8.62。（Table3, p.11；仅 chair/sofa/table，test-only 真实图，BDM sofa EMD4.98 优于 ours5.06，非所有格最优。）\n作者报告 13 类 ShapeNet CD4.376/EMD4.13、direct8192 F-score.347，SAM3D reference F-score.377 更高。（TablesS3–S5, Appendix F, pp.34–36；in-domain baselines 与 GT scale/rotation aligned asset reference 比较分开；主 Table1 只三类，不能把 3.92 当 13 类 CD。）\n作者报告 2048points A4000 40.72±2.74ms/1.033GiB，RGB2point28.39ms；mobile281.74ms。（Table4, Appendix C, pp.11,26–27；100 次 sameinput，mobile 无 sameenvironment baseline；PC2/BDM22/28s 多步对照，不是比 feedforward 更快。）\n作者报告 8NFE ODE CD/EMD7.12/5.76 差于 1NFE4.38/4.13；DSA 仍保留 30.921 TMD10。（Fig.S4/TableS2, Appendix D, pp.29–31；TMD 为 sum 不除 K，60fixedinputs×10seeds；不是 semanticcompletion coverage，Best@10 是 GT-oracle。）",
+    "caveatZh": "JVP 增加训练 compute/memory。\n直接 pointspace 成本随点数增长，dense 输出可需 refinement。\n只 ShapeNet/Pix3D，broadercategories/complexrealimages 待验证。\nAligned 稀疏点云只含 geometry，无 mesh 拓扑、材料、collision/manifold 或制造约束。\n遮挡附属 desk 等可漏掉，单 GT 监督与 DSA 可能压缩多模态，TMD 不是合理 completion 证明。\n更多 NFE 会降质，不能把 mean-flow consistency 当所有 interval 准确/可任意预算改善。\n主结果平均类别范围不同，3 类/13 类/60subset 不可混写，GTpointalignment 不是 realworldregisteredaccuracy。\n本项目未复现；no 训练 seed variance，runtime 单 input 微基准的 encoder/preprocessing breakdown 有限；公开实现未找到。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

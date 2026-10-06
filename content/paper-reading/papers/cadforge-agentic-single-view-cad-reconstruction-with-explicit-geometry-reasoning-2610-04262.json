@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.04262",
+  "slug": "cadforge-agentic-single-view-cad-reconstruction-with-explicit-geometry-reasoning-2610-04262",
+  "title": "CADForge: Agentic Single-View CAD Reconstruction with Explicit Geometry Reasoning",
+  "authors": [
+    "Keyang Lu",
+    "Zhifei Yang",
+    "Tianao Dong",
+    "Mingzhe Xing",
+    "Zhen Xiao",
+    "Yikai Wang"
+  ],
+  "publishedAt": "2026-10-03",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.04262"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "CADForge",
+    "Visual Design Agents",
+    "3D Reconstruction",
+    "3D Generation",
+    "CAD"
+  ],
+  "abstract": "Reconstructing editable parametric CAD models from a single-view image is of great practical value for modern manufacturing, yet remains challenging due to incomplete geometric observations and complex inter-part relationships. To address it, we propose CADForge, an agentic framework that progressively converts a single image into CadQuery programs. CADForge decomposes an object into CAD-meaningful components and performs explicit geometric reasoning for each component, a process that first identifies CAD-relevant constraints and then translates them into precise modeling parameters through mathematical code. The inferred parameters then drive component-wise synthesis of executable CadQuery programs, with a review agent evaluating the resulting geometry and providing targeted feedback for iterative refinement. To further improve robustness and efficiency, CADForge incorporates a failure-guided toolkit construction mechanism to distill accumulated experience into tools, and maintains a compact parametric CAD memory for retrieving modeling context on demand. Experiments on diverse single- and multi-part objects show that CADForge consistently outperforms existing baselines in reconstruction fidelity and perceptual quality, demonstrating an effective approach to accurate single-view CAD reconstruction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.04262v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.04262v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.04262v1 全文及 2026-10-06T12:57:13.252000+00:00 审阅记录；PDF 32 页，SHA-256 a8add233c48e9f7483e8828b8aae50c5f660d66531054b966c8290559eaaa35a，视觉核验第 1、4、6、16、21、22、23 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 32 页 source PDF 未提供可确认的 CADForge public implementation/project URL。附录展示 helpers 与 prompts，不能据此标记代码已公开。",
+    "ideaZh": "CADForge 把单图到 CadQuery 的任务拆成 CAD-meaningful components，并显式区分观察几何关系、执行 Python 求参、生成 B-Rep 和视觉纠错；参数 memory 与失败案例产生的 helper toolkit 让这些接口更稳定。作者报告 170 个有几何真值的样本上 CD 为 0.01580，较 Procedura 的 0.01724 改善，同时平均 token 从 331,804 降至 81,613。值得深读的是 component contract 与 error routing；CPVR 93.81% 是按原生执行尝试统计，方法间单位不一致，不能读成统一任务成功率。单图遮挡、未知尺寸与制造/装配可行性仍未解决，编辑及 articulation 只做了定性展示。",
+    "motivationZh": "单图 CAD 重建需要逐步推断尺寸、依赖关系和建模操作，直接生成代码难以核对几何。目标是结合显式几何推理、执行与视觉反馈，得到可编辑 CAD。",
+    "methodZh": "这是不专门微调 backbone 的 agentic CAD reconstruction 系统。VLM 先按建模依赖与共享几何把物体分为语义组件，再为当前组件选择已建部件作为 reference，输出比例、边界、方向、孔洞等 specification。geometry program 用已有最终参数求解当前尺寸与放置，独立 Code Agent 将其转为 CadQuery；kernel 执行/validity failure 触发技术修复，成功后以两幅高亮渲染交给 Review Agent，将几何错误回送观察/求参，将建模错误回送代码。每个 accepted component 的实际参数进入 compact memory，离线 Fusion 360 失败 traces 产生 reusable toolkit。附录给出完整 prompts、helper 例子、评测与修复细节。",
+    "methodFlow": [
+      "规划 CAD 组件与顺序：将共用轮廓、轴、间距或布局的部件合并为 coherent modeling unit；先建稳定结构，再建依赖组件，孔槽属于宿主组件而非独立正几何。",
+      "观察并求解几何参数：选择已完成 reference components，VLM 描述对象坐标系中的比例/边界关系，纯 Python geometry solver 从 memory 中的实际参数计算当前候选尺寸、位置与方向。",
+      "执行 CadQuery 并区分错误：Code Agent 用 specification 与参数、toolkit 合成 B-Rep；执行错误按错误信息修复，视觉 review 比较原图与 front/oblique renders，再按 geometry/modeling/mixed error 路由修订。",
+      "压缩状态并积累工具：只保存真正用于当前 geometry 的公共参数供后续检索；从离线失败 traces 的高 CD 或重复执行失败案例提炼并验证 helper functions。"
+    ],
+    "experimentsZh": "实验设置：作者报告评测 200 个输入，其中 Objaverse/Fusion 360/3D-FUTURE 合计 170 个进行几何评价，另 30 个 web images 用于 OOD 定性与偏好评价；离线 toolkit 使用独立 60 个 Fusion 360 cases，保留 10 个 helpers。主 agentic 对比使用 GPT-5.5，CADForge 每组件最多五次 code repair 与三次 review-triggered revision。几何先放入 canonical object frame、分别居中及 scale normalization，再采样 surfaces；不评价绝对真实尺寸。\n作者报告 CADForge CD 0.01580、HD 0.08749、F@0.01 0.52104；Procedura 分别为 0.01724/0.10032/0.46771，平均输入+输出 token 从 331,804 降至 81,613。（p. 6, Table 1）\n作者报告去掉 geometry reasoning CD 为 0.01834，去掉 review 为 0.01941，完整为 0.01580；在另选 100 个案例的 geometry-programming 消融中，CD 0.01655→0.01475。（p. 7, Table 2; p. 21, Table 7）\n作者报告无 toolkit 的 CPVR 91.08%、平均 repair 1.68750、token 85,943；完整为 93.81%/1.29167/81,613。（p. 7, Table 3）\n作者报告 3D-FUTURE memory 压缩将每组件 token 45,696→27,225；CD 0.01595→0.01601，HD 0.10137→0.09332。（p. 9, Table 4）\n作者报告五位评估者各评全部输入，CADForge exact Rank-1 preference 43.80%，Procedura 18.90%、GPT-5.5 19.90%；未提供评估者一致性或置信区间。（p. 20, Appendix E.3; p. 22, Table 8）\n比较范围：比较 direct VLMs、CAD-Coder、Articraft、Procedura，agentic 使用同一主 backbone 并保留各自原生迭代流程；一些最新 single-view CAD 方法因无代码/checkpoint 或设置不同未进入主表。cadrille 的 GT point-cloud 输入只出现在定性对比。主表 aggregated 几何占优不代表每个 subset 每项占优，例如 Fusion 360 的 F@0.01、HD、SIOU 等仍有直接 GPT-5.6-Sol 更好。\n消融与诊断：包含 component decomposition、geometry reasoning、review、toolkit、完整 history vs parametric memory、geometry programming 与不同 VLM backbones；支持分阶段接口，仍缺相同 call/token 预算的 planning/review 对照和 stochastic repeats。",
+    "insightZh": "贡献在于将 image-grounded geometry specification、可执行 mathematical solver 与 CAD code 分离，并结合 compact parametric memory 和故障路由形成可解释的建模接口。不是新 backbone 或严格的 CAD constraint solver，toolkit 也来自独立数据上的离线失败挖掘，而非无需几何真值的在线自改进。直接服务单图→editable B-Rep，具有主方向的实质方法价值。",
+    "whyRelevantZh": "直接对应视觉创作 agent 与 image-to-program CAD/B-Rep reconstruction；geometry specification→solver→code 的模块接口、reference memory 和 targeted revision 可迁移到可编辑结构化设计生成。此关联来自实际程序输出与控制流程，不依赖只看 agent 标签。",
+    "evidenceZh": "geometry observation、programming、CadQuery synthesis 与 review 分开，使参数和几何反馈能分别路由。（pp. 3–6, Sec. 3, Figure 1; pp. 23–32, Appendix G prompts；已读全部 prompts；Code Agent 不接收原图，geometry outputs 是 image-grounded contract，Review Agent 判定 geometry/modeling/mixed error。）\n作者报告较 Procedura 改善几何距离并减少总 token，但 attempt-based validity 不能直接比较统一任务成功率。（pp. 6–7, Table 1; p. 16, CPVR definition; p. 17, implementation；VLM/CAD-Coder 以 whole program、CADForge/Procedura 以 component attempt、Articraft 以 compilation attempt 为单位，并保留原生 repair workflows。）\ngeometry programming、review、toolkit 都有消融支持，memory 主要减少上下文开销。（pp. 7–9, Tables 2–4; pp. 20–21, Table 7；memory control 提供 reference 完整生成 history，不是完全去掉历史；其 CD 0.01595→0.01601 没有改善，不应宣称压缩同时提升每项质量。）\neditable 与 articulated extensions 有定性样例，但没有制造/运动可靠性的量化证据。（pp. 19–20, Appendix D; p. 23, Figures 8–9；PBR/joint prediction agents 是附加扩展；truss edits 和柜门 articulation 图不能替代物理、tolerance 或编辑成功率测试。）",
+    "caveatZh": "当前仅单图条件，多视角可提供更丰富约束；极端侧面/背面视角下 backbone 的 3D perception 不足，可能无法恢复完整 geometry。\nCPVR 的 attempt 难以严格 workflow-independent 定义，因此使用每个方法原生执行单位，Appendix C.1.1 明确此边界。\n论文主评测是 single-view reconstruction，instruction editing 与 appearance/articulation 是定性扩展。\n单图的遮挡、metric scale 与 hidden interfaces 不可辨识；scale-normalized surface metrics 和视觉 plausibility 不是尺寸正确或可制造的证明。\nkernel-valid B-Reps 不等于装配接触/tolerance、无碰撞运动或受力/制造约束合格；未有真实 fabrication 验证。\ntoolkit 以 GT Chamfer 最差案例挖掘，虽声明与评测分离，但“training-free”只指没有专门微调 backbone，不表示经验构造无需独立数据与目标几何。\nCPVR 非统一最终成功率；baseline repeated querying until executable 与 component 级有限修复的成本/失败单位不同，token savings 不是相同预算的因果实验。\n评测规模与家具选择有限，未报告随机重复、human reliability 或 uncertainty；safe_fillet fallback 可能保留 valid 但不准确形状。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

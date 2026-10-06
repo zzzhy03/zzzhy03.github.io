@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2609.38721",
+  "slug": "unievo-vl-an-on-policy-self-distillation-training-recipe-for-multimodal-model-self-improve-2609-38721",
+  "title": "UniEvo-VL: An On-policy Self-Distillation Training Recipe for Multimodal Model Self-improvement",
+  "authors": [
+    "Fang Wu",
+    "Da Xing",
+    "Yanjie Huang",
+    "Junxi Wang",
+    "Ji Wang",
+    "Hejia Geng",
+    "Guancheng Wan",
+    "Bowen Zuo",
+    "Xiaomin Li",
+    "Shixiang Tang",
+    "Xinyu Xiang",
+    "Zehong Wang",
+    "Shiyi Du",
+    "Peng Xia",
+    "Shuangjia Zheng",
+    "Yining Hong",
+    "Li Erran Li",
+    "Jure Leskovec",
+    "Yejin Choi"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38721"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "UniEvo-VL",
+    "Image Generation",
+    "VL"
+  ],
+  "abstract": "Modern multimodal models bring generation and understanding into a single unified system, which enables them to provide and learn from their own feedback. Motivated by this unified capacity, we introduce UniEvo-VL, a self-evolving framework for multimodal models to learn from this constructive self-correction feedback during test-time compute. Instead of relying on a separate, often larger, teacher, we leverage their self-critiques as privileged information and ask a single multimodal model to act as both teacher and student with different contexts. The student only sees the vanilla question, while the teacher conditions on the privileged critique. Then training minimizes the per-state divergence between their denoising diffusion distributions over the student's own sampling trajectories. Experiments demonstrate that UniEvo-VL improves the image generation capabilities of multimodal models, while maintaining their sensitivity to additional reflection information. Specifically, we build on top of the open-source Qwen-image-2512 and observe a significant performance gain from 0.747 to 0.808 on GenEval and from 32.97 to 35.53 on GenEval2 Soft-TIFA. Moreover, attempts with more powerful external critics (e.g., GPT5.6-Luna) show that multimodal models with strong judge capabilities can anticipate a higher self-evolving ceiling. Last but not least, mixed text-rendering outcomes show that our self-improvements may not be uniform across different tasks. Our study aims to shed light on the current hot recursive self-improvement research line to enhance the user experience when using multimodal models without external supervision or guidance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38721v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38721v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38721v1 全文及 2026-10-06T14:46:46.990538Z 审阅记录；PDF 31 页，SHA-256 fc817eb0b324f8c5e0691e73b8b43fef7b9358154e1e877aab332e648aac6063，视觉核验第 1、3、6、8、13、15、21、22、30、31 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文及 PDF annotations 未提供 UniEvo-VL public code/project URL；提到 accompanying source file/supplementary data 并不等于已确认公开实现。",
+    "ideaZh": "UniEvo-VL 把视觉 critique 改写成 EMA teacher 的 privileged prompt，再在原 prompt student 的 noisy trajectory 上做 transition matching。它能把部分 inference correction 留在生成器参数里；实际只训练 generator LoRA，critic 固定，GenEval2/OCR 并非所有配置改善，不能描述成同一统一模型的理解和生成同时无界自进化。",
+    "motivationZh": "视觉生成的 critique 常只能修复单次推理，难以沉淀为模型能力；目标是把已核验的修正经验转为 on-policy distillation 的训练监督。",
+    "methodZh": "生成 draft 后，fixed VLM 分语义/文本/质量提供 critique，synthesis 模型输出自足修正 prompt。Verified variant 用同 noise 再生成并确认满足原请求，仅留下成功修正经验。原 prompt student 与修正 prompt EMA teacher 共享 student latent state，匹配局部 flow transition；生成的修正图片不作为 target。分别训练 compositional/OCR adapters，并区分直接生成和一次 critique inference。贡献是可复用的 critique-to-parameter learning recipe，输出仍为 raster image。",
+    "methodFlow": [
+      "原 prompt 和 noise 生成 draft，fixed critic 检查语义/文字/视觉质量",
+      "synthesis 模型将 critique 合并成自足的 revised prompt",
+      "可选同 seed regeneration/verification，留下确认修正的经验",
+      "收集原 prompt student 的 detached flow trajectory",
+      "对 selected high-noise states 匹配 revised-prompt EMA teacher transition",
+      "更新 generator LoRA；部署用原 prompt 或再允许一次 critique"
+    ],
+    "experimentsZh": "实验设置：Qwen-Image-2512 的 generator adapters 分别训练 GenEval-format、separate compositional 和 OCR collections；评价直接生成/一次 critique，使用 official detector、Soft-TIFA、OCR edit similarity 与 Gemini atomic/holistic ratings。verified/unverified recipes 在 seed、learning rate 和 accumulation 等方面不同。\n作者报告 unverified Qwen GenEval 从 0.747 至 0.808，verified 为 0.818；各配置不共享完全一致 evaluation seeds/recipe。（p.6 Table 1; pp.14–17 Appendices A,D）\n作者报告 matched verified GenEval2 direct 31.92→35.07，一次 critique 42.52→46.23；相比直接训练增益，进一步 inference reflection 仍很大。（p.8 Table 2）\n作者报告 unverified GenEval2 Qwen Soft-TIFA GM 32.86→32.37，外部 Luna critic 32.97→35.53；不能将后者写成无 external critic 的统一收益。（p.21 Table 9）\n作者报告 OCR unverified Qwen 0.761 低于 Base 0.771，verified 为 0.790；HumanPref 是 Gemini 自动质量评分，不是 human preference win rate。（p.6 Table 1; pp.18–19 Appendix D）\n作者报告 verified acquisition 约 10–21% 被接受，其余尝试消耗生成和 critique 成本；少量 optimizer updates 不等价低总成本。（p.15 Appendix A.4）\n比较范围：Direct/reflection paired study 有用；没有 matched-compute Flow-GRPO/NFT、简单 prompt rewrite distillation 或 critique placebo 对照。强 external critic 和 verification comparisons 同时改变其他 training knobs，不能单独因果归因。Table7 heterogeneous published models 非同数据/算力对照。\n消融与诊断：有 verification variants、EMA sweep、difficulty groups、paired reflection 和失败 SFT 说明。SFT 采用不带 sampler interval weight 的 velocity loss，与 OPSD scaling 不同，失败不能证明 on-policy matching 必不可少。缺少冻结 teacher/无内容 critique/去 style 指令/独立 train seeds controls。",
+    "insightZh": "将 critique 作为 privileged conditioning 与 student-state on-policy transition matching 连接，区别于只筛选图像或标量 reward 的训练，有 general visual generation 的方法价值。实现中的 generator、Qwen3-VL critic 和 synthesis 是不同固定/可训组件；没有理解分支自更新或通用 multimodal recursive capability 证据。Flow loss 为 sampler-interval weighted deterministic L2，不是 exact stochastic-policy KL/JS。",
+    "whyRelevantZh": "Critique 如何变成生成器参数更新，对 controllable visual generation 有直接方法价值；没有可编辑 SVG/CAD/制造表示，也不形成独立 visual 设计工具 agent。",
+    "evidenceZh": "修正 prompt 是 teacher condition，修正 image 仅用于 verification，不作为训练 target。（pp.3–5 §2, Fig.2; pp.13–15 Appendix A；已核看流程图/公式；只匹配 selected high-noise transitions，不能称覆盖所有 denoising states。）\n实际只更新 generator LoRA，critic/synthesis/text encoder/base weights 固定。（pp.13–15 Appendix A.1–A.3, Tables 4–5；有公开模型作为先验，不是无外部学习信号的单权重 self-improvement。）\nPaired direct/reflection 比较支持保留部分 correction 收益，但不保证全任务一致改善。（pp.6–8 Tables 1–2; p.21 Table 9；已核看 table；abstract 的 GenEval2 较好结果属于 external-critic configuration。）\n筛选有明显 acquisition overhead，visual preference 是 automated proxy。（p.15 Appendix A.4; pp.17–19 Appendix D.1–D.2；update count 不是固定 compute；HumanPref 没有人类投票。）",
+    "caveatZh": "容易 prompts 有一定 regressions，任务/critic configurations 收益不均匀。\nCritic prompts 可导致低饱和/plain backgrounds 等风格偏置。\n验证筛选降低效率，AR extension 与其他 teacher schedules 未验证。\n实际更新 image generator，不证明 understanding capability 自进化或单模型无限 recursive improvement。\nPrivileged prompt 可加入原请求没有的具体物体风格/背景；匹配 teacher 可能同时蒸馏这些偏好。\n三个任务分别训练 adapters，不是一份权重统一保留所有能力；未给广域 preservation benchmarks。\n实验有限 training seeds，critic/verification recipes 有多项变化，无 equal-compute 结论。\nHumanPref/atomic/holistic/native scores 对应不同 judge 与 cohorts，不能混称用户研究或同一指标。\n单一 pretrained critic 自验证存在 correlated mistakes，较强外部 critic 也不保证所有 spatial/attribute 提升。\n没有确认 public implementation URL，训练 metadata 规模与 overlap audit 未完整展开。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

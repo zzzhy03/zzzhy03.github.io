@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.06616",
+  "slug": "video-encoders-built-on-image-representations-2610-06616",
+  "title": "Video Encoders Built on Image Representations",
+  "authors": [
+    "Jusheng Zhang",
+    "Wenhao Wang",
+    "Longqi Cai",
+    "Liangzhe Yuan",
+    "Yuxiao Wang",
+    "Ming-Hsuan Yang"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06616"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Video Encoders Built on Image Representations",
+    "VLM / MLLM"
+  ],
+  "abstract": "The design of a video encoder determines when frames begin to interact and which frame-specific visual evidence remains accessible to the language model. Native video pathways couple neighboring frames during visual encoding, whereas image pathways preserve independently computed frame representations but incur a much larger visual-token cost when all image tokens are forwarded. We ask a basic question: whether a compact video encoder can instead be built on image representations. To answer this question, we separate three operations that are often coupled: per-frame representation, cross-frame token allocation, and temporal interaction. A frozen image encoder first produces frame-specific candidates. A question-aware selector then allocates a fixed token budget across frames using relevance, diversity, and cross-frame correspondence, after which a lightweight learned refiner reads neighboring-frame context and writes residual updates only to the retained anchors. This preserves source positions and keeps the visual output at the fixed budget. Across 13 benchmarks and three vision-language backbones, the resulting pathway matches full-image aggregate performance while using only about 28%-35% of its visual tokens. Specifically, on Qwen3-VL-8B, it achieves a 13-benchmark macro-average of 62.75 with 1,535 visual tokens, compared with 62.58 for the full Image pathway at 4,424 tokens and 59.49 for native Conv3D at 2,212 tokens. On Qwen3-VL-32B, it reaches a 13-benchmark macro-average of 66.28, compared with 66.09 for Image, while providing a 2.16x end-to-end speedup. These results show that compact video encoding does not require early temporal mixing: frame-specific evidence can be preserved first, allocated jointly, and temporally contextualized after selection.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06616v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06616v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06616v1 全文及 2026-10-06T11:08:15.093103+00:00 审阅记录；PDF 33 页，SHA-256 6e890d019829e70d940a48d4957ff22cc209ce5bb578360e0f1127d9052cd8ad，视觉核验第 1、6、8、10、17、22 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文未找到该方法的 public repository 或 release URL，未以作者机构推断代码可用。",
+    "ideaZh": "先独立编码 video frames，再用 question-weighted DPP 与相邻帧对应分配固定 token，最后可选 18M temporal refiner；作者报告三 Qwen backbone、13 任务下以约 28%–35% Image tokens 保留宏平均表现，32B 端到端快 2.16×。主要收益来自 training-free selection，refiner 仅增 0.06–0.11 点；长期相似实例绑定仍失败。",
+    "motivationZh": "视频 token 压缩既要选择必要帧证据，又要利用跨帧对应，早期混合可能使二者难以分离。目标是在 image representations 上建立有限预算的证据选择与更新接口。",
+    "methodZh": "视频早期 temporal mixing 使逐帧证据不易独立选择，而全 Image 通路又浪费 token。方法保留 frozen image embedding/MRoPE/DeepStack source alignment，继承 SITE frame quotas，以 DPP 多样性和 mutual top-1 correspondence 共同选 B anchors；gated refiner 只向 anchors 写残差，但可读取未选邻帧 token。条件 KL 与固定 linear operator 分析解释缺失证据和跨 selection 边界交互的区别。作者在 32-frame 离线视频、多类 QA/temporal benchmarks 比较完整通路与压缩 baselines；支持固定预算的证据选择设计，不证明普遍保留像素信息或替代 native encoder。",
+    "methodFlow": [
+      "输入 video、question 与固定 visual-token budget；frozen image encoder 逐帧产生 embedding、source positions 与 intermediate streams",
+      "SITE allocator 提供 frame quotas；question fragments 与 visual features cosine 构造 quality-weighted DPP kernel",
+      "相邻帧 mutual top-1 feature matches 结合 margin、spatial distance 和 scene threshold 构造 complementary pair graph",
+      "在 quota 约束下 greedy 比较 singleton/pair marginal，选出恰好 B 个原始 anchors，不 merge 或改坐标",
+      "可选 temporal refiner 从相邻两帧读取 top-4+top-4 context，用 gated bounded residual 更新每 anchor，保持 B→B 输出",
+      "frozen language model 接收 compact tokens；refiner 可由 answer loss 与 Full Image teacher KL 训练"
+    ],
+    "experimentsZh": "实验设置：作者报告以 Qwen2-VL-7B、Qwen3-VL-8B/32B 均匀 32 帧，13 个 general/temporal/longvideo/perception 任务，压缩 baseline 约 1.5K visual tokens，三 seeds 共享样本、prompt 和 generation 设置。只训练 18M refiner；65K VideoChatGPT 子集作 exact ngram/semantic 去重，作者报告两 epoch、8 A100、12h。\n作者报告三 backbone13-task macro-average 为 59.43/62.75/66.28，Full Image 为 59.26/62.58/66.09；压缩后只保留約 28%–35% Image tokens。（Table 3, Appendix B, p. 16）\n作者报告 32B end-to-end latency 421.8ms、throughput 2.37 query/s，对照 Image 911.2ms、1.10 query/s；peak memory 仅从 69.04GB 到 67.65GB。（Table 2, p. 10）\n作者报告 8B dynamic allocation 将宏平均 60.12→61.74，cross-frame coordination→62.64，refiner→62.75。（Table 5, p. 17）\n作者报告 MVBench 在三 backbone 仍落后最强压缩 baseline4.69/2.13/3.01 点；并非各任务统一改善。（Sec. 4.2, p. 9; Table 3, p. 16）\n比较范围：包含 native Video/Conv3D、Full Image、Uniform、FlashVID、VidCom²、FastVID、VisionZip，并在 8B 补 FastV/SparseVLM/DyCoke；以 selection-only 消融缓解 learned-refiner 对 training-free 方法的不公平。只涉及 Qwen 家族与离线 32 帧，未检验其它视觉 encoder、causal 流、较大 batch 或任意 dense video。\n消融与诊断：动态 quota、cross-frame coordination、shuffled correspondence、frame count、0.75K/1.5K/3K token budgets 与 refiner answer/KD losses 均有对照。消融支持 selection 主要贡献；refiner 增益小且未给置信区间，Full Image 微幅平均提升不能解释为显著能力超越。",
+    "insightZh": "主要贡献是把 representation source、cross-frame allocation 和 temporal interaction 拆开，并在 source-aligned 固定 budget 上协调选择与后续 context 读取。DPP、correspondence、KL 分解和 residual attention 均非单独首次提出；完整 selector 实现与理论适用边界在 appendices 给出，不能把固定 linear identity 当 adaptive encoder 的 accuracy 保证。",
+    "whyRelevantZh": "直接推进 video VLM 的 source-aligned 证据表示与 question-aware temporal grounding；可启发 visual design agents 保留多 view 或迭代渲染的关键证据。向 2D/3D 设计迁移是方法启发，论文未验证这些 design 任务。",
+    "evidenceZh": "保留 source streams，通过 question DPP 和相邻 frame pair graph 选择 anchors，再可选零输出扩张 temporal refinement。（Sec. 3.1–3.3, Fig. 3, pp. 5–7; Appendix I, pp. 30–33；已视觉核验 Fig.3；附录明确 SITE quota 来自冻结 allocator、pair 权重与 context size，实际目标不同于主文直觉式 Eq.6。）\n作者报告 Qwen3-VL-8B 的 13-task 宏平均 62.75，以 1535 tokens 对照 Full Image 62.58/4424 tokens。（Table 3, p. 16; Table 1, p. 8；主表已视觉核验；数字为作者报告，本项目未复现，宏平均相当不代表各任务均优越。）\n作者报告 32B 端到端 latency 由 911.2ms 降至 421.8ms，主要节省 prefill。（Table 2, Sec. 4.3, p. 10；表 2 已视觉核验；batch-one 单 GPU 设置，selection/refiner 已包含 TTFT，但未泛化到 production batch 或 streaming。）\n作者报告 selection-only 宏平均 62.64，完整模型 62.75；跨三 backbone refiner 仅额外 0.06–0.11 点。（Tables 4–5, Appendix C.1–C.3, pp. 15–17；消融表已视觉核验，主要新收益由 training-free 选择产生；约 96 GPU-hours 训练成本为作者报告。）\n相似 parrot 跨长期片段的 subject binding 失败，Full Image 正确而全部 compact 路径错。（Fig. 9 and Appendix D failure analysis, p. 22；失败图已视觉核验；是示例而非失败频率估计。）\ngreedy pair term 含 supermodular 互补性，只保证 quota feasible completion，不给 global optimum 或 submodular 近似界。（Appendix E, pp. 23–25; Appendix G/H, pp. 26–29；已阅读完整理论附录；未将 fixed operator bound 外推到最终 accuracy。）",
+    "caveatZh": "零扩张只指输出 token count，不代表 encoding、context retrieval 或 refinement 成本为零。\n理论 conditional KL 针对 teacher 第一答案 token；teacher agreement 不等于 answer correctness。\n固定 linear operator identity 不是 adaptive nonlinear encoder 的 accuracy bound。\ngreedy 选择没有 global optimality 保证。\n长期相似 instance 身份绑定仍可能因 compact evidence 不足失败。\n三 backbone 均来自 Qwen family；macro-average 近 Image 的微小差值无报告置信区间。\n默认 32 帧与离线双向邻 frame context，不支持无限 streaming 或完整 video 证据保留。\nlearned refiner 增加约 96 GPU-hours，仅给很小平均增益，training-free selection 更值得先复用。\nmain Eq.6 仅 intuition，实作目标/allocator 依赖见 Appendix I，复现应避免只照主文公式。\n证据限 exact PDF 与作者报告，本项目未运行代码或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

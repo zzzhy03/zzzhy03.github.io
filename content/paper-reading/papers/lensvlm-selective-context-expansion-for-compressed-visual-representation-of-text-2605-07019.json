@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2605.07019",
+  "slug": "lensvlm-selective-context-expansion-for-compressed-visual-representation-of-text-2605-07019",
+  "title": "LensVLM: Selective Context Expansion for Compressed Visual Representation of Text",
+  "authors": [
+    "Roy Xie",
+    "Dan Friedman",
+    "Donghan Yu",
+    "Bowen Pan",
+    "Christopher Fifty",
+    "Jang-Hyun Kim",
+    "Xianzhi Du",
+    "Zhe Gan",
+    "Vivek Rathod",
+    "Bhuwan Dhingra"
+  ],
+  "publishedAt": "2026-05-07",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.07019"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "LensVLM",
+    "VLM / MLLM"
+  ],
+  "abstract": "Vision Language Models (VLMs) offer the exciting possibility of processing text as rendered images, bypassing the need for tokenizing the text into long token sequences. Since VLM image encoders map fixed-size images to a fixed number of visual tokens, varying rendering resolution provides a fine-grained compression knob. However, accuracy deteriorates quickly as compression increases: characters shrink below the vision encoder's effective resolution, making them indistinguishable. To address this, we propose LensVLM, an inference framework and post-training recipe that enables VLMs to scan compressed images, then selectively expand only the relevant images to their uncompressed form via learned tools. Building on Qwen3.5-9B-Base, LensVLM maintains accuracy comparable to the full-text upper bound at 4.3$\\times$ effective compression and outperforms retrieval-based, text- and visual-compression baselines up to 10.1$\\times$ effective compression across seven text QA benchmarks. LensVLM also generalizes to multimodal document and code understanding tasks, with the accuracy gain over baselines growing as compression increases. Our analysis validates this approach: training makes visual compression robust to rendering choices, and as compression grows the model increasingly relies on expanded content rather than unreliable visual reading. The analysis also yields practical tool-choice guidance: text expansion is preferable for rendered text, while high-resolution image expansion suits native documents whose layout cues carry task-relevant information.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.07019v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.07019v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/apple-aiml-research/ml-lensvlm"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.07019v3 全文及 2026-10-06T15:19:01.970694+00:00 审阅记录；PDF 33 页，SHA-256 3cd1b33f25a9c533339587ce35ceed400cc008cc2e1976d3082409ed53274fd1，视觉核验第 1、3、7、9、16、20、22、28、30、31、32 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF p.1 指向作者官方公开仓库，已确认存在 lensvlm 实现、页面渲染和 evaluation/demo 代码；未据此确认完整 SFT/RL 训练配方公开。",
+    "ideaZh": "LensVLM 将长文本压成页面图像，让 VLM 先浏览、再调用 Expand 取回所选页面的原文；值得借鉴的是可训练的视觉证据定位与按需读取接口。作者报告 5×名义压缩下总体 QA 为 68.9，完整文本为 72.4；压缩并不等于同倍数加速，短输入甚至更慢。其能力依赖原文保存和大量带 gold evidence 的合成轨迹，不能视为单靠压缩图像理解全部内容。",
+    "motivationZh": "长文档完整输入消耗大量 tokens，单次检索又容易漏掉多跳证据。目标是先浏览压缩页面，再按问题选择需要展开的原始文本。",
+    "methodZh": "问题是长文档的完整文本输入昂贵，而一次检索容易漏掉多跳证据。方法把文本以不同布局渲染为低 token 页面图像，冻结视觉编码器与 projector，在 Qwen3.5-9B-Base 上训练页面浏览、Expand 与回答策略；默认 Expand 返回整页 source text，而非局部高分辨率裁剪。先用教师根据 gold answer/evidence 构造轨迹，再进行 DAPO，奖励正确回答和正确时使用工具。实验覆盖长文本 QA、代码及另外训练的原生文档变体，并检查工具、渲染、证据定位与端到端延迟。",
+    "methodFlow": [
+      "页面压缩：保留原始文本，将文档渲染为不同名义压缩率的页面图像作为初始视觉输入。",
+      "视觉证据定位：VLM 根据问题浏览压缩页面，输出页面编号并调用 Expand；默认取回完整页面原文。",
+      "策略学习：使用 gold evidence/answer 条件化的合成教师轨迹做 SFT，再用正确性与条件工具奖励做 DAPO。",
+      "按需回答：结合压缩图像和展开页面回答，可重复访问页面，但需要保留 source text 或高分辨率原始文档。"
+    ],
+    "experimentsZh": "实验设置：作者在同骨干文本/图像/检索基线之间比较，冻结视觉部件；长文本测试约限制在 32k，RULER 移除部分 padding 保留 needle；原生文档、代码及 post-cutoff PubMed 适配另外训练。\n作者报告主任务总体 QA 在 5×名义压缩为 68.9，对照完整文本 72.4；10×为 62.1，15×为 52.1。（Table 1, p.7）\n作者报告 SFT 后总体为 63.7，RL 后 68.9；5×证据页面 any-hit 从 75.4 到 76.8。（Fig.4, p.9）\n作者报告三种渲染各自重新训练后结果约为 70.3、70.4、70.8。（Appendix D, rendering ablation, pp.22–23）\n比较范围：包含 full text、BM25、dense/late-interaction retrieval、静态视觉压缩及工具策略。主检索与 LensVLM 名义率接近但 effective compression 不完全一致；预建索引、多查询摊销会改变成本比较。不同参数或训练策略的 Search-R1/DeepEyes 不构成完全 matched 因果控制。\n消融与诊断：展开模态、oracle evidence、SFT/RL、工具预算及渲染布局均有消融。工具预算部分是在同一长轨迹上强制提前回答；不能据此保证独立预算策略的最优性。注意力只检查部分标准 attention 层，不证明全网因果解释。",
+    "insightZh": "贡献是把页面视觉浏览训练成主动证据读取策略，并将语义压缩图像与原文访问结合，超出静态检索或 token pruning。信息论附录主要说明信息损失与选择需求，并未证明选择始终比回答容易；多布局结果来自分别训练的模型，不能解释为同一个策略对任意渲染不变。",
+    "whyRelevantZh": "对 VLM evidence access 和长文档主动 grounding 有直接方法启发，可借鉴页面级可回访证据接口；没有 3D 或可编辑设计验证，因此不扩大为 creation pipeline 已验证能力。",
+    "evidenceZh": "默认工具展开整个页面的 source text，原生文档另有 OCR 与高分辨率图像变体。（pp.3–4, Fig.2; Appendix D, pp.22–28；主动访问机制保留外部原文，初始视觉压缩不能替代存储。）\n教师轨迹构造已提供 gold evidence 与答案，并要求以第一人称表现寻找证据。（Appendix D, pp.28–30, generation prompts；这些是构造的训练轨迹，不能当作独立记录的真实探索或 faithful reasoning。）\n作者报告压缩下可维持部分 QA 能力，但多数任务完整文本仍更高。（Table 1, p.7; Fig.4, p.9；5×名义压缩：LensVLM 68.9，完整文本 72.4；15×与 Jina 总体同为 52.1，但有效输入预算不同。）\n真正的成本收益随输入长度、缓存与索引摊销改变。（Appendix B, Table 5, p.16；作者报告短输入 full text 1.44s、LensVLM 1.81s；长输入 15×为 3.62s 对 2.83s，不能将名义压缩倍数直接当加速。）\n页面选中率只度量命中至少一页证据，未保证多跳证据全部覆盖。（p.9, evidence selection metric; Appendix C/D；用最终 QA 结果约束解释，避免将 any-hit 等同完整 grounding。）",
+    "caveatZh": "需要保留可展开的原始文本或高分辨率页面。\n短文档或成本较低时完整文本可能更适合；工具往返增加成本。\n强压缩、代码与原生文档布局存在能力下降，训练和教师质量重要。\n教师拥有 gold evidence/answer 的 role-play 轨迹不证明模型真实探索或 reasoning faithful。\n任意一页命中的定位指标不能证明多跳证据完备。\n原生文档、代码与 post-cutoff PubMed 结果包含独立适配，不能写成原检查点零样本迁移。\n主压缩率排除生成 token，并不对应同倍数延迟或显存收益。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

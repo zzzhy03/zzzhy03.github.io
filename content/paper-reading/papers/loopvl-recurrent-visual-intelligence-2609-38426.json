@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2609.38426",
+  "slug": "loopvl-recurrent-visual-intelligence-2609-38426",
+  "title": "LoopVL: Recurrent Visual Intelligence",
+  "authors": [
+    "Zhe Qian",
+    "Ziyang Gong",
+    "Zhongxing Xu",
+    "Hehan Li",
+    "Zhonghua Wang",
+    "Fei Luo",
+    "Mingxuan Wang",
+    "Xue Yang",
+    "Shiwei liu",
+    "Yanbiao Ma",
+    "Junchi Yan",
+    "Jungong Han"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38426"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "LoopVL",
+    "VLM / MLLM"
+  ],
+  "abstract": "We introduce LoopVL to study whether Loop Transformers can be effectively extended to vision- language models. LoopVL combines Module-Loop and Model-Loop computation to iteratively update a unified vision-language state through shared modules. We train LoopVL from scratch through language pre-training, multimodal training, and post-training. LoopVL outperforms a range of similarly sized and larger non-recurrent models on multimodal understanding and visual reasoning benchmarks. We also observe Visual Aha Moments in LoopVL, characterized by pronounced shifts in visual attention across loops. LoopVL provides practical evidence for recurrent vision-language modeling and offers an intuitive perspective on how shared parameters can support deeper multimodal computation over continuously evolving visual-language states.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38426v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38426v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Tier-Flow/LoopVL"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38426v1 全文及 2026-10-06T16:09:37.200244+00:00 审阅记录；PDF 32 页，SHA-256 e0f47aed641b87b74dee372c07ab2940b9733182d4d361cd31fce5c2a10bb88e，视觉核验第 1、4、6、7、11、13、23、24 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF p.1 code annotation 指向官方 repo，已确认 runtime/infer.py、benchmarks 与 findings 实际 evaluation/diagnostic 代码和模型 hub 链接；不是 README-only。未确认完整 from-scratch 训练 scripts 和所有 control checkpoints 全部公开，未运行复现。",
+    "ideaZh": "LoopVL 将 visual/text state 一起放入 HRM-style 两层级 recurrence，重复共享 L/H stacks，而非重复调用完整 VLM。值得深读的是 visual-state write/update 接口及重新训练的 read-only 对照。作者报告同 0.14T tokens 下 MMStar63.47，对 1B dense55.33，但训练 FLOPs 为 2.47×10^21 对 0.92×10^21；参数少不等于计算便宜。“Visual Aha”是 attention 重分配，额外 loops 反而退化，不能写成因果思考或可无限 test-time scaling。",
+    "motivationZh": "传统深层 VLM 沿固定层序处理图像，持续视觉状态和重复推理的作用难以利用。目标是以共享参数的 recurrent computation 维持视觉证据并迭代推理。",
+    "methodZh": "冻结 Penguin vision encoder，经 calibrated projector 与 2D positions，将 image/instruction 作为 bidirectional prefix、response 作为 causal 输出。分别存储 16 层 L/H 参数，默认 LLLHLLLH 共 128 layer calls；维护 coupled hidden states，每 cycle 加入 visual anchor 与 query-conditioned gate，训练逐渐扩大 selective backward graph。自行 language pretrain 后进行 alignment、multimodal midtraining、SFT 与 visual GRPO。实验对比同数据 dense baselines、独立训练 recurrence schedules、推理 schedule sweep 及 visual-state 干预和空间 attention/state probes。",
+    "methodFlow": [
+      "固定视觉入口：冻结 vision encoder，用 projector 将 patch features 映射到语言空间，保留空间对应与 PrefixLM visibility。",
+      "嵌套共享计算：当前 H condition 下连续三次 L 更新，再更新 H；第二 cycle 继续处理持续变化的 visual/text states。",
+      "视觉锚定：每 cycle 重新注入初始 projected visual anchor，由 query-conditioned token gate 与 cycle scale 控制。",
+      "训练与输出：先语言预训练再视觉适配/SFT/GRPO，选择性反传后期 invocations；最终 H readout 产生答案。",
+      "机制对照：禁用 visual write、freeze 状态及重训 read-only variant，比较能力并对相同物理层跨 cycles 捕获 attention 与 hidden states。"
+    ],
+    "experimentsZh": "实验设置：作者共约 0.14T 自训练 tokens，包含 language75B、multimodal49B、SFT16.81B；vision encoder 已预训练且冻结。16 benchmark families 以 direct 短 answer 为主，部分 CoT 仅 math。dense 同数据、不同参数/compute，以及独立训练 H1L1/H1L3/H2L1/H2L3 有对照。diagnostics32 例，部分新训练 full-backprop/no-anchor 模型验证 attention shift。\n作者报告同 0.14T tokens 的 MMStar，Loop63.47、1B dense55.33、4B deep61.33；ChartQA Loop74.52 低于 4B wide75.56。（Table1, p.6）\n作者报告完整主评测 LogicVista45.19、MMMU-Pro38.67、MathVision38.49，但 MMEval-Pro24.62 低于多种小模型。（Table2, p.11）\n作者报告相同 128layer executions，H2L3 MMStar63.47、H4L1 为 24.67，schedule 组织与 checkpoint 训练匹配影响很大。（Table4, p.13）\n比较范围：最有用的是同 0.14T dense 对照与独立 train schedules；外部商业/开源 tokens/FLOPs 数字协议、pretraining、visual encoder 成本不统一，Figure1 选三任务均值不能当全面效率优势。尚无 matched flat recurrent architecture、inference wall-clock/throughput/energy 或 compute-matched 全套生成对照。\n消融与诊断：visual read-only 重训、inference visual knockouts、H/L independently trained 与 fixed-checkpoint sweep、full-backprop/no-anchor 机制控制。attention concentration 与 hidden movement、linear recoverability、logit-lens 均描述性；不等于准确性提高的 causal mechanism，shared head 中间 calibration 未知。",
+    "insightZh": "hierarchical L/H recurrence 来自 HRM-Text，本文实质贡献是 multimodal persistent visual-state 构造与可对齐空间诊断、视觉状态更新的 retrained control。不同 hidden states 让共享参数产生不同 reading behavior 有证据，但 Aha 标签不提供额外心理/因果解释，未证明 adaptive computation 或长时间 memory。",
+    "whyRelevantZh": "continuous VLM 方向中，对 persistent visual representation 更新与参数共享计算组织有直接方法价值，可启发视觉证据迭代推理；未展示 3D design/编辑或 episode 间长期 memory。",
+    "evidenceZh": "两 16 层共享 stacks 默认执行 128 层调用，visual tokens 持续更新。（Fig.2, Sec.2.1, pp.4–5；L/H 各自参数不同，内部复用；frozen encoder 仅一次特征，不是反复看原图。）\n重训 read-only control 仍低于正常模型，支持 visual-state updates 实际有用。（Sec.2.4, Fig.3, pp.6–7；比仅 inference knockout 更明确；没有完整 flat-loop 匹配训练控制，不能将效果唯一归于 hierarchy。）\n比相同参数 dense 有更多执行计算，4B dense 只在部分任务落后。（Table1, p.6；作者报告 1B dense0.92、Loop2.47、4B deep2.89×10^21 FLOPs；4B AI2D/ChartQA/VMC 仍更高。）\n训练匹配 schedule 最佳，额外 cycle 并非稳定收益。（Table4, pp.12–13；作者报告 MMStar H2L3 为 63.47，H3L3 为 58.20、H4L3 为 24.00；早期 readout 未 parse 不是独立训练 H1 能力。）\nattention 诊断使用 teacher-forced reference answers，反映 allocation 而非因果重要性。（Secs.5.4–5.7, pp.13–19; Appendix B/C, pp.29–32；32 例诊断与 selected heatmaps 不估计全 benchmark 发生率；final-logit KL endpoint 零为定义结果。）",
+    "caveatZh": "长 reasoning 会 repeat tokens/segments，posttraining 主要 math。\n没有更一般 Model-Loop matched control，Aha 与具体 architecture/training 关系尚不确定。\n只 image tasks，native multiimage/video/agentic 和 adaptive schedules 未建立。\n参数存储效率与实际执行成本不同，128 层 calls 加 cache disabled 可能增加 latency。\n外部 training-compute 比例未含统一 vision pretraining 与 data 口径，不能作为端到端倍数保证。\nreference-answer attention 可受正确答案语义条件影响，非 free-generation faithfulness。\n后期 attention 更集中或 KL 更接近 final distribution 并不证明正确答案或 causal reasoning。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

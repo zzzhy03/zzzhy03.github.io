@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.39363",
+  "slug": "rethinking-multi-image-re-representation-in-multi-image-understanding-2609-39363",
+  "title": "Rethinking Multi-Image Re-Representation in Multi-Image Understanding",
+  "authors": [
+    "Gengyuan Zhang",
+    "Xiao Han",
+    "Xinyu Xie",
+    "Tong Liu",
+    "Volker Tresp"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39363"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Rethinking Multi-Image Re-Representation in Multi-Image Understanding",
+    "VLM / MLLM"
+  ],
+  "abstract": "Multi-image understanding requires MLLMs not only to recognise the content of individual images, but also to organise visual evidence distributed across them. We study this problem through multi-image re-representation, viewing prompted Chain-of-Thought reasoning and agentic visual tool use as different ways of re-organising visual evidence during reasoning. We introduce Mosaic, a general-purpose multi-image visual harness that enables an MLLM to actively construct visual intermediates with ten composable image operations. We compare five re-representation settings on existing multi-image benchmarks and on MosaicBench, a new grounding-focused benchmark for fine-grained multi-image understanding. Our experiments show that the relative benefits of textual and visual re-representation are strongly task-dependent. Visual re-representation is particularly effective for tasks requiring precise visual evidence, including hypothesis testing, precision comparison, and orientation-sensitive reasoning, while tasks dominated by higher-level semantic content show smaller or less consistent gains. Building on this finding, we train MosaicAgent-8B to use Mosaic with reinforcement learning using only accuracy and format rewards. Without demonstration trajectories or rewards for specific tool-use, the agent learns to compose visual operations over multiple steps and exhibits diverse problem-solving patterns unpromptedly. Code and data will be released at https://github.com/gengyuanmax/Mosaic.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39363v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39363v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39363v1 全文及 2026-10-06T14:47:06.068806+00:00 审阅记录；PDF 27 页，SHA-256 27398938c6532be35c07bc499172879c87be9fafdc2ed5496c64a239c0c77b1f，视觉核验第 1、4、5、6、7、8、9、15、16、20、27 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Exact PDF p.1 作者 repo https://github.com/gengyuanmax/Mosaic ，本次公开访问确认 repositoryempty；public URL 存在不等于实现可用，按 code/datawillrelease 承诺，不填 Code 链接。",
+    "ideaZh": "Mosaic 用 persistent image workspace 保存 crop/rotate/overlay 等十种操作的 derived views，Qwen3-VL-8B 以 accuracy+format GRPO 学多 step 视觉重表征。作者报告 fine-grained comparison/hypothesis testing 明显获益，适合 deep 借鉴设计 inspection 中的可执行 visual intermediates。工具与更长 prompt/更多 calls 混在一起，训练数据先筛 tool 可获益样本，语义综合任务退步；re-representation 不凭空增加源图证据，也未解决 stop/overtooling。",
+    "motivationZh": "多图中的微小差异和空间关系常被整体编码掩盖，仅增加文字推理未必有效；需要可执行的 crop、rotate、overlay 等中间视图，并保存操作后的证据状态。",
+    "methodZh": "原图和 derivedRGBAassets 以 stableimgID 保留，不修改 inputs，canvas 自动扩展/透明区在观察视图显示 checkerboard。Deterministiccrop/rotate/resize/flip/affine/grid/diff/homography/collage/overlay 按 modelcalls 创建新 asset 再 inspect。五 settings 比较 direct、CoT、guidedCoT、onlinevisual 与 prefabricatedvisual；GRPO 无 SFTdemonstrations 但 prompt 要求 extensiveplan/reflection，format reward 规定先有最少 text，G8/10assistantturns。程序化 32type 训练 pool→3509tool-sensitiveexamples，held-outMosaicBench560。完整 27 页含 everytaskbuilder/shortcut/split/extendedresults 全部读与主方法/表格/控制/失败 profile 实际查看。",
+    "methodFlow": [
+      "保留 source 与 derivedasset：StableimageID 和 RGBobservation/RGBAediting 双视图；每 operation 产新 asset、expandingcanvas 保留 padding，后续可以复用或回看原图。",
+      "执行并观察 visualhypotheses：十种 deterministicoperation 重新排布/对齐/比较 sourceevidence；model 检视 actualresult，不由 LLM 编造差分或 geometryoutput。",
+      "筛选 tool-sensitive 训练并 GRPO：No-tool 错误而八 toolrollout2–7 次正确才保留；只 finalaccuracy+format reward，train4H100/218steps/zeroKLentropy，学操作选择但不优化成本。",
+      "分开测构造与 readout：固定 recordedtrajectoryprefix，crosspre/postpolicy 和 solverforcedanswerlogits，辅助观察中间 state；prefabricatedviews 共用给 solvers 区分使用与在线构造。"
+    ],
+    "experimentsZh": "实验设置：Qwen3-VL-8Binitial，4H100 LR1e-6/1epoch/batch32/G8/10turn,maxprompt16384/maxresponse20480，binaryexactanswer+format/zeroKLentropy。Mosaic560/28types×20，26types4choicebalancedlabel，12publicsources+2proceduralgenerators；medical/remote/autodrive 为 generictooltests 的一部分非专门 domain 新模型。ExternalBLINK/M4/Mantis/MMIU，多 settings/models。\n作者报告 MosaicAgent63.3% vs 同 checkpointpreonline47.2%/preCoT45.2；M4Bench61.8vspreonline51.8/CoT51.3，但 BLINK62.8 低于 baseCoT64.4、MMIU57.2 低于 61.0，收益 taskdependent。（PDF pp.7/27, Tables1/9）\n作者报告同 dataCoTRL Mosaic53.0/M4 51.6，RL+visual63.3/61.8；除此推理 toolcalls/visualtoken/promptlength 不同，不能称等 compute 因果拆分。（PDF p.8, Table2）\n作者报告 sameagentcrop-only53.9→full63.3 Mosaic，M4 58.8→61.8，MMIU58.3→57.2 反降，支持 composedoperations 特定价值。（PDF p.27, Table8）\n作者报告 hypothesis testing62.9vsbestlistedopen31.7，preccomparison87.0/orient56.9；Mosaicoverall 略低 ClaudeSonnet5 63.6，不写超过所有 closed models。（PDF p.7, Table1）\n作者报告 posttotalcalls3037vspre1830/1.66×，crop54.8%/collage6.2%；在正确 probe 后仍常继续多 steps，RL 没有 costreward/stopping 目标。（PDF pp.8–9, Figures4/6）\n比较范围：Direct/CoT/guided/online/prebuilt 区分 visualrepresentationuse 与 construction；PV 资产由 trainedMosaicAgent 给所有 solvers，额外 teacher 计算未计 online 预算。Genericbaselines 不全部 tooltrained；sameQweninferencesettings/Table9 合理，但 prompt 差异与 runtime cost 不隔离。\n消融与诊断：SameRLSuiteCoTcontrol、samecheckpointcroponly/full 与 trainednotoolreadout、pre/postconstruction×solverprobe。缺 toolmode 同 metadataCoT、matchednumberoperations/visualpixels/texttokens、random/prefixedharness/traceimagedeletion/stopreward、generalcreativeediting 或 true3Dgrounding。重复±数字未充分说明全部 seed 与原表误差单位，避免称 trainingCI。",
+    "insightZh": "ThinkingwithImages/GRPO 与十个 imageops 已有，核心实质是多 assetpersistent workspace、五种重表征控制、task-specificutility 诊断和 toolcompositions 学习。Geometry/precisiontasks18pp 总增益及 crop-only/CoTRL 对照支持可执行 visual evidence 接口，达到 vlm-mllm 的 visualgrounding/设计检查的直接迁移门槛。它是理解 agent，未生成新的 creativeartifact，不按 visual-design-agent 计贡献或声称新 foundationarchitecture。",
+    "whyRelevantZh": "可执行 alignment/composition/difference/imageworkspace 对 visualdesignartifact 的细节核验和多 referencegrounding 有直接 interface 借鉴价值，hypothesis testing/precisioninspection 也是 structured creationagent 的基本能力。本文 eval 仍 VQA，未证明 SVG/CAD/embroiderycreation 迁移。",
+    "evidenceZh": "闭源图条件下重表征不增加完整 input 之外的新答案信息，但可改善压缩后视觉证据可访问性。（PDF pp.3–4, Eq3/ClosedEvidence；I(Y;Z|X)=0 为假设下 conditionalindependence，X 包含 fullsourcepixels，非实验发现；crop 重新 encode 改善低分辨率 initialtokens 不矛盾。）\n工具与 prompt metadata/planreflection 要求共同变化，不能归因仅有工具。（PDF pp.15–16, Tool/VanillaPrompts；作者明确 toolmodeimagepixelsizes/canvasconventions/必须 planreflect 多于 baseline，format reward 也规定 minimumtext，无 demonstration 不等于无 reasoningprompt。）\nDataset 筛选对 tool 获益有意偏向，但 held-outsource 与 image 排重已做。（PDF pp.7/19–21, Table7/AppendixB.5；12800 中 3509no-toolwrong+tool2–7success；评测 560/28types，sourcecontainers/bytes 排重 synthetic/CARPKpHash≥4，任务 distribution 与 training 相似非全部 OOD。）\nForcedprefixanswerability 是 next-tokenprobe，变化不能独立隔离 visualasset 与 modeltext/compute。（PDF pp.8–9/27, Eq5/Figs5–7；Context 含全部 text/calls/images，平均 calls3.16→5.41，first2step 无 construction 优势；paired441 描述但图 postn556，结论应限各自 selection/plot，不称新的视觉信息量被因果量化。）",
+    "caveatZh": "PDF p.16：工具 prompt 更多 metadata 和 plan/reflection，隔离 availability 需 matchinstructions。\nPDF pp.8–9/27：selfcorrection 同时可失去曾正确答案，post-stabilizationcontinuation 可 verification 或 overtooling，first2steps 没优势。\nPDF pp.20–21：VisDrone 全部 source 覆盖而排除 eval3tasks，mentalrotation 因 imagefilter 不留 eval，类似 product/documentinstances 仍保留。\n560samebuilderbench 有限，source 排重不排 tasktemplate/transformdistributionoverfit；selector 先测九 runs 也使 model-specificdifficulty 筛选，属于研究设计非无偏 universalskill 估计。\nContextforcedanswer 不分 textvsimage 因果；changedtrajectorylength 与 samplevalidity 导致终点/normalisedcurve 不能直接读为单位 toolstep 效率。\nSyntheticaffine/homography/2Dtile 使工具可直接检验 candidate，更复杂 3Dpart 关系、真实 camera 运动或不完整 artifact 尚未验证。\nToolcost/lateovertooling 高且零 KL 可能 semanticregression；不可假定视觉重表征总比 text 推理好或稳定保留 correctanswer。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

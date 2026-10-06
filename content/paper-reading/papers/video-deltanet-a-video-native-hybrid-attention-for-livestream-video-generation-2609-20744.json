@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2609.20744",
+  "slug": "video-deltanet-a-video-native-hybrid-attention-for-livestream-video-generation-2609-20744",
+  "title": "Video DeltaNet: A Video-Native Hybrid Attention for Livestream Video Generation",
+  "authors": [
+    "Haocheng Xi",
+    "Yiming Xie",
+    "Hexu Zhao",
+    "Yiwen Zhang",
+    "Michael Liu",
+    "Thomas Creavin",
+    "Kurt Keutzer",
+    "Xiuyu Li",
+    "Zhaoyang Lv",
+    "Chenfeng Xu",
+    "Haiwen Feng"
+  ],
+  "publishedAt": "2026-09-17",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.20744"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Video DeltaNet",
+    "Video Generation"
+  ],
+  "abstract": "Video diffusion models repeatedly process long spatiotemporal token sequences during denoising, making attention a major computational bottleneck. Linear attention offers an appealing alternative and has been widely adopted in recent large language models, but directly applying it to video models often fails to preserve the fine-grained interactions required for high-quality generation. We present Video DeltaNet (VDN), which combines local Softmax attention with bidirectional linear memory for long-range video context. Its linear branch introduces Video Delta Attention (VDA), which updates memory once per frame by jointly incorporating its spatial tokens. Separate output projections and learnable gates calibrate the two branches, while a staged teacher-alignment recipe progressively introduces the new pathway into pretrained models. We instantiate VDN on MiniMax H3, applying the hybrid to video-to-video interactions while retaining Softmax for interactions involving text or audio. With eight-step distillation and an optimized SGLang serving stack, VDN-H3 completes DiT denoising for a 14.3-second, 768p video in 6.70 seconds on eight NVIDIA B200 GPUs, corresponding to a 14.5x speedup over the 50-step dense H3 baseline on the same GPU count. GitHub code available at: https://github.com/OpenVDN/vdn-minimax-h3. Weights available at: https://huggingface.co/OpenVDN/vdn-minimax-h3",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.20744v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.20744v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/OpenVDN/vdn-minimax-h3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.20744v3 全文及 2026-10-06T13:16:47.518042+00:00 审阅记录；PDF 21 页，SHA-256 cecaee52e6f43a1fac7ac0bc6db07edee656e1db64c584accf011ca89f4dcd34，视觉核验第 1、3、5、9、10、17、19、20、21 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1 打印 repo/weights；已实际确认 Publicsrc/config/scripts/inference/training 真实实现及公开 weights 链，不是 placeholder。未运行或验证权重 hash，onlineREADME 完整生成约 9s 与 paper6.70sdenoising 范围不同。",
+    "ideaZh": "Video DeltaNet 将 local softmax+首尾 anchors 与 bidirectionallinear memory 组合，创新是每 frame 共同解所有 spatial writes 的 proximal least-squares 更新，避免独立 delta 写入冲突。作者报告同 50NFE/单 B200 backbone2.6×、H2003.2×加速；6.70s headline 还叠加 8NFE distillation 与 8 卡，不能归给 attention alone。值得精读 framewisecorrelation-awarememory 及预训练模型适配，但保证只限 fixed inputs 继承 state，评测最长约 14 秒/103prompts，不等于无限 livestream 一致性。",
+    "motivationZh": "视频 self-attention 随时空 tokens 增长而昂贵，独立写入线性 memory 又会相互干扰；需要针对同一帧的空间相关性设计共同更新，兼顾局部细节与历史状态。",
+    "methodZh": "Video-to-video interaction 用 VAEchunkaligned15latentframe localwindow，首尾 frame 四向 denseconnectivity；远区 forward/reversestate 排除 window 和 anchors，decaybridge 后 read。Linearbranch 共享 baseQKV 后 K/Vspatiotemporalconv、SiLU、Q/KL2，gate、RMSnorm 和单独 outputprojection 校准；textstate 各一半初始化 directionalscans，text/audio 相关 Softmax 保留。VDA 用 At=KᵀdiagβK、Bt=VᵀdiagβK，St=(Sbar+Bt)(I+At)⁻¹。分层 teacheralignment200、整网 500、LoRAcoadapt2000steps 后 DMD2-stylefewstep250genupdates；融合 kernels/FP32inverse/state、MXFP8GEMMs 及 headsharding。全部 21 页含 proof、correlationanalysis、reproduceconfigs 和 allNFEresults 读完，实际查看方法、主表、proof 和补充 qualityfigures。",
+    "methodFlow": [
+      "分配局部与远距 videoattention：按 VAEchunks 留 local softmax 及首尾 row/columnanchors；远区双向 linearstates，保持 text/audio 原 Softmax。",
+      "共同求解 frame memorywrites：解保持接近 decayedstate 且拟合所有 K/V 的 quadraticobjective，以 smallkeychannelinverse 耦合 correlatedwrites，无额外 framesizekeyscale。",
+      "校准并逐 stage 适配 teacher：Independentbranchesgate/projection/RMSnorm，perlayeralignment→end-to-endalignment→QKVO rank64LoRAcoadapt，再用自身 50stepteacherfewstepdistill。",
+      "优化执行并分层测加速：Frame/chunkaffinescans、fusedTritonprep/stats/gather、registerinverse、MXFP8 与 Ulysses-style8GPUheadshard；区分 backbone/steps/cards 收益。"
+    ],
+    "experimentsZh": "实验设置：10,015clips1344×768/345frames24fps（14.375s），cachedvideo/audio/textlatents；103fixedthirdpartyprompts 同 resolution/duration。H3 50NFE/8NFE/4NFE，Radial50 匹配 latency、Dense8 为 Larryadapter、FastH3v2/v1fewstep；H200/B200kernel 及 scaling，42–102latentframes。\n作者报告单 B20050step799.6→307.9s；8step49.3s，8B2006.70s；单 H2001767.3→557.9s，8step89.3s、8cards12.5s。各项 configuration 不同，未独立复现。（PDF p.10, Tables1–2）\n作者报告 50NFE VDN 与 latencymatchedRadial 共享七 qualitymetrics 中六项更高；8NFE VQAT89.20vsFastH3v2 78.42，VDN49.3vs60.2s（1.2×）；FastH3 无 FL2VA 结果。（PDF p.9, Figures5–6）\n作者报告 jointsolvevsadditive-scaledframe VQAA30.56vs30.14、WorldCoherence1.83vs1.76，但 QAlign92.69 低于 92.88/DOVER3.62 低于 3.76；并非全部 quality 提升。（PDF p.10, Table3）\n比较范围：EqualNFE 和 latencymatchedbaseline 帮助分离 attentionconversion；fewstep 全路线仍 training/adapters/quantization/kernel 变化，非纯 operator 同 budget。单 H3family，没有其他 backbone/分钟长 clip、人类偏好、3Dconsistency/dynamics 验证。FIRMlearnedjudge 与 endpointmetrics 不能证明中间 frames 全部 coherent。\n消融与诊断：Jointsolve、anchors、noanchorlinearbranchvswindowonly 有 matchedcomparison；kernelprep/stats/inverse/scan 分别 profile。Stageimportance 仅 relativeparameterdisplacement，不是去 stagequality 实验。Non-expansivityproof 有效有限条件，未直接 measurelearnedstatecorrelation/memory 容量失效点。",
+    "insightZh": "Local+linearmemory 本身有 SANA/LoGeR 等先例，fewstep、parallelserving 亦既有。实质贡献是 jointframe solve 与 correlation-awarestate 更新、video-nativewindow/anchor/decay 和可训练的 pretrainedbackboneconversion，附完整 math 与 controlledarchitectureablation，超过纯 kernel 加速/ordinarydistillation。这是新的 videoattention 适配路线而非新 fromscratchfoundation model。",
+    "whyRelevantZh": "Video-native 长期 context 的 correlation-awarememory 和预训练 prior 转换是实质 attention 建模进展，可支持高质量可控 visualworkflow 的低延迟底座；向 3D/design 迁移是 reviewer 推测，论文没有演示相关 downstream。",
+    "evidenceZh": "Non-expansive 是 fixedpreparedfeatures/gates 下 inheritedstate 差分，不保证 fullnetwork/新 writebounded 或视频物理。（PDF p.6, Proposition1; p.17, Appendix A.1；β≥0、α∈[0,1]使 GramPSD 与 inverse≤1；无 commutativity 要求。实际查看 proof，未复现。）\n速度 headline 包含少步和多卡，singleGPUequalNFEarchitecture 收益只有 2.6×B200/3.2×H200。（PDF pp.8–10, Tables1–2/Environment；6.70s 是 DiTdenoising，Table 所谓 end-to-end 为 denoisingpipeline；text/VAE 等不在正文计时，不混 1vs8GPU119.3×与 samecardcount14.5×。）\n首尾 denseanchors 及 bidirectionalscans 使用整个 clip，非 causal 无限流生成的证明。（PDF pp.3–4/18, Sec.2/Algorithm1；Window 若覆盖全 clip bypasslinear 用 dense；shortclips 和无未来输入场景不直接得相同 benefit。）\nQuality 多 metric 接近 teacher，但部分 instructionfollowing/endpointfidelity 退化。（PDF pp.9/20, Figures5/9–10；50NFE FIRMIF2.25→2.12，SSIM.833→.830，LPIPS.104→.111；stars 对 Dense50，不用于 VDNvsFastH3 统计推论。）",
+    "caveatZh": "PDF pp.6/17：bound 仅 fixed inputs inheritedstate，不包含 newwrites/fullnetwork。\nPDF pp.19–21：endpointfidelity 有小 degradations，RAFT 仅 motionmagnitude，significanceflags 只对 Dense50；没有独立 Limitations section。\nPDF p.19：exacthash/manifests/seed/topology 等 releasepackage 仍承诺补充，需匹配 vdn_solveconfiguration。\n标题 livestream 但主体为 bidirectionalfullclip14.3s，未证明长视频无限 generation/causalstream 或中途编辑稳定。\nFixedsizekeychannelmemory 容量不随 tokens 增，norm/proximalbound 不保证 semanticidentity/longrangecausalcontent 保持；仅 103prompts 可能漏复杂 failure。\nDenseboundaryglobalrefs 对 firstlastcondition 任务有优势，需要重验真正长期 unconstrainedvideo/world/camera 几何。\nHeadline8B200deploymentcost 高，不能迁移为 consumerreal-timeguarantee；纯 denoiser 计时与实际完整生成耗时须区分。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

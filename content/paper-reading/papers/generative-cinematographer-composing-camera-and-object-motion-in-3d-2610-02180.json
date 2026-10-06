@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.02180",
+  "slug": "generative-cinematographer-composing-camera-and-object-motion-in-3d-2610-02180",
+  "title": "Generative Cinematographer: Composing Camera and Object Motion in 3D",
+  "authors": [
+    "Jiahan Zhang",
+    "Chaohao Yang",
+    "Namitha Guruprasad",
+    "Vivekjyoti Banerjee",
+    "Trong-Tung Nguyen",
+    "Alan Yuille",
+    "Anand Bhattad"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02180"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Generative Cinematographer",
+    "Video Generation"
+  ],
+  "abstract": "Current controllable video generation systems often rely on 2D motion trajectories or sparse drag signals for object motion. These controls are ambiguous because the same 2D trajectory can correspond to different 3D motions, especially when the camera and objects move simultaneously. We present Generative Cinematographer (GenCine), a system that lifts a single image into an editable 3D scene scaffold where artists jointly author camera and foreground motion. Artists specify a camera path and move selected foreground regions using local 3D motion handles. Several handles can move different parts of a subject independently, providing a piecewise-rigid approximation to non-rigid motion without a physics simulator or category-specific prior. To communicate these controls to a pretrained video model, we project them into guidance maps. These maps record where the controlled regions appear in each frame, assign each handle a fixed color across frames and encode the current 3D positions of its controlled points in the same world coordinate system as the background. This lets us describe object motion relative to the scene even as the camera moves. For training, we recover controls from the motion observed in real videos and use ground-truth geometry and trajectories from synthetic videos. We train a lightweight guidance branch and LoRA adapters on a pretrained Wan model to follow these controls. Our experiments show consistent camera-relative motion, improved geometric consistency under viewpoint changes, and strong controllability across diverse real-world scenes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02180v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02180v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02180v1 全文及 2026-10-06T13:53:10.415554+00:00 审阅记录；PDF 23 页，SHA-256 75094e4713715ed392bf686af44dd172abb61917cb2aa1bd47df6ab366d753c0，视觉核验第 1、5、8、10、11、20、21、22、23 页。数字均为作者报告，本项目未独立复现。代码状态 promised：exactPDF p.1 官方 project https://generative-cinematographer.github.io/ 已实际访问，Code 按钮 disabled 且 title 为 Coming soon，没有 methodpublic implementationURL。页面作者 GitHub 个人链接不能替代代码。",
+    "ideaZh": "GenCine 从单图深度构造可编辑 point-cloud scaffold，让作者在同 world frame 中联合编排 camera path 与局部 rigid handles；用静态 background XYZ、当前 foreground XYZ 和固定 handle ID 三种 maps 区分“出现在哪里”“是谁”“在 3D 中怎么动”。作者报告 75 例中 translation 及 foreground LPIPS 略优，同时多项指标与 dense2Dtrack baselines 接近。值得深读这套结构化 authoring→conditioning 接口；单图隐藏 surface 由 generator 补，handles 不施加 physics/contact，训练支持会变化且不严格 rigid，不能称为真实物理仿真或普遍动作机制。",
+    "motivationZh": "相机与物体运动分开控制时，投影位置、深度与遮挡关系容易不一致。目标是以共享三维坐标编排运动，把艺术家设定的 controls 转成统一的视频条件。",
+    "methodZh": "系统以 ViPE depth/intrinsics 及 GroundingSAM2 dynamicmask 分开背景与前景，用初始 camera 作 world frame。作者在 Blender 选 points 做 motionhandles，轨迹与 camera 投影生成 shared-scale XYZ maps 和 time-invarianthandlecolor Gaussianfootprints，depthordering 处理 overlap，validitymasks 标注缺失 guidance。冻结 WanVAE 与 14Bbase，新增 8-block VACE-stylebranch 及 rank64LoRA 学习 geometryconditioning。trainingrealclips 以 CoWTracker 与 estimatedpose/depth 得到近似 controls，synthetic 提供 GT；inference 使用同 representation 替换为 artistauthoredcontrols。输出仍是 video，非完整动态 3Dmesh 或可验证 physics。",
+    "methodFlow": [
+      "单图 lift 与 jointmotionauthoring：估 depth/intrinsics/dynamicmask，彩色 point cloud 用初始 camera 为 world；选 foregroundregions 作为固定 support 的 localrigidhandles，和 camera 一起编排。",
+      "分开 identity 与 worldposition：当前 foregroundXYZ 改变随 objectmotion、固定 backgroundXYZ 作为静态 reference，time-invarianthandlecolor 保持 identity；共同 first-framebboxnormalization 和 camera 投影表达 camera-relative 运动。",
+      "处理 visibility 与 guidancevalidity：handleGaussianfootprints 和 z-order 给 identity/XYZ 同 support，backgroundhole 只有 local3Dsurface 支持 rayintersection 才填，不补输入中真正 occludedsurface。",
+      "适配 videoDiT 遵循 controls：frozenVAE 编码 maps，half-resVACEsidebranch、interbranchconvolutions 与 rank64LoRA 接受 pairedvideoflow matching；稀疏或无 handle 场景保留 prior。"
+    ],
+    "experimentsZh": "实验设置：作者报告 Wan2.1-Fun-V1.1-14B-Control40blocks 冻结 base/VAE，8sideblocks 约 main1/5 参数、halfspatialresolution/1/4tokens，rank64LoRA 训练 attention/FFN。45kclips 中约 5ksyntheticGT，其余 realestimatedgeometry/tracks，480×832，约 20kiterations/4H100。75DAVIS/SpatialVidtestexamples 分 camera/objectcategories，referenceposes/videos 供 control 与 PSNR/LPIPS、CameraCtrlmetric 和 VBench-I2V。无 fullmulti-seedCI、humanauthoringstudy 或 runtime/memory 表。\n作者报告 camera category GenCine Trans1.00/Rot3.70，WanMove1.02/3.73、GoWithTrack1.07/3.69；foregroundLPIPS .18 vs 两 baseline .19。（p. 8, Table 1）\n作者报告 object category GenCine LPIPS.35/PSNR16.54/R-LPIPS.21，GoWithTrack.37/16.59/.22；WanMoveR-PSNR15.46 优于 GenCine15.40，backgroundconsistency.94 优于.92。（p. 8, Table 1）\n作者报告 camera matchedablation R-LPIPS 完整.184，去 backgroundXYZ.235、去 foregroundXYZ.223；sidefullres.189 vshalfres.184，但 PSNR17.17→17.16 略降。（p. 10, Table 2）\n比较范围：vanillaWan、ATI/WanMove/GoWithTrack dense2Dtracks 与 VerseCrafter/SymphoMotioncoarse3D 控制。reference-conditionedquant 不是新轨迹 GT 效果，artistauthoredcomparisons 主要 qual。rotationunits/GTposes 估计协议和 categorycounts 细节较少，没有 amount-ofguidance/budgetmatched 或 physicsconstraintbaseline。\n消融与诊断：同 data/backbone/config 移除 BGXYZ、FGXYZ 和 branchresolution；没有单独去 IDmap、shared-vs-separatenormalization、handlecount/sparsity 或 samecontrol2D/3Drepresentation 的全 factorialcomparison。部分作者明确记录 qualconfound，较好限制其证据。",
+    "insightZh": "camera/3Dtrajectoryguidedvideo 已有 VerseCrafter/SymphoMotion 等；贡献在于共享 worldframe 下将 currentXYZ、persistenthandleidentity、staticbackgroundreference 分别编码，并以 localhandles 跨 rigid/articulated 创作。具体 authoring 与 training 接口直接面向结构化视觉创作，超过 ordinaryqualitytweak。不是运动 physicssolver：independenthandles 和 video prior 只近似未直接控制区域，不能由 robot-armqualexample 证明普遍 causalinteraction 能力。",
+    "whyRelevantZh": "直接面向 camera/object motion 的结构化视觉创作，提供可编辑 3Dhandles 到 video conditioning 的明确接口；主方向 transfer 是 localauthoring/controlrepresentation，未涉及 SVG/CAD 制造或真实 physicalsimulation。",
+    "evidenceZh": "三 map 分别承载 staticreference/currentposition/persistenthandleidentity，共享 worldnormalization。（pp. 5–7, Eqs. 1–5 and Figure 4; pp. 18–20, Appendices C–D/Figure 9；作者明确超出 first-framebbox 会让 XYZ 超 RGB 范围，identity 是 handlelevel 而非所有 movingpointdensecorrespondence。）\nartistfixedrigidsupport 与 trainingobservedtrack 支持不同。（pp. 21–22, Appendix F.1；training 成员可消失/重现、按 Mahalanobis 与 valid-frame/footprint 筛选，未严格 rigid；distributiongap 需保留。）\nquant 优势主要是 translation 与 foregroundperceptualfidelity，许多指标 nearparity。（p. 8, Table 1；2Dbaselines 用 denseGTtracks，GenCine 用同 reference-derivedsparse3Dhandles/camera，各输入信息不同；不能声称 matchedresource 全面优。）\n移除 foreground 或 backgroundXYZ 降低 foregroundfidelity，但 qualbackgroundablationcameraexports 有差异。（p. 10, Table 2 and Figure 6；作者直接说明 qualruns 的 savedcamera 不同，因果归因限于 matchedquanttable，未把 figure 当单变量证明。）",
+    "caveatZh": "单图深度在 reflective/transparent/thin structures 失败，隐藏 surfaces 未建模，generator 需补视角暴露区域。\nlocalrigidhandles 不适合 fracture/tearing/fluids，更多 handles 增加 authoring 成本，无 physical 或 causalinter-objectconstraints。\nfirst-framebbox 之外 motion 可导致 XYZ 超[0,1]；authoringwithinextent 是当前实用边界。\n稀疏 guidance 与 depthproxy 不能保证 metric3Dtrajectory/contact/physicalfeasibility，未控制区域的合理 motion 来自 prior。\ntrainingobservedlocaltracks 与 fixedrigidauthorhandles 不同，filter 阈值范围虽符号化但缺很多 numericaldefaults，独立复现需源码。\ndense2D/sparse3D/coarse3D 输入不对称，quant 差多较小，无统计稳定性，不能夸大 SOTA 优势。\n可编辑 3Dscaffold 不等于 output 有 editable3Dasset；pointvisibility 与 staticbackgroundholefill 不恢复 occludedgeometry。\n8sideblocks 约 main1/5 并非很小绝对模型量，未给训练/inference 成本、交互 latency 或 userstudy。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

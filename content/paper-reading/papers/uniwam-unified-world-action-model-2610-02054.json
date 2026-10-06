@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2610.02054",
+  "slug": "uniwam-unified-world-action-model-2610-02054",
+  "title": "UniWAM: Unified World-Action Model",
+  "authors": [
+    "Wenxuan Song",
+    "Jiayi Chen",
+    "Jingbo Wang",
+    "Shuai Zhou",
+    "Xicheng Gong",
+    "Zehua Fan",
+    "Ziyang Zhou",
+    "Junwu E",
+    "Haodong Yan",
+    "Fuhao Li",
+    "Qize Yu",
+    "Xu Huang",
+    "Pengwei Wang",
+    "Wen Chen",
+    "Shunbo Zhou",
+    "Haoang Li"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02054"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "UniWAM",
+    "VLM / MLLM"
+  ],
+  "abstract": "Vision-language-action models benefit from the understanding and reasoning capabilities of pretrained vision-language models, but action-only supervision provides limited grounding in world dynamics. Conversely, world-action models inherit spatiotemporal priors from video generation models, yet remain limited in semantic understanding and reasoning under distribution shifts. We introduce UniWAM, a unified architecture that integrates a physical reasoner, a world generator, and an action predictor to jointly learn semantic understanding of the physical world, visual generation, and action prediction. To ensure the quality of the training data, we developed a rigorous data cleaning and annotation pipeline for both human egocentric data and robot data. To adapt the vision-language component to embodied tasks while preserving its inherited language capabilities, we represent low-level actions in natural language and introduce a pre-training recipe that assigns complementary supervision from visual question answering (VQA) data, human egocentric data, and robot demonstrations to the appropriate model components. During post-training, future visual noise augmentation reduces reliance on precise future predictions, while history-conditioned flow matching uses encoded action history to initialize action generation. Together, these designs significantly reduce denoising steps while maintaining performance. UniWAM achieves state-of-the-art (SOTA) performance across multiple evaluations, including in-distribution performance, robustness, generalization, instruction following, and long-horizon task execution. Furthermore, we uncover a log-linear scaling law of unified human-robot co-training, demonstrating the effectiveness of large-scale pre-training on a mixture of human and robot data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02054v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02054v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/UniWAM/UniWAM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02054v2 全文及 2026-10-06T15:51:58.208861+00:00 审阅记录；PDF 29 页，SHA-256 c7f2669607e08d4e5d7b64190bcaea0c891d2919eda7f83c605354e26db04e31，视觉核验第 1、9、12、14、16、17、26、27、28、29 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF p.1 GitHub annotation 指向官方公开仓库，已确认 models/train、RoboTwin/LIBERO 数据处理及 inference policy 文件，非 README-only。公开 release 明确排除 Bridge/DROID/Fractal 与 real-world inference，不声称完整预训练/真实实验全部复现。",
+    "ideaZh": "UniWAM 以 joint attention 连接 VLM、视频模型和 action expert，用同坐标系的动作自然语言模板桥接 human/robot 数据，并用历史动作初始化 flow。值得借鉴的是混合数据的监督分工与语言化动作接口。作者报告 RoboTwin C2R 68.32%、真实任务 SR 67.5%；“physical reasoner”主要接受动作/QA 监督，没有充分证明生成文字的因果必要性、保留通用 VQA 或真实物理 world model。适合略读训练方案，不当作已验证的设计/制造 agent。",
+    "motivationZh": "VLA 擅长语言条件动作，却缺少视频动态先验；world-action 模型又容易忽略语义。目标是联合语言、未来视觉和动作学习，连接人类视频与机器人经验。",
+    "methodZh": "针对 VLA 语义与 WAM 动态先验各自不足，构造 Qwen3-VL-2B reasoner、Wan2.2-TI2V-5B world branch 和 action predictor 的 MoT。使用 VQA、human egocentric、robot demonstrations；把 wrist/EEF 滑窗净位移、旋转和 gripper 状态写成共享自然语言目标。video/action 各自 flow matching，语言 autoregressive。post-training 额外扰动 future visual inputs，并以 executed action history 加小 noise 作为 action flow source，减少推理步数。",
+    "methodFlow": [
+      "清洗与对齐数据：robot trajectories 检查 abrupt/state-action/FK/visual validity；human video 分割标注 subtasks，将双腕轨迹变换到固定 conditioning camera frame。",
+      "语言化动作监督：局部 EEF 位移/旋转按固定坐标、厘米与角度模板生成 natural-language target，VQA 提供额外语义监督。",
+      "三 expert 联合训练：VLM、video 和 action tokens 进入 shared attention，保留各自 FFN/output heads；语言 loss 与 video/action flow losses 按数据来源组织。",
+      "历史动作初始化：action flow 从前一 executed chunk 加小扰动出发，future video 从 noise 出发；future visual augmentation 防止 action 过度依赖干净未来。"
+    ],
+    "experimentsZh": "实验设置：作者预训练约一万小时 human/robot 加约 8.3M VQA，在 32×H800 运行七天；real dual Piper 四语言任务和桌面整理，200 demos/task、同 post-training protocol。RoboTwin 50 clean demos/task，100 evaluation episodes/task/setting。PDF figure embedded text 有乱码，使用实际页面渲染核对 pp.16–17，不按文本中的伪 form-feed 分页引用。\n作者报告 RoboTwin C2C/C2R/average 为 75.14%/68.32%/71.73%，OpenWAM-α 为 89.4%/48.7%/69.0%，并非所有设置最高。（Table 5, p.13; Table 7, p.28）\n作者报告 LIBERO 99.2%，LIBERO-Plus 92.6%；camera 92.0% 仍低于若干 listed baselines。（Tables 4/6, pp.12/14）\n作者报告真实四任务 SR 67.5%、IFR 82.5%，π0.5 为 54.4%/60.6%；六 milestone progress 为 5.0 对 4.8。（Fig.6, p.16）\n比较范围：real matched demonstration/training baselines 有用，simulation 大表并未统一 pretraining data/architecture，SOTA 表需限定 listed values。弱任务 hanging mug/handover block 仍仅约 16–24%，真实 Place-Relative SR47.5%。未有语言生成干预、独立未来视频 fidelity/physics 评测或通用 VQA 保持测量。\n消融与诊断：source mixtures、reasoner frozen/trainable/physical-language/pretraining 与 A2A/visual augmentation 有 cumulative ablations。data role 描述存在边界不一致：intro 表明 human 不 supervise low-precision action predictor，Fig.3 caption 却称 both sources train all three；应以实际 data loss masks 核验。数据总量数处口径不一致，不作为精确数据量结论。",
+    "insightZh": "MoT/world-action 组合与动作语言化有已有基础，贡献更集中在三源混合数据、监督接口和 action-history/noisy-future recipe。动作指标与 ablation 支持方案实用性，t-SNE overlap 不证明语义因果解耦；五个 data scales 的 log-linear fit 不应扩大为普遍 scaling law。",
+    "whyRelevantZh": "VLM 与 visual dynamics/action 的接口、共享坐标动作语言与异质数据监督，对 multimodal representation/grounded reasoning 方法有中等关联；未展示 structured creation 或制造执行。",
+    "evidenceZh": "three experts 通过 joint attention 交互，physical-language 是 action descriptions。（Fig.3, pp.9–10; Appendix D/G, pp.27–29；语言化动作被厘米/10°模板量化，不能写成任意精度的连续 controller 或 faithful chain-of-thought。）\n历史 action chunk 作为 source，visual latents 额外扰动但保留原 targets/noise embeddings。（Sec.4.3, Eqs.7–9, p.11；这是 conditional flow source 和训练 augmentation，不是独立物理约束。）\n真实语言 grounding 改善但 task success 仍有限。（Fig.6, p.16; Appendix B, pp.26–27；作者报告每任务 40 trials，average IFR 82.5% 而 SR 67.5%；不能用 IFR 当完整执行成功。）\naction flow 少步数有效，但未给 end-to-end latency。（Appendix C, Fig.11, p.27；作者报告四步 A2A average 71.73%，十步 N2A 66.73%；仍包含 world/semantic branches。）\n能力归因与跨 domain 解释超出当前控制实验。（Sec.5.3, Fig.7, pp.14/16; Fig.8, p.17；scaling 横轴是 robot hours、另混 human/VQA，不是任意计算预算；t-SNE overlap 与下游 gains 不能单独证明 shared physical understanding。）",
+    "caveatZh": "human motion labels 精度与 embodiment domain gap 影响监督设计；小 data scale 混 human 可降低性能。\n多项任务实际成功率较低，Table7 展示明显 task-specific variation。\nphysical-language template 并不等同因果 reasoning，generated language 的必要性未做 intervention。\n保持 inherited general semantics 主要由 data recipe 推测，缺通用 VQA retention benchmark。\n主证据是 manipulation action，而非自由视频 generation、asset design 或 fabrication。\nnoise augmentation 保留原 τ/target，实际 calibration 和独立 world fidelity 尚未测量。\nR² fit、t-SNE 与 limited data scales 不构成普遍 law 或跨 embodiment transfer 保证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

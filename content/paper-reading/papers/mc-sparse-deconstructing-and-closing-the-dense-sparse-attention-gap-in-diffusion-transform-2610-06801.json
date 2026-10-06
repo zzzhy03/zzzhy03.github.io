@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.06801",
+  "slug": "mc-sparse-deconstructing-and-closing-the-dense-sparse-attention-gap-in-diffusion-transform-2610-06801",
+  "title": "MC-Sparse: Deconstructing and Closing the Dense-Sparse Attention Gap in Diffusion Transformers",
+  "authors": [
+    "Jiarui Chen",
+    "Zeqiang Lai",
+    "Jiangshan Wang",
+    "Ziheng Ouyang",
+    "Ye Huang",
+    "Xiangyu Yue",
+    "Cewu Lu",
+    "Chunchao Guo"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06801"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "MC-Sparse",
+    "3D Generation",
+    "Video Generation",
+    "MC"
+  ],
+  "abstract": "Sparse attention is a primary approach to reducing the latency of diffusion transformers in long-sequence generation tasks, such as video and high-resolution 3D asset generation. However, existing methods can degrade generation quality and fidelity at high sparsity levels. Through controlled oracle comparisons, we trace this degradation to three sources: constraints imposed by token grouping, inaccurate interaction selection, and the attention contributions lost when tokens are discarded. Guided by this analysis, we propose Meta-Cached Sparse Attention (MC-Sparse), a training-free framework that selects individual key-value (KV) tokens while organizing similar queries into tile-aligned groups for efficient GPU execution. MC-Sparse caches metadata comprising query groups, KV indices selected using exact attention probabilities, and residuals between dense and sparse attention outputs, and reuses them across subsequent denoising steps. Across video and 3D generation models, MC-Sparse achieves higher fidelity to dense-attention outputs and larger denoising speedups than existing sparse-attention baselines, without visible quality degradation. Relative to dense attention, it delivers a $1.80\\times$ denoising speedup on Minimax-H3-Base and a $2.32\\times$ speedup on 3D asset generation, both with negligible quality loss.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06801v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06801v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/dodododddo/mcsparse"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06801v1 全文及 2026-10-06T11:36:17.000Z 审阅记录；PDF 17 页，SHA-256 2e73d39d28d13dd249458dce1d58239e28fa48c90687a709df502d92e7a1ad30，视觉核验第 1、6、8、9、10、15、16 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFp.1 打印作者 project URL；该页面 Code 链接指向此 public repo。2026-10-06 核查 GitHub API private=false，repo 含 mcsparse 实现、examples/scripts/tests，非 README-only 占位。",
+    "ideaZh": "MC-Sparse 用 matched-density oracle 分解 sparse-attention 误差，再以 tile-aligned query groups、exact token-level KV selection 与 dense–sparse residual cache 跨 denoising steps 重用；每步仍重算 Q/K/V。作者报告 MiniMax-H3-Base15% density 的 DiT denoising 加速 1.80×，内部 HY3D 模型 2.32×。可迁移的重点是 metadata 与补偿联合设计；加速不含 condition/VAE，3D 指标对比 dense-generated reference。",
+    "motivationZh": "Sparse attention 的质量损失来自选择误差与被丢弃的 tail，而降低耗时还要避免重复搜索；论文希望以跨步 cache 和 residual approximation 改善质量与效率。",
+    "methodZh": "稀疏 DiT 的质量损失同时来自 KV/query binding、approximate selection 及 discarded tail。方法在少数 anchor steps 计算 dense attention 及 top-K group mass，缓存 equal-size PDDP groups、KV indices 和 output residual；reuse steps 用新 Q/K/V 执行 CuTeDSL token-sparse kernel 再加旧 residual。系统设计包括 two-pass selection 和 CPU-cache prefetch，实验证据覆盖公开视频模型与私有 HY3D-Internal。它保持近似 dense fidelity，并不提供 lossless 或所有 GPU 上的 end-to-end 加速保证。",
+    "methodFlow": [
+      "在 pretrained DiT 的 dense warm-up/refresh 末步取得 Q/K/V 与 FlashAttention output/log-sum-exp",
+      "Fast PDDP 按 principal-direction median split 把 queries 分成 equal-size、tile-aligned groups",
+      "Two-pass kernel 恢复 exact attention probabilities，按 group mass 选 top-K KV tokens",
+      "计算 dense 减 sparse 的 output residual，缓存 groups、indices 和 residual；anchor 输出仍用 dense 结果",
+      "后续 steps 重算 Q/K/V，按缓存 groups/indices 做 token-sparse attention 并加 cached residual",
+      "按配置 refresh；必要时 inactive caches offload 到 CPU 并提前一层 prefetch"
+    ],
+    "experimentsZh": "实验设置：Video: MiniMax-H3-Base768p T2AV(video branch)、Hunyuan13B720p、Wan2.1-14B T2V/I2V720p；各 task 随机 50 样本，MiniMax 以 official prompt enhancement 生成 345frames。3D 为 1536-resolution HY3D-Internal detail-oriented image testset。Wan1.3B480p 用于 oracle/ablation。BF16/FA3 统一 backend，MiniMax8 Hopper GPUs(7 denoiser+1condition/VAE)，其它 1 Hopper；speedup 计 DiT denoising，包含 warm-up。\n作者报告 MiniMax15% density 相对 FA3 denoising1.80×，PSNR27.30；25% density1.61×、28.44。Full ImgQual69.20，sparse68.94/69.00，不能称所有 quality 指标提高。（Table 1, p. 8）\n作者报告 HY3D-Internal15% density 的 CD0.177、Vol-IoU82.91、F196.33 及 denoising2.32×；PISA CD0.976、speedup 仅 upper bound<1.87×。（Table 2, p. 9; Appendix A.1, pp. 15–16）\n作者报告 Wan1.3B20% density cumulative PSNR20.96→21.60→22.57→23.51→27.05，逐步加入 selection/reuse、token granularity、grouping 及 residual。（Table 3, p. 10）\n比较范围：比较 FA3 dense、Sol-Attn、PISA、SVG2、SVG-EAR、SpargeAttn(按模型适用)。Sparge 低精度 runtime 未直接比；PISA 在内部 3D 模型上未适配，速度是替代 kernel 估计。3D backbone 和 testset 未提供充分公开复现边界，不推出其它 native3D 模型相同倍数。\n消融与诊断：Cumulative 组件、KV 粒度/query grouping 的 realized density、不同 base 方法上的 residual、kernel 效率、grouping amortization、cache transfer 均有分析。支持 joint mechanism；warm-up/refresh 手动配置，未证明任意 diffusion schedule 或 GPU 通用最优。",
+    "insightZh": "不是单独发明 residual correction 或 query clustering；贡献是 oracle error decomposition、equal-size hardware-aligned grouping、exact token selection amortization 与跨步 tail compensation 的联合。Cumulative 与 matched-realized-density ablations 支持协同效果，适用于长序列生成的推理系统设计。",
+    "whyRelevantZh": "直接在 3D asset/video DiTs 验证长序列 generation attention 效率，是将高分辨率生成流程移到实际 GPU 时的具体系统参考。可迁移价值在 token 选择、hardware grouping 和 temporal residual 的组合；没有新 part representation、fabrication constraint 或 LEGO 专用生成验证。",
+    "evidenceZh": "误差拆成 structural binding、selection 及 discarded tail；token/per-query oracles 在 matched density 下区分来源。（Sec. 4.1–4.3, Figs. 2–5, pp. 3–6；分解是 controlled comparisons，不是保证每种模型轨迹均稳定的理论。）\nAnchor 缓存 G/S/R，reuse steps 重算当前 Q/K/V；精确选择使用 two-pass attention kernel。（Fig. 6, Algorithm 1, pp. 6–7; Appendix A.2, p. 16；图 6 已视觉核验；避免误写为直接复用旧 KV activations。）\n作者报告 MiniMax15% density PSNR27.30dB、denoising speedup1.80×；HY3D-Internal CD0.177、F1@0.00196.33、speedup2.32×。（Tables 1–2, pp. 8–9；对照与 qualitative 页均已查看；数字为作者报告，3D fidelity 参考 dense 生成结果。）\n作者报告 20% density 时 residual 使 Wan1.3B PSNR 从 23.51 到 27.05；不同 grouping 需按实际 executed density 比较。（Tables 3–5, p. 10；Largest cumulative gain 来自 residual，但与前面组件组合有关；不是单独 residual 即可完整复现收益。）\nRuntime 包含 dense warm-up 但不含 condition encoding/VAE decoding，HY3D-PISA 速度为估计 upper bound，硬件均 Hopper。（Sec. 5.1, p. 7; Appendix A.1–A.2, pp. 15–16；Boundary 页已视觉核验，不能将 kernel 或 DiT speedup 写成完整 application latency。）",
+    "caveatZh": "PISA 原 kernel 不能高效运行于 HY3D-Internal，其 denoising speedup 用 Sol-Attn 同 density kernel 估上界。\nSpargeAttn INT8/FP8 与其它 BF16 不直接比较 runtime。\nOffload/prefetch 能隐藏 transfer 仅在当前 measured setting 成立。\nPSNR/geometry metrics 衡量对 dense-generated 输出的 fidelity，不是真实场景 geometry correctness 或独立人评。\n3D 主要证据来自 private HY3D-Internal 和未充分描述 testset；外部复现与 transfer 仍有限。\nCached selections/residual 是跨步近似，trajectory/conditioning 变化可能破坏稳定性，无 lossless 保证。\nHopper 专用 kernel 与 CPU transfer 资源要求可能限制其它硬件收益；per-layer cache volume 很大。\n速度排除 condition/VAE；Table6 kernel speedup 还排除 selection/grouping，不能混为 end-to-end。\n本项目没有执行 code 或独立复现，所有实验数值为作者报告。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.37147",
+  "slug": "improved-distributional-diffusion-models-2609-37147",
+  "title": "Improved Distributional Diffusion Models",
+  "authors": [
+    "Tommaso Martorella",
+    "Alexandre Galashov",
+    "Felix Krause",
+    "Stefan Andreas Baumann",
+    "Valentin De Bortoli",
+    "Arthur Gretton",
+    "Björn Ommer"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37147"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Improved Distributional Diffusion Models",
+    "Image Generation"
+  ],
+  "abstract": "Distributional Diffusion Models (DDMs) replace the standard mean-prediction denoiser with a \\emph{distributional} denoiser trained via a scoring rule objective, learning a stochastic approximation to $p(x_1 \\mid x_t)$ rather than its conditional mean. However, scaling DDMs to modern image-generation settings faces two obstacles: (i) multi-particle training incurs overhead that scales with the number of particles, (ii) DDMs use globally fixed scoring rule hyperparameters, forcing a single trade-off across sampling budgets. We mitigate these limitations by deferring particle expansion to late transformer layers, and the hyperparameter trade-off by introducing time-dependent scoring rule schedules informed by the dynamical regimes of~\\citet{Biroli2024}. Combined with a DiT-based latent setup, these changes make DDM training practical on class-conditional ImageNet-$256^2$, achieving 4.48 FID at 4 steps and 2.38 at 50 steps with DiT-XL/2, from a single model trained from scratch in one stage, without a teacher, self-distillation or JVPs. The result is a stochastic few-step generator whose FID does not degrade as the sampling budget grows from 4 to 50 NFE, and the same recipe transfers to text-to-image generation. Code and pre-trained models available at https://github.com/CompVis/iDDM.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37147v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37147v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37147v1 全文及 2026-10-06T16:18:26.364Z 审阅记录；PDF 36 页，SHA-256 3274ee197185e26aaacacabd69f3365159fe525759d1466ce4f693f9df58bec1，视觉核验第 1、4、7、9、19、24、26、30、36 页。数字均为作者报告，本项目未独立复现。代码状态 promised：abstract 宣称 code/models available，但官方 CompVis/iDDM 当前仅 README/assets/LICENSE，明确 coming soon，checkpoint 同样 coming soon；因此不提供 Code link。",
+    "ideaZh": "iDDM 用后几层才展开四个 particles 的 shared-trunk DiT 降低 distributional denoising 训练成本，并按时间调 energy-score 的 λ/β。作者报告一 checkpoint 在 ImageNet 的 4/8/16/50 steps 均可用，XL FID4.48→2.38；价值是从头单阶段的随机 few-step recipe，不是全预算最优，更不能把有偏、局部 kernel 训练写成精确恢复完整 posterior。",
+    "motivationZh": "Mean-prediction denoisers 在粗采样时丢失条件分布的多样性，而 distributional denoising 的多粒子训练昂贵；需要共享计算并适应不同噪声阶段的目标。",
+    "methodZh": "给定同一 noised latent，早期 transformer 只运行一次，末层拼接独立 gated noise，再用 population confinement/repulsion score 训练。λ(t)下降、β(t)上升将高噪声阶段的多样性目标逐渐转向回归，默认 linear profile 并辅以偏低 SNR 的 t sampling。论文提供 matched architecture/steps 与 matched FM compute 两种控制，扩展到 1.6B T2I。少 steps 改善明显，many-step 同 compute 仍略输 FM，文本空间关系能力也弱于 FM。",
+    "methodFlow": [
+      "数据 latent 与 noise 按 linear flow path 生成 x_t，采样时间 t",
+      "shared DiT trunk 以原 batch 一次计算，B 模型末 2 层/XL 末 4 层才展开 m=4",
+      "拼接独立 per-token ξ与 t/class-dependent multiplicative gate，保持 attention/FFN inner width",
+      "population generalized energy score：目标 confinement 减 sample interaction；local spatial kernel 为默认",
+      "λ(t)=1−t、β(t)=2−1.9(1−t)，jit logit-normal 重分配训练时间",
+      "推理每 Euler 步采样一个ξ；同 checkpoint 用 4/8/16/50 steps，各预算独立选择 CFG"
+    ],
+    "experimentsZh": "实验设置：ImageNet256 latent DiT-B105M400Ksteps 与 XL515M1Msteps、m4、REPA-E frozen VAE。FID50K 与 DINO/KID/precision/recall，CFG 每预算扫；matchedcompute sweep 到 600KFM。1.6B T2I recaptioned COYO300Ksteps/frozenFLUX2VAE 与 Qwenembedding，COCO/GenEval/CompBench/HPS。\n作者报告从头单阶段 XL FID4steps4.48、50steps2.38；强 few-step baselines 低于 4.48 且预算不同。（Table4b, p.9）\n作者报告 T2I4stepFID41.046vsFM78.195，16step11.265vs11.200；Spatial4step .0232vs.0443。（Table13, p.24）\n比较范围：B-scale controlled retraining、额外 FM training compute sweep 较有价值；XL 系统对照异架构/epoch/预训练，不能混为等预算。MFM B-scale4step9.17 优于 iDDM13.13。训练 timings 在 4A100 JAX reimplementation 测而正式训练 H200；1–2steps 不占优。\n消融与诊断：逐步加 component 与独立加在 B 的消融，ξ类型、层数、gating、λ/βprofile、t sampling 及 kernel。每个有 budget tradeoff：E50step5.69 比 D5.47 差，Fsampling 改善；非每 metric 全提升。",
+    "insightZh": "Deferred population expansion 把四 particles 的重复特征计算共享，并展示延后噪声注入与 CFG 的相互作用；时间 schedule 与 sampling 使 DDM 在大 DiT 上可用。DDM/energy-score 本身已有，OU/FM 匹配仅通过 normalized corruption SNR；理论只支持 surrogate covariance shrinkage 的方向，不证明 terminal FID 最优。λ<1 本来造成 posterior variance bias，local score 只约束各位置 marginals，完整联合 posterior 不由此 identified。",
+    "whyRelevantZh": "为 2D 生成提供可调整 sampling budget 的随机 distributional training 及 shared-compute recipe；可借鉴条件多样性与推理预算研究，尚无设计编辑/3D 扩展证据。",
+    "evidenceZh": "m=4 后层展开，将 naive4×FM 训练成本降到约 1.5×，JAX XL 实测 1.41×。（Sec.3.1, Table2a, Table12, pp.4,7,23；理论层数 compute 与实测吞吐不同；推理每步一个 particle，不是重复四次且速度仍取决 CFG。）\n作者报告 XL200epoch 的 4/8/16/50 FID4.48/3.04/3.03/2.38。（Table4b, p.9；只指已测试离散预算；iMF/IMM 在同列 FID 更低但训练/架构预算大，不能宣称 absolute SOTA。）\n作者报告 matched FM compute，4steps26.70→14.33；50stepsFM4.97 优于 iDDM5.62。（Table10, pp.21–22；400KFM vs260KiDDM，checkpoint 下取 10K，CFG 各模型/预算独立扫；matchedsteps 与 matchedcompute 应分清。）\nposterior diversity 诊断仅测 fixed x_t 下变化及其随 t 变化，不测 posterior 准确性。（Table11, Appendix B.1, pp.21–22；1000training images 各 50samples/8steps，全图 pool FID，不能当 conditional MMD。）\nT2I4stepCOCO FID78.195→41.046，但所有 steps 空间关系分数均明显低于 FM。（Table13, Appendix B.2, pp.23–24；4step Spatial .0443→.0232；16stepFID11.200vs11.265，GenEval .364vs.353。）\nλ/βschedule 理论在 isotropic Gaussian surrogate 最小化 covariance-removal criterion，不定唯一 profile。（Appendix C/D/F, pp.23–29；anchors 来自 first latent channel50K 样本；local kernel 不约束 cross-spatial dependencies；strict propriety 只适用λ=1 且β<2，不覆盖全默认 schedule。）",
+    "caveatZh": "Mean-field regime anchors 在有限模型近似，smooth schedules 比 hard steps 稳健。\n1–2steps distillation/fastforward 方法更强。\nλ<1 和 local marginal score 牺牲完整 posterior 一致性；conditional stochasticity 不等于准确 p(x1|x_t)。\n4–50 预算非退化只验证四个 grid 且每 budget 重扫 CFG，不能保证所有步数、固定 CFG 或其他任务。\nT2I 主要 256 评估、512 样例另 finetune20K；spatial relations 明显退化，无 image editing/control/3D/video 直接验证。\nNo teacher 指生成 transformer 训练，仍有 pretrained frozen VAE/text encoder 与 recaptioned data 依赖。\n本项目未复现；无 multi-seed CI，训练总成本与 FID 小差异需谨慎；官方实现未发布。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

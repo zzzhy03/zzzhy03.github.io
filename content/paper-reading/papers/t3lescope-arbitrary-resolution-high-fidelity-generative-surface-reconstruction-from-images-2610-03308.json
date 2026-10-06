@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.03308",
+  "slug": "t3lescope-arbitrary-resolution-high-fidelity-generative-surface-reconstruction-from-images-2610-03308",
+  "title": "T3lescope: Arbitrary-Resolution High-Fidelity Generative Surface Reconstruction from Images",
+  "authors": [
+    "Atsuhiro Noguchi",
+    "Tianhan Xu",
+    "Yiming Liang",
+    "Yuta Kikuchi",
+    "Masahiro Ishiyama",
+    "Shintaro Takagi",
+    "Hitoshi Murai",
+    "Eiichi Matsumoto"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03308"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "T3lescope",
+    "3D Reconstruction"
+  ],
+  "abstract": "We reconstruct high-fidelity 3D scene meshes from posed multi-view images without per-scene optimization, across scales ranging from single objects to large outdoor scenes. Per-scene optimization methods lack the learned 3D prior needed when observations are sparse or surfaces are glossy or transparent. Existing generative methods leverage such priors to complete geometry in sparsely observed regions, but typically operate at a fixed resolution over a limited spatial extent, trading spatial coverage against detail. Reconstructing a large scene therefore often requires partitioning it into independently processed overlapping local regions, making it difficult to maintain global geometric consistency. To address these issues, we propose T3lescope, which applies a single fixed-resolution generator across scene scales in an inference-time coarse-to-fine cascade. A coarse level establishes the scene layout, and finer levels perturb and denoise geometry inherited from the coarser level within progressively finer spatial cells to recover surface detail. The model is trained on individual cells at multiple scales and shares its weights across all levels, so no hierarchy is fixed during training, and the number of levels, cell scales, and cell locations are determined at inference time. On indoor, outdoor, and city-scale scenes, T3lescope outperforms feed-forward and generative baselines, matches or surpasses per-scene optimization, and recovers fine structures as well as glossy and transparent surfaces. These results show that our method generalizes across diverse scenes, view counts, and image resolutions. Project page: https://pfnet-research.github.io/t3lescope/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03308v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03308v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03308v1 全文及 2026-10-06T12:25:28.758632Z 审阅记录；PDF 45 页，SHA-256 16abdbae2e43ec9adf8b19e593520b742be597fdf1b1f175c1a39c24a5497e9c，视觉核验第 1、4、6、7、8、10、28、44、45 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDFprojectURL 确认可访问，页面明确 Codecomingsoon，未确认 public implementation。 未确认公开实现的作者链接（审计用）：https://pfnet-research.github.io/t3lescope/",
+    "ideaZh": "T3lescope 在 inference 中用 multiscale cells、noised parent 与 cached tile bank 复用 TRELLIS.2 mesh flows。作者报告大场景部分几何指标改善。值得精读分层 native mesh refinement；其他 baselines 仍可在不同指标领先，细尺度成本高，generative completion 不保证真实隐藏结构。",
+    "motivationZh": "大场景图像重建受到固定分辨率与 conditioning 容量限制，局部细节容易丢失；目标是分层扩展生成式 surface reconstruction 的范围和精度。",
+    "methodZh": "各 level 用 MultiDiffusion 更新 sharedscenelatent，parentdecoder2Roccupancy 转 childSS 并 SDEdit；child 覆盖 dilatedparentregions。voxelquery 对 DINOtokens/views 做 offset/ray/apparentscaleattention，ConvNeXt 加入细节，imagepyramidtiles 作为 virtualcameras 缓存。general/city 分别 fine-tune 同 architecture，跨 levels 共享 flows 并非整篇只有一个 ckpt；DA3 仅 layout/views 选择但仍影响范围。主 objective 从 posedimages 恢复 scene，归 3Dreconstruction。",
+    "methodFlow": [
+      "DA3depth/poses 决定 coarseextent 和 tilevisibility，缓存 multi-resolutionvirtualcamera features。",
+      "coarseSS/meshflows 以 overlappingcells 共享 scenegrid 并 Hannblend。",
+      "parentdecoder2R 的 childSS 加噪至 t.8，用同 flow 在 half-sizecellsrefine。",
+      "voxelquery 多 viewDINO 局部 tokens 及 ConvNeXt 细节，meshflow 生成 geometry。",
+      "带 margin 分 chunkdecode/stitch 统一 mesh，可在 qualitativeROI 组合 cascadelevels。"
+    ],
+    "experimentsZh": "实验设置：TRELLIS2meshflowprune1.3B→655M/recover50Ksteps，TexVerseSS80K/mesh200Kpretrain16–32H200，general/city 各 flow25Kfine-tune8H200。general 全 syntheticrooms/houses/grass；city38train/3testblocks。ScanNet50split25small/large32/256views、Tanks 六 16/32/256views2K/4K、city256views；SS64³/mesh512³、12steps（childSS10）、stridehalfcell/64tiles。\n作者报告 denseTanks 小 sceneF@tau.354 对 GaussianWrapping.650，大 scene.248 对.370；denseoptimizationtightfidelity 更强。（Table2a, p.8）\n作者报告 large32viewparentt.8 CD.0212 对 noise.1051，但 small256viewF@2.6167 对 noise.7849。（Table7, p.41）\n作者报告 2×2DINOwindow 对 6×6 表现相近、meshstagesampling 约 4×快，总 runtime 仍 cell 数主导。（Table12/AppendixG.4, p.44）\n比较范围：per-scene2DGS/MILo/GaussianWrapping/CityGaussian、feedforwardDA3/MapAnything/Murre、generativeGenRecon 只 ScanNet。depthmethods 共享 TSDF 但 resolution/presets 不同；citydomainBIMmodel、GTextent 及 fullvsdownsampledinputs 尤其须明示。\n消融与诊断：parentnoise、voxel/ConvNeXt、tilelevels 及 separatelytrainedrules、attentionwindow、synthetichouses/grass。glass/reflective 主要 qualitative，未专门 materialtest 量化；unseenroofprior 对 BIM 较强但不确保真实 roof 恢复。",
+    "insightZh": "继承 TRELLIS2/MultiDiffusion/SDEdit，实质推进为同 flow 跨 physicalscale 的 inferencecascade 及 cell-independenttileconditioning，缓解 local 采样失去 globalgeometry。native3Dgenerator 的可扩展 composition 对 generation 方向有直接方法迁移，足以通过 selectivereconstruction 门槛。",
+    "whyRelevantZh": "shared3Dflow 跨 scale/cell composition 与 globalprior 传播对 native3Dgeneration 有明确迁移；最终 faithfulsceneobjective 因此不重复标 generation 或 fabrication。",
+    "evidenceZh": "multiscalecell 训练无 parentchildpair，inferenceparentSSnoising 传 globalstructure，cells/levels 可配置。（Sec.3/Fig.2/Eq.1, pp.3–5; AppendixC, pp.31–33；方法图已查看；parentmiss 与 errors 可能限制 child 恢复。）\n作者报告 largeScanNet32view MAE.0565/F@2.7155，对 GenRecon.1175/.2846；DA3 F@2.7765 更高。（Table1, p.7; Table4, p.14；主表查看；virtualscan 仅可见 GTsurfaces，额外/invisiblegeometry 未在此评分。）\n作者报告 cityCD.645m 对 2DGS4.858，但本方法 city9.5Kimages、baselines1.9K 且本方法有 BIMfinetune。（Table2/Fig.4, p.8; AppendixB.1/B.4/E.4, pp.29–30,39；city 图表查看；threeheldoutblocks 不能剥离 res/domaintraining 贡献。）\n作者报告 parentt.8 更 consistent 但 dense/small 条件 pure-noise F@2 更高；ConvNeXt 比 voxelattentionalone 贡献更大。（Fig.6, p.9; Tables7,9, pp.41–42；globalpreservation 与 tightfidelity 存在 trade-off。）\n作者报告 five largescenes 累计 5310s 约 89min、peak79GiB，farobjects 失败。（AppendixH/Table13, p.45; A.5/Fig.18, p.28；runtime 与 failurepages 实际查看，无 per-sceneoptimization 不等于 fastfeedforward。）",
+    "caveatZh": "surface 可能 offset，tightFscore 弱于 densephotometricoptimization。\ncost 随 cells/levels 增长，largehighres 慢，依 posedinputs。\nunbounded/farobjects 失败，fewstepdistillation 待 future work。\ngenerativeprior 可 hallucinateweaklyobservedgeometry。\nmainvirtualscan 忽略 GT 外 surfaces，whole meshprotocol 丢 GT 距离>15cmtriangles，未充分测 hallucinatedobjects。\ncity 低 resbaselines 无同 domainfinetune，threeblocks/BIMtarget 不支持任意 cityzero-shot。\nextent 部分用 GTfootprint/camerahull；parentmiss 超 dilation 区域 child 不尝试，DA3 错误影响范围。\ngeneral/city 两个 ckpts、额外 syntheticdata、conditioning 变化不全是 cascade 收益，缺 multiseedCI。\n79GiB/89min 与 hugetrianglecount 限制实际用法，未保证 manifold/fabrication-ready，本项目未运行或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

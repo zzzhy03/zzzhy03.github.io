@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.02819",
+  "slug": "text-centric-post-training-for-omni-modal-reasoning-2610-02819",
+  "title": "Text-Centric Post-Training for Omni-Modal Reasoning",
+  "authors": [
+    "Ziyang Cheng",
+    "Yuhao Wang",
+    "Hongcheng Liu",
+    "Qimin Wu",
+    "Jingru Fan",
+    "Chen Qian",
+    "Yanfeng Wang",
+    "Yu Wang"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02819"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Text-Centric Post-Training for Omni-Modal Reasoning",
+    "VLM / MLLM"
+  ],
+  "abstract": "Improving joint audio-visual reasoning in Omni Large Language Models typically incurs substantial data construction and training costs. Our diagnostics reveal multi-hop reasoning difficulties despite correct answers to all corresponding single-hop questions and suggest partial decoupling in the local optimization of perception and reasoning objectives. This motivates post-training with different emphases on these capabilities. Text-only reasoning training yields gains across data sources, model scales, and families. With the best-performing text-only configuration, supervised fine-tuning followed by reinforcement learning (RL) raises Qwen2.5-Omni-7B's geometric mean of nine reasoning scores by 25.83% over the base model, outperforming the complete native audio-visual route with 56.6% fewer GPU-hours. Training on data synthesized entirely by a text-only LLM raises this geometric mean by 21.01% without audio-visual data in construction or training. However, text-only training degrades perception. We therefore propose a text-centric post-training paradigm: text-only training provides the main reasoning optimization, and reduced-data native audio-visual RL then refines perception. Refinement uses about 90% fewer input tokens than full-data audio-visual RL, restores perception above the base level, and retains 93.5% of the best-performing text-only pipeline's reasoning gain.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02819v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02819v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02819v1 全文及 2026-10-06T12:40:19.262758Z 审阅记录；PDF 28 页，SHA-256 276ce427d853cc8fe01e8c47a3cf299cc9e17e4b15b5cd2f3d4bd58143211d5b，视觉核验第 1、2、6、8、9、17、25 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文/PDF annotations 无本方法 public repo，只有 datasets/thirdpartyreferences，不猜测 code 地址。",
+    "ideaZh": "论文先以 text-only SFT/GRPO 提升 Omni reasoning，再用较少 native A/V RL 恢复 perception。作者报告两阶段能力取舍较好。值得精读文本监督的多模态迁移；最佳文本来自视频 scripts，局部 gradient 解耦不是独立神经模块证明，成本节省也只覆盖 text-only stage。",
+    "motivationZh": "Omni 模型即使识别了单个 audio/visual facts，也可能无法组合推理；希望用较低成本的文本监督改善 reasoning，再恢复必要的多模态感知。",
+    "methodZh": "diagnostic 多 hop 由九 models 均答对 singlehopfacts 构造，显示识别 facts 不保证整合；video-levelcrossvalidatedgradientprojection 测局部 loss 可分调方向。主 posttraining 冻结 audio/vision encoder/projection，仅 languageThinkerLoRA16，ScriptCoT+MCQGRPO 最强；再小 budgetAVGRPO 提高 perception，保留大部分 reasoning。全文对 generaltext、fictionalLLMscripts、agenttrajectory 与 multiplefamilies 对照，最终 refinement 只在 Qwen2.5Omni7B。",
+    "methodFlow": [
+      "以 singlehop/multihop 及 localgradientprojection 诊断 perception/reasoning 不同优化响应。",
+      "用 ScriptCoT/MCQ 或 fullyfictionalLLMtext 构造 reasoning 训练，冻结 modalencoders。",
+      "SFT 后 GRPO 以 accuracy/format reward 优化 languageLoRA。",
+      "检测 text-onlyperceptiondegradation，再以少量 nativeAVGRPOrefine。",
+      "在 reasoning、perception 与 GPU-hour/token budget 同时评估 trade-off。"
+    ],
+    "experimentsZh": "实验设置：Qwen2.5Omni7B 主，3B/Gemma4E4B/E2B SFT+GRPO，Qwen3Omni30B 仅 SFT；eightA10080GB，同 mainhyperparams 与同 GRPO 问题，冻结 modalencoders，LoRA16/alpha32。nine reasoning scores、perception 为 fiveaggregate（表中含七子分）；GPUh 计 onlinegeneration+optimization，GRPOinputtok 不计 completion。\n作者报告 finalreducedAVGRPO.122B/82.7GPUh，对 full1.214B/642.3；finaltotal 约 366.9GPUh 而非 284.2。（Table6c, p.9）\n作者报告 GemmaE4BVideoMMEv2−.51、E2BOmniCloze−2.42/Who−.20，crossfamilyaggregategain 不等于所有任务改善。（Table3, p.6）\n作者报告 text-onlyagenttrajectoryOmniGAIA3.6→13.1 对 native13.3；Hard6.4 低于 textSFT7.7，还是低总体成功率。（Table13, p.21）\n比较范围：officialdatasets/stages 重训 externalbaselines 同 hardware 测 cost 有价值；optimaltextsource 由 RQ2benchmark 结果选，不代表 untuneduniversalrecipe。nativeAVbudget/SFTsources 与 text 不同，GRPO 同 questions 加强对照但不能完全剥离 supervision。\n消融与诊断：general/script/context/math/temporal、SFTmixtures、fullysynthetictext、多 family、localprojection 及 reducedAVSFT/GRPO。finalstageperceptionrecovery 未跨 family 或多 seedCI；不把 aggregateMCQA 变化等同所有 crossmodalreasoning 机制。",
+    "insightZh": "textreasoning 向 visual/audio 迁移已有研究，新意为 jointomni evidence 整合的系统数据/模型研究与低 AVbudgetrefinement 配方。跨 families 及实际 compute 核验有用，但 partialdecoupling 仅 localmeanloss 行为，非证明 perception/reasoning 完全可独立训练。",
+    "whyRelevantZh": "通用 MLLM/Omni 训练与 visual/audiotemporalreasoning 能力迁移，支持设计模型 posttraining 时分配 text 与 perception 数据；与 native3D/structuredartifact 直接任务仍间接。",
+    "evidenceZh": "diagnostic 将全部 models 答对 singlefacts 组合 multi-hop，原 1hop94.7%、2/3hop64.1/62.3；projectedupdates 分别保留 74.3/81.7%目标 loss 下降。（Sec.3/Fig.2, pp.3–4; AppendixA, pp.16–18；projection 公式页已查看；易 singlehop 条件选择与任务难度/构建不同，localprojection 不是 causalmodule 定位。）\n作者报告 text-onlyroute macro49.39/nativeAV47.37，total284.17vs654.52GPUh，input.505Bvs1.306B。（Table2, p.6；主表查看；56.6%省 compute 不含后续 AVrefine。）\n作者报告 text-onlyperception77.37→76.41，finalrefine78.50/reasoning48.48，retains93.5%geomeanreasoninggain。（Tables5–6, pp.8–9；perception/trade-off 页实际查看；finalperception 仍弱于 fullnativeAV79.07。）\n只有 fullysynthetictext 实验不使用 nativeAVconstruction，最佳 ScriptMCQ 来自 OmniVideo100K 视频脚本；synthetic7Bmacro47.50。（Table1, p.5; Sec.5.3/Fig.4, pp.7–8; AppendixB.1, p.19；避免把“text-onlytraining”误写所有数据完全不源自音视频。）",
+    "caveatZh": "明确 text-onlydegradesperception，仍需 nativeAVrefine 而非完全替代。\nlocaloptimization 只能支持 partialdecoupling；strongQwen3Omni 仅 SFT，不含完整 RL 验证。\nmultihop 构建只保留九 models 都答对的 singlefacts，diagnosticgap 与一般 perceptionbottleneck 不同。\nScripttext 携带既有 AVannotation，syntheticscripts/modelchecks 依 LLMquality 且人工复核 subset 未给规模。\ngeometricmeanofratios 并非 25.83accuracy-point 提升，93.5%为 gainratio 不是 93.5%性能。\nnativeAVframes/res/clipsettings 和 data 选择影响 compute，inputtokens 排除 GRPO 输出不能当总 token 成本。\nfinalstaging 仅 7B/evalset 和 optimaldata 选取，缺 seedCI、temporal/spatialevidencecausalprobe。\n本项目未执行或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

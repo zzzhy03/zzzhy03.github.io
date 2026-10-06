@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2605.13737",
+  "slug": "senses-wide-shut-a-representation-action-gap-in-omnimodal-llms-2605-13737",
+  "title": "Senses Wide Shut: A Representation-Action Gap in Omnimodal LLMs",
+  "authors": [
+    "Trung Nguyen Quang",
+    "Yiming Gao",
+    "Fanyi Pu",
+    "Kaichen Zhang",
+    "Shuo Sun",
+    "Ziwei Liu"
+  ],
+  "publishedAt": "2026-05-13",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.13737"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Senses Wide Shut",
+    "VLM / MLLM"
+  ],
+  "abstract": "When an omnimodal large language model accepts a question whose textual premise contradicts what it actually sees or hears, does the failure lie in perception or in action? Recent omnimodal models are positioned as perception-grounded agents that jointly process video, audio, and text, yet a basic form of grounding remains untested: catching a textual claim that conflicts with the model's own sensory input. We introduce IMAVB, a curated 500-clip benchmark of long-form movies with a 2x2 design crossing target modality (vision, audio) and premise condition (standard, misleading), which lets us measure conflict detection separately from ordinary multimodal comprehension. Across eight open-source omnimodal LLMs and Gemini 3.1 Pro, we document a Representation-Action Gap: hidden states reliably encode premise-perception mismatches even when the same models almost never reject the false claim in their outputs. Behaviorally, models fall into two failure modes: under-rejection, in which they answer misleading questions as if the false premise were true; and over-rejection, in which they reject more often but also reject standard questions, sacrificing ordinary comprehension accuracy. The gap is modality-asymmetric (audio grounding underperforms vision) and prompt-resistant across seven variants. As an initial diagnostic intervention, a probe-guided logit adjustment (PGLA) re-injects the encoded mismatch signal into decoding and consistently improves rejection behavior. Together, these results suggest the bottleneck for omnimodal grounding lies in translation, not perception.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.13737v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.13737v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ngquangtrung57/imavb"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.13737v2 全文及 2026-10-06T13:14:59.544074Z 审阅记录；PDF 38 页，SHA-256 01b9dc32a8ef67b53754591892e6373063385507bc67950b0ecc0535fbfdfd65，视觉核验第 1、3、5、6、7、9、23、34、35、36 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页/p.10exactURL 确认 public repo，experiments 含 data_pipeline/hidden_state_extraction/probing/pgla/logit_lens 实现目录；未执行。",
+    "ideaZh": "Senses Wide Shut 用同一 audio/video 配对普通与 false-premise questions，诊断模型能否识别并拒绝误导；PGLA 对拒绝 logits 做 gate。作者报告 probes 与行为仍有明显差距。grounding/readout 诊断值得速读，但不证明 perception 已解决，修复尚缺外部分布验证。",
+    "motivationZh": "Omni 模型可能在表示中保留正确感知信息，却顺着 false-premise 问题给出错误答案；需要区分可读出的信息与实际回答，并检验拒绝干预。",
+    "methodZh": "500clips/2000items 构 vision/audio×standard/misleading2×2，八 opensource 及一个 closedmodel 行为对照。使用 group-by-video 探测 lasttokenhidden states，以 Ridge 移除 SBERT 可预测 textsubspace 后检验标签。logitlens 追踪答案 letteralignment，MLPprobeconfidence 对 E/F 拒绝 logits 作 gapadaptedboost 与 positiondebias。PGLA 主要降低 underrejection 并牺牲 standardaccuracy，属于 diagnosticintervention。",
+    "methodFlow": [
+      "三 captionpasses 构 movie 时间 narrative，singlepremise swap 生成 2×2QA，逐 clip 人工 verification/relabel。",
+      "同 AVinput 做 standard/misleadingMCQ、option shuffle/prompt/temporal/modalitycontrols。",
+      "按 video 分组 CVprobe 各 layerlasttokenstates，比较 textonlybaseline。",
+      "fold 内 Ridge→textsubspaceprojection，withinmodalityresidualprobe；vanillalogitlens 辅助。",
+      "训练 MLPmisleadingconfidence，再对 E/Frejectlogits 做 gatedgapboost 与 positiondebias。",
+      "在同 benchmarkCV 测 standardaccuracy 与拒绝 trade-off，外部分布迁移留待验证。"
+    ],
+    "experimentsZh": "实验设置：500movieclips60–300s、50uniformframes/fullaudio16k、八 open+Gemini3.1Pro 只行为；所有 2000QA 人工核验。probe4foldvideo-groupCV，PGLA25%samplestrainMLP+剩 75%5fold 调 162configs，H1008GPUs/greedy，reportedbootstrapCIs。\n作者报告 conditionalmodalremoval 对 Qwen2.5vision+6.2pp、SALMONN+6.4，MiniCPM 反减少 4.4/5.8，故非所有 architecture 都 crossmodalinterference。（Table2, p.6）\n作者报告 promptA2 让 OLAstandardvision/audio74.0/92.8、mis34.8/11.8，显著改变行为；因此 prompt-resistant 指未彻底修复，而非所有 prompt 完全无效。（Table7, p.19）\n比较范围：raw/residualprobes、TFIDF/SBERT、modalremoval、sixpromptchanges/shuffledletters 和 GTtemporaltrim。没有 finetunedstrongtextonlyclassifier、non-Qwengenerator/judge、directhiddenactivationcounterfactual 或 OODPGLAtransfer。\n消融与诊断：layerprobe/readout/runnerup、duration/evidenceposition、PGLAbudget/MLPvariants，未完整 samevideo-group 说明 PGLA 拆分，训练数据不同问题共享 clip 可能影响泛化。",
+    "insightZh": "falsepremise/representation-outputgap 已见于 text/image；新贡献是完整 AV 在场的 pairedtemporalprobe 与 modalityasymmetry，以及可操纵 readout 诊断，超出单纯 benchmark 排行。机制归因尚弱：残差信号不是已定位矛盾，trainedprobe 可能利用 languageplausibility，同域 rejectlogitboost 不足证明 nativeperception 全足够。",
+    "whyRelevantZh": "对 MLLMvisual evidence、falsepremise 与 readoutalignment 的重要诊断，能帮助研究何时 groundingfailure 不该单归 encoder；不是完整视觉设计系统，但通用 multimodalreasoning 关系明确。",
+    "evidenceZh": "作者报告 OmniVinci standardvision75.4 而 misvision6.6/audio0；Qwen3 则 misvision72.8 但 standard40.6，呈 under/overrejectiontrade-off。（Table1, p.6；main 表实际查看，closedmodel 只有行为无 hidden state。）\n作者报告 withinmodalityresidualvision76.7–80.7/aud65.0–69.5（除 Baichuan 近 ceiling），TFIDF73.4/71.4。（Table16/App.L, pp.33–34；该 control 与 mainTable3crossmodalitynegative 不同，不能把其 83–86%rawprobe 直接解读纯 sensorymismatch。）\nPGLA 同域 5fold 报告 meanbalanced38.0→53.0，conservative3ppbudget+9.9；七 model 标准质量牺牲而非感知改善。（Table4 p.9 / Table11 p.23 / Sec.5；两 table 实际查看，保留作者报告及协议界限，不作 productionrepair 效果。）\n作者承认 textconfound、audio 语言抽象程度、probe 不定位矛盾、familyoverlap 和无 OODtest。（App.N, pp.35–36；全文 limits 实际查看，核心 conclusion 需按 vision 强/audio 弱读。）",
+    "caveatZh": "movie 单域/单 detailmisleading，视频仅 1–5min 非 hourlong；audio/visualpremise 难度 register 不同。\nresidualvision 优势较小，audio 甚至低于 TFIDF；strongcontextualtextcontrol 待做。\nprobe 可分标签不说明已定位错误，vanillalogitlens 不是稳定模型机制。\nQA/judge 均 Qwenfamily 且 eval 包含 Qwen；PGLA 同域训练无外部迁移，不是 deploymentready。\n移除可线性预测 SBERT 的 subspace 不消所有 textconfound，不能视 sensorymismatch 已因果 identified。\nPGLA 调整 labelreadout，gate 标准输入也不归零；balancedmetric 提高不等 nativevisualreasoning 更可靠。\nmainrawmodalityprobe 用 1:2label 比而 residualwithinmodality 更保守，须用一致分类任务比较 chance/文本 baseline。\njudgeprompt 无 rawclip，且 wrongprediction 必须 wrongexplanation 的规则令 W+R=0，解释 faithfulness 不是独立视觉验证。\nPGLA 表 4 为 CV 但表 12 整体 bestselected，同域 protocol 不同；conservativebudgetbaseline/std 均值需实现复核，勿当同一个部署 operatingpoint。\n电影事实的唯一正确答案/拒绝约定不必代表交互中所有合理纠错回应；未验证 design/spatialtoolagentdirecttransfer，本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.38180",
+  "slug": "point2part-unified-3d-partitioning-from-point-prompts-2609-38180",
+  "title": "Point2Part: Unified 3D Partitioning from Point Prompts",
+  "authors": [
+    "Hao-Tang Tsui",
+    "Yu-Rou Tuan",
+    "Xiaoxuan Ma",
+    "Nicolas Ugrinovic",
+    "Takaaki Shiratori",
+    "Kris Kitani"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38180"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "Point2Part",
+    "3D Segmentation",
+    "3D Generation"
+  ],
+  "abstract": "Existing 3D part decomposition methods do not necessarily partition the original shape into non-overlapping parts that collectively cover the entire shape, allowing overlaps or gaps that hinder downstream part-level applications. We instead formulate part decomposition as a joint partitioning of the entire shape, where the predicted parts are non-overlapping and jointly recover the entire shape. Our key insight is that part decomposition should consider all desired parts jointly, rather than modeling each part independently. To this end, we develop a promptable model for 3D part decomposition from images or meshes. Users can specify desired parts through 3D point prompts for controllable decomposition. Given one point prompt per desired part, our model produces the corresponding parts as a complete partition of the entire shape. We build on a pretrained 3D generation model and first obtain a shape latent from either an input image or mesh. We then introduce a prompt encoder that maps each 3D point prompt to a part token while attending to the shape latent. To decode the desired parts, we propose a novel part decoder jointly scoring the entire shape against all part tokens in a coarse-to-fine manner, assigning every position within the shape volume to exactly one part. We perform part decomposition in this shared shape latent space, enabling a unified model for image-to-part generation, mesh-to-part generation, and part segmentation. Our method outperforms existing works on all part-quality metrics across all three tasks, and improves compatibility among parts by an order of magnitude over previous SOTA methods. Code and models will be released.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38180v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38180v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38180v1 全文及 2026-10-06T15:13:41.371Z 审阅记录；PDF 22 页，SHA-256 422d86fd199e5440415842e441b8e7e82b64669003c64d1d9536f0292c7f47c5，视觉核验第 1、4、8、9、14、17、19、22 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 官方 project 成功访问并链接 henrytsui000/Point2Part；实际 publicrepo 只有 README/assets/docs，README 明确 Code Coming Soon 且所有 inference/checkpoint/eval/train 待发布，不能提供 Code 链接。",
+    "ideaZh": "Point2Part 将所有 3D point prompts 一起编码，用共享 whole-shape field 内的 joint argmax 分配各部件，再切出 closed part meshes；同一模型支持 image/mesh-to-parts 和 face segmentation。作者报告 mesh 部件 penetration0.06%、image0.01%，值得深读如何从独立 part generation 改为全局 partition。严格排他/覆盖针对 backbone 生成的体积标签，Marching Cubes 仍有 seam 误差；原 mesh 重建、语义和实际可拆装没有保证，官方代码仍 Coming Soon。",
+    "motivationZh": "独立生成或分割 3D parts 可能重叠、留空且难随 prompt 联动；论文希望在同一 shape latent 内联合分配全部 parts，提供点提示控制的完整划分。",
+    "methodZh": "Hunyuan3D2.1 将图像或 mesh 变成 shared shape latents。Point encoder 先 cross-attend shape、池化同 part 的 1–4 点击，再 inter-part attention；query decoder 读取 shape 和所有 part tokens，以 dynamic classifier jointly scores 每位置。体积内 argmax 使每位置唯一归属，通过保留该 part 内 s、别处取|s|构成 sign field 并 Marching Cubes 闭合。训练用 part SDF 最小者解析重叠标签，focal/Dice 和独立 prompt 集 token 一致性；generation 重建 geometry，segmentation 仅标注输入 face。",
+    "methodFlow": [
+      "从 mesh encoder 或 image-conditioned flow 取得 whole-shape latents 与 SDF，图像先生成 whole mesh 供 3D 点击",
+      "按每 part 点击进行 shape cross-attention/pooling 及 inter-part self-attention，生成 part tokens",
+      "query 依次读取 shape latents 与 part tokens，joint logits 经 argmax 分配 whole volume 内每位置",
+      "以 part 内 s/part 外|s|定义各 part sign field，从 128³到 512³在 shape surface 和低 margin seams 细化",
+      "分别 Marching Cubes 提取 closed parts；segmentation 直接查询 input face centroids 并保留原 geometry",
+      "focal/Dice 与两独立 prompt 集一致性训练，GT 重叠 parts 以最小 SDF 生成唯一标签"
+    ],
+    "experimentsZh": "实验设置：240KHY3D-Bench 训练（排 Tiny 重叠），4A10080GB 三天；200PartObjaverse-Tiny 三 tasks，另 PartNeXtsegmentation。onepoint/GTpart，fiveprompt-sampling runs 给 smallstd；官方 baselinecheckpoints 但输入/训练数据不同。singleA100timing。\n作者报告 mesh partF1@.05 84.4、penetration.06%/24.4s；image68.6/.01%/37.8s；whole meshF1 仅 94.1 低于 CubePart97.5。（Table 1, p. 8）\n作者报告 Tiny mIoU69.80、pF1@.01 78.3、.3s；PartNeXt mIoU57.76 与 pF1@.05 86.1。（Table 2, p. 8; Table 6, p. 16）\n比较范围：releasedsettings 的 proof-of-concept，非同 training/conditioning 预算。image GT count/ICP/prompt support，PartField oraclecountsearch 与其他 masks/names 控制不同。最快 mesh 及 seg，不是最快 image（PartPacker26.7s）。\n消融与诊断：去 promptencoder/consistency/refinement 与 independentassignment；independentpenetration1.23vsjoint.06，支持 competition 的结构价值。K/backbones/partcounts sweep；五 runstd 是 prompt 随机性不是五次 trainingvariance。",
+    "insightZh": "将部件集合改为一个 whole volume 的 joint partition，并在 shared pretrained shape representation 上支持 point-prompt 的生成和分割。排他与覆盖来自 single-valued assignment 形式，而非 learned semantic correctness；离散 mesh 提取仅近似连续 partition。不能保证每 part 非空/连通、接触面完美吻合或真实装配间隙。",
+    "whyRelevantZh": "直接 promptable3D part segmentation 与可编辑 part assets，对 joint partition 和部件兼容性有方法价值；可借鉴 3D generation 的共享 shape/part 解码，没有物理装配证明。",
+    "evidenceZh": "joint argmax 和 sign-field 形成 partition，coarse-to-fine 提取 part meshes。（Sec. 3, Eqs. (7)–(15), pp. 5–7；whole 是 backbone 生成/重建 solid；segmentation 不改变输入 geometry，generation 继承 VAE 误差。）\n作者报告 mesh/image penetration0.06%/0.01%、closed edge test100%。（Table 1, p. 8; Appendix B, p. 14；penetration 为 2Ksurface probes 经 own-interior guard 后进入 otherpart 的比例，不是 volumetricoverlap；wt 只检查 each edge 两 faces，不检自交。）\n作者报告 segmentation mIoU69.80，PartNeXt57.76。（Table 2, p. 8; Table 6, p. 16；PartField 在 Tiny 用 20counts 选 GT-best，是 privileged baseline；ours 仍给 GT count/每 GTpart surface point。）\n图像 predictions 先 bbox normalize 和 24-poseICP 到 GT，GT 用于 prompt 选点。（Sec. 4.1, p. 7; Appendix B, p. 14；不能外推无 GT 的 image-view pose recovery 或完全自动 point placement。）\nthin/open surfaces 和 touching prompts 会失败，moreprompts 可减歧义。（Figs. 8/11/14, pp. 17/19/22；没有真实 userstudy、connectedness 或 manufacturingassembly 实验。）",
+    "caveatZh": "extremelythin 和 largeopensurfaces 不易转 solid，pretrainedbackbone 重建误差会继承。\n形式 partition 不保证语义/连通/非空或精确 discrete seams；0penetration 并非实验实际结果。\n渲染 image 先 GT-align 采样 prompt，不能 claim 真实 posegrounding/自动 hiddenpart 选点。\nClosedmesh 的 edgecount 检查不验证 selfintersection、jointclearance、fabrication 或 articulation。\nwholegeometrymesh 指标并非最优；point 放 contact 处可 mergeparts，多点 helps 但需用户。\n代码/weights 未发布，本项目未复现，数字为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

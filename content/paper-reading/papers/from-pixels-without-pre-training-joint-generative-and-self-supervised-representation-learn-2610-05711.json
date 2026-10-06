@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.05711",
+  "slug": "from-pixels-without-pre-training-joint-generative-and-self-supervised-representation-learn-2610-05711",
+  "title": "From Pixels, Without Pre-training: Joint Generative and Self-Supervised Representation Learning in One Model",
+  "authors": [
+    "Vicente Balmaseda",
+    "Ching-Long Lin",
+    "Tianbao Yang"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05711"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG",
+    "stat.ML"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "From Pixels, Without Pre-training",
+    "Image Generation"
+  ],
+  "abstract": "Strong image generation models are conditioned on class labels, aligned to frozen pretrained encoders, or built on separately trained autoencoders. While effective, generation then depends on supervision or pretraining: labels must be annotated, and encoders or autoencoders pretrained for the target domain. We study joint generative and self-supervised representation learning in a single model, enabling self-conditioned generation without labels or pretrained models. This is challenging because the objectives are mismatched: contrastive learning consumes clean augmented views and favors coarse, invariant semantics, while flow matching consumes noisy images and must preserve the fine detail and spatial layout that contrastive learning discards. We propose SCION (Self-conditioned Generation on Self-supervised representation), whose core is a single pixel-space encoder conditioned on the flow timestep and an embedding. For representation learning, this conditioning embedding is a learned global vector shared across images, with the encoder's [CLS] token yielding the semantic representation trained by the contrastive loss. For generative training, the conditioning embedding is the image's own [CLS] representation, while patch tokens pass through a decoder to predict the image. To sample without a reference image at inference, we jointly learn a prior over the embedding. Gradient-norm balancing and stop-gradient mechanisms enable joint optimization in one run. SCION is self-supervised and self-contained, with no labels or pretrained models. On ImageNet 256x256, with the JiT-B recipe and no representation guidance, SCION reaches 8.92 FID, surpassing class-unconditional iREPA, which aligns to pretrained DINOv2 (46.44), and RCG, which conditions on it (14.27). With JiT-L, SCION achieves 5.89 FID without guidance and 3.47 with representation guidance, outperforming RCG with the ADM recipe (6.24).",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05711v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05711v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05711v1 全文及 2026-10-06T16:31:15.854737+00:00 审阅记录；PDF 37 页，SHA-256 e070ba4d6764c5c589885185faf46d439fc87d8bb2f6ad2606460915ab37c78e，视觉核验第 1、5、8、9、10、23、31、33、34 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：exact PDF 仅给作者主页及引用 baseline 的 code 链接，未定位本文公开 implementation；不把 RCG 或 ADM evaluation code 记为 SCION code。",
+    "ideaZh": "SCION 用同一个 pixel-space encoder 同时学习 contrastive 表征和 self-conditioned flow matching，并在同一次训练中拟合 embedding prior；不依赖 labels、预训练 encoder 或 tokenizer。作者报告 ImageNet 256 的 matched-epoch FID 8.92、linear-probe 72.35%，比仅加 contrastive loss 的生成改善大得多。值得深读的是从零联合学习的架构与梯度路径，不应把单数据集结果写成通用创作模型或更省算力：多视图和额外 prior 增加计算，尚无 text editing、geometry 或高分辨率验证。",
+    "motivationZh": "contrastive 学习倾向丢弃外观细节，而生成需要细节与布局，现有系统又常依赖预训练组件。目标是从 pixels 同轮学习语义表征和无标签生成。",
+    "methodZh": "生成需要细节与空间布局，contrastive 表征却追求 augmentation invariance。SCION 先以 clean 原图和增强视图、learned null 条件读取共享 encoder 的 CLS embedding，再用 detached 原图 embedding 条件化 noisy-image encoder 和 decoder。四项 loss 包含 contrastive、image flow matching、同轮 embedding-prior flow matching，以及 conditioned-branch consistency；局部 gradient-norm ratio 平衡 contrastive 与生成。推理先采样 prior embedding，再生成 image，可加 representation CFG。",
+    "methodFlow": [
+      "clean representation pass：以 learned null conditioning 处理原图与两个增强视图，CLS token 经 projection head 接受 global contrastive objective；patch tokens 保留生成所需空间结构。",
+      "self-conditioned generation：将原图 CLS embedding stop-gradient，作为 noisy-image pass 和 decoder 的条件；pixel-space clean-image prediction 接受 flow matching。",
+      "joint prior 与一致性：对 detached、标准化 embedding 同轮训练 residual-MLP prior，并使 noisy conditioned CLS 与 clean embedding 一致。",
+      "平衡与采样：在共享 encoder 最后 MLP 估计不同 loss 的 gradient norms，更新 loss 权重；推理由 prior 产生 embedding，随后积分 image ODE，可使用 representation guidance。"
+    ],
+    "experimentsZh": "实验设置：作者主要评估 ImageNet-1K 256×256，B/16 controlled 400 epochs、ablation 200 epochs；generation 用 ADM suite 与 50K samples，representation 为 frozen linear probe 与八分类数据集 transfer mean。更大模型及其他论文 reported numbers 属 system-level 比较。本项目未复现。\n作者报告 controlled B/16 unguided FID 8.92，RCG 14.27、iREPA 46.44、JiT unconditional 55.40；SCION ImageNet probe 72.35%、transfer-8 79.89%。（Table2, p.8）\n作者报告 representation guidance 后 B/16 FID 4.20，对 RCG 5.01；class-guided JiT 3.94 另列，不能宣称所有生成设置领先。（Table4, p.9）\n作者报告 L/16 400 epochs unguided/guided FID 5.89/3.47；该 system-level 表未匹配其他模型的 architecture、compute 和 training budget。（Table3, p.8; Table10, p.25）\n作者报告 400-epoch CL-only ImageNet probe 74.15%，高于 SCION 72.35%，而 transfer-8 为 78.66% 对 79.89%；联合训练没有在所有 representation 指标上胜出。（Table8, p.23）\n比较范围：受控比较含 JiT、Dispersive、REPA/iREPA 和重实现 RCG，统一部分 recipe 与 epochs；系统表另含 latent/pixel systems。不能把 RCG generator 自身低 probe 解释为其外部 DINO features 无效，也不宜将不同 readout 的 probe 作为纯架构因果比较。\n消融与诊断：详细视图组合、fixed-weight sweep、gradient balancer、self-conditioning+prior、CBC，以及 capacity-matched CL-only checkpoints；oracle embedding 与 learned prior 的 precision/recall 诊断检查 sampling coverage。缺少训练 FLOP 与总能耗对照。",
+    "insightZh": "各组成有 JiT、SogCLR、semantic-conditioning 和 CFG 基础，实质贡献是共享 encoder 的两个 conditioning/readout modes，以及同轮 from-scratch prior 将 contrastive semantics 转换为无标签生成能力。它形成可检验的新训练组织方式，不只是单 loss 的 ImageNet leaderboard 调整；作为 representation 与生成统一研究值得保留，通用领域效果仍未验证。",
+    "whyRelevantZh": "对生成和表征联合训练、semantic conditioning 如何兼容空间细节有直接方法价值，并用同轮 prior 解除预训练依赖。其研究 transfer 可用于从零学习的视觉生成架构，但当前不支持通用图像编辑或 3D 结论。",
+    "evidenceZh": "从零训练不需要 labels 或预训练 encoder/tokenizer，但包含额外 prior 模块。（Sec.3 and Fig.2, pp.4–7; Appendix F, Tables13–14, pp.31–33；single-model 指表征来自 generator 的 encoder，不是只有一个无额外组件的 Transformer；作者报告 B/16 prior 为 99.7M parameters。）\nself-conditioning 加 prior 是生成改善的主要实验 lever。（Table5, p.9; Table7, p.23；作者报告 balanced CL rung FID 54.79，加两者 11.66，加 CBC 10.10；两者联合添加，未隔离 prior 和 conditioning 各自的因果份额。）\nmatched recipe 仍有架构、计算与 baseline training-stage 差别。（Table2 and setup, p.8; Appendix E.1, p.28; Table12, p.30；RCG 是作者重实现、generator/prior 各一半 epochs；SCION 多视图同轮 prior，REPA 的 encoder/decoder split 不同。matched epochs 不等于 matched FLOPs。）\ntransfer probe 选择最佳 test accuracy，存在 test-set model-selection 边界。（Appendix E.2, pp.30–31；ImageNet probe 用 held-out training subset 选择 regularization，但 transfer-8 明确报告 regularization sweep 的 best test accuracy。）\n花苞插值仅是 representation interpolation，不是生长预测。（Appendix G.2, pp.34–37；端点可能来自不同个体，定性图不能作为 temporal 或 physical prediction 证据。）",
+    "caveatZh": "实验局限于 ImageNet 256 的 class-unconditional sampling，尚无 text-based 或 explicit identity control。\n未评估 memorization 或 demographic fairness。\nsingle-stage 不建立相较其他系统更低 total compute/energy；新领域和下游应用仍是未来工作。\ntransfer-8 hyperparameter 用 best test accuracy，绝对 transfer 结论应保留选择偏差边界。\n额外 prior 和多视图训练没有 FLOP-matched 对照，matched epochs 的优势不能写成算力节省。\nstop-gradient 切断 conditioning 路径，但共享 weights 仍受生成梯度更新；不是两个目标完全互不影响。\nrepresentation 生成与插值是定性可控性，未验证编辑精度、几何保持或真实 dynamics。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.02091",
+  "slug": "geolatent-geometry-guided-latent-structuring-with-routed-optimization-for-3d-reasoning-2610-02091",
+  "title": "GeoLatent: Geometry-Guided Latent Structuring with Routed Optimization for 3D Reasoning",
+  "authors": [
+    "Yakun Zhu",
+    "Yi Bin",
+    "Yujuan Ding",
+    "Zheng Wang",
+    "Pengpeng Zeng",
+    "Duo Peng",
+    "Jingkuan Song",
+    "Heng Tao Shen"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02091"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "GeoLatent",
+    "VLM / MLLM"
+  ],
+  "abstract": "Despite progress in vision-language models, 3D spatial reasoning from 2D images remains challenging. Text-based methods describe intermediate geometry with discrete tokens, limiting fidelity for continuous spatial relations. Continuous latents offer richer representations, but a single latent type does not explicitly separate the cues needed across spatial tasks. Decomposed spatial latents address this by representing position, direction, and global geometry separately under geometric supervision. Yet the geometry representation can still collapse toward one dominant direction, and unrestricted attention can leave the latents underused during answer learning. We introduce GeoLatent, combining Common--Residual Geometry Alignment (CR-GEO) with routed optimization to structure the geometry states while promoting latent-mediated answer learning. CR-GEO separates shared from residual teacher geometry; routed optimization jointly trains geometry and language, temporarily directs visual answer learning through the latents, and restores full attention with geometry supervision. In controlled comparisons, CR-GEO raises geometry effective rank from 1.00 to 3.87, while blocking latent readout at the bottleneck lowers direction accuracy from 89.1% to 25.8% on 128 fixed questions. After recovery, the differentiated geometry representation and latent-mediated visual route remain available alongside direct image access. GeoLatent achieves 73.0% on SPAR-Bench and 72.1% on SPBench, outperforming previously reported methods on both.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02091v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02091v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02091v1 全文及 2026-10-06T12:53:55.229017+00:00 审阅记录；PDF 23 页，SHA-256 ac50bb8e8b628fbdeba26d624d2a840632525fa6eb7779f4477405e9cde1cbce，视觉核验第 1、4、7、8、9、16、20、22、23 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 source PDF 中未找到可确认的 public code URL；未将方法描述或预训练 teacher 链接当作本方法代码。",
+    "ideaZh": "GeoLatent 把 geometry latent 的结构、任务成绩与实际读出依赖分开审计：用 common–residual objective 缓解 coverage loss 的 rank-one collapse，再以临时 attention bottleneck 训练视觉→latent→答案路径。作者报告 matched joint control 的 effective rank 从 1 升至 3.87；但主模型平均成绩仅 62.8，对照 no-GEO 为 62.4，外部 ViewSpatial 的 person-frame 表现仍弱。89.1→25.8 的读出阻断跌幅发生在 bottleneck 阶段，recovery 后同一阻断仅跌约 0.78 个百分点，而且该干预主要依赖 POS/DIR，单独阻断 GEO 不跌分。值得深读其机制审计与控制设计，不能把结果概括为最终模型必须依赖 GEO 或全面优于原方法。",
+    "motivationZh": "几何 latent 对齐 loss 可能在 slots 退化时仍变好，答案也可能绕过 latent 读取图像。目标是同时检验几何表示不退化、可读取，以及推理是否实际使用。",
+    "methodZh": "论文沿用 GeoAnchor 的 typed latent sequence，将 POS/DIR hidden states 对齐到由单目深度估计构造的 camera-frame target，将 GEO 对齐到 VGGT 的多尺度 teacher features。它首先证明原 coverage objective 在 collapsed family 内允许所有 slots 共享 teacher mean direction，然后将公共分量与 residual 分开匹配，并加入 assignment specialization。三阶段训练先 joint alignment，再阻断问题及答案 tokens 对 image keys 的直接访问、保留 latent 对 image 的访问，最后恢复 full visual attention。全文提供同初始化 loss-only controls、latent readout edge cuts、image corruption、held-out local geometry、data overlap audit、slot-count 与第二 backbone 实验，用来区分表示不退化、可用 latent route 和最终解答实际依赖。",
+    "methodFlow": [
+      "构造 typed geometric targets：从 Depth Anything v3 的深度与标记区域构造 POS/DIR proxy targets；从 VGGT 的多尺度 pooling 提取 GEO teacher vectors。它们是预训练 teacher 推断的监督，不是独立物理真值。",
+      "拆分 common 与 residual：对 teacher/student geometry vectors 去除 teacher common direction，匹配加权 residual，并对 soft assignment 施加 conditional entropy 与 balance regularization，以防 GEO slots 退化为单一方向。",
+      "训练临时 latent 路径：joint 阶段完成语言与几何对齐；bottleneck 阶段让问题、答案 tokens 不能直接访问 image keys，仍允许 latent tokens 读图；recovery 恢复 full visual attention。",
+      "区分结构、依赖与迁移：使用同初始化目标替换、分组 readout edge cuts、latent-only 与 neither routes、图像置换/遮蔽、数据重叠与第二 backbone 检查，分别检验 geometry slots 的秩、路径可用性和最终模型的视觉依赖。"
+    ],
+    "experimentsZh": "实验设置：主 backbone 为 Qwen3-VL-2B，冻结 vision encoder、训练 merger/LLM/latent heads；作者报告训练包含 100k SPAR 与 5,928 个 SpatialLadder 单图样本。joint/bottleneck/recovery 分别为 3,311/1,000/3,311 steps，全局 batch 32；SPAR/SPBench 是同域任务，ViewSpatial 是外部评测但仍有模板与少量 scene overlap。几何 local audit 使用 held-out 248 scenes 的 504 records。另有 Qwen2.5-VL-3B 的 matched objective control。\n作者报告主模型 SPAR 73.0、SPBench 72.1、ViewSpatial 43.2，平均 62.8；此前 GeoAnchor 报告 68.4/69.7/47.0，因而外部 ViewSpatial 降 3.8 个百分点。（p. 6, Table 1）\n作者报告 matched no-GEO control 平均 62.4，与主模型 62.8 接近；另一 original-coverage direct-recovery control 达 62.9，不能宣称该配置全面优于全部控制。（pp. 7–8, control matrix）\n作者报告 bottleneck cut-all-typed-latents 为 89.06→25.78；单独 cut POS 为 53.12、DIR 85.94、POS+DIR 26.56、GEO 89.06，而 recovery cut 82.03→81.25。（pp. 7–8; pp. 16–17, typed-group intervention）\n作者报告 final teacher-forced POS error 0.338 m、DIR cosine 0.899；live subset POS 0.300 m、DIR 0.920，但只有可对齐 outputs 进入该统计。（pp. 8–9; pp. 14–16, local geometry audit）\n作者报告去除 37 个已知 overlap records 后平均 62.76→62.59；第二 backbone 的平均 58.19→58.43、外部 ViewSpatial 40.53→38.83。（pp. 19–20, overlap audit and second backbone）\n比较范围：包括 prior reported GeoAnchor 与多种 VLM，许多主表比较沿用 prior reported scores；最有说服力的是 bit-identical initialization、seed、batch order 与权重的 loss-only joint control，以及 independently recovered objective/curriculum variants。no-GEO 和 direct-recovery controls 显示顶线分数并非 GEO representation 或 bottleneck 的唯一证据。\n消融与诊断：覆盖 original coverage vs CR-GEO、无 GEO、无 bottleneck/direct recovery、K=2/4/8/16、stage-wise edge cuts、POS/DIR/GEO 分组 cut、latent-only/neither route、图像遮蔽/错配、第二 backbone 与 scene/template overlap。作者报告 slot count 与 accuracy 不单调：K=4 平均 63.6、K=8 为 62.4，分别为单独 control runs，吞吐随着 K 增大下降。",
+    "insightZh": "主要贡献是对 geometry latent collapse 与使用路径的可检验机制诊断，以及 common–residual objective 配合 routed curriculum；不是新增 3D reconstruction 输出。loss-only matched control 与阶段/typed-group 干预比单纯 leaderboard 提升更有价值。理论命题只刻画 collapsed family 的最优方向，不证明全局最优一定 collapse。最终任务增益较小且与 slot diversity 不单调，因此不能把 effective rank 或 assignment information 当作完整几何能力或必要因果使用的证明。",
+    "whyRelevantZh": "直接涉及 VLM 的视觉空间 reasoning 与 geometry-guided latent representations；高价值在于如何验证辅助 geometry 是否真正被使用，适合研究 grounding 和 structured reasoning 的训练/评估设计。论文没有直接生成 CAD、mesh 或 scene programs。",
+    "evidenceZh": "coverage loss 的 balanced assignments 不能排除所有 GEO slots 指向同一方向；common–residual objective 将共享与可区分结构分开。（pp. 3–5, Sec. 3; pp. 10–12, Appendix A, Proposition 1 and objective derivation；collapsed-family 命题与 stop-gradient assignment 的适用边界已核对；不是关于所有训练轨迹的全局结论。）\n作者报告同初始化 joint control 的 effective rank 从 1.00 升至 3.87，ViewSpatial 配对差为 +1.85 个百分点，区间 [0.35, 3.34]。（pp. 6–7, Tables 2–3; Appendix B controls；rank 为对齐后 geometry vectors 的 Gram spectrum；I_assign 是归一化 assignment information，不是 general neural mutual information。）\ntyped latent readout cut 的巨大跌幅限于 bottleneck 阶段，恢复阶段跌幅约 0.78 个百分点。（pp. 7–8, stage-wise edge intervention; pp. 16–17, Appendix B.4 typed-group localization；作者报告 bottleneck K=8 从 89.06 降至 25.78；单独阻断 GEO 为零跌幅，POS/DIR 才支撑该子集，不能归因于 CR-GEO 的必要作用。）\nrecovery 后 latent-only route 优于 neither，但 full-attention ordinary decoding 的主要路径并未被证明必须经 latent。（pp. 17–18, recovered route controls；作者报告 SPAR latent-only 52.20 vs neither 46.89，SPBench 51.27 vs 47.55，ViewSpatial 33.49 vs 31.73；forced-route mask 与标准解码不同。）\ncamera-frame geometry 的收益没有普遍迁移到 person-frame reasoning。（pp. 8–9; pp. 20–23, Appendices B.7–B.9；作者报告 ViewSpatial camera 53.20、person 28.13；第二 backbone 外部 ViewSpatial 反而下降 1.70 个百分点。）",
+    "caveatZh": "camera-frame POS/DIR vocabulary 缺少 person reference-frame rotation，外部 person-frame 任务明显弱，Appendix B.9 给出该迁移边界。\n作者区分 SPAR/SPBench 的 in-domain 设置与 ViewSpatial；未获得 SPAR 完整 scene metadata，因此 exact image/example overlap audit 不等于完整 scene-disjoint 证明。\nslot diversity 和 task accuracy 不是单调关系；第二 backbone 的 representation rank 改善伴随很小平均增益与外部任务退步。\n主实验为一个训练 seed；配对样本区间和 McNemar test 不能替代跨训练 seed 的稳定性。\n89→25 的 headline 干预主要定位到 bottleneck 阶段及 POS/DIR readout，GEO-only cut 为零；恢复 full visual attention 后 route availability 不能被写成最终模型对该 route 的必要依赖。\n深度/VGGT targets 与 hidden-vector rank 属于 proxy geometry；沒有物理真值或显式 3D reconstruction 质量验证。\nlive POS/DIR 报告排除无法对齐的输出；VEF 是 above-chance score 被图像破坏移除的比例，不是使用图像的决策比例。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

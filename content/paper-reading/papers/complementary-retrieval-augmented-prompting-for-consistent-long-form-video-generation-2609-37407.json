@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2609.37407",
+  "slug": "complementary-retrieval-augmented-prompting-for-consistent-long-form-video-generation-2609-37407",
+  "title": "Complementary Retrieval-Augmented Prompting for Consistent Long-Form Video Generation",
+  "authors": [
+    "Xianghan Wei",
+    "Xiaoda Yang",
+    "Zhi Wang",
+    "An Pan",
+    "Daoan Zhang",
+    "Huayi Zhang",
+    "Yan Zhang",
+    "Wei Xu",
+    "Zishun Liao",
+    "Jianwen Lou"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37407"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "video-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "Complementary Retrieval-Augmented Prompting for Consistent Long-Form Video Generation",
+    "Visual Design Agents",
+    "Video Generation"
+  ],
+  "abstract": "While recent video foundation models excel at generating high-quality short videos, long-form video generation remains a critical challenge, where a major bottleneck lies in conditioning independently generated shots to preserve consistent characters, scenes, and objects throughout a story. Existing training-free approaches typically condition target shots using retrieved historical visuals. However, these references often suffer from severe informational mismatch, either introducing irrelevant contextual redundancy or failing to provide the full combination of required elements for the target shot. To resolve this, we present Complementary Retrieval-Augmented Prompting, an agentic framework that strategically aggregates a compact set of mutually supportive historical references to achieve complete and targeted conditioning for long-form video generation without retraining or modifying the underlying generator. Specifically, our framework explicitly models the visual elements required by each target shot by parsing the narrative script into a text-grounded visual element registry that tracks characters, objects, scenes, and their shot-level states. A VLM-annotated keyframe library further maps these elements to past visual observations. Guided by the required elements, our agent retrieves complementary references that maximize target-element coverage while minimizing historical noise. Finally, the retrieved references, structured element states, and grounding instructions are assembled into a unified prompt for the frozen video generator. This element-aware process provides comprehensive conditioning while remaining fully interpretable. Quantitative and qualitative evaluations on multi-shot story generation demonstrate that our method consistently outperforms recent-frame, memory-based, and entity-level retrieval baselines in cross-shot consistency and text-controllability.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37407v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37407v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37407v1 全文及 2026-10-06T13:36:22.000Z 审阅记录；PDF 11 页，SHA-256 4c3218ba4ed62c38fe2d0f6bd0843e9006c0fb45f1c3fd08cde6022f753feb4b，视觉核验第 1、3、4、5、6、7、9、10 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact11 页 PDF 未给本方法 public implementation/project 或 release promise；reference 中的 baseline 仓库不等于此工作代码。",
+    "ideaZh": "把每 shot 要保留/排除/可选/新元素写成 registry，用 VLM 标注历史 keyframes，greedy 重权重选互补 reference 并逐图说明该复制与抑制什么，再调用 frozen video API。作者报告 35 个筛选 EntityBenchepisodes 的 overall.8670vsStoryMem.8425。可略读 creativeagent 的 evidencecoverage，但提升限 cross-shot 一致性，非新视频 foundation model 或全质量胜出。",
+    "motivationZh": "独立生成视频 shots 易丢失角色和场景的一致性，单个历史 reference 又常缺少所需元素；论文希望检索互补参考并排除无关内容，为下一镜头构建条件。",
+    "methodZh": "已有图像被拆成 element-levelpresence/quality/bbox 与 holisticdescription，selection 优先尚未覆盖 requiredentities 并惩罚 excludedcontent。Full 标签才进入 coveredset，partial 仍可 score；历史 shot 生成后经 HPS/CLIP 保留并 VLMannotate，形成显式 visualartifactmemoryloop。Groundedprompt 避免把 reference 整图复制进新 scene，核心是 setcoverage 和 refusage 接口。Useredit/selfreflection 是可支持属性而非独立实测模块，算法也没有 completecoverage/minimality 保证。",
+    "methodFlow": [
+      "LLM 读 currentshot 与 prefix 更新 entityregistry，赋 REF/EXC/OPT/NEWstates",
+      "HPS/adjacentframeCLIP 从 generatedshots 保留最多 6keyframes/shot",
+      "VLM 按 registry 标 presence/bbox/full-partial-weak 与 holisticdescription",
+      "Greedy 每轮重算 uncovered/covered/optional/excludedweights，选至 5referencebudget",
+      "LLM 逐 reference 生成 preserve/suppressguidance，与 script/state/globalrules 组成 multimodalprompt",
+      "FrozenSeedance2.0 生成 5sclip；continuousshot 用 videoprefix+RIFE2boundaryframes，再更新 library"
+    ],
+    "experimentsZh": "实验设置：35EntityBenchepisodes20easy/10mid/5hard，5s480P/shot。Explicitworkflows 共同 Seedance2.0，但 referenceconstruction/library 不同；trainingbaselinesnativeweights/RTXPRO6000。21crossshotmetrics 平均、uniformDoubaoSeed2.1Turbojudge，5refsmatchedbudget 自身消融；未报告 intrashotquality/promptfollowing。\n作者报告 overall.8670vsStoryMem.8425，LLMcharacter/object/scene.893/.878/.851；DINO.8249 低于 LongLive.869。（Table 1, p. 7）\n作者报告 full→noCover.8482、noPrompting.8491、CLIP.8456、noReference.5456。（Table 2, p. 7）\n比较范围：Explicitbackend 相同但 StoryMem3sink+6recent、本方法 5refs 且 cachethreshold/count/annotations 均不同；trainingbackend/数据/compute 不匹配。Filteredsubset、commercialanimationrestrictions 与 modeljudge 限制外推；nohumanquality/cost/runtime/verylonglengthstudy。\n消融与诊断：Same5refscoverage/promptingablation 较明确；CLIP 同时去 planning/coverage/grounding，noreferencebaseline 与 fullpromptbudget 不同。Keyframeannotationquality/candidatebanksize 变化未单独控制。",
+    "insightZh": "把 topKsimilarity 改为 elementcomplementarycoverage，并把同图 required/excludedcontent 的使用边界显式写进 prompt，提供可迁移的 visual creationmemory 接口。不是 newretrievaltheory 或 backbone，setselection 是 heuristic 且 VLMannotations 仍可能错。",
+    "whyRelevantZh": "直接研究 visualstorycontentcreationagent 的 required/excludedentity 状态、历史视觉 artifact 管理与 referenceusagegrounding，可迁移到多轮 design 的 evidencecomplementarity；不因使用 LLM 而进入 LLMlandmark 雷达。",
+    "evidenceZh": "Entityregistry 和 dual-levelVLMframeannotation 驱动 retrieval，再由 actualgeneratedhistory 更新 memory。（Fig. 1, Method Element Registry/Keyframe Library, pp. 3–4；Boxes 和 fidelity 是 VLMannotation，不是 verifiedgroundtruth。）\nGreedy 重权重且只有 full 算 covered，partial/weak 仍影响 score。（Algorithm 1, Fig. 2, pp. 4–5；Loop 至 K/候选耗尽，未因 fullcoverage 或 negativescore 停止，因此不是 minimal/optimal/completecoverage 保证。）\n实际只 35filteredepisodes、Seedance 动画约束与 Doubaojudge，不是 fullEntityBenchdefaultprotocol。（Experiments Benchmark/Metrics/Settings, p. 6；140→105eligible→35sample，judge 由 Gemini 替换，对全部方法统一。）\n作者报告 full.8670，StoryMem.8425；trainingmethodsDINO 更强但 backend 不同。（Table 1, Results, p. 7；18/21 为 LLMmetrics，overall 不能替代 videophysical/photorealisticquality。）\nSamebackend/5refs 消融分出 coverage 与 prompting。（Table 2, pp. 7–8; Fig. 5, p. 9；w/oCover.8482、w/oPrompting.8491；CLIPvariant 同时去多组件非单 modulecause。）",
+    "caveatZh": "Elementplanning/visualannotationerrors 与 generatorpromptadherence 有限，commercialAPI constraints。\n需更长 narrative、backendtransfer 与 interactiveproduction 验证。\nGreedy 不保证最小/completecoverage，含 negativepenalty/partialweights 也无 setcoverapproximation 保证。\nVLMpresence/qualityerrors 可沿 generatedhistory 累积，explicitstates 不自动保证 correctness。\nMemory 保留 allhistory 仍随 shots 增长，只有 inputreferences 有小 budget。\nSelfreflection 和 humaneditability 为接口潜能，没有其 independentexperiment；数字仅作者报告，本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

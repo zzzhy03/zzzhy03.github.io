@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.38689",
+  "slug": "epic-epipolar-consistent-360-immersive-stereo-video-generation-2609-38689",
+  "title": "EPIC: Epipolar-Consistent 360° Immersive Stereo Video Generation",
+  "authors": [
+    "Debabrata Mandal",
+    "Dongdong Fu",
+    "Jonathon Miller",
+    "William Villareal",
+    "Xi Peng",
+    "Praneeth Chakravarthula"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38689"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.HC"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "EPIC",
+    "Video Generation"
+  ],
+  "abstract": "Immersive displays can enable rich and diverse virtual experiences. Manually authoring every possible experience to realize this potential, however, is prohibitively expensive, difficult to scale, and impractical. Generative AI models could remove this bottleneck, but today's models are built for conventional displays and cannot generate the high-resolution, stereoscopic $360^\\circ$ content required for immersive viewing. Further, temporal and stereo inconsistencies that may be tolerable on conventional displays can become highly disruptive when viewed through an immersive headset. Here, we address this gap with a zero-shot generative pipeline that extends existing video diffusion models into 4K stereoscopic $360^\\circ$ videos. Inspired from binocular vision and depth perception, we develop an epipolar-aware $360^\\circ$ image matching metric that captures the temporal and stereo geometric inconsistencies across views. We then use this metric as a preference signal for direct preference optimization with limited training data. Our work enables $360^\\circ$ stereo video generation and provides a scalable path for bringing generative content to immersive displays, allowing diverse mixed reality experiences on demand.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38689v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38689v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38689v1 全文及 2026-10-06T11:40:21.130297+00:00 审阅记录；PDF 11 页，SHA-256 5f9f7fb2f77959552b80af8cbb5c0437b922abfe712aa33e3e6ceb5df030d757，视觉核验第 1、4、5、7、10 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 11 页 PDF 未给本论文 code/project release URL；相关 Wan/PanoWan/NAFSSR 工具不等同 EPIC 代码。",
+    "ideaZh": "EPIC 以 panoramic depth warp 生成右 eye 并 inpaint disocclusion，再用球面 epipolar PEGS 排序训练 LoRA，最终 ODS 重投影/NAFSSR 到 4K。作者报告 stereo error3.121→2.640mrad、较 DissolveStereo gross mismatches 少，但 combined stereo-temporal axis 反而 2.958→4.375。它扩展沉浸式 visual creation；完整方法含训练，4K 来自后处理，metric 忽略 moving tracks，不保证整场景时空或观看舒适。",
+    "motivationZh": "单目 panorama 生成器难以保证双眼视差与时间上的一致性。目标是结合 depth warping 和球面几何评价，改善沉浸式 stereo video 的明显对应错误。",
+    "methodZh": "单目 panorama generator 无法自动保证左右 eye 与时间的几何一致。EPIC 用 Wan2.1-1.3B/PanoWan 先生成 448×896 左 view，DAP depth 平滑后球面 warp，mask holes 由 video model 补；EDM 对应、CoTracker 剔除非刚性 tracks 和 pose 估计形成 Tangent Sampson angular PEGS，检查 parallax/valid matches 后为同条件 pair 排序。Flow-DPO 只训练附加 LoRA，最后从 depth 重渲染 ODS 并 cube-face stereo SR。实验支持 stereo 大错 tail 减少，未实现所有 view 对应共同 3Dscene，未验证 native4K 模型或 human discomfort 降低。",
+    "methodFlow": [
+      "text 或 360image 条件下，frozen Wan/PanoWan 生成低 resolution monocular panorama video",
+      "估计/平滑 panoramic depth，按 rig baseline0.05 在 sphere warp 右 eye 并标 disocclusion",
+      "video diffusion 仅在 holes masked sampling，保留 warped 区域形成 training-free stereo 初稿",
+      "ERP matcher 找对应，track/filter 动点，估计 scale-free essential geometry，计算 sphere Tangent Sampson PEGS 并排除无效 pairs",
+      "同 prompt 多 samples 按 PEGS error 排名，差≥5mrad 才形成 preference pairs，rank64 LoRA 做 Flow-DPO 并 early stop",
+      "由左 view depth/右 viewmatches 校 scale，逐 longitude 变 eye offset 重渲染 ODS，cube faces 双 eye NAFSSR 上采样到 4K"
+    ],
+    "experimentsZh": "实验设置：作者报告 frozen Wan2.1-1.3B+PanoWan adapter，448×896/81frames/50steps/CFG5，DAP depth/rig0.05。Stage1/2 各 500videos 评价，额外 500 初稿用于 preference refinement；rank64 alpha128 LoRA，lr5e-6、batch4，heldout PE​​GS 每 25steps earlystop。50clip DissolveStereo 及 10clip OmniRoam pose-shift 对照。\n作者报告 stereo PE​​GS3.121→2.640mrad、temporal1.494→1.263；diagonal2.958→4.375 恶化。（Table 3, p. 7）\n作者报告 DissolveStereo≥20mrad mismatches8.2%，EPIC2.6%，p95 分别 15.4/8.4mrad。（Table 4, p. 7）\n作者报告 10clip pose-shift inconsistent46.0%对 EPIC1.2%，disparity46.0 对 21.5mrad；不同 disparity 需保留比较边界。（Table 5, p. 7）\n作者报告 PEGS-DPO tail 上界 bin clips35→11、median 约 3.10→2.64mrad；earlystop 而非收敛后 checkpoint。（Sec. 5.6, p. 7; Fig. 16, p. 10）\n比较范围：对 DissolveStereo 与 OmniRoam 适配同 left source，及 MEt3R preference/score 对照；没有 native immersive stereo ground truth、广泛模型 family、human comfort 或 4Kdetail 质量定量对照。MEt3R unitless、PEGS angular 单位不能互相比绝对数字；对无效 posepairs 的 coverage 需一并考虑。\n消融与诊断：以两种 metric 做同类 DPO 支持 geometry reward 价值；ODS scanline 和 injected mismatch 测试说明部分几何性质。未分离 depth/warping/LoRA 训练/SR 全部组件，未证明移除 motion 后仍检验 moving 主体一致性。",
+    "insightZh": "实质贡献是把 360 panorama、stereo adaptation、spherical geometric preference 和 ODS viewing correction 整合到生成 pipeline。Tangent Sampson residual、depth warp、DPO、ODS、stereo SR 均继承基础方法，创新是 geometry score 及约束应用；Stage1 training-free，Stage2 LoRA trained，不把整体称为完全 zero-shot。",
+    "whyRelevantZh": "沉浸式 360 stereo visual creation 需要跨 view 几何一致，spherical geometric verifier 作为非微分 preference 信号可启发 3D/4D 生成 reward；输出仍是双 eyevideo，不是显式 editable3Dasset，设计任务迁移未测。",
+    "evidenceZh": "三 stage 分别 training-free warp/inpaint、PEGS-LoRA DPO 和 ODS/SR，原视频输出 448×896/81frames。（Secs. 4.1–4.4, Fig. 4, pp. 4–6; Sec. 5.1, p. 6；overview 已视觉核验，native 低 res 与最终 4Kpostprocessing 分开。）\nPEGS 从 ERP correspondences 估 essential pose 并剔除不同于 background 的 moving tracks，dynamic content 本身不被 geometry score 覆盖。（Sec. 4.2, Fig. 6, p. 5; conclusion, p. 7；metric 图和 limitation 已视觉核验，pose-free 是无需 GT pose，不是无需估计 pose。）\n作者报告 stereo/angular error 改善，但 diagonal stereo+time 由 2.958 增加到 4.375mrad。（Table 3, p. 7；主表已视觉核验，不能把 stereo 改善推成全部 spatiotemporal 一致。）\n作者报告 50clips matched left/prompt/seed 的 inconsistent correspondences8.2%→2.6%，46/50clips 更好。（Table 4, Sec. 5.4, p. 7；作者报告未独立复现，comparison 限制在 right-view synthesis。）\nODS 沿一 scanline vertical disparity4.73px→0.04px，是几何指标而非人类 comfort 试验。（Sec. 5.5, p. 7; Fig. 15, p. 10；ODS plot 已视觉核验，没有补写 headset user study。）",
+    "caveatZh": "PEGS 假设 rigid scene，仅通过丢弃 moving content 处理动态。\n共同 stereo/temporal diagonal axis 仍未改善，下一步需所有 views 约束同一 scene。\n无 parallax/staticcamera/too fewmatches 等条件失败时不返回 score。\n最大 4K 由 ODS 与 stereo SR 后处理，不能声称 foundation generator 本身以 4K 训练或 native 生成。\noverall pipeline 有 DPO training，training-free 只首 stage；无 GT immersive 数据不等于无训练。\ninvalidpairs 被丢弃和 moving tracks 排除可隐藏困难区域，PEGS 改善不等同完整 scene 几何正确。\nTable5 两方法 disparity 明显不同，不可把 camera baseline、depth 分布和生成 quality 所有差异视为已控制。\nTable4 p95 pooling 方式/不一致比例细节未充分说明，保留作者报告、不重构未给统计。\n没有人类 headset comfort 或临床应用验证，主文应用动机不变为实验结论。\n仅 exact PDF 作者报告，未复现或运行。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

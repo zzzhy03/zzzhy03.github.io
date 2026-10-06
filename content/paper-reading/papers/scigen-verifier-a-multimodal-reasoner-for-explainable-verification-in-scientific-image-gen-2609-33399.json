@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2609.33399",
+  "slug": "scigen-verifier-a-multimodal-reasoner-for-explainable-verification-in-scientific-image-gen-2609-33399",
+  "title": "SciGen-Verifier: A Multimodal Reasoner for Explainable Verification in Scientific Image Generation",
+  "authors": [
+    "Jiali Chen",
+    "Zhengteng Lin",
+    "Zuqi Wang",
+    "Shirong Lin",
+    "Xi Yu",
+    "Xusen Hei",
+    "DingBa Fu",
+    "Jiayuan Xie",
+    "Yi Cai"
+  ],
+  "publishedAt": "2026-09-27",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.33399"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "SciGen-Verifier",
+    "VLM / MLLM",
+    "Visual Design Agents"
+  ],
+  "abstract": "In realistic education, a solution is often expressed not only in words but in a drawing--a circuit, a geometric construction, a function plot--and a teacher must grade the drawing as carefully as the text. Recent advances in unified multimodal models have enabled scientific image generation, yet verifying the correctness of these specialized visual outputs remains a critical bottleneck: errors often arise from intricate domain knowledge, structural reasoning, and multi-step instruction rather than surface-level artifacts. Existing verifiers mainly target natural images and compress judgement into scalar scores, leaving scientific coverage and explainable feedback for error correction underexplored. To bridge this gap, we make three main contributions. (1) We construct SciGen-Verify, a benchmark dedicated to explainable verification of scientific image generation, spanning instruction following, multidisciplinary reasoning, and world knowledge domains. It contains a three-tier hierarchical protocol over the binary judgement, supporting explanation, and corrective editing instruction. (2) We develop SciGen-Verifier, a reasoning-driven multimodal verifier trained via cold-start supervised fine-tuning followed by a curriculum-based two-stage reinforcement learning pipeline. The rubric-guided process rewards first strengthen scientific reasoning exploration and outcome rewards subsequently align output with ground-truth annotation. (3) On SciGen-Verify, SciGen-Verifier achieves competitive performance against much larger proprietary models. It further serves as a practical online critic for iterative image rectification.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.33399v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.33399v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.33399v2 全文及 2026-10-06T15:58:37.675176+00:00 审阅记录；PDF 42 页，SHA-256 3cc815cbc18b104bdb1cfdbdcaddf21ed998bd0c4984f6793c2fbdf57967e35a，视觉核验第 1、4、5、7、8、9、15、19、20、21、23、33、35、38、42 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：检查 exact PDF 全部 text 和 URI annotations，未给 SciGen 项目 public implementation URL；p.21 的 HF 链接均为 baseline。训练基于 ms-swift fork 不等于该 fork 已公开，未提供 Code link。",
+    "ideaZh": "SciGen-Verifier 把 scientific diagrams 的判断、解释与可执行 edit instructions 分开训练，以 rubric-coverage RL 后接 outcome RL，并作为图像编辑循环的 critic。作者报告宏平均 judgement86.28%、negative-sample conditional edit57.42%；最强 baseline 分别 86.03/64.75%，它并非全面最优。价值在面向结构约束的 feedback interface 与纠错流程；GenExam relaxed score58.7→63.5 仍低于较大 critic，且 CoT 消融同时移除了 process reward。",
+    "motivationZh": "科学图像即使外观合理，也可能违反关系或知识约束，仅判断对错无法指导修复；需要指出具体错误、解释依据，并提供图像编辑循环能执行的修改建议。",
+    "methodZh": "构造三类 scientific verification 样本：instruction-following、reasoning、world-knowledge，以代码/图像编辑或 text perturbations 制造错误，AI 初标后每例两名 domain experts 复核。Qwen3-VL-8B-Instruct 先用 48,311 tagged instances SFT，R1 用 partially-successful queries 和 generated rubrics 覆盖率鼓励证据探索，R2 用 ground-truth judge/explanation/edit rewards 细化输出。在线 workflow 按 critic 结果停止、local edit 或 regenerate，最多十步，回传修改后的 image 重新检查。",
+    "methodFlow": [
+      "构造结构化验证与修订标注：以 source-sample 分割原始 diagram 与全部 perturbed variants，形成 judgement、explanation、edit 三字段；错误覆盖缺失组件、关系、数值与 knowledge constraints。",
+      "冷启动 verifier：对 8B VLM 做 tagged-response SFT，让模型同时输出 reasoning 与最终反馈，source-sample 规则也用于 RL 和 rubric training。",
+      "先探索再对齐反馈：R1 将 binary correctness 与 rubric checkpoint coverage 动态混合；R2 以 LLM judges 评 explanation/edit 语义并保留 judgement 奖励，均用 GRPO。",
+      "驱动 diagram 编辑循环：Critic 为 false 时，三项以上 corrections 或 global 关键词触发 regeneration，其余进入 local image editing；修改图再给 critic，true 早停或十步截止。"
+    ],
+    "experimentsZh": "实验设置：SciGen-Verify 共 1,350 样本，406 instruction/287 reasoning/657 knowledge；每原 source 与全部 variants 只在 train 或 test 其中之一。SFT48,311，R1 从八 rollouts 部分成功者选 15Kqueries，R2 为 685 完全标注 examples。15baselines 同输出 prompt，two judges 在 300 样本/三 experts 校准，另有 third-party edit judge。Supplement 用 Wan2.6-Image 在 GenExam 做最多十步 critic-loop。\n作者报告三 domain 宏平均 Acc_a86.28、Acc_e81.79、Acc_i57.42；Qwen3.8-Max 为 86.03/84.46/64.75。0.25 pp judgement 优势没有 uncertainty；feedback 两项反而较低。Knowledge-domain94.21 judgement 是其最强部分。（PDF p.7, Table 1）\n作者报告 SFT80.09/75.32/46.72，SFT+R1+R2 为 86.28/81.79/57.42；R2-only edit52.78、R1-only50.47。CoT-free+RL edit37.9 相对 full57.4，但同时移除 rubric signal，不是单变量 CoT 因果证明。（PDF pp.8–9, Table 2, Fig.3）\n作者报告 300 样本中 explanation/edit judges 与 human κ0.79/0.76，IAA 0.83；一致性 reference 取三 experts unanimous cases，复杂有争议样本的 judge 可靠性仍需谨慎。（PDF p.15, Table 3）\n作者报告 GenExam relaxed score 在十步下 58.7→63.5，第二步 57.7 低于初始；Gemini critic64.9、Qwen3.8-Max64.4。没有直接科学正确率、成本或独立人工最终验收，不能说整个 loop 已可靠。（PDF pp.21–23, Table 8 and Appendix D.2）\n作者报告 rubric generator RR72.94、non-hallucination76.11、structuralF1 73.88；仍会漏规则/产生不匹配 checking points，不应称 process reward 为完美 unit tests。（PDF pp.17–18, Table 6）\n比较范围：包含相近大小 thinking VLM、235B/397B/open 与多个 proprietary models 和 generic OmniVerifier。共同 outputprompt 有助比较，但 API reasoning budgets、train-time domain exposure 与资源不相等。训练与 benchmark 上游同源虽严格 source-sample 分割，仍不证明跨领域或任意真实 generator 错误泛化。TTS 各 critic 初始 scores 不同，是否严格同 seed/initialimage 未充分说明。\n消融与诊断：SFT/R1/R2 及 CoT 组合有表，two-stage 优于单 stage；缺少 equal training steps/compute 和单独 coverage-versus-CoT 消融。Rubric RL 由同 verifier 评价 positive/negative checking points，存在共同盲区/feedback 循环的可能。",
+    "insightZh": "主要贡献是 scientific-structure verifier、三层 feedback benchmark 和面向 image rectification 的训练/应用配方，非新 foundation architecture。它与 generic aesthetic reward 的区别是检查具体科学/几何 constraints 并给操作指令，对 visual creation workflow 有直接迁移意义；但 process-coverage 不是 verified reasoning truth，loop 也未保证严格保留未修改结构。",
+    "whyRelevantZh": "Diagram 约束的可解释检查、具体修改 handles 和 image→critique→edit→reverify 流程，直接服务 scientific visual artifact 创建，符合 VLM 对视觉创作直接迁移的较低门槛。输出虽涉及 scientific line diagrams，未输出 editable primitives，不能归为 SVG/2D-design 或 fabrication。",
+    "evidenceZh": "Benchmark 将 judgement、explanation 和 negative-only editing success 以 cascading metrics 分别评价。（PDF pp.5–8, Sec.3–4, Table 1; pp.14–15, Appendix A.3；完整阅读 exact PDF 并实际看图表；Acc_i 的分母仅 negative samples，不能和全样本 Acc_a 直接当同一 success 率相减。）\nCoT/RL 和 stage comparisons 支持该配方，但不独立证明 CoT 是必要结构前提。（PDF pp.8–9, Table 2, Fig.3 and footnote; pp.18–20, training/reward details；作者报告；no-CoT prompt 同时移除 rubric-guided reward，两 stage 也缺少完整 matched-compute 说明。）\n有真实 generator-guided edit/regeneration 应用，迭代可提高 relaxed GenExam score 但不单调且不全面优于 frontier critics。（PDF pp.9–10, Fig.4; pp.21–23, Table 8, Appendix D.2；作者报告；不是 SciGen-Verify hierarchical accuracy，也不是最终科学正确率或本项目复现。）",
+    "caveatZh": "Correction instruction 比判断难，best 反馈仍有限；rubric coverage 是 proxy，可能奖励部分相关或不完整 traces。\nTTS relaxed score 不单调，也不能直接与 hierarchical metrics 比较。\n没有专门 limitations section，训练超参、总 compute、decoder budgets 与部分 coverage-checker 设置不充分，尚无独立复现。\nSynthetic perturbations 与 text-image mismatches 并不完全代表真实生成器错误分布；过滤低视觉质量也限制 worst-case 泛化。\nAcc_i 是 negative-only 并先经过 correct judgement/explanation gate，不能视为执行 edit 后真正科学正确的概率。\nα_max>β_max 并不保证任意 mastery m 下α_t>β_t；附录关于 aux reward 绝不 dominate 的措辞不能当数学保证。\nNo-CoT ablation 移除 rubric reward，不能支持 CoT 为不可替代前提；matched-compute 与重复 seed 未充分报告。\np.35 例图未含题干文字，SciGen 将题意视作 implied 而 baseline 要求补题干，说明 instruction interpretation 可能有歧义；不据此推断全部标注错误。\n只有 raster diagram 反馈，未自动验证 TikZ/SVG program correctness、物理 simulation 或 editable geometric constraints；本文没有运行生成/编辑。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

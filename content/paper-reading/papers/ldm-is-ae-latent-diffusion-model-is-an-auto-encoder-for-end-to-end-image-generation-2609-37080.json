@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2609.37080",
+  "slug": "ldm-is-ae-latent-diffusion-model-is-an-auto-encoder-for-end-to-end-image-generation-2609-37080",
+  "title": "LDM-is-AE: Latent Diffusion Model is an Auto-Encoder for End-to-End Image Generation",
+  "authors": [
+    "Zhengqiang Zhang",
+    "Lingchen Sun",
+    "Rongyuan Wu",
+    "Qiaosi Yi",
+    "Xiangtao Kong",
+    "Chaodong Xiao",
+    "Lei Zhang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37080"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "LDM-is-AE",
+    "Image Generation",
+    "LDM",
+    "AE"
+  ],
+  "abstract": "Latent Diffusion Models (LDMs) typically adopt a two-stage pipeline: an auto-encoder (AE) is first pre-trained to define a latent space, then a diffusion model is trained to perform denoising within it. Such a two-stage design introduces a representation mismatch, as the latent space is optimized for reconstruction rather than adapting the denoising dynamics. We reveal that the LDM itself is an AE, and consequently present LDM-is-AE, an end-to-end one-stage LDM training framework that eliminates the need for a separately trained tokenizer. Our key observation is that the LDM backbone actually performs a latent-to-feature-to-latent transformation at each denoising step, which can be interpreted as an internal decoding--encoding process. Leveraging this structure, we split the DiT backbone into two reciprocal components, DiT-E (i.e., DiT Encoding) and DiT-D (i.e., DiT Decoding), and impose image-space supervision on the intermediate features across all timesteps. Our model encourages the internal representation to align with the image domain throughout denoising, thereby establishing an explicit latent-to-image-to-latent path. At the zero-noise timestep, our model further performs an image-to-latent-to-image mapping, corresponding to an auto-encoding process. As a result, LDM-is-AE jointly learns latent representations and denoising dynamics in an end-to-end manner, yielding a diffusion-native latent space tailored to the generation process. Experiments demonstrate that LDM-is-AE exhibits highly competitive generation performance, achieving an FID of 1.80 and 1.90 on 256x256 and 512x512 class-conditional image generation, respectively.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37080v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37080v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/PolyU-VCLab/LDMisAE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37080v1 全文及 2026-10-06T12:11:17.558391+00:00 审阅记录；PDF 17 页，SHA-256 05012aadff972352d8d55671942bf8b76c2eea3c7e8460604d24648c6c4c7d4c，视觉核验第 1、4、6、7、9、10、14、16、17 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页 URL 已访问确认 public ldm_is_ae/train.py、denoiser.py 和 training/inference scripts；weights 仅 README 声明未逐下载验证。",
+    "ideaZh": "LDM-is-AE 将 DiT 切成 30block decoder+2block encoder，在中间 pixel-unshuffle image 接口加 MSE/LPIPS，用 t³混 aux features，共享模型学 latent 和 flow。作者报告 ImageNet256 FID1.80、5121.90，免单独预训 VAE 且 generation/reconstruction 共用模块。值得精读 representation 训练路线；encoder 只高 t 更新并 200epoch 后冻结，T2I 另接 Qwen/BLIP3o 两步适配，AE 解释是训练构造而非任意 LDM 天然可逆定理。",
+    "motivationZh": "固定 autoencoder latent 限制了生成器与图像空间之间的联合学习。目标是让 latent interface 和生成过程共同优化，并兼顾编码与重建。",
+    "methodZh": "常规 LDM 用固定 AE latent，此法把 DiT-D 的 intermediatefeature 明确拉到 image-domain，再经 DiT-E residual correction 回 latent；clean-endpoint 可将两模块反向顺序用于 image encoding/reconstruction。Training image encoding no_grad，latent flow 与 image supervision 一起更新模型，低 noise 以 imagefeature、高 noise 以 auxfeature 保 capacity。实验含 ImageNet 双 resolution、AE 指标、配方消融与初步 T2I。贡献是统一可学习 latent interface 和 generator，不是新的强 semantic foundation encoder 或保证任意 latent 结构正确。",
+    "methodFlow": [
+      "pixelunshuffle 原 image 到 16patch interface，DiT-E 在 t1 no_grad 编码为 currentcleanlatent",
+      "Gaussian 与 cleanlatent 按 t 插值，DiT-D 输出 imagealignedF 及 auxF'",
+      "以 weightedimageMSE/LPIPS 监督 F，t³F+(1-t³)F'送回 DiT-E",
+      "DiT-E 用 interpolatedchannelbase+residual 预测 cleanlatent，latentvloss 与 image loss 联合优化",
+      "encoder 低 lr 只在 t≥.5 更新，200epoch 后 freeze；推理 ODE 采样 latent 后 DiT-D 在 cleanendpoint 解码",
+      "T2I 由 512classmodel 引入 Qwen textencoder，以 BLIP3o 先适配 textbranch 再 fullfinetune"
+    ],
+    "experimentsZh": "实验设置：作者报告 JiTH961M ImageNet300epochs/globalbatch1024/AdamW/BF16/EMA；50kbalancedimages、50stepHeun、CFG2.2 interval[.1,1]。ablationJiTB100/200epochs10k samples，AEval50k、latentdrift100images。512T2I 从 classmodel 到 Qwen1.7B+BLIP3o 约 100kiteration。\n作者报告 256FID1.80，JiTH1.86/PixelFlow1.98，但 REPAEtune1.12/RAE1.13/UNITE1.75 更好；IS314 最高所列。（Table1 p. 7）\n作者报告 512FID1.90 对 JiTH1.94，IS320 对 309；无 seed/CI 不能认证小差显著。（Table2 p. 8）\n作者报告 JiTBnoCFG FID30.27，LPIPS27.57，LDMisAE25.95；SiTB45.19→41.68 但 sFID26.16→27.34 退化。（Table4 p. 10）\n作者报告 generator-onlyforwardFLOPs7.02×10^19 对 JiTH14.0×10^19；不是 wallclock/训练总 FLOPs 或 AE/VFM 全成本测量。（Table1 footnote p. 7）\n比较范围：覆盖 two/one-stage/pixel/jointlatent 代表及 LPIPS-only 同 backbone 控制，支持 pipeline 贡献；参数规模、epochs、prior 和 sampler 差异限制跨表归因，没有 matchedtotalcompute/多 seed/文本质量广泛 bench。LPIPS 也依赖预训 perceptualnetwork，不能写绝对没有 externalvisionknowledge。\n消融与诊断：latentwidth/auxmixk/depthsplit/LPIPS/weightstrength 明确，128/k3/2E10D 较好；lrfreeze/no_gradcleanencoder 和 conditionalAEroundtrip 同 classinput 未分离，claim 可逆性不能只凭结构。",
+    "insightZh": "把 image 监督置于 denoiser 内部并复用后两 blocks 作 latent encoder，结合 noise-awareauxmix 与 stopgradient，使 representation-learning 成为 generator 路径，有超出小幅 architecturetweak 的训练范式价值。latent-feature-latent 形状本身不证明 autoencoder/可逆，需要所提出 alignment 和实际 reconstruction；已有 UNITE/DSD/REPA-E 也 jointlearn，不能宣称第一个一阶段方法。",
+    "whyRelevantZh": "representation 与 denoising 联合的生成范式可影响 visual creation 基础模型，值得理解可显式操作 imageintermediate 接口；structureddesign/3Dtransfer 仍需单独研究，不额外分类。",
+    "evidenceZh": "imageencodingno_grad、denoisingDiTD→mixedimagefeatures→DiTE，twoloss 联合，不是普通 AE 端到端 reconstructiongrad。（Secs. 3.2–3.3, pp. 5–6; Fig2 p. 4/Algorithm1 p. 6；method/algorithm 实际视觉核验，区分 cleanencoding 与 sharedDiTE 训练梯度。）\nAppendix 规定 30D/2E、128latentchannels，encoderlr 比 decoder 低 1000×、t≥.5 更新、epoch200freeze。（Appendix A, p. 14；jointlatent evolution 不是全 300epochs 无约束持续变化。）\n作者报告 ImageNet256 FID1.80/IS314、5121.90/320，256 强 two-stageFID 更低且 UNITE1.75。（Table1 p. 7/Table2 p. 8；主表已视觉核验，不声称所有 baselines 最佳 FID。）\n作者报告 AEPSNR27.57/gFID1.821，但 rFID0.7879 高于 VAVAE0.2650。（Table3/Fig4, p. 9; Fig7 p. 16；AE 结果并非全部 fidelitymetrics 更好，latentvisual 只是 channelinterpolation。）\n作者报告 T2I GenEval.83 对 DeCo.86，position.62 对.80、colorattrib.74 对.79；T2I 额外 Qwen/BLIP3o。（Table5/Appendix B, p. 14；T2I 表已视觉核验，区分 primaryImageNet 无 externalDINO 与新 textprior。）\n作者承认 residuallatentprediction 可能限制 latent 探索，control/editing 只提 futureapplication。（Conclusion/Limitations, p. 10；explicitlimitation 页已视觉核验，无未测 editing 功能保证。）",
+    "caveatZh": "residuallatentprediction 可限制 latent 探索，未来优化与 imagealignedinterfaces 进一步研究。\nlatent-feature-latent 形状不是数学 autoencoder 定理；constructedimagealignment/实际 reconstruction 支撑的是本方法。\ncleanencoder 初始 no_grad、低 lr+epoch200freeze 是重要稳定化，不能称全训练 encoder 自由 endtoend。\nTable1 仅 generatorforward 成本，不含 backward/预训 prior，更不等于直接 2×walltime。\nLPIPS 预训 VGG 仍外部知识，T2I 显式 Qwen 和 BLIP3o 两 phase 不能沿用 ImageNet 纯 generator 无 dataaux 说法。\nhigherPSNR 但 rFID 较差，gFID 与 FID 接近不是 semantic 优越或 trainingmemorization 排除证据。\n没有 controlledediting/CAD/SVG 迁移试验，文中应用潜力不变实验结论。\n所有数为 exact17 页作者报告，未复现、未运行 repo。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

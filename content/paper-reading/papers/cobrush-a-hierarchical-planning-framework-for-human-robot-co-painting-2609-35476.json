@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.35476",
+  "slug": "cobrush-a-hierarchical-planning-framework-for-human-robot-co-painting-2609-35476",
+  "title": "CoBrush: A Hierarchical Planning Framework for Human-Robot Co-Painting",
+  "authors": [
+    "Dantong Qin",
+    "Yike Guo",
+    "Qinlin Liu",
+    "Alessandro Bozzon",
+    "Pan Wang"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.35476"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "CoBrush",
+    "Visual Design Agents",
+    "2D Design"
+  ],
+  "abstract": "Embodied co-painting requires a robot to repeatedly update a shared physical canvas while human intent evolves over interaction. Existing reference-driven painters or reactive assistants are typically optimized for single-shot rendering or sketch completion, limiting their ability to sustain coherent multi-round collaboration or to construct complex, content-rich scenes over time. We present CoBrush, a hierarchical framework that formulates multi-round co-painting as a coordinated semantic, spatial, and execution process. By separating high-level intent inference from spatial grounding and stroke-level control, the system supports progressive scene development on real acrylic canvases. We evaluate the framework through real human-robot painting sessions, stress tests, and user studies. Compared to single-turn baselines, our approach achieves stronger semantic alignment, more stable spatial progression, and higher perceived plausibility of robot actions. These results demonstrate that structured multi-stage reasoning improves the coherence and robustness of interactive painting and supports the progressive development of content-rich physical artworks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.35476v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.35476v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.35476v2 全文及 2026-10-06T12:46:49.000Z 审阅记录；PDF 8 页，SHA-256 28fa37dc3a963c9a0fed91b864c753bcca2c165c0b8fa57c4037d1d17bfd2753，视觉核验第 1、3、4、5、6、7 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文未找到本方法 public code URL；StrokeDiff 等现有组件链接不等于 CoBrush 实现。",
+    "ideaZh": "CoBrush 用 GPT-4o 规划下一笔语义与粗区域，再以生成参考图、DINOv2 weak-label ridge probe 和 attention/segmentation mask 定位，交给 StrokeDiff 生成 Bézier strokes 并由机器人执行。真实人机多轮绘画使它值得略读，但 11 个完成作品的 P-IoU 仅 0.376，且单轮物理执行 22–63 分钟；基线的预算与人类反馈不匹配。",
+    "motivationZh": "人机轮流绘画要求机器人理解不断变化的画布，并把语义目标落到可执行笔画；论文希望以分层规划和参考图定位连接视觉意图与物理绘画。",
+    "methodZh": "方法把 evolving canvas 的观察、语义规划、空间定位、参考图合成和物理笔画执行串成闭环。Human 给初始主题并与机器人轮流绘画；语义目标与 10×10 粗网格来自 frozen GPT-4o，局部区域由弱标签 ridge probe 加 attention/mask union 细化。贡献主要是模块组织和 reference-conditioned spatial refinement，没有训练新 foundation model。真实 acrylic painting 验证了可运行性，但有限、筛选后的长时会话和模型评分不能证明通用艺术质量。",
+    "methodFlow": [
+      "观察当前画布与人类初始主题，GPT-4o 预测语义目标和粗网格区域并自评",
+      "GPT-Image-1 从画布摘要与目标合成 reference image",
+      "在 reference 的 DINOv2 features 上以粗框内/周边作为 noisy positive/negative labels，ridge probe 估计 score map",
+      "以区域面积惩罚选择矩形，合并 LLaVA attention 与 GroundedSAM mask 得到 ROI",
+      "StrokeDiff 将局部参考分解成 Bézier control points/RGB，量化到 21 色 palette 并裁去重复笔画",
+      "camera–canvas calibration 转 3D waypoints；机器人清洗、蘸色、执行，观察更新画布再规划"
+    ],
+    "experimentsZh": "实验设置：7DoF Franka 与真实 acrylic canvas；14 participants、11 完成作品。CLIPDraw/FRIDA text-mode first-round outputs、去多轮版本与完整 pipeline 比较；CLIP/GPT-4.1/LLaVA-OV 模型评分、人类指定 bbox IoU 和 posterior ratings。另 18 states/6participants stress test。\n作者报告 P-IoU 0.376，PSA 0.675，target/bbox posterior ratings 7.5/8.1。（Table I, p. 5）\n作者报告满意度 7.11±1.17，但 turn flow 与 creative contribution 都仅 5.56，且物理执行 22–63 分钟/轮。（Sec. IV-E/F, p. 7）\n比较范围：基线只在 first-round canvas 上 single-shot，而完整方法有重复 human input、更多时间和信息。不存在匹配计算/人工预算的完整闭环比较。模型 scorer 和 posterior preference 也不等于物理画作 fidelity。\n消融与诊断：去 multi-turn 实验同时去 semantic/spatial planning；region refinement 主要为 Fig.6 质性对照，没有独立 ridge/area-penalty/mask union 数量消融。",
+    "insightZh": "Hierarchical semantic/spatial planning 与弱标签 probe 的组合把 VLM 的粗定位转成可执行局部绘画。VLM、image synthesis、masking 和 stroke generation 都是已有模块；reference 上的 probe 不是对真实画布目标位置的监督学习，定量消融没有隔离其贡献。",
+    "whyRelevantZh": "有真正 evolving visual artifact 的观察—规划—生成—执行闭环，且输出显式 Bézier strokes，可借鉴 visual design agents 和局部 2D 设计编辑。核心是系统组合而非新 MLLM；没有 fabrication-ready 输出。",
+    "evidenceZh": "语义规划、reference synthesis、ridge probe 与 ROI union 再接 Bézier 执行。（Sec. III-A–D, Fig. 2, pp. 3–4；DINOv2 features 提取自生成 reference，不应写成来自真实画布的几何 truth。）\n作者报告 14 participants 中 11 完成作品，2 因时间未完成、1 系统失败。（Sec. IV-A, p. 5；存在完成样本选择，典型 4–5 轮、4–5 小时。）\n作者报告 full pipeline P-IoU 0.376、OSA 70.75/63.75，而 baselines 为 first-round single-shot。（Table I, Sec. IV-B/C, pp. 5–6；Full pipeline 有多轮人类反馈；w/o multi-turn 同时移除 semantic planning/region prediction，不能归因单模块。）\nStress test 是 18 canvas states、6 新 participants，Severe 只评价区域定位而不报告 target alignment。（Table II, Sec. IV-D, pp. 6–7；五次平均不等于已给出显著性检验。）\n物理执行成为主要瓶颈。（Sec. IV-E, p. 7；Semantic 71–96s，synthesis/localization 52–88s，stroke/physical execution 22–63min/round。）",
+    "caveatZh": "需要更 adaptive 的 decision policy、用户偏好学习与复杂主题扩展。\n生成 reference 与真实画布存在分布差异，粗框弱标签未有 formal noise guarantee。\n21-color quantization、标定误差和 stroke pruning 会丢失细节。\n小样本且丢弃未完成/系统失败会话；多轮预算和人类输入混杂基线比较。\n闭源 VLM/image models 与 slow physical execution 限制成本、可复现性和实时性。\n本项目未复现，数字只为作者报告；不能将模型 yes/no logits 写成 calibrated truth。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

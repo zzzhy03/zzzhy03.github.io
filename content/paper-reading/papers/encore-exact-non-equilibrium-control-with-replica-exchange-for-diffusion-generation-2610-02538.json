@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2610.02538",
+  "slug": "encore-exact-non-equilibrium-control-with-replica-exchange-for-diffusion-generation-2610-02538",
+  "title": "ENCORE: Exact Non-equilibrium COntrol with Replica Exchange for Diffusion Generation",
+  "authors": [
+    "Jiahao Yu",
+    "Saifuddin Syed",
+    "José Miguel Hernández-Lobato",
+    "Jiajun He"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02538"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG",
+    "stat.ML"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "ENCORE",
+    "Image Generation"
+  ],
+  "abstract": "Inference-time control steers a pretrained generative model towards a target distribution without retraining. We study tilted targets $π_0\\propto G_0\\,p_0$, where $p_0$ is the sampler output distribution and $G_0$ is an evaluable reweighting function. Existing approaches rely on sequential annealing with sequential Monte Carlo (SMC) or parallel annealing with replica exchange (RE). Sequential control is exact but needs large particle populations, whereas no exact parallel control method exists: existing RE corrections approximate an intractable time reversal and are biased. We propose Exact Non-equilibrium COntrol with Replica Exchange (ENCORE), the first exact parallel control method. Each replica stores its generation trajectory, so the upward move is a truncation and the intractable time reversal is never simulated. We prove target invariance and show that the resulting dynamics are those of non-equilibrium replica exchange with the exact time reversal as forward proposal. Under regularity conditions, our diffusion analysis shows that both sequential and parallel control become unstable under refinement of the time discretisation without guidance, whereas guided proposals remain stable and yield diagnostics for tuning the schedule and the computational budget. Across synthetic targets, Boltzmann sampling of biomolecules, and image generation, ENCORE achieves competitive accuracy and diversity, remains robust to sampler perturbations, and applies to distilled samplers where existing RE corrections are unavailable.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02538v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02538v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02538v1 全文及 2026-10-06T12:51:38.638392Z 审阅记录；PDF 44 页，SHA-256 591cb07d5690d77ec9eceae47c4c6826a0863b5629c9aa1039555c0a9a5d9635，视觉核验第 1、6、7、9、10、26、44 页。数字均为作者报告，本项目未独立复现。代码状态 promised：p.10 Reproducibility Statement 承诺 acceptance 后 release code，PDF 未提供方法 public repository URL。",
+    "ideaZh": "ENCORE 用每个 replica 的部分 denoising trajectory，将向上交换改成历史截断，避免近似 time reversal 造成的目标偏差；在实际 sampler 输出 p₀ 的 reward tilt 上给出不变性。作者报告 DMD2 reward 与 FKD 接近而 DINO-Vendi 为 3.276 对 1.473。值得读 exact control 的构造与理论边界；不是有限样本精确性保证，也不纠正原模型错误。",
+    "motivationZh": "diffusion 的推理时分布控制常依赖近似反向核，容易引入偏差；目标是在不重训生成器时，以路径历史实现可分析的 replica exchange。",
+    "methodZh": "问题是无需 retraining 的 inference-time distribution control：传统 replica exchange 需要不可计算的反向生成核，近似 noising correction 带来 bias。ENCORE 在路径空间保留部分生成历史，向下用 proposal 延伸、向上只截断，以可求增量权重作 Metropolis exchange；公共路径密度消去。算法兼容没有 paired noising kernel 的 distilled sampler，并分析 guided/unguided ladder 的通信阻力。",
+    "methodFlow": [
+      "定义实际生成 sampler p₀ 的 endpoint potential G₀ 与中间 replica potentials。",
+      "每个 replica 保存当前 partial denoising trajectory，最高层从 reference 重新刷新。",
+      "交替并行相邻交换：向下 proposal 延伸，向上截断已存历史。",
+      "用可求 backward weight 的比率作 Metropolis 接受；可添加 invariant local moves。",
+      "读取最低层 endpoint，并按 rejection/communication 诊断选择 ladder 与 guidance。"
+    ],
+    "experimentsZh": "实验设置：1D/2D synthetic reward tilt、ALDP/A4/A6 molecular ensembles 与四步 SDXL-Turbo/DMD2 image control。synthetic 八 seeds、molecular 部分三 seeds 但 Boltzmann 主表仅单次 run 三个 subsamples；image32 prompts/32 outputs，以 exp(100 ImageReward) 为 endpoint potential。\n作者报告 A6 energy TVD .098 对 CREPE .337/FKD .196，但 FKD alignedW₂1.193 优于 ENCORE1.253；不是全面最优。（Table2, p.9）\n作者报告 SDXL-Turbo16-chain ImageReward1.711 对 FKD1.703，DINO-Vendi3.020 对 1.720，unique84.1%对 44.9%。（Table12, p.44）\n作者报告 model-reference ALDP transition-region TVD .012 对 CREPE.027/FKD/TDS.037；这是构型概率而非物理 transition-rate 验证。（Table9, p.42）\n比较范围：CREPE、FKD/TDS、SNIS、分子 RNE/FKC、图像 LiDAR/Best-of64/uncontrolled；DMD2 缺 paired forward kernel 因此没有 CREPE。synthetic/transition 附录比较 forward-NFE budgets；图像部分给采样配置而非完整 equal wall-time/peak-memory 比较。\n消融与诊断：transition variance 扰动、dense/coarse ladder、replica 数量与 chain 数，检验 correction/mixing 依赖；图像无 exact-target truth，仅 preference/alignment/diversity。",
+    "insightZh": "关键贡献是以 path augmentation 替代不可求 time reversal，而非再加一个 heuristic reward gradient；对实际 sampler 的 stationary target 给出 exact correction，包括 unguided deterministic sampling。理论还解释 Euler guidance 对 refinement 通信代价的不同阶行为。价值在通用 test-time sampling/control，图像实验支持迁移但不证明图像目标分布精度。",
+    "whyRelevantZh": "直接推进 image-generation 的 test-time preference/control 与 sampling reliability；路径空间 exact correction 可用于未来 visual-design reward/constraint 的方法研究，后者尚未在本文实测。",
+    "evidenceZh": "路径延伸/截断使公共路径 law 在接受比率消去；Theorem3.1 给出 target invariance，uniform ergodicity 另需权重上下有界。（Sec.3/Algorithm1/Theorem3.1, pp.4–6；实际查看算法与路径示意；exact 指不变性，未证明有限迭代已充分混合。）\n作者报告扰动 1D sampler 时 ENCORE W₂ .015±.0069，CREPE .650±.0331；但其他设置 SNIS 更优，非所有方法全面胜出。（Sec.4.1/Table1 and Table8, pp.8/42；synthetic exact-reference 测试支持对 reverse-kernel mismatch 的鲁棒性；reference 随 sampler 扰动而变。）\n作者报告 DMD2 ENCORE/FKD 的 ImageReward 1.661/1.659，DINO-Vendi 3.276/1.473；SDXL-Turbo CREPE diversity 亦接近或更高。（Tables12–13/Sec.E.4, p.44；完整表已查看；32 prompts×32 outputs，标准差跨 prompts，不是独立训练 seeds。）\n作者明确 target 相对于实际 sampler p₀；更强 memory cost 与 schedule/proposal dependence，理论 regularity 不覆盖 Boltzmann 无界梯度或硬 indicator。（Sec.5, pp.9–10; RemarkD.1, p.26；限制及假设页均实际查看，不将 broad invariance 与全部应用的 mixing theorem 混同。）",
+    "caveatZh": "partial paths 需要 O(N²d) memory，实践效率依赖 ladder、potentials、proposal。\ntarget 是 G₀p₀，因此不能修正 underlying generative-model misspecification。\n扩散通信分析的有界光滑假设排除部分实用 Boltzmann/hard-constraint settings。\nstationary invariance 不等于有限 burn-in 无偏独立抽样；强 tilt 的 mixing、相关样本与 reference restarts 仍须测量。\nguided correction 需要可求 proposal/sampler density ratio；unguided Q=P 才能直接消去并用于 deterministic transitions。\nimage rewards 不是 distribution accuracy，无 native structured visual design/constraint-satisfaction 实证。\nBoltzmann 表误差条来自一次 sampler run 的 subsampling；physical MD target 与 model-relative tilt 有区别。\nmemory/NFE 与独立多链成本需按实际部署预算评估；本项目未复现任何结果。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

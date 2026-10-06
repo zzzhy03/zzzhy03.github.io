@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2609.39441",
+  "slug": "cast-causal-advantage-structured-training-with-spatially-grounded-compositional-rewards-fo-2609-39441",
+  "title": "CAST: Causal Advantage-Structured Training with Spatially Grounded Compositional Rewards for Diffusion Models",
+  "authors": [
+    "Shu Yu",
+    "Chaochao Lu"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39441"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "CAST",
+    "Image Generation"
+  ],
+  "abstract": "Online reinforcement learning has been extended to flow matching for diffusion model (DM) image generation. However, this paradigm faces three limitations: (1) Window selection. Existing methods manually set the stochastic differential equation (SDE) sampling window, i.e., the denoising steps where exploration noise is injected. We instead determine it from each model's denoising trajectory. (2) Reward saturation. Current methods rely on scoring models trained on human annotations; we find that such scores are extremely high and nearly indistinguishable on the latest SOTA open-source DMs, making advantage estimation largely ineffective. (3) Sample inefficiency. A single scalar reward collapses different failure modes into almost identical scores, leaving minimal gradient guidance for targeted improvement. To address these issues, we propose CAST (Causal Advantage-Structured Training), an RL fine-tuning method for pretrained DMs, which (1) identifies the denoising step at which each model fixes the objects and their spatial arrangement in the image and uses that timing to set the SDE window, (2) decomposes each prompt via Causal Scene Graphs (CSG) into verifiable-atoms, i.e., minimal semantic units such as an object, count, attribute, or spatial relation that can each be checked independently, and rewards each atom separately, and (3) projects the signed atom-level advantages into pixel space through teacher-forced attention and uses them to spatially weight the SDE policy objective. We fine-tune two of the strongest open-source DMs, FLUX.2-dev and Qwen-Image-2512, with CAST, and evaluate them on GenEval 2, a compositional benchmark, and on Qwen-Image-Bench for overall quality. Within almost the same training budget, CAST's improvement over the base model on the most challenging GenEval 2 prompts is up to 3.07x that of Flow-GRPO, while overall generation quality also improves.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39441v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39441v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39441v1 全文及 2026-10-06T12:59:48.106982+00:00 审阅记录；PDF 19 页，SHA-256 68de8870fc5fc5afcc724494b9aec6233b59ab0bad647826bd350519d0c02237，视觉核验第 1、4、5、8、9、16、19 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF p.1 的官方 project https://opencausalab.github.io/CAST 实际可访问，Code 按钮指向 https://github.com/OpenCausaLab/CAST；检查 public repo 仅见 static/index.html/README/LICENSE 等网站内容，无训练/推理 implementation，因此不标记 available。",
+    "ideaZh": "CAST 将 prompt 的对象、数量、属性和关系拆成独立 VQA atoms，分别做 group-relative normalization，再用冻结 VLM 的 teacher-forced attention 将正负 advantage 路由到 denoiser patches。作者报告同 2,048 张生成图、128 次更新下 FLUX 的 GenEval2 Overall 84.54→85.95，Qwen 79.59→80.81，wall-compute 仅小幅增加。它对结构化创作的局部 credit assignment 有明确迁移价值，适合先略读目标与消融；3.07× 是预选 Hard-50 上相对 base 的增益比，attention map 和 CLIP knee 都不是因果定位或 layout 已不可改变的证明。",
+    "motivationZh": "组合 prompt 的不同要求可能分别成功或失败，整图 scalar reward 会抹掉错误位置。目标是保留每项要求的 advantage，并将更新路由到相应区域。",
+    "methodZh": "论文先通过 denoising clean-image estimates 的 CLIP curve 选择早期两步 SDE exploration window，再从 graph 合成 compositional prompts 与预定义 VQA probes。冻结 Qwen3-VL-8B 按 Soft-TIFA 给每个 atom score，并在独立 teacher-forced pass 中取第一 decoder layer 的 prompt 词→visual attention 作为 heatmap。每 atom 在同 prompt 的图像组内计算 advantage，各 map resize 到 denoiser patch、加权相加形成 signed map，用于 clipped patchwise Gaussian transition surrogate。训练仅更新 LoRA，ODE sampling 在窗口之外保持原模型。",
+    "methodFlow": [
+      "校准探索窗口：解码 Tweedie clean estimates，拟合平均 CLIP similarity curve，用 curvature knee 定义每 backbone 的早期候选范围；随机选其中连续两步注入 SDE noise。",
+      "构造独立核验 atoms：先采样含实体、数量、属性与关系的 graph，再生成 prompt 及对应 probe/词 span，保证训练生成之前确定结构化评分目标。",
+      "分别评分并定位：冻结 Qwen3-VL-8B 做 Soft-TIFA probability scoring；另一次 teacher-forced prompt pass 提取第一层 query-to-visual attention 并归一化为 atom heatmaps。",
+      "空间路由 policy credit：每 atom 单独 group-normalize，合成正负 patch advantage map；用 Gaussian channel-averaged patch ratios 的 clipped surrogate 训练 LoRA，并对 reference transition 做 KL regularization。"
+    ],
+    "experimentsZh": "实验设置：作者报告 FLUX.2-dev 与 Qwen-Image-2512 的 rank-64 LoRA，1024² resolution、50 sampler steps。训练 pool 为独立合成 1,024 prompts，RL 使用共用 128-prompt manifest、每组 16 图，共 2,048 图/128updates；held-out 256 development prompts 选 checkpoint/hyperparameters。评测全部 800 GenEval2 和 1,000 Qwen-Image-Bench prompts，四组 matched generation seeds。Hard-50 用未训练 FLUX 为每个 benchmark prompt 生成 64 图后选择，不参与训练样本。\n作者报告 FLUX GenEval2 Overall：base 83.16、scalar G2 Flow-GRPO 84.54、CAST 85.95；Qwen 分别 78.02/79.59/80.81。（p. 8, Table 1(a)）\n作者报告 Hard-50 FLUX 65.72→71.37→76.64，Qwen 67.79→69.11→71.84，1.93×/3.07× 表示相对 base 的增益比例。（p. 8, Table 1(a), Sec. 5.3）\n作者报告 Qwen-Image-Bench Overall FLUX scalar vs CAST 52.73→53.44，Qwen 50.70→51.32；这是 benchmark/verifier scores，不是独立 human quality study。（p. 8, Table 1(a)）\n作者报告 FLUX 同图像/更新预算 H200-h 32.43→32.90，Qwen 32.21→32.51；Hard-50 的额外筛选与大规模诊断不属于训练成本表。（p. 8, Table 1(b); p. 18, cost accounting）\n作者报告 FLUX per-atom uniform、aggregate attention、shuffled correspondence 的 G2 Overall 分别 85.12/84.91/85.00，完整为 85.95。（p. 9, Table 2）\n比较范围：包括 base、两种高分 self-distillation SFT、original aesthetic 及 matched GenEval2 scalar Flow-GRPO。RL 的主要公平比较与消融较完整；SFT 使用更多候选不是理论 upper bound，只是这两种蒸馏设置。诊断使用 PickScore，而 original RL 实际用 LAION Improved Aesthetic Predictor，两者区别需保留。未比较最新 temporal-credit methods 或独立 human/verifier transfer。\n消融与诊断：分离 per-atom normalization、aggregate spatial map、shuffled atom-to-map correspondence，支持 atoms 与局部 map 的联合收益；无统一预算下 alternative SDE windows、layer/head localization、heatmap 真值或 causally intervened regions 的实验。",
+    "insightZh": "可复用贡献是保留 atom-level advantage 并将其与对应视觉区域联合路由，避免先合并 scalar reward 后丢失错误结构；shuffled correspondence 与 per-atom/uniform controls 提供支持。graph 是合成训练结构，不是从现实观测识别的 causal graph；attention weighting 是局部 credit 的启发式，既无干预验证也无独立 grounding 真值。相对现有 Flow-GRPO 是有意义的结构化目标扩展，收录基于对可控视觉创作的直接迁移，尚不足称生成范式普遍改变。",
+    "whyRelevantZh": "atom-preserving reward 与区域 credit directly 支持对象数量、关系和属性的可控视觉创作，可迁移为 structured-design reward 的构件；尚未在 SVG、CAD 或物理约束输出上验证，相关性限于训练目标与局部反馈机制。",
+    "evidenceZh": "目标保留 atom-level rewards，并用第一层 teacher-forced VLM attention 合成 signed spatial advantage。（pp. 5–7, Sec. 4, Figure 3, Eqs. 4–9；conditional Gaussian factorization 不表示全局 denoiser 被解耦；局部 ratio 为 channels 平均 log likelihood，而非整图 joint probability ratio。）\n作者报告在匹配 reward、图像数、更新数、seed、窗口和初始化下，CAST 优于 scalar-reward Flow-GRPO。（pp. 7–8, Sec. 5, Table 1; pp. 17–18, Appendix D–E；H200-hours 包含生成、评分、attention 与优化；匹配实验隔离 spatial/atom 目标，但窗口改进没有独立 timing ablation。）\nmatched atom maps 比 atom-only、aggregate-map 与 shuffled-map 更好。（p. 9, Table 2；消融只在 FLUX 上，评测四次 generation seeds 不是四次独立训练。）\nheadline 增益比取自按未训练 FLUX 的高方差/低均值挑选的 Hard-50，不能泛化为全评测绝对三倍。（pp. 7–8; pp. 18–19, Appendix G；筛选不使用 trained methods，但依赖同 benchmark/verifier 和额外 base generations；同子集同时用于两个 backbones。）",
+    "caveatZh": "作者明确局部 Gaussian density factorization 不代表 MMDiT denoiser 独立：每个 patch 的均值仍依赖完整 state。\nHard-50 明确丢弃 consistently correct 及 consistently incorrect prompts，只保留可变且较难的子集，并另报告完整 benchmark。\n无独立限制节；VLM 的 scoring 与 teacher-forced attention 都依赖模型，prompt 强制输入仍会给缺失实体产生 attention，未量化其 grounding/causal fidelity。\n训练和 GenEval2 使用同 scorer/protocol，synthetic prompts 模仿同 compositional structure；exact/normalized prompt disjoint 不等于模板、词汇或评分偏差外推成立。\nCLIP similarity knee 是语义关联 proxy，无窗口 sweep 或局部布局干预证明该点固定 layout；PickScore 分布窄也不能单独证明 group-normalized advantage 无效，因为 z-score 对尺度变化有鲁棒性。\n主表的四组 generation seeds 反映同 checkpoint 的采样变化，未覆盖跨训练 seed 稳定性；QIB 改善小且无人类核验。\n3.07× 为筛选子集上的增益比，主集合改善约若干百分点；不能写成质量三倍或普遍因果 credit identification。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.38691",
+  "slug": "no-corners-cut-state-grounded-transitions-for-mid-stream-prompt-switches-in-video-generati-2609-38691",
+  "title": "No Corners Cut: State-Grounded Transitions for Mid-Stream Prompt Switches in Video Generation",
+  "authors": [
+    "Zejing Rao",
+    "Ketong Ren",
+    "Xiaoqiang Liu",
+    "Yiping Meng",
+    "Guoxin Zhang",
+    "Fan Tang"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38691"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "No Corners Cut",
+    "Video Generation"
+  ],
+  "abstract": "Streaming video generators allow users to dynamically modulate video synthesis via mid-stream prompt switching. Existing streaming methods can respond to the updated instruction while still cutting corners, prematurely realizing goals or taking heuristic shortcuts that bypass necessary intermediate state changes needed for a plausible transition. In this study, we present SEGUE, a novel framework that makes this process explicit and trains the generator to execute these transitions faithfully. At each switch, a training-free planner parses the latest frame and prompts, writes a few segue prompts with roles and durations, and then hands control back to the user's prompt. Furthermore, to address the inherent difficulty of training causal models on short-lived temporal schedules without corrupting preparatory supervision, we introduce SPANDMD, which evaluates each active prompt using the full rollout as temporal context while retaining its DMD residual only within the prompt's assigned span. On OpenTrans-360, a benchmark of 1,800 switches that scores how the old state exits and the new one begins, SEGUE ranks first on all eight transition metrics and raises the overall score over the strongest baseline from 0.866 to 0.887. It also ranks first on four of six instruction-response metrics of StreamAV-Bench, while the planner transfers to frozen autoregressive generators without retraining.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38691v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38691v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38691v1 全文及 2026-10-06T14:57:39.112635Z 审阅记录；PDF 34 页，SHA-256 604e068ed96ff0e314002aa0955abe40d2eba29dad94f30d819466bfbd60f0e1，视觉核验第 1、4、7、9、14、15、16、22、23、29 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact PDF 全文/annotations 未提供 SEGUE 或 SpanDMD 官方 code/project URL；他人 baseline 链接不属于该实现，未猜测 repository。",
+    "ideaZh": "SEGUE 让 streaming prompt switch 先经过根据当前 frame 编写的短 transition plan，再交还用户 prompt；SpanDMD 保留完整 rollout context，却只对每个 prompt 对应的时间 span 施加 score residual。它直接改善 interactive video 的 state transition；关键边界是 planning 不验证真实物理 prerequisites，masked supervision 的独立必要性也尚未隔离。",
+    "motivationZh": "流式视频中途更换 prompt 时，模型可能直接跳到目标状态而省略接触释放或姿态调整；目标是从当前画面规划并生成连贯的过渡过程。",
+    "methodZh": "连续生成时新 prompt 往往直接描述目标状态，导致跳过释放接触、调整姿态或引入对象的过程。作者用 TD-Schema 区分 terminate/release/align/entry，根据 latest decoded frame 编写短 segue schedule，异步编译执行。训练用 text-only offline schedules；每个 active condition 的 real/fake score 都看完整 noisy rollout，但只保留本 span 的梯度。评价将 smoothness、old-state exit、新事件 entry、identity 和 pacing 分开，且提供冻结生成器的 planner transfer。",
+    "methodFlow": [
+      "读取 latest frame、旧/新 prompts 与 transition budget，识别当前 contacts/entities",
+      "选择所需 terminate/release/align/entry，生成 process-oriented segue prompts",
+      "compiler 排序/合并/校验 durations，异步在下一个 block boundary 接管条件",
+      "按 segue schedule 继续 causal generation，结束后恢复原新 prompt",
+      "训练时每个条件在 full rollout 上估计 real/fake scores，仅保留 assigned span residual",
+      "分别评价 segment fidelity、transition process、响应与人类偏好"
+    ],
+    "experimentsZh": "实验设置：LongLive-initialized Wan causal student 与固定较大 real-score teacher、可训 fake-score network；约束在线 planner 不训。OpenTrans prompt streams 与 offline training pairs 分开，另用 StreamAV protocol。包括 schema、merged-prompt DMD、planner ablations、frame-grounding matched pairs 和 blinded studies。\n作者报告 OpenTrans overall 0.887，对 strongest baseline 0.866，paired difference 0.021、case-bootstrap 95% CI [0.017,0.031]；这是多个 checklist scores 平均，不是 21 个百分点或真实物理成功率。（p.7 Table1, §5.2）\n作者报告移除 SpanDMD 后 old-state exit 0.802→0.759、new-state entry 0.890→0.865；该对照同时更改条件组合和时间责任分配。（p.9 Table2）\n作者报告冻结 Self-Forcing 加 planner 的 semantic-update fidelity 0.647→0.721，LongLive motion-boundary smoothness 0.825→0.860。（p.9 Table2）\n作者报告 blinded preference study 对 HappyOyster overall 为 53.3%、Anchor Forcing 为 58.3%，ties 计半分；仅选定 30 cases，不能据此认定广泛显著全面优势。（pp.14–15 AppendixA.1, Table3）\n作者报告 shortened planner input 延迟约 0.82→0.50 秒，生成 throughput 约 20.7 FPS；planning 完成前仍继续旧 prompt，实际 update latency 还涉及 block boundary 和 transition durations。（p.9 Fig.5; p.28 AppendixA.10）\n比较范围：范围涵盖 causal/cache/memory/temporal planning；frozen planner transfer 最能隔离部署功能。部分 StreamAV baseline 来自原 benchmark，TempAct 被改成逐 prompt text plan 接 LongLive 而非原始完整任务。未给全部 equal-compute/硬件配置的端到端对比。\n消融与诊断：Schema 去除、merged DMD、planner 与无当前 frame 的 matched 比较；color diagnostic 只做相同大小的 latent correction，非训练参数更新。未测试独立 per-conditionscore 保留但不 mask 的控制，未分离 span-mask 必要性。Human alignment 是 method-level 排名相关，不能保证每个局部物理判断准确。",
+    "insightZh": "方法贡献是 runtime state-grounded transition planning 与 span-scoped/full-context distillation 的结合，超出一般 prompt rewrite 或 cache 优化。Conditional-score identity 在理想 scores 下解释局部更新，但不建立一个全 schedule 的精确 joint target；practical teacher 对混合语义 context 也有分布失配。其一般 online transition 接口可迁移到已有 causal video models。",
+    "whyRelevantZh": "直接推进 controlled streamingvideo 的 online state transition 与训练监督接口，具有可复用 video paradigm 价值；输出是 rastervideo，不是 native CAD/制造 artifact。",
+    "evidenceZh": "planner 观察当前状态，compiler 仅校验结构/时间，拒绝计划会 fallback 到直接 prompt switch。（pp.4–5 §3.1–3.2, Fig.2; pp.17–21 Appendix A.5；没有独立 symbolic/physical simulator 或每步执行结果 verifier。）\n每 active prompt 的 scores 看到完整 rollout，residual 只属于相应 temporal span。（p.6 Eq.3; pp.21–22 Appendix A.6；已核看图和推导；主 ablation 同时改变 score conditioning 与 mask，不能证明 mask 单独必要。）\n冻结 Self-Forcing/LongLive 加 planner 也改善 transition metrics。（p.9 Table2; pp.16–18 Table5, Fig.8；Planner transfer 与 matched frame/no-frame 比较支持 realized-state contribution。）\nbenchmark 自动评分具小规模 blinded human alignment，单帧 planning 仍会漏物理支撑。（pp.14–16 Appendix A.1–A.2, Tables3–4, Fig.7; p.28 Table14；已核看限制例图与用户界面；偏好分数含 half-credit ties，不是纯 win rate。）",
+    "caveatZh": "latest-frame observation 不能知道完整 motion history/occluded interactions，计划执行仍受生成器限制。\nRole ordering 不能确保支撑接触等 physical prerequisites，例图漏掉 lantern 接触桌面再 release。\n每 active condition 单独 score evaluation 使训练成本随 stages 增长。\nTraining text-only schedules 与 online 视觉 plan 存在 gap。\n没有阶段执行 verification，compiler 的结构检查不保证 state/contact 条件成立。\nApproximate conditional teacher scores 在混合语义 context 中可能失配，无完整 schedule joint target 保证。\nDMD 消融同时改变 condition 与 mask，latent 颜色 diagnostic 不能证明独立 hard-mask 收益。\nFixed 短 transition budget 对长动作/快速重复 prompt 更新的泛化缺少定量 failureprotocol。\n自动 metrics 只看少量 frames，主观 checklists 和少量 human cases 不能替代全物理 motion 测量。\n单 seed、训练 GPU 总耗时与 planner/generator 端到端硬件成本未完整公开；不是 training-free 整体模型。\n没有已确认 public implementation/project link。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

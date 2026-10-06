@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2609.38985",
+  "slug": "meshoctave-generates-meshes-via-cascading-resolution-transitions-2609-38985",
+  "title": "MeshOctave generates meshes via cascading resolution transitions",
+  "authors": [
+    "Junkai Lin",
+    "Tianhao Zhao",
+    "Hang Long",
+    "Huipeng Guo",
+    "Jielei Zhang",
+    "Youjia Zhang",
+    "Jiale Xu",
+    "Wenbing Li",
+    "Rendong Liang",
+    "Jozef Hladký",
+    "Matthias Nießner",
+    "Yuanming Hu",
+    "Wei Yang"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38985"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "MeshOctave generates meshes via cascading resolution transitions",
+    "3D Generation",
+    "3D Reconstruction"
+  ],
+  "abstract": "Generating compact, artist-style meshes with explicit topology typically relies on autoregressive models which incur prohibitive sequential per-token costs, or continuous flow models that depend on heuristic connectivity decoders. Next-scale generation paradigms offer a compelling alternative by enabling parallel intra-scale token prediction and coarse-to-fine refinement from global structure to local topology; yet, existing methods derive hierarchical scales via progressive mesh simplification and invert them sequentially. This eliminates intra-scale parallelism and scales generation steps linearly with face count. In this paper, we propose MeshOctave, which instead defines scale through dyadic spatial grid resolutions, framing coarsening as a deterministic collapse that merges vertices sharing a voxel cell and inherits connectivity. Its inverse operation, split-and-rewire, determines which octant sub-vertices are instantiated for each coarse face and resolves local connectivity using discrete structural tokens. These per-face operations require no serialization, each scale transition is modeled as an unordered set that adds one bit of coordinate precision, naturally supporting dynamic-length meshes and adaptive resolution refinement. We construct a scale-conditioned masked-uniform discrete diffusion model to learn split-and-rewire operation from resolution collapse hierarchies. MeshOctave outperforms strong baselines in geometric fidelity and topological validity by a non-trivial margin, while supporting adaptive resolution refinement and extending naturally to mesh subdivision tasks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38985v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38985v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38985v1 全文及 2026-10-06T14:37:07.128482Z 审阅记录；PDF 17 页，SHA-256 e3689041e040cb19a41c3d22a988e4acba8d34480a90fe7a328550d3345a9dd6，视觉核验第 1、4、5、7、9、14、15、17 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact PDF p.1 官方 project page 的 Code 按钮追溯到 https://github.com/MayMhappy/MeshOctave；已实际访问，目前仅 README/assets，没有可确认的 training/inference implementation，未标 available。",
+    "ideaZh": "MeshOctave 把 native mesh 生成改写为 dyadic-grid 的 split-and-rewire cascade，每层并行预测 child occupancy 和 connectivity，再交替 masked/uniform refinement。原生 topology 与 variable-length 层级表示非常相关；但表中主要测几何，未量化 manifold/face validity，lossless inverse 和近乎不随 face count 增长仍需实现审计。",
+    "motivationZh": "直接生成大量 mesh faces 的序列成本较高，固定表示也难提供可控细节层级；目标是把 native topology 生成改为逐层 split-and-rewire。",
+    "methodZh": "方法通过网格分辨率 collapse 合并同 cell vertices、保留 degenerate face placeholders，反向为各 coarse face 预测 octant child occupancy 与 intra/inter-parent adjacency。Hourglass transformer 用 point-cloud condition、geometry RoPE 和 discrete mask/uniform denoising，连接矩阵的小型 AR head 在 row 内保留依赖。结果是原生 explicit mesh 与可中途停止的 level of detail；也可从 coarse mesh sampled points 做 learned subdivision。",
+    "methodFlow": [
+      "量化 mesh 并按 dyadic grid 合并 vertices，继承 faces 与退化占位",
+      "对每个 coarse face 编码 child occupancy 和 intra/inter-parent connectivity",
+      "point-cloud encoder 提供 condition，hourglass/3D RoPE 处理无序 face blocks",
+      "masked pathway 提议结构，uniform pathway 修正并估计 confidence",
+      "小 AR head 逐行解码 adjacency，根据 confidence 重遮挡再 refinement",
+      "装配下一 grid resolution 的 mesh，重复 cascade 或提前停止"
+    ],
+    "experimentsZh": "实验设置：Objaverse/Toys4K meshes 训练 point-conditioned generator，test 包含真实和其他 generator 输出的 meshes。表面点距离与 normal consistency 比较 AR/flow/next-scale methods；删除 discrete/uniform/AR-head/3D-RoPE。Subdivision 只有定性图。\n作者报告 CD-L2 为 0.0392，对照 LATO.2 为 0.0406，HD 为 0.0645 对 0.0665，absolute normal consistency 为 0.8478 对 0.8333。（p.7 Table 2）\n作者报告 ablation Full CD-L2 为 0.0430，continuous variant 为 0.0512，去 AR head 为 0.0496；Full 与主表不同，评价子集/预算差异未充分说明。（p.9 Table 3）\n作者报告约 90 秒跨 10 scales，对比低复杂度 next-scale AR baseline 约 15 分钟；single-scale flow latency 仍低于本方法。（pp.7–9 §5–6）\n作者报告高复杂度 timing 本方法约 1.6 分钟，对照最高 33.3/40.3 分钟；后两者超出训练范围的输出 validity 未核验。（p.17 Fig.11）\n比较范围：最近 next-scale AR baselines 从零重训的 mesh 数量、face cap 和训练时间小于作者模型。主表 geometry metrics 不能证明 artist topology/manufacturing validity。Dense surface point/normal condition 不代表真实 noisy scans 或 partial observations。\n消融与诊断：Discrete、uniform correction、row AR 和 3D-RoPE 各有退步，支持结构与 correction 组合。缺少共享预测一致性 repair、triangle/winding losslessness、manifold rate、confidence-head 与跨 seed variance 评价。",
+    "insightZh": "实质贡献是将尺度定义为坐标精度而非 sequential edge-collapse history，允许并行 intra-scale structural prediction。不是完全无 AR，connectivity rows 仍顺序生成；canonical 只对固定量化 grid/坐标系成立。对于 arbitrary face complexes，仅 edge adjacency 能否 losslessly 恢复 faces、orientation 与共享预测一致性，当前论文没有充分论证。",
+    "whyRelevantZh": "直接推进 native mesh generation、explicit topology representation 与 learned coarse-mesh refinement；未验证 CAD features、manufacturing constraints 或 visual design agent。",
+    "evidenceZh": "网格精度定义层级，退化 triangles 保留未形成完整 face 的细结构 ancestry。（pp.4–5 §3, Fig.2, Eqs.1–4; p.14 Appendix A.1；已核看图与退化规则；不等于每一级都有 manifold/非零面积保证。）\nbackbone 并行，但 adjacency row head 与跨尺度 generation 仍有顺序依赖。（pp.5–7 §4, Fig.3; pp.14–15 Algorithms 1–2；伪代码中两 pathway 均覆盖全部 slots，不是永久冻结的标准 masked sampler。）\n几何 fidelity 超过报告的 baselines，但没有独立 topology-validity 指标。（p.7 Table 2; p.9 Table 3；已核看表；Chamfer、Hausdorff 和 absolute normal consistency 不测 winding/manifold/watertight rate。）\n部分高 face-count timing 超出 AR baseline 训练范围。（pp.16–17 Appendix A.7, Fig.11；已核看虚线；该范围 baseline mesh validity unverified。）",
+    "caveatZh": "跨尺度顺序 generation 比 single-scale flow 慢，coarse topology errors 可传播且没有 backtracking。\nDistillation 与 bidirectional coarse-topology revision 尚未研究。\nEdge adjacency 一般不唯一决定 triangle face list/winding，closed-triangle decoder 的 lossless claim 需要适用 mesh class 与 round-trip 验证。\n共享 vertex/edge 在多个 parent faces 的预测冲突和最终 degenerate placeholders 的处理不完整。\n没有 manifold、self-intersection、watertightness 或 artist edge-flow 指标，geometry fidelity 不等于 topology validity。\nCanonical hierarchy 依赖固定坐标 grid，quantization 会合并同 cell 的不同拓扑；不能推论旋转/平移不变。\nAR baseline 的训练资源/face cap 不匹配，高复杂度 timing 没有验证输出可用。\nNearly face-independent latency 是有限区间实测，variable-length attention 仍随 mesh 增长。\nDense point/normal condition 与实际 reconstruction 输入有差距，公开实现尚不可确认。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

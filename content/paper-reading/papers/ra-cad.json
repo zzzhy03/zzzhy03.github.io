@@ -5,12 +5,12 @@
   "authors": [
     "Shuhao Yan",
     "Changhao He",
-    "Xi Peng",
-    "Peng Hu"
+    "Peng Hu",
+    "Xi Peng"
   ],
   "publishedAt": "2026-08-06",
   "collectedAt": "2026-08-07",
-  "venue": "arXiv preprint · v1",
+  "venue": "arXiv preprint",
   "identifiers": {
     "arxiv": "2608.05714"
   },
@@ -25,12 +25,11 @@
   ],
   "primaryTopicId": "visual-design-agents",
   "keywords": [
-    "text-to-CAD",
-    "visual design agent",
-    "post-execution critique",
-    "CAD code generation",
-    "GRPO",
-    "generate-execute-rewrite"
+    "RA-CAD",
+    "Visual Design Agents",
+    "3D Generation",
+    "RA",
+    "CAD"
   ],
   "facets": {
     "task": [
@@ -62,34 +61,35 @@
   },
   "abstract": "Text-to-CAD generation translates natural-language design intent into editable and executable parametric computer-aided design (CAD) codes, reducing the expertise and effort required for manual modeling. Existing methods incorporate fixed, externally supplied, prompt-induced, or separately optimized critique mechanisms to optimize the generation process, but they do not necessarily optimize how feedback is interpreted and translated into effective corrective actions throughout the generation process. To bridge this feedback-utilization gap, we present RA-CAD (ReAct Agent for CAD), a state-aware agent that interacts with the CAD environment through a Generate--Execute--Critique--Rewrite loop. At each iteration, RA-CAD executes the current code and observes its outcome. Conditioned on the design instruction, current code, and execution feedback, the agent then generates an explicit post-execution critique as an intermediate policy action. This critique either validates the current result for termination or provides revision-oriented guidance that conditions the next rewrite. CAD Code Bootstrapping (CCB) first establishes fundamental parametric CAD coding capabilities through supervised fine-tuning. Feedback-Driven Agent Optimization (FAO) subsequently applies trajectory-level Group Relative Policy Optimization to both policy-generated code and critique sequences, assigning terminal F1 and Chamfer Distance rewards to the complete interaction trajectory. This formulation makes critique an outcome-aligned, learnable policy decision rather than an unoptimized auxiliary output. Experiments on CADFusion and Text2CAD show that RA-CAD achieves state-of-the-art execution validity and geometric quality compared with existing methods and strong proprietary language models, demonstrating the effectiveness of the proposed state-aware text-to-CAD agent.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2608.05714v1",
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.05714v3",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2608.05714v1"
+      "href": "https://arxiv.org/abs/2608.05714v3"
     }
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 2608.05714v1 全文整理；Paper URL 精确指向本次审阅版本；PDF 未打印可核验的 code repository，故不添加 Code 链接。",
-    "ideaZh": "把 text-to-CAD 建模为 Generate–Execute–Critique–Rewrite 闭环，并将 critique 设为与 CAD code 同一 policy 产生、由 terminal geometry outcome 优化的显式 action。",
+    "sourceNote": "依据 exact version 2608.05714v3 全文及 2026-10-06T11:12:06.978317+00:00 审阅记录；PDF 17 页，SHA-256 d1d5230ee7a0e1dc3d247a7138dd90ad4d583134e3c1a92f2be7685b29f32ca5，视觉核验第 1、2、6、7、16 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：17 页全文未印 RA-CAD public code/project repository URL；引用的训练框架不是本方法代码。",
+    "ideaZh": "RA-CAD v3 有实质实验更新：同一 Generate–Execute–Critique–Rewrite 框架，作者报告 CADFusion 表中 Avg CD 从 v1 的 35.44 改为 29.04、IR 从 6.20 改为 1.05，并新增 fixed G&R/固定 critique 消融。联合更新优于冻结其一，但段落对两者职责的解释和 Table 3 数值相反；推荐精读新证据，不把版本变化称新方法。",
+    "motivationZh": "文字生成的 CAD 程序即使能够执行，形状也可能偏离需求；需要利用执行后的几何状态提出具体 critique，并让后续改写真正修正结构错误。",
+    "methodZh": "Llama-3-8B 在 6-bit sketch/extrude DSL 先 CCB SFT，再最多 5 轮执行反馈、显式 critique 和 rewrite，以 terminal token-count F1/geometry CD 对完整轨迹 GRPO。v3 更新完整结果与 controlled module freezing；text-only、有限 DSL 和未监督 critique factuality 的边界保留。首次收录仍是 8 月 7 日，本轮是科学证据更新。",
     "methodFlow": [
-      "Natural-language design intent 输入 Llama CAD policy",
-      "Generate 当前 sketch-and-extrude CAD code",
-      "CAD executor 返回 validity 与 diagnostic feedback",
-      "Critique action 决定接受或生成 revision guidance",
-      "Rewrite 后再次执行，直至接受或达到轮数上限",
-      "以 terminal topology F1 + Chamfer reward 对完整 trajectory 做 GRPO"
+      "输入自然语言 design description，CCB 初始化 DSL code policy",
+      "生成 line/arc/circle 和 add/cut/intersect 的 6-bit 参数序列",
+      "CAD executor 返回 validity、结构统计或精确错误位置",
+      "同 policy 生成 critique，接受或给 targeted revision",
+      "Rewrite 再执行，最多 Tmax=5；terminal F1/CD 评价完整轨迹",
+      "GRPO 共同优化 code/critique tokens，输出 editable CAD"
     ],
-    "whyRelevantZh": "它正是用户关注的 visual-design agent：模型实际生成 editable CAD artifact、调用 executor、观察状态并迭代修正，同时也直接属于 3D/CAD generation。",
-    "evidenceZh": "作者报告 CADFusion 上 Avg F1 85.30、Avg CD 35.44、IR 6.20；CADFusion baseline 为 83.59、42.08、21.98（Table 1(a), p. 6）；作者报告 Text2CAD 上 Avg F1 77.51、Avg CD 38.86、IR 9.44；CADFusion baseline 为 76.69、49.78、21.85（Table 1(b), p. 6）；作者报告在 CADFusion component ablation 中加入 critique 后 IR 从 11.46 降到 6.20，Avg CD 从 44.24 降到 35.44（Table 3, p. 7）。",
-    "caveatZh": "作者限制：仅接收自然语言，尚不支持 image、sketch 或 point-cloud visual conditioning；code space 只覆盖 line/arc/circle、add/cut/intersect 的 sketch-and-extrude DSL 与 6-bit quantized parameters；uncommon industrial operations、continuous precision 与更广 execution environments 未验证。审阅风险：terminal reward 没有直接评价 critique 是否正确，policy 可能学到有用 rewrite pattern 而非可靠的显式 diagnosis；ground-truth sequence 与 geometry reward 在每条 training trajectory 可用，和真实无 GT 的 interactive design setting 存在差距；没有报告 per-round success curve、平均轮数、token/latency cost 或 multi-seed variance；论文没有打印 code/project repository URL，暂不能核验实现。",
-    "motivationZh": "一次性 CAD code generation 容易产生 invalid programs；固定或外部 critique 即使指出错误，也没有直接训练 agent 如何把 execution feedback 转换成有效 rewrite。",
-    "methodZh": "模型状态包含 design description、当前 code、executor result 与 critique。每轮先生成或 rewrite code，环境执行并返回错误，policy 再输出接受或修订建议；终止后以 sketch token F1 与可执行 geometry Chamfer reward 共同评价整条 trajectory，因此 critique tokens 通过 outcome reward 被隐式优化。实验使用 Llama-3-8B、CADFusion/Text2CAD，经 CCB SFT 和 FAO GRPO 两阶段训练；主表、proprietary-LLM 对比和 component ablation 都支持 executability 与 geometry 改善，但 critique 本身的正确率、per-round convergence 和更广 CAD operation 未评估。",
-    "experimentsZh": "CADFusion 约 20K、Text2CAD 约 60K samples，采用 90/5/5 split；base 为 Meta-Llama-3-8B-Instruct。CCB 用 LoRA SFT 训练 9 epochs，FAO 每个 prompt 采样 8 条 trajectories，并在两张 RTX 4090 上做一轮 GRPO。关键结果：在两个 task-specific datasets 上，RA-CAD 相对 CADFusion 都提高 F1、降低 Chamfer distance 与 invalid ratio；CADFusion component ablation 中，加入 critique 后 IR 从 11.46 降到 6.20，Avg CD 从 44.24 降到 35.44。基线覆盖：包含 Text2CAD、CADFusion 和多个 proprietary general LLM；真正公平的主比较是使用相同 DSL/evaluation 的 task-specific methods，8-shot proprietary LLM 主要说明 domain gap。消融：CCB、GRPO 与 critique 的拆分支持两阶段训练和 explicit critique 的增量作用；仍缺 fixed/external critique、execution-only retry、相同 token budget/turn count、reward component、trajectory length 与 critique accuracy 对照，不能完全隔离 critique-learning 本身。",
-    "insightZh": "核心新意是把 post-execution critique factorize 成与 code proposal/rewrite 同一 policy 内的显式、可优化 action，并以 terminal CAD outcome 对整条 multi-turn trajectory credit assignment。相比 external visual reviewer 或只对 final code 做 RL，它更接近真正的 artifact-grounded design agent；不过 reward 并不直接监督 critique factuality，提升可能同时来自迭代执行和 GRPO。建议精读 agent formulation、reward boundary 与 Table 3；它比泛化聊天 agent 更贴近 visual design workflow，且有直接 ablation 支持，但应把 DSL/ground-truth reward 限制视为研究原型边界。",
+    "experimentsZh": "实验设置：CADFusion 约 20k/Text2CAD 约 60k，90/5/5；Text2CAD 选 L2。CCB 9 epochs LoRA，FAO 8 trajectories/prompt、batch16、2 RTX4090、lr1e-6、reward weights0.1/0.9、Tmax5；CD 从 2,000 归一 surface points 计算。\n作者报告 v3 CADFusion Avg CD29.04/IR1.05，对 v1 归档 35.44/6.20；Avg F1 略降 85.30→85.04。（v3 Table1(a), p.6; v1 Table1(a), p.6）\n作者报告 v3 Text2CAD Avg CD33.42/IR1.25，对 v1 的 38.86/9.44；Avg F1 从 77.51 到 76.75。（v3 Table1(b), p.6; v1 Table1(b), p.6）\n作者报告 Full 优于 fixed G&R/fixed Crit：Avg CD29.04 对 36.97/32.72，IR1.05 对 4.42/7.05。（v3 Table3, p.7）\n比较范围：相同 DSL 下 Text2CAD/CADFusion 和 8-shot proprietary LLMs；v3 增加比较限制，承认未与 ToolCAD/IterCAD 等做统一对照，不据此宣称 universal SOTA。\n消融与诊断：分别冻结 G&R 和 Crit 的新对照支持两种 update 互补。解释段将数值方向颠倒，因此不照抄其模块分别负责 fidelity/validity 的结论；no-Crit 改变轮数仍是 confound。",
+    "insightZh": "基础方法延续 v1；科学增量是主实验数值替换、fixed G&R/fixed Crit 两组消融及明确 no-Crit 导致 single-round confound。新证据缩小模块贡献不明的边界，但没有 equal-token/turn-budget 或 critique 真值对照。",
+    "whyRelevantZh": "直接生成 editable CAD、执行环境检查并反复 critique/rewrite，贴合 design agents 与 CAD generation。新 module-freeze 对照服务理解 feedback learning；没有直接视觉输入。",
+    "evidenceZh": "Code/rewrite 和 post-execution critique 是复合 action；execution 属于 environment，terminal F1/CD 优化全部 policy tokens。（Method, Eq.2–13, pp.3–5；本次 exact PDF 方法描述；没有运行实现。）\n作者报告 CADFusion v3 Avg F1/CD/IR 为 85.04/29.04/1.05；v1 同表为 85.30/35.44/6.20。（v3 Table 1(a), p.6; archived v1 Table 1(a), p.6；双方 PDF 表已实际视觉核验；保持论文表中 ×100 尺度，不推断重跑原因。）\n新增 fixed G&R/fixed Crit 分别 Avg CD 36.97/32.72、IR 4.42/7.05，Full 为 29.04/1.05。（v3 Table 3, p.7; archived v1 Table 3, p.7；旧表无这两 rows；正文对哪组更高的解释方向与新表相反。）\n去 Crit 同时将多轮交互降为单轮，不能单由其收益证明 critique 内容学习。（v3 Ablation Studies, p.7；依据作者明确说明的轮数变化推断 confound。）\n仅支持 text 与 quantized sketch/extrude，缺直接 image/sketch/point-cloud conditioning。（Limitations and Future Work, p.16；限制页已实际查看。）",
+    "caveatZh": "目前 text-only，不能直接 reverse-engineer images/sketches/point clouds。\n有限 primitives、Boolean operations 与 6-bit quantization。\n缺近期 agent 方法统一可复现对照。\nTable3 正文职责解释与数值方向相反，保留数据而不采纳该解释。\nCritique 由 terminal reward 隐式优化，无 factuality 监督；好 rewrite 不证明 diagnosis 可靠。\n缺 per-round 曲线、平均 cost/latency、multi-seed variance 和 equal-budget 对照。\n主文提 AgentLightning、appendix 实现为 verl；无公开 code 时实现对应难核验。\n版本间结果改变原因未充分解释，只能报告作者更新，不能称独立复现或确定模型改进。",
     "relevance": "high",
     "readingAction": "deep",
-    "evidenceMaturity": "solid"
-  }
+    "evidenceMaturity": "mixed"
+  },
+  "updatedAt": "2026-10-05"
 }

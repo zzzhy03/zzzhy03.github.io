@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.39738",
+  "slug": "cncgen-a-dataset-and-framework-for-machining-process-planning-and-toolpath-generation-from-2609-39738",
+  "title": "CNCGEN: A Dataset and Framework for Machining Process Planning and Toolpath Generation from B-rep Models",
+  "authors": [
+    "Xiaolei Zhou",
+    "Boyi Lin",
+    "Yuchao Feng",
+    "Jianwei Zheng"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39738"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "fabrication"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "CNCGEN",
+    "Generative Fabrication"
+  ],
+  "abstract": "Learning to generate machining process plans and toolpaths from B-rep CAD requires coupling discrete operation decisions with continuous tool motion as the workpiece evolves. Correctly predicting an operation sequence does not by itself ensure correct material removal, because each toolpath acts on the stock left by preceding cuts. We formulate this problem around persistent manufacturing objects: object identity determines the target of an operation, while the evolving stock state conditions the generation of its toolpath. Based on this formulation, we propose CNCGEN, a dataset and learning framework for three-axis machining. CNCGEN-Dataset contains approximately 50k geometrically verified synthetic machining flows and 800 held-out real CNC records. Each flow aligns B-rep geometry with object-referenced operations, parameterized toolpaths, intermediate stock states, and verification outcomes, enabling supervision of the correspondence between planning decisions and their geometric effects. CNCGEN generates operations and toolpaths for selected objects step by step, updating a compact machining state to guide subsequent predictions. During training, a learned surrogate verifier provides material-removal feedback that links local predictions to their geometric consequences. Experiments on synthetic and held-out real CNC records show that CNCGEN improves the resulting workpiece geometry and reduces residual material and overcut compared with adapted CNC generation baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39738v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39738v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39738v1 全文及 2026-10-06T15:10:18.334Z 审阅记录；PDF 21 页，SHA-256 b9341b000e10e9087c03fcb573eda3840d596f898e75a792a3f226859eac766e，视觉核验第 1、4、6、8、9、18、19、20 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：21 页全文未找到本方法 public code/dataset 下载 URL；相关 CAD/CNCdatasets 引用不是 CNCGEN 公开实现。",
+    "ideaZh": "CNCGEN 用 persistent manufacturing objects 将 B-rep 目标、工序选择与 Bézier toolpaths 绑定，并根据 2.5D evolving stock state 逐步修订；冻结 surrogate verifier 只在训练提供几何反馈。作者报告 800 held-out 真实 CNC 记录上的 offline Removal F1 为 0.8126，值得深读 CAD-to-CAM 的状态建模。评估是 4mm 近净坯料几何 carving，外轮廓 setup 已提供，未验证生成刀路的真实加工、公差、夹具碰撞或 feeds/speeds。",
+    "motivationZh": "正确的 CNC operation 顺序并不保证刀路实际移除目标材料，因 stock 会随每次切削改变；需要联合预测加工对象、连续刀路和随历史更新的几何状态。",
+    "methodZh": "数据含约 50K geometrically verified synthetic flows 及 800 独立收集、专家筛选真实 records。GNN/set queries 恢复 manufacturing objects 并保留 identity，parallel planner 提出 operations，prefix refiner 读取历史与 stock state 修订，toolpath decoder 输出 segmented cubicBézier、waypoints、motion/pass/tool 和 cutting parameters。Deterministic carving 加 learned residual 更新 compactstate，SV 用 analytic contact 加 learned calibration 训练几何反馈。真实记录是测试输入来源，预测结果仍由 offline emulator 打分，没有方法刀路的现场加工验证。",
+    "methodFlow": [
+      "构建 B-rep face/edge 图，用 object queries 与 Hungarian 监督恢复 feature slots 并 confidence 过滤",
+      "在 MER 保存固定 face binding/geometry/embedding 及随 stock 变化的 state token",
+      "parallel step queries 提出 operation/feature/object pointer，prefix refiner 读取此前决策和更新 state 修订",
+      "selected object、operation、B-rep 及 state 共同条件化 Bézier/waypoint 与 tool/cutting 参数输出",
+      "compact2.5D cutter footprint carving 估计 stock 变化，learned residual correction 更新 global/object grids",
+      "分阶段监督训练后 joint rollout refinement，冻结 SV 用预测 selected-region IoU/overcut/residual 反馈；推理不用 SV 作保证"
+    ],
+    "experimentsZh": "实验设置：约 50Ksynthetic hash90/5/5split、800 真实 records 只 test；2A6000，stagedrecognition/planning、paths、SV、50epochjoint refinement，三 seed 均值。改编 CNC-Net predicted/oracleMRP 同 splits/evaluator；4mmoccupancy、8192surfacepoints、CDstockdiagonal 归一化。失败按末 occupancy 或 uncutstock 计入。\n作者报告 syntheticIoU.9525/RemovalF1.9016/residual.0431，predictedMRPbaseline.7144/.2318/.6032。（Table 1, p. 8）\n作者报告真实 recordsIoU.9274/RemovalF1.8126/residual.1845，predictedMRP.6275/.1170/.7268；oracleMRPovercut.0112 优于 ours.0134。（Table 3, p. 9）\n比较范围：CNC-Net 重新训练但输入为 rasterizedregion/depth、supervision 与 ours 丰富 B-rep/object/operation/path/state 不同，非 representation/supervisionbudget 匹配。Oracle 是 annotation-deriveddiagnostic 且同 type 训练/测试，不能称普通可部署 baseline。\n消融与诊断：MER/prefix/state/SV 逐一移除；固定 representationscope 下支持 state 和绑定价值。大量 RemovalF1 差额与较小 residual 变化须进一步看 per-record/aggregation，不可仅靠 averages 复原；无公开 rawoutputs 或 implementation 进行核验。",
+    "insightZh": "贡献是 persistent identity、state-conditioned motion 与 verification-guided 训练的联合对象状态 rollout，以及工序/刀路/中间 stock 对齐数据。与已有 stock-updating CNC-Net 相比学习 operation 选择及 B-rep 对象引用。不是物理 process simulator 或 correct-by-construction machine control；SV 只代理粗几何，不验证制造安全。",
+    "whyRelevantZh": "直接 CAD-to-CAM，显式 B-rep 制造 features、工序与连续 toolpath 在 evolvingstock 上的绑定，对 fabrication 方法设计有直接价值；不应将 coarsegeometricverification 写成 machine-ready。",
+    "evidenceZh": "sharedMER、prefix refinement、state-conditioned paths 与训练 SV 联合。（Sec. 4, Eqs. (2)–(8), Fig. 3, pp. 5–6; Appendix B, pp. 15–17；SV 冻结且仅 training/offline diagnostics；无 validsteps 样本 SV loss 为零，不能宣称每 rollout 都几何验证通过。）\n作者报告 800 真实 records 的 offline RemovalF1.8126、residual.1845。（Table 3, pp. 8–9; Appendix A.3/C.2, pp. 13–14/18；800 由>2Krecords 筛选，全部 held-out；near-netstock/目标来自 manufacturing annotations，外轮廓 setup 不计 learnedremoval。）\n工序正确不保证去料正确。（Table 2, p. 8; Appendix C.4, p. 19；去 state 工具路径 seqEM.8260vsfull.8290，reported RemovalF1.3113vs.9016；仅三 seed 均值，没有误差条或 per-record 计数可审计。）\nsurrogate 与 offline labels 存在预测误差，物理加工范围明确有限。（Tables S1–S2, p. 20; Sec. 6 / Appendix D, pp. 9/21；IoU MAE.048，rankingρ.79；risk AUROC.958 不是夹具/机器安全证明，未测试 chatter/toolwear/forces。）",
+    "caveatZh": "仅三轴 pockets/holes/chamfers/slant，外轮廓由 setup 提供；freeform、多轴、turning 等未支持。\n2.5Dstate 和 4mm 网格不证明 machiningtolerance/surfacefinish；真实 shop/fixtures/intent 覆盖有限。\ncontroller-neutralpaths 需 machine-specificpostprocessing，不评 forces/deflection/chatter/thermal/wear/coolant 或 cuttingparams 物理适用性。\n真实记录不等于生成结果实物加工，图中 machiningoutcome 为 offlinegeometry。\nhash 随机 sample split 不明确按 partfamily 隔离，synthetic 泛化范围需审计。\nSV 与 offline 共同粗 geometrybias，梯度可能优化 surrogate；没有 test-timefixture/toolholdercollision 检查。\nnear-netstock 减少外轮廓任务；predictfeeds/speeds 仅标注监督，不具现场可用性验证。\n三 seed 均值但无 variance/latency/parameter counts；本项目未复现，数字为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

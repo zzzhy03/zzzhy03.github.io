@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.38717",
+  "slug": "soft-spatial-reasoning-2609-38717",
+  "title": "Soft Spatial Reasoning",
+  "authors": [
+    "Rafi Ibn Sultan",
+    "Md. Sajid Alam Chowdhury",
+    "Saleh Zare Zade",
+    "Chengyin Li",
+    "Prashant Khanduri",
+    "Marco Brocanelli",
+    "Dongxiao Zhu"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38717"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Soft Spatial Reasoning",
+    "VLM / MLLM"
+  ],
+  "abstract": "Large Vision-Language Models (LVLMs) commonly perform spatial reasoning through chain-of-thought (CoT), encoding intermediate reasoning as autoregressive sequences of discrete language tokens. Such hard thinking requires committing to a single token at each step, even when the correct spatial interpretation remains uncertain. This early commitment constitutes premature discretization: an incorrect token selection can propagate errors through subsequent reasoning. We propose Soft Spatial Reasoning, a post-training framework that introduces soft thinking for spatial tasks in LVLMs. At each intermediate reasoning step, the LVLM forms a continuous soft state by mixing token embeddings rather than selecting a single token, allowing multiple candidate continuations to influence the next step. The appropriate degree of softness, however, can vary across reasoning steps: retaining multiple candidates may preserve a useful spatial interpretation, but if those candidates imply conflicting spatial relations, mixing them may interfere with subsequent reasoning. At the core of Soft Spatial Reasoning is AdaptSoft, a controller that uses the current hidden state and predictive uncertainty to adapt the degree of softness at each reasoning step. To train AdaptSoft, we introduce a gradient-alignment learning objective that provides a step-specific learning signal for softness control without intermediate reasoning supervision. Across diverse spatial benchmarks, Soft Spatial Reasoning outperforms hard and fixed-soft CoT baselines using the same backbone, as well as a range of existing LVLMs. The source code is available at https://github.com/rafiibnsultan/Soft_Spatial_Reasoning",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38717v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38717v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38717v1 全文及 2026-10-06T13:00:10.369938+00:00 审阅记录；PDF 22 页，SHA-256 ca506bcc2c6355d3043b7de246f1903da3ee85070bdd1576e07625961666b138，视觉核验第 1、4、7、9、10、17、22 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Exact PDF p.1 https://github.com/rafiibnsultan/Soft_Spatial_Reasoning 声称 available；已实际访问 Public 仓库只有 figures/README/requirements/license，README 明确 sourcecodewillbereleaseduponacceptance，尚无训练/推理实现，不提供 Code 链接。",
+    "ideaZh": "Soft Spatial Reasoning 在 VLM reasoning 阶段把 top5 token embeddings 混成连续 state，用 hidden state+predictive entropy 驱动小 MLP 逐步控制 temperature，并以 output-layer gradient alignment 训练 controller。作者报告同 backbone OmniSpatial49.68 vsfixed soft46.93、SpatiaLab48.71 vs46.86；属于有明确训练接口的 spatial reasoning 方法，值得 skim。结果是 Mean@8，未验证 visual uncertainty、显式多假设几何或 latent reasoning faithfulness；公开仓库目前承诺 acceptance 后放源码。",
+    "motivationZh": "空间推理中的早期 hard token 选择可能过早放弃其他候选，固定 soft reasoning 温度又不能适应步骤差异；需要学习何时保留连续候选状态、何时收紧选择。",
+    "methodZh": "继承 SofT-GRPO 的 Gumbelperturbedscores 作为 sampled 变量，用 jointGumbeldensity 而非单 discretetokenprobability 计算 ratio。AdaptSoft 读 fixedrandomprojection8dim hidden state 及标准化 entropy，τ=.5+.4tanh(u)。LVLMfullfinetune 走 GRPOanswer/format rewards，controller 独立走 disjointreference25%batch 的 gradient alignment，referencegradient/logitresidualstop-gradient 并 center 每 trace 温度 gradient；rolloutstoredscores/inputs 和 stop-gradienttrick 维持 forwardtemperatures。Max-weightdiscretespine 仅识别</think>再切最终 discreteanswer。完整 22 页含技术 derivations、analysis、benchmark/config 已读，实际查看首面、method、mainresults/ablation/limits、temperatureprobes 与 Mean@8 配置。",
+    "methodFlow": [
+      "构造随机连续 CoT：对 candidate logprobs 加 independentGumbel，top5softmaxweights 混合 embeddings 送回 LVLM，不是显式展开五个完整 reasoningbranches。",
+      "逐步调节混合浓度：AdaptSoftMLP 输入 projectedhidden state 和初始化固定标准化的 entropy，预测(.1,.9)temperature，调节候选 weight 分布。",
+      "分开训练 policy 与 controller：LVLM 以 Gumbelscoredensityratio 做 GRPO；controller 用 step-outputgradient 与 disjointreferencegradient alignment，detach 残差/基准及 perrolloutgradientcentering。",
+      "输出离散答案并评迁移：argmaxspine </think>结束 softphase，native-resolutionimages 上 8samples/question 评 Mean@8，检验 trainedOmniSpatial 与 unseenSpatiaLab/MindCube。"
+    ],
+    "experimentsZh": "实验设置：Qwen3-VL-8BThinkingfullfinetune，OmniSpatial6902train/1533test，8H100/200steps 约 2epochs，G8、promptbatch64，answer1+format.2reward；SpatiaLab1400 和 MindCube21154questions 零样本。Ablation 仅 PerspectiveTaking 对应 splits 另训，notfullmainmodel 全部 taxonomies。\n作者报告 OmniSpatial49.68 vsbase43.90/hardGRPO45.92/fixed soft46.93；AlloCentric34.93 反而低于 hard36.57/fixed36.23，Ego75.49 低于 fixed76.35，非所有类别都改善。（PDF p.7, Table1）\n作者报告 SpatiaLab48.71 vsfixed soft46.86（+1.85pp），MindCube38.13 vsbase33.62 但 InternVL37.50；MindCube 缺 matchedhard/fixed softGRPO rows，不能全归因 controller。（PDF pp.8–9, Tables2–3）\n作者报告 PerspectiveTaking 单独设置 full42.75、去 hidden39.22、去 entropy40.64、去 alignment38.68、去 centering41.18；这些不同于 mainTable1 各 perspective 值。（PDF p.9, Table4）\n比较范围：同 backbone/post-traininghard 与 fixed soft 最可比；其他 model 规模/训练/responsebudget 不同，proprietary 仅 reference，不构成公平 overallSOTA。没有显式 geometrytoolbaseline 统一预算、genericVQA/language 能力 retention 或 latency/computeoverhead。\n消融与诊断：Controllerinputs/alignment/centering 消融及 temperature 分布/entropy/trace 内变化。缺 topK/τrange/densityratio/embeddingsupdatedprefixreconstruction 消融；mainmethod 公式 fullvocab 但实际 top5candidateimplementation 需要源码核验。未给 multiseed variance。",
+    "insightZh": "Softembeddings/Gumbel-GRPO 及 adaptiveLLMtemperature 已有工作；本作新增 VLMspatialtask 的 state+entropycontroller 与 step-specificgradient alignment 学习，超越 ordinaryprompt/rewardwrapper。Controlledhard/fixed softbaselines 和 zero-shottransfer 支持接口有效，但改善较小、单 backbone、没有机制证明或多 seed，适合 skim 而非 landmark。",
+    "whyRelevantZh": "针对 VLM 空间推理的连续 intermediatestate 与 stepwiseoptimization 接口可迁移 groundedspatial reasoning，实际主贡献为多模态 reasoningmethod 而非 retrievaltopic 的纯 LLM。",
+    "evidenceZh": "Softstates 是 singlemixedembeddingsequence，不是独立多几何假设/parallelsearch 的显式表示。（PDF pp.4–5, Sec.3.2–3.3; p.18, Appendix B.2；top5mix+maxweightspine，不保证线性 embedding 混合保留各 candidate 含义或多条路径。）\nStepcontroller 学习来自 referenceoutputgradient alignment，而非 visual uncertainty 和 ground truthCoT。（PDF pp.6–7, Sec.3.4; pp.19–21, Appendix C.2–C.3；firstorder 信号 detachGRPOresidual/Gref、gradientcenter，policy 和 controller 优化分离；未复现。）\n主要 accuracy 采用 8responses 的 Mean@8 而不是 greedy/pass@8/majorityvote。（PDF p.22, Table5 Evaluation；trainingmax2048/testmax3072，temperature.6/topk5；actualviewconfig。）\n更高 entropy 学得更低温度，不是简单越不确定越软。（PDF p.17, Appendix A/Fig.6；作者报告 correlation−.613、medianτ.590→.350；correct/incorrecttrace 温度 spread 近似，不能作正确性 confidence。）",
+    "caveatZh": "PDF p.10 Limitations：没有 explicitvisual evidenceuncertainty，未来可结合 visualambiguity 与 languageuncertainty。\nPDF pp.19–20：storedtemperature 复现 state 依赖 tokenembeddings 未变化，gradient alignment 为 detachresidual 下 firstorder 近似。\nSoftstate 解码显示的 CoT 只是 greedyreadableprojection，不证明模型真实沿文字逻辑推理或保持所有 candidateinterpretations。\n仅单 8Bbackbone/smallspatialtraining、incrementalMean@8 无 statisticalvariance，缺泛化其他 architectures/visualgrounding 和 visual uncertainty 实证。\nJointscorelikelihood、top5support 与 fullfinetuning 后 prefixstate 一致性需实现核验；README 目前无代码，无法确认数学描述与 actualRL 细节完全一致。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

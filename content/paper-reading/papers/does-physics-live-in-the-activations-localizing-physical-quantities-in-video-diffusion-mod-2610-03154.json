@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.03154",
+  "slug": "does-physics-live-in-the-activations-localizing-physical-quantities-in-video-diffusion-mod-2610-03154",
+  "title": "Does Physics Live in the Activations? Localizing Physical Quantities in Video Diffusion Models",
+  "authors": [
+    "Jonas Kneifl",
+    "Jakub Skalski",
+    "Bartłomiej Twardowski",
+    "Kamil Deja"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03154"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Does Physics Live in the Activations? Localizing Physical Quantities in",
+    "Video Generation"
+  ],
+  "abstract": "Video generation models produce strikingly realistic sequences and are increasingly proposed as world models, yet recent benchmarks reveal pronounced deficits in their physical reasoning. This raises the question of whether these models internalize physical principles or merely reproduce familiar motion patterns. We address this by probing internal representations of video Diffusion Transformers (DiTs) for simulator-derived ground-truth physical quantities spanning kinematic motion and rigid-body dynamics under gravity and contact. We find that these quantities are linearly decodable with high accuracy early in the denoising process, substantially outperforming a baseline decoded directly from the model's own noised latents, indicating that the relevant physical information is actively constructed during denoising rather than already present in the input. Additionally, we show that activations at on-object tokens carry the relevant physical information and that quantities defined over multiple frames are readable from single latent frames. Hence, information is sharply localized within the token sequence and is computed globally but stored locally. The probes further show partial extrapolation, transferring to scene variations and object configurations outside their training regime, so what they read is not simply a correlate of the scenes they were fit on. When fitted directly in the full-resolution activation space, the probing directions can serve as steering vectors to change the model's output.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03154v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03154v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03154v1 全文及 2026-10-06T15:19:08.380989+00:00 审阅记录；PDF 22 页，SHA-256 195c88ba19a7d7f5556b5f20931e04c69cfc0bdd8a7798ed56aebc82ae1c82d0，视觉核验第 1、2、5、8、9、20、21、22 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF p.10 reproducibility statement 表示 publication 后释放 simulation、capture、probing 和 steering code/data；全文没有可确认的本项目实现 URL，不能把 backbone/simulator links 当作者代码。",
+    "ideaZh": "这项研究在三个冻结 video DiTs 中，用 simulator labels、object-centered ROI 和 ridge probes 解码 speed、momentum、gravity，并把完整 token-grid probe 注入生成来翻转球体方向。作者报告翻转率为 0.45/0.35/0.31，优于方向 prompt；但可读状态不等于掌握物理规律，probe 来自 forward-noised 真值视频，跨场景高分还依赖十条目标场景校准视频。值得速读其定位、校准与控制边界，不宜称作可靠物理 world model。",
+    "motivationZh": "逼真的视频不能直接证明生成模型理解物理；需要定位速度、动量和重力等量在 activations 中是否可读，并区分可解码状态与可干预生成的能力。",
+    "methodZh": "论文将三类有精确运动参数的合成视频编码并前向加噪，单次运行 Wan2.1、CogVideoX-1.5、Open-Sora2.0，比较 transformer activations 与 noised/clean latents 的 linear decodability。Simulator 轨迹给出 token-grid ROI，video-level cross-validation、shuffled labels 和 off-object controls 检查读出。作者随后固定 source probe 方向，用 gain/offset 校准迁移场景，并从完整时空 activations 的 probe 权重构造 SLERP steering direction。",
+    "methodFlow": [
+      "构造有物理标签的视频：生成 rolling、elastic collision 和 projectile 场景；质量与可见半径按固定密度绑定，部分轨迹直接用解析解渲染。",
+      "捕获并定位 representations：将真值 clip 前向加噪，保持首帧 image conditioning、空 text prompt；按 simulator 物体位置选择 ROI，与 global/off-object pooling 对比。",
+      "拟合并迁移 probes：Ridge 参数只在训练 folds 选择，按视频分 folds；迁移时固定 probe 权重，但用十条目标视频调整输出 gain/offset。",
+      "干预完整 token grid：将 full-resolution direction probe 重排为每 token 的 steering direction，在生成前四分之一 steps 用 SLERP 注入；pooled direction 不产生有效控制。"
+    ],
+    "experimentsZh": "实验设置：三类场景各 200 条视频，三个冻结 I2V architectures，按各模型 native geometry 捕获多层、多 noise levels。五折按视频划分，标准化与 ridge penalty 在训练 folds 完成；加入 50 次 labels permutation、同维度 global/ROI/off-object 对照、单帧/latent/activation 对比和受控 background/shape/perspective/count shifts。Steering 在各 backbone 的 52 条已知 baseline 左滚 seeds 上评价。\n作者报告单 latent-frame activations 的 gravity R² 为 0.41–0.81，clean latent 为 0.07–0.12；说明 transformer representation 比局部 latent 更便于线性读取跨时信息，不等于输入完全不含该信息。（PDF p.7, Fig.3c）\n作者报告场景迁移校准后 median R² 为 Wan 0.876、CogVideoX 0.905、Open-Sora 0.295；未校准的 57 个 ROI evaluations 中 26 个 R² 为负，整体 median 约 0.16。高 transfer 分数需要目标域校准。（PDF p.8; pp.18–20, Appendix B.2.2）\n作者报告 full-resolution direction flip ratio 为 0.45/0.35/0.31，方向 prompt 为 0.30/0.017/0.04，reversed direction 的向右翻转为零。但反向干预后仍被判左滚比例仅 0.77/0.50/0.33，因此零翻转不意味着输出无退化。（PDF p.22, Table C.1）\n比较范围：输入 baseline 拼接 noised latent 与首帧 conditioning，并采用相同 ROI pooling，避免简单 conditioning 漏计。模型 native resolution 不同，不能按 R² 排名推断等资源性能。Steering 有同 seed prompt/reversed controls，但缺少 random orthogonal direction、场景移位和物理约束整体准确率比较。\n消融与诊断：ROI/global/center/decoy、ROI radius、单帧表示、noise/depth、迁移校准与 full-resolution/pooled steering 均有诊断。Tracked decoy 仍含 trajectory-correlated signal，作者明确承认；radius 控制不能替代移除 oracle trajectory 信息的检验。",
+    "insightZh": "连续物理参数的量化 probing、object-local readout、校准迁移和生成干预结合，提供关于视频模型控制能力的有用诊断。它扩展了仅判断 plausibility 的 probing，但没有训练更可靠的物理生成器，也没有证明任意物理参数可独立编辑。最强结果针对特定简单场景和 lateral direction。",
+    "whyRelevantZh": "为 controllable video generation 提供可迁移的 object-local probing 与 activation intervention 思路，尤其帮助判断物理状态、生成控制与物理定律之间的证据界限。与 SVG、CAD 或制造参数控制尚无直接实验。",
+    "evidenceZh": "Probes 读取单次 forward-noised 真值视频的 activations，ROI 使用 simulator 位置。（PDF pp.3–4, Sec.2–3; pp.16–17, Appendix B.1；这不是无监督发现物体或直接读取自由生成 trajectory；完整阅读并实际查看图。）\n跨场景迁移区分未经调整的 R²、相关系数和十视频校准后的 R²。（PDF pp.7–8, Fig.4; pp.18–20, Table B.2；作者报告；不能把 recalibrated score 写作零样本绝对物理量预测。）\nFull-resolution probe 能改变简单方向，pooled probe 控制失败，其他参数控制尚难。（PDF pp.8–9, Fig.5; pp.21–22, Appendix C, Table C.1；作者报告；仅在 baseline 向左的 seeds 上测向右翻转，没有证明正确物理定律。）",
+    "caveatZh": "局限于简单少物体 rigid-body mechanics，不含 dissipation、复杂 rotation、deformable/articulated bodies、fluids 或 optics。\n激活来自 forward-noised real/simulated video，属于 off-trajectory capture；decode states 不检验状态间 laws 是否满足。\n部分参数相关，质量又由半径决定；其他物理参数只有 pooled probes 好，无法有效 steering。\n真实视频需 tracking；迁移需 scale/offset 校准，Open-Sora 的迁移较弱。\nOracle ROI 跟随 ground-truth trajectory，在很高噪声下仍携带位置/轨迹选择信息；同 ROI input baseline 和 decoys 有帮助，但不足以把所有强分数解释为 autonomous physics inference。\nLinear baseline 失败只说明该特定线性读出不足；DiT 可能将已有信息线性化，而非从无信息输入创造真实物理量。\nSteering 限于筛出的左滚 seeds，参数选择与分类器失败/退化比例应一并看；不能认定任意 scene、速度或 gravity 可可靠控制。\nFigure 1 的定位热图是示意图，作者明确标注 schematic，不是测量出的 activation heatmap。\n本文仅核验 exact PDF 与图表，未复现 simulator/probes 或观看生成视频。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

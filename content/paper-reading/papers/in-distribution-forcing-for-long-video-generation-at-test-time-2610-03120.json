@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.03120",
+  "slug": "in-distribution-forcing-for-long-video-generation-at-test-time-2610-03120",
+  "title": "In-Distribution Forcing for Long Video Generation at Test Time",
+  "authors": [
+    "Jeongwoo Shin",
+    "Youngyoon Choi",
+    "Sangwoo Jo",
+    "Hyunmog Kim",
+    "Sungjoon Choi",
+    "Joonseok Lee",
+    "Jaewoong Choi",
+    "Jaemoo Choi"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03120"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "In-Distribution Forcing for Long Video Generation at Test Time",
+    "Video Generation"
+  ],
+  "abstract": "Modern autoregressive (AR) video diffusion models excel at short-horizon video generation, yet generating long videos remains challenging due to drifting, where colors and textures shift, and motion dynamics decay. Existing works primarily rely on KV conditioning, which selects or modifies cached key-value (KV) entries to mitigate drifting. However, we observe that KV conditioning alone is insufficient as it assumes cached KV entries remain in-distribution. This assumption fails beyond the training horizon: nothing constrains the construction of KV entries during rollout, giving rise to the KV-provenance problem where cached entries themselves become out-of-distribution (OOD). To address this, we propose In-Distribution Forcing (ID-Forcing), a test-time framework that aligns both KV caching and KV conditioning with training configurations. Its key mechanism, self-caching, prevents OOD KV entries at their source. Each chunk is cached without attending to prior KV entry, keeping the rolling window exactly in-distribution. Consequently, ID-Forcing seamlessly extends short-horizon models to minute-scale video generation. Extensive evaluations show that our method remains competitive on standard video generation benchmark while substantially outperforming prior work in mitigating drifting, as validated by both our drift metrics and a user study.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03120v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03120v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03120v1 全文及 2026-10-06T12:29:32.236702Z 审阅记录；PDF 15 页，SHA-256 b0e3ac3f6015081377d608ba2c8a25cd88db24a4064ab2fd80e7a19a57067c26，视觉核验第 1、4、7、9、13、15 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 给 https://in-distribution-forcing.github.io/ 及 https://idforcing.github.io/，本轮 web 均不可访问，未确认 actualpublic repo。",
+    "ideaZh": "ID-Forcing 用 self-caching 重算 KV 来源，配合首 chunk anchor 与 temporal rerotation，使滚动窗口的 context 配置符合训练 horizon。作者报告长期 drift 与 motion 改善。写入/读取分离值得精读；配置匹配不保证概率分布严格 in-distribution，重算 cache 的 runtime 也未完整报告。",
+    "motivationZh": "滚动 KV cache 的编码历史与位置配置可能偏离 AR video 的训练条件，导致长视频 drift；目标是重建更匹配训练 horizon 的上下文。",
+    "methodZh": "新 chunk 先生成再以空 priorKVself-cache；每窗口早段沿 selfcache、尾段从最后 selfcache 重新 AR 编码，保留最初κ0 并将 recentkeys 重新旋转到训练范围。区别于仅调整 sink/RoPE/readpolicy：相同 conditioningindices 下 KV 还带历史编码 provenance。原始 frame 首 VAE 分布不同作为保留 sink 理由，实测两个 Wan1.3Bderivedmodels 至四分钟，无需新 training。",
+    "methodFlow": [
+      "生成 chunk，self-cache 时不读外部 priorKV，保存 cleanchunk 与基础 cache。",
+      "窗口永久保留首 chunkκ0，取 recententries 并 temporalre-rotate。",
+      "按 selfcachelength 对后段重新 ARcache，限制 provenance 深度及 position 配置。",
+      "四步 denoise 新 chunk 后 evictoldestnon-sink，重复执行固定 window。",
+      "用 longvideoquality、首尾色彩/运动稳定分及 pairwiseuserstudy 检验。"
+    ],
+    "experimentsZh": "实验设置：Wan2.1-T2V1.3B 架构上 SelfForcing/LongLive；chunks 三 latentframes，foursteps，480×832，MovieGenfirst128Qwenrefinedprompts，30/60/120/240s。L3，SelfForcingℓ2/LongLiveℓ3（countsink），对 DeepForcing/InfinityRoPE/MemRoPE；20users×20prompts balancedLatin2AFC 共每 baseline100comparisons。\n作者报告 SelfForcing240s dynamic64.76 对 MemRoPE59.75，color70.34 对 61.41；subject96.70 略高于 96.47。（Table1, p.7）\n作者报告 20participants 整体偏好 IDvsSF100、Deep95、Infinity93、Mem86；每用户每 baseline 五 trials，不能说 86%独立人只选一个固定答案。（Table2, p.7; AppendixC, p.13）\n作者报告 colordrift 为 first/last180binHuehist L1 转换，motiondrift 为 first/last 五秒 DynamicDegree 差转换。（AppendixB/Eq.6, p.13）\n比较范围：同 derivedbackbones/caching 替换与 fullquality 表较可控；两 base 均 Wan1.3B，并非不同 foundationarchitectures。没有高参数/newfamilies/actioncontrols 或 storyscriptbenchmark。\n消融与诊断：sink→rerotation→selfcache 累计，两个 base/fourlengths/userstudy 支持实效；缺 L/ℓbudget、recachecost 及 formaldistributionmatching。短期 motionstability 不是长期 causalstory/worldstate。",
+    "insightZh": "sink、rollingwindow、RoPEreassignment 有前例，新贡献为 KVcachingprovenance 与 conditioning 的区分以及 self/ARrecache 规则。统一 testtimecache 管理有明确方法价值；“exactlyID”是 configurationmatching 的解释，未给完整随机过程分布等价证明。",
+    "whyRelevantZh": "直接推进 ARvideogeneration 的 longrolloutcache 方法和 drift 诊断，可启发 memoryconditioning 研究；未验证 3Ddesign/fabrication 或 worldphysical 一致性。",
+    "evidenceZh": "KV 写入依读取时 priorcontext，同 indices 读取不代表同 cache；selfcache 及 tailrecache 改变 provenance。（Secs.2–3/Eqs.3–5/Figs.2–3/Algorithm1, pp.3–6；方法图已查看；保留 sink/re-rotate 之外还需额外 cacheforwardpasses。）\n作者报告 SelfForcing120s color 稳定分 25.54→72.37、dynamic30.04→65.65；motiondrift46.88→89.06。（Table1, p.7；主表已查看；高 driftscore 表示少 drift，不是大 drift。）\n作者报告 LongLive120/240s motion 稳定 96.09 均低于 MemRoPE96.88，120s aesthetic58.99 略低于 base59.25。（Table1, p.7；并非所有 metrics 最佳；主文 substantiallyoutperforms 所有 drift 项措辞应收窄。）\n作者报告 sink+rerope 后 color60.66，自缓存后 72.37；dynamic65.44→65.65 主要早先组件贡献。（AppendixA/Table4, p.13; Fig.5, p.9；消融实际查看，不能把全部 motiongain 归 selfcache。）",
+    "caveatZh": "无独立 limitations section；implementation 与实验范围限定两个 Wan1.3Bderivedmodels、最多 240seconds。\n首 chunkVAE 编码不同与 cachecontext 训练 horizon 为设计前提。\nselfgeneratedcleanchunk 分布仍可能偏移，配置/positionseen 不意味着 jointKVvalues 或 video 内容概率 distributionexactlyID。\n初始 pureGaussian 不排除后续 denoise/conditioning/modelerrors，KVsolepath 假说不足以证明唯一 drift 原因。\nhuehist 忽略亮度/饱和度、不同内容天然 colourchanges；firstlastmotion 差可奖励两端皆静态，需结合 dynamic/subject。\nfixedinitialsink 可能限制 scenechanges，finitewindow 丢远程 events；未评估叙事、长期 scene/worldidentity 或 actionresponse。\ntailrecache 增加 forward 成本，全文无 runtime/memory/latency 量化；训练 free 不等于免费。\nuserstudy 小 promptset 且无 CI，四分钟不支持无限时长稳定；本项目未运行或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2609.26375",
+  "slug": "kwaimind-technical-report-2609-26375",
+  "title": "KwaiMind Technical Report",
+  "authors": [
+    "Boheng Zhang",
+    "Fan Yang",
+    "Jia Sun",
+    "Junlong Wu",
+    "Wenwu Ou",
+    "Yuting Hu",
+    "Zijun Li",
+    "Dewen Fan",
+    "Fei Zuo",
+    "Honglie Wang",
+    "Huaiqing Wang",
+    "Pengcheng Wei",
+    "Yimin Zhou",
+    "Haixuan Gao",
+    "Lihui Peng",
+    "Tingxuan She",
+    "Yuqing Li"
+  ],
+  "publishedAt": "2026-09-22",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.26375"
+  },
+  "venueIds": [],
+  "publicationType": "technical-report",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "image-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "KwaiMind Technical Report",
+    "Visual Design Agents",
+    "Image Generation"
+  ],
+  "abstract": "Commercial image editing requires product identity preservation, accurate text rendering, and user appeal alongside general editing quality. We present KwaiMind, an image editing system combining general capabilities with e-commerce specialization. An agent-based data engine maintains approximately 1.8 million high-quality editing pairs. Built on a multimodal diffusion transformer, KwaiMind undergoes continued pre-training and supervised fine-tuning, followed by preference optimization and online reinforcement learning. A general-purpose vision-language judge and specialized rewards for click-through rate (CTR), text rendering, and product consistency guide specialized policies, which are consolidated through on-policy distillation. We introduce Ecom-Bench, covering 11 commercial editing tasks with task-specific visual evaluation and CTR-based ranking. KwaiMind achieves the strongest overall scores among evaluated open-source editors on ImgEdit, GEdit, both language splits of REDEdit, and Ecom-Bench visual quality, and the highest aggregate CTR ranking score among compared systems. Offline, CTR-guided optimization increases the proportion of generated images whose predicted CTR exceeds that of the original product image from 12.16% to 37.41%. In an online A/B experiment, CTR-based selection of product main images yields an approximately 2.44% relative increase in actual CTR. These results demonstrate the value of domain-specific data and reward-driven alignment for commercial image editing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.26375v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.26375v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/KwaiMmu/KwaiMind"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.26375v2 全文及 2026-10-06T14:03:58.055843+00:00 审阅记录；PDF 40 页，SHA-256 4875e6f24996056ada9c1d43d95badd78b89edec6d515bb81044fa5b7faac739，视觉核验第 1、5、6、10、11、15、26、27、35 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1 打印官方 repo，实际公开访问确认包含 kwaimind 实现、examples/infer.py 和 benchmark runners，非 README-only；公开范围以 inference/eval 为主，checkpoint 另行提供，未确认全部 agent/alignment 训练代码。",
+    "ideaZh": "KwaiMind 用带人工兜底的 Data Agent 循环生成、修改和审核 image-editing pairs，再以 Qwen-Image-Edit 为底座串联 CT/SFT、DPO、专门 rewards 与多教师 on-policy distillation。值得 skim 的是可复用视觉数据工作流，不是新 MMDiT architecture。作者报告通用编辑与商品图 benchmark 提升；CTR 排名只是预测器偏好，2.44% online CTR 增益属于选图系统，不能外推生成模型真实点击率。Outpaint 和部分细节编辑仍退步。",
+    "motivationZh": "规模化 image-editing 训练需要指令、原图与结果准确对应，但人工制作和审核成本高；需要能生成、修改、验证并在困难案例转给人工的数据工作流。",
+    "methodZh": "Coordinator 用有限状态 work orders 和循环预算调度 Filter、Generation、Caption，Generation 通过 planner 调用定位/分割/图像生成专家修改可修复样本，Caption 用差分区域提示生成分层指令并 reverse-audit；评审再路由修改、接受或人工异常队列。作者从约 26.2M 原始 pairs 维护约 1.8M 训练 pairs，以 234.9K 严选 pairs 进行 SFT。Alignment 使用既有 DiffusionNFT/DiffusionOPD，将 CTR、OCR 和商品一致性教师整合成单模型。完整 40 页包括 benchmark、定性图和引用均已读；关键方法、表格与未来工作页面实际视觉核验。",
+    "methodFlow": [
+      "筛选并定位修改目标：Coordinator 分配 work order，Filter 执行图像质量/任务符合度审核；可修复 rejection 附诊断，Generation planner 路由 Grounding DINO、SAM2、去背景和生成等专家。",
+      "有界生成与标注反馈：生成修改后返回 Pre-Filter；差分 mask/SOM 辅助 Caption 产生 detailed、brief、colloquial 中英文指令，reverse-audit metadata 并改写，预算耗尽或不确定交人工。",
+      "维护高质量编辑对并适配模型：Post-Filter 评估指令/编辑/视觉质量，高置信接受才入库；高分辨率 CT 与 general/ecommerce 混合 SFT 适配原 Qwen MMDiT，保留多参考输入。",
+      "专门 reward alignment 与整合：DPO 后各任务独立 DiffusionNFT teachers 使用通用 judge 与 CTR/OCR/consistency reward，DiffusionOPD 在 student 自身 trajectories 上匹配各 teacher 的 transition means。"
+    ],
+    "experimentsZh": "实验设置：General ImgEdit/GEdit 改用共同 Gemini3.1ProPreview judge 和原任务 rubric，REDEdit 沿原 bilingual protocol；Ecom-Bench 每任务 100cases×11，其中两任务双 reference，四项 1–5 rubric 几何均值，跨 task 宏平均。CTR 八模型完成全部 1100cases，比较同 case 预测排名。\n作者报告 ImgEdit4.15/GEdit6.29，分别对原 Qwen-Edit2511 3.83/5.97；REDEdit EN/CN3.75/3.73 对 3.43/3.43。共同 judge 下本轮 open editors 总体领先，但 closed GPT-Image2 GEdit7.10 更高。（PDF pp.26–27, Tables6–7）\n作者报告 Ecom3.67 对原 Qwen3.18，ClothingDetail4.25 对 2.62；Outpaint2.55 低于原 Qwen3.92 与 Flux4.57，ProductExtract3.69 低于原 Qwen3.77，专门适配并非均匀改善。（PDF pp.27–28, Table8/§5.2）\n作者报告 CTR top-three 次数 544=215+164+165；closed Seedream525，最高次数不意味着视觉质量超过 GPT-Image2 的 4.20，且此信号与训练 reward 同源。（PDF pp.1/27–28, Figure1/Table8）\n作者报告原图对比的预测 CTR 胜率 12.16%→37.41%，onlineCTR 选图相对提升约 2.44%；无样本量、CI 或随机生成模型对照可将其归因到 KwaiMind 输出。（PDF pp.18–19, §3.4.4）\n比较范围：包含 6 open editors 和 3closed systems，jointGemini 评分可作内部对比而非引用原官方 benchmark 分数。JoyEdit/LongCat 缺双输入，Ecom 总体按 9 任务平均，其余 11 任务不完全同分母；CTR 已明确排除两者。Training data/compute 与 commercialAPIs 不匹配。\n消融与诊断：文中描述 reward/pairwise refinement 效果，但没有完整 DataAgent 去循环/去人工、CT/SFT/DPO/NFT/OPD 逐阶段 matched-budget table、多 seed 或奖励权重/跨目标干扰量化；不能因最终模型强而独立归功于每个 agent 或 OPD。",
+    "insightZh": "实质是 production image-editing data engine、任务 reward/benchmark 与完整 staged adaptation 的系统组合；MMDiT、DPO、NFT、OPD 均有明确既有来源。Generation 真实操作视觉 artifact，具有反复观察/修复与人工失败恢复，满足 visual-design-agents focused gate；贡献不依赖把电商 CTR predictor 视为基础 VLM 创新。",
+    "whyRelevantZh": "视觉 artifact 生成→观察诊断→修改→再审核是 visual-design-agents 的核心工作流，数据引擎的显式失败路由与多质量维度可以为 structured creation 数据构建提供思路；不声称本文已解决 SVG/CAD/embroidery 或 LEGO 设计。",
+    "evidenceZh": "Data Agent 执行实际图像修改和带预算的反馈循环，非只调用一次 LLM 生成文案。（PDF pp.6–11, §§2.1–2.6, Figure 4, Table 1；Generation 返回筛选，Caption reverse-audit，uncertain/OOD/预算耗尽交人工；reverse-audit metadata 一致不等于独立图像真实性验证。）\nArchitecture 继承 Qwen-Image MMDiT，alignment 整合已有 NFT/OPD。（PDF pp.12–17/22, §§3.1–3.4.7, Figures 5–6；没有新的基础架构对照；single student mean matching 基于共享 noise covariance/schedule。）\nEcom CTR 分数为八模型输出的预测 top-three 排名次数，非 CTR 百分比。（PDF pp.25/27–28, §4.2.3/§5.2, Table 8；rank1/2/3 等权，544 是次数和；同一个已用于优化的 reward predictor 担任该评估信号，不能当独立用户效果。）\nOnline A/B 结果针对 CTR-based 主图选择，而非生成模型随机分配的因果实验。（PDF pp.18–19, §3.4.4；作者报告约 2.44% relative actual CTR；offline12.16%→37.41% 衡量预测 CTR 超过原图的比例，不是 actualclick 增长。）",
+    "caveatZh": "PDF p.28：Outpaint、ProductExtract 表现不均；部分 baseline 缺双 reference，九任务均值须谨慎解释。\nPDF pp.27/35：与 proprietary 系统视觉质量仍有差距，future 改善 compositional/multi-reference robustness。\nAgent 数据规模很大但因果消融不足，未给循环预算及人工工作量，不能假定自治流程效率/质量保证；metadata reverse-audit 可能共用模型偏差。\nCTR 训练和评估共用预测器，曝光日志虽按同 product/time 筛对，用户/position/traffic confounding 仍可能影响商业偏好，offline proxy 不能当 actualCTR。\n商品一致性和所谓 physicalplausibility 都是 VLM rubric/teacher proxy；没有 editable SVG/layers、fabrication/几何约束或 3D 可制造证据。\n公共 repo 已提供 inference/evaluation，但权重另行分发，Data Agent/reward 训练与私有 8M 数据未见完整公开，不等于全系统可复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

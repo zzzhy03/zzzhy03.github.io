@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.00333",
+  "slug": "lego-opd-factorized-teacher-composition-for-multimodal-on-policy-distillation-2610-00333",
+  "title": "LEGO-OPD: Factorized Teacher Composition for Multimodal On-Policy Distillation",
+  "authors": [
+    "Jaeyun Shin",
+    "Hangeol Chang",
+    "Jong Chul Ye"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.00333"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "LEGO-OPD",
+    "VLM / MLLM",
+    "LEGO",
+    "OPD"
+  ],
+  "abstract": "Multimodal on-policy distillation (OPD) aims to improve visual grounding while preserving the strong reasoning capabilities of language models. Recent multi-teacher approaches combine LLM and VLM teachers to provide complementary supervision. However, directly using a VLM's full predictive distribution entangles its visual grounding signal with its own language prior, preventing the grounding information from being transferred independently. Conversely, increasing the strength of visual supervision can improve perception but may overemphasize visual evidence and degrade language reasoning. To address this trade-off, we introduce LEGO-OPD, which selectively composes factors from a Language Expert and a Grounding expert into One teacher distribution for multimodal OPD. Under a generalized Bayesian formulation, the language expert provides a prior over candidate tokens, while the grounding expert contributes a visual likelihood that updates this prior, rather than transferring its complete predictive distribution. This factorized composition allows language reasoning and visual grounding to be controlled independently. We further introduce adaptive calibration to determine how strongly the visual likelihood should update the language prior at each decoding prefix. Specifically, LEGO-OPD uses the grounding expert's image-induced prediction shift as a prefix-dependent reference, preventing both insufficient and excessive visual supervision. Experiments with Qwen3 models show that LEGO-OPD consistently outperforms the evaluated single- and multi-teacher OPD baselines on both multimodal and text-only reasoning tasks. Moreover, it improves the initial student's visual perception while preserving text-only reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.00333v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.00333v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.00333v1 全文及 2026-10-06T15:46:53.229417Z 审阅记录；PDF 33 页，SHA-256 c62d2f196f6479ddefbf22f5595f820cb356a563599823d3ecb6eaa7e181f9c6，视觉核验第 1、2、7、18、19、29、33 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF p.10 声称代码位于 anonymous.4open.science/r/LEGO_OPD-51C1；浏览器工具无法访问，直接请求该页及其官方 API 均返回 403，无法核验 public implementation，因此不标 available，也不推断代码不存在。",
+    "ideaZh": "LEGO-OPD 用独立 LLM 的语言 prior 加上 VLM 的 image/no-image logit 差构造 teacher，并按 source KL 自适应调视觉信号。作者报告多模态和纯文本推理均优于所测蒸馏对照；值得精读的是跨专家组合与 calibration 的边界。视觉差只是 model contrast，实际系数有截断、support restriction 和局部近似，不能称准确视觉 likelihood 或严格保持 KL budget。",
+    "motivationZh": "强语言专家与视觉专家具有不同优势，单教师蒸馏难同时吸收两者；目标是组合语言 prior 与 image-dependent residual，并控制视觉信号强度。",
+    "methodZh": "学生生成回答前缀，冻结的语言 expert、带图 VLM 和无图 VLM 在共同词表上打分。teacher logits 以语言 prior 为底，加上稳定化的视觉 residual；系数由图像造成的 source KL 与 residual variance 决定。完整 teacher 在全词表归一化，student 使用 detached top-token surrogate 更新。理论分析区分理想 raw residual 与实际 flooring、nucleus statistics、regularizer 和 cap；实验比较固定权重、专家替换和 language-only supervision。",
+    "methodFlow": [
+      "学生在图文输入上生成 rollout，所有 experts 评分同一回答前缀。",
+      "语言 expert 提供 prior，VLM 带图与无图预测之差形成视觉 residual proxy。",
+      "抑制不可靠的低概率 ratio，并在 teacher nuclei 的联合 support 上估计 KL 与 variance。",
+      "从局部 KL 近似求系数并施加 regularizer 和 cap，组合全词表 teacher。",
+      "用 student top-token surrogate 蒸馏，分别检查视觉感知、多模态推理和纯文本推理。"
+    ],
+    "experimentsZh": "实验设置：Qwen3-family frozen experts 蒸馏同一小型 VLM，使用 MMFineReason 多模态训练输入，比较 Standard OPD、VA-OPD、M-OPD、H-OPD，并测试固定系数、source budget、expert swap、无视觉监督与重新组合单 VLM teacher。多次 evaluation sampling 的标准差不代表多次独立训练。\n作者报告默认 LEGO-OPD 的多模态均分为 45.84，H-OPD 为 43.47，初始学生为 40.11；纯文本均分分别为 56.01、55.57、51.89。（p.7, Table 1）\n作者报告固定系数中最佳多模态均分为 43.22，而 adaptive 默认值为 45.84；感知分数并非超过所有 baseline。（p.8, Table 2; p.7, Table 1）\n作者报告换成初始学生的 visual residual 后多模态均分仍为 45.02，换掉强语言 prior 后为 39.76，说明收益很大部分依赖语言 expert。（p.9, Table 4）\n作者报告 practical self-prior recomposition 的多模态均分 40.18，与 direct VLM teacher 的 40.37 接近但不相同；它同时改变 residual stabilization 和 coefficient approximation。（p.29, Table 10）\n比较范围：覆盖单、双 teacher OPD 与因子替换。VA-OPD 生成多个回答因而看到较少 unique prompts；M-OPD 使用不同域数据；H-OPD 使用 description-augmented LLM 输入与不同 support。没有跨词表专家、其他模型家族或完整训练成本比较。\n消融与诊断：固定系数及 budget 控制相对明确；support-mass sweep 和 numerical solver 比较检查近似。solver 图在 restricted support 上汇总均值，不能证明每个 prefix 的 full-vocabulary budget 都吻合。Decomposed OPD 结果只是作者改设定下的 reproduction attempt。",
+    "insightZh": "预测空间的 logit 差与 expert composition 延续既有思想；新意在跨专家 prior/residual 分工及 source-referenced calibration，使视觉监督强度以当前 prefix 的预测位移为尺度。它给出理论适用范围和 practical approximation 分析，具有多模态训练迁移价值，但不是从图像真值推导的独立 likelihood，也没有通过正确性检测筛掉错误视觉证据。",
+    "whyRelevantZh": "研究如何将语言推理能力与视觉信号分开组合并控制训练强度，直接关联 VLM 的视觉 grounding 与 reasoning 干扰问题，属于有可迁移方法的多模态训练研究。",
+    "evidenceZh": "无图分支是移除图像而非 marginalization，视觉 residual 因而是模型依赖的 contrast。（pp.4–6, §3; p.33, Appendix F；全文明确的 evidence boundary；回答前缀也可能已携带视觉信息。）\n实际系数使用稳定化 residual、restricted support、regularization 与 cap，teacher 仍在全词表归一化。（pp.18–19, Appendix B；理论 raw/full-vocabulary KL 结论不能无条件搬到实践规则。）\n同基座的固定系数与 factor 替换控制支持组合及 calibration 有用，但主 baseline 的监督形式不同。（pp.7–9, Tables 1–4; pp.23–29, Appendices C.5/D；作者报告；不是所有方法等 FLOPs 或等 unique prompts 的比较。）",
+    "caveatZh": "source KL 测量视觉造成的变化而非正确性，可能放大错误证据。\n前缀可能已包含图像信息，视觉 residual 不是孤立视觉因子。\n要求共同 tokenization 与词表，限制专家组合。\n局部 calibration 在大位移下可 overshoot，稳定化及 cap 也改变理想组合路径。\n主要用单次训练 checkpoint；报告的多个 evaluation seeds 不反映 training variance。\n语言 expert 的贡献较大，感知增益较小且不胜所有对照，不能将全体推理收益都归于更好的视觉 grounding。\n基线存在数据、support 和 rollout 差异，没有等实际算力的全面因果比较。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

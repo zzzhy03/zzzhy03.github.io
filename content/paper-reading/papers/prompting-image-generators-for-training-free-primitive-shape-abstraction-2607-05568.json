@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2607.05568",
+  "slug": "prompting-image-generators-for-training-free-primitive-shape-abstraction-2607-05568",
+  "title": "Prompting Image Generators for Training-free Primitive Shape Abstraction",
+  "authors": [
+    "Gregor Kobsik",
+    "Tim Elsner",
+    "Leif Kobbelt"
+  ],
+  "publishedAt": "2026-07-06",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2607.05568"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "Prompting Image Generators for Training-free Primitive Shape Abstraction",
+    "3D Segmentation",
+    "3D Reconstruction"
+  ],
+  "abstract": "Compact primitive abstractions represent 3D shapes with a few geometric primitives while preserving recognizable components. Learned methods depend on their training classes, and optimization-based methods split shapes geometrically rather than into parts. We instead reuse the visual part knowledge of pretrained models without task-specific training or fine-tuning. A vision-language model names parts in multi-view renders, and an unmodified image generator paints color-coded part masks. Reprojection and spatial clustering recover 3D instances, and a classical optimizer fits one tapered and bent superquadric per part. With five to eight primitives per object, the abstractions match the Chamfer distance of the strongest learned baseline on HumanPrim, improve on it by 10% on Toys4K, and have the lowest overlap among compact methods, while chair legs, backrest bars and wheels remain separate primitives. Our accuracy also transfers better than theirs to objects outside the learned methods' ShapeNet training classes. Replacing the generated masks with part labels from the 3D segmentation methods P3-SAM or PartField lowers IoU by 7 to 17 points under the same fitter. Further studies relate the remaining volumetric error to part granularity and to parts that the rendered views observe from one side only.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.05568v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.05568v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.05568v2 全文及 2026-10-06T13:16:47.252594+00:00 审阅记录；PDF 21 页，SHA-256 3a5cf9a17c97cacde9e08e2d6e2529c0d3121d7499aa52336ef329b63497df13，视觉核验第 1、2、4、8、9、13、18、21 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 21 页 exactPDF 未提供该方法 public implementation/project 链接；附录有 prompts、clusteringalgorithm 及 fitter 设置，但不据此标记已公开代码。",
+    "ideaZh": "这项 shape abstraction 用 VLM 提出 part/color vocabulary，让未微调的 image generator 绘制一致 multi-view masks，再把标签重投影到已知 3D 几何、按颜色连通聚类，并为每 part 拟合 tapered/bent superquadric。作者报告六视角 Toys4K CD .086 vs SuperFlex .096，HumanPrim .081 vs .082；但 IoU 63.7%/65.3% 仍低于 SuperFlex 67.6%/66.8%。值得深读的是 generated masks→parameterized parts 的接口与固定 fitter/GT segmentation/visibility 控制；真实厚度、相接同类 instances 与小部件仍失败，不等于单图重建、editable CAD 或制造可行性。",
+    "motivationZh": "已有 mesh 或 point cloud 很难直接转成语义合理的 primitive abstraction。目标是不训练专用模型，利用多视图语义分组得到可参数化的部件形状。",
+    "methodZh": "输入是已知 mesh/point-cloud object，不是只给 RGB。系统渲染四环视图（或补 top/bottom 为六视角），Gemini3Flash 分析语义 parttypes 并分配颜色，NanoBanana2 按同 palette 涂 mask。palette 合并与跨 viewsmajorityvote 把 2Dlabels 投回可见 3Dsurfacepoints；同色 connected components 分离空间隔开的 instances，小 clusters 被移除。每 component 独立 multi-startL-BFGS 拟合最多 15 参数 superquadric，允许 taper/bend，Chamfer 候选中偏向较大 axisproduct 以缓解 one-sidedsurface 的 zero-thicknessoptimum。全文比较 learned/optimizationbaselines、同 fitter 的 3Dsegmenters 与 PartNetGT，并量化 viewcoverage、fit 初始化、primitivegranularity 和 repeat-runvariation。",
+    "methodFlow": [
+      "以 parttypes 约束生成 mask：渲染已有 3Dobject，VLM 命名 parts 并输出 palette，同类 instances 同色；imagegenerator 在同一 composite 上涂色，避免跨反向 view 的 left/rightinstance 身份混乱。",
+      "标签重投影与连通实例分离：可见 point 收集 masklabels 并投票，palette 按 CIELAB 合并；按同色邻域 graph 提取 connected components，仅保留足够大 clusters，未被任何 view 见到的 points 丢弃。",
+      "独立拟合可参数化 primitive：每 component 用 boundingbox×三 shape families×三轴×五 deformationstarts 并行优化表面 Chamfer；设 minimumaxisfloor，top10 低 cost 候选取最大 axisproduct。",
+      "分开评估语义与几何误差：更换 segmentation source/GT granularity 而固定 fitter，改变 surfacecoverage 与 candidate 规则，重复 modelcalls 区分 surfacequality、volume 和 partcount 变化。"
+    ],
+    "experimentsZh": "实验设置：作者报告 HumanPrim314objects/10kpoint cloud、Toys4K315objects/105categories 及 ShapeNet300objects。knownmeshes/Poissonrecon 支持 visibility 与 IoU；统一 unsquaredbidirectionalL2surfaceCD、128³occupancyIoU、primitivevolumeoverlap 与 count。pipeline 使用 Gemini3Flash+NanoBanana2，两 calls，无专门 training；partcloud2048points、2500areasurfacesamples，45candidates×80L-BFGSiterations。参数在 40shapes 搜索/其余手设；view/fitterstudies 用 50HumanPrim，PartNetGT94chairs/95tables。\n作者报告六视角 HumanPrim CD .081/IoU65.3%/7.7primitives，SuperFlex .082/66.8%/6.7；Toys4K .086/63.7%/4.7 vs .096/67.6%/4.9。（p. 4, Table 1）\n作者报告同 fitterHumanPrim generated6viewsIoU65.3%，P3SAM57.4%、PartField48.0%、PartSAM70.6%；PartSAM 用 11.0primitivesvs7.7。Toys4KPartSAMCD.082 优于 ours.086，但 IoU62.1%低于 63.7%。（p. 8, Table 3）\n作者报告 50object 四→六 views coverage81.6→97.5%、IoU68.4→69.1，16viewscoverage99.8%而 IoU68.8；更多 views 不单调改善且 mask 也随之改变。（p. 7, Table 2; p. 14, Table S6）\n作者报告 ShapeNet 六 views CD .095/IoU48.6%，SuperFlex .081/63.3%；OOD 类别优势不等于所有 benchmarkSOTA。（pp. 16–17, Table S7）\n作者报告五次 calls 在 50objects 每 objectstandarddeviation CD.006、IoU4.6 百分点、primitivecount1.1；runmeans IoU 标准差.6 百分点。CDbestof5 selection 平均 IoU64.0→68.2 但 calls 乘五。（p. 20, Table S10）\n作者报告四/六 views 的 modelcalls+fit 约 39/52s，其中 fit14/15s；未包含 rendering 与 reprojection，不是完整端到端 40s 保证。（p. 14, Figure S2/Table S6）\n比较范围：统一 protocol 复算 EMS/LightSQ/PrimitiveAnything/F2C/SuperDec/SuperFlex，同时比较 P3SAM/PartField/PartSAMlabels 固定 fitter；primitivebudgets 不同，compact 组与多 primitive 组明确区分。PartField 采用 k8、PartSAM 三 objects 降低 defaultthreshold，EMSShapeNet22failures 从其 means 剔除。训练类划分对 SuperDec/Flex 精确，对 F2C/PrimAny 仅近似，不声明 foundationpretrain 无类别重叠。\n消融与诊断：固定 masks 测试 init1/3/9/45、taper/bend、minaxisfloor、cost/volume/oracle 候选；view1–16、singlecomposite/sequential、GT granularity、instancecolor 失败以及 modelcomparison。九 imagegenerators 仅两个 hand-pickedexamples，不能据此普遍排名 models 或推荐当前 price。maskgranularity/partsemantic 保留无独立 quantitativecorrectnessmetric。",
+    "insightZh": "render→2Dprediction→backprojection 与 superquadricfitting 分别成熟，论文明确承认。贡献是将 unmodifiedimagegenerator 的 partknowledge 变成跨 viewcolor mask、与 classicalfitter 解耦的 compactparameterpartrepresentation，并以共享 fitter 和 GT granularity 实验解释何时优于 native3Dsegmentation。不是训练新 3Dbackbone，也无 jointconstraint-awareCAD 程序。直接 part abstraction 方法与诚实控制设计具有主方向价值。",
+    "whyRelevantZh": "直接面向 3Dpartsegmentation 与 compactparametricshape abstraction，提供 image-generativeprior→可编辑 primitive parts 的具体接口，并揭示 viewcoverage、semanticgranularity 与 volume 的关系。可借鉴于 part-aware 结构化设计，但论文尚不生成 CADcommands 或 fabricationconstraint 模型。",
+    "evidenceZh": "semanticpartcolor 加 3Dconnectivity 代替跨 viewinstanceidentity，使相隔同类部件可独立拟合。（pp. 2–4, Figure 1, Sec. 3; pp. 16–17, Appendix S9；same-colorinstances 只有 spatiallyseparated 时可拆开；touching 或 colorbleed 会 merge，并非可靠 instancecorrespondence。）\n作者报告 surfaceCD 接近或改善 compactbaselines，但 volumetricIoU 没有全面超过 SuperFlex。（pp. 4 and 7, Table 1, Sec. 4.2; p. 17, Table S7；ShapeNet 训练类上 SuperFlex 整体 CD/IoU 更好；largestvolumeproxy 不恢复 truepartthickness。）\n固定 fitter 的 segmentation 与人工 partgranularity 实验展示 masksource 和 granularity 的重要性。（p. 8, Tables 3–4; pp. 16–17, Appendices S10–S11；PartSAM 在 HumanPrim 更好且用更多 primitives；IoU/CD/overlap 本身不 measuresemanticcorrectness，partpreservation 证据以 qual 为主。）\none-sidedsurfacefitting 有 zero-thickness 退化，minimumfloor 与候选 volume 选择仅缓解。（pp. 3–4; pp. 11–13, Tables S2–S5; p. 21, limitations；2%floor 为 segmentlargesthalfextent 下界，不是从图中恢复真实制造厚度；oraclecandidate 只是 analysisupperbound，不是实际 inference。）\n作者实际报告同 input 五次生成的单 objectvariation，部分 ablationmask 处于较好 run 端。（pp. 20–21, Appendix S12, Table S10；重复 modelcalls 不等于全 benchmarkfiverepeats；fitter 固定，variation 来自生成 stages。）",
+    "caveatZh": "小 clusterfilter 可丢失重要 thinparts，相接同色 parts 或 colorbleed 会 merge；分割 granularity 无法可靠控制。\nimagegenerator 跨 opposingviews 不能保持 left/rightinstanceidentity，所以 instances 仅在 3D 空间分离时由 floodfill 恢复。\nsurfaces-onlyobjective 和 discardedunseenpoints 不能识别真实厚度，axisfloor 只阻止 zero-volume，并造成低于 volumetricbaselines 的 IoU。\nphantomviews、boundaryvariation、fixedviewundersides 及 40–50smodelcall 主耗时都是作者展示的实际失败/限制。\n输入完整 3D 几何、camera/visibility 已知；不是从 singleimage 或 unknownposedmultiview 恢复物体，不能包装成通用 3Dgeneration。\nfoundation model“无需专门训练”不保证无 pretrainingexposure；只按 learned3Dmethods 的训练 classes 定义 OOD。\n部分 ablation 用单独较好 maskrun，repeat-run 个体 spread 与顶级 method 差距同阶，singleobject 优劣不可过度解释。\nsemanticpart 正确性主要 qual，参数 superquadric 可编辑也不等于 CADB-Repoperationhistory、物理 contact、collisionfreeassembly 或可制造。\nproprietarymodelAPI/version 和 maskgenerationstochastic 性影响复现；两个对象上的模型及价格比较不具普遍选择依据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

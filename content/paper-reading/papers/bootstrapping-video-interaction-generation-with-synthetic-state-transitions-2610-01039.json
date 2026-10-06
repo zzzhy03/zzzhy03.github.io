@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2610.01039",
+  "slug": "bootstrapping-video-interaction-generation-with-synthetic-state-transitions-2610-01039",
+  "title": "Bootstrapping Video Interaction Generation with Synthetic State Transitions",
+  "authors": [
+    "Jiho Jang",
+    "Jinyoung Kim",
+    "Nojun Kwak",
+    "Kyungjune Kim"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01039"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Bootstrapping Video Interaction Generation with Synthetic State Transitions",
+    "Video Generation"
+  ],
+  "abstract": "While recent video generative models can synthesize high-fidelity videos, they struggle to portray plausible physical interactions and the resulting state transitions, a critical bottleneck for applications in robotics and VR/AR. To address this, we introduce a framework to generate a scalable synthetic dataset of controllable interactions. Our pipeline leverages a structured taxonomy and state-of-the-art image editing models to create explicit `start' and `end' state images, which serve as visual anchors for the interaction. To generate a seamless video utilizing these anchors, we propose State-Guided Sampling (SGS), a novel sampling technique that mitigates artifacts common in naive conditional generation. Furthermore, we develop and validate a new automated evaluation system that aligns with human judgments to ensure data quality. Experiments show that fine-tuning a base model on our dataset significantly enhances its ability to generate plausible interactions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01039v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01039v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01039v1 全文及 2026-10-06T15:22:00.298576+00:00 审阅记录；PDF 25 页，SHA-256 f89a9508f92f20e0ae3f5a4dcfc545004afde210959c903d2c0c1324ba26e546，视觉核验第 1、2、4、6、7、10、14、25 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF p.2 的 github-page annotation 指向官方 project https://hagiss.github.io/synthetic-state-transitions/；实际页面说明 Code and dataset will be released，未提供已公开实现，故不标 available。",
+    "ideaZh": "这篇论文用 taxonomy→起止状态 images→SGS 视频→质量过滤构造 synthetic interaction data，再微调 Wan2.1。SGS 按视频帧位置混合 I2V 与 first-last-frame velocity，使后段更依赖 I2V；作者报告 fine-tuned I2V 的人工胜出份额从 29% 升至 53%，但外部 PhyGenBench 平均自动分仅从 0.51 到 0.52。值得速读显式状态约束与数据闭环，不能把视觉 plausibility 评分写成物理定律或机器人 action-outcome 的验证。",
+    "motivationZh": "物体交互视频需要同时满足起始状态、结束状态与合理转场，现有训练数据未必覆盖这些条件；需要可扩展的状态配对、视频生成和质量筛选数据闭环。",
+    "methodZh": "GPT-4o 根据对象/交互 taxonomy 生成 actor、object、interaction、state-change tuples，再生成起始图并编辑为结束图。SGS 将 start-conditioned I2V 和 start/end-conditioned FLF 的 velocity fields 以 frame-wise exponential weights 混合。初始人工标注数据训练 LoRA 与 hybrid quality evaluator，再由初始/微调模型扩展候选并筛选训练集。Evaluator 结合 Gemini 四项分数、VideoPhy2、V-JEPA2 surprise、质量/物理 probes 与 temporal artifact detector。",
+    "methodFlow": [
+      "枚举交互与目标状态：对象和交互两种采样策略结合 taxonomy，以 GPT-4o 判断组合并生成 before/after states 与 video prompt。",
+      "建立视觉端点：生成起始图，再通过 image editing 得到状态变化后的结束图，作为视频 visual anchors。",
+      "混合局部与端点条件：SGS 在各视频帧位置混合 I2V/FLF velocity；后帧 I2V 权重按 exponential curve 增至一，以减轻 rigid end-frame 引发的 ghosting。该 schedule 以视频 frame index 为轴。",
+      "过滤并迭代微调：人工标注初始 candidates，训练 hybrid evaluator 与初步 LoRA；对扩展生成候选自动过滤，再用合格视频微调生成器。"
+    ],
+    "experimentsZh": "实验设置：作者报告初始 191 prompts×六 sampling 配置为 1,146 条人工标注视频，扩展 1,018 prompts 产生 4,971 条候选，最终训练 1,525 条/681 prompts；视频为五秒、81 frames，另有 105 held-out prompts。验证 hybrid evaluator、SGS α 与 Wan2.1 微调，另将 PhyGenBench 转为 Flux-dev 起始图条件的 I2V 任务。\n作者报告 Gemini 与人类的 Pearson correlation 在 clarity/causality 为 0.54/0.49，在 plausibility/continuity 为 0.37/0.31；hybrid evaluator Macro F1 从 0.66 升至 0.71，Good-class F1 仅 0.63。（PDF pp.4–6, Fig.3, Table 1; p.10, Table 6）\n作者报告 held-out prompts 上 fine-tuned I2V 的 Gemini average 3.15→3.28，temporal artifact 0.13→0.07；fine-tuned SGS average 为 3.34，但 artifact 0.11，不优于 fine-tuned I2V。VideoPhy2 PC 未获得一致改善。（PDF p.6, Table 2）\n作者报告 I2V fine-tuning 的人工 rank 1.98→1.68、WR 29%→53%，VBench Dynamic Degree 0.64→0.73；这不是单独 SGS 的微调增益。（PDF p.7, Table 3）\n作者报告 SGS α=0.5 的 Good fraction 为 0.38，相对 I2V 0.22、FLF 0.15；仍有多数候选不合格。外部 PhyGenBench 平均自动分 0.51→0.52、Mechanics 0.49→0.47，而人工 WR 27%→42%。（PDF p.7, Tables 4–5）\n比较范围：包含 Wan2.1 I2V/FLF/SGS、fine-tuned I2V/SGS、Hunyuan 与由 PhyT2V 适配的 PhyI2V。模型条件、图像生成来源和资源不完全统一；外部 benchmark 被适配为 I2V，不能直接类比原始 T2V leaderboard。评价兼有人评与多个自动代理，但人评参与人数、完整评分分布与 uncertainty 未充分说明。\n消融与诊断：有 SGS α=0.3–0.6、evaluator features 的逐项加入以及 qualitative constant-weight ghosting 对照。未分离 taxonomy、image editor、人工 bootstrapping 与自动过滤对最终微调增益的独立贡献，也未提供匹配真实视频/随机过滤数据量对照。",
+    "insightZh": "显式 before/after states 与 frame-wise velocity mixing 为 interaction-oriented synthetic data engine 提供可复用设计；hybrid evaluator 的人工校准揭示 VLM 单独判物理/连续性较弱。方法总体是既有图像编辑、视频模型和浅层质量模块的组合，没有 simulator 约束或证明混合 velocity 保证起止状态、物理 manifold 与因果 laws。",
+    "whyRelevantZh": "显式状态约束、局部/端点生成权重协调和分阶段质量过滤，具有视觉生成工作流和 synthetic transition data 的迁移价值。对 structured editing 的启发是暴露 before/after handles；论文不含 editable CAD/SVG 或 fabrication 验证。",
+    "evidenceZh": "SGS 权重沿视频 frame index 变化，而不是沿 denoising step 变化。（PDF p.4, Sec.3.3, Eqs.1–2; p.14, Fig.8；完整阅读 exact PDF 并查看公式和 ghosting 对照；没有复现 sampling。）\n数据由人工 bootstrapping 与自动 quality filtering 形成，evaluator 使用 out-of-fold quality/probe predictions 减轻标签泄漏。（PDF pp.5–6, Sec.5.1–5.2; p.10, Table 6；Out-of-fold 表述针对 feature predictions；未明确整个 evaluator 是否按 prompt 分组 cross-validation。）\n人评支持交互改善，但外部物理 benchmark 自动增益较小且部分指标退步。（PDF pp.6–7, Tables 2–5；作者报告；作者关于 PhyI2V evaluation hacking 的解释是假设，不是独立证实。）",
+    "caveatZh": "当前 pipeline 依赖 proprietary image editor/VLM，计划使用开源替代。\n未来才考虑 physics engine 直接约束生成；当前主要过滤 implausible outputs。\n计划扩大 taxonomy、数据量与 preference tuning。\n起止图片与人/VLM plausibility 不能证明真实接触 dynamics、守恒 laws 或可用于机器人规划的 action-outcome accuracy。\nSGS 混合公式没有端点或 manifold 保证；视觉 ghosting 改善属于实验现象。\n同 prompt 的六 sampling candidates 若跨 folds，可能造成 evaluator 泛化高估；PDF 没有明确 prompt-group split，不能断言已泄漏或已排除。\n最终 Good classifier precision 0.61；自动过滤仍有错误，synthetic data 不应视为全部物理正确。\nLoRA rank、optimizer、训练资源和全部数据生成成本不充分，本文未复现代码或观看实际视频。\nMagic/cinematic taxonomy 与 prompt 允许非标准物理，需与 real-physics 场景区分；没有逐类别真实物理准确率。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

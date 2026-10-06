@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2610.05770",
+  "slug": "computational-design-of-free-form-lampshades-2610-05770",
+  "title": "Computational Design of Free-Form Lampshades",
+  "authors": [
+    "Hiro Nakasuji",
+    "Soma Yokota",
+    "Yutaka Ohtake",
+    "Yuki Koyama"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05770"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "fabrication"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "Computational Design of Free-Form Lampshades",
+    "Generative Fabrication"
+  ],
+  "abstract": "Conventional lampshades are predominantly restricted to simple geometries, owing to the difficulty of controlling optical functions across complex shapes. We present a computational design method that enables 3D-printable lampshades with complex free-form shapes to achieve controlled illumination, such as uniform luminance. Given an arbitrary shape, our method determines the internal cavity geometry and the number and placement of lights in two stages: an initialization stage fixes the number of lights and establishes their initial positions and the initial cavity geometry, after which gradient-based optimization jointly refines the cavity geometry and light positions via differentiable rendering subject to geometric constraints. We calibrate the material parameters of the translucent shade material prior to optimization to improve the agreement between simulation and the fabricated result. We validate our approach by 3D-printing five lampshade designs of varying geometric complexity and demonstrate that the fabricated lampshades achieve reasonably uniform luminance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05770v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05770v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05770v1 全文及 2026-10-06T12:51:29.000Z 审阅记录；PDF 10 页，SHA-256 7bbc3291bbdea70eff5c14c4084f85636983f3f75a1e2fb4cddfd6457579d2f5，视觉核验第 1、3、4、5、6、7、8、9 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact 全文未提供本工作 public implementation URL 或明确发布承诺；Mitsuba 可用不代表此 pipeline 代码公开。",
+    "ideaZh": "固定 free-form 外壳，以 material calibration、greedy fiber-fed sphere-light placement 和 Mitsuba differentiable rendering 联合优化 cavity mesh/灯位置，五个真实 FDM 灯罩闭环验证。作者报告 squirrel 的 simulation MSE0.0159→0.0054；值得深读 design-to-fabrication 的光学约束建模，但物理效果只质性、单视角且每形状约 10 小时 H100 优化。",
+    "motivationZh": "复杂自由形状灯罩很难仅凭外形控制光照均匀性；论文希望在保持目标外形的条件下优化内部 cavity 与灯的位置，并连接光学仿真、材质标定和实际打印。",
+    "methodZh": "输入既定外形和目标亮度，初始化先固定灯数，再优化隐藏内部结构与位置，保持可见形状。Greedy placement 在可容纳 12mm diffuser 的 grid 中选灯；光学材质与亮度用真实样块/照片校准；Large Steps 平滑 geometrygradient，SDF hinge penalties 限制外壳/内腔/灯交叉。输出通过 PC 半壳打印、PLA diffuser 和 fiber/strut 装配落实。实际制造而非只有渲染演示，但 uniformity 和 robustness 尚无物理 photometric 量化。",
+    "methodFlow": [
+      "真实标定 source intensity/exposure、opaque PLA roughness 和 translucent PC volumetric scattering",
+      "对 fixed 外壳 SDF 作 5mm inward offset/remesh 初始化 cavity",
+      "Greedy candidate sphere placement 最小化 rendered image MSE，固定灯数和初始位置",
+      "Mitsuba3 differentiable rendering 计算 cavity/light 梯度，Large Steps 更新 mesh、Adam 更新 lights",
+      "加入 mesh–mesh、mesh–light、light–light SDF/distance hinge penalties",
+      "输出两半 PC shade 与 printed struts，装 PLA diffuser/fiber，再合壳验证"
+    ],
+    "experimentsZh": "实验设置：Squirrel 主实验与 cube/Spot/Bimba/bunny 四 demo；singleH100、150×100rendering1024spp、30Ksteps、约 10h/shape。Uniform 目标灰度按 shape 手定，5mmoffset/6mm 球灯半径/1mmmargin；对 naive 单灯、greedy 和 jointoptimization 比较，材质标定与去 geometryconstraints 消融，真实 PC 打印验证。\n作者报告 squirrel simulationMSE0.0159naive→0.0131greedy→0.0054full，3lights。（Fig. 8, p. 6）\n作者报告五个物理灯罩，cube/Spot/Bimba/bunny 灯数 4/2/4/3；薄肢体和耳朵仍欠照明。（Sec. 7, Fig. 11, pp. 7–8）\n作者报告每 run 约 10h H100；physical 结果无 photometricMSE。（Sec. 6.1, p. 6; Sec. 8.2, p. 9）\n比较范围：主要 naive 单灯和自身 initialization，不是对最新 lampinverse-design 方法大 benchmark；五形状、无 repeat/perturbation 或制造公差统计。MSE 为 simulation，而 physical 只照片。\n消融与诊断：去 calibration 失配照片，去 constraint 出现 mesh/light 穿出；两项主要质性。未隔离 cavity-only/light-only、LargeSteps 优势，也没有物理鲁棒性量化。",
+    "insightZh": "将 fixed-shell optical inverse design、calibrated volumetric transport 和可装配 fiber-fed light 方案连起来，贡献在完整可制造系统与几何/光学变量 coupling。Renderer、Large Steps、Marching Cubes 为已有方法；灯数仅 initialization 决定，不是联合离散连续全局求最优。",
+    "whyRelevantZh": "直接涵盖 computational fabrication、隐藏功能结构设计、可微光学优化与真实 print/assembly evidence，可借鉴 function-constrained shape design。",
+    "evidenceZh": "Greedy 阶段选择灯数，gradient 阶段只优化 cavity 与位置；SDF 约束防止几何冲突。（Fig. 3, Sec. 3.1–3.4, Eqs. 1–7, pp. 3–4；Soft penalties 与 preconditioning 不是 formal manufacturing guarantee。）\nFDM PC 两半壳、PLA sphere diffuser、optical fiber 与 printed strut 实现内部灯位。（Fig. 5, Sec. 4, p. 4；strut 在 fabrication 实际存在但不进入 differentiable rendering。）\n真实照片标定 intensity/roughness/scattering。（Figs. 6–7, Sec. 5, pp. 5–6；roughness 由 black PLA 借用于 PC，作者承认 material mismatch。）\n作者报告 simulation MSE0.0159→0.0131→0.0054；五灯罩 physical 结果只质性。（Fig. 8, Sec. 6.1/6.2, p. 6; Fig. 11, pp. 7–8; Sec. 8.2, p. 9；不能写成真实亮度误差降低 66%，MSE 来自 simulation。）\n薄耳/角仍暗，single-front-view、grey uniform targets 与 simulation mismatch 明确受限。（Sec. 8.1/8.2, pp. 7, 9；multi-view、color、nonuniform targets 为 future work。）",
+    "caveatZh": "黑 PLA 标定 roughness 并非 PC；FDM anisotropic scattering 与 ideal sphere radiance 近似。\nStrut 阴影不在渲染模型，薄特征不能容纳 6mmradius 灯。\nManual target luminance 可能不可实现，single-front-view 不保证全角度 uniformity。\nColor、nonuniform/multi-view 目标、materialdistribution 和 photometric/perturbation 评价尚待实现。\nSoft geometric constraints 和 selected lowest objective iterate 不证明所有生成几何/assembly 都合法。\nCalibration 与低分辨率长优化需要特定 printer/material/source 流程，跨材料复用需重标定。\n没有制造耗时成本/热管理/完整电气 system 评价；本项目未复现，数字为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

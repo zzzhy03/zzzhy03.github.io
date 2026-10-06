@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2609.36651",
+  "slug": "focusvtc-efficient-and-high-performance-visual-text-compression-with-adaptive-resolution-2609-36651",
+  "title": "FocusVTC: Efficient and High-Performance Visual Text Compression with Adaptive Resolution",
+  "authors": [
+    "FangZhi Zhong",
+    "Xuerui Qiu",
+    "Yuqi Pan",
+    "Ya Liu",
+    "Shaowei Gu",
+    "Bo Xu",
+    "Guoqi Li"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36651"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "FocusVTC",
+    "VLM / MLLM"
+  ],
+  "abstract": "Long-context reasoning in large language models incurs substantial computation and memory costs. Visual text compression (VTC) reduces input length by rendering text as images, but fixed-resolution rendering creates a compression-performance trade-off: low DPI saves tokens at the expense of legibility, whereas high DPI spends tokens on irrelevant content. We introduce FocusVTC, which breaks this trade-off through adaptive resolution while preserving general multimodal capabilities. It combines compressed low-DPI global views with selective region enhancement, integrating enhanced views into ongoing reasoning. We construct 29.4K high-quality Reasoning-Evidence Localization (REL) chain-of-thought examples (REL-CoT) that link reasoning traces to page indices and bounding boxes. Multi-resolution REL supervised fine-tuning (REL-SFT) teaches the model to localize relevant regions, and Group Relative Policy Optimization learns when to enhance resolution and how to use the resulting observations, without a separate continual-pretraining stage. At 72 DPI on RULER v1, FocusVTC scores 87.4 at $2.9\\times$ input compression, including tool observations, versus 57.5 for Glyph at $3.0\\times$ input compression. It surpasses its text-input backbone on LongBench (56.40 versus 55.86), improves the MRCR macro-average by 13.91 points, and achieves a 51.19 macro-average on VTCBench. The MRCR latency evaluation also shows a $2.79\\times$ online end-to-end speedup over Text. General multimodal capabilities are preserved, with MMMU increasing from 65.12 to 66.73 and MME from 2424.02 to 2457.62.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36651v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36651v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/fangzhi-zhong/FoucsVTC"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36651v1 全文及 2026-10-06T14:46:51.028383+00:00 审阅记录；PDF 23 页，SHA-256 d358ce2b15db8744ed122f713f569c81696f65fbc050b411f51f39f11e6ac7e6，视觉核验第 1、3、6、7、8、9、17、18、19、21、23 页。数字均为作者报告，本项目未独立复现。代码状态 available：exactPDFp.1Codebutton 经 pdftohtml 解析为该 publicURL(仓库名 FoucsVTC 拼写如此)，实际访问并读取 eval/infer.py；repo 有 SFT/GRPO/eval runtime。README 说明 GRPO 需独立 gold，release manifest 不包含它，完整训练 data 复现仍有准备步骤；未运行。",
+    "ideaZh": "FocusVTC 让 VLM 先读低 DPI 整页，再按 page/bbox 请求对齐的高清证据 crop；REL-CoT 监督定位，GRPO 学习何时看细节及如何停止。作者的工具/训练消融支持主动视觉阅读能力，不只是把文字压成图像节省 tokens。推荐 skim 这一接口；速度收益包含输出变短且排除离线 rendering，headline 是指定任务子集，复杂 reasoning 并未全面优于原 backbone。",
+    "motivationZh": "将长文本渲染成低清页面可以减少 tokens，却会让小字和关键证据不可读。目标是保留全局浏览能力，并按问题定位需要读取的高清区域。",
+    "methodZh": "把长文本渲染为多个对齐低/高 DPI 页，模型保留全局低清上下文并迭代调用 Enhance_Region 读取局部高清 pixels。跨模型 annotation/filter 生成带 page 与 box 的 reasoning traces，按多 DPI 扩展后 SFT；GRPO 用 answer/format reward 及 correctness-gated localization 和 call-efficiency 奖励教工具策略。初始低清不存在的信息不是凭空恢复，精读依赖保留的高清 source。论文给字体可读性校准、token observation 计数、训练和 tool ablations 及在线 latency。",
+    "methodFlow": [
+      "Render aligned pages：source text 按固定 font/layout 生成多个 DPI 版本，使用归一化 page 坐标保证高清 crop 对齐。",
+      "Ground supervision：模型 filter 去 knowledge-only QA，teacher 产生 page/bbox REL-CoT，另一模型检查框内证据支持答案。",
+      "Train localization：多 resolution SFT 学习低清 overview 上的 evidence 定位、reasoning 与 answer 输出。",
+      "Learn crop policy：GRPO 对完整 reason/tool/observation 轨迹打分，只有正确 answer 得到 tool bonus，惩罚过宽或重复请求。",
+      "Read selectively：推理时 iterative page/bbox action 从高清 source 取 pixels，保留 overview 与历史 crop 后作答。"
+    ],
+    "experimentsZh": "实验设置：作者微调单一 multimodal backbone，对多文档/长 context 任务做 visual/text 以及训练/tool/dpi 比较，并测 general multimodal 性能。training 与 test 例声称无重叠；主 training 使用 cross-model filteredREL，globaloverview 与高清 source 共同提供完整 task 信息。\n作者报告 72DPI RULERv1 所测子集 87.38，Glyph57.53，input+observation 约 2877tokens 对 text8400；这些是 subsetscore 与 inputcompression。（pp.9/18/20 Table 10, Table 15）\n作者报告 11 个 non-code LongBench 任务平均 56.40，textbackbone55.86；summarization 与 few-shot 并非全面更好。（p.7 Table 1）\n作者报告 VTCBench Retrieval91.00/Memory26.33 领先所列 visualbaselines，但 Reasoning36.25 低于同 backbone 固定 visual41.57。（p.7 Table 2）\n作者报告 noSFT+GRPO LongBench49.30、noTools36.82、完整 56.40，说明 evidence localization 预训练与 tool policy 具有贡献。（p.8 Table 3）\n作者报告 pairedMRCR 在线 187.09→67.06 秒，同时 generatedtokens5411.30→1529.77；2.79 倍 speedup 不能全归因于输入缩短，离线 rendering 未计。（pp.18–19 Table 11, Appendix C.2）\n比较范围：包含 fixed-resolution 文本/visual 模型、同 backbone tools-only 和各 training-stage variants。缺少跨 unrelatedbackbone 方法迁移及全部同 post-trainingbudget text-only 控制；font/DPI/backend 都影响结果。\n消融与诊断：多 DPI、字体、toolaccess、SFT/GRPO 及 checkpoint progression。tool reward 含 evidence-box 监督，局部正确性依赖 teacher annotation；并未证明单 bboxIoU 提升对应完整真实 causalreasoning。",
+    "insightZh": "在 visual text compression 中加入学得的跨 resolution evidence acquisition，将 low-DPI coverage 与精确 character reading 分开；训练 data 与 tool 政策有实质 VLM 能力贡献。active zoom 与 rendered-text 既有研究提供基础，不应称首创 zoom 或通用 reasoning paradigm；更适合作为 document-grounding 方法参考。",
+    "whyRelevantZh": "直接推进 VLM 文档视觉 grounding 与主动证据读取，方法可参考 visualagent 读取密集技术文档的接口。贡献是视觉能力与训练，不是 generic scheduler/serving 优化；无直接 3D 或设计 artifact 生成，medium/skim。",
+    "evidenceZh": "高清 observation 来自对齐的 source 页面，不是生成增强或访问纯文本答案。（pp.4–6 §3.1/§3.4, Eqs.(1)–(9); p.23 Figure 10；Figure10 caption 说明 boxes 和 observation 为 illustration adaptation，不能当未经改动的真实 trajectory 证据。）\n学习 tool 使用是关键，未训练的 tools 和 SFT+tools 都可能显著退化。（p.8 Table 3; pp.19–20 Tables 12–14；有 noSFT/noGRPO/noTools 和 tools-only controls；增益不是简单给所有 model 同工具就出现。）\ntoken compression 包含各 observation 一次，但不包含 generated tokens；latency 另计所有 online rounds 且排除 rendering。（pp.18–19 Appendix C.1–C.2, Tables 10–11；两种成本口径分开，不把 compression ratio 直接当 FLOP/totalcost ratio。）\nLongBench 平均是 non-code 任务子集，RULERv1 去掉 variable tracing 及 word-frequency 任务。（p.7 Table 1 caption; p.20 Appendix C.4, Table 15；不能作为完整 standard suite 整体 score 引用。）",
+    "caveatZh": "当前 model/data 规模有限，多语言、复杂 layout 与更长 context 扩展待评估。\n未来需同时检验完整 interaction 成本与 answer 质量。\n只有一个 backbone，renderedQA 文档与真实 scan/layout 域不同；字体选择与输入 preprocessing 紧密耦合。\n压缩只计 initialinput 与 observations，renderedsource 存储和 offlinegeneration 不是零成本；longtextdecode 长度改变是 latency 重要因素。\nreasoning 类在 VTCBench 仍弱于固定 visualbackbone，general capability 小幅提升不能无统计地宣称全面增强。\n工具 source 必须保留高分辨率，低清 overview 可能漏掉无冗余字符；跨模型 filter 不能替代全部 human evidence audit。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

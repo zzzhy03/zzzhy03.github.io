@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.06218",
+  "slug": "branch-centric-tokenization-and-test-time-augmentation-for-skeleton-generation-2609-06218",
+  "title": "Branch-Centric Tokenization and Test-Time Augmentation for Skeleton Generation",
+  "authors": [
+    "Zhengyuan Li",
+    "Chuanyu Pan",
+    "Yuanming Hu",
+    "Raymond A. Yeh"
+  ],
+  "publishedAt": "2026-09-05",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.06218"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Branch-Centric Tokenization and Test-Time Augmentation for Skeleton Generation",
+    "3D Generation"
+  ],
+  "abstract": "Automatic skeleton generation involves predicting both joint positions and skeletal connectivity. However, existing approaches struggle to encode branch structures into token sequences and do not use test-time computation effectively. We study these choices within a unified autoregressive framework. First, we introduce branch-centric tokenization, a branch-aware representation that places structurally related elements next to each other and encodes connectivity directly in the sequence. Compared with standard BFS-style serialization, this representation yields more compact sequences. Second, we introduce view-augmented generation, a test-time augmentation procedure that applies axis-aligned rotations to the input mesh, maps all predictions back to a common frame, and selects the final skeleton based on mesh coverage and consistency among predictions from different views. Experiments show that our method achieves better skeleton prediction accuracy than state-of-the-art methods. In particular, our method reduces the CD-J2B error by 16.9% on the Articulation-XL2.0 dataset compared to the strongest directly comparable baseline, Auto-Connect. Qualitative results on in-the-wild meshes further demonstrate generalization across diverse inputs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.06218v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.06218v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.06218v2 全文及 2026-10-06T13:13:21.000Z 审阅记录；PDF 15 页，SHA-256 ce2e8687e078d0842ed83e57d1cb72b6cc5fc401b2d55b293e9f64870617e736，视觉核验第 1、4、5、7、9、12、13、14、15 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact15 页 PDF 未提供本方法 project/public code URL 或 release promise；baselinecode 可用不是本方法开源。",
+    "ideaZh": "将 rig skeleton 先缩成 junction/leaf tree，再按 branch BFS 把 connection joints 连续插回并加 branch delimiter；推理时生成六个 axis-rotated 候选，以 meshcoverage 和 joint Sinkhorn consensus 选一棵。作者报告 Auto-Connect 相比 J2B 降 16.9%，但自己的 BCT/DAT 与 TTA 增益应分开，TTA 耗时 1.0→5.8s。可略读 structured3D rig 表示，不等于完整 skin/animation pipeline。",
+    "motivationZh": "自动 rigging 不仅要预测 joints，还要编码 branch connectivity；普通序列化冗长且测试时视角利用不足，论文希望改善骨架表示与多视图候选选择。",
+    "methodZh": "研究重点是为已有 mesh 创建可编辑 joint/connectivity 结构，不恢复可见 surface，因此属于 structured3Dcreation/rigging。Branch-role serialization 保持同 chain 邻近，DAT 用 distance 确定 siblingsorder；TTA 避免 meshupright 不一致，coverageconsensus 只选择原有候选而不平均拓扑。Backbone 与 Auto-Connect 一致、无 posttraining，方法贡献为表示与 task-specificselection，不是 foundation model。动物/幻想 object 范围超出纯 humanrig，但 loops/multicomponents 仍受限。",
+    "methodFlow": [
+      "训练 GTtree 将 degree2nodes 平滑移除，保留 root/junction/leaf 为 series-reducedtree",
+      "按 distance 排序 siblings 并 BFS reducedtree，依 branch 终点→parent 插回 degree2nodes",
+      "以 8bitcoordinate 和 E1/E2/E3 结构 delimiter 序列训练 Michelangeloencoder+OPT-styleARdecoder",
+      "测试 mesh 作六 axis→z shortest-arcrotations，各自 greedydecode 一棵 skeleton",
+      "逆旋转回同坐标系，计算 500surfacepointcoverage 与 pairwisejointSinkhornconsensus",
+      "最小 score 选一个完整 tree 作为 rigstructure，未生成 skinweights 或动作"
+    ],
+    "experimentsZh": "实验设置：ArticulationXL2.0 57Ktrain、4H10057h/1000epochs；in-domain、diversepose、ModelsResource，joint/boneChamfer 及 treeedit/Graph2Vec。BCT/DAT、6vsbeam/stochastic、24rotations、translation/scale 和 hyperparameters 消融。Anymate205Ktree-onlytrain 另 300epochs/61h，非 zero-shot。\n作者报告 ArticulationJ2B2.030AutoConnect→1.687full，oursnoTTA1.770；meantokens146.3→127.6。（Table 1, p. 7; Fig. 4, p. 5）\n作者报告 controlledbaselineJ2B1.864→BCT1.798→BCTDAT1.770；rotation+coverageconsensus1.687。（Tables 2–3, p. 9）\n作者报告 noTTA1.0s/full5.8s H100，AnymateCD.038/EMD.046 另训结果。（Tables 9–10, p. 15）\n比较范围：Matching 主 trainset 与 backbone 较明确，但 extra-dataTokenRig 不能直接 rank，AutoConnectdiversepose 无 checkpoint。Anymate 独立 retrain，wildexamples 只质性。没有 skin/animationquality 或 rigartistacceptance，joint/boneaccuracy 不等于 deformation 可用。\n消融与诊断：BCT/DAT 分离，sixhypothesisbudget 区分 rotationvsbeam/stochastic 与 selector；24views 仅小增益，translation/scaling 大幅退。Hyperparameters 较稳定但没有已 uprightcanonicalizedbaseline 验证 rotation 收益必要性。",
+    "insightZh": "Branch-awareconnectivitytokenization 与 coverageconsensusselector 有可迁移 structuredtree 生成价值；核心网络已有，DAT 和 rotationTTA 属于配套设计。不是新的 semanticanatomyprior 或完整 animationassetgenerator。",
+    "whyRelevantZh": "面向 general3Dassets 的 branchstructuredrigcreation，可迁移到 explicitgraph/treecontentrepresentation 和 editableassetworkflows，不仅 humanskeletonrecovery。相关性 medium，属于 3DGeneration 的结构创建分支。",
+    "evidenceZh": "ReducedtreeBFS 加 branchconnectionnodeinsert 和 E3delimiter 保持 branch 连续。（Sec. 4.1, Fig. 3, pp. 4–6; Appendix A Algorithm 1, p. 12；仅 tree 且 8bitquantized，不覆盖 loops/multiplecomponents。）\n六 axisrotations 各输出 tree，再由 coverage+Sinkhornselectone。（Sec. 4.2, Eqs. 5–8, pp. 6–7；Rotationview 指输入 meshorientation，不是额外观测 camera；consensus 不提供 equivariance 保证。）\nBCT/DAT 和 sixhypothesisbudgetselection 均有 controlledablation。（Tables 2–3, p. 9；MainAutoConnectgain 不能全归 BCT，oursbaselinetableJ2B1.864 已优 mainAuto2.030。）\n作者报告 crossdatasetModelsResource 改善，TokenRigextra-training 仅 reference。（Table 1, Sec. 5.1, pp. 7–8；TokenRigsomecolumns 仍更低，但不匹配 training，不宣称无条件 SOTA。）\nAnymate 另训避免 ObjaverseXLoverlap；TTA 增加 runtime。（Appendices D–F, Tables 9–10, pp. 14–15；Anymate 不是 Articulationtrainedmodel 直接 zero-shot，timing 排 data preprocessing。）",
+    "caveatZh": "Reliableuprightcanonicalization 可能降低 rotationTTA 必要性；无法获取 Stroke3Duprighttool。\n不研究 posttraining，complementarity 待验证。\n仍限制 singleconnectedtree；8bit 量化与 root/siblingdistance 选择存在细节/对称 ties 问题。\nCoverage 可以偏长 bones，consensus 可能共享错误，未提供正式拓扑 validity/泛化保证。\nTTA 慢 5.8 倍同模型，24views 再 4×hypotheses；实际 pipeline 还要 preprocessing。\n目标是 rigstructure，不是完整 skinweights/animation；本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.37654",
+  "slug": "texture-space-material-diffusion-2609-37654",
+  "title": "Texture Space Material Diffusion",
+  "authors": [
+    "Jacob Munkberg",
+    "Peter Kocsis",
+    "Jon Hasselgren"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37654"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Texture Space Material Diffusion",
+    "3D Generation",
+    "3D Reconstruction"
+  ],
+  "abstract": "We present a method for generating high quality materials for 3D objects entirely in texture space. We finetune a video diffusion transformer for text-guided material generation, multi-view material generation, and material upscaling. Our key insight is to use the known projection from image space to texture space, enabling the diffusion process to generalize across arbitrary geometries and texture parameterizations. This approach also avoids the view consistency issues inherent in video and multi-view diffusion models. Because texture space is two dimensional, we can reuse the strong priors of pretrained video diffusion models. We apply our method to high quality material reconstruction from posed photos captured under unknown lighting, as well as to text- and image guided material generation. Our method can scale to high resolutions (8K), 100+ input views, and neural material representations. In quantitative and qualitative evaluations we show state-of-the-art results for material generation and reconstruction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37654v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37654v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37654v2 全文及 2026-10-06T13:38:39.577844+00:00 审阅记录；PDF 25 页，SHA-256 15c4ef57948a42e2e2488d21456bd6fc331d3602d26f8d80d721e4383bb51dc3，视觉核验第 1、3、7、9、17、18、21、22、23 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：已检查作者官方 project https://nvlabs.github.io/texdiffusion/，目前提供 paper/resultsviewer 与方法结果，没有本方法 public code 链接；页面 TEXGen/Wan/RomanTex 等外部 repo 不是本方法 implementation。未猜测 NVLabsrepo 名。",
+    "ideaZh": "Texture Space Material Diffusion 把 posed views 投到已知 mesh 的 non-overlapping UV atlas，用 finetuned Wan DiT 直接生成 basecolor 与 height/roughness/metallicity maps；single-view/text 模式以 world-position RoPE 连接 UV 远处、3D 邻近的 regions。作者报告 32 个 synthetic objects 的 relighting PSNR30.46dB vsDiffPT24.90，但八个 real objects reconstruction29.03 低于 DiffPT30.67，且主表经过 GT 原光照上的 CRF/exposure 拟合。值得深读 UV-space prior 及多视角融合；8K/117views 是可行但昂贵的推理扩展，作者报告 GB300 约 48min19s/48GiB，未知光照不意味着真实材质参数唯一恢复或跨 UV seams 完全无误。",
+    "motivationZh": "多视角图像含有光照和视图不一致，难以直接得到统一的材质贴图。目标是在已知 geometry 与 UV 上生成一致材料，支持文本或照片条件与高分辨率输出。",
+    "methodZh": "输入为已知 geometry、validnon-overlappingUV、positions/normals 以及 text 或 posedphotos。模型将 sparse shaded texture observations、geometryguides 及 noisymateriallatents 作为视频 frames 沿 temporal dimensionconcatenate，以 flow matching 微调 Wan2.1-1.3B。输出两张 UVmaps：basecolor 和 RGBpackedheight/roughness/metallicity；height 用于 bump，不生成 geometry。多视角模式处理 17views 并用 FLUXimg2img/bluraugmentation 抵御 inconsistentcapture。single-view/text 模式加入 world-position+frameRoPE，upscaler 以 low-resmaps 为条件。超过训练 resolution 时先 2K 生成，再 8Knearest-upsample/noise 与 randomrolling2Ktiles；超过 views 时共享 noisylatent、coverage-top2expertflowfusion。neuralmaterial 仅 proof-of-concept。",
+    "methodFlow": [
+      "已知几何的 textureobservations：用 camera/mesh/UV 把各 shadedview 重投影到同 atlas，得到带缺口 observations，另提供 worldpositions、normals 和 text。",
+      "UV-space 视频 DiT 生成材质：把 noisyPBRlatents、observations、guides 作为不同 frame-types 输入 WanDiT，生成 basecolor 和 height/roughness/metallicity 两张 maps；training 增广 inputblur 与 viewvariation。",
+      "world-positionRoPE 与多模态条件：single-image/text 用每 tokenmaskedpool 的 worldposition 替代 UVxyRoPE，结合 frameidentity 让相邻 surface 跨 UVislandsattend；textmode 用 UVcoveragemask 代替 observations。",
+      "crop 与 coverageexpert 扩展：独立 trainedmaterialupscaler 配合 randomrolling2Ktiles 达到 8K；多 view 分 overlappingbatches，各 texel 选 coverage 最多的 top2predictedflows 加权融合。"
+    ],
+    "experimentsZh": "实验设置：作者报告 TexVerse120kpath-tracedobjectvideos、17views2048²、697HDRprobes 随机光照、Qwen2.5VLcaptions，normalmaps 近似积分为 height。全 DiT15kiterations/32A100/effectivebatch128，resolution512→1024→2048。评测 32heldoutBlenderVaultobjects×8views×8lights 及八 DTCreal objects/17captures；材质分量用 g-buffermetrics，generation 统一 knowngeometry。CRF10params 拟合 original-lightingL1 并固定到 newlights。runtime 在 GB300/fourDTCcases，未本地复现。\n作者报告 knowngeometrysyntheticreconstructionPSNR31.24/LPIPS.0370 vsDiffPT27.50/.0739；syntheticrelight30.46/.0401 vs24.90/.0911。（p. 7, Table 1）\n作者报告 realreconstructionPSNR29.03/LPIPS.0331 低于 DiffPT30.67/.0307；用 LSRMgeometryreal27.01/.0423 也非全面胜 LSRM27.75/.0388。（p. 7, Table 1）\n作者报告无 CRFsyntheticrelight29.89/.0350 vsDiffPT21.14/.0911 仍更好；realrawPSNR22.66 vsDiffPT27.01，真实 light/materialbias 仍明显。（p. 17, Table S1）\n作者报告 singleviewCLIP-FID1.520/CMMD.0081/LPIPS.0325 vsTrellis2 2.227/.0184/.0395；textCLIP-FID3.338 vsVideoMat4.376。（p. 9, Table 2）\n作者报告 17view2K→117view8K 四 realcasesPSNR28.42→28.34/SSIM.919→.917/LPIPS.0668→.0639，quality 主要 preserved 而非每项改善。（p. 9, Figure 8）\n作者报告 GB30017view2K130s/22GiB；117view2K2610s/48GiB，117view8Kcombined48min19s/48GiB；17view8K6min47s/22GiB。（p. 17, Table S2）\n比较范围：multi-viewDiffPTknowngeometry 与 LSRMjointgeometry 任务边界明确，补 oursLSRMgeometry；generation 都 knownreferencegeometry 比较 Trellis2/Hunyuan3D/VideoMatGen，TEXGen 只 diffuse 同 renderprotocol。blackbackground/objectsize 影响 metrics，paper 协议不同 DTC/StanfordORB 并做一致性 check，不直接援引原 paper 数字作 uniformcomparison。upscalerPBR-SRroughness/metallicityPSNR40.6 优于 ours38.0。\n消融与诊断：CRF/raw、materialcomponents、imperfectVACE17objectsubset、casual17frames、17vs117views/2Kvs8K、ESRGAN/PBR-SR、512²RoPE+Gbuf 对照。8K 和 117views 联动而非单独 factorialtest，coverageproxy 未校准 uncertainty；four-seed 稳定图只单 scene，无 fullbenchmarkmulti-seedCI。",
+    "insightZh": "直接生成完整 PBRmaps 在 texture-space、借 videoDiT 跨 input/condition/outputmodalities 以及 world-positionRoPE，是可复用的 representation/prior 接口。TEXGen 已有 UVdiffusionalbedo，RomanTex 已有 3DRoPE，noise-rolling 也沿用先例；创新在组合为 fullmaterialreconstruction/generation 与 scalableviewfusion，不是首次 texturegeneration 或完全解决 inverse-renderingidentifiability。高相关于 assetappearance，geometry/UV 仍外部已知。",
+    "whyRelevantZh": "直接生成/重建 3Dasset 的可重光照 PBRmaterials，texture-spaceprior 与 3Dpositionalinterface 对 structured3Dcreation 有核心价值；不是制造材料物性或 geometrygeneration。",
+    "evidenceZh": "材质生成在共享 texture-space，而不是先生成多 viewPBR 再融合，直接避免同 texel 不同 viewprediction。（pp. 2–6, Figures 2–3, Sec. 3；同 texel 统一不等于不同 UVislands 的 seam 无缝；patchmixing 与 positionspooling 仍有局部歧义。）\n主评测 CRF/exposure 拟合减少 globalmaterial/lightingbias，rawresults 另报。（p. 7, Sec. 4.1; pp. 16–17, Appendix A.1, Table S1；每 series10params 按 GToriginal-lightingviews 优化再用于 relight，reportedquality 是 calibratedappearance，不是直接无需校准物理参数准确率。）\n单/多 views、text 和 upscaler 为不同 conditionedmodels，neuralmaterials 仅概念验证。（pp. 5–6, Sec. 3.1; pp. 21–25, Appendices C.5–C.6；未把 fuzzyteaser 称为广泛 neuralBRDFbenchmark 或完整 unifiedmodel。）\nworld-positionRoPE 在 512²controlledablation 提供小幅增益，main2Kgeneration 结果不可混合。（pp. 18 and 22–24, Table S5/Figures S6–S8；128head 维分 44frame/28 各 xyz，maskedpool 到 16×16token；attentionmaps 是辅助关联，不是消除所有 UVparamdependence 的证明。）",
+    "caveatZh": "inference 尚未优化，多 views 昂贵；specularappearance 仍难。\n16×16patch 与 RoPEgranularity 无法区分同 patch 中多个 UVsegments，需 patch-awareunwrapping 或更细 diffusion。\nunknownlighting 和 materialreflectance 存在 fundamentalambiguity；height 由 normalapproximatePoissonintegration，原 normal 不一定 integrable。\nknownposedgeometry 与 validUV 是输入，不负责 mesh/camera 恢复；generativefill 对未观察 regions 是 plausibleprior 而非真实 material 测量。\nCRF/exposure 在 GTsame-lightviews 拟合，吸收 systematicbias；appearancequality 与 physicalBRDF 正确性、真实 relighting 泛化应分开。\n32synthetic/八 realquantobjects 较小，realnovellight 主要 qual；metal/roughspecular 分解仍有歧义，没有 sensor/BRDF 独立真值验证。\n8K 为 generativeupscalingdetail，不等于真实 8Kmeasuredfeatures；117view48min 在 GB300 不适合描述成实时或普通消费 GPU 普遍可用。\ncoveragecount 不等于 calibrated uncertainty，遮挡/重复 view/inputgeometry 误差可能产生 biasedexpertconfidence。\nUV 单 texelviewconsistency 不保证 UV seams、thinparts、atlasmixedpatch 全正确；neuralmaterials 是单 proof-of-concept。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

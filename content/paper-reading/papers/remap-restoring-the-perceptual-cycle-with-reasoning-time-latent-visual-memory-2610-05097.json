@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.05097",
+  "slug": "remap-restoring-the-perceptual-cycle-with-reasoning-time-latent-visual-memory-2610-05097",
+  "title": "ReMAP: Restoring the Perceptual Cycle with Reasoning-Time Latent Visual Memory",
+  "authors": [
+    "Hao Jiang",
+    "Zhanyu Guo",
+    "Chenwei Wu",
+    "Yichen Guo",
+    "Qizhe Zhang",
+    "Junchi Yao",
+    "Jixian Wu",
+    "Jinhao You",
+    "Kai Tang",
+    "Jiajun Cao",
+    "Tinghao Wang",
+    "Mengyu Wang",
+    "Leo Anthony Celi",
+    "Shanghang Zhang"
+  ],
+  "publishedAt": "2026-10-04",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05097"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "ReMAP",
+    "VLM / MLLM"
+  ],
+  "abstract": "As multimodal large language models (MLLMs) reason for longer, attention to the initial visual input diminishes, weakening visual grounding. Visual memory reintroduces visual evidence during reasoning. We conduct a controlled analysis of visual memory along three axes: curation, organization, and access. We find that local evidence benefits from global context, compact latent representations balance accuracy and visual-context cost, and the utility of memory access depends on the reasoning state. Guided by these findings, we propose ReMAP (Reasoning-Time Memory-Augmented Perception), which couples two complementary latent memories: a static, question-conditioned Global memory that preserves scene and cross-image context, and a dynamic Local memory that uses this context as an anchor while selecting and re-encoding region-level evidence according to the current reasoning state. Both memories return compact latent tokens inserted into the reasoning sequence, and a reinforcement-learning access policy trained with branched rollouts decides when to continue reasoning or invoke Global or Local memory. On ten benchmark families, ReMAP outperforms prior visual-memory methods on all four multi-image benchmarks, exceeding the strongest prior results on MuirBench and MIMIC by 8.38 and 14.84 percentage points. Across four backbone families, enabling memory access improves over the same trained model with memory disabled, and on shared V*Bench, CV-Bench-2D, and MuirBench questions ReMAP reduces the visual tokens entering the reasoning sequence by 51.0-76.8% relative to the native-resolution backbone. Further analyses show that Global and Local memory form distinct yet complementary latent representations. Together, these components restore the perceptual cycle by letting the reasoning state trigger targeted visual retrieval, with the retrieved evidence guiding subsequent reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05097v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05097v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05097v1 全文及 2026-10-06T12:00:04.381125Z 审阅记录；PDF 32 页，SHA-256 0910178d3d96a7b1b6d4d8f499303fd0bb3a4d65c82539b128ce68a0c32c311e，视觉核验第 1、4、5、6、10、28、32 页。数字均为作者报告，本项目未独立复现。代码状态 promised：首页 Codecomingsoon 与 reproducibilitystatement 承诺公开 source/weights；全文/PDF annotations 未提供本方法 public codeURL，不猜 repo。",
+    "ideaZh": "ReMAP 让 reasoning state 决定继续文本还是请求 global/local latent memory，以静态跨图摘要锚定动态 ROI 重编码，并用同 prefix 的分支 rollouts 学调用收益。作者报告 memory-on 超过同权重 memory-off。值得精读；减少的是 decoder visual context，不能直接等同总计算或因果证据。",
+    "motivationZh": "文本 reasoning 延长后，模型可能难以再次查看相关图像细节；目标是由当前推理状态决定何时请求 global/local visual memory，恢复有效的视觉证据访问。",
+    "methodZh": "Global Weaver 对每 image 四 queries 及跨图四 queries 形成 question-conditioned 缓存；Local 依 layer12 请求 state 选至多三 source，layer18Twig 以当前 prefix 定位 crop，冻结 encoder 重新读 pixels 后与 Global anchor 压到总 32latents。StageI 通过 teacher continuation、facts/relations、ROI 与 studentstate 适配训练 memory；StageII 冻结 memory，以分支 invocation 对 same-state continuation 的 reward 差更新 requestinterface，另 GRPO 更新 decoderLoRA。推理只有单 trajectory、至多五 requests。",
+    "methodFlow": [
+      "coarsevisualprefix 启动推理，question-conditionedImage/RelationWeavers 缓存 4N+4Global latents。",
+      "decoder 生成 Global/Local request 或继续 ordinarytext，Global 请求直接重插同缓存。",
+      "Local 请求从 reasoningstate 选至多三 sources，Twig 定位 ROI 并 freshpixel re-encode。",
+      "LocalWeaver 结合 state 与 Global anchor 输出总 32latents，插入 decoderKV 后继续推理。",
+      "StageI 教师 continuation/ROI 和 studentstate 适配建立接口；StageII 同 prefix 分支 reward 训练 invocation 与 decoderLoRA。"
+    ],
+    "experimentsZh": "实验设置：主 Qwen2.5-VL7B，Localformation50K/Global30K/access40K，Qwen3-VL32B teacher，VisualCoT/COCO/Mantis/VStarCOCO/ScanQAtrain 来源并称 dedup。16A800、seed20260911；4roots×2siblings 并额外 continuation/preferenceprobes，LoRArank16top4layers。10families15units19913examples，MMVet/MathVista freeform 改用 fixedDeepSeekV4judge；fourbackboneMemory-OFF 对照。\n作者报告 MIMICfullmean68.00，其中 Common92.00/Counting71.76/OddOneOut80.00/Listing28.24；平均非 officialmetric，Listing 低于 PixelReasoner41.46。（Tables1,8, pp.6,25）\n作者报告 fourbackbones 开启 memory 均优于同 trainedOFF，但 Qwen3MuirBase73.77/full74.31，部分强 backbone 收益小。（Table2, p.7）\n作者报告 GTsamebox32latents pixel-reencode accuracy62.30→71.73、goldlogprob+0.2243；支持 freshpixels，但 GTROI 非 learnedlocalizer 质量。（AppendixA.8.1/Fig.10, p.27）\n作者报告 CRD routingyield75.91%对 routeentropy68.36%，JointEAY0.144 对 0.143 近似；这是 frozenpolicydiagnostic 而非另行训练终性能。（AppendixA.10/Fig.12, pp.29–30）\n比较范围：pixelreinspection、featurereplay 与 latentmemory 多 family，prior 保持 releasedweights/tools、singleimage 适配 contactsheet；native/coarse、teacherSFT/StageI 及 sameweightsmemoryOFF 补控制。主要 crossmethod 表不能完全排除不同 backbone/data/protocol；部分表 BLINK/HR 用 micro 而主表 macro 需分清。\n消融与诊断：Global/Local、fixed/random/entropyaccess、latentcapacity、sameboxpixels vsfeatures、wrongcontent/blank/zero、relationalrole、branchrules，含 negative/NS 结果。强 scope/time 贡献须以同 weightsaccess 为主，不以 tSNE 或 oraclefailureprobe 替代。",
+    "insightZh": "延伸 activecrop、latentmemory 及 ARPObranchedrollout，较有意义的组合是动态 Local reacquisition 的 Global anchor，以及对“现在请求 vs 现在继续”的 same-state credit，兼顾跨图 relations 与 local details。机制研究含明确 controls 和负结果；尚不能将 latent 投影与 attention 现象当充分理解证明。",
+    "whyRelevantZh": "直接研究 MLLMagent 在 reasoning 途中主动取得、压缩和使用 visual evidence，跨图 relations 与细粒度 crop 证据紧贴 grounded reasoning 方向；可为 visualdesignagent 的观察调度启发，但未验证编辑、3Dasset 或 fabrication。",
+    "evidenceZh": "Global 固定且可重复插入，Local 由 state 选择 ROI 并重读 pixels；Local-only 仍使用 cachedGlobal 作 compressionanchor。（Sec.3/Figs.2–3, pp.3–5; AppendixA.2–A.3, pp.17–21; A.9, p.29；方法/训练图实际查看；Local-only 消融不是完全无 Global 信息。）\n作者报告同 ReMAPweights 关闭/开启 memory 时 Muir61.00→65.38、V*79.06→82.20、MMVet57.80→64.27。（Table3, p.9; AppendixA.9, p.29；固定 parameters 的 inference 消融较可信，但不是重新训练无 memory 模型或匹配 requests 数量。）\n作者报告 Table1priorbestMuir57.00 对 65.38、MIMIC53.16 对 68.00；V*82.20 仍低于 DeepEyes84.29，MIMIC StageI68.37 略高于 full68.00。（Table1, p.6; Table8, p.25；主表实际查看；全套/每项 SOTA 不成立，priorcheckpoint 与 training data 也不匹配。）\n作者报告 shared 子集 decoder visual tokens 减少 76.8/51.0/52.3%，count 排除 vision encoder/weavers 内部表示、markers 及 text。（AppendixA.12/Table12, pp.30–32；计数表已查看；profile 子集 78/60/107questions 而 performance 来自全 benchmark，未给 matchedend-to-endruntime。）\noracle relationalcontext 在 71selectedfailurestates 修复 57.7%，blank/zeroblocks 也修复 53.5/52.1%，late/earlyrole 变化不显著。（AppendixA.8.2/Table11/Fig.11, p.28；control 表实际查看；goldlogprob 支持内容影响，不证明 learnedGlobal 或 generality，选择 failure 及插入效应须保留。）",
+    "caveatZh": "五 memoryrequests、Local 最多三 sources 及固定 Globallayout 会漏多 image/extendedsearch 证据。\nTwig 仅 StageI teacherROI 训练、StageII 冻结，定位错误会削弱 zoom。\nlayer12/18 taps 经 internalrepresentation 选择，未做 end-to-endtap 位置 sweep。\n新增操作不能消除 inheritedbias，source/localization 错误亦可能显得自信。\ndecodercontext 缩短排除 freshcropencodes/weaver 开销，无 latency/总 FLOPs/totaltrainingtime 证据。\nGlobalstatic 重复插入不加入新观察，Local-only 仍有 Global anchor，scope 消融存在 coupling。\npriorbaselines 异 weights/data/caps/contactsheet，强 multiimage 提升不完全归于本方法。\n部分 mechanisticstudies 在 Q-Zoom-adaptedcheckpoint 而非 ReMAP；GTROI/oraclerelations 和 selectedfailures 限制因果解释。\nmemoryplacement 与 blankblock 也可改变答案，case 中的正确 option 伴随错误 signborder 描述，不能称完整 groundedrationale。\nsingletrainingseed 及教师伪标注，code/weights 尚未 release；本项目未执行或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

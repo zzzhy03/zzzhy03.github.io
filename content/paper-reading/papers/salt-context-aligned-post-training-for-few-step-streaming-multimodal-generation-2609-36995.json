@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2609.36995",
+  "slug": "salt-context-aligned-post-training-for-few-step-streaming-multimodal-generation-2609-36995",
+  "title": "Salt++: Context-Aligned Post-Training for Few-Step Streaming Multimodal Generation",
+  "authors": [
+    "Xingtong Ge",
+    "Yutong Wang",
+    "Lunjie Zhu",
+    "Haitao Lin",
+    "Fangyu Lin",
+    "Yushi Huang",
+    "Xin Zhang",
+    "Yi Zhang",
+    "Yu Liu",
+    "Jun Zhang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36995"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "eess.IV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Salt++",
+    "Video Generation"
+  ],
+  "abstract": "Few-step streaming audio--video generation requires both causal modeling and step distillation, yet standard training recipes face two context-related challenges. Teacher forcing pairs clean history with a noisy target, but supervises predictive contextual representations only indirectly through velocity prediction. Meanwhile, directly reusing bidirectional score models in causal Distribution Matching Distillation (DMD) creates a mismatch between generation and scoring contexts. We address these challenges with Salt++, a two-stage post-training framework comprising Causal Self-Flow (CSF) and context-aligned autoregressive DMD. CSF exploits contextual information asymmetry by varying the history while keeping the noisy target fixed: a noise-mixed-history student aligns its intermediate representations with those of a clean-history exponential-moving-average teacher. This self-supervised signal encourages the student to extract semantic information and improves cross-modal alignment. Context-aligned AR DMD shares the causal mask and prefix across generator sampling, fake-score training, and real-score evaluation to match generated and reference distributions under a block-conditional KL objective. With calibrated teacher guidance, it performs clean-prefix few-step distillation and then adapts to generated histories without switching objectives or requiring separate consistency distillation. At 480p, Salt++ improves visual and motion quality by 57% and 45% over OmniForcing on JavisBench under the same 4-step causal setting. A separate scale-wise post-training stage extends Salt++ to 4-step $1664\\times960$ generation, outperforming bidirectional LTX-2 on six of seven reported metrics. Project page: https://xingtongge.github.io/Saltpp",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36995v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36995v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36995v1 全文及 2026-10-06T16:07:38.266521Z 审阅记录；PDF 22 页，SHA-256 e02fdc2b9c10ca80254ad0f86c38d0bd50aa15d9473daca61fa7cfec350ad36c，视觉核验第 1、4、5、7、9、16、17、20 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 官方 project page 的 Code 指向 github.com/XingtongGe/Saltpp；在线确认仓库仅 assets 与 README，inference/training scripts 和 weights 仍在 TODO，不标 available。",
+    "ideaZh": "Salt++ 用 corrupted-history→clean-history 的 feature alignment 训练 causal A/V teacher，再把 generator、real/fake scores 的 mask 与 prefix 对齐，让 DMD 本身完成 few-step distillation。作者报告视觉和 motion 分数显著改善，值得精读条件分布与 score context 的控制。同步与语义 alignment 存在取舍；高分辨率阶段改用 bidirectional rollout-level scoring，且四次 generator 调用不代表等 latency 或实时能力。",
+    "motivationZh": "少步 streaming generation 的生成器与 score models 可能使用不同历史条件，放大 rollout errors；目标是对齐上下文与教师监督。",
+    "methodZh": "CSF 固定 noisy target，只改变历史清洁程度，将较浅 student features 对齐到 clean-history EMA teacher 的深层 features，与 flow matching 交替训练。随后 generator 与两种 scores 使用相同 causal context，先 clean-prefix、再生成 history 的 DMD refinement。额外 scale-wise extension 用 causal upsampler 和分辨率分开的 KV cache，在低、高两个尺度分配 generator evaluations；这个扩展的 reference scoring 与核心 block-conditional DMD 不同。",
+    "methodFlow": [
+      "在固定 noisy target 下，令 student 看 noise-mixed history、EMA teacher 看 clean history。",
+      "结合 flow matching 与跨深度 feature alignment，得到 causal audio–video teacher。",
+      "使 generator、fake-score training 和 real-score evaluation 共用 causal mask、block packing 与 prefix。",
+      "使用校准 teacher guidance 的 DMD，从 clean prefixes 蒸馏再迁移到学生生成 history。",
+      "可另做 scale-wise post-training：低分辨率生成、causal upsample、再高分辨率 refinement。"
+    ],
+    "experimentsZh": "实验设置：在 LTX-2 上用内部 A/V 数据 post-train，比较 released OmniForcing、bidirectional reference、CSF teacher、TF-dCM 与 AR–AR route；在官方和统一 enhanced prompts 上各取一个 sample，补充 score-context 与 guidance controls。评测仅短片，未提供 human/audio listening study、training seeds 或完整 runtime。\n作者报告官方 prompts 的 VQ/MQ 从 OmniForcing 的 1.807/0.699 到 2.838/1.010，对应约 57.1%/44.5% 相对分数增长；不等于人类质量相同比例提升。（p.7, Table 1(a)）\n作者报告 AR–AR 的 DeSync 为 0.759，TF-dCM 为 0.710，ImageBind A/V 为 0.184 对 0.229，显示视觉质量与跨模态匹配取舍。（p.7, Table 1(a)）\n作者报告 score-context 初始化控制的 VQ 为 BI–BI 0.837、BI–AR 1.131、AR–AR 3.147；后者有效但仍依赖训练 reference 与配方。（p.9, Table 3(a)）\n作者报告高分辨率在所列指标多数优于 LTX-2，但 DeSync 为 0.768 对 0.658；OmniForcing 在该表仅做 resolution extrapolation。（p.7, Table 1(b); p.16）\n比较范围：score-context controls 与两种初始化 routes 共享基座，但完整 routes 的 guidance、score initialization、迭代数与 refine 设置不同；released OmniForcing 也没有同数据重训练。没有等 wall-clock、高分辨率训练 matched baseline 或长 horizon 对照。\n消融与诊断：fixed high guidance 与 lower randomized range 同时改变强度和随机化，不能单归于 randomization。CSF vs clean TF 未隔离 history corruption、EMA alignment 与额外计算；on-policy continuation 主要 qualitative，并非所有质量指标单调提高。",
+    "insightZh": "延续 Self-Flow 与 causal DMD，贡献在将历史信息差作为 representation supervision，并明确 block-conditional scoring context 及其受控比较。高分辨率扩展是另一个 rollout-level 目标，不能把核心 causal conditional score 结论作为其理论保证。",
+    "whyRelevantZh": "score-context 是否对应生成的条件分布，是 streaming diffusion 的基础训练问题；joint audio–video 的表示监督与蒸馏控制具有跨视频生成方法的直接迁移价值。",
+    "evidenceZh": "CSF 只在 history 引入信息差，target noise 共用，并在训练后移除 EMA/projection heads。（pp.4–5, §3.2; p.16, Appendix A.5；全文核验；与普通 noise augmentation 的独立贡献还需更细消融。）\n核心 DMD 将 generator 与 scores 放在相同 causal prefix，近似 fixed-context KL 的 score difference。（pp.5–6, §3.3; p.9, Table 3；exact score 推导不等于有限 fake-score、CFG 与 normalized surrogate 的无偏保证，也不自动是完整 joint KL。）\n四步主实验有视觉质量优势，但同步与 audio–visual alignment 并非全胜。（pp.7–9, Tables 1–3; pp.15–17, Appendix A；作者报告；约短 clip 的 benchmark 不建立无限长 streaming 稳定性。）",
+    "caveatZh": "appendix 明确 DeSync 需结合 motion quality 解释，near-static video 可得低 offset。\ncall counts 只是 sampling budget，非跨分辨率或模型的等 runtime。\nwithin-clip consistency 不等于 extended rollout consistency；selected stills 不建立完整视频或音频质量。\n内部训练数据与缺完整开放实现限制独立复现。\n核心 fixed-context score 推导与 practical CFG/normalization、有偏 history gradient 需区分。\n高分辨率阶段重新用 bidirectional completed-rollout scores，不能声称所有阶段始终同一 causal block objective。\n没有真实 streaming latency、长时 drift、独立人类 audio 同步判断或重复训练统计。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

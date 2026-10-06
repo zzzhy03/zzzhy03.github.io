@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.06021",
+  "slug": "scalable-minimal-change-learning-for-controllable-image-editing-2610-06021",
+  "title": "Scalable Minimal-Change Learning for Controllable Image Editing",
+  "authors": [
+    "Shuo Chen",
+    "Fengming Huang",
+    "Yu Yao",
+    "Mingming Gong",
+    "Tongliang Liu"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06021"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Scalable Minimal-Change Learning for Controllable Image Editing",
+    "Image Generation"
+  ],
+  "abstract": "Image editing should change only the attributes specified by an instruction while preserving everything else, yet current methods often make unintended changes. We treat this minimal-change principle as an optimization objective for instruction-based editing. Latent L1 regularization is a poor proxy for output locality in modern nonlinear generators and often requires supervision unavailable at scale. We instead optimize edit outcomes with reinforcement learning. An agentic vision-language reward model audits each source image, instruction, and edited image for two failure types: unimplemented requested changes and unintended changes. A group-level rubric merges and verifies these issues to provide consistent rewards across candidate edits without per-instruction human annotations. On FLUX.1 Kontext-dev, ARRO raises average EditScore from 5.21 to 5.88 across MinEval, MagicBrush, AnyBench, and Emu-Edit. On 600 evaluation examples, it reduces off-target pixel change by 8.4% relative to the base editor. Reward and SFT controls, blinded human evaluations, and transfer to OmniGen2 provide complementary evidence. Code: https://github.com/Showwwwwwwww/ARRO",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06021v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06021v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06021v1 全文及 2026-10-06T11:30:07.259791+00:00 审阅记录；PDF 29 页，SHA-256 c968030ae5f366465f98a8059b6241aae9b39e12de75093f5862c2c2ec6a0f02，视觉核验第 1、5、9、10、11、17、19、21 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF p.1 打印 https://github.com/Showwwwwwwww/ARRO；已实际访问 public repo，目前仅 README 写 code coming soon，没有 implementation 文件，故不标 available 或给 Code link。",
+    "ideaZh": "ARRO 把编辑失败分为 unimplemented 与 unintended：VLM 逐候选审计，LLM 合并 group rubric，VLM 二次勾选，再以双 channel GDPO 训练 editor。作者报告四 benchmark EditScore5.21→5.88、mask 外像素 change 少 8.4%，但 EditScore Consistency 平均略降，主要增益在 prompt following；auditor 会被 hack，公开 repo 当前只有 coming-soon README。可参考视觉设计的局部修改反馈，不能称保证 causal minimal change。",
+    "motivationZh": "图像编辑器实现目标指令时，常额外改动用户希望保留的内容；latent sparsity 也不保证局部性。目标是从实际输出学习同时奖励目标达成和最小变化。",
+    "methodZh": "现代 editor 常实现目标却改动非目标内容，latent sparsity 不是可靠 output locality proxy。ARRO 用已有 Qwen VLM 在 source/instruction/candidate 上列未实现与额外变化，text LLM 将 16 候选 issues 合为共享原子 rubrics，再由 VLM 对每 candidate 闭式赋 Boolean，负 issue counts 分别 group 标准化后加权并 batch 重新标准化。FLUX Kontext 的 flow GDPO 优化两类奖励，另迁移 OmniGen2。完整 prompt 与 matched reward/SFT controls、masked pixel 评价及 blind human study 支持 structured outcome feedback 价值，但该奖励并非显式 causal model 或无差错保真证明。",
+    "methodFlow": [
+      "预先生成/筛选单 object、单 atomic-edit 的 source/instruction pairs，并用 base editor 候选分布拒绝 degenerate groups",
+      "对每 pair 从当前 flow editor 采 16 候选，VLM 分别比较 source/output，列 unimplemented 与 unintended issues",
+      "text-only LLM 去重/拆原子 issues，过滤 instruction 直接要求的额外变化，形成两个 shared group rubrics",
+      "VLM 重新逐 candidate 审核每 rubric item，仅 Boolean 选择，不新增 issues",
+      "把两个 negative issue counts 各自 group z-score，以 0.3 efficacy/0.7 locality 加权再 batch z-score",
+      "用 MixGRPO/GDPO PPO clip fine-tune editor，输出无需 reward-agent 参与的普通 image edits"
+    ],
+    "experimentsZh": "实验设置：作者报告 FLUX1 Kontext-dev12B 以约 10K MinEval atomic source/instruction pairs 训练 230steps，8 A100 约 300GPU-hours，25denoising/720²，16candidate groups。Qwen3-VL30B-A3B audit/verify 加 Qwen3-30B-A3B text aggregator。四 evaluation: MinEval600、MagicBrush535、AnyBench900、EmuEdit3589，主 judge EditScore 及独立 HPS/IR。\n作者报告平均 EditScore5.88 对 5.21、HPS0.222 对 0.215、ImageReward−0.51 对−0.67；crossbenchmark dispersion 非 seed CI。（Table 1, p. 9）\n作者报告 OffTarget-L1 少 8.4%，EditScore(PF,Cons)-GDPO 控制少 6.8%，Top1-SFT 少 2.0%。（Table 6, p. 17）\n作者报告固定 GDPO 改用 EditScore 双 rewards 的四 benchmark ES3.777 对 ARRO5.880，去 rubric aggregation 降到 4.961。（Table 8 and Appendix C.1, p. 18）\n作者报告 OmniGen2 三域 ES 平均 5.06→5.59；blind60pairs 十 ratings 每对的 win/tie/loss53.5/17.8/28.7%。（Tables 4–5, p. 10; Appendix C.3/Table 12, p. 20）\n作者报告 16 候选 reward generation 耗 16.06s、61950tokens/33inference passes，非完整训练吞吐。（Appendix C.1, p. 19）\n比较范围：比较六跨 architecture editors 与 untuned base，并以固定 GDPO 的 reward 控制、raw/无 aggregation variants、Top10SFT 及第二 flow editor 检验方法。不同 external 模型 training 数据/参数规模不可完全匹配；仅两 rectified-flow backbones，未证明 diffusion/structured SVG/3D 迁移。MinEval 声明 prompt split disjoint，但 PDF 未完整说明 source-image 家族及与 MagicBrush evaluation 重叠检查。\n消融与诊断：separate/merged reward normalization、efficacy-only/locality-only、raw/aggregate/verify、reward-vs-SFT controls 及 CLEVR diagnostics 均可审计。locality-onlyhack 显示 reward 脆弱；自然复杂 compositional instructions 和 candidate assignment 还未系统量化，model multi-seed variability 缺失。",
+    "insightZh": "新意在 minimal-change outcome 约束的双类 issue reward 和 Audit–Aggregation–Verification group rubric，而非新 GDPO 或 causal representation 模型。L1 不能保证 nonlinear decoder 输出局部性是动机，不等于证明所有 L1/structured causal 方法无效。Agentic 在这里是 reward construction，不是设计工具 agent；主要贡献应归 image editing/post-training。",
+    "whyRelevantZh": "对局部视觉设计修改，显式区分目标未达成与非目标漂移，以及统一 candidate 比较标准，有直接迁移的 feedback 机制。论文仅验证 raster image editing，向 SVG/embroidery/3D design 的应用仍需另做实验。",
+    "evidenceZh": "dual failure-mode audit 经 group 共享 rubric 再 verification 生成可比较 issue counts，并分 channel 标准化而非先相加。（Secs. 3.2–3.4, Fig. 2, pp. 5–7; Appendix B/F, pp. 16–17,27–29；已视觉核验方法图并读全部 optimizer/prompt 附录；text aggregator 只看 issue 文字，不看图。）\n作者报告四 benchmark 平均 ES5.88 对 base5.21，但 BAGEL 在 MinEval/MagicBrush ES 更高。（Table 1, p. 9；主表已视觉核验；±std 跨 benchmark 而非 multiple training seeds。）\n作者报告 600examples OffTarget-L1 0.20366→0.18659，8.4%下降，但此 metric 依赖 SAM2 mask 与 image alignment。（Appendix C.1, Table 6, p. 17；pixel 表已视觉核验，不推断 mask 内目标全部正确或所有 untargeted semantics 不变。）\n作者报告 EditScore PF6.60→7.35，而 Cons8.36→8.31，headline ES 增益主要是 instruction 执行。（Appendix C.4, Table 13, pp. 20–21；subscore 表已视觉核验，避免把 overall 高分全部归因于 locality。）\nlocality-only 奖励在约 step170 被 noise 输出 hack，误把不可见 issues 记零；两个 channel 联合才抑制此局部 shortcut。（Table 3, p. 9; Sec. 4.4, p. 10；证明该单 reward 配置脆弱，不意味着 dual reward 从此不会被 hack。）\nblind human study 有 600ratings 但只 60underlying pairs，audit 只验证 group issue merging/support，candidate assignment error 未量化。（Appendix C.2, Table 11, pp. 19–20；human 页已视觉核验，合并 issue 准确性不能等同每 candidate reward 正确率。）",
+    "caveatZh": "reward 受 VLM 感知限制，subtle/ambiguous/compositional instructions 和 candidate-specific assignment 可出错。\njudge 系统错误可在 RL 被利用；expert study 只验证当前 auditor 配置。\nOffTarget-L1 是 segmentation-dependent pixel change，不是完整 semantic correctness。\nOmniGen2 证明第二 flow editor 迁移，不等于 diffusion backbone 验证。\n未量化 multi-seed variability。\ncausal minimal-change 原则在此为 motivation 与 outcome proxy，不是已识别 SCM 或完整 counterfactual 不变性保证。\noverall EditScore 主要 PF 增益，Consistency 未提高，pixel-mask 证据才直接支持较小 off-target 变化。\n表 std 跨 benchmarks、human600ratings 共享 60pairs，两者均不能当 600 独立样本或 training variance。\n训练和 judge 均 Qwen family 存在共享 perception bias；HPS/IR 与 human 证据有补充但不消除全部问题。\nper-group 生成 rubric 不能覆盖所有未被 candidate 初次 audit 提出的错误；verification 提示疑似 issue 可 false-negative。\npublic repo 当前仅 README/comingsoon，完整实现不可立即复现；本项目仅读 exact PDF，未运行。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

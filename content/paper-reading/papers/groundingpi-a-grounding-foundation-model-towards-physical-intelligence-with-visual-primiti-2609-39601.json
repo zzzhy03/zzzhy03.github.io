@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2609.39601",
+  "slug": "groundingpi-a-grounding-foundation-model-towards-physical-intelligence-with-visual-primiti-2609-39601",
+  "title": "GroundingPI: A Grounding Foundation Model towards Physical Intelligence with Visual Primitives",
+  "authors": [
+    "Qize Yu",
+    "Lianrui Fan",
+    "Boyu Chen",
+    "Jiaqi Liang",
+    "Xini Ding",
+    "Yue Chen",
+    "Zetian Song",
+    "Yuran Wang",
+    "Yi Zou",
+    "Kaixuan Wang",
+    "Tianxing Chen",
+    "Wenxuan Song",
+    "Bohan Zhou",
+    "Mingleyang Li",
+    "Siqiao Huang",
+    "Yuqi Ye",
+    "Caigao Jiang",
+    "Wei Wei",
+    "Ruihai Wu",
+    "Hang Zhang",
+    "Yixiao Ge",
+    "Shuchang Zhou",
+    "Shilong Liu",
+    "Xianming Liu",
+    "Ping Luo",
+    "Shiyu Huang"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39601"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "GroundingPI",
+    "VLM / MLLM"
+  ],
+  "abstract": "Precise grounding matters. It specifies which object is the target and where that object is, even in clutter and for tiny objects, and it has to be fast enough for closed-loop control. Yet vision-language-action (VLA) and world-action models (WAMs) take perception from general-purpose vision-language and video-generation backbones, which still fail in these settings. We introduce GroundingPI, a 4B grounding foundation model that generates points and boxes as quantized coordinates in a shared vocabulary. Training combines multimodal and spatial pretraining, supervised fine-tuning, and reinforcement learning with GRPO, using supervision from public datasets and dedicated data engines. Against 44 baselines across 34 grounding benchmarks spanning 11 perceptual capabilities, GroundingPI establishes a new state of the art, averaging 73.68%, above the larger GPT-6 Astra (71.54%). As a downstream visual backbone, GroundingPI improves performance on robotic manipulation and autonomous driving. On RoboTwin 2.0, it outperforms every mainstream backbone we evaluate in all four out-of-distribution settings, by up to 24.8% relative to the strongest backbone. On RoboCasa-GR1, GroundingPI trained with 50% of the demonstrations outperforms those baselines trained with 75%. On nuScenes, used as the visual backbone, GroundingPI attains an average open-loop L2 error of 0.296 m. We systematically analyze GroundingPI's pretraining in scale and data composition. Downstream autonomous driving and robotic manipulation improve as the pretraining is scaled. Analyzing the data recipe across these 11 perceptual capabilities shows dense grounding's substantial benefits for both, and OCR's potential as a catalyst for perceptual learning. These results support grounding as a perceptual foundation, and dedicated perceptual pretraining as a promising direction for foundation models of physical intelligence.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39601v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39601v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/groundingpi/GroundingPI"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39601v1 全文及 2026-10-06T16:57:18.000Z 审阅记录；PDF 64 页，SHA-256 b22bd2cae79840b85ff828f8a55bf2e53378581f9389969c2885a25a7af294cd，视觉核验第 1、6、7、13、16、18、27、33、40、55、59、63、64 页。数字均为作者报告，本项目未独立复现。代码状态 available：官方仓库有真实 models/infer/train/eval/vla、API 与部署/训练文档，并链接 HF 模型包；不是空 repo。确认公开实现存在，不表示完整 teacher data/原始训练 provenance 全部公开，本项目未运行。",
+    "ideaZh": "GroundingPI 以 MoonViT-V2 + Qwen3-4B 统一生成 labels、quantized points/boxes，再用 coverage/localization 与 OCR rewards 做 GRPO。值得精读其 perception-first 数据配方及固定 Action DiT 的迁移对照；“4B”是 backbone family，完整模型 4.844B，73.68 是 11 能力均值，机器人仅 simulation、驾驶仅 open-loop，不能当真实物理智能已解决。",
+    "motivationZh": "一般 VLM 的语义能力不等于精确定位拥挤、小目标和交互区域；论文希望先学习广泛的 grounding，再让有限动作演示建立在可复用的空间感知基础上。",
+    "methodZh": "四个 supervised stages 先对齐 projector、联合图文训练、一般视觉/视频理解，再专门学 coordinate-grounding；最终语言侧 GRPO。Multi-teacher engine 按 field/coverage/task dependencies 验证 annotation，不能由空 prediction 直接推 absent。34benchmarks 涵盖 box/point/OCR/GUI/layout/exemplar，效果并不均匀。动作迁移统一八 depth features、每 depth64tokens 和 16atomic-block Action DiT，比较整套 pretrained foundations；它支持 grounding foundation 有效，但不隔离架构或 OCR 独立因果作用。",
+    "methodFlow": [
+      "MoonViT-V2 提取 features，2×2 merge 与 MLP projector→36 层 full-attention Qwen3-4B",
+      "把 labels/protocol 与 1000atomic coordinate tokens 统一成可变长 box/point/OCR 输出，absent 显式 None",
+      "Public data 与 multi-teacher field fusion→任务必需字段/全 target coverage 验证→iterative annotation",
+      "Projector alignment→joint multimodal→general visual/video→coordinate SFT 四 supervised stages",
+      "8-response GRPO：grounding separately-normalized set/strict rewards，OCR Hungarian text–geometry composite；只更新 language",
+      "作为 perception backbone：AR6waypoint driving，或八层 features 压成 64tokens/depth 接固定 flow-matching Action DiT"
+    ],
+    "experimentsZh": "实验设置：34grounding benchmarks/11capabilities/44baselines，混合 local/external 与明确 unsupported flags。自家结果报告 5seeds×2runs，localbaseline3runs；paired uncertainty 和不同 table 的 run 定义仍需审计。RoboTwin/RoboCasa simulation 统一 action-interface，nuScenes front-image+ego-history open-loop。Data fraction/exposure/group leave-out、coordinate/encoder/RL 消融。\n作者报告 Dense200 F1mIoU74.53、RefSpatialUnseen75.32、ScreenSpotPro65.78；后者仍明显低于 Astra93.17。（Tables1–2, pp.10）\n作者报告 50%robot demonstrations SR28.75 超 baseline75%27.75；nuScenesL2Avg .296mvsQwen3VL .301m，差仅.005m。（Fig.8, Sec.5.2.1, pp.12,14）\n比较范围：Downstream fixed action expert 与 updates/token budget 比原生 VLA/WAM 对比更可解释，但 nativebackbone pretraining 和大小不等。感知 tables 包含 external 替换、unifiedparser 不兼容与不同 metric，不能泛称每 benchmark 全胜；Avg 是 11 能力均值。所有机器人在 simulation，驾驶 offline，physical prompts/control latency 未测。\n消融与诊断：Quantized vs textual71.21→73.68、RL72.86→73.68；data leave-outF 混含 OCR/layout/GUI，缺 A/D 单独 leave-out，无法 OCR-specific 因果归因。Scaling OOD 与 grounding 上升但 ID 末段下降；base architecture 比较非 matched isolates。",
+    "insightZh": "主要是覆盖广泛 grounding 的专门 foundation 与数据/训练 recipe，以及保持动作 head/condition budget 一致的跨 foundation 对照。Quantized coordinates、AR grounding、GRPO 及π-style action expert 本身已有；亮点是把 where-to-act 作为可迁移 perceptual foundation 并分析 data composition。Architecture/门控/DeepStack 和 OCR 机制讨论是 local conditional analysis/假设，不是证实最优架构或完整双系统。",
+    "whyRelevantZh": "明确推进 MLLM fine spatial grounding、structured visual primitives 与 representation-to-action transfer；对设计 agent 的 where-to-act 和 layout 理解有迁移价值，但不是完整视觉创作 agent。",
+    "evidenceZh": "完整参数 4,843,664,384，1000coordinate tokens 共享 language head，最高 1024projected visual tokens。（Tables8–9, Appendix A.1–A.2, pp.25–27；262K positional capacity 不同于 8K/32K 训练 length；“4B”不含完整模型各模块。）\n三整体 phases 内含四 supervised stages；Base500.41B+grounding221.17B token exposure，GRPO vision/projector 冻结。（Appendix A.4–A.6, Tables10–11, pp.27–29；128GPU supervised/256GPU RL，exposure 不是独立 unique 图数；主文 SFT refinement 措辞与 Appstage numbering 须按配置理解。）\n作者报告 headline73.68vsAstra71.54 是 11capability scores 均值，而非 34benchmark 表项直接平均。（Sec.5.1, Appendix F reporting convention, pp.8–10,40；Box/OCR 为 F1mIoU，point 为 SAM box-to-mask F1；external rows/N/A/parser incompatibility 不代表基线固有能力为零。）\n作者报告 Dense200 F1mIoU74.53vsAstra65.04，但 ScreenSpotPro65.78vs93.17，VisDrone IoU.95 F1 仅 3.31。（Tables1–2,21–22,32, pp.10,43–44,54；不同 task 优势不均匀，Tiny boundaries/frontierGUI 仍是明显缺口。）\n作者报告 fixed Action DiT 下 RoboTwinFull66.20、Clean2Random17.60；RoboCasaFull37.75 低于 RynnBrain39.00。（Fig.6, Appendix B.2, pp.12–13,32–34；八 64token 条件、16atomicblocks、4Eulersteps、40Kupdates 固定；foundation 预训练/scale/representation 仍不同。）\n作者报告 50%demonstrations SR28.75 高于最佳 baseline75%的 27.75；四训练 exposure 末段 ID SR38.75→37.75 反降。（Fig.8, Tables16–17, pp.14,34–35；仅 manipulation demonstration efficiency，不是总训练便宜或单调 scaling law；paired uncertainty 未展示。）\n作者报告 nuScenes .296m，使用 front image+最多 3 秒 ego history，累积 horizon average metric。（Sec.5.2.1, Appendix B.1, pp.12,31–32；仅 open-loop recordedtrajectory agreement，无 closed-loop/真实驾驶与 latency 验证。）\nFig13 Ours 为 GT-completed display，部分面板 user-curated；tokens/box 减少不是 latency speedup。（Table5/Fig12, Appendix C.5/H, pp.18,36–37,54–55；可说明视觉任务但不能当 raw model recall；denseAR 输出生成成本随 object 数量增长。）",
+    "caveatZh": "Tiny/highIoU boundaries、TotalText、FSC147 与 frontierGUI 仍有缺口。\nPrompt/parser incompatibility 限制部分 baseline 测量。\nFoundation 不同 scale/architecture/supervision；OCR 机制与 System1/2 division 未独立验证。\n训练 exposure721.58B 并非 721Bunique tokens/images，dedup/test-contamination 与 teacherengine 原始 provenance 在报告中不足以独立审计。\nRset 允许一 prediction 复用给多个 GT，可超过 1，是 coverage surrogate；strictreward 缓解但无完备定位保证。\nSimulation OOD 成功率仍有限，driving .005m 优势不是真实闭环可靠性；没有完整 perception–action latency。\nSFT 文字提冻结 refinement 而 Appstage4alltrain，重现需以公开 configs 核对；数据 group 与 architecture 机制只是条件假设。\nGT-completed/user-curated 展示不能当原始输出精度；本项目未复现，所有数字只为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

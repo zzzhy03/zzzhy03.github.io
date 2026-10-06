@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.02914",
+  "slug": "custom-forcing-training-free-subject-customization-for-autoregressive-video-generation-2610-02914",
+  "title": "Custom Forcing: Training-Free Subject Customization for Autoregressive Video Generation",
+  "authors": [
+    "Yunseung Ok",
+    "Hyunsoo Kim",
+    "Minseo Kim",
+    "Suhyun Kim"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02914"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Custom Forcing",
+    "Video Generation"
+  ],
+  "abstract": "Autoregressive video models can generate minute-long videos in real time, but they produce generic subjects from text rather than specific subjects from user-provided images. Existing customization methods either require costly per-subject optimization or use pretrained conditioning networks that jointly process all video frames with bidirectional attention. Neither approach is designed for causal streaming. We present Custom Forcing, a training-free method that stores reference-based anchor frames in the persistent KV cache of a frozen autoregressive video model. However, fixed anchors face two limitations: simple conditioning allows identity to drift, and the text prompt continues to favor a generic subject. To address these problems, drift-adaptive value amplification (DVA) scales reference influence with the degree of identity drift, while anchor contrast guidance (ACG) steers generation away from the generic class prior. Over two-minute rollouts, fixed anchors fall from 0.58 to 0.42 in DINO-I, while Custom Forcing keeps it between 0.58 and 0.62 without reducing motion. Custom Forcing also achieves higher subject similarity than bidirectional customization methods and better preserves identity over 30s than causal image-to-video and reference-to-video models, while generating each frame 9.5-28.5 times faster than these long-video baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02914v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02914v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02914v2 全文及 2026-10-06T11:20:13.469923Z 审阅记录；PDF 31 页，SHA-256 3a1d44d16f37f9774040a2f4c15aef8741d8612a4df0d3cd92e8b964a4b75ac3，视觉核验第 1、4、7、8、23、26 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 首页只链接公开 demos project https://gustn9609.github.io/custom-forcing/；本轮 page 可访问，但未确认该方法 public repository，故不提供 Code link。",
+    "ideaZh": "Custom Forcing 将参考图和生成的 scene anchor 写入冻结 AR video model 的 KV cache，以 DINO drift 调节 reference values，并做 attention contrast guidance。作者报告较长片段的 identity 指标改善。可借鉴长期外观控制；实验主要是单 subject，不能推断细小部件或复杂多对象均被保持。",
+    "motivationZh": "长视频按 chunk 生成时无法回改历史，参考主体的外观容易被通用类别先验逐渐覆盖；需要无需重新训练的持续身份约束和 drift 修正。",
+    "methodZh": "流式视频不能重新修改已生成 chunks，固定 reference anchors 仍会逐渐被 generic class prior 覆盖。方法以 5reference images 加 4copies custom anchor 替换 attention sink；逐 chunk 测 global DINO 相似下降，以 mask-weighted EMA amplification 校正下一 chunk，ACG 在每层以 anchor-free attention 作为负 branch 作有界外推。Rolling/Deep Forcing 均无需新训练，100prompts、两分钟生成和 30 人比较支持 reference fidelity；没有多 subject、interactive control 或 part-specific fidelity 验证。",
+    "methodFlow": [
+      "参考 images 经 FLUX.2 生成 opening custom anchor；参考图 SAM subject masks 过滤 background tokens。",
+      "将 reference anchors 与 custom-anchor copies 一次写入冻结 AR model 的 persistent KV sink。",
+      "首批 chunks 估计 baseline similarity；后续 DINO drift 转为 mask-weighted EMA value gain。",
+      "每层读取同 cache 的 with-anchor/without-anchor attention，以差分作 clipped contrast extrapolation。",
+      "流式生成后测 finalized chunk，为下一 chunk 更新 gain，保持用户 reference 而非只保持 history 一致。"
+    ],
+    "experimentsZh": "实验设置：Rolling Forcing/Wan2.1-1.3B frozen backbone，10DreamBooth 动物/物体各 10prompts，单 seed 生成 30s 和 2min。比较短 bidirectional customization、AR LoRA/fixed anchors、FramePack/SkyReels；另在 Deep Forcing 复测。30 人对 20prompts×5baselines 完成 600 视频 paired judgments。\n作者报告 Rolling Forcing 30s first/last DINO-I0.619/0.616，对 fixed anchors0.579/0.475；two-minute last0.578 vs0.415。（Table1, p.7）\n作者报告 30s last-window 增益在 88/100prompts 为正，subject bootstrap95%CI 为 0.093–0.189；仅 10subjects。（Appendix D.3, Table6, p.21）\n作者报告 Rolling Forcing 比 fixed anchors 耗时 1.13×/1.11×；Deep Forcing overhead1.30×/1.26×。（Sec.4.2, p.8; Appendix D.2, p.20）\n比较范围：覆盖多个 customization 和 image/reference-to-video baselines，但 length、resolution、fps、parameters、sampling 步骤和 reference-count 不一致。9.4–28.5×frame-time 优势部分来自 1.3B few-step backbone，不能全归因于新 attention 机制。\n消融与诊断：DVA/ACG、替换 drift sensor、gain 强度、reference/custom-anchor 比例和 subject mask 均有消融；固定 gain 能人为抬高 DINO 却让 subject 充满 frame，证明单一 identity metric 不可独立解读。",
+    "insightZh": "将外部 subject references 作为持久 streaming KV context，并组合 online drift-dependent gain 和 anchor-contrast self-attention。借用了 attention-sink、reference feature sharing 与 NAG 归一化，贡献为因果长 rollout 的 identity adaptation，不是新 foundation model 或 part-level 生成表示。",
+    "whyRelevantZh": "为长视频视觉创作提供训练免费的 user-reference identity 控制，并明确 history consistency 与 reference fidelity 差异；对 core part/assembly 设计的迁移有限，不能保证积木小 connector 或局部纹理保持。",
+    "evidenceZh": "DVA 用 finalized video chunk 的 DINO 相似下降调节下一 chunk，只放大 SAM mask 内 reference values；ACG 比较同 query 有/无 anchor 缓存。（Sec.3.2–3.4, Fig.3, pp.4–6；方法图已查看；两 attention reads 不等于两次完整 network forward。）\n作者报告 two-minute Custom Forcing whole/last DINO-I0.623/0.578，fixed KV anchors0.501/0.415；Dynamic Degree0.45/0.47。（Table1, p.7；主表已实际查看；identity similarity 与 semantic motion correctness 并非同一指标。）\n作者报告 human subject preference60.0% vsfixed KV，但 quality45.8%，对 SkyReels-V3 identity45.8%且无显著偏好。（Appendix D.7, Table9, p.23；人评表已视觉核验；VLM 只看 10frames 且与人类判断不同。）\n方法不能定位/校正小部件 identity drift，仅验证单 subject 和至两分钟 rollouts。（Appendix G, p.26；限制页已实际查看，直接影响向 part-aware design 场景的迁移。）",
+    "caveatZh": "仅整体 subject identity 控制，不能针对 wheel/strap 等小 part 独立纠正。\n外观保真受冻结 backbone 能力限制。\n仅一 subject 与最长两分钟，multi-subject 和更长 horizon 留待未来。\n100prompts 含重复，只有 70distinct sentences 与 10subjects，无法代表一般视觉设计对象/动作空间。\nglobal DINO/CLIP embeddings 可受 background/scale 影响；sensor swap 消除部分 metric-sharing 疑虑但不是逐 part 真实保真证明。\n需要外部 FLUX custom-anchor generation 和 SAM masks；训练免费不等于零预处理或无额外模型。\nruntime comparison 跨 backbone/frame-rate，且只有 single generation seed；long-horizon arbitrary interventions 未验证。\n本项目未运行代码或复现，数字均为作者报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

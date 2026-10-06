@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.00395",
+  "slug": "specificity-aware-diffusion-steering-via-variance-reduced-sequential-monte-carlo-2610-00395",
+  "title": "Specificity-Aware Diffusion Steering via Variance-Reduced Sequential Monte Carlo",
+  "authors": [
+    "Luran Wang",
+    "Linrui Ma",
+    "Hannes Stärk",
+    "Regina Barzilay"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.00395"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Specificity-Aware Diffusion Steering via Variance-Reduced Sequential Monte Carlo",
+    "Image Generation"
+  ],
+  "abstract": "Inference-time steering enables pretrained diffusion models to satisfy new constraints without full retraining. However, specificity-aware generation is difficult: repelling samples from a negative reference distribution can also erode the positive distribution where the two overlap. The key challenge is to suppress negative mass while minimally distorting the positive distribution. We address this problem by formulating specificity-aware steering as a target-design problem and deriving a target distribution from an overlap-based objective. The resulting target keeps the desired reference distribution only in regions where it is sufficiently preferred over the undesired reference distribution, giving a likelihood-ratio interpretation of specificity. To sample from the corresponding time-dependent target path, we develop a Sequential Monte Carlo sampler with a variance-minimized local proposal. We further introduce a practical fixed-noise optimization procedure with the Jacobian--vector products with the desired and undesired score fields. Experiments on synthetic task, class-contrastive generation, text-to-image tasks and peptide-MHC (p-MHC) binder show that the proposed method suppresses undesired regions more effectively, reduces mode shift, and improves sampling stability by decreasing the SMC weight collapse compared with negative-guidance baselines. Code is available at: https://github.com/WangLuran/Specificity-Aware-Diffusion-Steering",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.00395v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.00395v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/WangLuran/Specificity-Aware-Diffusion-Steering"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.00395v1 全文及 2026-10-06T14:22:14.482461Z 审阅记录；PDF 36 页，SHA-256 17782ae050db60baaead2cd594d5103f2b7ceffb130838d3ef1e8e7e5ab341d8，视觉核验第 1、3、7、8、9、10、20、31、36 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1 提供作者 public GitHub；已访问确认 t2i、binder、tests 和 generation/table-recompute scripts，不是 README-only。未执行实现或复现结果。",
+    "ideaZh": "这篇把 negative guidance 的目标先写成 likelihood-ratio retention，再用 common-noise/JVP 的 SMC proposal optimization 保持 specificity 与 particle diversity。值得深读的是 target design 与实现边界：理论给出理想分布，实际 same-noise selection、估计 gate 和稳定化权重并不是 exact RN sampler；CLIP margin 的提升也不是逐对象严格删除保证。",
+    "motivationZh": "正负 reference 分布重叠时，negative guidance 容易连同有用模式一起排除；目标是明确选择性保留的分布，并兼顾粒子多样性。",
+    "methodZh": "针对正/负 reference 分布重叠时普通排斥会丢掉正模式的问题，论文从 overlap objective 推导 positive-dominant support 的 hard target，并用 sigmoid gate 与独立 power 构建 soft path。两个 score fields 的局部 Gaussian proposal 展开消去 leading stochastic fluctuation，再共享每个 reference 的 JVP 对候选 drift 系数预测 cumulative ESS，选择低方差推进。评价包括合成模式、类别对比图像、正/负 text prompts 与计算蛋白设计，显示一定 specificity/模式保持收益；后者仅为 predicted structural-confidence 验证。",
+    "methodFlow": [
+      "定义 desired/undesired references，并由 likelihood ratio 构造保留 gate",
+      "以 gate sharpness 和 power 控制 time-dependent soft target",
+      "建立辅助 forward/backward Gaussian kernels，匹配 drift 消去 leading fluctuation",
+      "对每粒子固定 mutation noise/displacement，共享两个 reference JVP",
+      "在有限系数网格上最大化预测 cumulative ESS，传播同一 stabilized weight surrogate",
+      "按 ESS 与 cooldown 重采样，同时携带 gate state 和 residual weights"
+    ],
+    "experimentsZh": "实验设置：CIFAR 使用 DDPM conditional/unconditional reference 和多 guidance operating points；T2I 使用 SD v1.4、related/unrelated negative prompts，部分 SMC baseline 共用作者 target。补充做同轨迹 JVP diagnostic 与 paired-seed proposal 消融；蛋白设计固定生成/verification budget，通过 Boltz-2 预测结构评价。\n作者报告 T2I overall CLIP margin 为 0.1666，对照 DAS 0.1611、DriftLite 0.1572、CFG/DNG 0.1465；related negative margin 0.1309，但 unrelated margin 0.2024 低于 DAS 0.2107。（p.8 Table 1）\n作者报告 paired-seed proposal 消融中 effective roots 从 3.49±1.41 升至 5.07±1.74，CLIP margin 从 0.1294±0.0130 升至 0.1363±0.0080；margin 仅在五组中的三组改善。（p.31 Table 5, §E.6.2）\n作者报告同一轨迹的 JVP raw-surrogate diagnostic Pearson 从 0.689 升至 0.804；这不是重新运行无 JVP sampler 后的最终图像质量消融。（pp.30–31 §E.6.1, Table 4）\n作者报告蛋白设计 mean specificity-confidence margin 为 0.1856，对照 target-only 0.1786；positive-margin fraction 为 84.4%，反低于 target-only 87.5% 与 fixed guidance 93.8%。（pp.9,36 Tables 2,6）\n比较范围：T2I SMC baselines 共用 target，有助分离 proposal；没有完整 equal-compute benchmark。CIFAR batch sizes、reference backbones 与调参 protocol 部分不同。multiclass Wrong% 按 B-only 而非全部非 keep classes 定义，不能单独测到 overlap-class 残留；需同时读 FID/Recall。\n消融与诊断：同轨迹 JVP agreement 与 paired five-seed ESS/genealogy 消融有实际边界说明；主 T2I 仅少量 scenes/particles，主要靠 CLIP proxy 与定性图。稳定化包括 gate/JVP/kernel 分组 winsorization 和 JVP shrinkage，没有展示去除全部 stabilizers 或用 exact adaptive correction 的 target-fidelity 对照。",
+    "insightZh": "新意是把 specificity 目标与有限步 proposal 设计分开，并保留 transition fluctuation 而非仅 continuous potential variance。DNG 在 eta=1 时属于 gate 的特例，匹配条件后的 continuous control family 与 DriftLite 相同；真正区别在 sharper target 与 finite-step surrogate/common-noise objective，不应称全新的 continuous control 原理。该机制对一般有正/负条件的生成约束具直接迁移价值。",
+    "whyRelevantZh": "正/负条件共存时的生成约束与 particle diversity 对 controllable visual generation 有直接方法迁移价值；文中仅验证 raster 图像和分子，不提供 editable 2D/3D/CAD 或 fabrication-ready 输出。",
+    "evidenceZh": "hard target 在 positive-dominant support 内保留正密度，soft gate 分离 sharpness 与 power。（p.3 Proposition 1, Eqs.1–6; pp.15–18 Appendix A；理想 reference 与支持/边界假设下的结论，不是实际估计 gate 的分布保证。）\ncommon-noise selection 使用局部 weight surrogate，不是 selected mutation law 的 exact RN correction。（pp.4–6 §4; p.20 Appendix B.1; pp.28–29 E.2–E.3；已核看 p.20 的明确说明；同噪声选参会改变条件噪声 law，winsorization 进一步改变实际权重。）\nrelated negative 的 text-to-image margin 和 particle genealogy 有平均改善，但没有逐 seed 全胜。（p.8 Table 1; pp.30–31 Tables 4–5；已核看表格；JVP 消融是同一轨迹重建的 raw-weight diagnostic。）\n蛋白验证采用 predicted binder–peptide interface confidence，并未测实际 binding affinity。（p.9 Table 2; pp.33–36 Appendix F；same-scaffold matched targets，只有一组 peptide pair；生成期间没有实际 resampling event。）",
+    "caveatZh": "依赖 stochastic SDE 与 local one-step approximation，deterministic solver、EDM 和 finite-time flow map 尚未覆盖。\n需要两个 reference models、particle sampling、JVP 和应用-specific 超参，增加计算。\n缺少大规模 text-to-image specificity benchmark；binder 仅一组 peptide pair，验证为 predicted iPTM。\n解析 target 不变不代表实际 sampler 精确：估计 gate、same-noise adaptation 与 winsorization 均限制 RN/无偏解释。\nhard target 会删除 overlap 中的正质量，这符合 specificity objective，却不能保证保留所有语义合理正样本。\nCLIP negative 相似度低不等于对象不存在；表中 unrelated CLIP− 实际 CFG 更低，正文称本方法最低不符合数值。\nCIFAR multiclass Wrong% 不计 overlap classes，且 DNG 与作者使用的 base reference 不完全一致。\n少量 prompt tuning、固定 seed/不同粒子 batch 与缺少 equal-compute 报告限制泛化和效率判断。\nbinder 结果不是实验亲和力或真实 off-target specificity，positive fraction 未领先；不能归为制造能力。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

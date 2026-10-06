@@ -1,0 +1,60 @@
+{
+  "id": "arxiv:2604.16067",
+  "slug": "aegis-anchor-enforced-gradient-isolation-for-knowledge-preserving-vision-language-action-f-2604-16067",
+  "title": "AEGIS: Anchor-Enforced Gradient Isolation for Knowledge-Preserving Vision-Language-Action Fine-Tuning",
+  "authors": [
+    "Guransh Singh"
+  ],
+  "publishedAt": "2026-04-17",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2604.16067"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "AEGIS",
+    "VLM / MLLM"
+  ],
+  "abstract": "Fine-tuning pre-trained Vision-Language Models (VLMs) for robotic manipulation introduces a fundamental stability-plasticity dilemma: continuous flow-matching action experts backpropagate concentrated, low-rank regression gradients into transformer backbones trained on high-dimensional cross-entropy objectives. This cross-modal gradient asymmetry rapidly degrades pre-trained visual reasoning. Existing solutions either disconnect continuous gradient flow via stop-gradients or constrain updates via LoRA, which restricts update rank but remains directionally blind to semantic corruption; both typically rely on mixed-batch VQA co-training, doubling training compute. We introduce AEGIS (Anchor-Enforced Gradient Isolation System), a buffer-free, layer-wise orthogonal gradient projection framework enabling continuous flow-matching fine-tuning while isolating pre-trained representations from destructive parameter updates. Prior to training, AEGIS estimates per-layer Gaussian activation statistics from pre-training data as a static reference anchor. During fine-tuning, a closed-form Wasserstein-2 transport penalty generates an anchor-restoration gradient through the active computation graph. A sequential dual-backward pass applies layer-wise Gram-Schmidt orthogonalization, projecting task gradients onto the orthogonal complement of the restoration vector during directional conflict. We establish an exact energy preservation bound for layer-wise orthogonal projection, showing that AEGIS sheds only 0.62% of gradient energy empirically while halting cumulative feature drift. On PaliGemma2-3B fine-tuned on the LIBERO manipulation benchmark, AEGIS fully preserves pre-trained Visual Question Answering performance and baseline holdout loss while matching continuous action convergence, without replay buffers, teacher models, or co-training data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.16067v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.16067v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2604.16067v2 全文及 2026-10-06T12:04:57.192016+00:00 审阅记录；PDF 15 页，SHA-256 43fe28b6bac7062b4047d7d56bed16751a25fc2ea64aa236f04eec6acf2403e3，视觉核验第 1、6、7、8、12、14 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 15 页 PDF 未给 AEGIS 公开 implementation/project URL；references 中的 otherVLA 项目不提供为本论文 Code link。",
+    "ideaZh": "AEGIS 在 VLM→VLA 适配前保存 layerwise VQA activation mean/variance，robot batch 的 diagonal W2 gradient 作为 anchor 方向，与 action gradient 冲突时做 orthogonal projection。作者报告 1500 步 OK-VQA60.23 对 base60.15%，offline action MSE 相近且训练成本+40%。可速读不用 replay 的 retention 方法，但没有 closed-loop 机器人成功率，projection energy 恒等式不证明 Adam 下全语义/长期知识保持。",
+    "motivationZh": "将 VLM 微调为机器人动作模型时，action gradients 可能损伤已有视觉问答能力。目标是在学习动作的同时，用稳定的表征参照限制知识遗忘。",
+    "methodZh": "目标是 continuous flow action gradients 造成 VLM 忘记。先以 3000VQAv2 校准 masked 每层 Gaussian moments，在 robot inputs 上计算在线 moments 对 static anchor 的 diagonal W2 距离。同 forward graph 做 action 和 anchor 两次 backward，将 tensor 组为 language layer/projector，冲突时移除 action gradient 在 anchor 方向上的负投影，expert 仍学 flow matching。单 PaliGemma 短期实验提供 VQA retention 信号，主要价值是 static statistics 替代 live answer replay 的 gradientsurgery 配方，不是已可靠控制机器人或 formal 语义流形保护。",
+    "methodFlow": [
+      "3000VQAv2 forward 在有效 tokens 上估 language layers/projector 静态 mean 与 diagonal variance",
+      "robot batch 输入 agent/wristimages、proprioception 与 instruction，flow expert 用 noised50×7action 训练 velocity",
+      "同 robot hidden states 算 dimension-normalized diagonal-Gaussian W2 anchor penalty",
+      "保留 graph 先 backward action 再 backward anchor，按 layer 拼 gradient vectors，negativeinnerproduct 时减负投影",
+      "clip 并 AdamW8bit 更新 language/projector/expert，冻结 vision encoder；无 live VQA training stream，评估 retention 和 offlineMSE"
+    ],
+    "experimentsZh": "实验设置：作者报告 PaliGemma2-3B frozenSigLIP+trainablelanguage/projector，4layer1024widthflowexpert，LIBERO offline trajectories1500steps/12ksamples/batch8，50step7DoFaction。Retentionsmall100cachedVQAv2CE 每 20steps 及 5000OKVQA greedy16tokens。BF16/AdamW8bit/weightdecay0；full/LoRA/FASTconditions 参数和 lr 不同。\n作者报告 OKVQA60.15±.38 base 对 60.23±.36 AEGIS，naive57.36±.54，LoRA59.32±.46。（Table2 p. 8）\n作者报告 naive holdoutCE 至 0.776、LoRA0.512，AEGIS 最小 0.374 且曲线保持近 base；minimum 不是 finalscore。（Fig3/Sec6.1 p. 7）\n作者报告 energy shedmean0.62%/max3.35%，W2penaltymean728.1，保留 marginals 不等于 penalty 归零。（Table3 p. 12）\n作者报告训练 overhead40%，没有真实 mixed-VQA co-training 对照实测 2×收益。（Sec7 p. 8）\n比较范围：适配策略对照与 offlineaction loss 有初步证据，缺相同 trainablebudget/lr 调优、global-vs-layer-vs-tensor、W2penalty-only、mean-only/variance-only、calibrationsize、多 backbone/seed、closed-looprollouts。Co-training2×和 LoRA 方向 blind 泛化来自论述，不能认证普遍事实。\n消融与诊断：gradient spectra/PCA/telemetry 为 diagnostics，没有 component 消融单独验证 diagonalW2、mask 和 layergrouping 贡献；小 shed 比例与 retention 只是共现，不证明唯一因果机制。",
+    "insightZh": "将 static activation statistics 的 transport gradient 作为在线 layerwise surgery 方向，有可复用 VLM adaptation 贡献。Gaussian W2 与 orthogonal projection 本身经典，创新是它们在单 data stream continual/VLA finetune 组合；energy identity 只关于 Euclidean gradient，不证明 semantic topology 或 adaptive optimizer 更新安全。",
+    "whyRelevantZh": "知识保持的 VLM 跨 objective 适配方法直接相关，staticgeometryanchor 可启发 visual creation 新 head 训练保护已有能力；迁移到 CAD/design 未实验，不分类 robotwrapping 为 designagent。",
+    "evidenceZh": "anchor 来自 3000VQAv2 masked mean/diagonalvariance，robotbatch online stats 与其 W2 比较，仅保留 stats 不 replay 样本。（Secs. 4.1–4.2, Eqs. 3–5, pp. 4–5；buffer-free 只针对样本 buffer，不是没有保存统计或无需原 taskcalibration。）\ndualbackward、layerwise negativeprojection、clip 后 AdamW8bit，vision encoder 冻结。（Algorithm 1 p. 6; Appendix D/Table4 p. 14；algorithm 页面已视觉核验，没有额外恢复 gradient 加入 objective。）\n作者报告 1500steps OKVQA60.23 对 base60.15，naive57.36/LoRA59.32/stopgrad59.61。（Table2 p. 8；主表已视觉核验，5bootstrapresamples 不是 5trainingseeds，p0.72 不证明统计等效。）\n作者报告平均 shed0.62%、约 51.2%layers 受投影，action rawMSE 曲线相近。（Fig3 p. 7; Table3/Appendix B pp. 12–13；没有从 gradientnorm 推导任务 utility/semanticenergy。）\n作者承认只 offline convergence，closed-loop success、>50ksteps 和 lifelong streams 还未测，训练 overhead 约 40%。（Discussion and Limitations p. 8；explicitlimitation 页已视觉核验，LIBERO 数据使用不等于 LIBERO rollout benchmark 完成。）",
+    "caveatZh": "robot 能力仅 offlineflowMSE，closed-loopphysicalsimulation 成功率尚未评价。\n1500steps 短 adaptation，extended>50ksteps 与 onlineanchor/lifelongstream 仍 future work。\n保留 graph dualbackward 带约 40%wallclock 开销。\ndiagonalmean/variance 可相同但 jointfeatures/semantics 不同，PCA 图不是全 representationtopology 证明。\nEuclidean projection 在 SGD firstorder 下解释可用，Adam momentum/preconditioning 可能打破 anchor 方向 constraint；未证明累积 drift 一定停止。\nε分母使投影并非数学 exactorthogonality，energyidentity 是理想化无ε表达，不等于全部实际 updates 保护。\np0.72 只未检出差异，不是 equivalencetest；fivebootstrap 不是 independenttrainingruns。\nstaticVQAanchor 对 robot 分布有天然 shift，anchorreference 不是 pretraining 全分布，不声称 bufferfree 即 datafree。\nAppendix4096samples 对 2048dim 不必然 rankdeficient 且 token 相关，diagonalchoice 计算合理但 statisticalguarantee 夸大。\n当前 benchmark/code 未公开核验，数字均作者报告，本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2609.36806",
+  "slug": "canto-cad-native-transformer-operators-for-ai-aided-engineering-2609-36806",
+  "title": "CANTO: CAD-Native Transformer Operators for AI-Aided Engineering",
+  "authors": [
+    "Daniel Leibovici",
+    "Nikola Borislavov Kovachki",
+    "Dawon Ahn",
+    "Ruben Ohana",
+    "Ira J. S. Shokar",
+    "Abouzar Ghasemi",
+    "Semih Akkurt",
+    "Rishikesh Ranade",
+    "Neil Ashton",
+    "Jan Kautz",
+    "Jean Kossaifi"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36806"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "fabrication"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "CANTO",
+    "3D Generation",
+    "Generative Fabrication",
+    "CAD",
+    "AI"
+  ],
+  "abstract": "Modern engineering systems, from automobiles to aircraft, are designed by using precise, continuous parametric computer-aided design (CAD) models. Evaluating design changes through numerical simulation requires meshing the continuous geometry, a computationally expensive and often brittle process that can require manual intervention and replaces the continuous representation with a discrete approximation. Most neural surrogates accelerate the simulation, but inherit this representation gap by relying on meshes, point clouds, voxels, or other sampled approximations of geometry. We introduce CANTO, a transformer neural operator that maps directly from continuous CAD geometry to physical fields, without meshing the input geometry. We develop a theoretical framework for learning operators from geometric manifolds to function spaces of physical fields, representing geometry through sequences of parametric patches. CANTO instantiates this framework by directly tokenizing non-uniform rational B-spline (NURBS) patches from their control points, knot vectors, and weights, and predicts continuous surface and volume fields at arbitrary query locations. We evaluate CANTO on four automotive and aircraft aerodynamics industry benchmarks: AhmedML, WindsorML, DrivAerML, and HiLiftAeroML. CANTO achieves state-of-the-art accuracy on most evaluated surface and volume prediction tasks, including a 19.8% reduction in surface-pressure relative $L_2$ error compared with AB-UPT on HiLiftAeroML. Differentiability with respect to CAD parameters further enables gradient-based inverse design of designs. On AhmedML, CANTO identifies designs with 4.4 to 20.4% lower drag than the best dataset designs satisfying the same volume and lift constraints, with the improvements verified using the same CFD setup used to generate the original dataset.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36806v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36806v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36806v2 全文及 2026-10-06T13:45:16.227849+00:00 审阅记录；PDF 25 页，SHA-256 1e6cf732a8fdfbae03cf36382936b33fc0f138366a4c26a6a7895f67c2d8668d，视觉核验第 1、2、8、9、13、18、19、21、23、25 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 25 页 exactPDF 没有 CANTO 官方 public code/project 链接；Emmi-AI/noether URLs 仅指 baseline 数据 split，不能视为 CANTO 实现。",
+    "ideaZh": "CANTO 直接编码 NURBS control points/weights/knots，以 patch tokens 替代几何点云与 surface anchors，再预测可连续查询的 CFD fields；更有价值的是把可微 CAD 参数接入 volume/lift 约束下的 inverse design。作者报告 Ahmed 六参数族的优化 drag 比同约束 dataset 最佳设计降低 4.4–20.4%，并用原 OpenFOAM 协议复核。值得深读 CAD-to-physics 接口与验证闭环；不是 free-form 生成或制造合格证明，surrogate 训练/验证仍依赖 mesh CFD，trimmedCAD 需要近似 untrimming，DrivAer 单 case 预处理约 2800s，原始 CAD 到 field 速度不能只看 160s inference。",
+    "motivationZh": "工程 surrogate 常依赖离散 point cloud，难以与 CAD 的连续设计参数直接衔接。目标是从 NURBS 几何预测物理场，并支持基于设计参数的优化。",
+    "methodZh": "方法将每个 untrimmed NURBS patch 的 weighted control net 及两个 knotsequences 分别用 Perceiver 压缩，合成单 patch token；globalselfattention 建立 geometrycontext，替换 AB-UPT 的 point cloudgeometrybranch 与 surfaceanchors，volumeanchors 仍随机采样。表面/体积 queries 通过 anchoredfielddecoder 输出 pressure、velocity、shear 等，目标为 supervisedMSE。trimmedsurfaces 先做 boundary-preserving tensorpatch 近似转换。CADfamily 参数到 NURBS 与 surrogate 可微，作者用 SLSQP 优化 drag，closed-formvolume 与 predictedlift 为约束，再重新 meshing/CFD 验证新设计。四个 aerodynamic 数据集各自训练，不是统一模型跨物理域泛化。",
+    "methodFlow": [
+      "将 trimmedCAD 转为 patch 序列：保留 canonicaledge/sharedboundarycontrolpoints，内部 Coonscollocation 近似 parent surface；简单 Ahmed 参数族可直接生成 13analyticpatches。",
+      "直接 tokenize NURBS：controlpoints 加 weights/gridindices、knotvalues 加 boundedindex 分别 Perceiverpooling，合成 patchtokens 并 globalselfattention。",
+      "连续 fieldsurrogate：NURBSgeometry 及 refinedsurfacepatchtokensconditionAB-UPTsurface/volumebranches，volumeanchors 仍 sampled；decoder 对 arbitrarycoordinatequeries 预测 CFDfields。",
+      "inverseCADdesign 与 CFD 核验：在 Ahmed 六参数 datasetbox 内对 drag、volume、lift 求 surrogategradients 并 SLSQP 优化，再按原 OpenFOAM/mesh/turbulence 协议验证，未开展真实制造。"
+    ],
+    "experimentsZh": "实验设置：作者报告 Ahmed500/400train/50val/50test；Windsor350 按 ordered60/20/20；DrivAer484 可用/400train/34val/50test；HiLift180geometry×10angles 共 1800，以 in-distributionsplit1260/180/360。模型约 12.61–17.17M，各 dataset 独立训练；八 H100 或四 GB200，17/13/11/69h。NURBScontexts、sampledvolumeanchors 与 supervisedCFDlabels。inverse 只 Ahmeddatasetbox 六参数、lift≤.05、volumefloor70–150L，400train 其余 heldout；初始化可取整个 dataset 最佳 feasible，label 未反传 train。\n作者报告 HiLiftpressure relativeL2 5.65%→4.53%，相对降低 19.8%；velocity7.06→5.87、shear8.72→8.52。（p. 8, Table 1）\n作者报告 Ahmedpressure3.01→2.66/vorticity6.52→4.83，但 velocity1.90→2.04 退步；DrivAerpressure3.82→3.97 退步、velocity5.93→5.14 改善。（p. 8, Table 1）\n作者报告 inverse 同约束 datasetfront gains4.4–20.4%，predicteddrag 与新 CFD 误差绝对不超过 2.2%，各 threshold 的 CFDlift 符合≤.05。（p. 24, Table 15）\n作者报告 DrivAeruntrimming2800s+GB200inference160s，相对 40hCFD 全流程约 50×；只 inference 约 900×，且硬件不同所以是 wallclockratio。（pp. 18–19 and 22, Tables 9/11/13）\n比较范围：AB-UPT 在 Windsor/HiLift 重新训练，其余 Ahmed/DrivAerbaselines 借原 AB-UPT 报告。CADencoder+pointanchors 的 CANTO-PA 与 fullpatchanchors 消融更直接；inverse 未比较同 budgetadjointCFD/其他 surrogate 优化器，胜于 finiteexistingdataset 不证明 globaloptimum。\n消融与诊断：fixedMLP 与 variablePerceiverNURBS、CANTO-PA、surface/volumeanchorcounts 及不同 sampling、patchsplit1–5（training4）和 querychunkmemorytradeoff。对 split5 稳定不保证任意 knotinsertion、reparameterization 或 patchdecomposition 不变。",
+    "insightZh": "主要贡献是从 CAD 设计 representation 直接连接 learnedphysicalfields，以 NURBSpatchcontext 同时替代 pointgeometryencoder 和 surfaceanchors，并建立 differentiableinverse-design 接口。Perceiver/AB-UPT/neuraloperator 和 NURBS 数值方法已有，理论部分是 domain-to-function framework 与 Poissonillustration，没有给实际 CFD 网络 error/representation-invariance 定理。具体 CAD 设计空间及作者 CFDverification 使其超过单 benchmarksurrogate，直接相关于 physical-performance-aware3Ddesign。",
+    "whyRelevantZh": "直接把 parametricCAD 接入 physicalperformance 预测、可微 constraint-awareinverse3Ddesign，与制造功能约束研究相关；实际贡献是设计 analysis 接口，不是自动构造完整 CADprogram 或直接制造工件。",
+    "evidenceZh": "几何 input/surfacecontext 来自 parametricpatch，volumecontext 仍有 sampledanchors。（pp. 6–7, Sec. 4.4; pp. 13–16, Figure 4 and CANTO-PA ablation；input 无 mesh 不意味着完全没有 sampling，训练 label、query、forcequadrature 与验证 CFD 仍离散。）\ntrimmedCAD 转换保 watertightboundary，但 interior 是近似且有成本。（pp. 21–22, Appendix D.2, Tables 12–13；Windsor8×8sampledprojecteddistance 最大 relative6.40e-4，不是所有连续 surfaceglobalerrorbound，也没有其它 complexdataset 同表误差验证。）\n作者 CFD 复核支持限定 Ahmedfamily 的 constraint-awareinverse 设计。（pp. 9–10, Figure 3; pp. 22–24, Appendix E, Table 15；70/80L 收敛同 84.3L 设计；fixedreferencearea 使 dragcoeff proportional toforce，bounds/volume/lift 以外无制造/装配约束。）",
+    "caveatZh": "当前 untrimming 为 datasetthroughput 设计，percase 序列 CPU 处理成本需计入 rawCAD 到 field；speedups 明确不是 hardware-normalized。\n原 trimmedsurface 的精确转换会大量增加 patch/degree，采用 boundary-preservingapproximation，非所有 CAD 都 exactgeometry 传入。\n不同 patchrepresentations 可能对应同 solid，通过 basis 与多 decompositiontraining 处理该 nonuniqueness，未宣称 formal 网络 invariance。\n无独立 limits 节；结果均 in-domainparameterfamilies 的 steady/time-averagedaerodynamics，不能视为通用 physics、多 boundaryconditions 或新 topology 泛化。\nCFDvalidated 不是本项目复现或 windtunnel/physicalmanufacture 验证；只约束 volume/lift 和 sixparameterbox，无 thickness、toolpath、structuralstrength 或 assembly 合法性。\ngenericNURBSgradient 不涵盖 discreteuntrimming/topology 变化；inverseproof 仅 analyticAhmedmap。\n有限 patchtoken 压缩与 supervisedMSE 没有 PDEresidual/conservation/errorcertification，R².99 不是 nearperfect 所有 localforces。\n培训/原始 simulation 及最终 CFD 仍需 mesh；任意 query 意味着连续 neuralfield 可评，不是无限分辨率物理细节正确。\nuntrimming 误差只 Windsor 稀疏 samplegrid 评估；DrivAer45kpatches/昂贵预处理限制复杂 CAD 迭代成本。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

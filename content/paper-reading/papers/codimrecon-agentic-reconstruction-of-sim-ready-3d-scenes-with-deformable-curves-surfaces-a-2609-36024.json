@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2609.36024",
+  "slug": "codimrecon-agentic-reconstruction-of-sim-ready-3d-scenes-with-deformable-curves-surfaces-a-2609-36024",
+  "title": "CoDimRecon: Agentic Reconstruction of Sim-Ready 3D Scenes with Deformable Curves, Surfaces, and Volumes",
+  "authors": [
+    "Shuzhao Xie",
+    "Lelin Wang",
+    "Guying Lin",
+    "Zhi Wang",
+    "Minchen Li"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36024"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "CoDimRecon",
+    "Visual Design Agents",
+    "3D Reconstruction"
+  ],
+  "abstract": "Reconstructing simulation-ready 3D scenes from real-world observations enables robotics, gaming, and immersive applications, yet existing methods largely assume rigid objects. This leaves an important gap for deformables, whose simulation-ready geometry depends on dimensionality (curves, surfaces, or volumes) and whose behavior may require models beyond elasticity. We present CoDimRecon, an agentic framework that reconstructs editable scenes containing rigid, articulated, and deformable objects from multi-view RGB observations. Scene-level geometric priors ground scale and layout, while object-level generated meshes guide the agent toward detailed, compact geometry; articulated rigid objects are decomposed into movable parts with explicit joints. For deformables, category-wise agent sessions reconstruct curves as centerlines with radii, surfaces as manifold shells with thickness, and volumes as watertight solids for volumetric meshing. Reusable simulator skills initialize compatible physical models and parameters, while agent-guided behavioral tests expose mismatches and trigger targeted revisions of motion, geometry, numerics, or material modeling. On evaluated Replica and ScanNet++ scenes, CoDimRecon achieves competitive compositional reconstruction accuracy while additionally producing deformable assets for rod, shell, and solid simulation. We further demonstrate robot interactions across all three representations, including a controlled paper-folding case in which behavioral testing motivates plastic bending.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36024v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36024v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36024v3 全文及 2026-10-06T15:43:42.017Z 审阅记录；PDF 28 页，SHA-256 cc4645b18697c5969d5f50e25aa3fd08a93b2b0c5484ccb2de83c313c88c2110，视觉核验第 1、4、7、8、16、18、19、20、21 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 官方 projectshuzhaoxie.github.io/CoDimRecon 成功访问，明确 Code Soon；仅 demos/paper/visuals，未确认 public implementation。",
+    "ideaZh": "CoDimRecon 用几何与生成 mesh references 帮助 agent 重建可编辑场景，再按 curve/shell/solid 修复可变形 assets，以 robot behavioral tests 修订运动、边界条件和必要材料模型。作者报告纸张同轨迹 elastic/plastic 对照释放后 fold114.97° vs4.48°，说明数值有效不等于预期行为，值得深读 scene-to-simulation 闭环。参数是选定模型下的有效值，未从真实动态恢复；trial 其余环境固定。",
+    "motivationZh": "现有 sim-ready reconstruction 多把物体视为刚体，难处理曲线、薄壳和体积形变；需要可编辑几何与行为测试共同指导不同维度的仿真资产恢复。",
+    "methodZh": "多视角 RGB 经 VGGT-Omega 提供 camera/depth，mask clustering+SAM3D 生成 registeredobjectreferences，agent 用 Blenderprimitives 重建并 render/metricrefine。Rigidparts 建 joints 与 MuJoCosettle；deformables 分别构造 centerline/radius、shell/thickness、closedsolid/tets。Simulator skills 给 constitutive initialization 及 preset tests，failures 按 motion→geometry→numerics→material 诊断。贡献是 solver-compatible 几何、可编辑程序与行为验证组织，没有新 IPC solver 或真实 materialidentification。",
+    "methodFlow": [
+      "从 RGB 估 camera/depth 和跨 view 实例，选 liftedsurfacearea 最大 view 生成 SAM3Dreference 并 multi-viewregister",
+      "agent 以 Blenderprimitives/modifiers 重建 objects，REST3D 补可见 smallobjects，保留 editableparts",
+      "input-viewrender 与 quadraticcoloralignment 作 diagnostic，修 light/material/pose；建 joints、rigidgravitysettle",
+      "category-wise sessions 构造 curve/radius、shell/thickness、closedproxy/tets，按 dimension 选择 rod/shell/FEM",
+      "adapt simulator examples，settle 保存 equilibriumgeometry，执行 presetrobot 动作与 strain/inversion/taskcriteria 审计",
+      "先修 motion/tool/contact/geometry/numerics，必要才改 material 并 freeze；paper 同 trajectory 回放 plasticity 开关"
+    ],
+    "experimentsZh": "实验设置：6 室内 scene，CDcm/F1@5cm/NC 及 input-viewPSNR/SSIM/LPIPS、V-JEPAfeatureLS、individual3sMuJoCodrop。BaselineHoloScene*modified、ReplicateAnyScene 补未 release 模块并 per-scenetune、RGB-onlyGPTagent。Geometryablation 一 scene，renderrefine3ScanNet++；deformablecapabilitydemos 与 paperplasticcontrol。\n作者报告 Replica CD6.63cm vsHoloScene*6.79、NC79.76vs78.76 但 F1 较差；ScanNet++CD21.66/F138.28/PSNR16.68。（Table 3, p. 7）\n作者报告 plastic/elastic 释放 1s 保留 92.5%/3.7%peakfold；phone 两 run lift 约 197.8mm，cushion 三处 indent22.6–22.9mm，均为 preset simulation。（Table 4, p. 8; Appendix B.4, p. 17）\n比较范围：HoloScene*不是官方默认 performance，ReplicateAnyScene 作者重实现并 per-scenetune；定量/qual 配置不同。GTglobalregistration 不证明无需对齐 metricrecovery。无 deformablecrossmethodbaseline/realrobotcalibration；LS 也受 Cycles vsunshadedstyles 影响。\n消融与诊断：去 geometric/generative refs geometry 一 scene；RR 主要 appearance 改进；categorysessionscurve 只有 qual。Paper 同 trajectory 隔离 plasticity；未隔离 agent/manualexpert、预算或 unseenmaterials。",
+    "insightZh": "agentic reconstruction 与 codimensional 几何目标、behavioralverification 的联合接口是价值所在。StaticRGB 不足以辨识 dynamicmaterialphysics，修到预设行为的 effectiveparams 不等于真实恢复。Papercontrol 和 revisionlog 支持具体 workflow 可运行，不证明大规模自动 successrate。",
+    "whyRelevantZh": "Image/metric evidence 驱动 editable3Dassets 及 solver-compatiblecurves/shells/solids 闭环，直接 visualdesignagents 与 compositionalreconstruction；没有实际 fabrication 成果。",
+    "evidenceZh": "生成 meshes 仅参考，agent 重建 primitives；deformables 按 dimension 适配 solver。（Sec. 3, Fig. 2, pp. 4–6; Appendix B, pp. 15–18；43primitive/81×vertex/301×face 压缩只是一个 chair，对 generatedreference 而非 realchair。）\n作者报告 competitive 重建，但并非全部指标最优。（Table 3, p. 7; Appendix C/D, pp. 18–21；3Replica+3ScanNet++；ReplicaF1 52.24 低于 HoloScene*53.48/GPT52.91，PSNR15.06 低于 21.22；inputviews 非 NVS。）\npaper 同 140°grippertrajectory 对照验证 plasticfoldretention。（Fig. 5/Table 4, p. 8; Appendix B.4, pp. 17–19；释放 1s4.48°/114.97°；elastic 是后续 controlledrerun，非原 failedtrial，initial5.35°未减。）\ntrial/revisionlog 与 rigidstabilityproxy 有窄范围。（Appendix B.4/Table 6/C.2, pp. 16–20；target/robot 以外 scene 固定；phone 需 resample 清 penetration，cushionbondedframe/修 tool 和 contact。Drop 每 object 单独、无限 floor 并可删>2cm 穿插 slabs。）\nbaseline 与 GTalignmentprotocol 需区分。（Appendix C.1/D.1–2, pp. 18/21；HoloScene*禁 normal 且用 estimatedinputs；qual 另用官方 pose/masks；GPT 以 GTyaw/mirror/scaleICP 全局注册。）",
+    "caveatZh": "staticRGB 不识别真实 dynamicparams，effectiveproperties 来自假定模型及 simulationbehavior，非 measuredproperties。\ntrial 只有 target/robot 动态，其余 fixed，不代表全 scene 耦合稳定。\nmodel/boundary/tool/motion 修订只满足给定测试，无 realinteractionfit 或全样本 agent 成功率；revisiontable 省略 setupfailures/interruptedruns。\nrigiddrop 统一 density/friction、虚拟 floor 和可删 penetratingbackground，不验证真实 physics 或原 scene。\ninput-viewrender、GTglobalalignment、baselineconfig 差异与小 scene 范围限制泛化。\ncodeComingSoon，总 runtime/tokencost 缺 matchedbudget；本项目未复现，数字为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

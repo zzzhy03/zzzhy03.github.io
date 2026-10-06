@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.18581",
+  "slug": "groundingvln-reasoning-and-acting-with-grounding-for-vision-language-navigation-2609-18581",
+  "title": "GroundingVLN: Reasoning and Acting with Grounding for Vision-Language Navigation",
+  "authors": [
+    "Kailing Li",
+    "Yu Han",
+    "Tianwen Qian",
+    "Yuqian Fu",
+    "Jingyu Gong",
+    "Jiangming Shi",
+    "Xiaoling Wang"
+  ],
+  "publishedAt": "2026-09-16",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.18581"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "GroundingVLN",
+    "VLM / MLLM"
+  ],
+  "abstract": "Although vision-language models (VLMs) possess strong visual understanding and reasoning capabilities, existing vision-and-language navigation (VLN) agents struggle to connect semantic reasoning with spatial execution. Two coupled gaps remain in this connection, as intermediate reasoning is not explicitly anchored to visual evidence and high-level decisions lack precise spatial goals to guide low-level motion. Cognitive science suggests that human navigation bridges these levels hierarchically by anchoring cognition to relevant landmarks and guiding locomotion toward spatial goals. Motivated by this principle, we propose GroundingVLN, which uses visual grounding as a shared interface between reasoning and action. GroundingVLN first reasons with grounding by anchoring task-relevant visual evidence to precise image locations throughout structured reasoning. It then acts through grounding by predicting a progress-aligned pixel goal that a geometric planner translates into primitive actions. To learn these capabilities, we construct GroundingCOTVLN-188K, a dataset of temporally aligned grounded reasoning traces, and introduce Grounded and Execution-Aware Reinforcement Learning (GEAR), which aligns grounded reasoning and spatial decisions with downstream execution. Experiments demonstrate that GroundingVLN achieves state-of-the-art performance (69.9% SR on R2R-CE and 75.1% SR on RxR-CE) with high sample efficiency, using just 0.9% as much training data as the strongest baseline. It also generalizes strongly across datasets, attaining 59.9% SR on RxR-CE when trained solely on R2R, a gain of 20.1% over the strongest baseline. Code and models will be released after review. Code is available at [https://github.com/Teacher-Tom/GroundingVLN](https://github.com/Teacher-Tom/GroundingVLN).",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.18581v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.18581v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.18581v3 全文及 2026-10-06T12:09:40.529893Z 审阅记录；PDF 22 页，SHA-256 9f69b321cacc638ca7dfbf79a51f344f51d2a449415e4c51cdc475b62d2d04af，视觉核验第 1、4、7、9、15、16、20、22 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 给出的 public repo 本轮确认只有一个 LICENSE 文件；首页 available 声明尚无可运行源码/README/weights，不显示 Codeavailable。 未确认公开实现的作者链接（审计用）：https://github.com/Teacher-Tom/GroundingVLN",
+    "ideaZh": "GroundingVLN 将带坐标的 evidence、历史对象和 progress-aligned pixel goal 接到 RGB-D 几何 planner，再用路线 reward map 训练。作者报告导航及跨数据迁移收益。可借鉴跨视角 grounding；系统依赖深度与 planner，数据比例的单位不能直接比较，官方代码仍未提供实现。",
+    "motivationZh": "导航中的对象指代、进度判断和动作目标容易在跨视角历史中脱节；目标是将可验证的视觉 grounding 与路线状态连接到可执行的几何目标。",
+    "methodZh": "teacher 将导航指令分 subtasks，程序从 executedroute 构造 visible/walkabletargets，SAM3+worldmarker 在 annotation 阶段对齐 entityidentity。模型 SFT/GRPO 生成 history/perception/progress/planning 与 MOVE/TURN/STOP；MOVEpixel 由 depth/pose 反投影并 A*执行。GEAR 是固定 anchorresponse 优化，pixelmap 依 GTroute 与 geometry，不是自由 closedlooprolloutterminalnavigationRL。方法对模型的 groundedtemporalrepresentation 有贡献，但输出任务仍 navigation 而非 designagent。",
+    "methodFlow": [
+      "replayexperttrajectory 并记录 RGB-D/pose/actions，teacher 标 subtask、object 与 CoT。",
+      "SAM3/depthworldmarkers 在 dataengine 跨 view 对齐 entity，程序生成当前 semanticsegment 内 pixelgoal。",
+      "SFT 让 MLLM 生成 coordinate-taggedreasoning 与 progress/action/goal，加入 expected-digitcoordinateobjective。",
+      "固定 anchors 采 G8responses，以 route/goalmap、action/subtask/grounding 奖励作 GEAR。",
+      "推理 MOVE 使用 RGB-Dbackprojection/SLAM/A*到达 pixelgoal，TURN 固定旋转，记录历史后继续。"
+    ],
+    "experimentsZh": "实验设置：Qwen3.5-4B，397B-A17Bteacher；188Kpairs/21Ktrajectories、oneepoch8H200 约 8h；16KsubsetGEAR2000steps 约 20h。HabitatR2R/RxRunseen、100manualgroundingepisodes；realwheeledrobot30tasks（easy/medium/hard 各 10），4090+Insta360/RealSenseD435。\n作者报告 D435-like syntheticnoise SR69.9→65.5、SPL64.1→59.7，容忍该特定扰动但未测试完整 depthfailure/SLAMdrift。（Table7, p.16）\n作者报告 mean37.41s/episode、9.26VLMcalls，略慢于 ProgressThink36.60；真实 30episodesoverall83.3%。（Table6, p.15; Fig.4, p.9）\n作者报告 GEAR Hit@10%76.1→92.9、meangoalerror7.4→4.6%，rewards 重用 depth/navmaps 及 teacherlabels，不是仅 language 监督。（Fig.3, p.9）\n比较范围：多 VLNreleased/reported 系统含 waypoint/pixel/directaction；differentbackbones/pretraining/planners/dataunits。DualS2+SPFidealexecutioncontrol 补强，benchmark-onlytrainingcomparison 尚无 matchedbackbone/teacherannotation 等预算。\n消融与诊断：tags、temporalalignment、GEAR/subtasks/2Dreward、general capability、depthnoise。GEARgroundingbonus 接受同 label 任意 instance 并只在 decisiongood 时奖励，可能不完整惩罚错误额外 objects；未直接监督 identitymatch 全关系。",
+    "insightZh": "pixelgoals、hierarchicalnavigation、CoT 与 GRPO 已有路线；新意在同 grounding 接口组织证据与目标、dataengine 跨 viewidentity 与 execution-aware 监督。可迁移视觉 agent 训练思路，未证明 general-purposefoundation model 或 edit/design 能力。",
+    "whyRelevantZh": "模型 training 把视觉/空间证据与执行目标显式连接，并对跨 viewgrounding 给予结构化监督，能启发 groundedmultimodalagent；与 visualdesign/3Dasset 编辑的迁移未实际验证。",
+    "evidenceZh": "模型 grounding/currenttarget 以 normalizedcoords 表示，execution 依 metricdepth、RTABMap 与 A*；SAM3 用于 annotationtracking 而非证明模型自身 persistent3Dmemory。（Sec.3.3–3.4/Fig.2, pp.4–6; AppendixA.7/A.11, pp.17–18,22；方法和 limits 页实际查看；highlevelRGB 不等于 whole pipelineRGB-only。）\n作者报告 R2R69.9/RxR75.1、R2R-only→RxR59.9 对 Aware39.8。（Tables1–2, pp.7–8；主表已查看，success 为 within3mstop，cross-dataset 仍同 Matterport 场景类型，不是任意 realworld 泛化。）\n作者报告去 GEAR SR69.9→57.2、去 groundedtags→66.1、无 temporalanotation→62.2，支持 training data/geometryrewards 作用。（Table3/Fig.3, p.9；消融/grounding 图实际查看，grounding 正确与 action 正确相关不是因果中介证明。）\n188Kstep-levelpairs 与 ABot21.9Mreportedtrajectory/reasoningcounts 混合比较；generalMMStar63.67→57.20、MVBench50.93→45.55。（AppendixA.1/Table5, pp.14–15；retention 表实际查看；0.9%不是 matchedtokens/annotationcompute，更不是通用能力提升。）",
+    "caveatZh": "lowlevel 依 metricdepth 进行 backprojection/SLAM，RGB-onlyplanner 尚无。\n作用依赖 routegeometry、datateacher、SAM3 与 planner；cannotattributeallnavigationimprovements 到 MLLMreasoning alone。\ncrossviewentitytracking 主要 dataengine，2mcontinuitygate/anyinstanceSAMreward 可能混淆同类 objects。\ngeneralbenchmark 基模型明显下降，其他 navigationprotocol 答不出 option 不能单独证明知识彻底遗忘。\n0.9%混合 samplesunits 且不含 teacher/pretrain 代价；method 仍少量 realworldtasks 无 CI。\nofflineanchorGRPO 与 trueclosedloopnavigation 优化不同；perepisode 时间是否含 physicalmovement 边界不详。\n本项目未运行或复现，public code 未实质发布。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

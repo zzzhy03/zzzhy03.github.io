@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.39168",
+  "slug": "reinforcing-multimodal-reasoning-via-token-level-perception-grounded-advantage-estimation-2609-39168",
+  "title": "Reinforcing Multimodal Reasoning via Token-Level Perception-Grounded Advantage Estimation",
+  "authors": [
+    "Zhihan Zhang",
+    "Lizi Liao"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39168"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Reinforcing Multimodal Reasoning via Token-Level Perception-Grounded Advantage Estimation",
+    "VLM / MLLM"
+  ],
+  "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has improved the reasoning capabilities of Multimodal Large Language Models (MLLMs), yet existing frameworks rely on coarse, sequence-level reward signals that lack the fine-grained supervision over the visually-grounded steps within a multimodal reasoning chain. We investigate this gap through the lens of two token-level metrics: visual dependency (i.e. how much a token's prediction relies on the input image features) and predictive entropy. Our empirical analysis reveals two key findings: (1) correct reasoning chains exhibit a markedly sharper entropy reduction as visual grounding intensifies, compared to incorrect ones; (2) pivotal tokens, those whose misprediction triggers reasoning collapse, are statistical outliers in the joint distribution of visual dependency and predictive entropy derived from correct chains. Motivated by these findings, we propose token-level perception-grounded advantage estimation (TPAE), which estimates token-level advantages by measuring each token's statistical consistency with the vision-entropy patterns of correct rollouts. TPAE leverages this granular score to modulate the sequence-level advantage, producing a fine-grained supervision signal that can be integrated into various RLVR frameworks. Extensive experiments on seven benchmarks show that TPAE consistently outperforms leading strong baselines, yielding more stable and efficient optimization for multimodal reasoning. The code is publicly available at https://github.com/Zhihan72/TPAE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39168v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39168v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Zhihan72/TPAE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39168v1 全文及 2026-10-06T14:33:49.043845Z 审阅记录；PDF 10 页，SHA-256 f19ccb8a34c54869a51fb6bf98e0ccf30e24e8a7a3f7f0240c14077bf04f8c3e，视觉核验第 1、3、4、5、7、8 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1 给出作者 public GitHub；已访问确认 preliminary_study、training_scripts 和修改的 verl 实现，README 指向 compute_stat_advantage.py。未执行代码或复现结果。",
+    "ideaZh": "TPAE 用 token 的 image-masking KL 和 predictive entropy，在正确 rollouts 中估计 reference，再惩罚偏离 reference 的 token advantages。它为视觉 grounding 的过程监督提供可复用接口，并在两组模型/GRPO-DAPO 对照中改善结果；但 Mahalanobis 阈值是估计 reference 下的 heuristic，不能称为经校准的 99% token 正确性检验。",
+    "motivationZh": "粗粒度 answer reward 无法指出视觉推理链中哪些 tokens 偏离感知证据；目标是用逐 token 的视觉敏感性统计提供更细的训练反馈。",
+    "methodZh": "粗粒度 answer reward 不能定位 reasoning chain 中的视觉错误，作者比较 token entropy 与保留部分图像信息后的 distribution KL。按每题正确回答的同 token occurrences 拟合二维 Gaussian/shrinkage covariance，把超出 trust boundary 的 token 加上有界负 advantage correction，接入 GRPO/DAPO，不训练额外 reward model。完整主文提供基线和视觉几何 reasoning 结果；统计 outlier 与人工错误标签仅支持关联，未验证改变某 token 能因果修复整条链。",
+    "methodFlow": [
+      "从同一图像/问题采样 rollouts，并按最终答案 reward 分成正确/错误 sets",
+      "在原图与随机 patch-masked 图下计算每个 token 的 distribution KL，并计算 predictive entropy",
+      "按正确 rollouts 中同 token occurrences 拟合二维 reference mean/covariance",
+      "计算 Mahalanobis deviation；reference 中没有的 token 默认不加惩罚",
+      "对超出 trust boundary 的 token 增加 bounded negative advantage correction",
+      "以 GRPO 或 DAPO 更新 policy，并比较 visual reasoning accuracy"
+    ],
+    "experimentsZh": "实验设置：训练使用 ViRL39K，两个 Qwen VLM backbones 分别配 GRPO/DAPO；评价多个视觉数学、几何、逻辑与通用 benchmark，采用 exact-match 的 avg accuracy@8，非 pass@8。主文还对 token outliers 做人工类别分析和 threshold sensitivity。归档 exact PDF 为主文与 references，文中提到的独立 supplementary 没有附在这份文件内。\n作者报告 Qwen2.5-VL DAPO 平均 accuracy 从 44.97 升至 48.71，GRPO 从 43.86 升至 47.63；同数据/rollout/reward 路线比较支持模块贡献。（p.7 Table 2）\n作者报告 Qwen3-VL DAPO 从 58.85 升至 61.35，GRPO 从 58.32 升至 60.62；这不是单纯将较新 base model 与旧模型比较。（p.7 Table 2）\n作者报告 Qwen2.5 TPAE-D 的平均 48.71，高于 VPPO 47.59；但 MMMU-Pro 37.45 低于 TPAE-G 38.27，不能写逐项全部领先。（p.7 Table 1）\n作者报告人工检查的 200 个 outlier tokens 中 68.5% 为 perception error、18.8% 为 reasoning error；这没有测 non-outlier baseline 或错误定位 recall。（pp.4–5 §3.3, Fig.2）\n比较范围：同 algorithm 的模块 ablation 有价值，外部 reasoning models 的训练数据/预算不完全对齐。未给独立训练 seeds/CI 或 additional masked forward 与 vocab-distribution storage 的 compute。\n消融与诊断：主要比较加入/不加入 TPAE 和少量 trust thresholds；缺少 entropy-only、KL-only、随机 mask/reference、leave-one-out reference 或 per-context token controls。主文将 shrinkage 系数称 optimal，但公式仅是样本量 heuristic，不能据此推出统计 test 校准。",
+    "insightZh": "将既有 visual-dependency/entropy 指标联合用于 token-level reference-based advantage correction，超出单个 domain wrapper，具有通用 grounding-aware training 的迁移价值。不是准确过程标签或独立 PRM；按 token identity 聚合会混合不同位置/语义，理论 calibration 与干预证明不充分。",
+    "whyRelevantZh": "直接为视觉与几何 reasoning 的 token-level learning 提供方法，适合研究 grounding-aware credit assignment；没有 visual creation/CAD agent 或制造输出。",
+    "evidenceZh": "Visual dependency 是部分 patch masking 后的 vocab KL，advantage correction 实际为 additive penalty。（pp.4–6 Eqs.4–9, Fig.3；已核看图与公式；并非完全 vision-blind，也不是只缩放 rollout advantage。）\n正确 rollout 的 token reference 被拟合为 Gaussian 并使用 shrunk covariance。（p.5 §4.1–4.2, Eqs.5–8；有限样本、估计参数和相关 token 下不能直接套用 known-parameter chi-square 的严格覆盖率。）\n同训练路线加入 TPAE 在两个 backbones 和两种 RL algorithms 上均改善平均结果。（p.7 Table 2; p.8 Fig.4；已核看数值；step-based reward convergence 不是 equal-wall-clock efficiency。）\noutlier human labels 和几何示例支持错误关联，但没有验证因果 criticality。（pp.2–5 §3.3, Fig.2; p.8 Fig.5；没有非 outlier control、完整 detection recall 或局部替换干预。）",
+    "caveatZh": "已估计和 shrink 的 covariance、同 rollout correlated occurrences 不具 known-parameter Gaussian 的严格 chi-square law，99% 是阈值设定而非 token 正确性保证。\nFinal-answer correctness 不保证中间推理正确，reference 可能包含 lucky guess/合理但不同路径；按 token identity 混合不同语义。\n随机 patch masking 保留图像信息，KL 可反映输入扰动而非忠实 grounding；缺少 causal intervention。\noutlier-only 人工审计不能证明 precision/recall 相对普通 tokens 更好，更不能证明这些 token 是 collapse 原因。\n追加前向和 full-vocab statistics 有成本，training-step convergence 不等于 wall-clock 加速；无训练 seed uncertainty。\n主文引用 supplementary 的 annotation protocol、Gaussian alternatives 和资源细节，这些不在已归档 exact PDF 中，未把未见内容当证据。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

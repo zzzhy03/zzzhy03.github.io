@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.05526",
+  "slug": "have-i-scene-this-before-spatially-grounded-conversational-memory-for-complex-queries-in-e-2610-05526",
+  "title": "Have I Scene This Before? Spatially Grounded Conversational Memory for Complex Queries in Egocentric Assistants",
+  "authors": [
+    "Jiazhou Liang",
+    "Liam Gallagher",
+    "Kiko Chen",
+    "David Guo",
+    "Armin Toroghi",
+    "Yifan Simon Liu",
+    "Scott Sanner"
+  ],
+  "publishedAt": "2026-10-04",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05526"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Have I Scene This Before? Spatially Grounded Conversational Memory for",
+    "VLM / MLLM"
+  ],
+  "abstract": "Egocentric assistants must connect what users say with what they see across long interaction histories. We formalize this challenge as Spatially grounded Conversational Reasoning (SpaCR): cross-scene, recall-oriented, and counterfactual spatial queries that combine user-stated facts with geometric evidence. Direct vision-language models incur high inference costs and context limits as histories grow, while keyframe selection and retrieval can omit objects or evidence needed for complete recall. We propose Spatially grounded Conversational Memory (SpaC-MEM), an object-centric working memory that uses 3D reconstruction and segmentation to ground conversational information in persistent physical objects. It compresses multimodal histories while preserving spatial evidence and allowing object-specific facts to be updated through dialogue. We also introduce Ego-SpaCR, a benchmark comprising 620 ScanNet video sessions augmented with 95 task-oriented conversations and 3,100 evaluation queries. SpaC-MEM achieves the highest overall answer accuracy among the evaluated methods and improves object recall while requiring substantially fewer reference input tokens than native-video baselines. Removing 3D spatial information substantially degrades performance, highlighting the importance of preserving spatial and conversational evidence together.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05526v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05526v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/joeliang0520/SAPCR-MEM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05526v1 全文及 2026-10-06T15:45:00.377272+00:00 审阅记录；PDF 26 页，SHA-256 2b547eb9adc60b7d53a7bf45fea6ed31480247f780e5c9a0c9241f2820e00dfb，视觉核验第 1、2、6、9、10、20、21、22、26 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.7 footnote 明确此 URL。web 首次返回 404，随后实际 GitHub/API 访问 200 且 private=false，contents 包含 spacmem-code；README 与目录确认 reconstruction、links/context/answer/evaluation 实现，非 README-only。保留 PDF 拼写 SAPCR，不猜改为其他 URL。",
+    "ideaZh": "SpaC-MEM 把 egocentric RGB 重建为 persistent 3D object records，将原始对话及后续修订关联到同一物体，再交给 LLM 做跨会话和 hypothetical spatial queries。作者报告 Ego-SpaCR accuracy52.5%，相对最强不同模型 baseline43.1%，同 GLM 的去 geometry 消融 51.5%→34.9%。值得借鉴对象身份、几何和时间事实的统一状态；真实 ScanNet 配合合成对话、静态几何与约 16 cm 重建误差，尚不能保证可靠摆放或实体操作。",
+    "motivationZh": "跨会话空间问答需要辨认同一物体、关联过去对话与后续修订，并处理假设摆放；仅保存文字摘要难以维持身份、几何和时间事实的一致对应。",
+    "methodZh": "DA3 从 RGB 估计 approximately metric depth/points/poses，SegVGGT masks 提升为 object point clouds；按同类几何 overlap、共同出现约束和 appearance/tracks 合并成持续对象。LLM 将 dialogue subject references 关联对象，保留 verbatim turns、correction/state-change 时序和 centroids/boxes。最终完整 memory 不检索地交给 answerer，支持全对象集合 recall。Benchmark 以 ScanNet 真值几何、合成任务事实和 Writer/Reader 检查构造可执行 query programs。",
+    "methodFlow": [
+      "建立对象几何：RGB→DA3 geometry＋SegVGGT instances，将 mask 内可信 depth 提升为点云并对齐房间 dominant planes，记录 centroid/axis-aligned box。",
+      "维护 persistent identities：按同类点云 overlap 及匹配歧义合并 observations；不同时共现且有 track/appearance 支持的 fragments 可合并，罕见 detections 被去除。",
+      "绑定对话与时序事实：LLM 以 prior dialogue、可见 objects 和 geometry 解析 subject references，将原 turn 挂到对象；correction 与 state change 的历史语义不同。",
+      "在完整 object memory 上回答：Answerer 接收所有历史对象、associated turns 与当前 visible set，综合 conversational conditions、size/distance 和 hypothetical relations，不先 RAG 筛一小部分。"
+    ],
+    "experimentsZh": "实验设置：95 合成多-session conversations、620 ScanNet video sessions，official3,100 queries 中 85.4% 为 count，含 C1 grounding/C2 relations/C3 geometry/C4 counterfactual。Writer 建立 facts，独立 Reader 还原 prefix state，deterministic program 检查答案并有人审；几何边界 count 容许 0.04m tolerance、interval width≤2。Object-description scoring 用三次 candidate-resolution VLM judge，避免 target-only 宽松判定。\n作者报告 SpaC-MEM GLM51.5%、Luna52.5%，最强 Gemini Agentic43.1%；C4 分别 60.3/61.4 相对 37.3。最佳比较 answer models 不同，不能把全部 9.4 pp 归因单变量 memory。（PDF pp.9,24, Tables 2,6）\n作者报告同 GLM 去 spatial evidence，overall51.5→34.9%、C4 60.3→24.5%；添加 RGB object views 只少量恢复。原对话 association 保留 human-GT accuracy 的 89%，不是 89% link accuracy。（PDF p.10, Fig.7）\n作者报告 object-centric context 比 per-frame 平均少 4.7×tokens，11sessions 少 5.1×；memory recall 约 70%，但 cost 是 common reference tokenizer/300tokens-frame 下最终 answer input，未计 reconstruction、summaries、updates、tools、output/evaluation。（PDF pp.10,21,25, Appendix D,H）\n作者报告 39scenes/864GTobjects，0.5m centroid threshold 下 instance recall91.1%、precision67.0%、semantic recall82.2%；matched median centroid error16.2cm，box IoU0.25 recall51.7%。不能据此保证 packing dimensions 准确。（PDF pp.25–26, Table 7）\n比较范围：包含 native video、uniform/AKS/FOCUS、VideoAgent、Gemini Agentic、MM-RAG/SummaryRAG/M2A 和 conversation-only controls。两种 answerers 的 object-centric/per-frame 及 geometry 消融较有用，但所有 baselines 没有统一同一个模型；输入 budget、内部 tool 成本和 reasoning resources 也不同。Wilson answer intervals 以 queries 为单位，episode correlations 需结合另有 episode-bootstrap 趋势读。\n消融与诊断：Oracle object boxes/measurement、geometry vs class-only/RGB、per-frame vs consolidated、human vs automatic dialogue links、history/object-size scaling。No-geometry loss 较大，oracle geometric values 主要帮助 C3 而非 C4；论文没有真实实体 relocation、动态 geometry 追踪或跨数据集 counterfactual 验证。",
+    "insightZh": "贡献是 spatial conversational state 的对象级统一表示与可验证 benchmark，而非新 reconstruction/segmentation model。与普通对话 RAG 的区别在于 persistent identity、explicit geometry、完整集合 recall 和 fact-update temporal semantics。C4 消融支持这种表示对 counterfactual reasoning 的作用，具有结构化场景 reasoning 的方法迁移价值；泛化仍主要限于本任务与静态 ScanNet。",
+    "whyRelevantZh": "Persistent object 身份、geometry 与带时间语义的用户事实，是 structured scene/layout reasoning 可复用的状态设计；counterfactual 空间消融具有直接方法价值。这里并未生成 CAD/SVG 或执行物理摆放，故保持 VLM/spatial reasoning 分类，不能归为 visual-design-agent 或新 3D reconstruction。",
+    "evidenceZh": "用户事实、语义 updates 与 RGB-estimated object geometry 挂到同一 persistent record。（PDF pp.5–7, Fig.3; pp.21–22, Appendix E；完整阅读 exact PDF 与附录，实际查看 method figure；true geometry/poses 用于 benchmark construction/evaluation，不冒充预测输入。）\nGeometry 记录与 object-centric aggregation 对回答/recall 有受控消融支持。（PDF p.10, Fig.7; p.25, Fig.8 and Appendix H；作者报告；结构压缩不等于整个 pipeline compute 成本下降。）\nBenchmark 真实图像但任务事实、conversation 与 visits 顺序为构造，几何固定。（PDF pp.17–20, Appendix B；不能称已验证真实多天移动物体、live human conversations 或操作成功。）\nReconstructed pool recall 高于严格 box fidelity，不能以宽松 centroid matching 认定精确尺寸。（PDF pp.25–26, Table 7；作者报告；该评估先通过 camera correspondences 对齐坐标，随后 class-agnostic matching。）",
+    "caveatZh": "基准房间几何来自静态 source scans，personas、facts、dialogue 和 visits 顺序为构造。\n每场景独立 metric coordinates，cross-scene queries 聚合 predicate 结果，并非统一跨房间坐标。\nReference input tokens 只度量最终 answer context，不是 billing 或 total pipeline compute。\n无 dedicated limitations section；总体 52% 左右仍有大量错误，static-room results 不能保证真实搬动物体、遮挡/geometry 变化和长期 assistant。\nDA3/segmentation errors、16.2cm matched centroid 误差与宽松 recall 对照，不能支持精密 fit/fabrication 判断。\n去除 rarely observed objects 可能损害完整集合 recall，当前 benchmark 未独立量化这类 miss。\nWriter/Reader、事实/问题 templates 与少数 scenes 限制生态效度；human judge validation 只描述 500 答案检查，未给 numeric agreement。\n每 queryassociation 处理 priorprefix，onlineincrementalupdate 的 latency/memory 未实测；保存完整 verbatim turns 仍随事实增长。\n本文未运行 reconstruction/QA，全部指标为作者报告，未声称它会生成或编辑 visual artifacts。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

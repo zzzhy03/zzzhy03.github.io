@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2610.02210",
+  "slug": "moore-escher-penrose-a-conformal-golden-braid-2610-02210",
+  "title": "Moore, Escher, Penrose: A Conformal Golden Braid",
+  "authors": [
+    "Sophia Feldman",
+    "Assaf Shocher"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02210"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Moore, Escher, Penrose",
+    "Image Generation"
+  ],
+  "abstract": "I don't think I have ever done anything as peculiar in my life. Among other things, it shows a young man looking with interest at a print on the wall of an exhibition that features himself. How can this be? Perhaps I am not far removed from Einstein's curved universe.'' So wrote M.C. Escher about his 1956 lithograph Print Gallery. Nearly half a century later, a mathematical analysis related its geometry to an untwisted source image through a conformal power map $z \\mapsto z^α$, $α\\in \\mathbb{C}$. Building on this construction, we use a frozen text-to-image diffusion model to generate new self-referential scenes. Prompting alone does not enforce the recursion, while a post-hoc transformation can leave structures poorly connected. Applying the transformation during sampling is also insufficient: the denoiser may \"repair\" the intended distortion or drift out of the prescribed geometry. We construct a generalized inverse $T^\\dagger$ of the non-invertible image transformation $T$, adapted to its recursive constraint. In the idealized formulation, the Penrose identity $TT^\\dagger T = T$ makes $TT^\\dagger$ an idempotent projection onto geometrically admissible images. Yet denoising only the transformed image remains an out-of-distribution task, even with projection. We therefore braid denoising steps with $T$ and $T^\\dagger$: source-space steps develop the untwisted scene, while transformed-space steps refine its appearance and connections in the final geometry. We generate Print Gallery-like compositions and explore further transformations. Rather than distorting a finished image, we let the scene and its distortion develop together.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02210v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02210v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/sophied111/moore-escher-penrose"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02210v1 全文及 2026-10-06T12:54:47.875769+00:00 审阅记录；PDF 20 页，SHA-256 3da1b8894085572aec6094c69ef37107d26b4b8a825eedb79644f5abf95e0729，视觉核验第 1、5、9、16、17、18 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.2 官方 supplementary/project URL https://assafshocher.github.io/escher/supplement.html →其 Overview https://assafshocher.github.io/escher/ →官方 Code 链接 https://github.com/sophied111/moore-escher-penrose。已实际访问 Public 仓库并确认 escher/、cli.py、batch_run.py、locked dependencies 等真实实现，非 README-only placeholder；未运行/复现。",
+    "ideaZh": "该作将冻结 diffusion prior 与匹配的 geometric transform T/T† 交替采样，使场景内容与 Escher/Droste 递归布局一起形成。关键是从同一 fundamental band 提取/重复得到 reflexive generalized inverse，连续空间 TT† 可恢复几何约束，而非不断叠加 warp。方法对结构化 2D 生成有直接启发；作者仅展示 qualitative baselines/累积消融，raster resampling 和最后 denoise 仍破坏精确递归，不能把 algebraic projection 当最终像素或视觉质量保证。",
+    "motivationZh": "生成 Escher 或 Droste 式递归图像，需要自然内容在变换后保持几何对应；反复 warp 容易累积误差，需要让生成 prior 与匹配的变换算子共同采样。",
+    "methodZh": "Source image 满足 scaleperiodicity，complexpowermap 加入 scale/rotation。T=E2B1 选 sourceband 并重复为 twistedimage，T†=E1B2 选匹配 Escherband 并 Drosteextend；continuousB1E1=B2E2=id 给 TT†T=T 与 T†TT†=T†。FrozenFLUX1-dev 先 zero-spinwarmup，再 T→denoise→T†→source-denoise→T→finaldenoise，每次操作 cleanestimate，4×RealESRGAN 后 warp/downsample 并重新加 freshnoise。还展示 multiplepoles/Möbius/squarenesting；Rimringsinverse 不稳定只用 forward。完整 20 页含 explicitinverse、实现、empiricalgeometrycheck、PixelDiTtransfer 和 gallery 已读，实际查看首面、sampler、主要 qualitativeablation/limits 及 check/transfer 图。",
+    "methodFlow": [
+      "指定递归几何与匹配 band：用 scaleλ和 complexpower 构造 source/Droste 与 Escherclasses，固定 sourceband 及其 outputrepresentative，定义 extractionB 和 extensionE。",
+      "建立可恢复约束的 operatorpair：T=E2B1 与 T†=E1B2 是 chosenreflexiveinverse，TT†在 idealcontinuousspace idempotent；没有 orthogonal/nearestpoint 要求。",
+      "在两个表示中交替 denoise：冻结同 model/prompt，zero-spinwarmup 建立 copies，按 noiselevel 切 T/T†/T；每次 cleanprediction 经 SR/warp/resize/VAE 后 freshre-noise。",
+      "结束于 transformedcomposition：最后自由 denoise 补细节；optionaltime-travel 可能平滑或放大 seams，mainrecipe 关闭。换几何 family 或 pixelbackbone 需对应 map/schedule。"
+    ],
+    "experimentsZh": "实验设置：FrozenFLUX1-dev12B fp16，1024²，128FlowMatchEulersteps/guidance3.5，defaultλ4,p1，warmup.95→.87、T.87/T†nine stepslater/finalT.5，4×SR；96GBBlackwell 约 2min/image、peak45 GB。PixelDiT1.3B 另用 RTX5090 约 20s 并重新匹配 noiselevels，非同 hardwaretiming 比较。\n作者报告 qualitativepromptonly/extendedprompt 不能稳定产生规定 recursion，posthocwarp 复制 geometry 但内容连接差；Fig.8 累计 warmup+inverseforward+SR 得到更清楚 innercopies。没有 successrate、人类 study 或基准质量分数。（PDF pp.8–9, Fig.8）\n作者报告 checkerboardλ2/4/16 的|P²(Tx)−P(Tx)|残差 0.011/0.012/0.014；为 bilinearresamplingfloor 的离散几何检查，没有定义为最终图像一致性指标。（PDF p.17, Fig.10）\n作者报告 PixelDiT 可迁移 recursion，warmupstart.95→.96、firstT.87→.92、lastT.5→.69；保持 prompt/seed/scale 但不是完全相同 schedule。（PDF pp.14/18, Appendix B.1/Fig.11）\n比较范围：Samebaseprompt/initialseed 的 prompt、promptextension、posthocT 和 singleT，未和 SyncTweedies/LookingGlass/TiledDiffusion 等运行比较；extendedprompt 改变 text 为明确 baseline。Gallerycurated，没有多 seed 成功率或不筛选 outputs。\n消融与诊断：两个 prompts 累计添加 warmup、T†/T、SR 与 optionaltime-travel；列出 knobsweep 但无全因子 quantitative 表。Checkerboardoperatorcheck、pixelmodeltransfer、不同 maps 进一步说明可用范围。Rimrings 只 forward 不能用它证明 generalizedinverse 统一适用全部 mapfamilies。",
+    "insightZh": "Constrained/pairedviewdiffusion 和直化 Escherinpainting 均有先例。新贡献是 scale-recursivegeometry 的 matchedbandimageoperatorpair 及 source/transformedspaces 交替内容演化，用非可逆 warp 的 reflexiveinverse 恢复选定图像 class。无新基础模型、trainingparadigm 或普遍采样正确性定理，但直接回答 2D 内容在显式几何约束内生成的接口问题，值得精读。",
+    "whyRelevantZh": "为结构化 2Dcomposition 提供直接可实现的 geometryoperator 与 frozenimageprior 耦合思路，尤其当约束是一组重复/连接关系而非单纯 prompt；可对矢量/平铺/可制造设计接口作有边界的方法借鉴。",
+    "evidenceZh": "TT†是 idempotentprojection 不是 Euclidean nearestpoint 或 MoorePenroseorthogonalprojection。（PDF pp.4–6, Sec.2.2/3.1; pp.15–16, Appendix C.1；band 选择确定 inverse，continuousidentities 排除 origin；raster/SR/denoising 不在证明中。）\n操作 cleanestimate 后重新加 freshnoise，不直接 warpexistingnoise。（PDF p.6, Sec.3.2/Eq.9; p.13, Appendix B；warpednoise 协方差变为 WW*；这里只说明 freshmarginalnoise，不是证明最终遵循 conditionalprior。）\n主要比较是两 promptseedrows 的 qualitative 累积消融，非独立统计各因素效果。（PDF pp.8–9, Sec.4.3/Fig.8; p.13, Appendix A；actualview 相同 128×128centralcrop8×放大；addedwarmup/pair/SR 的累计列，未独立复现。）\nEmpiricalroundtripcheck 不证明最终 denoisedscene 精确 recursion。（PDF p.17, Appendix D/Fig.10；checkerboard 离散 operator 单独 check 排除 SR/denoising，边缘可见 blur/residual；作者报告.011/.012/.014。）",
+    "caveatZh": "PDF p.9 Sec.5/Fig.9：固定 recursioncenter 可能 anchor 错误 subject，time-travel 可放大 seams；finite resolution 与后续 denoise 不保证 exactfinalrecursion。\nPDF pp.6/15：Rimrings 不做 unstableinverse；其他 coordinatecharts 本身不自动有 matchedimage-spaceinverse。\nPDF p.5 Fig.3caption：earlyDrostepreview 是后期图的 illustrativeblur，不是 recordedcheckpoint。\nIdealcontinuousproof 只约束 operator，没有显示 Bayesianconditional sampling correctness；后期 free-denoise 还可能 repair/remove 要求的 distortion。\nCuratedqualitativegallery 和仅两 rows 累计消融无法量化 prompt/seedrobustness 或判定比现有 constraintdiffusion 更好。\nRasterimage 递归不等于 vectorpaths/topology/fabricationconstraint 满足；可以借鉴 operator 接口，不能称已有 vector/CAD 生成能力。\nOnlineanimatedsupplement 对 stillimages 重建/融合 nestedviews，不是额外生成 frames 或最终 stillexactconsistency 证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

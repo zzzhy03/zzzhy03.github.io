@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.38746",
+  "slug": "matisse-evidence-space-reasoning-for-active-3d-reconstruction-2609-38746",
+  "title": "Matisse: Evidence-Space Reasoning for Active 3D Reconstruction",
+  "authors": [
+    "Xihang Yu",
+    "Kaichen Zhou",
+    "Lorenzo Shaikewitz",
+    "Clément Jambon",
+    "Xiao Zhan",
+    "Rajat Talak",
+    "Luca Carlone"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38746"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Matisse",
+    "3D Reconstruction"
+  ],
+  "abstract": "How can a 3D reconstruction system acquire and retain useful information to understand the geometry of a scene from partial views under a limited computation budget? Existing active view acquisition methods typically estimate uncertainty over observed or instantiated geometry, limiting their ability to reason about unseen structure, while long-horizon reconstruction methods often retain redundant observations. We introduce Matisse, a training-free framework that unifies active reconstruction and keyframe selection by leveraging evidence provided by a pretrained generative 3D model. Matisse estimates Evidential Uncertainty from cross-attention evidence associated with 3D latent tokens and derives an Evidential Information Gain to guide both view acquisition and keyframe selection based on the expected reduction in posterior entropy. Matisse supports multi-object scenes through occlusion-aware, object-balanced aggregation and propagates uncertainty through intermediate latents to avoid full reconstruction during planning. Matisse reduces Chamfer distance by 12.7%, 3.8%, and 9.2% on GSO30, YCB-V, and Replica, respectively, relative to the best baseline on each dataset, and achieves a $1.50\\times$ end-to-end speedup over the best active reconstruction baseline on GSO30 with the same reconstruction backend. In the GSO30 keyframe selection experiment for long-horizon reconstruction, Matisse achieves comparable Chamfer distance using 14% of the input views compared with Stream3D.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38746v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38746v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38746v1 全文及 2026-10-06T12:51:55.397923+00:00 审阅记录；PDF 20 页，SHA-256 af953194ace2dc20987538290f4aba5545d3f380213dbb194d816f4f1f8456ac，视觉核验第 1、2、8、9、14、20 页。数字均为作者报告，本项目未独立复现。代码状态 promised：exact PDF p.1 的 projectwebsite embeddedURI 为 https://xihangyu630.github.io/matisse/ ，实际访问公开作者 page，Code 标注 Comingsoon；不提供 placeholder Code 链接。",
+    "ideaZh": "Matisse 用现有 Stream3D/SAM3D 的 observation-to-token evidence 估计 latent uncertainty，按可见未充分支持的 tokens 选择新视角和 keyframes，避免每个候选都完成昂贵 mesh 生成。作者报告 GSO30 CD54.167 mm 对 random62.078 mm、YCB-V6.451 对 6.705 mm，以及既定轨迹选 7 帧达到 Stream3D 处理 48 帧的接近质量。可借鉴 generative 3D prior 的证据管理接口；这里的 Bayesian 解释依赖假设，不能当已校准的几何/幻觉置信度。",
+    "motivationZh": "少量观察下的生成式三维 prior 会补全未见区域，但下一视角未必最有用；需要评估哪些 geometry tokens 缺少证据，再选择视角或 keyframes。",
+    "methodZh": "已有 AEM 在 canonical3Dtokens 记录 image cross-attention evidence 和 frameIDs，SAM3D sparse-structure 预测包含 completedunseengeometry 的 occupancy。Matisse 假设 view-independentlatent 和 evidence-scaledGaussiannoise，由 evidencesum 得到 U=α/(α+E)，候选 view 的 binaryvisibility 把 entropyreduction 近似为可见 tokenU 之和。按 objecttoken 数归一化/均分，depthbuffer 处理 occlusion，乘 camera-diversity 因子，greedy 或 recedinghorizon 执行；SS 变化小则停止。相同 score 可在固定 posedsequence 中选择 keyframes。完整 20 页含 proof、额外结果/设置和 limitations 已读，实际查看首面、workflow/robot、主表、Gaussian 推导及明确 limits。",
+    "methodFlow": [
+      "维护生成几何证据：Stream3D 把多个 view 的 association/evidence 放入 SAM3Dcanonicaltokenmemory，SSoccupancy 含观察与 completed 区域。",
+      "从证据得到 uncertainty：假设 Gaussianviewfeatures、evidence 作 precision 及 priorpseudo-evidenceα，posteriorvariance 归一化为α/(α+sumweights)。",
+      "低成本排序候选视角：Depthbuffer 找可见 occupiedtokens，求 uncertainty 近似 gain、均衡 objects 并乘 poseexploration 因子，只解 SS 无需 SLATmesh，批量 GPU scoring。",
+      "采集或保留并更新：执行 greedy/RH 的首 view 后才更新 memory；固定 trajectory 则逐次选未选 frames，occupancystability 或 budget 结束，最后生成 geometry/appearance。"
+    ],
+    "experimentsZh": "实验设置：SAM3D4stepSS/SLAT+defaultStream3D，双 RTX4090，init1view 后 4updates。GSO30 单 objects，YCB12scenes55instances/fiveinitialviews，Replica8scenes 手选 54objects；Replica 按 object 采样/预算，非全场景 objectbalanced 模式。Sameinit/5viewbudget，CDGSO/YCB 双向、Replica 单向，geometrymaskIoU/PFID 及 appearance 指标。Robotqual19frames11objects。\n作者报告 GSO MatisseG CD54.167vsbestbaselineRandom62.078（12.7%），runtime16.023vs 同 backendMAGICIAN23.965s（1.50×）；random16.374/occupancy16.929s 也接近，不能说快于所有 baseline1.50×。（PDF p.8, Table1）\n作者报告 YCB CD6.451vsRandom6.705（3.8%）、runtime88.435vs88.989s；PFID21.450 差于 Random21.249，RH21.192 最好，主要 prior/backend 已强。（PDF p.9, Table2）\n作者报告 Replica 单向 CD19.103vsGauSS-MI21.028（9.2%），固定 YCB trajectory keyframe4vs24views meanCD6.760vs6.994 mm、9/12scenes 更低。（PDF pp.15–16, Tables4/7）\n比较范围：同时列 native3DGS 和重建 backend 替换为 Stream3D 的 planners，能部分区分 prior/fusion 与 planning 贡献；singleview 模型只收 initialimage，不能视等观测预算比较。Replica 禁 MAGICIANbeamsearch 且手选 objects；realrobot 仅 demonstration。\n消融与诊断：去 IG YCB CD7.403 vsfull6.451；去 exploration6.460 几乎相同且 PFID20.938 更好。GSOα.01/.1/1/10 选 1 同 benchmark 最优；RH 无稳定统一优势。没有 posterior 假设/visibilityapproximation 与 calibrated uncertainty 的完整实证。",
+    "insightZh": "不同于仅现有 3DGS 表面的 localparameteruncertainty，该接口利用 generativecompletiontokens 评估未见区域、共用 criterion 处理 activeacquisition 和 frame retention。AEM、SAM3D、Stream3D 均既有，新增 Gaussianinterpretation、visibilityapproximation、objectbalancedaggregation 和 scoringsystem。属于 genericgenerativeassetrecovery 的直接 priortransfer，不是新 3D 内容模型或普通 SLAM pose 改良。",
+    "whyRelevantZh": "对从少量观测用 3D generative priors 恢复 editableobjects 时的证据选择、priorhallucination 和 memorybudget 提供直接方法接口，可启发 3Dassetcreation 中的观察/校验步骤。",
+    "evidenceZh": "Information-gain 的实际 viewscore 是有条件的 first-ordervisibility 近似。（PDF pp.4–5, Theorems1/3; p.14, Appendix A.1–A.2；需 Gaussianviews/tokenindependence/smallincrements，unknownfutureevidence 替 binaryvisibility；α=1 少证据时 increment 不必小，未复现/未校准。）\nRH hypotheticalviews 不更新 futureevidence，只有 exploration 累积。（PDF pp.14–15, Appendix B；branchgain 固定当前 uncertaintyfield，不是执行完整未来 posteriorprediction 或 latentdynamics。）\n7/48 为从已知 spiraltrajectory 选 views 对顺序处理的比较。（PDF p.8, Fig.3/KeyframeSelection; p.16, Appendix C.6；YCB 固定 BOPtrajectory 额外 4vs24frames；viewbudget 减少不直接等于 causalonlinecamera 采集/总 sensorcost 减少。）\nUncertainty 分析是 visibility/symmetry/blur 的有限 probe，不是 calibration 和 OOD 准确率证据。（PDF pp.17–18, Appendix D/Fig.7；单 bottleblurmean .778→.819 非严格 monotonic；无 errorvsconfidence calibration curves，未独立复现。）",
+    "caveatZh": "PDF p.20 Appendix F：依赖 generatorprior 和 Stream3Dassociation/fusion，SS 错误或不一致 views 会污染 uncertainty 及后续 view selection。\nEvidenceweights 被赋 Gaussianprecision 并不自动成为真实 geometryuncertainty，相关 views 会重复累积支持；只对 predictedoccupiedtokens 评分可能漏掉 prior 没提出的真实部分。\nSS occupancy 稳定是 modeloutput 停止变化，不保证对真实 geometry 正确；object-balancedscore/canonicalalignment 依赖输入分割、poses 和 completion 可靠性。\n有限 objects 与固定候选轨迹/手选 Replica 没有充分 OOD 泛化、uncertaintycalibration 或 metricprecision/fabrication 证据。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

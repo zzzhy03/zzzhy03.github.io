@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.05274",
+  "slug": "answer-with-evidence-consistency-aware-grounded-visual-question-answering-for-roadside-tra-2610-05274",
+  "title": "Answer with Evidence: Consistency-Aware Grounded Visual Question Answering for Roadside Traffic Scenes",
+  "authors": [
+    "Runwei Guan",
+    "Rongsheng Hu",
+    "Shangshu Chen",
+    "Ningwei Ouyang",
+    "Shaofeng Liang",
+    "Heyi Lin",
+    "Jinjing Zhu",
+    "Yang Shi",
+    "Dongming Wu",
+    "Daizong Liu",
+    "Henghui Ding",
+    "Hui Xiong"
+  ],
+  "publishedAt": "2026-10-04",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05274"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.HC"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Answer with Evidence",
+    "VLM / MLLM"
+  ],
+  "abstract": "Roadside traffic reasoning requires every free-form textual claim to be backed by visual evidence. Existing grounded multimodal large language models (MLLMs) frequently exhibit say-point mismatch, in which the textual answer contradicts the bounding boxes the model localizes. Evaluation metrics that score answers and boxes separately leave this failure unpenalized. We trace the mismatch to the conventional answer-then-ground factorization, which commits to a numerical claim before any object is enumerated. To measure it, we build RoadSceneVQA-G, a benchmark of 34.7K question-answer pairs in which every free-form answer is linked to the set of boxes that witnesses it, and we propose the Answer-Grounding Consistency (AGC) evaluation suite. To address it, we introduce Enumerate-then-Answer (EtA), which reverses the generation order so that answer-evidence agreement becomes a property of the output structure, and Enumeration-Consistent Policy Optimization (ECPO), a reinforcement learning stage that uses the union of multiple rollouts as a recall teacher without ground-truth boxes. EtA raises say-point consistency from 26.6\\% to 93.7\\% and grounding F1 from 52.2\\% to 73.0\\%, and ECPO further increases F1 to 75.6\\% without per-box supervision. On gRefCOCO, the same framework outperforms the strongest compared method, indicating that it transfers beyond traffic scenes. The project is available at \\url{https://github.com/GuanRunwei/RoadSceneVQA-G}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05274v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05274v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05274v1 全文及 2026-10-06T11:50:29.189847+00:00 审阅记录；PDF 14 页，SHA-256 d8caadb6bb2fa8605c6dfd02b1cccd08bcb24e027b4f2eda9bbcdddd01c9f8c0，视觉核验第 1、5、7、8、11、12 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 首页 project URL https://github.com/GuanRunwei/RoadSceneVQA-G 已访问确认 public 但仅 README，没有 implementation；conclusion/Appendix C 承诺 publication 时 release，因此不提供 Code link。",
+    "ideaZh": "EtA 把 boxes 先于 answer 序列化，ECPO 将多个 rollout 的 IoU clusters/support 过滤为 pseudo recall teacher，改变 VLM say-point agreement。作者报告同 8B SFT→EtA F1 52.2→73.0、SPC26.6→93.7，ECPO F1 进一步 75.6；gRefCOCO 有通用迁移。可速读 evidence-first 结构，但 RL 仍用 GT answer、SFT 仍用 GT boxes，consistency 不等于正确，理论不保证实际 decoder 且表间有不一致。",
+    "motivationZh": "free-form VQA 的答案与对象证据可能彼此矛盾，单独评分难以发现。目标是联合学习回答和零、单、多对象 grounding，并评估内部一致性。",
+    "methodZh": "RoadSceneVQA-G 将 free-form roadside QA 绑定 zero/one/multi-object evidence sets，AGC 分开 grounding decision、count、输出内部一致和 joint 正确。方法用同 Qwen3-VL backbone/SFT 数据预算把标准 answer-then-ground 改成 canonical sorted boxes-then-answer；RL 从六 rollouts 聚合 overlap boxes，至少两 rollouts 支持的 clusters 作为 coverage reward，另含 format 与 GT answer token-overlap reward 和 KL reference。它实质研究 VLM 输出证据与 claim 如何联合学习，并在 general gRefCOCO 上再训练验证，不只 traffic application；没有证明 zero-shot 跨 domain 迁移或可验证所有 free-form 事实。",
+    "methodFlow": [
+      "用既有 roadside boxes 和 LLM draft 建立 human-reviewed QA/evidence bindings，允许 empty、single、multiple box sets",
+      "同 autoregressive decoder 先生成按 top-left 排序的 0–1000 坐标 boxes，再输出 answer，以 EtA targets 做 LoRA SFT",
+      "当前 policy 采样六 rollouts，按 IoU≥0.5 聚类 boxes、保留至少两 distinct rollouts 支持的 clusters",
+      "对每 rollout 以 consensus coverage、format 和 GT answer overlap 组合 reward，group-relative policy gradient 与 EtA frozen-reference KL 更新 LoRA",
+      "用 AGC joint metric 与 grounding F1 检验 agreement/正确性，另在 gRefCOCO 与 CARPK 按各自 labels 重新训练验证"
+    ],
+    "experimentsZh": "实验设置：作者报告 34736QA(30059train/4677test)，human consensus 与 5000item re-adjudication。EtA Qwen3-VL-8B LoRA 三 epochs，ECPO 六 rollouts 一 epoch；六 RTX3090。对同预算 order control、grounding specialists、grounded MLLMs 及 RL 配方，另外 gRefCOCO 1B 再训练与 CARPK dense counting。\n作者报告 EtA F1 52.2→73.0、ECPO75.6，RL 与使用 GT-box 的 Perception-R1/VisionReasoner 同 75.6，收益主要 supervision 边界而非超过所有 RL。（Tables IV/VIII, p. 8）\n作者报告 gRefCOCO testA EtA54.7→ECPO65.6 perfect-set%、no-target91.2→92.9；testB46.4→59.3。（Table V, p. 8）\n作者报告 CARPK MAE EtA2.51、GRPO2.53、ECPO2.46，但 box recall 三者均 82.3，改善主要小幅 count/consistency。（Table VI, p. 8）\n作者报告 SPC-only reward F175.4、group-union75.6、union+SPC75.9、union+GTrecall76.0；不是唯有 union 有效。（Table IX, p. 9）\n比较范围：same data/backbone/order control 有较强辨别力，包含 general-scene supervised 迁移和 reward 对照。无多 seed CI、broad zero-shot general VQA、video/adverse 条件或 truthful 解释语义评估。GCA lexical predicate 并不能正式充当 joint correctness 的数学 lower bound。\n消融与诊断：count rewriting 与 inference boxes-first 提示 controls 揭示一致性捷径；consensus 统计实测相关性。未看到支持阈值/G 组数系统 sweep 或 answer reward 移除后的纯 label-freeRL 能力。",
+    "insightZh": "可复用贡献是 evidence-first 输出训练、set-union recall reward 和 agreement/joint evaluation，而非仅交通数据集。EtA Proposition1 证明存在一致 policy，未证明只改 order 能强制任意 decoder 一致；union recall 独立假设与 support-filter 后的 teacher 不同，理论不能直接覆盖实际 ECPO。",
+    "whyRelevantZh": "直接 VLM evidence-first serialization 与 set reward 方法具有通用 grounding 价值，gRefCOCO 再训练检验超出 traffic 域；道路实验作为 context，不以 traffic 部署为收录理由。",
+    "evidenceZh": "EtA 输出 box list 先于 answer，以 same backbone/data/budget 和 standard SFT 比较，empty list 统一 no-ground。（Sec. IV-A, pp. 4–5; Sec. V-B/D, pp. 6–7; Fig. 3, p. 5；method 已视觉核验，count 一致仍是 trained behavior，非程序强制 decoder 保证。）\nECPO 不使用 GT boxes 作 RL reward，但 answer reward 对 GT a*；EtA SFT 已有 per-box supervision。（Algorithm 1/Eqs. 10–12, Sec. V-B, p. 6；不能把整个 pipeline 写成 label-free 或无 per-box annotations。）\n作者报告同 8B standard/EtA/ECPO F1 52.2/73.0/75.6，SPC26.6/93.7/97.9，GCA-l46.3/51.2/55.5。（Table IV, p. 8；主表已视觉核验，作者报告未复现。）\n作者报告 gRefCOCO testA perfect-set65.6、no-target92.9%，但使用 209344 当地 training expressions 重新训练。（Table V, p. 8; Appendix B, p. 9；通用 task 迁移证据成立，但不是 traffic 训练 zero-shot transfer。）\nconsistency rewriting 可 SPC99.9 但 GCA 下降，demonstrates 自洽不足以保证正确。（Table VII, p. 8; Sec. V-D, p. 7；这个 control 必须与高 SPC 共同说明。）\n作者报告 union recall77.9 远低于独立预测 96.0，7+bucket consensus recall 仅 32.1 且 9%full-support clusters 无 GT match。（Table XV, p. 11; Sec. V-D, p. 7；作者明确工具/ensemble 相关失败与 dense 遗漏限制，页已视觉核验。）",
+    "caveatZh": "dense small/far objects 遗漏，7+ recall 所有 RL 只约 37–38%，consensus 能教的目标受遗漏限制。\nrollouts 正相关导致 independence recall 界乐观，consensus 含 false positives。\nMLLM annotation audit 对 wrong evidence 仅约一半检测率，不能保证 labels 完美。\nvideo、adverse 条件和高 resolution encoding 是未来方向。\nEtA theoretical claim 为存在 policy，不是仅 serialization 自动保证一致；实际 SPC 仍非 100%。\nECPO 称 no-box-label 只针对 RL reward，SFT 用 ground-truth boxes 且 RL 用 ground-truth answers。\nfiltered consensus 并非 union，Proposition2 不直接保证 filter 后 recall；文中称 amplification margin 随 p 递减也非对所有 p 成立。\nTable IV 与 Appendix XIII 的 Groma AP/GDA/SPC 不一致(31.2/85.4/87.8 vs39.5/95.4/97.8)，不选择方便数字掩盖差异。\nTable XII CntAcc/support 呈现与主表 metric naming 有歧义，多个??交叉引用显示 manuscript 未完善。\n公开 GitHub 仅 README 没有代码，数据/评估仍承诺后续 release。\n仅 exact14 页作者报告，无安全 traffic deployment 或独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

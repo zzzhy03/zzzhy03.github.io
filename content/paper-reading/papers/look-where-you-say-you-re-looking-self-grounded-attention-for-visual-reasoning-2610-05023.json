@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2610.05023",
+  "slug": "look-where-you-say-you-re-looking-self-grounded-attention-for-visual-reasoning-2610-05023",
+  "title": "Look Where You Say You're Looking: Self-Grounded Attention for Visual Reasoning",
+  "authors": [
+    "Uri Berger",
+    "Gal Chechik",
+    "Gal Dalal"
+  ],
+  "publishedAt": "2026-10-04",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05023"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Look Where You Say You're Looking",
+    "VLM / MLLM"
+  ],
+  "abstract": "We introduce Self-Saliency, a method for training Vision-Language Models (VLMs) to increase the alignment between their visual attention and the image regions mentioned in their reasoning. Self-Saliency uses a grounding model to localize the objects mentioned in each reasoning step and treats the resulting areas as supervision for the model's visual attention. Previous work on steering visual attention determines target image regions based solely on the image and question. In contrast, we show that conditioning the target regions on the model's generated reasoning improves downstream performance. For proper evaluation, we build a unified, broad suite of 25 visual reasoning benchmarks, where we reproduce the results of previous methods. We find that Self-Saliency significantly outperforms both prior attention-steering methods and baselines that ground image-level text, achieving both a better average rank and a better mean score. Post-training analysis shows that the model primarily adapts its reasoning text to existing attention patterns, producing shorter steps that refer to larger regions. Nevertheless, when controlling for generated text, attention to grounded regions increases significantly across the relevant layer. Finally, we identify a consistent geometric bias in VLM visual attention toward the image border. However, our ablations show that Self-Saliency's gains cannot be explained by simply aligning attention with the center of the image, highlighting the importance of aligning visual attention with the regions mentioned in the model's reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05023v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05023v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05023v1 全文及 2026-10-06T12:03:26.987937Z 审阅记录；PDF 19 页，SHA-256 25376399409660fee16ea5db8e1f8bad042602725bd6d210bca9b12a18bc268e，视觉核验第 1、4、7、9、15、16 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文与 PDF annotations 仅有引用的 SaliencyR1 等他人 repo，未给 Self-Saliency 本方法 public code 地址；不将 baseline 链接冒充本方法 Code。",
+    "ideaZh": "Self-Saliency 用模型自己的 observation text 定位 regions，再奖励 attention 与这些 regions 一致。作者报告平均能力稍升、回答更短；同时发现奖励可被扩大 boxes 等行为满足。值得精读 grounding supervision 与 reward gaming；并未证明每个 reasoning step 真因所看证据而正确。",
+    "motivationZh": "VLM 的观察描述与 visual attention 可能脱节；希望用模型自身的区域描述监督 attention，增强证据对应，并检查奖励是否易被取巧满足。",
+    "methodZh": "先 SFT Qwen3-VL8B 形成 reasoning，再 GRPO 结合 answer/format 与 self-grounded saliency。按 punctuation 分 steps，classifier 只选 observe，groundingboxunion 作 target，stepvisualattention 均值除全 image 最大值形成 saliencyreward；两 heads 按 accuracycorrelation 选择。对 same-generatedtext teacherforce 隔离 attention 变化，并比较 centerrectangle/questionboxes，说明收益不是简单 centerbias 但也主要改变 generatedtext。",
+    "methodFlow": [
+      "SFT 生成 reasoningcoldstart，以标点分割并 classifier 保留 observe 步骤。",
+      "GroundingDINO 对各 step 所述 objects 产生 boxes，union 到 visualpatchgrid。",
+      "从预选 layer22heads28/31 提 stepattention，计算 groundedregion 均值/maximageattention。",
+      "以 saliency0.4 加 directanswer、LLMjudge、format reward 训练 GRPOLoRA。",
+      "无 externalgrounder 推理；用 No-Sal、question/centerboxes 及 fixedtextattention 分析真实变化。"
+    ],
+    "experimentsZh": "实验设置：Qwen3-VL8B SFT LLaVACoT/Mulberry，SaliencyR1 8080 留 100 验证，GRPO3epochs/G8/6prompts、query/valueLoRA16、beta0，GroundingDINO 和 GPT4ominijudge；8H100 约 46h。25suitegreedy、4096generationcap，resolutionbench 提高 pixelbudget；fourfamilyattentionanalysis1800VisualCoTexamples。\n作者报告 MathVision41.5 对 No-Sal37.5、SalBench64.7 对 59.8、MME-RW68.7 对 66.7；MathVista70.4 低于 No-Sal71.8，DailyClue31.2 低于 34.2。（Tables2,6, pp.7,16）\n作者报告四 familyborderenrichment1.18–1.50 对 humanbox0.53，highestpatch 在 corner；training 主要把 cornerattention 移到 border，少部分 center。（Table4/Figs.4–5, pp.8–9）\n作者报告 meanvariantrewardweight 按 groupstd 调为 0.033 仍不优 No-Sal；signal 的具体 normalization 影响结果。（AppendixC/Table7, pp.16–17）\n比较范围：同 coldstart/No-Sal、reimplementedSaliencyR1/VGA/EASE。SaliencyR1 不同 globalbatch/optimizerstepcount 并额外 answerreward；EASE 因原数据/ckpt 未公开改用 SaliencyR1boxes，重训与原工作不同。论文如实解释，不能将表当官方 checkpoint 直接 benchmark。\n消融与诊断：question/centerbox、maxvsmeanreward、same200chains teacherforce、fourmodelsborder 统计；bootstrap 为 question/image-samplingSE 不代表 training-seed 不确定性。未实测 fullobservationtruth、perceptioncausalintervention 或 attention 改变对 correctness 的单独作用。",
+    "insightZh": "相对 question/humanbox 预先规定目标，改用 policy 自己生成的 reasoning 定位 saliencytarget，允许训练同时选择描述与 attention。更有研究价值的是区分 textadaptation 和 attentionsteering，并报告 selectedheads 无改变的反直觉证据；不应宣传为已证明 causalfaithfulreasoning。",
+    "whyRelevantZh": "直接研究视觉 reasoning 的 evidence-grounding、attentionreward 及 textadaptation，尤其适合判断 MLLMreasoning 是否真从目标 region 取证；可迁移为 agentperceptiontraining 思路，未验证 3D/native 生成。",
+    "evidenceZh": "observe-stepboxunion 与 stepmeanvisualattention 生成 max-normalizedreward，两个 heads 由 VisualCoT 上 reward/accuracycorrelation 选。（Sec.3/Eq.1/Fig.2, pp.3–5; AppendixA.1, pp.14–15；方法图和公式已查看；objectlocalization 不是 verification of fullrelation、属性或推理结论。）\n作者报告 25benchmean64.3 对 No-Sal63.5/SaliencyR1 63.6、rank3.02 对 3.68/3.26；Hallusion55.7 低于 No-Sal57.1 与 base63.2。（Table2, p.7; Table6, p.16；结果和 errorbars 页实际查看；broadaverage 不能声称全面 hallucination 改善。）\n作者报告 fixedtext 下 selectedheadsregionattention0.462→0.462，而 layer22allheads0.612→0.621；generationlength230.0→149.6、boxarea0.533→0.566。（Table3/Sec.4.4, pp.7–8；说明 reward 主要适应描述而非所选 heads 真实更精准，allheadsp 值只示 statisticalshift。）\n作者报告 centerrectangle/questionboxmean63.39/63.33 对 self64.26；mean-normalizedsaliency63.2 且不优于 No-Sal。（Table5, p.10; AppendixC/Table7, pp.16–17；ablation 与 heatmaps 已查看；genericcenterbias 不足，但没有 token/lengthmatchedcontrol 完全剥离文本变化。）",
+    "caveatZh": "没有独立 limitations section；分析明确承认 selectedheadsattention 不增加、模型主要改变 reasoningtext。\ngrounder 主要 naturalimagetraining，mathdiagramslocalization 可靠性有限；baselines 需 backbone/data 适配且协议有差异。\nself-producedtarget 可能奖励易 ground 的大 object 或短 description，attentionalignment 不等于事实/关系正确、必要因果证据或 faithfulCoT。\nGroundingDINO 与 observeclassifier 的 mislabels 影响 reward，classifier93%humanheldoutaccuracy 不能保证 policyshift 泛化。\nsinglebackbonetraining、rewardweight/head 经选择，crossfamily 只 attentionanalysis 而非 posttraining 收益。\nhallucination/knowledge 任务部分回退，NoKL/短训练与 textlength 变化均可能牵涉 trade-offs。\nreportedbootstrap 只 samplinguncertainty，baselinesteps/databox/saliencyweights 不完全 matching。\nPDF 无本方法 codeURL，本项目未运行或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.00970",
+  "slug": "relationvggt-visual-geometry-transformers-for-3d-spatial-relation-segmentation-2610-00970",
+  "title": "RelationVGGT: Visual Geometry Transformers for 3D Spatial Relation Segmentation",
+  "authors": [
+    "Minsu Kim",
+    "Jaesung Choe",
+    "Jiwoo Lee",
+    "Yu-Chiang Frank Wang",
+    "Seon Joo Kim"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.00970"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "RelationVGGT",
+    "3D Segmentation",
+    "VLM / MLLM"
+  ],
+  "abstract": "Recent advances in 3D reconstruction have progressed from per-scene optimization to feed-forward inference, and semantic scene understanding has followed suit -- yet existing methods remain confined to object-centric perception, neglecting spatial relations between objects. We formulate 3D spatial relation segmentation in a feed-forward, pose-free multi-view setting: given a visually specified subject and a relational text query, the model segments the target across views without receiving its category name. To this end, we propose RelationVGGT, a novel feed-forward framework that integrates semantic features from a visual foundation model with geometry-aware representations from a 3D geometry foundation model and leverages a relation transformer for subject-conditioned, cross-view relation prediction -- requiring neither per-scene optimization nor known camera poses. We additionally provide a fully automated annotation pipeline built on ScanNet++ with VLMs and LLMs, enabling scalable training data generation for this new task.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.00970v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.00970v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.00970v2 全文及 2026-10-06T11:20:01.298132+00:00 审阅记录；PDF 26 页，SHA-256 ff4ce47226220d7b086fbb6836dc0fded54ffa88f7d86f8c52798dfc7972a86c，视觉核验第 1、4、8、10、15 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 仅提供 project link https://relationvggt.github.io/；checklist p.22–23 承诺后续 open-source code/data，没有打印 public code repo URL，故不提供 Code link。",
+    "ideaZh": "RelationVGGT 用 reference subject mask 加 relation text 直接找跨 view target，不提供 target category 或 camera pose；DINOv2 语义与 Pi3 几何经 subject cross-attention/多 view self-attention 输出 relation mask。作者报告 119queries 三域平均 mIoU0.382，但 LERF 仅 0.254，自动标注过滤后 precision 仍 67.2%。值得参考 relation-first segmentation，尚非可靠的完整 scene graph 或干净自动数据引擎。",
+    "motivationZh": "对象名称式 3D segmentation 难以直接表达相对于指定对象的空间目标。目标是由视觉指定 subject 和关系文本，在多视图中分割对应对象或区域。",
+    "methodZh": "传统 open-vocabulary 3D 分割给 object 名，RelationVGGT 改为视觉指定 subject、仅用关系决定 target，绕过逐 scene volumetric relation 搜索。frozen DINOv2/Pi3 特征融合，保留 subject mask 内 patch 布局，relation transformer 在 target views 做 cross/self attention，DPT 解码 pixel relation embedding，再与 Jina text query 相似度经 sigmoid 阈值取 mask；Pi3 point head 用于 3D 可视化。ScanNet++ existing instances 经 SoM VLM、三 view 一致和几何过滤生成关系，LLM 只作 text rephrasing。小规模人工 relation benchmark 与 annotation audit 支持任务/表示贡献，但 clutter 和 label 噪声限制外推。",
+    "methodFlow": [
+      "输入 unposed multi-view RGB、reference-view subject mask 和纯 relation query，不输入 target category",
+      "frozen DINOv2 每 view 语义 features 与 Pi3 multiview geometry tokens 拼接，经 RoPE input mixer 融合",
+      "mask reference patches 保留 subject layout；target tokens 交替 subject-conditioned cross-attention 与跨 view self-attention",
+      "DPT decoder 输出 per-pixel relation feature，Jina Embeddings v3 编码 query，相似 logit 经 sigmoid 和固定 0.3 阈值取 target mask",
+      "Pi3 point/confidence head 将 pixel relation 映射到 3D visualization，不进行 scene-specific optimization",
+      "训练 labels 由 ScanNet++ instance 投影 SoM、Qwen3-VL proposals、≥3view 一致与 geometry filter 产生，GPT-5.2 保 family 重述 query，multi-query focal/Dice 监督"
+    ],
+    "experimentsZh": "实验设置：作者报告 900 ScanNet++ scenes 训练 200epochs，4 H200 每 GPU batch7；输出 512×388 mask，fixedτ0.3。人工 benchmark 含 ScanNet++40 queries、LERF31 relations/3scenes、Replica48relations/8scenes，共 119queries/28predicates；比较 feature-field 与 video grounding 方法。\n作者报告 Replica/LERF/ScanNet++ mIoU0.446/0.254/0.445，Avg0.382；RelationField0.326/0.276/0.307，Avg0.303。（Table 1, p. 8）\n作者报告 camera baseline small/medium/large mIoU0.417/0.404/0.366，对 UniPixel0.423/0.328/0.354；small setting 并非最好。（Table 2, p. 8）\n作者报告 SAM2 oneclick subject mask 保留 Avg0.383，但 automatic Qwen+SAM2 为 0.357，GroundingDINO+SAM2 为 0.322。（Table 4, p. 10）\n作者报告 25scene audit 共 4695 proposals，过滤仅保 770；precision36.4%→67.2%，删除 92%错误但只保 28.5%原池正确 proposal。（Tables 6–8, pp. 14–15）\n比较范围：包含 LangSplat/OpenGaussian、RelationField 及 relation-only 版本、VideoLISA/SA2VA/UniPixel，附录补 MVGGT/ReferSplat。不同 baseline 输入类别、subject 指定方式和 scene optimization 不同；MVGGT best-of-six text template 仍非 matched-input。训练与测试 scene IDs 的完整清单未在 PDF 明确给出，不能自行声称无同 scene 泄漏。\n消融与诊断：去 DINO、去 Pi3、pointmap 替代、cross-only/alternate attention、single-label loss、无 geometry filter 均下降；query synonyms 及 meaning-changing controls 支持语义敏感性。消融只 40ScanNet++queries，不能确定全部模块跨域因果效力。",
+    "insightZh": "实质贡献是 visual-subject/relation-only 输入的跨 view 关系分割任务、per-pixel relation-first decoder 及可规模化监督 pipeline。不是重新训练 VGGT foundation：实际几何 feature 来自 Pi3，2D 来自 DINOv2；从既有 mixer、DPT 与 pretrained features 组合成新任务方法。以关系找 target 不同于已知 target 类别 referring segmentation，但不能由比较断言每个新组件单独首次或普遍更优。",
+    "whyRelevantZh": "直接命中 promptable/open-vocabulary object 3D segmentation，并将语言关系 grounding 跨 view geometry 结合；可启发 part/assembly 之间的关系查询，但论文未验证 LEGO part 或 editable design 场景。",
+    "evidenceZh": "subject mask 内 full patch set 条件化 target-view relation prediction，query 仅描述关系而不含 target 类别。（Secs. 3.1–3.4, Fig. 1, pp. 3–5；方法图已视觉核验；Pi3 而非标题所暗示 VGGT 为实际 geometry feature 源。）\n自动 annotation 依赖 ScanNet++已标 instance/posed frames、multi-view 共识及 geometry 过滤，LLM 只作 text category 级同 family 措辞。（Sec. 3.5, Fig. 2, p. 6; Appendix B.3, Figs. 6–7, pp. 16–18；完整 prompt 附录已读，不把 text-only rephraser 说成查看 3D geometry 的 agent。）\n作者报告 Avg mIoU0.382、mAcc@0.25 0.549，但 LERF mIoU0.254 低于 RelationField0.276 和 OpenGaussian0.256。（Table 1, p. 8；主表已视觉核验；仅平均领先，不保证各 domain/metric 最佳。）\n作者报告过滤后 annotator 平均 precision67.2% [60.3,73.5]，correct proposal retention28.5%；剩余 label noise 不可忽略。（Appendix A.2, Tables 7–8, pp. 14–15；audit 表已视觉核验，retention 不是所有真实 scene relations 的 recall。）\n改变 relation family/正确 target 使对原 target mIoU 下降，支持 query 敏感性但不测替换关系自身 accuracy。（Appendix C.3, Table 12, p. 20；按作者明确的 control 边界解释，不把反事实下降写成新的正确分割率。）",
+    "caveatZh": "annotation pipeline 依赖 instance-level 已标注数据，未扩展到 unannotated/in-the-wild。\nSoM relation 提取的准确/效率有改进空间。\n当前只 object-object spatial relations，functional relations 与联合 panoptic/完整 graph 是 future work。\n过滤后 supervision 仍有噪声，并主动牺牲 coverage。\nnot-visible subject subset 仅 23views，较高 mIoU 不说明缺失 subject 天然更容易。\n模型提供关系 conditioned per-view masks，不是显式完整 scene graph 或对象/part 边界普遍保证。\nbenchmark 只有 119queries 且 LERF clutter 退化，不能外推大规模开放 world/novel categories。\n自动 labels 保留 precision 约三分之二，LLM rephrasing 和共识不是事实正确证明。\nfeed-forward26ms 与 RelationField288s/scene 优化>3h 属不同 operating regimes，不能当统一输入/预处理匹配 speedup。\n主模型结果未报告多 seed error bars；PDF checklist 与附录 audit 统计不能替代模型 variance。\n证据限 exact PDF 作者报告，未运行或复现实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

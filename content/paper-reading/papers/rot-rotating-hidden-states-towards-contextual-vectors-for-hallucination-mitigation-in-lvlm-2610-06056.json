@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.06056",
+  "slug": "rot-rotating-hidden-states-towards-contextual-vectors-for-hallucination-mitigation-in-lvlm-2610-06056",
+  "title": "ROT: Rotating Hidden States towards Contextual Vectors for Hallucination Mitigation in LVLMs",
+  "authors": [
+    "Yijing Du",
+    "Xiangcheng Zhan",
+    "Shuo Yang"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06056"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "ROT",
+    "VLM / MLLM"
+  ],
+  "abstract": "Large Vision-Language Models (LVLMs) frequently suffer from object hallucination. Existing training-free interventions primarily manipulate attention weights, which indirectly affect the deep semantics reaching the final predictive layers. In this work, we shift our focus to the hidden state vectors extracted after self-attention and residual addition. Empirical analysis reveals that hallucinated tokens do not simply over-rely on linguistic priors; instead, they exhibit an anomalous contextual deviation, showing significantly lower similarities to both textual and visual contexts in intermediate layers. Motivated by this, we propose ROT, a layer-specific, training-free framework. ROT dynamically detects semantic deviation in the middle layers and applies a norm-preserving rotation to steer the hidden states back toward the local multimodal context plane spanned by the contexts. For subsequent layers, a representational smoothing mechanism is introduced to stabilize the calibrated trajectory. Extensive experiments on multiple benchmarks demonstrate that ROT consistently reduces hallucinations across various model architectures and scales, offering an efficient, geometry-driven solution for grounded generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06056v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06056v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06056v1 全文及 2026-10-06T11:26:42.165391+00:00 审阅记录；PDF 15 页，SHA-256 390600aa4e118a5ac7a514ea41840a52d440b193d6a275b786511c083c98c12f，视觉核验第 1、2、7、8、9、12、13 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 PDF 没有本方法 repository/release URL，不根据作者邮箱或相关工作猜 Code link。",
+    "ideaZh": "ROT 用 attention 聚合的 text/visual context 判断 hidden-state 方向偏离，触发 norm-preserving Slerp 旋转，后层再 smooth。作者报告 LLaVA7B CHAIR 对象 hallucination15.7%→6.7%，但 POPE 低于最强 saliency baseline，32B 对象 hallucination 改善仅 0.8 点。适合参考解码时几何校准；context plane 来自模型自身，不是已验证事实，阈值/执行层及 efficiency 证据仍不完整。",
+    "motivationZh": "LVLM 在生成 caption 时可能写出图中不存在的对象，现有推理过程缺少局部纠偏机制。目标是利用 hidden states 与上下文的一致性，减少对象幻觉。",
+    "methodZh": "作者观察 3000 个 LLaVA CHAIR 样本中 hallucinated tokens 与 text/visual attention-context 的 cosine 均更低。ROT 以 E=2−ST−SV 作为风险 trigger，在中间层将 post-attention/post-residual hidden vector 朝 text/visual 加权方向旋转但保持 norm，随后与前层 state 插值稳定传播。四 LLaVA/Qwen 模型 caption/object 存在任务验证和去 rotation/smoothing 消融支持有限实效；仍是经验性的 training-free inference intervention，不能证明所有 hallucination 因语言先验解释被推翻或 factual plane 绝对正确。",
+    "methodFlow": [
+      "每 generated token 在 self-attention+residual 后、FFN 前取 hidden state 及 attention weights",
+      "分别 normalize text/visual attention 并对上一层 token states 加权得到 CT、CV",
+      "计算 cosine ST/SV 与 deviation E=2−ST−SV，在选定层且 E≥tau 触发干预",
+      "构造 normalized (1−alpha)CT+alphaCV target，按 beta 作 Slerp 并归一后乘原 hidden norm",
+      "后续层用 gamma 前层 state 与当前 state 插值，再继续 LayerNorm/FFN 及 decode",
+      "按 object hallucination 和存在/位置/颜色测试评价，不修改模型权重"
+    ],
+    "experimentsZh": "实验设置：作者报告 LLaVA1.5-7B/13B、Qwen2-VL7B、Qwen2.5-VL32B 在 CHAIR、POPE 三 subsets 以及 MME existence/position/color 子项，统一 A800-80GB。主要 mechanism 分析 3000 CHAIR 样本；针对 caption、yes/no 任务使用各方法相同 prompt。\n作者报告 LLaVA7B CHAIR CS33.0、CI6.7、object recall75.6、caption length85.1；greedy54.4/15.7/75.2/82.7。（Table 1, p. 7）\n作者报告 32B CHAIR CS43.6→30.9、CI9.5→8.7，并非同尺度比例提升。（Table 2, p. 7）\n作者报告去 rotation 的 LLaVA7B CI12.4、去 smoothing8.3，完整 6.7；Qwen2-VL 对应 6.6/5.2/4.9。（Table 3, p. 8）\n作者报告 MME 三选定感知子项之和 506.66，不能称全部 MME 完整总分。（Table 1, p. 7; Appendix B, p. 13）\n比较范围：覆盖 VCD、OPERA、RITUAL、Vissink、SID、TAME、saliency，跨 model 表部分只 greedy/VCD/MemVR。没有开放复杂 spatial reasoning、multi-image/3D、image-conditioned editing 验证，也无 latency/FLOPs 实测支撑 efficient headline。\n消融与诊断：双 model 去 rotation/smoothing 支持组合增益，但没有同成本 norm 缩放/线性插值/random rotation 控制；contextual deviation→hallucination 的因果解释未单独隔离。缺 tau sweep 和误 trigger calibration/ROC。",
+    "insightZh": "重点是将 intervention 从 attention/logits 转至 hidden-vector 方向，用 modality context 风险触发并分离中层旋转与后层 smoothing。Slerp/方向 steering 并非本次独立验证的首次，论文的 first geometric intervention 主张不据此照抄。低 cosine 为相关性观察，风险 indicator 作者也明确非校准 hallucination classifier。",
+    "whyRelevantZh": "通用 VLM grounded decoding 中的 hidden-state intervention 对视觉反馈可靠性有方法参考，直接关联 multimodal 模型推理；迁移 design agent 的 render verification 只是启发，论文未测该任务。",
+    "evidenceZh": "文本和视觉 contexts 由模型自身 attention 对上一层 states 聚合，E 仅作为风险 trigger。（Secs. 3.1–4.1, Eqs. 1–2, pp. 4–5；不能将 model-derived contexts 当外部事实 oracle，低 similarity 也可能出现在正确新信息。）\npost-residual hidden state 进行 norm-preserving rotation，再于后层作 representation smoothing。（Sec. 4.2, Eqs. 4–6, Fig. 1, pp. 2,6; Algorithm 1, p. 12；方法图/pseudocode 已视觉核验；pseudocode1..Lmid 与正文 LLaVA6..26 执行 zone 描述不同。）\n作者报告 LLaVA7B CHAIR CS54.4→33.0、CI15.7→6.7，但 POPE ROT86.6/86.3 低于 saliency87.5/87.0。（Table 1, p. 7；主表已视觉核验，不写成所有指标最佳。）\n作者报告 Qwen2.5-VL32B CI9.5→8.7，四模型效果大小不同且 hyperparameters 分别调节。（Table 2, p. 7; Appendix C, p. 13；跨模型可应用不等于无需 model-specific tuning 的普遍收益。）\n作者承认 context plane 只来自局部 model contexts，执行层/trigger 由经验设定。（Sec. 7 Limitations, p. 9；限制页已视觉核验；没有加入 global scene graph 或外部 structured evidence。）",
+    "caveatZh": "grounded plane 仅 model 局部 text/visual contexts，无 external structured knowledge 或 global scene graph。\ncritical layer 与 tau 经验选取，不同 depth/大模型需要 adaptive search。\nplane 并未保证事实正确，model context 内已有误识别/旧 hallucination 可能被强化。\nAppendix C 列 alpha/beta/gamma 但未给 trigger tau 完整数值；正文 6–26zone 与 Algorithm1 从 layer1 到 Lmid 不一致，复现须澄清。\n主要是 object-caption hallucination/yesno 测试，不能声称复杂空间 reasoning 或所有 multimodal capability 保持。\nMME 报告只 3 子项，部分 POPE 表现低于最强 baseline。\n缺多 seed uncertainty、latency 及多 hyperparameter 公平 tuning 比较。\n仅 exact PDF 作者报告；未运行或复现，也未确认 public code。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2609.37096",
+  "slug": "why-mllms-struggle-to-count-overcoming-individuation-and-aggregation-bottlenecks-with-conv-2609-37096",
+  "title": "Why MLLMs Struggle to Count: Overcoming Individuation and Aggregation Bottlenecks with ConvStack",
+  "authors": [
+    "Liwei Che",
+    "Yihao Quan",
+    "Sen Fang",
+    "Hongyi Wang",
+    "Ranjay Krishna",
+    "Ruixiang Tang",
+    "Vladimir Pavlovic"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37096"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Why MLLMs Struggle to Count",
+    "VLM / MLLM"
+  ],
+  "abstract": "Multimodal Large Language Models (MLLMs) consistently struggle with fine-grained visual counting, yet the underlying causes remain poorly understood. In this work, we present a mechanistic analysis of this failure mode, identifying two critical bottlenecks inherent to the global attention pipeline of MLLMs. First, we reveal an individuation bottleneck stemming from image patchification: because Vision Transformers process patches independently, they struggle to group fragmented geometric features across boundaries into distinct object representations. Second, we identify a collapse in the subsequent counting aggregation process, where representation separation rapidly diminishes as numerosity increases due to attention compression. Identifying and formalizing these twin bottlenecks constitutes our first major contribution. To overcome them, we propose ConvStack, a lightweight architecture that operates directly in the visual token space to explicitly aggregate and inject local spatial structures via zero-initialized residual connections. By explicitly addressing the individuation bottleneck, ConvStack provides unambiguous geometric evidence for downstream aggregation. Remarkably, by fine-tuning exclusively on counting tasks, the model achieves substantial improvements in dense object counting and broader spatial understanding benchmarks, without compromising on general visual capabilities.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37096v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37096v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37096v2 全文及 2026-10-06T13:01:53.631945+00:00 审阅记录；PDF 18 页，SHA-256 2ff0139e0d3172c96aedff3f042f7c39c29157f2abf3d5ce42a55b1a5d676f22，视觉核验第 1、6、7、8、14、17、18 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 18 页 PDF 没有 ConvStack 官方 public code/project 链接；references 中的其他方法/数据/blog 不视为本方法代码。",
+    "ideaZh": "ConvStack 在视觉 token grid 上加 3×3 depthwise bottleneck，再沿 vision/DeepStack residual routes 注入局部结构；作者报告只用 counting data、训练约 0.488% 参数，PixMo-Count 从 65.46% 升至 75.19%，同数据 1×1 control 为 73.09%、LoRA 为 73.85%。这支持局部 mixing 与多层视觉路由对 instance-aware counting 的作用，值得略读结构与对照。它没有证明全体 MLLM 的错误都由 attention compression 导致：理论为单头固定同质 token 的条件模型，stable-readout 假设也未直接测定。真实主评测数量主要为 2–10，SAT-Spatial 仅 76.79→76.81，MathVista 66.60→65.00，不能写成无损全面空间提升。",
+    "motivationZh": "MLLM 的计数错误既可能源于物体未被分开表示，也可能源于聚合时丢失数量信号。目标是区分这两种瓶颈，改善视觉表征中的局部计数证据。",
+    "methodZh": "工作以 controlled disks/polygons 对比 patch alignment 与 CNN/ViT 的学习速度，区分 individuation 和后续 count aggregation。其简化单头模型显示，当固定同质 object tokens 的 attention 优于 background 时，相邻数量的 attention mass increments 递减；另一条件定理说明若外部 residual 保留共享方向上的近似线性 count evidence 且胜过 base interference，可存在稳定 count decoder。ConvStack 将视觉 tokens reshape 为二维网格，用 LN、1×1 down、3×3 depthwise conv 与 1×1 up 做局部修正，up projection 零初始化，融合到选定 vision layer 和 native DeepStack levels。只训练新 adapters 与既有 visual merger，评测 counting、spatial tasks 和 general visual tasks，并分析 original hidden-space count separation。",
+    "methodFlow": [
+      "诊断 individuation 与 aggregation：在合成图上改变 disk 相对 patch grid 的位置并比较局部卷积；以固定 homogeneous attention model 分析相邻数量信号的压缩，避免将理想模型当成真实全网证明。",
+      "混合局部视觉 tokens：把 token sequence 按原二维 grid reshape，以 1×1 bottleneck 和 3×3 depthwise conv 聚合相邻 token，零初始化 up projection 保留初始 pretrained features。",
+      "多层 residual 注入：将适配 features 注入 vision layer18 和 native DeepStack routes，仅更新 adapters 与 visual merger，冻结其余 vision/LLM。",
+      "计数训练与迁移核验：使用 PixMo-Count train 及合成计数答案训练，比较同数据 1×1/单路由/LoRA controls，并用外部空间题及原始 hidden-space separation 检查迁移。"
+    ],
+    "experimentsZh": "实验设置：作者报告主 Qwen3-VL-8B，一 epoch、effectivebatch32、lr5e-5，仅 count-answer token loss；PixMo-Count train 加 SynPoly/SynDot 各 2,000 样本。新增 2.708M adapters 并训练 40.119M 既有 merger，共 42.827M，占完整 8.767B 模型 0.488%。PixMo test524、CountBench491、CVSpatial1,850；SpatialEval 仅固定 150 题，SAT-Spatial15,000 仅 eval。encoder controlled 模型四层、synthetic1–10；maincountrepresentation 使用独立 500SynPoly，S-Space 用 500COCO。\n作者报告 PixMo exact accuracy 65.46→75.19，CountBenchQA89.82→90.22；同数据 1×1 为 73.09，LoRA73.85，ViT-only73.09、LLM-only74.05。（pp. 7–8, Tables 2 and 4）\n作者报告 CVSpatial92.34→93.20、SAT-real59.33→63.33、SpatialEval61.33→66.67，但 SAT-Spatial76.79→76.81 几乎不变。（p. 7, Table 2）\n作者报告 POPE F1 87.83→89.52、MME2219.6→2251.0；MMBench88.67→88.60 和 MathVista66.60→65.00 下降。（p. 7, Table 3）\n作者报告合成 counts6–10 accuracy56.8→98.8、original-space cosine silhouette .479→.707、adjacent separation .996→1.449；这不等于无限或高密度真实场景计数。（p. 8, Figure 7; p. 18, Figure 10）\n比较范围：最可靠对照是同 Qwen backbone 同数据/超参数的 1×1、LoRA、ViT-only/LLM-only 和 injection-layer sweep；Spatial-MLLM/LLaVA-SP/Honeybee 不同 backbone 数据不能归因于单个模块。缺只训练 merger、param/compute matched 更多 localadapters、第二 pretrainedbackbone 与 realhigher-count 分析。\n消融与诊断：controlledCNN/ViT/1×1 comparisons 有 three-seed 设置；mainMLLM 有双 route 与 3×3→1×1、LoRA、vision layer0–26 sweep，layer18 按 PixMo validation 选取。未见 maintrain 多 seed、CI、latency/memory 成本或因果 activationinterventions。",
+    "insightZh": "Convpass 的 convolutional prior 与 DeepStack 的多层注入本身已有先例，贡献是围绕 object individuation/count margins 的诊断，将其组合到冻结 MLLM 的 visual token paths，并提供同数据 control 与 counting-only spatial transfer。真实 pretrained MLLM 只验证一个 backbone；conditional readout theorem 是机制动机，不保证 learned adapters 满足 additivity 或后续 layers 保留它。",
+    "whyRelevantZh": "直接关联 VLM 的 instance-aware counting、视觉空间表征与多层 visualgrounding，提供局部 tokenmixing 和 externalvisualroute 的具体实现。对结构化设计中对象数量/关系核验有方法启发，但没有 SVG/CAD 或真实 3D 生成验证。",
+    "evidenceZh": "patch-boundary fragmentation 改变 controlled counting 学习速度，但简单 patch occupancy 可产生 shortcut。（pp. 3–4, Figures 2–3; pp. 15–16, Appendix B.4；原 patch embedding 独立不表示完整 ViT 不沟通；center/edge 构造只是局部 inductive bias 的测试。）\nattention count-margin compression 与 stable residual readout 都是显式条件结果。（pp. 5–6, Eqs. 2–6; pp. 13–15, Appendices B.1–B.3；固定 single head/logits/values/residual、object-biased attention；residual theorem 假设跨数量共享方向与有界干扰，作者明确不保证真实图/训练/后续层成立。）\n同数据消融支持 local mixing 的额外收益而非仅 counting adaptation。（pp. 7–8, Tables 2–4；作者报告 1×1 与 LoRA 也明显超过 base，ConvStack 额外优于它们；未给只训练既有 merger 的 control。）\ncount separation 改善在原 hidden space 统计，不仅 t-SNE 视觉。（p. 8, Figure 7; p. 18, Appendix D, Figure 10；作者报告 cosine silhouette .479→.707；属于 representation/readout association，不是 activation patching 的必要因果证明。）",
+    "caveatZh": "作者明确同质 single-head compression 不覆盖 heterogeneous values、多头或 count-dependent residuals；worst-case norm-ball overlap 不证明具体图像变换存在。\nstable-readout theorem 只为 injection point 的 sufficient condition，真实图未必满足 additivity 与 coverage，训练和后续层保持都不保证。\n作者承认 generalvisualbenchmarks 有增有减，SpatialEval 采用 150 题子集。\n以局部 convolution 和 DeepStack 组合强化能力，但无法由表征 cluster 改善证明它修复的就是所假设的整个 attentioncompression 机制。\n新增 adapters 仅 2.708M，训练主体是 40.119M 既有 merger；缺 merger-onlycontrol，0.5%trainable 不是 0.5%新参数。\n“dense”主真实评测 count 范围 2–10，syntheticanalysis 主要 1–10；未证大规模 crowd 或跨数量 out-of-range 泛化。\n部分迁移差别仅少数题或极小百分点，无 maintrain 稳定性/显著性统计；MathVista 损失 1.6 百分点，不能声称所有 general capability 无损。\nS-Space 空间 probe 与计数 silhouette 是可读出信息关联，非独立 3Dphysicalgeometry 真值或必要因果机制检验。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2606.24286",
+  "slug": "avoc-enhancing-hour-level-audio-video-understanding-in-omni-modal-llms-via-retrieval-inspi-2606-24286",
+  "title": "AVOC: Enhancing Hour-Level Audio-Video Understanding in Omni-Modal LLMs via Retrieval-Inspired Token Compression",
+  "authors": [
+    "Yijing Chen",
+    "Wenhui Tan",
+    "Xiaoyi Yu",
+    "Yuyue Wang",
+    "Xin Cheng",
+    "Kaisi Guan",
+    "Hao Jiang",
+    "Xiangyang Li",
+    "Guojie Zhu",
+    "Ruihua Song"
+  ],
+  "publishedAt": "2026-06-23",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2606.24286"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "AVOC",
+    "VLM / MLLM"
+  ],
+  "abstract": "Multimodal Large Language Models have achieved remarkable progress in short-form audio-video understanding, yet long-form audio-video comprehension remains challenged by limited context windows and severe information redundancy. To address these bottlenecks, we propose AVOC, a framework for long-form audio-video understanding in Omni-modal Large Language Models. AVOC introduces a learnable token compression module between the modality encoders and the LLM backbone. We reframe multimodal token compression as a top-$K$ retrieval problem: given a fixed context budget, the module must retrieve a compact subset of tokens that best supports answering the user query. We draw inspiration from three classical Information Retrieval criteria for selecting informative units from a large candidate pool: relevance, importance, and diversity. AVOC instantiates each criterion as a tailored mechanism for audio-video understanding, and integrates them into a unified retrieval-style compression pipeline. Experiments show that AVOC achieves state-of-the-art performance on long-form audio-video benchmarks, surpassing the second-best model by 4.9 and 5.5 points in average accuracy on OmniVideoBench and LVOmniBench, respectively. Moreover, AVOC maintains robust performance on Audio-Video Needle-in-a-Haystack task at durations up to one hour. Code and model are at github.com/YJCX330/AVOC.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.24286v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.24286v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/YJCX330/AVOC"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.24286v2 全文及 2026-10-06T11:22:19.342487+00:00 审阅记录；PDF 15 页，SHA-256 494e1ae245f1f3c5558d347534d7c39f2a851b9618e9041d2c668e784f5f5d1e，视觉核验第 1、3、7、8、9、15 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 打印 github.com/YJCX330/AVOC；已访问 Public GitHub 确认 train/infer 源码。未下载模型或复现实验。",
+    "ideaZh": "AVOC 把 audio/video token 选择拆为 query relevance、双向 cross-modal importance 与局部时序 MMR，联合 fine-tune MiniCPM-o。作者报告长 AV benchmark 平均超第二名 4.9/5.5 点并保留一小时 needle，但自然 video 只抽最多 320 帧，needle 用另一个无 frame cap/25K 预算协议；近 9×只指 prefill，TTFT 仅 26.27→22.55 秒。适合参考离线证据压缩，不能当实时 streaming 或完整一小时理解保证。",
+    "motivationZh": "小时级 audio-video 输入超出模型 context 预算，单模态压缩还可能丢掉另一模态的线索。目标是结合问题相关性和跨模态信息选择紧凑证据。",
+    "methodZh": "长 AV 内容在有限 LLM context 中有重复信息，但单模态引导压缩会丢失另一模态线索。AVOC 在 frozen encoders 与 LLM 之间学习 text-to-token relevance 和 temporal-block 内 audio↔video importance，按模态 Z-score 融合后，以 same-modality 局部 TA-MMR 选择固定预算并恢复时间排序。训练先 LLM 适配，再以 Gumbel-softmax/ST top-K 联合 compression/LLM，TA-MMR 只在 inference 启用。正文真实 benchmark 和 appendix 人造 needle protocol 需分开解释；实验支持离线长 AV 检索/压缩方法，而非 causal online memory。",
+    "methodFlow": [
+      "audio/video 分别编码，按时间 block 交错为 candidate pool，保留 modality/time 索引",
+      "learned text-query cross-attention 的平均 logit 给 token relevance",
+      "每 temporal block 的双向 audio-video attention 给 query-independent importance",
+      "各模态分别 Z-score 两类 logits 并平均融合 score",
+      "按固定 video/audio budget，用 local-window same-modality MMR 贪心选 token，避免跨远时间相似事件被误去重",
+      "选中 token 按 time 排序输入 LLM；训练用 differentiable top-K，inference 额外 TA-MMR"
+    ],
+    "experimentsZh": "实验设置：作者报告在 MiniCPM-o4.5 上用 40K AVSD/How2/FineVideo/ChronusAV/LongVILA examples 分两 stage，各 20K、oneepoch，frozen vision/audio encoders 及 adapter。WorldSense、OmniVideoBench、LVOmniBench 自然数据最高 90min，最多 320 视觉帧/完整 audio/10240tokens，video:audio2:1。另做人造 AV-NIAH 到 3600s。\n作者报告 WorldSense52.6%、OmniVideoBench42.3%、LVOmniBench40.3%，比表内第二名高 1.7/4.9/5.5 点。（Table 1, p. 7）\n作者报告同 budget random-selection 的 LVOmni 平均 35.1，full AVOC40.3；去 TA-MMR 降至 38.7。（Table 2, p. 8）\n作者报告 A800 BF16/flash-attention2 的 10min128frames TTFT26.271s→22.549s，ρ0.1 prefill0.497s、compression0.260s。（Table 3, p. 9）\n作者报告 AV-NIAH hour-level 多数 duration/depth cell 仍有高 retrieval 表现，但使用单 haystack、五 needle 而无自然语言复杂事件推理扩展。（Figs. 3,6, pp. 8,15; Appendix A.1 p. 14）\n比较范围：包含 7–8B VideoLLaMA、Baichuan、HumanOmni、Qwen、SALMONN、MiniCPM 和 OmniZip；统一 scale 但非统一 training 数据/token cap。real 长 AV 与 needle 采用不同 preprocessing/budget，未比较训练数据匹配/causalonline 或多个 hour haystacks。\n消融与诊断：同 budget random selection、去 text/AV scoring 和 TA-MMR 均变差；lambda/window 及固定 modality ratio sweep 支持 2:1/localwindow 设置。未将 LLM joint finetuning 增益与 module 作用完全隔离，模型 accuracy 未报告多 seed variance。",
+    "insightZh": "贡献是以对称 audio/video scoring 及局部时间多样性重排实现 query-aware omni token 压缩，并给联合学习与长 AV 验证。relevance/importance/MMR 来自既有 IR，不宜称全新 retrieval 理论；也不是 training-free 插入任意 backbone，LLM 和 compression 都重新训练，且 audio/video budget 仍固定。",
+    "whyRelevantZh": "长 AV 中跨模态证据选择和局部时序重复判断直接推进主要 multimodal representation 方向；可参考长过程 visual-agent 记录压缩，但 design 任务及 causal 实时应用未验证。",
+    "evidenceZh": "文本相关性、块内双向 AV 重要性和 local-window MMR 三信号决定固定预算，而不以某单模态全局支配。（Secs. 3.1–3.4, Fig. 2, pp. 3–6；方法图已视觉核验，MMR 相似仅同 modality/localwindow，固定 ratio 未变为 content-adaptive。）\n训练 TA-MMR 关闭，Gumbel/ST top-K 让 learned score 和 LLM 联合优化，推理才用 greedy TA-MMR。（Sec. 4.1, p. 6；不能把推理 selector 全部描述成被 end-to-end 直接训练。）\n作者报告 OmniVideoBench 平均 42.3、LVOmniBench40.3，对第二名 37.4/34.8。（Table 1, p. 7；主表已视觉核验；baseline official frame/context configurations 不同。）\n作者报告 10min128frame 条件 prefill4.453→0.497s，而 TTFT26.271→22.549s。（Table 3, Sec. 4.5, p. 9；效率表已视觉核验；近 9×不能外推到端到端或一小时处理。）\n一小时 needle 仅一个 haystack clip、五个 6digit needles，且用 1FPS 无 frame cap、25K 预算；自然 benchmark 用最多 320frames、10,240tokens。（Sec. 4.2–4.3, p. 7; Appendix A.1, p. 14; Fig. 6, p. 15；needle 图和 limitations 已视觉核验，未从 heatmap 估计未报告的总体准确率。）",
+    "caveatZh": "整个 AV stream 可用后才能 offline 评分/选 token，不能直接 streaming。\n只单个较小 backbone scale，未验证大模型扩展。\nvideo/audio budget ratio 为固定 hyperparameter，content-adaptive 分配仍未实现。\n自然 benchmarks 的 320frame cap 仍可漏瞬时视觉事件，压缩无法恢复 preprocessing 丢失信息。\nneedle 单 source/five 样本并给显式 secret cue，不能代表所有一小时 global reasoning。\nappendix 写 100–3600s step100 却称 26 duration settings，数量表述不一致，未引用 26×11 为精确实验规模。\njoint finetune 和 baseline 不同输入预算存在 confounds，所谓 SOTA 限表内比较。\nprefill9×与 TTFT 较小改进须分开；视觉/audio encoding 仍主要成本。\n仅 exact PDF 作者报告，未执行源码或独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

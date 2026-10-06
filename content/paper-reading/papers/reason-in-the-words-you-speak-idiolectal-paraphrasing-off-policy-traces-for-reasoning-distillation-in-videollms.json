@@ -12,9 +12,9 @@
     "Hyunwoo J. Kim"
   ],
   "publishedAt": "2026-08-27",
-  "updatedAt": "2026-08-27",
+  "updatedAt": "2026-10-04",
   "collectedAt": "2026-08-29",
-  "venue": "arXiv v1",
+  "venue": "arXiv preprint",
   "identifiers": {
     "arxiv": "2608.26684"
   },
@@ -24,50 +24,44 @@
     "cs.CV"
   ],
   "topicIds": [
-    "vlm-mllm"
+    "vlm-mllm",
+    "llm"
   ],
   "primaryTopicId": "vlm-mllm",
   "keywords": [
-    "vlm-mllm",
-    "Reason",
-    "the",
-    "Words",
-    "You",
-    "Speak",
-    "Idiolectal",
-    "Paraphrasing",
-    "Off-Policy",
-    "Traces",
-    "for"
+    "Reason in the Words You Speak",
+    "VLM / MLLM",
+    "LLM"
   ],
   "abstract": "Recent large language models achieve strong performance on complex reasoning tasks, where reinforcement learning with Group Relative Policy Optimization (GRPO) has emerged as a leading paradigm for optimizing models on self-generated trajectories. However, the on-policy nature of GRPO bounds the model to the reasoning skills it can already produce, restricting to learn more advanced capabilities. Prior works inject privileged reasoning traces from a stronger teacher policy to guide training, yet these traces are inherently out of distribution with respect to the student policy. We observe that this mismatch between on-policy and off-policy causes gradient clipping on semantically critical reasoning tokens, ultimately rewarding correct answers while leaving the reasoning that justifies them unlearned. Hence, we propose \\textbf{Echo-GRPO}, a framework that lets the model reason in the words it speaks. Rather than imitating low-probability privileged traces from the teacher model, Echo-GRPO rewrites them into the student policy's own \\textit{idiolect}, that is, its own characteristic vocabulary and expression patterns, while preserving their semantics via Dual-Reference Decoding. We instantiate this framework as \\textbf{VideoEcho-R1} for video reasoning distillation, achieving consistent improvements across three multimodal LLM backbones and five benchmarks. Finally, we show that our idiolectal paraphrasing is a plug-in module that consistently improves both RL and supervised fine-tuning frameworks for reasoning distillation, demonstrating that policy-aligned supervision extends beyond GRPO.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2608.26684v1",
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.26684v2",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2608.26684v1"
+      "href": "https://arxiv.org/abs/2608.26684v2"
     }
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 exact version 2608.26684v1 全文整理；本地 PDF 共 18 页，SHA-256 6b1f98c0281288421e820ad538af021c08c120db7d7fdbe5a7ec802ad171f901，并视觉核验第 1、2、3、6、10 页。",
-    "ideaZh": "Echo-GRPO 把 teacher off-policy reasoning 改写成 student 自身 idiolect，降低 privileged traces 在 mixed-policy GRPO 中的 clipping 和分布失配。 作者报告：idiolectal paraphrasing 在不同 backbones/benchmarks 均改善 reasoning distillation，并同时适用于 RL 和 supervised fine-tuning。 证据边界：semantic preservation 仍由 reference/decoder 判断；teacher cost 与 clipping 分析不能排除数据质量等替代解释。",
+    "sourceNote": "依据 exact version 2608.26684v2 全文及 2026-10-06T11:25:12.954812Z 审阅记录；PDF 18 页，SHA-256 4f9cdc94c11211e1c755703c905cb3b172c06d77ec9ec23c0fc7c7db6f748a64，视觉核验第 1、5、7、17、18 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：exact v2 PDF 只出现第三方 EasyR1 repository，未给 Echo-GRPO 自身 public code URL，不生成 Code link。",
+    "ideaZh": "Echo-GRPO 将 teacher reasoning 改写为 student idiolect，并以两种 reference 的分布组合控制 mixed-policy clipping。v2 实质纠正了消融与成本解释：作者报告 prompt-only rewriting 的旧均值被上调，使完整方法的额外收益缩小。应更新科学判断；方法本身未改变。",
+    "motivationZh": "教师推理的表达分布可能偏离 video student，影响 off-policy 学习；目标是保留推理语义，并改写成 student 更易吸收的 idiolect。",
+    "methodZh": "同模型两路 decoding，一路带 privileged trace 确保语义候选，一路无 trace 按 native question prompt 评词概率，合成离线 paraphrases 后替换 GRPO 的 teacher rollout。三 VLM backbones、五 video QA/reasoning benchmarks 与 SFT 插件验证改写价值。相对 receipt-backed v1，本次 v2 主要修正 prompt-only baseline 及三 benchmark cost-table GRPO baseline，收窄 DRD 增益，而非新增方法或新的 benchmark 突破；应该以更正后的 trade-off 更新既有记录。",
     "methodFlow": [
-      "从 stronger teacher 获取 privileged video reasoning traces",
-      "Dual-Reference Decoding 在保持语义下改写为 student vocabulary/style",
-      "把 rewritten traces 作为 mixed-policy GRPO references",
-      "在 VideoEcho-R1 中联合 video reasoning rewards 训练"
+      "从 stronger teacher 取得 video/question 的 privileged reasoning trace。",
+      "初始 student 分别以带 trace semantic prompt 与不带 trace native prompt 产生 next-token 分布。",
+      "只保留 semantic reference top-k，并与 native 分布相乘、归一后逐 token 改写。",
+      "将 cached idiolectal trace 替换一个 mixed-policy rollout，以 accuracy/length rewards 进行 GRPO。",
+      "部署只运行训练后的 VideoLLM；同离线改写也可替换 SFT targets。"
     ],
-    "whyRelevantZh": "vlm-mllm 方向的直接证据：Echo-GRPO 把 teacher off-policy reasoning 改写成 student 自身 idiolect，降低 privileged traces 在 mixed-policy GRPO 中的 clipping 和分布失配。",
-    "evidenceZh": "方法流程：从 stronger teacher 获取 privileged video reasoning traces -> Dual-Reference Decoding 在保持语义下改写为 student vocabulary/style -> 把 rewritten traces 作为 mixed-policy GRPO references -> 在 VideoEcho-R1 中联合 video reasoning rewards 训练。（Method / system description, p. 2-3; visual overview, p. 3）；作者报告：idiolectal paraphrasing 在不同 backbones/benchmarks 均改善 reasoning distillation，并同时适用于 RL 和 supervised fine-tuning。（Experiments / results, p. 6; abstract, p. 1）；适用边界与风险：semantic preservation 仍由 reference/decoder 判断；teacher cost 与 clipping 分析不能排除数据质量等替代解释。（Limitations / discussion / reviewed scope, p. 10）",
-    "caveatZh": "semantic preservation 仍由 reference/decoder 判断；teacher cost 与 clipping 分析不能排除数据质量等替代解释。 所有数字与比较均为作者报告，本项目未独立复现。；所有实验数字均为作者报告，本项目没有独立复现。",
-    "motivationZh": "Echo-GRPO 把 teacher off-policy reasoning 改写成 student 自身 idiolect，降低 privileged traces 在 mixed-policy GRPO 中的 clipping 和分布失配。 从 stronger teacher 获取 privileged video reasoning traces -> Dual-Reference Decoding 在保持语义下改写为 student vocabulary/style -> 把 rewritten traces 作为 mixed-policy GRPO references -> 在 VideoEcho-R1 中联合 video reasoning rewards 训练。作者报告：idiolectal paraphrasing 在不同 backbones/benchmarks 均改善 reasoning distillation，并同时适用于 RL 和 supervised fine-tuning。 semantic preservation 仍由 reference/decoder 判断；teacher cost 与 clipping 分析不能排除数据质量等替代解释。 所有数字与比较均为作者报告，本项目未独立复现。",
-    "methodZh": "Echo-GRPO 把 teacher off-policy reasoning 改写成 student 自身 idiolect，降低 privileged traces 在 mixed-policy GRPO 中的 clipping 和分布失配。 方法流程：从 stronger teacher 获取 privileged video reasoning traces -> Dual-Reference Decoding 在保持语义下改写为 student vocabulary/style -> 把 rewritten traces 作为 mixed-policy GRPO references -> 在 VideoEcho-R1 中联合 video reasoning rewards 训练。",
-    "experimentsZh": "三个 multimodal LLM backbones、五个 video reasoning benchmarks，并在 RL 与 SFT distillation settings 检验 plug-in transfer。 作者报告：idiolectal paraphrasing 在不同 backbones/benchmarks 均改善 reasoning distillation，并同时适用于 RL 和 supervised fine-tuning。（Experiments / results, p. 6; abstract, p. 1） Baseline coverage：全文覆盖作者选择的主要 baselines 与任务设置；外部效度仍受以下边界约束：semantic preservation 仍由 reference/decoder 判断；teacher cost 与 clipping 分析不能排除数据质量等替代解释。 Ablation/diagnosis：全文中的组件、设置或诊断对比用于支持作者内部归因；未呈现的消融不补写，已有结果也不能替代跨实现复现。",
-    "insightZh": "Echo-GRPO 把 teacher off-policy reasoning 改写成 student 自身 idiolect，降低 privileged traces 在 mixed-policy GRPO 中的 clipping 和分布失配。 作者报告：idiolectal paraphrasing 在不同 backbones/benchmarks 均改善 reasoning distillation，并同时适用于 RL 和 supervised fine-tuning。 证据边界：semantic preservation 仍由 reference/decoder 判断；teacher cost 与 clipping 分析不能排除数据质量等替代解释。 exact-version 全文的方法、实验、视觉页与局限形成证据闭环，支持 accept-deep；保留作者报告、未复现与适用范围边界。",
-    "relevance": "high",
-    "readingAction": "deep",
-    "evidenceMaturity": "solid"
+    "experimentsZh": "实验设置：2.4K OneThinker multiple-choice video instances，teacher Seed1.5-VL；InternVL3.5-4B、Qwen3-VL-4B/8B 统一 8frames 与 6rollouts。五主要 video benchmarks，额外三 math benchmarks、SFT→GRPO 和 9K scale-up；本次科学更新集中已有消融与成本解释数字修正。\n作者报告 v2 prompt-only rewriting mean56.9 vsDRD58.2，DRD 额外 1.3points；offline cost9.4 vs163.9ms/token。（Table4, p.7; Table10, p.17）\n作者报告 Qwen3-VL-4B 五 benchmark average57.2 vsGRPO55.9；8B 则 58.2 与 GRPO58.2 持平，VSI-Bench49.1 低于 GRPO51.1。（Table2, p.7）\n作者报告 9K scale-up Echo58.2 vsGRPO56.4，即 1.8point gain；clipping7.9% vs7.8%，低 clip 本身不能解释全部提升。（Table9, p.17）\n比较范围：含 SFT、GRPO、mixed-policy、LUFFY、OPSD 与 generic/prompt-only/single-reference variants，许多近似方法有 adaptation；teacher/input/data 仍小规模，某些 numerical spatial tasks 并不优于 on-policy GRPO。\n消融与诊断：random-vs-semantic unclipping 支持 token identity 作用，但 semantic importance 代理主要是 query/options nouns；v2 更正后简单 student rewriting 已获多数收益。top-k10 降至 53.4 说明 semantic drift 风险；没有严格 fact-preservation 证明或完整 uncertainty 估计。",
+    "insightZh": "原方法将 student-style paraphrasing 用作 off-policy distillation 的数据接口，并以 dual-reference decoding 权衡 semantics 与 probability；v2 不改变此机制。真正 scientific delta 是 ablation baseline 与离线 cost/performance 数字的更正，减少相对简单 rewriting 和 GRPO 的额外效果，必须避免沿用旧版较大 gain。",
+    "whyRelevantZh": "为多模态 teacher traces 的 policy-compatible 训练提供参考；当前最有价值的是修正 DRD 相对简单 rewriting 的增益与成本，不把已有工作再次包装为新模型发布。",
+    "evidenceZh": "DRD 用初始 student 的 semantic top-k 与无 privileged context 的 native distributions 做 product-of-experts，rewritten traces 离线缓存。（Sec.3.3, Fig.3–4, Eq.2, pp.5–6; Appendix E, p.17；方法图与成本表实际查看；相乘不是严格 on-policy sampling 保证。）\nv2 Table4 将 prompt-only student rewriting 的 MMVU/Video-Holmes 改为 67.8/44.9、mean56.9，v1 为 66.6/43.3、mean56.0；DRD58.2 未变。（v1/v2 Table4, p.7; Sec.4.4, p.9；两 exact versions 对应表实际视觉对比，DRD 增量由 2.2 变为 1.3 点；并非仅 stamp 更改。）\nv2 Table10 的 three-benchmark GRPO baseline 为 56.0，Echo without/with DRD 为 56.9/58.2；v1 baseline55.6 与 gain1.3/2.6 被修正为 0.9/2.2。（v1/v2 Appendix E, Table10, p.17；两成本页均实际查看；9.4/163.9ms per token 不变，额外 DRD 效果与 preprocessing 成本需一起解读。）\nv2 将 9K 实验对 vanilla GRPO gain 更正为 1.8 点，原 v1 正文误写 4.7；Table9 本身 58.2 vs56.4 未变。（v1/v2 Appendix D.4, Table9 and following text, p.17；这是结论可信度相关的 numerical correction，不是新增 run。）\n旧 receipt、review 和 PDF SHA 均匹配 assignment provenance；全文 diff 还包括 NeurIPS footer、引用与 grammar 修正。（content/paper-reading/runs/2026-08-29.json; archived 2608.26684v1 PDF/review；未覆盖旧 audit artifacts；venue/footer 不是单独触发收录的理由。）",
+    "caveatZh": "DRD 增加离线双 forward-per-token preprocessing 成本，cached traces 后部署不增加 decoding overhead。\nteacher reasoning quality 限制 rewrites，numerical precision 任务可能减益。\npretraining/evaluation 潜在 overlap 带来 implicit leakage 风险。\nnative/semantic probability 乘积与 top-k 不保证每个 teacher 事实被保持，不能把 rewriting 称作严格 on-policy 证明。\n大幅优于 naive Mixed-Policy 主要反映该 baseline 显著退化；对强 GRPO 或 prompt-only rewriting 的实际 gain 较小。\n成本表和 scale-up 文字曾有实质数值错误；本轮只采用 v2 更正值，并保留未报告重复 variance 的边界。\n所有数字均为作者报告，本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
   }
 }

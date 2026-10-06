@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2609.38562",
+  "slug": "longtake-learning-to-sustain-dynamics-in-long-horizon-video-generation-2609-38562",
+  "title": "LongTake: Learning to Sustain Dynamics in Long-Horizon Video Generation",
+  "authors": [
+    "Byoungwoo Park",
+    "Jaemoo Choi",
+    "Juho Lee",
+    "Yongxin Chen"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38562"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "LongTake",
+    "Video Generation"
+  ],
+  "abstract": "World models, game simulators, and long-take video creation require coherent scene evolution and sustained dynamics over extended durations. Autoregressive (AR) video diffusion provides a natural framework for long-horizon generation, yet extended rollouts often become near-static or lose visual quality. We hypothesize that these failures reflect the limited guidance provided by short-video supervision on how ongoing scene dynamics develops over longer durations. This motivates us to introduce LongTake, a two-stage training pipeline built around Long-Horizon Teacher Forcing (TF) on curated real long videos. Long-Horizon TF trains the AR model to predict later frames conditioned on long ground-truth video prefixes, extending direct supervision beyond the short training horizon. This supervision is designed to help the model sustain dynamics and preserve visual quality during long-horizon generation. Our central finding is that this training stage strengthens direct initialization for distribution matching distillation (DMD) under student self-rollout, without the intermediate few-step distillation stage used in standard pipelines. Under the same five-second DMD training setup, our initialization yields substantially higher dynamic degree than short horizon TF initialization on 30-second rollouts at comparable aesthetic quality, and surpasses the evaluated baselines in both measures. Hybrid DMD further reuses this teacher to extend supervision to later frames of the self-rollout while retaining bidirectional joint supervision over the initial window. On long-horizon self-rollouts, LongTake lies on the Pareto front of dynamic degree and aesthetic quality, and Hybrid DMD attains the highest dynamic degree among evaluated methods at both 30s and 60s.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38562v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38562v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38562v1 全文及 2026-10-06T16:03:14.915776+00:00 审阅记录；PDF 29 页，SHA-256 0ac58d24adaa8f10fc3e1ab25dd79677e38e9fd8d523d1e263a9ec4b9e512daf，视觉核验第 1、2、6、9、18、25 页。数字均为作者报告，本项目未独立复现。代码状态 promised：exact PDF p.1 project https://bw-park.github.io/LongTake/→official github.com/bw-park/LongTake。已确认仓库仅 README，明确 Code coming soon；不把官方仓库存在当 implementation available。",
+    "ideaZh": "LongTake 用真实长视频的后段监督改善 AR teacher 初始化，再直接做 self-rollout DMD；Hybrid DMD 另用 causal teacher 监督后续 chunk。对长镜头创作的 motion stagnation 有直接方法价值。作者报告 30s dynamic degree 51.30→90.73，同时 aesthetic 63.90→62.51；不是所有画质都提高。dynamic degree 不能证明动作语义或物理演化正确，当前只测试 1.3B 与最多 60s，缺生产交互和更长 horizon 验证。",
+    "motivationZh": "长视频生成后期接收的有限历史与短视频训练不同，student rollout 也偏离 GT context。目标是同时改善长时上下文训练和自生成轨迹上的动态保持。",
+    "methodZh": "区分两类 gap：短 TF 不见后期 retained sink/recent context 的分布，和 GT cache 与 student self-rollout 的差异。Long-Horizon TF 从 5–30s 视频采样 later split，以 bounded cache 的 layer-wise parallel prefill 构造 GT prefix，然后对固定 target window 训练 flow。TF weights 直接初始化 SGF self-rollout DMD，省独立 few-step initialization；可选 Hybrid 在初段保留 14B bidirectional joint supervision，在后段用长 TF causal teacher 按相同 student prefix 做 conditional score supervision。",
+    "methodFlow": [
+      "后期 GT cache 监督：从真实长视频取 later target window，前缀按 sink/FIFO bounded policy 逐层并行计算，detach cache。",
+      "直接 student 初始化：long-TF teacher weights 直接进入标准 5s joint DMD，不经过额外 CD/ODE few-step stage。",
+      "self-rollout replay：无梯度生成 student rollout，选 denoising step，再用 two-stream replay 重新编码 prefix 以训练 memory writing。",
+      "可选 hybrid teacher：初始 window 由 bidirectional teacher 联合监督，后续 chunks 由 causal long-TF teacher 在固定 student prefix 下评分；不反传整个生成历史。"
+    ],
+    "experimentsZh": "实验设置：作者以 Wan1.3B/CausalForcing 初始化，43K pairs 含 40K OpenVidHD 和 3K 短 clean GT，3K longTF 更新。两变体同 1200 DMD iterations，Hybrid 在 800 后以 42 latent frames 训练 400，默认四 steps。30s 用 128 MovieGen prompts，60s 用 251 VBench-Long union，但各 metric 使用对应 subset；所有 variant 同 finalEMA 测试两个 durations。\n作者报告 30s joint LongTake dyn90.73/aesthetic62.51/Quality85.79，Hybrid96.30/62.17/85.97。（Table1, p.9）\n作者报告 60s joint dyn94.72/Quality85.96，Hybrid97.36/85.71，更多 motion 伴随 Quality 略降。（Table1, p.9）\n作者报告 50 个 held-out real-prefix continuation 中 LongTF 的 5s prefix VR18.28 对 17.26、20s prefix17.83 对 16.60；IF 近饱和。（Table8, p.24）\n比较范围：多种公开 1.3B AR checkpoints 和相同 DMD 初始化对照有用。外部 baselines 保留各自 cache 容量/训练配方；RollingForcing 来自 CausalForcing 发布的特定 variant，不是所有 RollingForcing。没有 data/extra-training-budget matched 的 long-prefix-only 控制、盲人类 motion/语义研究或不同 backbone。\n消融与诊断：Hybrid λ与总 iterations 对齐，训练后 dynamic/quality 权衡明确。Quality 本身包含 dynamic degree，另报剔除该项的 Pareto 避免完全循环；VLM 字段指 Gemini exposure rubric，不是总体语义理解分。endpoint ΔIQ 可能遗漏中间退化，不代表全段高质量。",
+    "insightZh": "价值在真实长视频监督的初始化效果和两教师分工，而非重新发明长视频 TF 或 context-matched distillation；附录明确讨论相关先例。对延长可用视频创作有直接 transfer，但本文不建立 arbitrary interactive world simulation 或长期物理正确性。",
+    "whyRelevantZh": "直接解决长镜头生成中的运动停止与后期 cache 分布问题，对可用视频 creation 的持续演化训练有 transfer；不扩大到 metric3D、editable assets 或真实物理模拟。",
+    "evidenceZh": "相同 5s DMD 下的 long-TF 初始化改善 motion，仍存在审美/一致性权衡。（Fig.5, p.6; Table1, p.9；作者报告 ShortTF dyn51.30/aesthetic63.90，LongTF90.73/62.51；数据与额外 TF 训练同时变化，缺同 data 短 prefix 控制。）\nparallel prefill 与 target two-stream mask 不泄露当前 clean target。（Appendix B.1, Figs.9–10, pp.16–18；stored keys 在 RoPE 前，有限 window 重新编号；不是不断增长的绝对 time 编码。）\nHybrid 采用 detached self-rollout 和 gradient replay，不等同全轨迹 KL 精确梯度。（Appendix B.2, Eqs.14–16, pp.18–19；prefix sample 固定，但 student 重新编码 prefix 的 parameters 有梯度；score fake/teacher 使用相同 video 但各自 representation。）\ndynamic degree 与非 motion quality 均有 Pareto 分析，但动作正确性证据有限。（Fig.14, p.25; Appendix D.1, Table8, p.24；独立 IF 仅 pre-DMD 短 continuation 且近饱和，不能将主 rollout 的高运动量写成 semantic/physics fidelity。）",
+    "caveatZh": "Hybrid 依赖 long-horizon teacher 在错误 student prefixes 上的预测质量。\n只验证 1.3B 与最多 60s，更大 backbone/更长 rollout 未知。\nlong-data curation 和额外 TF 训练与 prefix 长度混合，因果归因需更多 matched 控制。\n高光流运动可能是 camera motion 或不正确动作，不能证明持续正确 physics。\n仍缺 step-changing user actions、editability 和 productionlatency 验证。\nevaluation 每 dimension 的 60s prompt counts 不同，不合并成所有 251 个视频所有指标统一控制。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.36348",
+  "slug": "representation-by-design-in-generation-cross-view-class-token-alignment-in-diffusion-trans-2609-36348",
+  "title": "Representation by Design in Generation: Cross-View Class-Token Alignment in Diffusion Transformers",
+  "authors": [
+    "Xiaoyu Wu",
+    "Yifei Wang",
+    "Chen Wei"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-09-28",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36348"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Representation by Design in Generation",
+    "Image Generation"
+  ],
+  "abstract": "Generative and representation learning remain asymmetrically connected: semantic representations are used to improve diffusion generation, whereas the models' own representations are often treated as a by-product of synthesis. We ask whether diffusion models can instead be trained to learn substantially stronger semantic representations without sacrificing generation quality. SelfFlow takes a step in this direction by introducing self-supervised patch alignment into flow matching, but its main gains remain in faster convergence and improved generation. Inspired by DINO and iBOT, we extend this framework with cross-view class-token alignment to further strengthen semantic representations. Specifically, we form two independently noised, dual-timestep observations of each image and align each student class-token representation with the stop-gradient EMA-teacher target from the other observation. This objective is optimized jointly with the inherited flow-matching and local patch objectives. Notably, although the additional objective acts only on the class token, it strengthens both class-token and patch representations. Compared with a matched two-view baseline, ImageNet linear-probing accuracy improves by 9.4\\% using the class token and 10.1\\% using mean-pooled patch tokens, while frozen-backbone VOC2012 segmentation improves by 3.6 mIoU. These representation gains are achieved while maintaining comparable ImageNet generation FID. In text-to-image training, the same objective also improves generation FID, reducing it from 2.52 to 2.37 at matched checkpoints. Our results show that representation need not remain a by-product of generation or merely a tool for improving it: it can be directly optimized as a first-class capability of diffusion pretraining alongside generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36348v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36348v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36348v1 全文及 2026-10-06T12:36:24.066533+00:00 审阅记录；PDF 20 页，SHA-256 4c4ed5c83d9487c09f8a2f34816c0816d679bd7120417b3d25570a2ca8cb3e8c，视觉核验第 1、3、7、8、13、16、18、19、20 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 20 页 PDF 未给本论文 code/projectreleaseURL，不猜作者 repo 或把 SelfFlow/DINO 实现当本方法。",
+    "ideaZh": "在 two-view SelfFlow 的 flow+patch alignment 上，加 cross-view CLS 对 EMA teacher cosine 目标，作者报告 CLS linear63.49→72.90、patch60.03→70.11、VOC57.15→60.79，ImageNetFID5.12→5.26 略差。生成 backbone 学更强 perception features 值得速读；两 noise views 不是 multi-camera，teacher 仍 class-conditioned，probe 大量 validation 调参、单 pretraining run，T2IFID2.517→2.369 仅同 evaluator 可比。",
+    "motivationZh": "diffusion 生成训练不一定形成可用于理解的稳定语义表征。目标是在生成过程中学习跨噪声、跨视图一致的 global representation，并保留空间信息。",
+    "methodZh": "两个独立 Gaussian/maskbranch 共享 cleanlatent 与 timestep pair，studentpatches 混 clean/noisytime，EMA teacher 更 clean。两 variants 都有 CLS、two-viewflow 和 sameviewpatchcosine；新 variant 仅对 studentCLS 与 oppositebranchrawteacherCLS 加 cosineloss，学 noise-invariantglobalsemanticrepresentations，并通过 sharedtransformer 改善 patchlinear/denseprobe。主价值是把 diffusion 的 representation 作为可优化能力而非只服务 FID，结果不是新 MLLM 或结构化 designmodel。",
+    "methodFlow": [
+      "以 frozenSDVAE 把 image 变 16×16latentpatchgrid，对同 image 采两 independentnoise/masks 及共用 clean/noisytimepair",
+      "student 用 mixedtimestepinputs，EMA teacher 用同 branch uniformlycleanerinputs，二者都保 CLS",
+      "既有 flowvelocityloss 与 sameviewpatch alignment 不变，新增 studentCLS 经 MLP 对 oppositeviewrawteacherCLS 的 negativecosine",
+      "AdamW 联合训练、EMA teacherstopgradient 更新，discardalignmentheads 用于 generation/frozenprobes",
+      "nullclass+t.8features 作 CLS/meanpatchlinearprobe 与 VOC 线性 densehead，另用同 samplingFID 比较生成"
+    ],
+    "experimentsZh": "实验设置：作者报告 ImageNetSelfFlowDiTXL28blocks 从 scratch1Msteps/batch256source→512views，frozenSDVAE；t.8/nullconditionlinear 和 VOC21classLayerNormlinearhead。T2IFluxstyle7double+14singleblocks/frozenQwen4B 与 VAE，1Mtrain/50kvalpairs、400ksteps/batch512source。多 probe LR/epoch valbest；onepretrainingrun each。\n作者报告 ImageNetCLS63.49→72.90、patch60.03→70.11、VOC57.15→60.79，FID5.12→5.26。（Table2 p. 7）\n作者报告 T2I 同 evaluatorFID2.517→2.369，CLIP 增.032points，未支持所有 compositionalbenchmark 改善。（Sec4.3 p. 7/Appendix F p. 20）\n作者报告 multiblockVOC60.399→63.104(+2.705)，较 singleblock+3.732gain 小，absolute 却更高。（Table6 p. 18）\n作者报告 lambdaCLS.2pilotFID19.25vs 无 CLS17.81，.5FID21.79；representation/generation 有 tradeoff。（Table8 p. 18）\n比较范围：matchedbaseline 隔离 objective 具有可信辨别力，samearchitecture/two-view/warmup/preprocessing，另 noise/depth/weight 及 T2Isetting。但没有 DINO/iBOTstandalone、DDAE++/otherjointmethods 同 compute 基准或 broaddownstream；labelsconditionalteacher 和 pretrainedVAE 保留。\n消融与诊断：CLSattachment 与 lambda100kpilots、patchdepth/multiblockfeatures 显示传播与 tradeoff，attachmentdepth 同时改 readout 并不单独控制 depth；oneconfigonepretrainseed 且未 same-viewCLS/no-patchcontrol，不清 crossview 必要性。",
+    "insightZh": "在 matchedtwo-viewgenerativepretraining 中显式优化 globalsemanticobjective，连 patch/densefeatures 大幅改善，是生成与 discriminativecapability 协同的有用 representation advance。DINO/iBOT/selfdistill/双 time 继承已有原则，新增一个 CLSobjective 并非首次 jointgenerativerepresentation 学习；crossview 是 noiseview 不是真实 3Dmultiview。",
+    "whyRelevantZh": "将 generatorsemanticrepresentation 显式训练并 transfer 到 frozenperception，有助视觉生成/理解共享基础表示研究；论文未做 SVG/CAD/3D 设计迁移，不以 titleDesign 硬贴 structured2Dtopic。",
+    "evidenceZh": "matchedvariants 共享 architecture/CLS/2views/EMA/flow 和 patchobjective，只 lambdaCLS 开启不同，teacherclasslabels 保留。（Secs3.1–3.3 pp. 3–5/Fig1 p. 3; Appendix A p. 13；method 图已视觉核验，不是 no-labelsemanticlearner 或 freeofallpretrainedpriors。）\n作者报告 CLS+9.41pp、patch+10.08pp、VOC+3.64mIoU，ImageNetFID 差+.14。（Table2/Fig2 p. 7；主表已视觉核验，百分比差是 points，不改成 relative9.4%。）\npatchgain 主要 block20teacherpatchdepth 而非 CLSblock18；block18VOC 反降 57.91→57.02。（Fig4/Sec4.4 p. 8；depthplot 已视觉核验，attention 图不证明特定 causalmechanism，作者明确承认。）\n作者报告 T2IFID2.517→2.369、CLIP31.709→31.741，采用 torchvisionInception 不同于 ImageNetADM 标准。（Sec4.3 p. 7/Appendix B p. 14；不能跨 paper/evaluator 声称 SOTA 或直接与 ImageNetFID 比。）\nlinearprobe 用 33rates×60epochs 独立选最高 val 结果，noiseperimage 只一次缓存且 match 未独立验证。（Appendix C1/Tables5–6 pp. 15–18；probe 页已视觉核验，hypersearch 一致但 validationselection 有 optimism，trend 不是 independenttrials。）\n作者承认 onepretrainingrun/config、下游范围有限、T2Icompositionalmixed、mechanism 未定。（Appendix F p. 20; Fig7 caption p. 19；limits 页已视觉核验，qualitative 是 posthocCLIP 挑选并 omitnearblankbaseline，仅 illustrations。）",
+    "caveatZh": "单 pretrainingrun/config，seedvariability 和更大 scale 尚未评估。\n主要 ImageNet/VOCtransfer，T2Irepresentation 未 probe、其他 tasks 需扩展。\nT2Icompositional 结果 mixed，depth/attention 描述不能确证 patchgain 机制。\nImageNetteacher 保 classlabels、student10%dropout，nullconditionprobe 不等于 pretraining 无 labels，别写全自监督 datafree。\ncrossview 仅 noise/mask 变换，不能联想成 multi-camera3Dconsistency。\n33LR×60epoch 及 readoutdepth 用 validation 挑最高，gain 需独立 test/seed 确认；VOC 每 validation freshnoise 再 valmax 有额外 selectionvariance。\nFID1M 稍退化而 earlyweighttradeoff 明显，不能称无任何 generationcost。\nT2I 用 torchvisionInception 和自建 50kref，不对标外部 standardFID；sourceIDs/prompts 无重复并未排除 imagecontentduplicate。\nnominalDopri5 250 是 requestedoutputtimes 不是 verifiedNFE，不用作 inferencecompute 结论。\nqualitativeposthoc 按 CLIPimprovement 挑选，无 human/structureddesign/prototype 应用实测。\n全文无 codeURL，未复现或验证 implementation。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

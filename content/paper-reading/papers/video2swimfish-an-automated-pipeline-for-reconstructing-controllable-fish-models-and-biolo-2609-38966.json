@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2609.38966",
+  "slug": "video2swimfish-an-automated-pipeline-for-reconstructing-controllable-fish-models-and-biolo-2609-38966",
+  "title": "Video2SwimFish: An Automated Pipeline for Reconstructing Controllable Fish Models and Biological Locomotion from Real Fish Videos",
+  "authors": [
+    "Hangong Chen",
+    "Linfeng Cheng",
+    "Tahsin Zaman Jilan",
+    "Ian Fuller",
+    "Lee Caesar",
+    "Jiaye Wu",
+    "Yantian Zha"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38966"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Video2SwimFish",
+    "3D Reconstruction",
+    "Visual Design Agents"
+  ],
+  "abstract": "We present Video2SwimFish, an automated pipeline and benchmark for building controllable fish assets from real-fish videos for underwater embodied AI. Given synchronized multi-view videos of an individual fish, the pipeline reconstructs a metrically scaled deformable mesh from a VLM-selected canonical frame, generates internal articulation adapted to that individual's morphology through a VLM actor-critic loop, and extracts a Biological Locomotion Manifold (BLM) from the fish's observed midline curvature. The BLM provides a low-dimensional action space bounded by real-fish motion, enabling an individual swimming policy to be learned for each reconstructed fish. We release two paired datasets: synchronized top- and front-view recordings of 120 individual fish across 6 species, and the controllable assets and individual swimming policies derived from them. Because every asset is tied to the animal it came from, the dataset supports a benchmark that evaluates locomotion learning not only on task success but on fidelity to that individual in trajectory shape, body curvature, and tail-beat frequency, across trajectory following, reward-free swimming behavior transfer from video, and a downstream case study in which a simulated BlueROV underwater robot captures one of the assets. We find that task success and locomotion fidelity do not necessarily improve together: the method achieving the highest task completion is not the method achieving the highest locomotion fidelity, and we identify faithful reproduction of individual animal locomotion as an open challenge for the community. Project website: https://hangongchen.github.io/video2swimfish-web/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38966v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38966v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38966v1 全文及 2026-10-06T14:42:17.827199Z 审阅记录；PDF 22 页，SHA-256 29af4048faa8966a95d4aa039b539f990e93ab922e4e1ea07299b2a2e87bccc7，视觉核验第 1、4、8、9、17、18、19、22 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact PDF p.11 指向 https://github.com/hangongchen/Video2SwimFish；实际访问返回 404，未确认 public implementation。论文的数据/资产 release 声称不能替代源码存在证据。",
+    "ideaZh": "Video2SwimFish 将真实鱼视频变成带骨架与可控 locomotion 的模拟资产，并用真实 midline curvature 的 PCA 限定动作空间。它包含实际观察渲染并编辑骨架的 VLM loop，值得借鉴到可控资产建模；但 mesh 来自单帧商业 generator，主要 fidelity 只测选择过的 2D silhouette，运动/内部生物结构没有真实 3D ground truth。",
+    "motivationZh": "真实鱼视频缺少可直接使用的骨架和三维运动资产，手工 rigging 与动作建模成本较高；目标是重建可控模拟鱼，并保留视频中的运动特征。",
+    "methodZh": "VLM 选择 canonical fish frame，Meshy 生成并缩放 mesh；actor 根据当前骨架/半透明 mesh 的渲染做 add/remove/reposition/resize，critic 与几何 verifier 提供反馈，结束后 deterministic completion 补齐骨链。视频 curvature 经 PCA 得到 per-fish BLM，通过 simulation-calibrated Jacobian 转 joint targets，训练 tracking 或 behavior cloning policy。方法连接输入特定动物、可控 articulation 和运动参考，实验诚实显示 task success 与 biological fidelity 不完全一致。",
+    "methodFlow": [
+      "选择 canonical front-view frame 并裁剪鱼体，用 Meshy 生成/尺度校准 mesh",
+      "LoRA actor 观察 mesh/骨架 renders 并输出骨架编辑",
+      "critic 与 containment/midline verifier 反馈，迭代后 deterministic completion",
+      "从 top-view 视频提取 midline curvature 并拟合 PCA/action-rate bounds",
+      "在模拟中标定 curvature-to-joint controller",
+      "在 BLM action space 学习 tracking/behavior-cloning，分别评价成功率与个体 fidelity"
+    ],
+    "experimentsZh": "实验设置：作者收集同步 top/front fish videos，生成可控资产；在选出的个体上用相同 actuator/approximate panel-fluid model 比较 joint RL、AMP、CPG、BCO 与 BLM，另进行模拟机器人 capture。按每方法 convergence/plateau 停止，部分 unstable fish 被替换。\n作者报告 Task1 BLM completion 0.89，高于 Joint RL 0.70，但 Fréchet 0.65 BL 比 Joint RL 0.48 与 AMP 0.34 更差；AMP curvature Wasserstein 0.78 优于 BLM 1.01。（p.8 Table 1）\n作者报告 Task2 BLM+IL curvature distance 0.74 对 BCO 1.63、speed error 0.11 对 0.39；frequency error 0.038 反高于 BCO 0.012。（p.9 Table 2）\n作者报告 clean silhouette subset 的 affine IoU mean 0.88、similarity IoU 0.84；这是选择出的八个 fish 的 2D 对齐评价。（pp.18–19 Table 5, Fig.4）\n作者报告 strict containment pass 87/120；VLM 常放置 5–6 bones，而 completion 后为 12–19，说明大量最终结构来自确定性修复。（p.17 Appendix B.4–B.5）\n作者报告模拟 capture success 0.988/0.992，仅为两条模拟鱼对应任务，未验证 sim-to-real。（p.9 Table 3）\n比较范围：控制基线共享模拟设置，task/fidelity 指标分别报告有意义。未对 mesh generator、frame selector、actor vs deterministic completion 做完整比较；selected stable/clean fish 与全 dataset 不同，缺少独立训练重复 CI。\n消融与诊断：没有主要 reconstruction/agent-loop 模块删除消融，BLM 与不同动作空间比较混合动作维度/先验和 controller 差异。Per-fish PCA 的 pooled fallback 范围在 Table4 与正文计数不一致；未验证改变 skeleton 是否更忠实真实内部 anatomy。",
+    "insightZh": "新意在输入个体对应的 controllable deformable asset、实际 visual articulation editing loop 与 curvature-limited action space 的组合，超出 pure novel-view synthesis。PCA、商业 image-to-3D 和 actor–critic building 各有先例，未分离 VLM loop 与确定性修复贡献；不属于 physical fabrication 或通用 VLM 模型创新。",
+    "whyRelevantZh": "输入特定形状的可控 articulated/deformable asset 建模与视觉反馈编辑，对重建和设计 agent 有直接方法联系；不含 CAD/制造约束，也不推论广泛的 foundation VLM 进展。",
+    "evidenceZh": "actor 真正观察当前 visual artifact 并执行骨架编辑，而非单次描述或 generic GUI recommendation。（pp.4–6 §3.1–3.2, Fig.2; pp.16–17 Appendix B；已核看图；joint parameters 为固定 preset，不是从每个动物推断的内部生物力学。）\nBLM 使用个体 curvature PCA 和变化限制，但 joint mapping 仍需模拟 calibration。（pp.6–7 §3.3–4.1; p.20 Appendix D；避免 video-to-joint pseudo-labeling 不等于无需任何 inverse/controller 模型。）\n高 completion 不保证更准确轨迹和个体身体形态。（pp.8–9 Tables 1–2；已核看对照；BLM 与其他方法各有指标优势。）\nmesh fidelity 为 selected silhouette comparison，非全资产真实 3D geometry 测量。（pp.18–19 Table 5, Fig.4；实际表列八条鱼、四 species，alignment 搜索后 IoU 不能证明 3D 个体精度。）",
+    "caveatZh": "近似 quasi-steady hydrodynamics 不包含完整 fluid–structure interaction。\n没有 sim-to-real 试验；控制评价只覆盖全数据的部分 fish。\n商业 Meshy 服务和 stochastic loop 随时间改变，重跑可能不生成相同资产。\n单张 selected frame 生成 mesh，双视视频不等于多视几何联合重建；缺少真实 3D shape/internal anatomy ground truth。\nSilhouette subset 经 clean-selection 与 affine/max-IoU alignment，不是全资产 reconstruction accuracy 的严格下界。\nVLM critic score、结构 completion 与固定 physics preset 共同决定结果，缺少各自贡献消融。\nContainment 未全部通过，部分不稳定个体被替换，不能称全部自动资产满足同样严格物理标准。\nBLM PCA bounds 不保证真实 joint mechanics，curvature-to-joint controller 和 fluid speed/impulse caps 影响可达运动。\nPer-method convergence stopping 与失败 retry 可能造成训练预算差异，无跨 seed 方差。\n公开 GitHub 在当前访问返回 404，未确认 public implementation。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

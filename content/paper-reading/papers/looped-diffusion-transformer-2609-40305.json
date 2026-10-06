@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2609.40305",
+  "slug": "looped-diffusion-transformer-2609-40305",
+  "title": "Looped Diffusion Transformer",
+  "authors": [
+    "Yong Xien Chng",
+    "Tianyi Chen",
+    "Wenwen Tong",
+    "Haiwen Diao",
+    "Zhongang Cai",
+    "Lei Yang",
+    "Ziwei Liu",
+    "Lewei Lu",
+    "Dahua Lin",
+    "Gao Huang"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.40305"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Looped Diffusion Transformer",
+    "Image Generation"
+  ],
+  "abstract": "Improving text-to-image models has traditionally relied on increasing model size or the number of denoising steps. In this work, we explore an alternative way to scale computation by repeatedly running shared Transformer blocks within each denoising step, effectively increasing computational depth while keeping the parameter count fixed. This looped computation enables iterative refinement of internal representations without explicit reasoning tokens. However, naive looping fails to consistently improve image quality. We trace this problem to weak supervision across intermediate loops and unregulated attention updates that progressively erode local information. To overcome these challenges, we propose Looped Diffusion Transformer (Looped-DiT), which combines deep supervision across intermediate loops with self-modulating attention to stabilize looped feature updates. Under matched-parameter and matched-compute settings, Looped-DiT consistently outperforms non-looped baselines. Notably, a 260M-parameter looped model can surpass a model 6.5x larger across multiple text-to-image benchmarks while requiring 4.9x lower inference compute. Beyond this performance gain, we find that looped computation can offer a more effective form of iterative computation for diffusion models, with increasing loop depth yielding larger gains than adding more denoising steps under a fixed inference budget. Furthermore, deeper loops can progressively correct mistakes made in earlier loops, exhibiting behaviors suggestive of latent reasoning. Together, these results show that looped computation offers a promising way to scale visual generation models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.40305v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.40305v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/OpenSenseNova/Looped-DiT"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.40305v1 全文及 2026-10-06T13:51:46.647233Z 审阅记录；PDF 21 页，SHA-256 bc97f24d5703911433e04b1dfdedbc8f11f931de8a4158cc3592f5335563eaef，视觉核验第 1、2、5、7、10、18、21 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页 exactURL 确认 public repo 含 looped_dit/configs/tools/tests 实现；未执行。",
+    "ideaZh": "Looped-DiT 在同一 denoising step 重复共享中段 blocks，配 intermediate supervision 与 XSA。作者报告小模型以较少参数/推理 FLOPs 获得不错生成结果。可速读有效深度设计；同计算的深层控制已接近，latent reasoning 仍仅有行为证据，训练开销反而更高。",
+    "motivationZh": "增大 DiT 深度通常增加参数与计算，模型容量和推理预算难以独立调节；目标是在同一步去噪中复用 blocks，并按收益决定重复次数。",
+    "methodZh": "MiniT2I pixelMMDiT17blocks 拆 6/5/6，中间 5blocksloop4 次形成 32effectiveapplications。每 loop 经共享 post6blocks 预测同 cleanimage，final+mean 权重训练；XSA 在 jointimage/textattentionhead 输出上投影到当前 tokenvalue 的正交子空间，再写 residual。loopcount 可 1–8earlyexit，adaptivegate 预测未来 loss 下降/额外 loop，另需训练 gate 而非无需任何训练。",
+    "methodFlow": [
+      "pixelimage/textembeddings 经 pre6MMDiTblocks。",
+      "middle5blocks 共享 weights 重复，XSA/Gatedattention 调每 head 写入幅度/方向。",
+      "每次 loop 通过 sharedpost6blocks 计算 training-only 同 cleanimage 监督。",
+      "推理只 decodechosenloop 终点，loopdepth 与 Eulerdenoisingsteps 分别调预算。",
+      "可训练 cross-attention+MLPgate 预测 futurebenefit 并按 threshold 退出。"
+    ],
+    "experimentsZh": "实验设置：260MMiniT2I B16/B32 pixel512²、6/5/6/loop4，CC12MPT 与 BLIP3o/DALLE3/4o-imageFT。B16 500K+80Ksteps/globalbatch1024/32GPUs、B32 250K+40K/16GPUs；Euler100steps/CFG6 默认，3evalsamplingseeds。DPG/PRISM/CoRe/Spatial/GenEval/TIIFshort，latencyH100batch1warmup 后 100gens。\n作者报告 samebudgetloop4 的 25–50denoisingstep 设置优于 singleloop 更多 steps；范围内成立，不代表 fewstepdistilledmodels 或所有 samplers。（Fig.6, p.7）\n作者报告 CoTpromptrewrite 与 loop 有互补，总 averagegain5.5 对 loop4.0/CoT2.1；外部 Qwenrewrite 成本未纳 internal 预算。（Table3, p.8）\n比较范围：samebackboneparam/deeper/widercompute 及 deeperDeepSup/XSA 更可信；officialSOTAmodelsdata/architecture/steps 不同。samecheckpointloopdisablecontrol 会离开 traineddefault4loop，需与 independentlytrainednonloop 同时看。\n消融与诊断：loop/DeepSup/Gated/XSA、supervisionweights、loopcount、samplersteps、promptrewrite、spatialprobes。adaptivegate 训练 target 用 GTfutureloss 但训练 split/预算细节未完备，positionprobe 仅 lineardecodability。",
+    "insightZh": "loopedtransformer、ELTclassconditionalgeneration、DeepSupervision/XSA 均已有；价值是 text-to-image 条件下的 loop-depth 训练、earlyexits 稳定与内部/外部迭代 compute 比较，形成重要参数效率架构研究。不是已经证实通用视觉 reasoning 算法，机制对大 latentDiT 尚未知。",
+    "whyRelevantZh": "重要 visualgenerationarchitecture/computeallocation 研究，compositional/spatialcontrol 能力与未来 visual creation 模型设计有关；不将 rastergeneration 误归 explicit2Ddesign。",
+    "evidenceZh": "sharedmiddleloop 与 intermediate 同 image-target 监督，XSA 移去 self-value 方向不只是 mask 自身 attentionweight。（Secs.2/Fig.2 pp.2–5; App.A.3 pp.19–20；完整方法图与 projection 公式实际查看，headnonexpansive 不等整个 residualblock 稳定保证。）\n作者报告 B16 平均 71.5 对 InternVLU69.0、PRISM67.0/CoRe53.5，但 GenEval87.4 略低于原 MiniT2I87.5。（Table1, p.5；main 表实际查看，largermodels 官方不同设置，非全部 metrics 胜出。）\n作者报告 matchedtraining/forwardcomputedeep+DeepSup58.1 与 loop59.1；deep+DeepSup+XSA 进一步 58.8。（Table2 p.7 / Table5 p.10；两控制表实际查看，强 nonloopcontrol 差仅.3 不能夸大独有 loop 优势。）\n作者报告 fullB32training1246GFLOPs 对 base441、deep809，而 infer267 对 base146。（Table8/App.A.1, p.18；costtable 实际查看，fixedparams 不等 fixedcompute，也非总训练更省。）",
+    "caveatZh": "only260MpixelMMDiT/512²，large/latent/highres 迁移未知。\n固定 partition/loop4 非 designspaceoptimum，DeepSup 增加 trainingcompute。\nlatentreasoning 主要 behavioral/representation，未完整 mechanisticanalysis。\nqualitativeerrorcorrection 可以是 denoisingrefinement，不证明规则推理或 faithfulinternalplanning。\nR2positionprobe 下降不等所有 localinfo 丢失；attentionwriteheadprojection 不能保证后续 Wo/FFN 整体 nonexpansiveness。\ncontrolledstrongdeeperDeepSupXSA 与 loop 差.3 无 trainingseedCI，不能宣称 loop 在每 setting 必需。\n500K×1024=512Mpretrainimagepresentations，small12Mdataset 不等 smallcompute；mainB16 高 trainingoverhead 需总 cost 评估。\nadaptive 版训练额外 gate，predictedlossbenefit 不直接等 promptconstraintcorrectness，不能说 training-freeexitpolicy。\nnoSVG/stitch/native3Ddesigntransfer 实测，overallarchitecture 思想重要但 artifact 仍 raster；本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

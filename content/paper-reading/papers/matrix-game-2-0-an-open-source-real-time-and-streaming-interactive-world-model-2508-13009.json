@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2508.13009",
+  "slug": "matrix-game-2-0-an-open-source-real-time-and-streaming-interactive-world-model-2508-13009",
+  "title": "Matrix-game 2.0: An open-source, real-time, and streaming interactive world model",
+  "authors": [
+    "Xianglong He",
+    "Chunli Peng",
+    "Zexiang Liu",
+    "Boyang Wang",
+    "Yifan Zhang",
+    "Qi Cui",
+    "Fei Kang",
+    "Biao Jiang",
+    "Mengyin An",
+    "Yangyang Ren",
+    "Baixin Xu",
+    "Hao-Xiang Guo",
+    "Kaixiong Gong",
+    "Size Wu",
+    "Wei Li",
+    "Xuchen Song",
+    "Yang Liu",
+    "Yangguang Li",
+    "Yahui Zhou"
+  ],
+  "publishedAt": "2025-08-18",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2508.13009"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Matrix-game 2.0",
+    "Video Generation"
+  ],
+  "abstract": "Recent advances in interactive video generations have demonstrated diffusion model's potential as world models by capturing complex physical dynamics and interactive behaviors. However, existing interactive world models depend on bidirectional attention and lengthy inference steps, severely limiting real-time performance. Consequently, they are hard to simulate real-world dynamics, where outcomes must update instantaneously based on historical context and current actions. To address this, we present Matrix-Game 2.0, an interactive world model generates long videos on-the-fly via few-step auto-regressive diffusion. Our framework consists of three key components: (1) A scalable data production pipeline for Unreal Engine and GTA5 environments to effectively produce massive amounts (about 1200 hours) of video data with diverse interaction annotations; (2) An action injection module that enables frame-level mouse and keyboard inputs as interactive conditions; (3) A few-step distillation based on the casual architecture for real-time and streaming video generation. Matrix Game 2.0 can generate high-quality minute-level videos across diverse scenes at an ultra-fast speed of 25 FPS. We open-source our model weights and codebase to advance research in interactive world modeling.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2508.13009v5",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2508.13009v5"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2508.13009v5 全文及 2026-10-06T14:06:34.080498+00:00 审阅记录；PDF 19 页，SHA-256 e81c2a22d8df3e763b25d407ac3b89e24da77f0aa878942a5c63fe53909ede2c，视觉核验第 1、8、9、11、12、14、15 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1officialproject URI https://matrix-game-v2.github.io/ →GitHub 指向此 2.0subtree；实际公开 API 确认 inference.py/inference_streaming.py/pipeline/wan 实现。总 repo 已发布 3.0，审查的是 2.0 exact PDF，不混用 3.0memoryclaim。",
+    "ideaZh": "Matrix-Game2.0 将带鼠标/键盘 action 的 Wan/SkyReels I2V distilled 成 Self-Forcing causal generator，用小 KV cache、VAE cache 和三步采样支持在线交互。作者报告单 H100、352×640 约 25 FPS，值得借鉴实时控制接口与 train-inference 一致训练。它没有显式历史记忆：wild-scene consistency 不全面胜出，control accuracy 只在 Minecraft 量化，不能把可无限 rollout 当长期稳定的 3D/物理世界。",
+    "motivationZh": "实时交互视频既要及时响应键鼠 action，也要持续生成，完整双向 diffusion 和固定历史条件难以兼顾；需要处理训练与 rollout context 的差异并降低延迟。",
+    "methodZh": "Unreal NavMesh/PPO 与游戏录制生成同步 image/action 数据。基座移除 text branch，mouse 连续值 concat latent 后 MLP/temporalattention，keyboard 以 cross-attention 注入，RoPE 支持长 sequence。Teacher ODE pairs 初始化 causalstudent，再用自己生成的 past rollouts 进行 DMD Self-Forcing；rolling cache 逐出 oldtokens。真实 speed 涉及 VAEcache/actionmodules 减半/4→3steps，不只是架构 attention 替换。完整 19 页含 quanttables、失败案例、limitations 和 references 已读，主架构/初始化/结果/限度页实际查看。",
+    "methodFlow": [
+      "生产同步 action-video 监督：Unreal NavMesh 导航及 PPO 探索，记录 perframe 键鼠/camera；游戏 ScriptHook 配合录制同步，筛除冗余/无效轨迹。",
+      "训练无 text 的 action I2V 基座：SkyReels1.3B/Wan 架构去 text、加入 mouse latent concat temporalattention 和 keyboard cross-attention，VAE/CLIP 条件首帧；加 action 后 1.8B。",
+      "初始化并 self-forcing distill：40K teacher ODE pairs 初始化 blockcausalstudent；自身 rollout 作为 past 条件，DMD 对齐 teacher 分布，减轻 teacher forcing exposurebias。",
+      "小 cache 流式生成：latentchunk3/localcache6frames，滚动 KV 移除 oldstates；VAE cache、前半 DiT action modules 及三步 denoising 达实时报出。"
+    ],
+    "experimentsZh": "实验设置：Foundation120Ksteps/batch256，40KODEpairs、6Kstudentinit+4KSelfForcing；quant597-framecompositeactions，32Minecraft/16wildimages，GameWorldScore。Base153hMinecraft+615hUnreal 约 800h，Sekai85h 另训 real-world，574hdriver/560hTempleRun 为额外 finetuning；abstract~1200h 与分项并非明确统一总数，避免合并。\n作者报告 Minecraft keyboard.91/mouse.95 vsOasis.73/.56，image.61vs.27；scenario.80 低于 Oasis.84，motion.98vs.99，非每维领先。（PDF p.11, Table1）\n作者报告 wildimage.67vsYUME.65、temporal.86vs.85，object.71vs.77/scenario.76vs.80 下降。Actionmetric 专用于 Minecraft，wild 未定量验证。（PDF p.12, Table2/§5.2）\n作者报告叠加 VAEcache、action 模块减半、4→3steps 后 25.15 FPS；同表 object.68→.63→.64，真实速度质量有 tradeoff。（PDF p.14, Table3）\n比较范围：Minecraft 仅 Oasis，wild 仅 YUME，不含所有同期开放 interactive 模型的 matcheddata/backbone/compute；GameWorldScore 来自同系列前作，physicalunderstanding 栏目为 proxyconsistency，非 collision/3Dgeometry/causalintervention 验证。\n消融与诊断：Cache9vs6 仅 qualFigure14，Table3 叠加加速；未单独验证 dataagent/PPO、quaternion、去 text、SelfForcing 与 TF/DF 同预算控制，没有 multi-seed/errorsbar，长回访/occludedstate 保持未系统测。",
+    "insightZh": "Action 模块、Wan 和 Self-Forcing/DMD 有明确已有来源；主要是同步 interactive 数据与 action-conditioned causal distillation/部署加速组合，形成公开可交互 model。达到 video-generation 实时 visual creation/controltransfer 门槛，而不是因为 gameplay 场景就归 visual-design-agents，亦非显式 3Dscene 创建或物理 law 学习证据。",
+    "whyRelevantZh": "交互视觉生成需要输入 action 持续改变后续 artifact，公开 causalstudent 与 streamingpipeline 提供可复用控制/效率接口；对通用 visualworkflowtransfer 有价值，不声称已在 structured2D/LEGO/3Dfabrication 上验证。",
+    "evidenceZh": "在线 generation 去 textbranch，framelevelcontinuousmouse 与 discretekeyboard 分别注入。（PDF pp.8–9, Figure7/§4.1；Remove text 不能逻辑上证明增强物理理解，尚无保留 text 的 matchedcontrol。）\n短 rollingcache 支持任意持续 rollout 但不保存所有 history。（PDF pp.9–11/14–15, §4.2/§6.1；Cache evictsoldtokens，local6latentframes，authors 明确历史缺 explicitmemory；无限 length 是 computationalcapability 非长期 stateconsistency guarantee。）\n25 FPS 是特定加速叠加结果，不能脱离 hardware/resolution/步数复述。（PDF pp.3/11/14, Table3；单 H100/352×640，15.49→21.03→25.15 FPS；仍是 throughput，未独立测用户 action 到 displaylatency 或 server/network。）",
+    "caveatZh": "PDF pp.14–15：OOD 向上/长期前进可过饱和或退化；352×640 低于高分辨率 model。\nPDF p.15：缺显式 historymemory，长期 contentconsistency 仍挑战。\nNavMesh/collision 规则属于 training data 生成，generator 本身无显式碰撞/几何 state，不能把数据物理约束移植成输出保证。\n野外 control 只有定性，基线 higherconsistency 解释为 staticcollapse 是作者归因，未用独立动作/场景 GT 或匹配 motion 确认。\n小 cache 阻断过去信息，scene return/objectpersistence 不可靠；交互视觉设计可借鉴 I/O 和 distillation，不宜作 CAD/4Dscene 物理 simulator。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

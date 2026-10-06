@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2512.03284",
+  "slug": "think-then-look-active-spatial-reasoning-for-house-scale-3d-scene-understanding-2512-03284",
+  "title": "Think, Then Look: Active Spatial Reasoning for House-Scale 3D Scene Understanding",
+  "authors": [
+    "Hongpei Zheng",
+    "Shijie Li",
+    "Lin Qian",
+    "Zhenghao Li",
+    "Qijun Yang",
+    "Yanran Li",
+    "Hujun Yin"
+  ],
+  "publishedAt": "2025-12-02",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2512.03284"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Think, Then Look",
+    "VLM / MLLM"
+  ],
+  "abstract": "Spatial reasoning in large-scale 3D environments remains challenging for current vision--language models, which are typically constrained to room-scale scenarios. We formalize Active House-Scale Spatial Reasoning (AHSR), a new paradigm in which a model reasons over a pre-built house-scale 3D map via virtual spatial tool invocations to answer spatial questions, without exhaustive scene-wide processing. To support AHSR research, we introduce H$^2$U3D (Holistic House Understanding in 3D), the first benchmark targeting house-scale 3D scene understanding, featuring environments with an average aggregate floor area of 250.8 m$^2$ and up to three floors, together with hierarchical coarse-to-fine visual representations. Building on H$^2$U3D, we propose SpatialReasoner, an AHSR framework trained via supervised fine-tuning with self-correction, followed by reinforcement learning with a task-aware adaptive exploration reward. SpatialReasoner achieves state-of-the-art performance on H$^2$U3D with 64.9% overall accuracy, outperforming strong baselines including GPT-5.4 and Gemini-3.5-Flash, and generalizes effectively to MT-HM3D and HM-EQA. These results demonstrate the clear advantage of active map-directed exploration over passive scene-wide processing in house-scale 3D understanding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2512.03284v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2512.03284v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2512.03284v2 全文及 2026-10-06T14:09:03.761308+00:00 审阅记录；PDF 21 页，SHA-256 b7e066f88db25bf8fbede755d46af6bfbe971dedb9154da0f411fa3c4676cac8，视觉核验第 1、2、7、12、13、15、16、21 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact PDF 完整正文与 appendix 只提 baselineQwen/OpenRLHF/Habitat/gsplat 工具，没有作者实现 repo/projectURL 或明确 release 承诺；未把所用 library 当 Code。",
+    "ideaZh": "Think, Then Look 让 Qwen3-VL 在预建 multi-floor house map 上选择 zoom/render_view，利用执行后的视觉反馈纠错，SFT 后以成功率自适应探索 reward 做 GRPO。作者报告相同 backbone/tool budget 准确率 47.8%→64.9%，值得借鉴 query-directed 空间证据获取。它不重建地图，也不做真实 robot 导航；效率、fixed-view 训练对照和跨数据空间能力证据尚不足，skim 关注 render 后再思考接口，不把 4 选 1houseQA 当通用 3D 理解。",
+    "motivationZh": "房屋尺度问题可能需要跨楼层关系或局部细节，固定视图未必包含关键证据；需要根据 query 选择地图缩放和相机视图，再利用实际渲染结果调整推理。",
+    "methodZh": "H2U3D 从 797HM3Dscene 生成 34,651 MCQA，用完整 floorBEV 和选定区域/ground-view 建立 teacher trajectories；场景互斥 split，val/test 双人工筛选。SpatialReasoner 先学习 tool 格式与 25%templateerror→correction，错误 tooltokens 和 rendereroutputs 不作 predictiontargets；RL 奖励最终答案、低成功率时探索 bonus/高成功率时预算 penalty、最终 region/view 接近 teacherannotation、重复访问 penalty。Groundtruthmap 在推理时可 randomaccess，区别 physicalEQA。完整 21 页含所有 appendix/prompts/sourceexample 读完并实际查看方法、table 和 errorfigure；没有独立 Limitations section，风险单列。",
+    "methodFlow": [
+      "提供完整预建 multi-floor 地图：HM3D/Habitat 或 COLMAP+3DGS map 生成 floorBEV，model 获得全局 context；没有 map reconstruction 或真实 movement requirement。",
+      "执行 query-conditioned spatialtools：Zoom 选择 floor 与 box，render_view 把[0,1000]坐标映射到 global 或 regionalframe、camera1.5m yaw，并把新视觉观察追加 context。",
+      "SFT 观察错误后纠正：5626 manuallycheckedteacherCoT 中 25% 插入 wrongzoom/position/angle，执行获取失败 view；只学习 failureanalysis 和 correctedactions/finalanswer，不模仿错误动作。",
+      "GRPO 平衡探索与正确性：Remaining22048questions G8 rollout、最多 8calls；依据 groupansweraccuracy 调整 explorationbonus/penalty，finalvalidtool 对 teachergeometry 软奖励，再罚 near-duplicatecalls。"
+    ],
+    "experimentsZh": "实验设置：638/80/79scenes，27674/3605/3372questions，nooverlap；4choices/6categories。SFT3epochs5626CoT、RL1epochremaining22048，LR1e-6/seed42。DirecttoolbaselinessameinitialBEV/interface/max8calls；passive24/32sampledimages。Realoffice/lab 各 30manuallyauthoredquestions，跨 benchsinglefloor 只给 relevantfloorBEV。\n作者报告 H2U3D64.9% vs sameQwen3-VL-8B tools47.8% / GPT5.4tools60.1%，Position64.4%/Counting61.7%；Material65.4% 低于 Ross3D70.7%，并非全类别胜出。（PDF p.7, Table1）\n作者报告 SFTonly56.5%→full64.9%，calls1.97→3.79；去 errorinjection57.1%/2.01calls，去 explorationreward59.7%/3.12。提升伴随更多观察，不等于更少 compute。（PDF p.7, Table4）\n作者报告 MT-HM3D47.9%/HM-EQA66.8%，但 baselines 用 GPT4o 而 oursQwen3-VL-8B，未提供相同 base/annotations 的 trainingbudgetcontrol。（PDF pp.7/14, Table2/AppendixE）\n作者报告 real60questions66.7% vsGPT5.4tools61.7%，即多正确 3 题；没有 CI、multiseed 或更多环境，不能证明普遍现实泛化。（PDF pp.6–7/14, Table3/AppendixE.1）\n比较范围：Directtool 和 same backbone 重要控制，但训练与 promptbaseline 不同；passive 模型没有相同 query-selectedviews。AppendixC 描述全 27674QA fixed-viewQwen8B-SFT，却主/附表没有该 baseline 结果，无法排除普通 SFT+更多观察解释。\n消融与诊断：SFT/RL/error/reward 移除可见，未 matchednumbercalls/visualtoken/latency、更严格 goal/repetitionreward 独立消融。Explicitmap 规模只 housefloor 与六局部 QAtypes，crossbench 仍 HM3D，real 仅两 environment。",
+    "insightZh": "重要接口是从 passivefixedviews 到预建 3Dmap 上的 random-access query-driven visual evidence；具体 SFT/GRPO、errorinjection 与 curiosity 均有既有来源。相同 8B/tools 对照改善 17.1pp，去错误/探索 reward 消融具有明显空间信息获取效用，达到 vlm-mllm 视觉空间能力或 inspection workflowtransfer 门槛；不是新 foundationarchitecture，也不归 3D reconstruction/visual-design-agent。",
+    "whyRelevantZh": "为 VLM spatial reasoning 提供明确的 3Dmap/viewpoint 接口，执行 render 后校验当前证据并重新观察可以为设计 artifact inspection 提供思路；迁移是 reviewer 推测，本文没有生成/编辑 CAD 或视觉设计。",
+    "evidenceZh": "Agent 可任意 zoom/render 完整已有 map，非无先验地图的 embodiednavigation。（PDF pp.1–4/10/13–14, AHSR/AppendixA/C/E.1；Real-worldmap 由 COLMAP+gsplat 先独立重建；map 获取/处理 cost 不计入 reportedansweraccuracy。）\nAdaptiveexploration 由同一 question 组最终成功率控制，训练时使用答案/teachergeometry。（PDF pp.5/15, Eq3–6/Table8；Groupaccuracy 低于.5 鼓励 uniquecalls，>.8 惩罚超 5calls；finalvalidcamera 相近不保证任意有效 alternative 不受惩罚，teacherpath 非 unique。）\nErrorrecovery 不训练复现注入的错误动作。（PDF pp.4–5/12–13, Eq2/Self-correction；Lossmask 错误 tool 和 environmentreturns；templatefallback 最终接回原 successfulteacher path，不是任意现实失败分布。）\nHumanvalidation 主文 agreed 比例，附录明确实际为双 validretention 比例。（PDF pp.3/12, QualityControl；8470 候选 6977 双 valid=82.37%，1493 至少一 invalid；不能作为 annotatoragreement/kappa 准确复述。）",
+    "caveatZh": "完整预建可任意 render 的 map 是强前提；partial/noisy/dynamicmaps、真实 navigation 和 map 维护成本未覆盖，house-scale 与 floor 选择不等于复杂 3D 长程推理。\nDataset 先选择清晰 view 再生成问题，可能偏向 localrender 可回答内容；teacherCoT 得到 annotatedanswer，合理解释不是独立解题证明。\n主文 82.37% 不能当 annotatoragreement；Fig8 中 cameraerrorcontext 从 livingroomTV 切到 bedroomplant，显示 templatecorrection 图例不完全语义一致，须谨慎信任自动轨迹。\n更多工具 call 与更高 accuracy 相关但无同证据预算 control，未有 latency 或无 CoT 等研究因果拆分；附录 fixed-viewSFT 缺 result。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.04152",
+  "slug": "kepler4d-controllable-future-video-generation-via-4d-scene-state-evolution-2610-04152",
+  "title": "Kepler4D: Controllable Future Video Generation via 4D Scene State Evolution",
+  "authors": [
+    "Feiran Wang",
+    "Bin Duan",
+    "Junyi Wu",
+    "Gaowen Liu",
+    "Yan Yan"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.04152"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Kepler4D",
+    "Video Generation"
+  ],
+  "abstract": "Video world models aim to preserve scene structure and predict how dynamic objects evolve beyond visual observations. We present Kepler4D, a framework for future video generation through explicit 4D scene state evolution. Given a monocular video, Kepler4D constructs a shared 3D representation of background geometry, object motion histories, coarse spatial supports, and semantic context. Chain-of-Motion summarizes observed motion and uses a vision-language model to select structured speed and heading decisions and decide whether to bound object-center height from below. A deterministic rollout converts these decisions into future object trajectories for inspection and editing before synthesis. We render the evolving proxies into geometric controls for a pretrained video generator, separating coarse object motion from the synthesis of appearance and articulation. Experiments on real-world videos demonstrate that Kepler4D enables controllable object motion and plausible future rollout while preserving scene consistency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.04152v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.04152v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.04152v1 全文及 2026-10-06T12:47:11.539370+00:00 审阅记录；PDF 24 页，SHA-256 cdb10b18ce2382c8d380e65574ee782942dd74a8d2988f32f0e013ac9ec1280a，视觉核验第 1、3、7、9、21、24 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF p.1 仅提供 project URL https://brack-wang.github.io/kepler4d/ 并声称 code，p.10 reproducibility 又说 will release。访问 project 未成功，exact PDF 未提供本工作 public repository URL，不能确认 available。",
+    "ideaZh": "Kepler4D 把单目视频恢复为背景几何、粗 object proxies 和运动历史，用 VLM 选择 speed/heading actions，再由 deterministic rollout 生成可编辑 3D 中心轨迹，渲染给已有 VerseCrafter/Wan 视频模型。值得借鉴的是生成前可检查和修改的几何控制接口；作者报告 DAVIS continuation FID 202.64、Flow-EPE15.22，但相机路径由完整视频外部估计，TurnErr 是 camera-yaw proxy，不能据此声称准确预测物体未来或保证接触物理。",
+    "motivationZh": "仅用文字或二维轨迹控制未来视频，难以检查物体在场景中的移动和相对关系；需要可观察、可修改的三维状态作为生成前的控制接口。",
+    "methodZh": "方法面向可控未来视频而非训练新的 3D 生成基础模型。DA3 提供背景/depth/cameras，Qwen2.5-VL 与 SAM2 给 identities/masks，mask 中有效 3D 点均值构成中心历史。Chain-of-Motion 读取数值运动摘要和语义，选择离散动作；固定规则更新速度/平面转角、可选中心高度下界及 Gaussian smoothing。固定 extent 的单 Gaussian proxies 与背景在给定未来 camera path 下渲染为 RGB/depth/mask streams，预训练 GeoAdapter/Wan 合成外观和局部 articulation。完整 24 页含技术附录已读，实际查看首面、Fig.2、主要结果表、指标定义与明确 limitations。",
+    "methodFlow": [
+      "建立共享 3D 场景状态：DA3 恢复观测几何和 camera；端点 VLM boxes 驱动双向 SAM2 masks，把背景、带 semantic ID 的 proxy、centers/extents 和 scene context 放入同一坐标系。",
+      "结构化选择未来动作：总结 center history 的 velocity/turn/acceleration；VLM 只选择 maintain/increase/decrease、left/right/straight 和 height-bound flag，同时生成 motion description。",
+      "确定性生成可编辑轨迹：按显式 speed schedules、turn-rate rules 和可选 height clamp rollout，平滑时间路径；language edits 指定角度可直接改变控制轨迹。",
+      "渲染几何控制并合成视频：固定 extent Gaussians 随 center 移动，在外部 camera path 下渲染 foreground/background RGB/depth 与 mask；已有 GeoAdapter/Wan 结合末观测图和 motion text 补外观/articulation。"
+    ],
+    "experimentsZh": "实验设置：DL3DV-Evaluation55 静态场景首 49 帧观测；DAVIS2017 train/val 池选 38 条 75–104 帧视频做自动 continuation，language controlled cases 来自同 90 序列池。统一观测与支持时的 DA3 future camera path。RTX PRO6000 Blackwell96 GB；Wan2.1-T2V14B+已有 VerseCrafter GeoAdapter、LightX2V LoRA，720×1280、6steps、seed2025。\n作者报告 DAVIS PSNR 14.921/FID 202.64/Flow-EPE15.220，VerseCrafter14.090/303.80/15.400；LPIPS 0.4561 略差于 Verse0.4556，camera RotErr5.02 优于 8.961。Flow-EPE 是全画面 motion，不单独测 object forecast。（PDF p.7, Table2; p.20, Appendix C.3）\n作者报告静态 PSNR 13.55/FID 41.37、5.2min/clip、62.46 GB；baselines37.81–54.73 GB。不同模型/加速配置下的时间不能视为单独算法同预算加速，静态任务不含 CoM。（PDF p.7, Table1; pp.15/18, Appendix A.1/B）\n作者报告 supplied source-derived trajectory AngleErr5.78°，left60°11.37°、down60°26.92°；这检验控制响应，不等于从观测预测 reference 未来轨迹的误差。（PDF p.9, Table5; pp.21–22, Appendix C.4/D.2）\n比较范围：静态 GEN3C/TrajectoryCrafter/SPMem，动态加 VerseCrafter，language 加 Wan Inpaint。共享 input 和支持时的 camera，但 text baselines 不获 Kepler 推断 trajectory/control maps，因此比较完整 pipeline 而非 identical geometric tensors。\n消融与诊断：文本→motion text→rendered trajectory，以及去 history/semantic/surface cues 与 directional perturbations；作者报告去 history Flow-EPE18.742 vs full15.220。没有独立 trajectory forecasting dataset/uncertainty calibration 或 physics/contact validation。",
+    "insightZh": "主要增量是连接观测状态、离散 VLM motion decisions、可编辑 deterministic object-center trajectories 与既有几何条件视频生成的接口。重建、分割、VLM、GeoAdapter 和 distillation 均继承预训练组件；rollout 是规则而非学习的物理动力学。作为可控 3D/4D 视觉 workflow 的直接迁移值得 skim，现有小规模结果尚不足视为 video landmark。",
+    "whyRelevantZh": "将可编辑 3D 中间状态变成视频控制信号，是 video prior 迁移到 3D/4D 视觉设计流程的直接接口思路；不以普通 faithful NVS 或驱动 domain 标签收录。",
+    "evidenceZh": "VLM 选择结构化动作，数值 trajectory 由固定规则 rollout，而非让 VLM 直接生成完整物理动力学。（PDF pp.4–5, Sec.3.3; pp.16–17, Appendix A.3–A.4；速度倍率至 2 或最低 0.3、category turn defaults、height clamp 和 Gaussian smoothing 均明确；未独立复现。）\n自动 continuation 使用外部未来 camera path，并非 camera forecasting。（PDF p.19, Appendix B；38 DAVIS sequences 的完整 video 送 DA3 估计 camera，future poses shared 给 camera-controllable 方法；无 future object trajectory 输入。）\nTurnErr 和 SurfErr 不能解释为物体转向正确率与物理接触精度。（PDF pp.20–21, Appendix C.3–C.4；TurnErr 取 camera-yaw 绝对 peak 不能区分左右；SurfErr 为 estimated center-height reference 偏差，不是 object boundary contact。已实际查看 p21。）\nMotion text 和 rendered trajectory 的组合改善 pipeline FID，尚非独立 VLM 预测准确率证据。（PDF p.9, Table4; pp.21–22, Appendix D.1；作者报告 Qwen prompt79.53→CoM text60.49→加 trajectory48.76，PSNR 15.175/15.106/15.189；未复现。）",
+    "caveatZh": "PDF p.24 Appendix F：固定粗 supports 不显式建模关节、变形、contact dynamics，几何 guidance 不能保证物理互动正确。\nPDF p.24：遮挡/可见面积改变会移动 estimated center，未传播 calibrated uncertainty。\nPDF pp.19–22：reference recording 不是唯一合理 future，edited motion 可能降低 reference similarity；各指标按其实际测量解释。\nFuture camera 条件由完整 source sequence 估计，DAVIS 只有 38 序列；不能扩写为任意 camera 下自主 world forecasting。\nLanguage turning 量化是 camera proxy，actual object-level instruction adherence 主要 qualitative；不同 control interfaces 与 small set FID 限制因果比较。\n规则 speed/turn 和固定 proxy extent 把精细 articulation 留给视频 prior，可能出现外观可信但 centers/contact 不可靠的生成。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

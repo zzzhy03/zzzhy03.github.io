@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2609.37655",
+  "slug": "exemplar2vqa-a-scalable-exemplar-driven-visual-question-answering-generation-framework-via-2609-37655",
+  "title": "Exemplar2VQA: A Scalable Exemplar-Driven Visual Question Answering Generation Framework via Multi-Agent Coding",
+  "authors": [
+    "Jiayu Ying",
+    "Qijian Tian",
+    "Ruijie Xu",
+    "Xinnan Zhu",
+    "Daoguo Dong",
+    "Jiachen Xu",
+    "Xin Tan"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37655"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Exemplar2VQA",
+    "VLM / MLLM"
+  ],
+  "abstract": "Advancing spatial intelligence in Multimodal Large Language Models (MLLMs) is bottlenecked by the scarcity of complex, scalable 3D question-answer (QA) data. While manual annotation is labor-intensive, directly utilizing LLMs to synthesize these QA pairs often fails due to their inherent deficiencies in spatial and geometric computation. We introduce Exemplar2VQA, a scalable exemplar-driven visual question answering generation framework that rapidly synthesizes large-scale spatial QA pairs in simulated environments via multi-agent coding. By equipping collaborative agents with a meticulously designed library of geometric utilities, Exemplar2VQA bypasses LLMs' spatial reasoning flaws through deterministic code execution. Crucially, the framework exhibits remarkable versatility: taking diverse static object-centric spatial query templates as exemplars, it seamlessly and autonomously scales them into massive, high-fidelity synthetic datasets. Fine-tuning Qwen2.5-VL (3B/7B) exclusively on Exemplar2VQA-generated synthetic indoor data yields significant performance improvements across various diverse benchmarks. Furthermore, its effectiveness is not limited to in-domain indoor datasets but also robustly extends to outdoor and mixed-scene benchmarks. These results establish Exemplar2VQA as a scalable and powerful paradigm for bridging the sim-to-real gap in Embodied AI. Our code is at https://github.com/yingjiayu12/Exemplar2VQA",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37655v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37655v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yingjiayu12/Exemplar2VQA"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37655v1 全文及 2026-10-06T14:35:25.271826+00:00 审阅记录；PDF 33 页，SHA-256 5d70b1c9cb00de1e386a6192ed5ecd811dfaf0bbf1010b6629028e67757dbc3a，视觉核验第 1、4、7、8、9、18、19、20、21、22、23、29 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1 作者 repo，实际公开确认 Track1/Track2/shared/run_pipeline.sh 和 geometry/codegen 实现、非 README-only；只含三 example scenes，未验证所有论文 SFTdata/modelcheckpoint 完整开放或本地运行。",
+    "ideaZh": "Exemplar2VQA 用 camera 与 QA 两条 coding pipeline，把 exemplar 变成调用几何 API 的可复用 program，借 simulator metadata 生成 grounded spatial 监督。作者报告 synthetic-only SFT 带来多数据集空间 QA 改善，值得 skim 程序化 evidence 而非 LLM 猜答案的接口。数学执行不保证程序语义正确；MMSI25.9→28.2 且 tracking 退步，VSI42.9 只 MCsubset，figure 存在无选项答案，不能复述无限、零错误或通用 sim-to-real 突破。",
+    "motivationZh": "空间问答标注若只让 LLM 看图猜答案，难以保证相机和物体关系正确；需要把 exemplar 转成调用几何 API 的程序，生成可执行核对的视觉监督。",
+    "methodZh": "Qwen3Coder30BA3B 同模型通过不同 prompt/context 做 Architect/Coder/Reviewer/Refiner。Camera track 生成 JSONtrajectory→Python→AI2THORtrace 诊断；QAtrack 抽象 questiontemplate→调用 bboxprojection/planarangle/intersection/distance 等 handbuiltutility→Python 执行→修复。生成程序跨 scene 复用，queries 以 staticobjectgeometry 为主，camerarotation 构造 video；SFT 不改 Qwen2.5VL 架构。完整 33 页含 numerical/seedtables、所有 qualquestions、failure/efficiency/limits/checklist 读完，关键方法/实验/figurelabel 实际查看。",
+    "methodFlow": [
+      "把 captureintent 变成 camera code：CameraArchitect 定义 objectfilters/radius/trajectory/visibility，Coder 调用 AI2THORcaptureview 与 metadata，Reviewer/Refiner 根据 runtime 与 collision 等 logs 修正。",
+      "把 QAexemplar 变成 geometryprogram：抽取对象与数值 placeholder，路由 handbuiltutilities，例如 bboxX/Zfootprint→relativeangles/intervalrelations；API 负责 geometry，不直接 LLM 估算答案。",
+      "执行并复用模板生成监督：代码 syntax/logic 诊断后枚举 roominstances/permutations，ambiguousangles 过滤，questions/answers 及 renderedviews 形成 SFTpairs；程序成功仍需检查语义与 label。",
+      "训练并检验 visualspatialtransfer：6Kmulti-imagepairs 训练 7BLoRA/fullSFT、10Krotationvideos 训练 3B，targetformat 但 realimagesdistinct；再 evalSpaCE/ViewSpatial/SpatialObj，OSR 另生成 6K 单独训练。"
+    ],
+    "experimentsZh": "实验设置：两 RTXA6000 生成、四 H200SFT/singleH200eval，3epochs/globalbatch32、3BLR1e-5full/7BLR1e-4LoRAr16，NEFTune5。Targetquestionformats6K/10K，nearuniformcategories、manualspotcheck 未给数量。SamebaselineSFT 超参但 datasetsizes/visualcoverage 不同；SpaCE/ViewSpatial 零目标训练，OSR6K 另训。\n作者报告 MMSI7BLoRA28.2vsbase25.9/fullSFT28.0，CamCam33.3vs24.7，但 ObjTracking25.0vs39.5 退步、ObjReg23.5vs29.4 下降；不能称全面空间能力提升。（PDF pp.7–8, Table1）\n作者报告 VSI MC3B42.9vs35.3、RelDir52.1vs42.6，RoutePlan35.1vs28.9 虽未专训该 task。SameDataInternVL2B28.2→35.6/8B36.7→46.1，跨 backbone 监督有效。（PDF pp.7/18, Tables2/A3）\n作者报告 target-freeSpaCE33.3→42.2/ViewSpatial36.9→45.4，SpatialObj69.71→70.50 仅.79pp；SpaCEscenequant36.9→24.2 下降，不能声称通用 transfer 无 tradeoff。（PDF pp.8/18–19, Tables3–4/A2）\n作者报告 100seed4agentsQA92%vs1agent34%、camera84%vs60%；剩余错误包含逻辑错，未 equalcalls/context/tokenbudget 证明数量本身或 cognitiveoverload 因果。（PDF pp.9/21–22, Table5/FigA3）\n作者报告 code synthesis camera3min/QA2min，render15s/scene、100scenesQAinstantiation25s，不包含 roomgeneration/assetdownloads 或 alltaskendtoenddataqualitycost。（PDF pp.22–23, AppendixA.6）\n比较范围：同 Qwenbase、otherdatasetsSFT、directGemini3.5Flashlabel10K 同 trainrecipe 及 InternVLtransfer。Directlabel 对照 ApprOrder6.3 大跌，具体 prompt/evidence/syntheticviews 匹配未完整描述，不能证明所有 VLM 直接 annotation 不可行。GPT4o/Gemini1.5/olderlargeVLM 不能等同 2026frontier。\n消融与诊断：Rolemerging1–4/9Bvs30B、directannotation、LoRAvsfull、MMSI3seeds；缺 samebudgetprogramsingleagent、固定 handwritten 模板/pureAPI 的 datautility、utilities 移除、生成 room/sceneOODsplit/size/quality 敏感性。NumericA5 与 checklist 和 qualcopy 错误应复现前逐条核对。",
+    "insightZh": "Program-ofthought/CodeasPolicies/ViperGPT 和多 agentdebug 已有；价值在 exemplar→camera/QAdualtrack、geometryutilityprerequisites 与可扩展 staticspatial 监督。实际多 bench/多个 VLMbackbone 空间改善满足 vlm-mllmspatialcapability 或 groundedinspectiontransfergate；不是新的 VLMarchitecture，也非 visualdesignagent（产物主要 QAdata，reviewer 看 logs 不专门 visualartifact 美学评审）。",
+    "whyRelevantZh": "用可执行 geometry 而非 VLMguess 构造 spatialgrounding 监督，适用于研究 VLM 多 view 关系/inspection 与结构化 objectdata 接口。HandbuiltgeometryAPI 与 templatevalidation 可为 CAD/LEGO 空间 query 数据借鉴，但本文没有生成这些设计 artifact。",
+    "evidenceZh": "Deterministic 执行只替代 geometry 算术，不能消除 semantic/code 错误。（PDF pp.5–6/9/21–23, Code1/Table5/AppendicesA.5–A.7；还有 incorrectQA、trajectorysemanticmisalignment、syntaxfailure；4agent92%QA/84%camera 只是 100seed 任务 success，不是 16Kpairs 逐条 accuracy。）\nVSI42.9 仅四 MCtasks，附录 numerical 另给结果，不与其混成完整 benchmarkscore。（PDF pp.7–8/20, Tables2/A5；Main 明确 focusMC；AppendixA5 四 numericaltasks37.4vs22.5，但未独立完整数值训练/evaluationprotocol 解释，不同类型分数不能任意合并成 overallSOTA。）\nQualgallery 显示一个 answer 不在给定对象 options 中，应谨慎信任零错误主张。（PDF p.18, FigureA1 右侧 RelativeDistance；实际查看 options buffetcart/sideboard/door/dinnerplate，标 AnswerBookshelf；可能编辑 copyerror，不能由此推断所有 data 错误，也不能称全部 perfectground truth。）\nAppendixA4 三 seed 实验与 checklist 未更新的 no-seed 声明不一致。（PDF pp.19/29, TableA4/Checklist7；按实际结果表保留 29.33±.99，不说完全没有重复；其他 bench 未给多 seed/CI，baseline 多来自既有旧模型未全面现代 eval。）",
+    "caveatZh": "PDF p.23：staticobjectcentric，dynamictracking 留未来；explicitmetadata 前提，rawrealphotos 需 upstreamreconstruction。\nPDF pp.8/23：staticSFT 干扰 dynamicpriors，codingmodel/physicsengineglitches 限制 success。\nBoundingboxfootprints/distances 是 proxygeometry，对 nonconvex/occlusion/concavities/parts 不保证物理 shape 正确；数学正确 API 不等于问句/visibleevidence/option 正确。\nInfinite 只指 program 可反复场景运行，ProcTHOR/Holodeck 资源多样性有限；exhaustiveO(M^4)随着多 object 扩大，缺 density/raretype/noveltemplates 系统测试。\n未公开 manualspotcheck 数量/criterion 和 semanticvalidation 自动实现详情；gallery 不一致提醒要验证 labels，不能只看 traceexit0。\n训练输出格式与 targetbench 接近，部分提升可来自 format/distribution/taxonomy 适配；strictzero-shot 仅指目标 QA 未训，不保证全部 pretrainunseen。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

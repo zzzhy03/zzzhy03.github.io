@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.01314",
+  "slug": "arrow-arbitrary-reconstruction-and-tracking-of-4d-observations-in-the-wild-2610-01314",
+  "title": "ARROW: Arbitrary Reconstruction and Tracking of 4D Observations in the Wild",
+  "authors": [
+    "Ilya Fradlin",
+    "Christian Schmidt",
+    "Jens Piekenbrinck",
+    "Karim Knaebel",
+    "Gonzalo Martin Garcia",
+    "Bastian Leibe"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01314"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "ARROW",
+    "3D Reconstruction"
+  ],
+  "abstract": "Dynamic scenes may be captured by a moving camera, multiple video streams, or images taken at different times. These observations reveal complementary aspects of scene geometry and motion, yet bringing them together requires establishing correspondence across viewpoints, capture times, and visibility changes. We introduce ARROW, a feed-forward model that unifies 3D reconstruction and 3D point tracking from arbitrary image sets. At its core is a novel order-invariant querying approach, which allows the association of queries with observations across arbitrary inputs. We show that exposing the model to more diverse sets of inputs during training results in improved task performance. Moreover, the resulting model is capable of generalization to a wider range of tasks including multi-view tracking. Trained with this strategy, ARROW establishes a new state of the art in 3D tracking on WorldTrack and TAPVid-3D and outperforms dedicated multi-view trackers on an adapted RGB-only MVTracker benchmark, while remaining competitive across 3D reconstruction tasks. Code and weights are publicly available.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01314v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01314v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01314v1 全文及 2026-10-06T15:35:11.041606+00:00 审阅记录；PDF 28 页，SHA-256 0b1f16c1f587523d4afc38c8615341132b958059fc61d03fc82b278ec74f6ac8，视觉核验第 1、4、7、8、9、24、25、27 页。数字均为作者报告，本项目未独立复现。代码状态 promised：exact PDF p.1/10 的 https://vision.rwth-aachen.de/arrow 重定向官方 https://ifradlin.github.io/arrow/，Code 指向 https://github.com/ifradlin/arrow。已确认仓库公开但仅 assets/LICENSE/README，README 明确 Coming soon: code and weights，与 PDF release claim 不同；当前不给 available Code link。",
+    "ideaZh": "ARROW 用 image-derived ID tokens 替代固定时间编号，将 source pixel、target observation 与 reference camera 独立组合，统一无序多视角重建和跨时间 3D 点追踪。值得深读的是任意观测的 query 接口及非连续、多视角训练采样。作者报告 RGB-only 多视角 APD 为 61.0，OmniX 为 48.0；评测采用每场景 GT 尺度对齐，只支持已有输入观测时刻，不能插值、预测未来或直接输出 asset-ready mesh。PDF 虽称 code 已公开，官方仓库实际仍是 coming soon。",
+    "motivationZh": "传统 tracker 常将 query 绑定固定视频时间顺序，难以统一无序视图与同步相机输入。目标是按观测身份查询三维位置、可见性和跨观测对应。",
+    "methodZh": "问题是传统 point-query tracker 用 learned timestep bank 绑定视频顺序，难以处理无序 views 与同时拍摄的 streams。ARROW 以 DA3 image-set encoder 提供 global context 和每图 camera token 派生的 ID；query 合并局部 RGB crop、Fourier UV、source/target/reference IDs，经 independent cross-attention decoder 预测 3D point、normal、UV、visibility、displacement 与 confidence。使用 static multi-view、dynamic tracks 和无 track 的 same-time geometry 混合训练，支持同模型 sparse/dense decoding。",
+    "methodFlow": [
+      "观测集合编码：DA3 encoder 处理 unordered RGB image set，生成共享 patch context 与 input-derived 每图 ID token，不加时间 PE。",
+      "独立角色寻址：query 选择 source pixel、target observation capture time 和 reference camera，组合 RGB crop/Fourier UV 与角色顺序固定的三 ID。",
+      "按点解码：每个 query 独立 cross-attend 全 context，预测位置、UV、visibility、normal、displacement；query 之间没有直接 interaction。",
+      "多样观测监督：跨 view/noncontiguous sampling 增强 correspondence，static data 提供跨视角，动态 tracks 提供跨时间，缺 tracks 的动态区域只做 same-time 监督。",
+      "派生几何：同物理点在两 reference cameras 的输出做 confidence-weighted SVD 得 camera pose；dense queries 可输出点云和轨迹，但不提供 watertight surface。"
+    ],
+    "experimentsZh": "实验设置：作者在 DA3-Giant 上用 19 公开 datasets 的约 78K scenes/22.8M frames 训练，200K steps、32×GH200；输入 2–24 images，长序列可全 context。评测 WorldTrack、TAPVid-3D mini-val、RGB-only adapted MVTracker、pose/reconstruction/depth，绝对尺度在 scoring 对齐。\n作者报告 RGB-only 多视角 average APD 61.0、EPE 0.1252；OmniX 为 48.0、0.1701，ARROW 的 DexYCB EPE 0.1705 仍比多个基线差。（Table 3, p.8）\n作者报告 TAPVid-3D average camera AJ 0.248/APD 0.341，D4RT 为 0.212/0.283；OA 则 0.863 低于 D4RT 0.899。（Table 2, p.7）\n作者报告 NRGBD Chamfer 0.0263、normal consistency 0.933，DA3 为 0.0287、0.927。（Table 4, p.8）\n比较范围：涵盖 D4RT/OpenD4RT、geometry transformers 与多种 4D/multi-view trackers。部分 TAPVid 数字来自 D4RT 原文；OpenD4RT 是非官方实现，不能简单视为原 D4RT 等价。RGB-only tracking 统一替换 external geometry 并说明 adaptation，不与官方 calibrated results 横比。\n消融与诊断：cumulative ID addressing、去时间 PE、nonsequential sampling、static datasets；另外 encoder freezing、multi-level context、patch features、EMA，以及 24-frame matched full-context 对照。長 context 优于 window 不分离 handoff drift/occlusion recovery；encoder global attention 内存随 observations 增长，GH200 实验有 OOM/time-out，缺统一生产端延迟预算。",
+    "insightZh": "明确的 input-derived role addressing 去掉 fixed timestep 限制，再用跨时间/视角采样实证扩大统一重建追踪能力，属于 selective reconstruction 门槛下的输入与能力变化。D4RT 的 query roles 和 confidence-normalized loss 为已有基础，新增贡献应聚焦身份绑定与训练观测多样性。",
+    "whyRelevantZh": "统一任意视角/时间 observations 的 geometry 和 correspondence，提供可被动态重建/交互系统利用的 sparse query interface，属于 reconstruction 的 generic capability advance；未扩大为已验证 3D asset editing。",
+    "evidenceZh": "内容派生 ID 绑定 source/target/reference，无序全局 context 可复用。（Figs.2–3, pp.3–4; Sec.3.1, Eqs.1–4, p.5；ID 不是直接 camera estimate；角色 index 只选择观测，不表示时间间隔。）\n非连续、多 view 采样是大幅改善多视角 tracking 的关键。（Table 6, p.9; discussion p.10; Table 10, p.24；作者报告 S3→S4 multi-view APD 增 28.85 points；这是 cumulative protocol，不把所有增益归于 ID token。）\n模型只能在已有观测 capture time 输出，无法任意连续时间或未来预测。（Appendix E, pp.24–25；任意 input observation 不等于 arbitrary continuous time simulation。）\n多视角结果属于改造 RGB-only protocol，不能与官方 calibration/depth protocol 直接比较。（Table 3, p.8; Appendix C.1–C.2, pp.21–22；GT calibration 用于 source query projection 和 scoring，输出以每场景单个 GT scale 对齐。）",
+    "caveatZh": "只支持输入观测时刻，不能 interpolate/extrapolate future。\ndense queries 更昂贵，queries 无直接 interaction 可能损害低置信远区。\n多视角混入 out-of-distribution ego views 会下降，精细 UV/pose 仍需局部优化。\nscale-invariant training 与 GT median-scale scoring 不证明已恢复 absolute metric scale。\n点云/轨迹不等于 watertight、rigged 或可制造 mesh；没有 creation editing 验证。\nlarge-data/backbone training 与 cumulative sampling changes 混合，不能把主榜增益单独归于 ID design。\n相似或重复视觉观测的纯内容身份区分与隐藏快速状态仍存在潜在歧义。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

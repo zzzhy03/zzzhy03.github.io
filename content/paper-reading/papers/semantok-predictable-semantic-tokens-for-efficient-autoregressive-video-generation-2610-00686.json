@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.00686",
+  "slug": "semantok-predictable-semantic-tokens-for-efficient-autoregressive-video-generation-2610-00686",
+  "title": "SemanTok: Predictable Semantic Tokens for Efficient Autoregressive Video Generation",
+  "authors": [
+    "Mikhail Dereviannykh",
+    "Vikram Voleti",
+    "Simon Donne",
+    "Mallikarjun Byrasandra Ramalinga Reddy",
+    "Shimon Vainer",
+    "Mark Boss"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.00686"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "SemanTok",
+    "Video Generation"
+  ],
+  "abstract": "Recent video-based world models pair the scalability of autoregressive (AR) prediction with the visual quality of diffusion models. The choice of scene tokenizer is paramount for the optimal performance of each of these, both in terms of fidelity and semantics. Flexible-length, coarse-to-fine tokenizers yield exactly that: the first coarse tokens carry the clip's global semantics while later tokens further specify details. Existing flexible tokenizers only apply a representation-alignment (REPA) loss on early decoder hidden states, a target the decoder can partly meet from its noised input instead. We introduce SemanTok, a flexible video tokenizer that feeds frozen DINO features into its encoder and adds lightweight heads that reconstruct them from each retained token prefix alone. SemanTok achieves high semantic alignment and video fidelity at every AR model size: a 201M SemanTok AR model matches or beats a VideoFlexTok AR model $3.4\\times$ its size, and larger SemanTok AR models further improve fidelity. It keeps semantic alignment on out-of-distribution classes and gives the decoder higher semantic alignment at every noise level, including pure noise. It performs well in both reconstruction and generation, and its short token prefixes are cheaper to predict and give better generation fidelity, with pixel detail deferred to later tokens.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.00686v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.00686v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Stability-AI/SemanTok"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.00686v1 全文及 2026-10-06T16:42:19.958054+00:00 审阅记录；PDF 29 页，SHA-256 7379df049f94e2ccc4e59930715c64d7edb21323d5fb65910956c44c77130bf7，视觉核验第 1、4、6、9、17、19、21、22 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF→semantoken.github.io official Code button→public Stability-AI/SemanTok；已确认 semantok/tokenizer.py、ar.py、dino.py、eval 与 scripts/generate/reconstruct 实际存在。公开 inference/evaluation 已确认，完整 training recipe implementation 未确认。",
+    "ideaZh": "SemanTok 让 flexible video token prefix 自身重建 DINO features，避免 decoder 仅借 noisy input 达成 REPA；再用 AR 预测 coarse-to-fine tokens。作者报告同规模 Kinetics AR 在短 prefix 的生成与 semantic alignment 改善，prefix cross-entropy 也更低。值得深读的是 generation-friendly semantic representation 与 prefix 干预设计。代价是较差的精确 reconstruction；只有短、小分辨率视频，best-budget 选择和额外 teacher cost 不能写成完整 pipeline 的无损加速，也未验证 action-conditioned world model。",
+    "motivationZh": "灵活视频 tokenizer 的 decoder 可能借 noisy input 达成 REPA，短 prefix 仍缺语义。目标是让早期 tokens 更易预测且足以指导生成。",
+    "methodZh": "沿用 VideoFlexTok 的 frozen VidTok VAE、FSQ、nested dropout 与 time-causal flow decoder。DINO patch features 与 VAE latents 融合进入 encoder，DINO CLS 注入首 register token；两个辅助 heads 只能从保留 prefix 预测 dense/CLS teacher features。冻结 tokenizer 后训练独立 AR，以 time-first、coarse-to-fine 顺序预测 tokens。推理用户选择 prefix budget，diffusion decoder 从该 prefix render video。",
+    "methodFlow": [
+      "建立语义输入：对 latent-frame 对应 RGB group 获取 frozen DINO features，与 VAE latents 融合；匹配 CLS projection 注入首 register。",
+      "可裁剪离散 code：time-causal encoder 的 registers 经 FSQ，nested dropout 去掉 suffix；原 reconstruction/decoder-REPA 路径保留。",
+      "只由 prefix 预测 teacher：dense/CLS heads 不看 noisy latents，仅 cross-attend retained tokens 和历史 frames，迫使 early prefix 携带 semantic information。",
+      "AR 与 flow rendering：冻结 tokenizer，AR 按 coarse-to-fine、time-first order 学全部 tokens；推理选 budget 后由 diffusion decoder 渲染。"
+    ],
+    "experimentsZh": "实验设置：作者在 Kinetics-600 class-to-video 与 uCO3D text-to-video 上使用短 128×128 clips，比 retrained time-causal VideoFlexTok；同 codebook、decoder、AR recipe，扫描 AR scales 和 prefix budgets。全主文、appendix 和数值表已读；本项目未复现，也未以静态 PDF 断言实际时序播放质量。\n作者报告 Kinetics 同 201M AR、固定 prefix budget 的 gFVD 272.9→217.2，class accuracy 0.422→0.639；此指标为 classifier readout，不是 physics 或 identity accuracy。（Tables6–7, pp.25–26）\n作者报告 201M AR 的 early-prefix cross-entropy 为 8.8 对 12.9 bits/token，约 32% 相对下降；不是等比例整体 inference time 节省。（Fig.11 and Sec.5, pp.8–9）\n作者报告 uCO3D reconstruction 在固定 prefix 的 PSNR 18.66→15.96 dB，但 ClipV 0.808→0.835；生成易预测性与 exact reconstruction 存在真实 trade-off。（Table2, p.17）\n作者报告跨模型比较 201M 对 679M 的 uCO3D gFVD advantage bootstrap 区间包含零；不能将所有 fidelity 指标说成显著胜过大模型。（Appendix D.5, p.22）\n比较范围：核心 baseline 是同预算重新训练 VideoFlexTok；官方 released checkpoint 因 decoder attention recipe 不一致未直接比较。teacher-alignment metrics 与 DINO targets 有同源性，另报 Inception/UMT/ViCLIP；缺少更广 foundation-scale generator 或通用长视频对照。\n消融与诊断：AR scale/training-token ladders、tokenizer checkpoints、fixed/best budgets、noise-level readout、teacher-forced prefixes、cross-entropy 与 repeats，部分 budget 多 sampling seeds；early teacher/input/loss 设计只有小规模选择说明，没有最终规模全 factorial ablation。",
+    "insightZh": "semantic teachers、nested dropout 与灵活 tokenization 都有基础；本文将 teacher input 和 prefix-only targets 合用到 causal flexible video code，改变核心生成表征，并通过 budget/scale/teacher-forcing 检查 predictability 与 fidelity。不是仅减少 serving tokens；各 token-side 改动在最终规模的独立份额仍未隔离。",
+    "whyRelevantZh": "直接涉及生成 tokenizer 应存什么信息、如何让 coarse prefixes 同时易预测与可渲染，适合研究 semantic/spatial representations 与视频生成的关系。可借鉴 prefix-only supervision 和早期 GT intervention，但不应把 teacher semantics 当作 geometry/world dynamics。",
+    "evidenceZh": "prefix heads 没有 noisy latent shortcut，保留原 decoder target。（Sec.3, Fig.3, pp.4–5；DINO 是训练 encoder input 与 target；AR generation 时无需从未知生成视频提取 DINO。decoder 仍预测 VAE latent，非直接生成 DINO。）\nearly prefix 的作用有 teacher-forcing 诊断，但不等于单一模块 causal ablation。（Fig.11, pp.8–9; Appendix D.4, p.21；强制 early GT tokens 后两 tokenizer 的 generation gap 消失，说明差异集中前段；同时改变 token inputs/targets，未分离三条新增路径。）\nreconstruction 舍弃部分 appearance，低 token budgets 并不全面领先。（Limitation, p.9; Table2, p.17; Appendix C limits, p.18；uCO3D smallest prefix 的 fidelity 有失败；semantic alignment、PSNR 与 physical accuracy 不可混同。）\n主要 compute 图只算 AR inference，不能代表整个 decode pipeline。（Fig.4, p.6; Appendix D.1/D.4, pp.19–21；另有 frozen VAE、DINO tokenizer processing 和多步 diffusion decoder；bits/token 降低也不直接等于 GPU latency 降低。）\nheadline best-k 使用同一 evaluation set 的 per-metric selection。（Appendix D.4/D.5, pp.21–22；两 arm 都受选择影响；fixed-budget results 更便于比较。bootstrap 是 clip sampling uncertainty，不是独立 training runs。）",
+    "caveatZh": "优先 semantics 的短 prefix 难以精确还原颜色和 appearance。\n最小 budget 不能同时满足所有 objectives，部分 fidelity 落后。\naction-conditioned world-model state、video-native teacher 和直接 predictability optimization 留待未来。\n只验证短低分辨率 clips，没有长期 rollout、精确 motion、3D structure 或 closed-loop action evidence。\nbest-k 从同 evaluation pool 选出，single training run 的 clip bootstrap 不覆盖训练不确定性。\nencoder input 与 prefix losses 合用，无法把收益全归于一种 loss。\nOOD classes 指 tokenizer/AR training split；frozen DINO/VAE 预训练是否见过该类未证明，不能写成完全未知语义泛化。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2606.03715",
+  "slug": "text-to-image-models-need-less-from-text-encoders-than-you-think-2606-03715",
+  "title": "Text-to-Image Models Need Less from Text Encoders Than You Think",
+  "authors": [
+    "Nurit Spingarn",
+    "Noa Cohen",
+    "Tamar Rott Shaham",
+    "Tomer Michaeli"
+  ],
+  "publishedAt": "2026-06-02",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2606.03715"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Text-to-Image Models Need Less from Text Encoders Than You Think",
+    "Image Generation"
+  ],
+  "abstract": "Text-to-image models rely on text prompts as their primary interface to human intent. Prompts are encoded by a text encoder into embeddings that condition the image generation process. Beyond individual token meanings, text embeddings encode contextual information across the full prompt, such as compositionality and attribute binding. However, whether image models actually exploit this richer information remains underexplored. Here, we address the question: Which aspects of text representation are essential for image generation? We show that text-to-image diffusion transformer-based models commonly rely only on two relatively straightforward aspects of text representations: (i) the merging of adjacent tokens into a word representation, for words spanning multiple tokens, and (ii) word order, which is imprinted by the positional embedding of the text-encoder. To show this, we construct a new text embedding that encodes only individual word meanings and order but lacks any contextual information about the full prompt. We find that this bag of position-tagged words representation is sufficient to successfully guide image generation, achieving visual quality and text fidelity that are on par with full text embedding-guided generation. This demonstrates that, contrary to common belief, text-to-image models often do not use the rich information encoded in the text embedding beyond individual word meanings and word order. Instead, the decoding of complex linguistic structures is performed by the image model itself. Project webpage: https://nsping13.github.io/contextless-TTI/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.03715v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.03715v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.03715v2 全文及 2026-10-06T11:48:25.628624+00:00 审阅记录；PDF 29 页，SHA-256 b284e882fdae06eafd6649d2db5f84bae7ad7775ff72e21d9c4cd0eb7789a489，视觉核验第 1、4、9、15、18、22 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 PDF 未给出本方法的 Code/project repository URL；不把引用模型及 dataset 链接当作者代码。",
+    "ideaZh": "作者把同一 word 在无关句子、相同位置的 text-encoder embeddings 做平均，得到保留 word identity/position、去掉当前 prompt 跨词上下文的 BoPTW，直接替换 SD3/FLUX 的条件。结果提示部分 compositional decoding 可以在 image DiT 内完成，适合研究视觉生成中的语言接口；但不是证明 text encoder 可以全面删除：作者报告，FLUX.2 的标准 GenEval 总分从 82.3 降到 71.3，长 prompt 与文字渲染也明显失败，构造表示仍调用原 encoder。",
+    "motivationZh": "文生图模型的组合语义可能来自 text encoder，也可能在 image DiT 内形成；需要通过实际条件表示干预，分辨词身份、位置与上下文各自承担的作用。",
+    "methodZh": "论文以干预而非另训练模型研究 TTI generator 实际利用哪些 text features。BoT 跨词跨位置平均、BoW 额外保留 multi-token word、BoPTW 再固定 absolute token position，均不向 image model 提供当前 prompt 的完整 contextual embeddings。研究覆盖三个 pretrained DiT、两个 legacy U-Net、synthetic matched-capacity comparison，配合 VLM preference、标准 GenEval/FID/CLIP 与小规模 human study。贡献是可迁移的语言条件剥离实验和分工证据，不是一个已验证更便宜且全面等价的新 foundation model。全文 29 页及 appendix 已读，实际查看方法、主结果类别图、标准 GenEval 表与失败案例。",
+    "methodFlow": [
+      "汇集 token contextual samples：用 CC3M/MSCOCO-2017 的原 encoder 输出建立字典；低频 token 或 multi-token words 用 Claude 生成无关句子补样。",
+      "按信息粒度平均：BoT 只保留 token；BoW 保留 subword 属于同一 word；BoPTW 进一步限定该 word 的 absolute position，平均掉当前 prompt 的其他词语。",
+      "直接替换生成条件：将 contextless embeddings 拼接并补 empty-string padding，SD3/FLUX 的所有 text/pooled 条件对应替换，不修改 pretrained image generator。",
+      "比较输出与语言解码分工：比较完整条件和干预条件的 prompt adherence、GenEval、图像质量、人类偏好；再用 U-Net/DiT 控制实验和 attention trajectory 检查架构差别。"
+    ],
+    "experimentsZh": "实验设置：SD3、FLUX.1 Schnell、FLUX.2 Klein-4B，512×512；DrawBench 排除 misspellings/rare words，GenEval 每 prompt 5 images，MSCOCO-2014 30K prompts 每个 1 image。主 judge Gemma-3，Qwen3 agreement 补充；25 humans 对 DrawBench/GenEval 各 30 prompts，另测 DPG 1,065 长 prompts 和 matched-capacity synthetic generators。\n作者报告标准 GenEval overall：SD3 Full/BoPTW 66.0/63.9；FLUX.1 70.4/70.7；FLUX.2 82.3/71.3。（PDF p.15, Table 4）\n作者报告 MSCOCO FID Full/BoPTW：FLUX.1 25.6/27.1，FLUX.2 27.2/27.2，SD3 26.2/26.9。（PDF p.14, Table 2）\n作者报告 user–Gemma agreement DrawBench/GenEval 61/62%，user–user 67/73%；相等偏好还包含两张都差的情形。（PDF p.20, Appendix A.7; p.26, judge instructions）\n比较范围：以同 pretrained generator 完整 embeddings 为关键对照，BoT/BoW/BoPTT/BoPTW 分层干预；另涵盖 legacy U-Net 和同 T5 synthetic architecture comparison。测试 architecture diversity 有用，但现实 DiT 与 U-Net 的预训练/规模仍有 confounds。\n消融与诊断：Appendix A.1 验证 position 可解码及 BoPTT；B.2 展示 averaging-set 1–10 的有限 qualitative comparison；B.3.1 synthetic controlled experiment。未测用简单 embeddings 从头训练的大规模模型与完整 encoder cost/latency。",
+    "insightZh": "关键是把 contextual interactions、word cohesion 与 position 分开干预，并跨 DiT/U-Net 比较；这种接口诊断直接帮助判断 binding failure 应改 text side 还是 generator side。所谓 contextless 是移除当前 prompt 的跨词信息，平均向量仍继承 encoder 的总体语言/视觉语料统计，attention localization 也不是完整因果机制证明。",
+    "whyRelevantZh": "对 image generation 与 visual creation 的直接迁移价值是诊断 attribute binding、spatial relations 的语言条件接口，并避免默认更大 text encoder 就解决生成语义。适合 deep read 方法与 Tables 4–5，但没有 structured 2D 或 CAD 输出，故不额外归类。",
+    "evidenceZh": "BoPTW 按 word identity 和 absolute position 收集无关句子 embeddings，作为 pretrained TTI 条件的直接替换。（PDF pp.4–6, Fig.3, Sec.3 and Construction; pp.24–25, Appendix B.2；实际查看 Fig.3；构造仍用原 text encoder，multi-token words 还可能需要 inference-time Claude 句子生成。）\n标准 GenEval 显示效果依模型而异，FLUX.2 不能称全面 on par。（PDF p.15, Table 4；作者报告 FLUX.2 overall 82.3→71.3、two objects 92.7→58.9；FLUX.1 70.4→70.7，SD3 66.0→63.9。表已实际查看；未复现。）\n长 prompt / quoted text 是明显边界。（PDF p.8, Sec.4.2; p.18, Table 5; p.22, Fig.17；作者报告 DPG non-inferiority SD3/FLUX.1/FLUX.2 为 47.2/57.0/41.5%；DrawBench text 为 27/37/24%。已查看失败案例，不把这些值当正式统计非劣检验。）\n相同 T5、约 30M synthetic generators 对比支持架构分工差异，但限于简单二维形状。（PDF p.27, Appendix B.3.1; p.9, Sec.4.3；作者报告 DiT/U-Net non-inferiority 67.56/26.27%，288 unique prompts、10,000 synthetic images；不能直接推出所有 DiT 完整语法推理都在 image model。）",
+    "caveatZh": "Sec.4.2 明确 text rendering、quotation marks、部分 position tasks 与长 prompts 的退化；Fig.12/17 给出 failures。\nSec.4.1 排除原模型亦常失败的 DrawBench rare words/misspellings。\nConclusion 提出 multi-word idioms 或可改善，但尚未验证。\nnon-inferiority 是偏好+平局比例，平局包含 both poor，不是绝对 prompt accuracy 或预注册统计非劣证明。\nFLUX.2 的标准 GenEval 明显下降，与广义 on-par 结论有张力，尤其 two objects 和 binding。\n平均 embeddings 仍用大 encoder 与 corpus/Claude，未证明直接删掉 encoder 的实际总成本收益。\nAttention 图和简单 synthetic tasks 支持 internal decoding 假说，但不足以给出完整因果计算路径或所有语言结构的保证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

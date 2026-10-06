@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.36798",
+  "slug": "seeing-what-should-be-heard-diagnosing-and-repairing-cross-modal-shortcuts-in-omni-modal-l-2609-36798",
+  "title": "Seeing What Should Be Heard: Diagnosing and Repairing Cross-Modal Shortcuts in Omni-Modal LLMs",
+  "authors": [
+    "Yueran Ma",
+    "Ronghao Lin"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36798"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Seeing What Should Be Heard",
+    "VLM / MLLM"
+  ],
+  "abstract": "Omni-modal large language models (LLMs) are expected to answer a question using the modality it explicitly refers to. However, existing training paradigms rarely verify whether models actually follow this modality, because multimodal inputs from the same sample often provide redundant evidence for the same answer. In this work, we uncover a pervasive cross-modal shortcut in omni-modal LLMs: when asked an audio-related question, models rely on the image as much as on the audio, and sometimes even more. To systematically diagnose this behavior, we introduce the Factorized Modality Diagnostic, which independently swaps audio and images between samples to isolate each modality's causal contribution. Across two model families in different settings, we find that this shortcut persists throughout supervised fine-tuning and reinforcement learning post-training, while judge-based RL may further amplify such reliance on irrelevant visual information. Based on this finding, we propose DMC-Repair, which trains models on the same kind of cross-modal swapped samples while assigning supervision according to the modality specified by the question. This prevents models from exploiting the spurious correspondence between modalities within the same clip. Experiments demonstrate that DMC-Repair reduces the image-induced share of the answer effect by 59.9%, effectively suppressing the cross-modal shortcut without compromising audio-question answering performance. The reduction in shortcut reliance generalizes across two model families and zero-shot to an unseen dataset and an unseen benchmark, and persists through subsequent post-training. Code is available at https://anonymous.4open.science/r/DMC-Repair.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36798v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36798v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36798v1 全文及 2026-10-06T16:13:35.599842Z 审阅记录；PDF 25 页，SHA-256 302cee1faaac1df9e2c6f11cd6cc6d86f1ad1dde220199605960a0af6ae26134，视觉核验第 1、2、4、7、18、20、21、24 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 链接 anonymous.4open.science/r/DMC-Repair 并称已公开 core scripts、acceptance 后发布 complete code；浏览工具不可访问，直接请求返回 403，未核验 actual public implementation，不标 available，也不推断代码不存在。",
+    "ideaZh": "DMC-Repair 把真实图像与 audio 成对完整交叉，并按问题指定的 modality 标注，用 answer-token hinge 学习抵抗不相关模态。作者报告独立 confirmation set 的 Shortcut Index 相对减少 59.9%，并改善 conflict cells 的 audio-following。值得精读 factorized diagnostic 和 label construction；有限答案、人工冲突与 residual interaction 限制普遍模态 invariance，后续 RL 的比例稳定也不意味着绝对 image effect 完全不回升。",
+    "motivationZh": "Omni 模型可能用不相关图像代替问题指定的 audio 证据，普通评测难隔离 shortcut；目标是通过完整模态交叉诊断并修复证据选择。",
+    "methodZh": "同一 question 下取答案不同的真实样本，组成全部图像/audio combinations，使 non-designated input 和 match status 都不能单独预测标签。audio/visual questions 根据指定来源标注；双模态问题仅保留已知 original cells。训练只比较正确答案与配对另一答案的 length-normalized likelihood。diagnostic 分离 audio/image 的 main effects 与 interaction，并使用 question-family held-out confirmation、媒体排除、paired cluster bootstrap、construction controls 与跨模型迁移。",
+    "methodFlow": [
+      "同 question、不同答案的真实样本组成完整 crossed image/audio grid。",
+      "按问题指定的 modality 给 cell 标注；多模态联合问题仅使用标签可确定的 original cells。",
+      "对 answer tokens 的候选 likelihood gap 施加饱和 hinge，避免依赖图文同源关系。",
+      "分别计算 audio/image main effects、interaction 和各条件绝对 effect。",
+      "在 held-out families、自由生成和 external datasets 上检验指定模态遵从与普通能力。",
+      "继续 RL 后检查比例、绝对 effects 和 downstream accuracy 的变化。"
+    ],
+    "experimentsZh": "实验设置：以 MUSIC-AVQA 构建训练 grids，预先分离 diagnostic question families 并排除其媒体。对 Qwen Omni 和 MiniCPM-o 采用各自 readout，做完整 grid、single direction、dropout、mismatch-label、loss/parameterization 与种子控制，并 zero-shot 检查 AVQA/AVHBench，后续 RL 检验 retention。published methods 分数来自不同 papers 和 base checkpoints，不能直接排序。\n作者报告 sealed confirmation Audio SI 从 0.559 到 0.224，paired difference 为 −0.335，95% CI 为 [−0.390,−0.279]；这是 ratio 相对约 59.9% 下降。（p.7, Table 1; p.18, Table 10）\n作者报告 confirmation free-generation audio-following 增加 13.7 个百分点，95% CI 为 [+7.4,+19.7]。（p.18, Table 10）\n作者报告 external AVQA image effect 从 0.852 到 0.323，而 audio effect 从 1.556 到 1.522，支持主要降低非指定视觉依赖而非仅改变分母。（p.20, Table 13）\n作者报告 development mean absolute image effect 从 1.275 降到 0.343，随后 RL 为 0.506；修复收益保留，但绝对 effect 有回升。（p.17, Table 7）\n比较范围：construction 和 loss 控制较完整，跨家族支持方向迁移。RL modality rewards 是作者自身少量配方，不代表所有 modality-aware RL；published method table 的不同 bases/protocols 不构成 matched comparison。\n消融与诊断：complete grid 领先 single-direction、mismatch labels 和 modality dropout；parse failures 的不同处理均支持方向。hinge 与 CE、LoRA 与 full 表现接近，说明关键更在 cells。诊断的 own-reasoning prefix 来自 original matched cell 并复用于 swaps，不等同每个冲突输入独立生成的完整 reasoning。",
+    "insightZh": "counterfactual training 与 modality swapping 均有先例；贡献在完整 crossed construction 消除 mismatch-status shortcut，并把相同 factorial grid 用于训练及诊断。受控 data construction 和 confirmation 证据比仅 benchmark 提升更有研究价值，但 measured answer contrasts 不等于内部机制或所有媒体替换下的绝对 invariance。",
+    "whyRelevantZh": "模态选择与证据因果依赖是 omni-modal grounding 的基础能力；完整 counterfactual label construction、独立确认和 conditional-effects 分析可迁移到视觉/语言证据冲突研究。",
+    "evidenceZh": "完整 grid 平衡非指定模态与 match status，使 designated source 决定训练标签。（pp.4–6, §§3.2–4.4, Figures 2/4；理论只对构建 grid 的均匀 cells 成立，不能自动推到任意自然分布。）\nconfirmation 与媒体隔离、cluster intervals 支持 held-out repair，而非只在开发集调参。（pp.6–8; pp.13–14,17–19, Appendices A/F；作者报告；registered criteria 的 stricter band 差异也在附录公开。）\nabsolute conditional effect 与失败案例显示修复未彻底完成，后续 RL 有部分回升。（pp.16–17, Table 7; pp.20–21, Tables 13–14, Figure 10；作者报告；SI ratio retention 与零残余 leakage 不是同一命题。）",
+    "caveatZh": "未来需扩展到多个指定模态和 open-ended answers。\nanswer-only supervision 不监督描述，许多 outputs 仍不含明确 audio explanation。\nbinary diagnostic 与 finite training answer pool 不建立开放式、时间细粒度或真实复杂冲突的普遍 grounding。\nfactorial input effects 测量的是所选媒体替换下的输出变化，不能定位内部 causal mechanism。\n平均 image effect 或 SI 接近目标仍可能隐藏 per-cell residual interaction；附录绝对条件效果并非完全为零。\nexternal cross-model readout 不同，不能横向比较绝对 scores；anonymous public implementation 暂无法核验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

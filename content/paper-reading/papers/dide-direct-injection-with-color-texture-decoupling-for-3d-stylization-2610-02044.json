@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.02044",
+  "slug": "dide-direct-injection-with-color-texture-decoupling-for-3d-stylization-2610-02044",
+  "title": "DiDE:Direct Injection with Color-Texture DEcoupling for 3D Stylization",
+  "authors": [
+    "Tao Wu",
+    "Alexandra Gomez-Villa",
+    "Senmao Li",
+    "Yaxing Wang",
+    "Joost van de Weijer",
+    "Kai Wang"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02044"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "DiDE",
+    "3D Generation"
+  ],
+  "abstract": "Recent advances in rectified flow-based image-to-3D generative models have enabled high-fidelity 3D asset generation. Building on this, a growing line of work has exploited these strong 3D priors for training-free stylization, transferring visual attributes from a reference image onto a generated 3D asset. However, existing methods enforce an all-or-nothing paradigm: color and texture are transferred jointly, with no mechanism to control them independently -- a limitation we formalize as Disentangled 3D Stylization(Disen3D). To address this, we propose DiDE, the first training-free framework for Disen3D. Key to our approach is the observation that the structured latent space of image-to-3D models is overcomplete with respect to texture: texture information occupies only a small subset of the style-significant channels, leaving a free subspace available for independent color encoding. DiDE exploits this via a channel partition mechanism that processes a content image, a texture reference, and a color reference through dedicated branches and composes both style signals interference-free at every self-attention layer, preserving content geometry throughout. Experiments on Disen3D-Bench, our newly collected multi-reference benchmark, show that DiDE consistently outperforms 2D and 3D stylization baselines in color fidelity, texture transfer, and content preservation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02044v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02044v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02044v1 全文及 2026-10-06T13:11:05.878744Z 审阅记录；PDF 18 页，SHA-256 409e8525f394ed7a149d4790dd37a6495ec21d44299700d1cbd13957e4481754，视觉核验第 1、4、6、8、10、15、18 页。数字均为作者报告，本项目未独立复现。代码状态 promised：p.7 及 App.A 承诺 peerreview 后 release，exactPDF 无 publicproject/codeURL，未提供 Code link。",
+    "ideaZh": "DiDE 在 TRELLIS appearance stage 分开注入 content、gray texture 与低频 palette signals。作者报告组合控制的颜色和纹理指标改善。独立借用 surface pattern 与颜色直接关联 3D editing；解耦是经验性，geometry 非严格不变，亮度与人类研究协议仍有限制。",
+    "motivationZh": "三维 stylization 常将几何、颜色和纹理混在一起，难以独立借用不同参考的属性；目标是在生成采样中分别控制表面图案与 palette。",
+    "methodZh": "固定 content 生成的 StageI sparse support，StageII stylebranch 用各自 Q/K/V 避免 contentquery 削弱 style。texture 预处理 gray，colorimage 滤高频或 palette 做 Voronoi；texturevariance 最高 25%channels 取 textureV，其余取λweightedcolorV，每层替 contentselfattention 残差。可输出 native3Dassets，按三 reference 组合而非忠实重建输入，分类 3Dgeneration。",
+    "methodFlow": [
+      "contentimage 生成 TRELLISStageI sparse support，作为粗 geometry 结构。",
+      "texture 转 grayscale；colorreference 低频过滤或 paletteVoronoi 后 DINO 编码。",
+      "StageII 并行三 branch，各 stylebranch 自 Q/K/V 做 attention。",
+      "按 texturebranchvariance 选 top25%channels 给 texture，剩余给λcolor。",
+      "fusedattention 替 contentbranchselfattention，用 contentAdaLNgate 更新。",
+      "decode 为 stylized3Dasset，并观察换 reference/亮度/λ下的保形与解耦。"
+    ],
+    "experimentsZh": "实验设置：Disen3DBench37referenceimages 组合 1800assets、TRELLIS/A40/k25/λ1.2、25steps/CFG3，两 stage；TRELLIS2 仅 qualadaptation，InternVL2.5-8Bbinarytexture/colorjudge，λablation600samples。\n作者报告对 StyleSculptor CD 下降约 14.1%、HD 约 6.1%，但 ground-truth/reference geometry 定义与 meshnormalization 未充分给出。（Table1/Sec.4.2, p.8）\n作者报告 C-Hist.87 优于 StyleSculptor.89；textureSSIM.12519 对.12461、LPIPS.68 而 SADis/MorphAny.65 更好。（Table1, p.8）\n比较范围：SADis2DthenTRELLISlift，StyleSculptor 额外 colorbranch 直接 sum，MorphAny3Dtwo-inputmorph；作者承认不为本 task 设计。缺 simplegrayscale/colormatchpostprocess、更强 PBRtexturepipeline 及 multi-view 一致性定量。\n消融与诊断：gray/Voronoiqual、variance 来源 swap、k/λsweep、PCAproxy、TRELLIS2qual；缺因子交换后的 cross-attributeleakagemetric、不同 objects 多 viewper-reference 报告、seedsCI/runtime。",
+    "insightZh": "继承 StyleSculptor 的 style/contentchannel 思路，实质新能力是分离两 reference 的 color/texture 并原生 3D 合成，属于 trackedappearanceediting 方法。overcomplete 证据是 DINOproxy+PCAablation，不证明数学独立 subspaces；mask/后续 channelmixing 不能保证完全 interferencefree。",
+    "whyRelevantZh": "直接命中 native3Dappearance/styleediting 与 independentreferencecontrol，是核心 3Dgeneration 方向可用的方法参考；可启发 LEGO 等 assetappearanceworkflow，但本文未针对 LEGO/fabrication 验证。",
+    "evidenceZh": "StageI sparse support 保持，StageII 替 selfattention；graytexture 与 colorpreprocessing+channelmask 控制两属性。（Secs.3.1–3.4/Fig.4, pp.4–6；mainmethodfigure 与 equations 实际查看，粗 support 固定不等最终 meshgeometry 完全相同。）\n作者报告 VLMcolor70.94/texture30.72、CLIPI.75/CD15.38/HD7.87；MS-SWD20.40 差于 SADis18.38/MorphAny18.31。（Table1/Fig.5, p.8；完整表查看，不称全部 color/texturemetrics 最优。）\n只 10content×12texture×15palette 共 1800assets；baselines 需 two-reference 改造，不是其原任务公平排名。（Sec.4.1, p.7；组合数量不等 1800independentreference/generalizationcases。）\n作者展示 texturebrightness1.5×让输出接近白色、texture/color 细节丢失；userstudy 完整协议将在 revision 补。（Fig.9/Table3/Sec.4.3, p.10；failure 与 study 页实际查看，reference 敏感性是有效边界。）\n作者用 singlecontent 的 DINOmeantextureproxy 和 PCA 重建判断 sparechannels，但 Fig.2top25%的曲线尚未达到最终高位。（Sec.3.2/Fig.2 p.4–5; Fig.13 p.18；实际查看两图，留作 heuristicmotivator 而非可辨识的完全属性分离证明。）",
+    "caveatZh": "仅 TRELLIS/TRELLIS2family，无 other3Dparadigmgeneralization。\ngeometry 依 host，无专门 geometricrefinement；仅 color/texture 非 material/lighting/geometricstyle 全部属性。\n亮度变化可严重洗白；额外 inference 操作约束极端 lowmemory 部署。\nlowdimtexture/PCAretention 不等其他维度仅 color，后续 attentionprojection/FFN 会混 channel；完全 interferencefree 为强表述。\nStageIsupport 保留不保证 StageIIdecodegeometry 不变，Fig5cutoutstructure 本身影响 finegeometry。\nTable1CD/HDreference 与 normalization 未明确；LPIPS/SSIM 对不同 content/reference 语义也不等纯 texturefidelity。\nsmall37images 组合重复，VLMbinary 纹理成功仅 30.72 且 colorjudgenoextra 色不是 palette 分布匹配；judge 无 humanvalidation。\nuserstudy 只有比例，无人数/trials/随机/blinding/CI，不能做强 perception 结论。\n附录提 low-noiserestart 但主方法未完整描述，colorimagefcol 公式也混 Ivor 记号；implementation 待 release，本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

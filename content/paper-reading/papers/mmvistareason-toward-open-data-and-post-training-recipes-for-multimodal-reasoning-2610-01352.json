@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.01352",
+  "slug": "mmvistareason-toward-open-data-and-post-training-recipes-for-multimodal-reasoning-2610-01352",
+  "title": "MMVistaReason: Toward Open-Data and Post-Training Recipes for Multimodal Reasoning",
+  "authors": [
+    "Juekai Lin",
+    "Honglin Lin",
+    "Yuqian Yuan",
+    "Xiaolong Wu",
+    "Jie Cao",
+    "Liang Liang",
+    "Yunqi Cao",
+    "Yun Zhu",
+    "Wenqiao Zhang",
+    "Lijun Wu"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01352"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "MMVistaReason",
+    "VLM / MLLM"
+  ],
+  "abstract": "Open multimodal reasoning models have benefited from large-scale reasoning supervision, yet reliable post-training remains challenging due to uneven data quality, inefficient supervision construction, imbalanced difficulty, and cross-domain interference. We introduce MMVistaReason (MVR), an open-data post-training recipe with three components: (1) broader capability coverage across complementary Analytical and Real-World reasoning groups, emphasizing structured reasoning versus visual perception and spatial grounding; (2) efficient SFT and RL data construction, standardizing heterogeneous open data through staged cleaning and annotation, combining difficulty-aware cascaded teacher distillation with answer-likelihood-based trajectory selection to construct MVR-SFT-528K, and applying scale-specific frontier filtering for MVR-RL-63K; and (3) specialize-then-integrate training, which trains complementary RL experts and consolidates their capabilities through multi-teacher on-policy distillation (MOPD). Our analyses reveal a capacity-dependent interaction between supervision difficulty, trajectory quality, and model capacity: smaller students benefit more from selected supervision, while larger students are robust to trajectory variation and mixed-domain interference. Mixed-domain RL introduces benchmark-level negative transfer, whereas MOPD provides consistent capability integration, with the preferred KL direction varying across model scales. Across 15 multimodal benchmarks, MVR-4B achieves an average score of 72.8, outperforming Qwen3.5-9B (Instruct) and MMFineReason-8B while using about 70% fewer samples than MMFineReason. Scaling to 9B improves the average to 74.4, surpassing Qwen3.5-35B-A3B (Instruct). Overall, MMVistaReason demonstrates that systematic open-data construction and capacity-aware post-training provide a practical and scalable path toward reliable multimodal reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01352v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01352v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/JackieForest/MMVistaReason"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01352v1 全文及 2026-10-06T16:45:17.067090Z 审阅记录；PDF 42 页，SHA-256 3a62931aa066f64dae84caf56bc7d324087458c1c8f74f0414829b338d84e436，视觉核验第 1、5、9、10、11、13、15、25、35、39、40 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 直接列官方 GitHub URL；web fetch 曾返回 404，但 direct HTTP 与 GitHub API 均为 200/public。实际 tree 含 cleaning/distillation scripts、answer-likelihood scoring、SFT/RL launchers 与 MOPD teacher_manager/distillation_loss，实现确实公开；未下载或运行，未声称端到端复现。",
+    "ideaZh": "MMVistaReason 把开放视觉数据清洗、难度分层蒸馏、frontier RL 和两组专家的 MOPD 串成可用 recipe。作者报告统一模型在各 benchmark 都优于自身 SFT；相比 Mixed-RL 的整合更稳定。最值得读的是 matched trajectory selection 与专家整合 controls，不能把同一模型家族上的小差距写成普遍 capacity law，样本更少也不等于总训练更便宜。",
+    "motivationZh": "开放 VLM post-training 的数据质量、难度和任务覆盖不均，混合训练也可能互相干扰；目标是构建并整合互补视觉 reasoning 能力。",
+    "methodZh": "论文针对开放 VLM post-training 的数据质量、视觉任务覆盖与跨域 interference：先去重/图像筛选，再用大 VLM 标准化问题和答案；小模型全失败的样本依次交给更强教师，正确轨迹按最终答案 normalized likelihood 选取。SFT 后以每种 student 的 pass rate 选 frontier prompts，分别训练 Real-World 与 Analytical experts，再在 student 自采样 prefixes 上由按数据域路由的 expert 提供 teacher-top-K KL supervision。模型推理不需要外部专家路由。主要结果支持一个工程完整的视觉能力整合方案，未建立新的蒸馏定理或一般模型容量规律。",
+    "methodFlow": [
+      "汇总开放 VQA 来源，用 image hashes、pHash、CLIP similarity 及图像质量规则处理重复/无效输入。",
+      "大 VLM 做英文标准化、answerability 与答案规范化，标注任务域并保留 source metadata。",
+      "小模型筛去容易样本，级联教师生成候选；验证正确/格式完整后按 answer likelihood 选轨迹。",
+      "对 Base 模型做 full-parameter SFT，再按各 student 的 rollout mastery 筛选可学 frontier data。",
+      "从同一 SFT generalist 分别训练 Real-World 与 Analytical GSPO experts。",
+      "student 自采样 prefixes，按训练样本域查询专家 top-K distributions，以 FKL/RKL MOPD 整合成单一模型。"
+    ],
+    "experimentsZh": "实验设置：作者报告 SFT 527,809 样本，RL-63K 是两个模型规模各两组训练集合的合计，并非单模型使用全部数据。基于 Qwen3.5-Base，主要训练/评测在 4B、9B，data scaling 另有 2B；十五个视觉 benchmarks 包含 GUI grounding、counting、spatial、科学/数学与图表。评测使用 deterministic decoding、生成上限及 CompassVerifier judge 替代传统 string matching，不能不加说明与所有官方数字等同。\n作者报告 SFT→最终 MOPD 的 overall 为 4B 70.8→72.8、9B 72.3→74.4；两种规模在十五项上均优于自身 SFT。（pp.11/14, Tables 3–4）\n作者报告同尺寸 Qwen Thinking overall 为 4B 72.3、9B 74.3，最终模型对应 72.8/74.4；部分视觉或逻辑 benchmarks 仍落后 Thinking。（p.11, Table 3）\n作者报告 Mixed-RL 为 4B 71.3、9B 73.2，最佳 MOPD 为 72.8/74.4；FKL/RKL 在 4B 为 72.8/72.3，9B 为 74.2/74.4，差距不能证明普遍 divergence 规律。（pp.15–16, Fig.6）\n作者报告固定题目与候选轨迹池后，answer-likelihood selection 相比 random correct selection 平均提升 4B 0.29、9B 0.24；最长轨迹在部分题上更好。（p.13, Fig.5）\n作者报告 9B 用 124K subset 的 overall 72.3 与完整 528K 相同；这些 subsets 同时改变样本量、教师、difficulty 与 domain composition，不能独立归因于 difficulty。（pp.12–13, Fig.4）\n作者报告 bird example 的正确物种答案伴随 prominent crest 等描述，但图中未见相应直立 crest；说明 final-answer verification 仍可能保留 unsupported visual rationale。（pp.39–40, Appendix D, Example 5）\n比较范围：有 Base/Instruct/Thinking、同样 SFT 初始化的专家与 Mixed-RL、FKL/RKL，并固定轨迹候选池比较选择策略。缺完整 benchmark decontamination audit、相同总 compute/rollout budget 的继续训练/单教师 OPD controls，以及训练多 seed/error bars。少样本相对其他方法不等于 distillation、cleaning 和多专家训练的总 FLOPs 更少。\n消融与诊断：轨迹选择比较较干净；数据子集分析改变多个变量，难以解耦 teacher source、difficulty、规模与域构成。MOPD 对 Mixed-RL 同时增加专门专家训练与 distillation steps，没有固定总计算成本；KL preference 的小差距限于已测设置。",
+    "insightZh": "新意主要是开放 multimodal corpus 与 data/training recipe 的系统整合及 matched empirical analysis；MOPD 和 GSPO 本身来自既有方法。对视觉感知、spatial grounding 与 analytical reasoning 的互补覆盖有直接价值。答案 likelihood 是轨迹质量 proxy，不能证明过程忠实；capacity-dependent 趋势只测同模型家族的少量规模。",
+    "whyRelevantZh": "贡献直接涉及通用 VLM 视觉感知、spatial grounding 与 reasoning post-training，而非只把通用 RL 套到文本任务；可作为开放数据与 visual capability integration 的具体实验参考。",
+    "evidenceZh": "级联先按可解性分层，再在相同题目与候选轨迹上选最终答案 likelihood 最高的正确轨迹。（pp.6–7, Sec.3.2; p.13, Fig.5; pp.31–33, Prompts 8–9；最终答案正确与过程 consistency 依赖 Qwen judge；verification prompt 不包含原图输入，不能把它视作独立视觉 grounding 证明。）\nMOPD 的专家按训练样本 reasoning group 路由，在 student-induced states 提供 truncated token distributions。（pp.8–9, Sec.3.3; p.25, Table 11；top-K support 下的 KL 与完整词表 KL 不同；RKL truncation correction 引用已有 MOPD，不是新的精确完整分布证明。）\n专家有域内提升和域外退化，MOPD 在已测 benchmarks 整合收益。（p.14, Table 4; p.15, Fig.6；同 SFT 初始化的 controls 比异尺寸 main leaderboard 更能支撑因果解释；总训练/教师调用预算未匹配。）\n同尺寸 Thinking 模型构成更强参照，整体差距较小且个别任务仍更强。（p.11, Table 3；不以只比较 Instruct 的 headline 替代真实强 baseline 边界。）",
+    "caveatZh": "没有独立 limitations section；数据全来自已有开放来源，文中未提供对十五个 benchmark 的完整 train/eval 去污染方法。训练池内部去重不能自动保证无 test overlap。\n清洗、轨迹筛选、RL rewards 与最终评测均大量依赖模型 judge，答案正确不保证视觉依据或 CoT 正确；附录样例仍包含 unsupported visual details。\ncapacity 分析限于同一家族少量规模，且 subsets 教师/难度/构成共同变化；小分差没有 seed uncertainty 支持。\n两个专家再整合比 Mixed-RL 有额外训练与教师调用；未证明总 compute efficiency 或推理 latency 优势。\n教师、清洗与 judge 同一家族可能共享偏差，top-K matching 对完整分布的代表性需在实际实现与其他架构上继续核验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

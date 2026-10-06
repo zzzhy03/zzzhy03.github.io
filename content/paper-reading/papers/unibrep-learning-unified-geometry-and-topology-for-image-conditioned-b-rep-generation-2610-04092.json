@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.04092",
+  "slug": "unibrep-learning-unified-geometry-and-topology-for-image-conditioned-b-rep-generation-2610-04092",
+  "title": "UniBRep: Learning Unified Geometry and Topology for Image-conditioned B-Rep Generation",
+  "authors": [
+    "Haiyang Ying",
+    "Allen Tu",
+    "Jiaye Wu",
+    "Tom Goldstein",
+    "Matthias Zwicker"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.04092"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "UniBRep",
+    "3D Reconstruction",
+    "3D Segmentation"
+  ],
+  "abstract": "Generating a boundary representation (B-rep) conditioned on a single image requires faithful reconstruction of geometry, valid topology, and support for complex shapes. We present UniBRep, a geometry-first framework that adapts a pretrained image-to-3D model to generate a feature mesh as a unified intermediate representation. Its surface provides a geometric scaffold, while spatially aligned learned features encode face-separation cues for topology recovery. Dual decoder branches generate the geometry and face-separation features; a geometry- and feature-guided construction pipeline then fits parametric surfaces, recovers boundary curves and connectivity, and assembles an explicit B-rep using a CAD kernel. Recovering topology from mesh regions avoids predefined architectural face-count limits, allowing face count to scale with shape complexity. On the standard DeepCAD benchmark, UniBRep produces valid B-reps for 80.49\\% of inputs and reduces face Chamfer distance from 0.1096 to 0.0345 relative to CADDreamer. In a matched comparison, UniBRep also outperforms the HoLa public demo across all reported metrics. Further evaluations demonstrate scalability to high-complexity shapes beyond the standard 30-face range, generalization to objects outside the CAD training distribution, and qualitative transfer to real photographs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.04092v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.04092v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.04092v1 全文及 2026-10-06T14:38:07.000Z 审阅记录；PDF 15 页，SHA-256 62a1685abc21018f466fc6ca9befd90ea8e1de2c3373837753b25a58624188dd，视觉核验第 1、3、4、5、7、8、13、14、15 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDFp6 承诺 public release code/weights/splits/generatedoutputs，全文无本方法 repository/projectURL；未确认实际实现公开。",
+    "ideaZh": "UniBRep 将 TRELLIS 适配为 geometry + face-separation feature mesh，再按几何/特征分区、拟合曲面、沿 mesh 边界恢复 trim/topology 并用 OpenCascade 装配。作者报告 DeepCAD valid single solids80.49%、face CD0.0345，值得深读 editable CAD recovery；31+faces validity 仅 37.57%，且几何指标仅 valid outputs，HoLa 对照是 public demo 而非已复现论文结果。",
+    "motivationZh": "单图生成 B-rep 同时需要连续表面与合法共享边界，现有固定 face-count 表示难覆盖复杂形状；论文希望借助 mesh geometry 与 face cues 恢复 CAD 拓扑。",
+    "methodZh": "最终目标是从单图忠实恢复 CAD geometry/topology，归 Reconstruction 并有独立 face segmentation 验证。Geometry branch 先训练并冻结，8Dfeature branch 以 GTface nearest-neighborlabels 和 pull/pushloss 训练；features 只细分 primitive fitting 失败的 regions。Boundary 从 meshtrace 而非 surfaceintersection，cubicB-splines 共享 endpoints 再 projectp-curves 并 sew/heal。Broadprior 提供 plausiblegeometry，BRepvalidity 来自后续 kernelchecks，不恢复 designhistory/constraints 或制造工艺。",
+    "methodFlow": [
+      "DeepCAD tessellation 保留 GTface 对应，rank32 LoRA 适配 TRELLIS SS/SLat generators",
+      "Rank16geometrydecoder 生成 256³FlexiCubes surface 后冻结，featuredecoder 学习 8Dface-instanceembeddings",
+      "几何 adjacency/normal/boundary regiongrowing 后依次 RANSAC fit 五种 analyticprimitives",
+      "仅 fit 失败 regions 作 featuremeanshift+connected components 并重 fit，剩余 FlattenAnything/B-splinefallback",
+      "Trace 共享 mesh 边界，cubicB-spline 采样并共享 endpoints 恢复 FE/EV 拓扑",
+      "Project 每 facep-curves，OpenCascade sewing/healing；单 SOLID/wire/edge/tessellationchecks 筛 validoutputs"
+    ],
+    "experimentsZh": "实验设置：DeepCAD64,049train/4,466val/2,605test，standard2424 为 7–30faces，181 为 31+；HoLa818 随机 object/viewpairs 无 outputfilter，BrepGen40OODfurniture，realphotos 仅 qual。SS4A6000×4days，SLat2×3days，decoders2×5days；oneoutput/postprocess perinput，strictOCCsolidchecks/tessellation20stimeout。\n作者报告 standardfaceCD.0345、FEFscore.812、valid80.49%；CADDreamer.1096/.384/18.28%compoundaccept。（Table 1, p. 5）\n作者报告 818subsetvalid81.30%vsHoLademo70.66%；HoLaprotocolpublished86.37%/faceCD.0101 不可直接比较。（Table 1, p. 5; Table 6, p. 14）\n作者报告 31+valid37.57%、40OODfurniture72.5%；A5000end-to-end3.88min，其中 meshgen.17min/parameterization2.07min。（Sec. 5, pp. 7–8）\n比较范围：CADDreamer 不同输入/compoundcriterion；HoLapublicdemo 不复现其 paper 且 camera/preproc/evaluation 差异未知；NVDNet/Point2CAD 读 oursgeneratedgeometry/segmentation 且只 paramsurfaces，无 validratio。主要 DeepCAD 和小 40OOD，metricsconditionvalidsets，realphotos 无 GT 或 systematicquality。\n消融与诊断：GeometryFT47.65→62.50valid，RGBfeatures74.75、contrastive80.49；samegeneratedgeometryfaceFscore 控制；200caseparameterperturbationsvalid73.5–81，best5postprocess 不能提高 validcount。",
+    "insightZh": "Featuremesh 作为 broadimage-to-3Dprior 与 explicitCADtopology 的统一 interface，解耦 geometry 和 facefeatures 并用 meshboundaries 减 surface-intersectionerror。HPNet-styleembedding、RANSAC 与 OCC 均已有，主要价值在 representation/pipelinecoupling 和 controlledpreservation 证据。Variablefacecount 无 architecturalcap 不等于 unbounded 有效 complexity。",
+    "whyRelevantZh": "Single-imagefaithfulCAD/BRep recovery 对 editable assets 和 generativeCADtoolchain 有直接 transfer，满足 selectiveReconstruction；face-instancefeaturefield 有 samegeometry 独立 segmentation 指标，次归 3DSegmentation。Fabricationconstraints/manufacturinginstructions 未验证，未归 Fabrication。",
+    "evidenceZh": "Dualdecoder 顺序训练、geometry 冻结后学 facefeatures，featurelabels 来自 GTface nearestneighbor transfer。（Fig. 2, Sec. 3.1/3.2, Eqs. 1–7, pp. 3–4; Appendix A, p. 13；NNlabeltransfer 在 geometryerror 处会错；feature 不是完整 BRepconnectivity 直接编码。）\n几何 fit 失败才用 feature 分区，meshboundarytrace+OCCtolerancehealing 构造 solid。（Fig. 3, Sec. 3.3, pp. 4–5; Appendix A, pp. 13–14；Heuristicthresholds/planarfallback/1000-stepparameterization 与 0.1maxheal tolerance 影响精确性。）\n作者报告 standardvalid80.49%，geometry/topology 仅 validoutputs 平均；baselineinputs 和 acceptance 不同。（Table 1, Sec. 4.1/4.3, pp. 5–6；CADDreamer GTorthonormalmap、compounds，UniRGB/singlesolid；HoLaRGB+edgeoverlay/demo，不做全结果 same-protocolSOTA 声明。）\nSamegeometry face segmentationFscore.783vsNVDNet.690、geometrypreservationmeshCD.0319→BRep.0345。（Sec. 5.1, Tables 2–3, p. 7；Facefeatures 与 geometryFT 各有消融；preservation 比较基于各自 acceptedcases 非 pairedintersection。）\nComplexity 与 OOD 有量化，但 31+valid37.57%，freeform/NURBSheavy 仍未测。（Table 4, Sec. 5.2/6, p. 8; Figs. 6–10, pp. 9–10；p8 又写 80.5%fail，与 80.49%valid 及 0.5+4+14.9%failure 分解矛盾，按多张 table 一致 validity 并明确需作者修正文句。）",
+    "caveatZh": "Singleimagehiddengeometry/topologyambiguous，errors 沿 generation/segmentation/fit/assembly 传播。\n31+facesvalidity 下降；broaderfreeform/NURBS-heavyuntested。\n支持 CADoperations 但不恢复 designhistory/parametricconstraints。\nNoarchitecturalfacecap 不保证无限 complexity，fixedgrid/fit/mean-shift/parameterization 成本仍限制。\nGeometry/topology 仅 validoutputs 可 selectionbias；各方法 validsets/inputs/acceptance 不完全可比。\nOCChealingprecision.01/max.1 在单位 boundingcube 中非精密公差保证；validsolid 不是 manufacturing-ready 验证。\np8failure 句 80.5%与 table 冲突，不能将其作为真实 failurerate；code/weights 尚未确认发布。\n本项目未复现，全部数字为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.02468",
+  "slug": "windfoil-closed-form-coverage-for-real-time-and-differentiable-vector-graphics-2610-02468",
+  "title": "Windfoil: Closed-Form Coverage for Real-Time and Differentiable Vector Graphics",
+  "authors": [
+    "Matt DesLauriers"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02468"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "Windfoil",
+    "2D Design"
+  ],
+  "abstract": "We present Windfoil, a GPU-friendly algorithm that treats rasterisation and differentiable vector graphics as two sides of the same problem by evaluating the box-filtered winding number of quadratic Bézier contours in closed form. We implement this in WebGPU, allowing it to run across a range of environments, including a web browser on a consumer laptop, and apply the system to real-time 2D rendering, high-resolution rasterisation for print media, and a differentiable renderer. We compare our renderer against Skia, a production-grade engine, and Slug, a popular GPU rasterisation algorithm for games and real-time applications, measuring fidelity to a reference box-filtered coverage. Our renderer matches the reference more closely than either, at performance comparable to Slug. We also compare our optimiser against DiffVG and Bézier Splatting, where it reaches equivalent or better reconstruction quality at a fraction of the per-step cost, scaling to tens of thousands of shapes at interactive rates.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02468v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02468v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/texel-org/windfoil-paper"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02468v1 全文及 2026-10-06T11:19:04.596747+00:00 审阅记录；PDF 8 页，SHA-256 edea0b9a3aa3e4c113c4b2529314125efb2346e66d3529a39d8b13b30be72cfa，视觉核验第 1、3、6、7 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFp2 的 reference repository 链接内含此 URL（pdfinfo -url 确认），作者 GitHub 页面已确认 Public 并含 jax/js/bench/demos；windfoil-algorithm 是旧 archive。URL 来自 PDF 作者链接，非猜测。",
+    "ideaZh": "Windfoil 对 quadratic Bézier contours 闭式积分 box-filtered winding，让 display 和 differentiable fitting 共享 coverage。作者报告 Kodak512shapes 单步 3.2 ms，对 DiffVG336 ms，PSNR 26.60 对 26.41；但只测一次 seed，且 self-crossings、变换和 compositing 可破坏 exactness。是直接服务 SVG/路径优化的底层方法，而非普遍精确 SVG renderer。",
+    "motivationZh": "矢量图的显示与可微优化若采用不同 coverage 近似，梯度可能无法对应实际边缘；需要让 Bézier 路径的抗锯齿覆盖计算与 fitting 使用同一数学接口。",
+    "methodZh": "以 Green 定理把像素平均 winding 转成曲线边界积分，先分 monotonequadraticpieces，再 GPU 独立 gather 与解析 VJP。Display 用 rowbands，fitting 用 tilelists/CPUpreprocessing。报告 imagevectorfitting 和 CLIP-guidedSVG 示例，代码公开；不支持完整 SVGeffects 或任意 filloverlap。",
+    "methodFlow": [
+      "闭合 directedquadraticBéziercontours 按 extrema 分 monotonepieces",
+      "按 pixelaxis-alignedbox 裁曲线并闭式积 clippedwidth",
+      "累加 winding 后施 nonzero/even-oddfill，再 painter-ordercomposite",
+      "Display 按 rowbands、differentiation 按 tilelists 访问候选",
+      "解析 VJP 回传 controlpoints/color/opacity 并映射优化参数",
+      "MSE 或外部 CLIPimage-gradient 驱动 Adam，输出 vectorpaths"
+    ],
+    "experimentsZh": "实验设置：Coverage 对 supersampledboxreference、Skia/Slug；imagefitting 为 Kodak24images 与 Färlev，RTX2000Ada16 GB；WindfoilDawn/Vulkan 对 PyTorch/CUDA 基线。Equalsteps/equaltime/parity 分开。\n作者报告 Kodak512shapes800steps PSNR 26.60/26.41/22.80，单步 3.2/336/29 ms（Windfoil/DiffVG/Bézier）。（Sec.5.2,p.5; Table1,p.6）\n作者报告 Färlev4096²附近 60sbudget PSNR 20.96 对 19.96/19.77；largeN50k 仅 Windfoil 测试。（Table1,p.6）\n比较范围：DiffVG 共享初始化，Bézier 用 native 初始化/representation；Slug 为作者 WebGPU 移植。LargeN 基线未测；跨 runtime/CPU 使 timing 非纯算法速度。\n消融与诊断：比较 filterkernels/zoom regimes 与不同 shapeN/budgets，非完整组件消融。每 benchmark 一次 seed，无 variance；CLIP loss 示例不是生成语义质量定量保证。",
+    "insightZh": "把已有 exactfiltering/Greenintegral 组织成单 pixelindependentgather、单 axisbands 和共享 forward/backwardcoverage。不是第一个 analyticcurverasterizer，也不能将先平均 winding 再 fill 视为一般 exactcoverage。",
+    "whyRelevantZh": "直接服务 editablevectorrepresentation、imagevectorization 与 CLIP-guidedsketchoptimization，属于 2Ddesign 基础表示/计算方法；并非普通 2Dperception 或仅 UIinteraction。Embroidery/stitch 未验证。",
+    "evidenceZh": "Quadraticmonotonepieces 的边界积分可独立逐 pixel 闭式计算，fill 在积分后应用。（Sec.3.1–3.3,Eq.1–5,p.3；实际查看公式页，方法未给独立 pipeline 图。）\n作者报告 Kodak 平均 26.60dB/2.57s，DiffVG26.41dB/269s，800steps；paritymedian243×仅 20/24 达到。（Table1,p.6; Sec.5.2,p.5；主表已视觉检查；per-step 和 parity 不同定义，均未独立复现。）\n作者报告 Färlev4096shapes800steps26.77dB，DiffVG21.31、Bézier22.61；timing 排除 setup/warmup/output。（Table1,p.6；单 seed/单实例比较，不能外推所有 renderingworkloads。）\nSelf-crossing/windingcancellation 可出错，axisbox 对 rotation/shear 不 exact，只支持 closedquadratics。（Sec.8,p.7; Fig.2,p.4；限制页已实际查看，不能称完整 SVG 支持。）",
+    "caveatZh": "先 averagewinding 再 fill 在 selfcrossings/overlap 不等同 filteredfill。\nAxisalignedfootprint 对 rotation/shear/perspective 近似；shape-wisefiltering 不同于 fullscenecompositefiltering。\n仅 closedquadratics；cubic/strokes 需转换，differentiation 不支持 clippingmasks/gradients/textures。\nIntegeratomicgradients 有 quantization/overflowrisk，CPUpreprocessing 仍有成本。\n单 seedtimings 和 paritysurvivor 集合不能作统计显著性或普适加速保证。\nSkia/Figma 可正确处理论文失败的 self-crossing，boxreference 贴合不等于全部 SVG 正确性。\n完整 8 页已读；研究与网页 code 已核验存在，未执行/复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

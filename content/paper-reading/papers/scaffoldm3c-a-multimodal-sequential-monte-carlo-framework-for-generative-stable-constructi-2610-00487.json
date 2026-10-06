@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.00487",
+  "slug": "scaffoldm3c-a-multimodal-sequential-monte-carlo-framework-for-generative-stable-constructi-2610-00487",
+  "title": "ScaffoldM3C: A Multimodal Sequential Monte Carlo Framework for Generative Stable Construction Planning",
+  "authors": [
+    "Gadiel Sznaier Camps",
+    "Chengyang He",
+    "Guillaume Sartoretti",
+    "Eduardo Montijano",
+    "Mac Schwager"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.00487"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "lego",
+    "fabrication",
+    "3d-generation"
+  ],
+  "primaryTopicId": "lego",
+  "keywords": [
+    "ScaffoldM3C",
+    "LEGO",
+    "Generative Fabrication",
+    "3D Generation"
+  ],
+  "abstract": "Autonomously constructing physically realizable 3D structures remains a significant challenge due to combinatorial action spaces, interchangeable components, equifinal assembly sequences, and strict stability requirements during construction. State-of-the-art methods fine-tune large language models for text-based generative construction. However, these approaches do not allow for Multimodal (text, image, sketch) conditioning, overlook the practical role of scaffolding for stabilizing intermediate structures, and suffer from slow inference speeds. Therefore, we formulate construction as a probabilistic next-block generation task with multiple potential assembly actions and multiple potential task conditioning modalities. Concurrently, we explicitly consider the utility of scaffolding by introducing an auxiliary scaffold block token. We present Scaffold Multimodal Monte Carlo (ScaffoldM3C), a multimodal, lightweight, auto-regressive model for stable block-based construction, that proposes a set of next-step candidate blocks. Leveraging these candidates, we utilize Sequential Monte Carlo (SMC) to maintain a population of possible assembly sequences, allowing us to consider multiple, potentially different, assembly directions simultaneously. We train our multimodal architecture by extending the StableText2Brick dataset to contain image conditioning prompts and scaffold-stabilized build sequences. ScaffoldM3C is 4x smaller than competing baselines, yielding a 5x to 20x speedup during inference, while achieving comparable construction quality to state-of-the-art methods and higher overall stability. We demonstrate the effectiveness of our approach through simulations and real-world robot assembly demonstrations.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.00487v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.00487v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.00487v1 全文及 2026-10-06T13:09:39.000Z 审阅记录；PDF 13 页，SHA-256 28d7c3778489a86cc7e23cfe0cc75b2cbd8269b0684183cf747d15ea8669dd90，视觉核验第 1、3、4、5、7、8、9、10、12、13 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Exact PDFp1project 已访问，Code 与 GitHub Repository 仍 soon/disabled TODO；未公开真实实现，不能仅据 open-source 措辞提供 Code 链接。",
+    "ideaZh": "ScaffoldM3C 用 225M trainable next-block model 同时提出多种 placement，SMC 式 particle search 与 XY collision repair 生成带 auxiliary scaffold 的 LEGO-style 装配。作者报告 text collision-free100%但全序列 feasible 仅 26.72%，而实机三示例额外 rejection 筛选。值得深读 temporary support 与 multi-hypothesis assembly，不能把它写成已保证稳定/robot-accessible 的施工 planner。",
+    "motivationZh": "生成稳定积木构造不仅要匹配目标形状，还要选择顺序和临时支撑；论文希望把 multimodal 条件、候选搜索与支撑信息结合为可执行 construction planning。",
+    "methodZh": "StableText2Brick 序列按 centroid/contact-hull 规则重放并插支撑，扩展 text、render、Qwen-generatedrealistic/abstractconditions。Gemma3 编码 prompt，独立 constructiontransformer 用 Fouriercoords、interwovenattention、position/class/likelihoodheads 给 20candidate proposals。Particle search 保留多序列，通过 collisiontranslationpenalty 重权重并选最长完成序列。支撑 token 建模和并行多假设直接命中 brickconstruction，但 inference 只 collisionrepair 不 stabilitycheck，robotaccess/scaffoldremoval 仍待解决。",
+    "methodFlow": [
+      "重放 StableText2Brick，按接触面 convexhull/centroid 规则插入 1×1 可变高 scaffold",
+      "为每结构建立 13text/image/multimodalconditionpairs，Gemma3 编码 prompt",
+      "225Mconstructiontransformer 以 buildhistory 生成 20position/class/likelihoodcandidates",
+      "20particles 各扩展 candidate，XY minimumtranslation 修碰撞并以 shift 大小惩罚",
+      "按 normalizedscores 采样/重采样，收集 EOS 完成序列并选最长、weight 打破 tie",
+      "实机另做 rejection 寻找 feasibleplan，将 stand-in 支撑展开为 singletonblocks，robotposition/torquefeedback 执行"
+    ],
+    "experimentsZh": "实验设置：论文称 553Kconditionedsequences，各 structure 扩 13pairs，并非 553Kuniquegeometries；479text/288image testprompts，BrickGPTdisabledrollback/rejectionvariants 与 scaffoldfinetune，TopK/SMC。24textpopulation/temperatureablation，2A6000/1500epochs 训练；三 9-type3DprintedLEGO-stylerobotdemonstrations。\n作者报告 textSMCcollision-free100%、overallstable/feasible26.72%，TopK20.04%、BrickGPTScaffoldfeasible11.27%。（Table I, p. 7）\n作者报告 textSMC1.79±2.03s vsBrickGPTno-rejection11.46s 和 Scaffold64.51s；imageSMC2.13s。（Table I, p. 7）\n作者报告 24samplepopulation20→320 的 overallstable25→33.33%，time1.60→22.89s，非 monotonicimprovement。（Table II, p. 9）\n比较范围：主表均禁 rollback，并非与完整 BrickGPTphysicsverificationpipeline 对照；image 无兼容 baseline。Onlythreehardwaredemos 额外 rejection，notsystematicrobotrun。PromptCLIP/DINOproxies 与 train-distance 不是独立 OOD/generalization 证据；Gemmaencoding 是否计入 timing 未明确。\n消融与诊断：Population/temperature 给 trade-off 但仅 24samples；TopKtemperature.1vsSMC2/1 且 proposalpool 不同，未完全隔离 search。No 去 scaffold/multimodalencoder/matchedfullbaselinecontrol。",
+    "insightZh": "Brick-specific temporary supporttoken、multimodal 监督和多 hypothesisplacement 是直接 coreproject 贡献。SMC 在此作为 heuristicsearch 而非验证过精确 posterior；learnedpriors 与 collisionrepair 并不自动约束 stableconstruction，225M 也不含 pretrainedGemmaencoder。",
+    "whyRelevantZh": "主要研究对象就是 LEGO-styleinterlockingbrickdesign 与 assembly，auxiliarysupport 进入生成表示和训练序列，实际 robot 执行而非积木展示道具。直接属于 LEGOcoreproject，并独立涉及 constructionsequencefabrication 和 newbrickmodelgeneration。",
+    "evidenceZh": "稳定性由 supportcontacthull 与 centroidprojection 定义，dataset 据此补 scaffold。（Fig. 2, Sec. III-A/V, pp. 3, 5；简化静态规则，不包括 global 力平衡、friction/snapfit 或 robotclearance。）\nInference 只 XYcollisionrepair 与 particleweight，最后选最长；online 稳定性检查为 future work。（Sec. III-C, Algorithm 1, pp. 3–4; Sec. VI-B/VIII, pp. 8, 10；不能把生成粒子都描述为已物理验证的 feasiblepaths。）\nConstruction 主体 225M，但 conditioning 由 4-bitpretrainedGemma3 给出。（Sec. IV/V, pp. 4–5; Appendix B, p. 13；'trainedfromscratchwithoutfoundation models'不适用于整个 pipeline。）\n作者报告 text26.72%/image20.49%全序列 feasible，collision-free 皆 100%。（Table I, p. 7；区分每 blockstability 与全部 steps 合法率；SMCvsTopKtext+6.68percentagepoints，不是正文所称 6%relative。）\nRobot 三 structures45/86/89blocks 且另 rejectionsampling。（Sec. VI-E, Fig. 6, p. 8；不是未经筛选 100%robotconstruction 成功率；没有 repeat、耗时、failure/successrate。）\nCandidate targetlikelihood 由 singleGTnegativeerror 近似，AppA 未写概率 normalization。（Appendix A, Eq. 16, p. 12；原文ρ=−(MSE+CE)直接放 logρ数学不合法，需实现/作者澄清；不得把候选分布视作 equifinalGT 标注。）",
+    "caveatZh": "Syntheticprompts/images 可能歧义，positionalerrors 导致 OOD、早 EOS、漏 block/scaffold。\nSupportordering 可能挡 robotworkspace；最长 sequence 偏 largerstructure 且不显式检验稳定。\n需要 onlinevalidation 与 accessibilityawareplacementordering。\n100%collision-free 不等于 stablefeasible，全 sequencefailure 仍多数。\n简化 centroidcriterion 不建 globalmechanics；scaffold 拆除时序、removal 后稳定性未验证。\nAppAnegativeerrorlikelihood/KL 写法需实现澄清，dataset 缺 equifinalmultitargetlabels。\n225M/foundationfree 声明不包含 Gemma，参数和耗时范围不可混用。\n作者称 open-source 但 project 代码仍 soon；数字为作者报告，本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

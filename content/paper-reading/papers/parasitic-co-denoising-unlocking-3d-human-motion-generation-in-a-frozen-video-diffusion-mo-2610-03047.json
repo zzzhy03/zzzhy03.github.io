@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.03047",
+  "slug": "parasitic-co-denoising-unlocking-3d-human-motion-generation-in-a-frozen-video-diffusion-mo-2610-03047",
+  "title": "Parasitic Co-Denoising: Unlocking 3D Human Motion Generation in a Frozen Video Diffusion Model",
+  "authors": [
+    "Yunjiao Zhou",
+    "Junlang Qian",
+    "Lihua Xie",
+    "Jianfei Yang"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03047"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Parasitic Co-Denoising",
+    "3D Generation",
+    "Video Generation"
+  ],
+  "abstract": "Despite never being supervised on explicit 3D motion, large-scale text-to-video diffusion models synthesize realistic human motion in their generated videos. We ask whether this implicit knowledge can be turned into explicit 3D motion generation, without training a separate motion model. Probing a frozen Wan2.1 reveals that a recoverable motion signal is present in its intermediate states across the entire denoising schedule, not confined to the clean output. Motivated by this, we introduce parasitic co-denoising, a paradigm in which motion is decoded from the host model along its denoising schedule rather than produced by an independent generator. We instantiate it as the Parasitic Motion Decoder (PMD), an efficient flow-matching decoder that shares the host's noise schedule and reads its intermediate features through a $σ$-adaptive multi-layer fusion, leaving the host unmodified. Drawing its coverage from the host rather than from motion data, PMD leads dedicated motion generators on text-motion alignment at a small fraction of their trainable parameters, while producing paired video and motion in a single pass that motion-only baselines cannot match.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03047v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03047v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03047v1 全文及 2026-10-06T11:25:14.437935+00:00 审阅记录；PDF 9 页，SHA-256 8440186472d4c17edc2770e69bf38a0b5dff844163c976fcdeb5f26dd9299228，视觉核验第 1、3、5、7 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 PDF 没有本方法 public code/projectURL；不从作者身份猜 repo。",
+    "ideaZh": "PMD 把 19M motion decoder 挂在 frozen Wan2.1-14B 每个去噪步，同σ读取多层 features 生成 paired video/3D motion。作者报告 HumanML3D top1 检索 0.537，但 FID 0.098 弱于 DisCoRD0.032；小 trainable 参数不等于低总算力，仍跑 14B host50steps 并用 motion 数据监督。跨生成先验提取显式结构值得参考，不将“无独立 motionmodel”误读成零 motion 训练。",
+    "motivationZh": "视频生成模型已学习大量运动外观，却通常不输出显式三维人体运动；需要研究能否沿其 denoising trajectory 读取这些先验，而不重新训练整个视频模型。",
+    "methodZh": "先训练 motionencoder/decoder 和 video-VAEprojection 作 latentalignment，再 frozenhost/motionAE，在 sharednoise schedule 上训练 PMD 的 video/textcross-attention 与σ-adaptivelayerfusion。独立 video/motionnoise 允许多 motion 对应 hostvideo。两个 ViMoGenprotocols 和 HumanML3D 检验语义与 kinematics，报告 ablation；其他 hosts/modality 迁移未验证。",
+    "methodFlow": [
+      "MotionAE 与 videoVAEprojection 用 paireddata 对齐，保留 motionreconstruction",
+      "冻结 Wan2.1-14B 和 Stage1，video/motion 独立 noise 但共用σschedule",
+      "Hook5DiTlayers，经 hosthead、layeradapters 和 projection 映射到 motionlatents",
+      "σMLP 权重融合，PMD 以 self/video/textattention 预测 motionvelocity",
+      "Joint50stepflowdenoise，videoVAE/motiondecoder 分别输出 pairedresults"
+    ],
+    "experimentsZh": "实验设置：ViMoGen228K（MoCap/in-the-wild/synthetic），A 仅 10k/1ksynthetic，Bfull 训练＋MBench；另 HumanML3D。PMD6blocks、hidden256、5hooklayers、Stage2Adam100epochs,batch48；3RTX4090，50steps。Probing400held-outmotionpool、UE5 每 motion10views。\n作者报告 MBenchA PMD0.57/0.96 语义，B0.58/0.72；trainable19M。（Table1,p.5）\n作者报告 HumanML3D top1 0.537/FID 0.098；pairedvideo 无需额外独立 video 生成流程。（Table2,p.5; Method,p.4）\n比较范围：涵 MDM/MoMask/MotionCraft/ViMoGen/MotionVLA 及 HumanML3D 方法；训练参数比较排除 frozenhost，缺同总 FLOP/latency 和同 hostclean-outputpose-estimation 对照。\n消融与诊断：去 host/text/alignment、fusion/layer 位置对照支持 trajectoryfeatures；但没有独立 ablation 把共享σschedule 与一般条件 motionbranch 隔离，也没有其他 host 泛化。",
+    "insightZh": "实质贡献是在 frozenvideo 完整去噪轨迹上解码 secondaryexplicitmodality，以 noise-dependentlayerfusion 耦合而非只 cleanendpoint 估 pose。Decoder 仍是 motion-supervisedflowmodel；不能将可读 motion 信号证明为无需 motiondata 的 physicsinternalization。",
+    "whyRelevantZh": "Video 先验转显式 dynamic3Drepresentation，为跨模态 generativecontent 方法提供机制参考；当前只验证 humanmotion，object/LEGO/fabrication 迁移只是启发。",
+    "evidenceZh": "Stage1 学习 motionAE/video projection；Stage2 以 paireddataflow matching 监督，host 与 Stage1 固定。（Method,Eq.1–6,pp.3–4；Fig2 和两阶段训练已实际查看。）\n作者报告 MBenchB 语义 consistency/generalizability0.58/0.72，ViMoGen0.53/0.68；kinematics 非全面领先。（Table1,p.5；主表实际查看，semanticmetric 由 GeminiFlash2.5 评分。）\n作者报告 HumanML3D R-Ptop1 0.537±.002，FID 0.098±.011，对 DisCoRD0.524/.032。（Table2,p.5；语义与分布 fidelitytradeoff，不称所有指标 SOTA。）\n去 host/Stage1 严重损语义；dynamicfusion 胜 final-layer/uniform，7layers 与 5layers 近似。（Table3,Fig4,p.6；组件作用是作者消融，未独立复现。）\n19M 只计 trainablePMD，14Bfrozenhost 与 50steps 仍须运行，本文无完整 latency/memorycost 表。（ImplementationDetails,pp.5–6；从明确 host/steps 推断资源比较边界。）",
+    "caveatZh": "HumanML3DFID 弱于专用 MoCap 方法，偏 semanticcoverage 而非窄 datasetfit。\n其他 secondarymodalities 只作为展望。\nMotiondata 监督仍大量使用；19M 参数不计 14Bhost/Stage1，总 runtime 未报。\nMBenchsemantic 由 VLMjudge，无公开人评 correlation 或 pairedvideo-motionground truth 一致性误差。\nStage1latentdim/lossweights 与所有 pair 构造细节有限，code 缺失使复现边界不明。\n无独立 limitations section；全部 9 页读完，discussion 和结果页实际检查；数字为作者报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

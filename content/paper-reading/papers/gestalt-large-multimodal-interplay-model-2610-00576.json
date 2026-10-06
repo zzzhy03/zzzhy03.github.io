@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.00576",
+  "slug": "gestalt-large-multimodal-interplay-model-2610-00576",
+  "title": "Gestalt: Large Multimodal Interplay Model",
+  "authors": [
+    "Zequn Yang",
+    "Yu Miao",
+    "Haotian Ni",
+    "Ziheng Chen",
+    "Chengxiang Huang",
+    "Dongzhan Zhou",
+    "Kai Chen",
+    "Qi Zhang",
+    "Ji-Rong Wen",
+    "Yake Wei",
+    "Di Hu"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.00576"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Gestalt",
+    "VLM / MLLM",
+    "Image Generation"
+  ],
+  "abstract": "In this paper, we propose Gestalt, a new paradigm of large multimodal model built around multimodal interplay. Despite rapid advances, large multimodal models are reaching a bottleneck: existing approaches focus primarily on accommodating additional modalities while overlooking the distinct characteristics of each modality and the relations among them. Motivated by the multistage property of human multisensory perception, we propose a multimodal interplay pyramid that organizes multimodal modeling as a progression from modality-specific processing, through cross-modal alignment, to deeper multimodal integration. Guided by this pyramid, Gestalt adopts a unified discrete diffusion framework and an interplay-partitioned architecture, with learnable interplay tokens mediating cross-modal exchange and integration. The pyramid also structures its data organization and training strategy. Strong performance across image generation, multimodal understanding, and text-only evaluation shows that Gestalt significantly improves cross-modal integration while preserving modality-specific information, effectively harnessing the strengths of diffusion-based multimodal models and offering a promising path toward unified multimodal intelligence.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.00576v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.00576v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/GeWu-Lab/Gestalt"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.00576v1 全文及 2026-10-06T12:31:04.948018+00:00 审阅记录；PDF 17 页，SHA-256 21bb035206b2195e67779bf20891605ba374ee22b307b1d0fed21d729766050d，视觉核验第 1、3、7、8、9、14、15、17 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 明确 Code URL；实际 public repository 含 gestalt、configs、scripts/training/inference，官方 README 说明 weights/code 已发布、SFTdatacomingsoon。未运行。",
+    "ideaZh": "Gestalt 是基于 LLaDA-8B 的 unified discrete-diffusion image/text model：前四层用分模态 FFN 和 32 个 interplay tokens 控制跨模态交换，后层全连接，并按 unique/redundant/synergistic data curriculum 训练。作者报告 TIIF long78.86、CV-Bench3D86.1，适合关注统一理解/生成的表示组织。但主要优势是相对所测 diffusion unified baselines；BAGEL 多数通用理解指标更高，text rendering3.80 很弱，缺少架构独立消融，不能称全面超越 AR 模型或 pyramid 机制已被因果证明。",
+    "motivationZh": "统一图文模型需要共享信息，却也会让模态间干扰影响理解和生成；需要研究何时保留各自路径、何时交换信息，以及训练数据如何支持这种组织。",
+    "methodZh": "Image 由固定 IBQ VQ tokenizer 变为 16384 离散 codes，加入语言 vocabulary，统一 masked reconstruction 目标允许双向条件。ZoneI 禁止 visual/text 直接 attention、通过 learnableinterplaytokens 交换并保留独立 FFN，ZoneII 共享 attention/FFN 整合。70Mjoint+8Mconditionalpretraining、13.7M 理解/语言 SFT 另约 2.46M 生成 data，所有参数训练。17 页完整正文/appendix 已读，actualvisual 核查 architecture、generation/understanding/text 结果、data 过滤/curriculum 和 qualitative 图。没有独立 limitations section，风险明确来自正文边界和 reviewer 评估。",
+    "methodFlow": [
+      "统一离散 image/text tokens：LLaDA8B backbone 加 IBQ16384 visualcodes 与 MRoPE，image/text 在 sharedsequence 以 masked-diffusion 目标训练。",
+      "先分模态和受控交换：前 4layers separatevisual/textFFN，禁止直接 V↔Tattention，32interplaytokens 作为共享 mediator。",
+      "后层完整整合：后续 layers fullmultimodalselfattention/sharedFFN，image/text/interplaytokens 可自由交互。",
+      "分阶段 data 与 objective：Jointmaskedpretraining→conditionalCPT→三 phaseSFT；四类 data 一直保留，仅逐步偏向 visualunique/synergy，生成 data 近似均匀加入。"
+    ],
+    "experimentsZh": "实验设置：LLaDA8B-Instruct/IBQ 固定 tokenizer，70Mpretraining+8MCPT，13.7MSFT 另 2.46Mimage generation。UniGenEnglishLong/TIIF、8MMUtracks、6text-onlybenchmarks、4unique/synergybenchmarks；部分 baselinefrompapers，其余 officialcheckpoints。Text5shotMMLU/WinoGrande/TruthfulQA、0shot 其余；remote-domain 仅 50Kadaptation 作为边界，不分类为 remote-sensing 应用。\n作者报告 UniGenoverall73.30 对 LuminaDiMOO71.81，TIIFlong78.86 对 BAGEL71.70。（PDF p.7, Tables1–2）\n作者报告 CV2D/3D78.9/86.1，对 BAGEL77.7/84.2；通用 RWQA59.1 仍低于 BAGEL67.6。（PDF p.8, Table3）\n作者报告 MMLU49.50 对 Show-o271.70；embeddingCKA0.99494 不等价于保留基座所有 languagecapability。（PDF p.9, Tables4–5）\n作者报告 MM-IMDb67.07、SRBench53.17 对 BAGEL60.60/51.89；visualMIB-V59.89 对 BAGEL65.96 则不领先。（PDF p.9, Table6）\n比较范围：官方 checkpoint/papercomparisons 覆盖多种 AR/discrete-diffusionunifiedmodels，但数据、参数、generationsteps/budgets 不同；不是同 compute 训练的架构实验。未充分展示强 generalMMU-only 模型或近期更广 foundation models 的全面对照。\n消融与诊断：唯一 explicitcontrolledcurriculumstudy 同 CPT/10%SFTsubset 有 mixedresults；没有 nointerplaytoken、allsharedFFN、noZoneI 等同参数架构控制，也无 full-scale 多 seed/latency/throughput 分析。",
+    "insightZh": "是统一 discrete diffusion 中的 stage-specificmultimodalprocessing/datarecipe 与公开模型，而非仅 domainVQA 包装。Unique/redundant/synergy 是 task-levelheuristic 组织，未直接测量信息分解；representation 可视化与 benchmarks 支持结果，但不能单独定位 32tokens 或 ZoneI 的因果贡献。",
+    "whyRelevantZh": "新公开 unifiedmultimodalmodel 直接推进视觉/语言离散表示与 understanding/generation 联合训练，image generation 亦有实质结果，适合深读 architecture/datarecipe 与证据边界。",
+    "evidenceZh": "ZoneI 与 ZoneII 采用不同跨模态信息通路，image/text 共享 masked objective。（PDF pp.3–5, Fig.2, Sec.2–3.1；actualviewmaskdiagram 和 model 配置；前 4layers 独立 FFN/32interplaytokens，allparameters 训练。）\n作者报告复杂 imageinstructions 较强，但 renderedtext 类别弱。（PDF p.7, Tables 1–2；TIIFshort/long74.57/78.86；UniGenoverall73.30、Text3.80，低于 BAGEL12.23 和 OmniGen27.99；未复现。）\nUnderstanding 优势不能扩大为全面胜过 ARbaseline。（PDF p.8, Table 3；Gestalt/BAGEL CV3D86.1/84.2，但 RWQA59.1/67.6、MMVP48.7/69.3、GQA60.2/66.4。表实际查看。）\nCurriculum controlledstudy 仅 10%SFT，final 收益 mixed 且没有 architecture 独立消融。（PDF p.15, Table8 and Appendix B.1; pp.3–10 architecture/results；FinalMMStar+2.20、CV2D+0.63、MME−37.9；不能把 fullmodel 与外部 baselines 差异全归于 pyramid。）\nInterplaydata 类别不是 13.7M 逐例精确标注。（PDF p.14, Appendix A.2；每 subdataset 抽 100samples+taskheuristics/modelverification，按 subtask dominantcategory 归类。）",
+    "caveatZh": "PDF p.14：discreteVQtokenization 可丢 finevisualdetails，需 filter 原本可答但 tokenized 后不可答的数据。\nPDF p.8：representation 对比 Qwen3.8 用第三方 distilledvariant，非官方 9Bcheckpoint。\nPDF p.15：curriculum 不是 uniformgain，不同阶段改变不同能力。\n没有独立 limitations section 和 architectureablation，因果 pyramid 结论应比 newparadigm 叙述更保守。\nSharedembeddingcosine/CKA 与二维点云混合不能证明 synergy 计算完整，也不证明基座 language 能力无退化；缺直接 LLaDAbase 能力表。\nTextgeneration 评测 49.50MMLU 以及 imageText3.80 揭示明显能力边界，不能称全域 AR/图像模型优势。\nExacttrainingsteps/compute、totalparams 和 inferencesamplingbudget 不充分披露；官方 publicSFTdata 尚待发布，不声称全部训练数据可复现。\nImage 生成仍是 raster，没有 editableSVG/CAD/3Dconstraints；不额外归 2DDesign 或 Fabrication。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

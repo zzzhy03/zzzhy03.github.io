@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.02754",
+  "slug": "jumping-up-and-down-denoiser-diffusion-models-for-discrete-ordinal-data-2610-02754",
+  "title": "Jumping up and down: Denoiser diffusion models for discrete ordinal data",
+  "authors": [
+    "Yair Shenfeld",
+    "Ricardo Baptista",
+    "Stefano Peluchetti"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02754"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG",
+    "stat.ME"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Jumping up and down",
+    "Image Generation"
+  ],
+  "abstract": "Diffusion models are highly developed in continuous spaces for image and video domains. Recently, major advances have been made for discrete diffusion models for categorical data, specifically in the language domain. In contrast, diffusion models for discrete integer-valued data are less developed, despite the prevalence of this modality, ranging from images and music to gene counts. We introduce Jumping Up and Down (JUD)---a new family of denoiser-based diffusion models for discrete ordinal data. This is the first family of diffusion models for ordinal data which centers around training denoisers, which at the same time allows for bi-directional (up and down) perturbations of the data. The simplicity of the training objective, combined with the flexibility of bi-directional perturbations, leads us to obtain competitive results across different data modalities.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02754v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02754v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AnonrsySubmitter/JUD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02754v1 全文及 2026-10-06T16:36:36.231096+00:00 审阅记录；PDF 39 页，SHA-256 fef9f1b414c9f6ee46a9f8772c0a254e5668ad203decc59f7b8f813db2f43e2d，视觉核验第 1、5、6、8、9、10、36、37 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF 的 anonymized public repo 已确认，包含 synthetic/sudoku/cifar10；实际 CIFAR train.py、generate.py、jud_time.py 与 training modules 存在。未执行或复现。",
+    "ideaZh": "JUD 为 ordinal pixels/counts 建立可双向跳转的 denoiser diffusion：预测 lost-count 和 added-count 的条件均值，再解析得到 reverse CTMC rates。作者报告 CIFAR-10 FID 2.07，但需要 2048 NFE；Sudoku 最好分 66.99% 使用 shuffled digits 且增加训练预算。值得 skim 新的 discrete generative formulation 与离散 Tweedie 关系，而非把它当作已验证的高分辨率创作模型或通用 reasoning 突破。",
+    "motivationZh": "ordinal pixels 和 counts 具有自然顺序，但单向离散扰动难以修正采样过冲。目标是用简单的去噪预测，建立可双向跳转的 discrete diffusion。",
+    "methodZh": "单向 ordinal perturbation 的 sampler 难以纠正过冲。JUD 对非负整数使用 Binomial thinning 加 Poisson noise，对全整数使用两侧 Poisson noise；将潜在丢失/新增量的 conditional means 与 reverse birth/death rates 对应。可直接 MSE regression，也可学 clean-coordinate marginal posterior 再解析 average latent means。理论单个 denoiser 足够，但非局部关系会增加数值与调用成本，实际采用 shared two-head network。",
+    "methodFlow": [
+      "双向 ordinal corruption：对非负整数做 Binomial loss 加独立 Poisson addition，保留非负支撑；对全整数则做两侧 Poisson perturbations。",
+      "训练 latent means：回归 loss/addition counts 的条件均值，配合 moment-based affine EDM preconditioning；categorical 示例可由 marginal posterior 转成 latent means。",
+      "构造 reverse rates：通过 discrete Tweedie identities 将潜在均值乘 schedule derivative/level，得到相邻整数的 birth/death rates。",
+      "近似离散采样：从 Poisson 或近似 Skellam reference 出发，使用 Euler/tau-leaping、边界处理和 endpoint readout 生成数据。"
+    ],
+    "experimentsZh": "实验设置：作者测试低维 synthetic count distributions、unconditional CIFAR-10 32×32 和 hard Sudoku completion。图像使用 shared DDPM++、two scalar heads per channel 与 affine preconditioning；Sudoku 为 puzzle-conditioned DiT，CE/MSE 各比较 original/shuffled。已读全部理论与实验附录，本项目未复现。\n作者报告 CIFAR FID 2.07 对 Binomial Flow 2.94，作者 EDM reproduction 2.09，原 EDM 1.97。（Table2, p.8）\n作者报告 tau-leaping FID 在 256/512/2048 NFE 为 3.27/2.29/2.07；添加 marginal-preserving correction 在这些步数反而变差。（Table8, p.37）\n作者报告 Sudoku original MSE/CE 为 17.49%/40.31%，shuffled 为 29.00%/66.99%，所列 Duo 58.4%；每本文分数是多次 training runs 的 mean。（Table3, p.9）\n比较范围：synthetic 基于统一 MLP 与不同合法 reference，含 uni-directional、Count Bridges、Count-FM、SEDD；CIFAR 多数 baseline 为 published scores，非统一 compute。Sudoku 数字无 natural order，非 ordinal structure 必然有益的证明，且训练配置变化必须保留。\n消融与诊断：CIFAR 固定 trained model 比较 Euler/tau-leaping/NFE/correction；Sudoku CE/MSE 与符号 permutation 检查。缺少高分辨率、text-conditioning、编辑、视频或通用 categorical language 评估。",
+    "insightZh": "贡献是 denoiser regression 与双向 ordinal CTMC 的统一关系及证明，而不是只对已有 categorical sampler 换调度。先前 Binomial-only、Count Bridges 和 generator matching 已有部分构造，本文的新接口让简单 conditional-mean targets 与双向 sampling 联接；CIFAR 实验建立了 raw-pixel generation 的实际 transfer，尚未扩展到复杂视觉创作。",
+    "whyRelevantZh": "新的 denoiser-to-discrete-rate 接口对 ordinal visual generation 的基础建模有实际意义，且 raw pixels 上有验证；当前 transfer 停留低分辨率生成，不延伸到 spatial reasoning、text editing 或实体 fabrication。",
+    "evidenceZh": "精确 marginal recovery 的理论以 exact conditional means 和正确 terminal law 为前提。（Theorem2.1, p.5; Appendices B–C, pp.16–30；Binomial-Poisson terminal 为 exact Poisson；Poisson-Poisson 真实 terminal 是 data 与 Skellam convolution，实践仅近似用 Skellam。不能声称 learned finite-step sampler 也精确。）\n图像效果达到所列 discrete models 的较强水平，调用成本仍高。（Table2, p.8; Appendix G, Table8, pp.36–37；作者报告 2048-NFE FID 2.07；连续 EDM 原报告 1.97，因此不是所有 generation methods 的 SOTA。）\nSudoku 最好分混合了 augmentation 与训练配置变化。（Table3, p.9; Appendix H.1, p.37；original/shuffled updates 分别 10k/20k，cosine/constant LR、weight decay 0.05/0 也不同。66.99% 不能纯归因于 shuffling。）\n理论 single denoiser 存在非局部转换，实际 two-head 更稳健。（Sec.2.1, p.5; Corollaries B.5/C.4, pp.19/27；需要邻坐标 states 的 ratio，非一个任意 noisy-input 预测即可免费求完整生成 field。）",
+    "caveatZh": "不能使用 arbitrary source distribution。\n采样需要较高 NFE。\nPoisson-Poisson terminal 近似需要额外参数调节。\nexact-mean CTMC theorem 不直接提供 learned denoiser、endpoint cutoff 和 clipping 的有限步生成误差保证。\nsynthetic Poisson-Poisson 对若干 multimodal distributions 很差，理论统一不等于所有 branch 都实践稳健。\nCIFAR 的 pilot-targeted timestep sampling 是完整 recipe 一部分，结果不能仅归因于双向 jumps。\nSudoku 最佳提升存在训练预算/regularization confound，不能当作通用 reasoning capability。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

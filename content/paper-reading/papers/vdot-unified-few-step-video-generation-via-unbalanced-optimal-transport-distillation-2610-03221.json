@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.03221",
+  "slug": "vdot-unified-few-step-video-generation-via-unbalanced-optimal-transport-distillation-2610-03221",
+  "title": "VDOT++: Unified Few-Step Video Generation via Unbalanced Optimal Transport Distillation",
+  "authors": [
+    "Yutong Wang",
+    "Xingtong Ge",
+    "Enhuai Liu",
+    "Yunke Wang",
+    "Tianfan Xue",
+    "Yu Qiao",
+    "Yaohui Wang",
+    "Xinyuan Chen",
+    "Chang Xu"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03221"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "VDOT++",
+    "Video Generation",
+    "VDOT"
+  ],
+  "abstract": "Video creation spans text-to-video (T2V), image-to-video (I2V), and condition-based generation, yet video diffusion models remain costly because they repeatedly evaluate large backbones during sampling. Distribution matching distillation (DMD) reduces this cost, but its reverse Kullback--Leibler (KL) objective can provide unstable or incomplete guidance when the student and teacher distributions have limited overlap. VDOT addressed this issue by adding optimal transport distillation (OTD), whose explicit coupling supplies geometric directions for condition-based generation. Balanced OTD, however, performs full-mass matching between the spatial tokens of each corresponding student--teacher frame pair. This assumption weakens for T2V and I2V, where one condition admits many valid outputs and spatial content need not align across different realizations. We present VDOT++, a unified distillation framework that applies the same training recipe separately to generators for the three task families. It makes OTD robust to output diversity through an asymmetric unbalanced formulation that allows unreliable student tokens to carry less mass while maintaining coverage of the teacher tokens. An $\\ell_1$ ground cost further replaces mean-based aggregation with a more mode-preserving weighted median that limits the influence of distant transport targets. The two changes respectively determine whom to match and how the selected targets should be aggregated. We additionally combine distribution matching and adversarial refinement through sequential backward passes, and exploit the decoupled score networks for cross-scale distillation, where larger score networks improve a compact generator. Experiments on UVCBench, VBench, VBench-I2V, and the VACE benchmark show that the resulting four-step generators are competitive with many-step teachers and strong few-step baselines across all three task families.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03221v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03221v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03221v1 全文及 2026-10-06T14:19:43.473405+00:00 审阅记录；PDF 18 页，SHA-256 f62a0a54306a2cf3303347168564632b598cd8f9ab7569f9209c4d6caf637b9e，视觉核验第 1、4、5、9、10、11、12、15、16、17、18 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact PDF 正文、footnotes 和 appendix 没有作者 VDOT++project/repoURL 或明确 release 承诺；不能从前作/使用 SelfForcinglibrary 猜本篇 Code。",
+    "ideaZh": "VDOT++ 用 asymmetric UOT 松开 student token mass、保留 teacher marginal，并把 L2 transport cost 改 L1，以减少多解条件下强制匹配/均值混合；DMD 与 GAN 分次 backward 累积同一更新。作者报告四步 Wan14B T2V 归一化 81.59 对 teacher77.70，值得 skim 少步 visual creation distillation。Unified 是三个 task 模型共用 recipe；plan 仅帧内、coverage 仅 tokenmarginal，不能当时空 motion/分布多样性保证，dense/composite 任务并不全升。",
+    "motivationZh": "少步视频蒸馏中，强制 student tokens 与多种 teacher 解一一匹配容易产生混合或失真；需要允许不平衡匹配，并选择更适合保留结构的 transport cost。",
+    "methodZh": "Re-noise 学生 generatedlatent 后 real/fakescore 网络分别评价，spatialpool 每对应 frame 形成 token 集合，60 轮 logSinkhorn 求 transport；studentτs.1/teacherτt10 使 unreliablelocalcorrespondence 梯度衰减，L1 sign 梯度避免远 target 幅值主导。Plan detached，OT 伪梯度通过 fake-score 网络回 generatedsample，DMD 仍监督全视频；relativisticGAN registerhead 复用 fakebackbone。三种 task 独立 distill VACE/WanT2V/WanI2V，crossscale 只在训练用更大 score。完整 18 页含 proofs/schedule/dataset/allcompositetables 已读且关键页实际核图。",
+    "methodFlow": [
+      "生成并评价同 noisylatent：四步 generator 输出 re-noise，frozenrealteacher 与 trainablefakescore 保留 T/H/W 预测，分别 pool/flatten 每 frame 的 spatialtokens。",
+      "不对称 partialtokentransport：Uniformmarginal、entropy.1、sourceKL.1/targetKL10，logSinkhorn60steps；teachercol 近似覆盖，studentrowmass 可增减，不跨 frame 匹配。",
+      "L1 局部梯度叠加 DMD：Detachedplan×componentwise sign 给局部 pseudo-gradient，经 fake 网络反传；DMD0.9/OT0.1 保留 globalguidance，不直接把 weightedmedian 生成成 video。",
+      "jointGAN 与 crossscale 部署：Matchingbackward 释放 graph、同 noise 重跑 GANbackward 再 singleupdate，fake critic 同样累积；score/discriminator 训练后丢弃，1.3B 部署可用 14Bauxtraining。"
+    ],
+    "experimentsZh": "实验设置：四 H200/FSDP2100steps 每 GPU1sample，criticR5、900warmup 后 GANschedule；250KArtgrid4Krescale832×480、InternVLcaptions/controlextract，UVCBench8single+10composite×20videos 由 Wan/VACE/QwenImage 合成并 humanverify。VBench 六 quality/consistency 维度 normalizedaverage，不是完整 16dimension 官方 total。\n作者报告 T2V 四步 81.59vsWan14B50×2 77.70/DMD2 四步 78.18，Dynamic54.91vs36.20 但 subject96.89 低于 teacher96.99；Hunyuan1.5 多步 83.36 仍更高。（PDF p.9, Table3）\n作者报告 I2V78.38vsteacher77.92/VDOT74.86；Dynamic45.07vs42.54，但 background95.38vs96.05、motion97.91vs98.19 下降；非所有 dimension 保持。（PDF p.9, Table4）\n作者报告固定 GAN factorial：T2V balancedL2 77.62/balancedL1 80.41/partialL2 79.47/partialL1 81.59；VACEstrong78.31→78.56 近似，符合 weakcondition 更有用。（PDF p.9, Table5）\n作者报告 asymmetricSourceRelaxed81.59 vsSymmetric78.26/TargetRelaxed77.84/balancedL1 80.41；differentpenaltydirection 有实证，但 noerrorsbars/多 seed。（PDF p.10, Table6）\n作者报告 1.3Bscore79.98→14Bscore80.51，同 1.3Bgenerator 四步；moretrainingcost. CompositeFirstDepth77.54 低于 VDOT78.78，FirstScribble76.88 低于 77.72，未普遍改善 constraints。（PDF pp.11/17, Tables8/11）\n比较范围：sameWanDMD2/VDOT/AccVideo/CausVid/rCM 与多步 teachers；DMD2 由 SelfForcingcode 自行适配非 officialvideo 实现。大跨 backbonecomparison 非 matchingdatacompute，sharedbaselineprotocol 细节及 T2Vpromptcount/seeds 未充分给。仅 sixdimension 不包含独立 text/controladherence 或 multiseedperpromptdiversity/humanperception。\n消融与诊断：Matching×cost×conditionstrength、source/target/symmetric、noGAN/alternatingjoint 及 scorescale 对照充分定位局部增益；没有 transportplanconfidence 校准、完整 temporalcorrespondence、samplingresolution/length wallclock 或 errorsbars。GANjointimaging 提升但 aesthetics 不 uniform，Table7 如实保留。",
+    "insightZh": "继承 VDOT 的 DMD+balancedOTD，实质扩展是对应 distillationrole 的 asymmetricmarginals、L1robustaggregation 及 jointtraining/crossscale，且有 matching×cost factorial 和 marginaldirectioncontrols。Generativeweakconditions 的少步控制效率直接关联 video-generationvisualworkflowtransfergate；仍是既有 Wan 系统上的 trainingobjective，不是 all-in-one 新 backbone 或实时 worldmodel。",
+    "whyRelevantZh": "少步 generation 支持视觉创作中多次可控 render；不对称 partialmatching/robustcost 可作为多解设计监督的参考，具有直接 workflowefficiencytransfer，但未验证 SVG/3D/CAD/fabrication。",
+    "evidenceZh": "理论 gradient 与 median 局限固定 plan、正 mass 和单坐标，不保证全部 image modes。（PDF pp.4–7/15, Propositions1–4/AppendixB；Envelope 性质对 costmatrix 成立；L1weightedmedian 在 ties 是 subgradient，coordinatewiseaggregation 可离开 jointteacherfeaturemanifold。该限制为 reviewer 推断；没有全 NN 优化收敛/全分布 modecoverage 证明。）\nTokenmass 保留是每对应 frame 教师 marginal 约束，不是全 teacherdistribution 支持覆盖。（PDF pp.4/6/12, §4.2–4.6/Limitations；real/fakescores 都评价 generatedxt，OT 对 fakebranch 给伪梯度；frame-independentplan 无跨帧 trajectorytransport，不能把图 2heatmap 当 semanticconfidencecalibration。）\n统一 recipe 分别训练 taskmodels；额外网络只训练用。（PDF pp.1–3/8/11–12, Abstract/§5.1/§5.4；VACE-Wan14B/T2V14B/I2V14B 独立 generator，teacher/fake/discriminatordiscard；crossscale 性能不是 1.3B 自训练所得。）",
+    "caveatZh": "PDF p.12：仅对应 frame 内 spatialplan，future trajectory/spatiotemporaltransport、adaptivepenalties。\nPDF p.12：当前 fourstepbidirectional，one-step/streaming/autoregressive 需要解决更强 rollouterror/supportmismatch。\nPDF pp.8/16–17：dense/composite 任务存在 dynamics-imagingtradeoff、多数 compositeimaging 下降。\nDynamicdegree 反映 motion 但不等于合理 motion/control 或分布 modecoverage；只有 sparse3framesqual，不能主张物理/轨迹更准确。\n近似 teachercolmass 既不覆盖 unvisitedglobalmodes 也不确保 validcorrespondence，unreliablefeature 可能只是当前 cost 下难匹配；weightedmedian 无 jointmanifold guarantee。\nNFE50×2→4 只是调用数，不直接等于 25×wallclock，3Dprior/fabricationtransfer 和 realtime latency 未测试。\n自产 UVCBench 小量 20/task，与 trainingprior 同 Wan/VACE，未明确 semanticleakage/外部 generatorOOD；未看到 pairedseed/humanaccuracy/explicitcontrolmetric。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

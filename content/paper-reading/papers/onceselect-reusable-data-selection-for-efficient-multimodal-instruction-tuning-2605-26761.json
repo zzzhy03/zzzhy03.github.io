@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2605.26761",
+  "slug": "onceselect-reusable-data-selection-for-efficient-multimodal-instruction-tuning-2605-26761",
+  "title": "OnceSelect: Reusable Data Selection for Efficient Multimodal Instruction Tuning",
+  "authors": [
+    "Mingkang Dong",
+    "Muxin Pu",
+    "Hongyi Cai",
+    "JieLi",
+    "Jiancheng Pan",
+    "Xu Zheng",
+    "Yadan Luo",
+    "Yuqian Fu"
+  ],
+  "publishedAt": "2026-05-26",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.26761"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "OnceSelect",
+    "VLM / MLLM"
+  ],
+  "abstract": "Multimodal instruction tuning is widely used to adapt multimodal large language models (MLLMs), yet the large-scale image-text datasets it relies on are often highly redundant. Existing data selection methods are commonly tied to specific datasets, target models, or training states, requiring retraining or recomputation when transferred to new settings. We ask whether a selection signal can instead be learned once and reused across datasets and models. We propose OnceSelect, a reusable data selector trained once and directly applied to unseen datasets. OnceSelect encodes image-instruction pairs in a frozen joint multimodal space, clusters them into pseudo-labels capturing coarse semantic structure, and trains a lightweight selector using a fixed validation macro-accuracy criterion. Low-confidence samples under the learned partition are treated as informative candidates. As the selector is independent of the downstream MLLM, it can be transferred across datasets without retraining or model-dependent scoring, while selected subsets can be reused across model architectures. Using only 15% of LLaVA-625K, OnceSelect retains 99.2% of full-data aggregate performance across nine evaluation metrics. Without retraining, it achieves 103.4% and 102.5% relative performance on unseen Vision-Flan-186K and LRV-Sub-180K. The same 93.7K LLaVA subset further achieves 99.9-106.7% relative performance across Qwen3-VL and InternVL3 models without model-specific scoring or reselection. These results demonstrate efficient and reusable multimodal data selection across datasets and model architectures. Code is available at https://github.com/DMK041218/OnceSelect",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.26761v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.26761v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/DMK041218/OnceSelect"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.26761v3 全文及 2026-10-06T11:55:44.531519Z 审阅记录；PDF 20 页，SHA-256 174462a39845f0291d073d41b548bc0cfc2a2aafb53fa7f452fff8f278591c94，视觉核验第 1、4、7、8、9、17 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页 code URL 已确认 public，仓库含 onceselect feature extraction、selector training、transfer scoring 与 DPP implementation 及 checkpointmetadata；未下载模型或运行代码。",
+    "ideaZh": "OnceSelect 在固定 CLIP space 聚类，用轻量 classifier 的 low confidence 与 cluster-wise k-DPP 选择 multimodal SFT 数据，再跨数据和模型复用。作者报告少量数据保留大部分平均表现。组合实用；uncertainty 是启发式，未直接核验回答质量，结果主要来自单 seed。",
+    "motivationZh": "multimodal instruction tuning 的数据筛选常需针对新数据或新模型重新训练；目标是复用轻量选择器，以较少样本兼顾任务覆盖与样本多样性。",
+    "methodZh": "source image-instruction concat embeddings 经 KMeans，centroid-nearest3%作 pseudo-label core，gated image/text selector 在 core validation macroaccuracy 接近 0.6 的 checkpoint 冻结。新 dataset 仍计算 CLIP features 并映射 source centroids，不重训 selector；各 cluster 按 population 分 quota，将两倍 quota 的 low confidence pool 分 128 大小 blocks 做 quality-weighted fixed-cardinality DPP。response 保持原样、不参与 selection，subset 可跨 MLLM 家族重复 SFT。",
+    "methodFlow": [
+      "以冻结 CLIP 提取 image 与 user-turn instruction 表示，构建 128 source semantic clusters。",
+      "取每 cluster centroid 最近 3%作 pseudo-label core，独立 split 训练 gated 轻量 classifier。",
+      "按 core validation macroaccuracy 接近预设 0.6 选 intermediate checkpoint 并冻结。",
+      "target embeddings 映射 source centroids，按 target population 分配 data quota 及 low-confidence candidate pool。",
+      "fixed-seed blockwise k-DPP 组合 uncertainty 与 diversity，保留原 response 供不同 MLLM SFT。"
+    ],
+    "experimentsZh": "实验设置：sourceLLaVA624610、targetVision-Flan186103/LRV180712；CLIPB/32、128clusters、core3%、80/20split，selectorAdamW1e-5/100epochs。LLaVAVicuna7B 冻结 vision，LoRA128+projector 一 epoch/seed17；同 subset 评估 Qwen3-VL4/8B 与 InternVL3-8B，九 metrics 含 strict circular MMBench、MME、AI2D、POPE、ScienceQA、OCR。\n作者报告 15%subsetOCRBench30.9 对 full31.3、MME-C314.6 对 278.6；不含 DPP 或 gate 等消融 aggregate 约 97.0–97.4%，组合提升约 1.8–2.2points。（Tables1,4, pp.7,9）\n作者报告 source 一次 training+selection0.68GPUh、selector 复用 LLaVA0.18/target0.05GPUh，singleA6000；未经本项目运行。（Fig.3/Sec.4.4, p.8）\n作者报告 5%/15%/25%budget aggregate95.0/99.2/98.9，更多样本不单调更好；没有 multi-seederrorbars 支持微小差异显著。（Table9, p.19）\n比较范围：同 finaltuning 配置含 Random/Length/Perplexity/COINCIDE/PRISM/RDS+/ScalSelect/VisNec/XMAS。ScalSelect 部分固定 100K 略高于 93.7K 且如实列数；targetVision-Flan 主要比 Random，transferbaselines 覆盖不全。\n消融与诊断：dynamicgate、interaction、DPP、highconfidencepool，四 backbones、cluster/ratio 敏感性及 tSNE。没有系统剥离低 confidence 中的 mislabeled responses、OODnoise 与有效 difficulty，也没有 global DPP 与 blockwise approximation 差异检验。",
+    "insightZh": "cluster pseudo-label、uncertainty selection、gating 和 DPP 均为已有组件，贡献在 source 语义 reference 与 selector 一次训练、多数据及多模型复用的组合协议。对降低反复 model-dependent rescoring 有方法价值，但尚不能证明 low confidence 本身等于高监督质量。",
+    "whyRelevantZh": "针对通用 MLLM instruction-data 效率与跨模型复用，可为视觉推理 training-data 选择提供实用启发；不是空间 agent、3D segmentation 或 native 生成的方法。",
+    "evidenceZh": "selector 只读 image/instruction，source-trainedcentroids 及 intermediate checkpoint 直接用于 target，DPP 在 128 大小 blocks 独立执行。（Sec.3/Fig.2, pp.4–6; Appendix7.6–7.8, pp.16–18；方法图与 checkpoint 页已查看；复用不免除新 dataset feature extraction/scoring。）\n作者报告同 15%budget LLaVA 平均相对表现 99.2%，优于 ScalSelect97.6、Random95.7，但 MMBench60.0 低于 full64.0，SQA63.9 低于 67.6。（Table1, p.7; Appendix7.5/Eq.12, p.15；主表已查看；Rel.是九 metrics 各自比 full 后的等权平均，不是 99.2%accuracy。）\n作者报告 selector 无 target retraining 时 Vision-Flan/LRV 相对表现 103.4/102.5%，同 93.7Ksubset 在 Qwen3/InternVL 相对 99.9–106.7%。（Tables2–3, pp.8–9；transfer 表实际查看；LRV POPE precision61.1 低于 full69.1，不能说 transfer 各能力都提升。）\n作者报告 default checkpointepoch35/macro0.6108；ratio15%与 K128 为实验中 best observed 选择，sole source scale/diversity 未系统检验。（Sec.6, p.9; Tables7,9–10, pp.17,19；limitations 页已查看；checkpoint 本身不用 benchmarklabel，但全配方超参数仍由实验表现选择。）",
+    "caveatZh": "LLaVA625K 为唯一 source，source 规模、多样性与多 source reference 尚未系统检验。\nselector 不查看 assistant response，不能识别回答错误或 image-instruction-response 不一致。\n低 confidence 可表示有用边界也可表示 OOD/noise；rank-weighting 免校准不免 quality 问题。\nblockwise DPP 只保证 block 内 diversity，sourcecluster 比例可能继承 source 表示偏差。\noneepoch/subset 比 full 少 optimizersteps，数据效果与避免过拟合/训练预算同时变化。\n固定 seed 且无 confidenceinterval，15%/K128 实验调参不能当 benchmark-free 普遍最优。\n本项目未运行或复现实验。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

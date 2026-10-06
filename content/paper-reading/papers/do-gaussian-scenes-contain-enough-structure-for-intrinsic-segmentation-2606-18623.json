@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2606.18623",
+  "slug": "do-gaussian-scenes-contain-enough-structure-for-intrinsic-segmentation-2606-18623",
+  "title": "Do Gaussian Scenes Contain Enough Structure for Intrinsic Segmentation?",
+  "authors": [
+    "Mohamed Rayan Barhdadi",
+    "Hasan Yazar",
+    "Erchin Serpedin",
+    "Mehmet Tuncel",
+    "Hasan Kurban"
+  ],
+  "publishedAt": "2026-06-17",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2606.18623"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "Do Gaussian Scenes Contain Enough Structure for Intrinsic Segmentation?",
+    "3D Segmentation"
+  ],
+  "abstract": "Gaussian segmentation is usually posed as transferring object knowledge from 2D foundation models into a 3D representation. This leaves a fundamental question unanswered: how much object structure is already encoded by a trained gaussian scene? We investigate this question with GS-IntSeg, an intrinsic, mask-free, and training-free method that constructs partitions using only: gaussian geometry, opacity, spherical-harmonic radiance, and deformation trajectories. On the dynamic Neu3D and HyperNeRF datasets, GS-IntSeg obtains a mean of 0.677 mIoU across multi-view and monocular scenes without masks, external features, or segmentation training. This intrinsic formulation also enables GS-IntSeg to require approximately 2.5 minutes per HyperNeRF scene on a consumer RTX 5080 to construct its partitions, over 10x faster than SAM-based methods that require mask generation, feature rendering, and other stages. These results suggest that gaussians alone can approach mask-supervised performance in gaussian scenes segmentation. While a gap remains between intrinsic and foundation model based methods, to our knowledge, GS-IntSeg is the first mask-free approach to gaussian segmentation, motivating a re-evaluation of the assumption that gaussian scene segmentation must be based on external masks and pointing toward an alternative faster, more generalizable segmentation approach.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.18623v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.18623v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/KurbanIntelligenceLab/intrinsic-gs"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.18623v2 全文及 2026-10-06T12:55:13.000Z 审阅记录；PDF 10 页，SHA-256 c230ba3f78d77debba94c4e1e83a5557e5de991725829c7db88dd1c6ce0b5128，视觉核验第 1、4、5、6、7、8 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFp1 作者 project→官方 Code 链接确认 publicrepo，self_supervised_scripts 有 affinity_graph/clusterers/render/evaluation 真实实现。README 标 REPO GETTING UPDATED 并仍为旧指标/Leiden 版本，不能声称代码完整复现此 v2dualInfomap 结果。",
+    "ideaZh": "GS-IntSeg 从 frozen Gaussian 的 geometry/SH/motion 建立 Leiden+Infomap partition bank，以单点 query、family-balanced consensus/common fate 选持久区域，分割无需外部 mask/features 或训练。作者报告 Neu3D0.899 接近 TRASE0.902，HyperNeRF 仅 0.566；可略读 intrinsic structure baseline，不能把物理 coherence 等同语义 object 或完整训练免费。",
+    "motivationZh": "Gaussian scene segmentation 往往额外依赖二维 masks 或特征蒸馏；论文检验已有 Gaussians 的材质、几何和运动属性是否足以支持无需额外标签的分组。",
+    "methodZh": "方法检验已训练 Gaussian 本身包含多少可分组信息：material branch 有四尺度 partition，dual harmonic branch 用 phase-sensitive 与 rotation-invariantSH、geometrycontinuation 和可靠 motion 建层级。固定单点后，选择只访问自身 regionagreement、coverage 和 trajectorycoherence，不读 GTmask。其有用性是拆解 scene 结构来源与提供 persistent 匿名 regions，而非新的语义模型或重建精度提升。静态场景只质性，dynamic 效果对 capture regime 差异大。",
+    "methodFlow": [
+      "读取 frozenGaussian geometry/covariance/opacity/SH 和可选 deformation 轨迹",
+      "透明度过滤后建 k20 center graph；material 四尺度 Leiden partitions",
+      "Phase/invariant SH 融合 surface、reliability 与 common-motion cues 得到 Infomap hierarchy",
+      "由单 positive point 在各 partition 检索 region，以 family-balancedagreement 和 coveragepenalty 选一个",
+      "Dynamiccommon-fate 与 parentfragmentation 规则细化；canonicalGaussianID 随 deformation 持久 render"
+    ],
+    "experimentsZh": "实验设置：5Neu3D+10HyperNeRF dynamic scenes，deterministicGT-derivedpositivepoint、singlepredictionIoU，固定 partition/hyperparameters 与 selectorablation；two static scenes qualitative。RTX508016GB，checkpoint-to-partitiontiming，TRASE stageaccounting。\n作者报告 Neu3D0.899vsTRASE0.902，HyperNeRF0.566vs0.866；lemon/banana0.185/0.174。（Table 1, p. 7）\n作者报告去 commonfate 使 HyperNeRF0.566→0.405，Neu3D 保持 0.899；candidate-meanconsensus 令 Neu3D 降 0.793。（Table 2, p. 7）\n作者报告 HyperNeRF150.3s vsTRASE2259.6s 预处理 15×；跨 scene 平均 190.4s、3.01GiB。（Sec. 5.5, pp. 7–8）\n比较范围：SA4D/GaussianGrouping/TRASE 有 mask 监督，监督条件不同。固定 point 由 GT 生成不代表真实 interactivequery 分布；静态和其他 reconstructionfamily 未定量。\n消融与诊断：同 partition、同 point 消融 commonfate/coverage/familybalance/fragmentation；额外 cuefamily 和 point-sensitivity 仅引用 supp，本 exact10 页 PDF 未包含。",
+    "insightZh": "Gaussian intrinsic attribute 的多 family 分组与 deterministicselector 构成可审计 baseline，将 mask/semanticcue 引入前的结构与下游监督分开。Leiden/Infomap 和感知 groupingprinciples 是已有工具；property 证明是条件 maskindependence 与 scorebound，不是 semanticrecovery 保证。",
+    "whyRelevantZh": "对 object-centric3D/4Dscene 资产分解和可编辑 Gaussianregions 提供无需 foundationfeatures 的参考基线；没有主 claim shapegeneration 或 newsemanticVLM。",
+    "evidenceZh": "Material、dualharmonic、motion 与 Infomap 层级来自 frozenattributes，无 externalvisualfeatures。（Sec. 3.1–3.5, Fig. 3, pp. 3–5；整个 Gaussianreconstruction 仍由 RGB 训练。）\nGT 用来挑 largesttargetview/deepestinteriorpoint，之后 selector 不读 GTmask。（Sec. 3.6/4/5.1, pp. 5–6；条件 maskindependence 不表示 evaluation 没有监督或人工点位鲁棒性。）\n作者报告 Neu3D0.899、HyperNeRF0.566、15scene overall0.677。（Table 1, Sec. 5.2, pp. 6–7；不是两个 datasetmean 简单等权平均；HyperNeRF 有明显失败。）\nRuntime15×是 HyperNeRF checkpoint-to-partition vsTRASEmask/renderstages。（Sec. 5.5, pp. 7–8；排除两者 reconstruction、自身 categoricalrender/metric 及 TRASEcontrastivetraining；无 Neu3Dtimingspeedup。）\nStatictransfer 只有两 scene 质性，motion 可能合并交互 objects。（Sec. 5.3/6/7, pp. 6–8；Anonymouspersistentregions 不等于 semanticobjectidentities。）",
+    "caveatZh": "Intrinsicgrouping 可能合并 hand+heldobject、拆 articulatedobject；SH 受 light/specularity/exposure 影响。\nCenterkNN 会连 contactsurfaces、漏 thin structures。\n只两个 dynamicdatasets 定量；static 和其他 capture/reconstructionfamily 待验证。\nGT-derivedlargestview/deepestinteriorquery 比自然 userpoint 有利，propertyproof 不构成 semanticaccuracy 保证。\nCheckpointtraining 与 rendering 时间不在 15×范围；速度不能扩到 fullpipeline。\n公开 repoREADME 仍报旧 Intrinsic-GS 指标/结构并标 gettingupdated，exactv2dualInfomap 实现一致性未确认。\n本项目没有复现；全部数字为作者报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

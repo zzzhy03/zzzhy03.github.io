@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2609.39924",
+  "slug": "covisco-codec-native-vision-encoder-with-native-token-compression-for-unified-image-video-2609-39924",
+  "title": "CoVisco: Codec-Native Vision Encoder with Native Token Compression for Unified Image-Video Understanding",
+  "authors": [
+    "Yulong Liu",
+    "Xiaotian Han",
+    "Junyuan Shang",
+    "Yuchen Ding",
+    "Zhenyu Zhang",
+    "Shuohuan Wang",
+    "Guibo Zhu",
+    "Sirui Han",
+    "Dianhai Yu"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39924"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "CoVisco",
+    "VLM / MLLM"
+  ],
+  "abstract": "Vision-language models face a fundamental scaling bottleneck: the number of visual tokens grows with both temporal duration and spatial resolution, making long-video understanding expensive for the vision encoder and the language model. Existing methods often compress visual tokens after dense encoding, creating a mismatch between the representation used during training and the compact interface required at deployment. We present CoVisco, a codec-native vision encoder with native token compression for unified image-video understanding. By combining codec-native input support with segmented attention, CoVisco can encode long visual inputs in a single forward pass without forming dense patch-to-patch interactions across all frames. Each temporal segment is equipped with learnable abstract tokens that learn a compact segment-level representation, while fine-grained patch tokens remain available throughout the encoder. Alternating intra-segment and abstract-communication layers preserve video-level context through the abstract-token channel. A lightweight selector further exposes either abstract tokens alone or abstract tokens augmented with a runtime-selected subset of patch tokens, yielding a compact visual interface that reduces the visual context and prefill burden of downstream MLLMs while retaining fine-grained evidence when needed. Pretrained with contrastive objectives on 565M image--text pairs and 6.4M videos, CoVisco shows competitive performance on video-oriented embedding and multimodal understanding benchmarks. In the evaluated four-segment, 64-frame setting, abstract-only inference uses only 400 visual tokens while achieving video-understanding performance close to, and on some benchmarks exceeding, OneVision-Encoder. Selected patch tokens further improve fine-grained video reasoning. Project URL: https://github.com/ernie-research/CoVisco.git",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39924v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39924v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ernie-research/CoVisco"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39924v1 全文及 2026-10-06T14:23:36.316517+00:00 审阅记录；PDF 26 页，SHA-256 c494e68821128cba9574b120d9c4f7892660542815d380bd2e0a4770cdfa89a0，视觉核验第 1、5、12、13、14、15、22、23、24、25 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.2 打印 projectrepo；实际公开确认 CoVisco_ViT/CoVisco_sft 预训练与 MLLM 实现/launchers，非 README-only。官方 README 说明 weightscomingsoon，不能把 codeavailable 写成 checkpoints 或 exact 结果可直接复现。",
+    "ideaZh": "CoVisco 把各 segment 的 100 个 learned abstract tokens 作为 contrastive 监督与跨段沟通通道，保留 ViT 内部 patch stream 供 LLM 追加 topK 细节。作者报告 64 帧四段只给 LLM400tokens 仍有较强 video QA，值得 skim 摘要与细节双输出接口。400 不是 ViT 只计算 400；长视频 16 段会到 1600，OCR 摘要模式大幅失真，也没有 wallclock 证据，不能称 26 倍实际提速或已支持 causal streaming。",
+    "motivationZh": "高分辨率图像与多段视频产生大量 visual tokens，压缩又可能丢失细节；需要同时提供紧凑摘要与可按需读取的 patch stream，兼顾内容与 context 成本。",
+    "methodZh": "0.3B ViT24layers 交替 segmentfullattention 与每 query 读 localpatch+allsegmentabstracts，禁止 crosssegmentpatch 直接 attention。CodecHEVCmotion/residual 在输入前 equalbudget 每 segment 选 patch，uniform/collage 也支持；4DRoPE 跟原未裁 grid 坐标。Onlyabstractattentionpool 接受 SigLIP 式 pretraining，targets 来自 SigLIP2 和 Qwen3VLEmbeddings。两层 selector 先 patchselfattention 再读 abstract，scoretopK 各段独立，训练 selectedfeatures 乘 continuousscores 回传；ranking 不读语言问题，K 是 runtimebudget 不是 agent 自动任务决策。完整 26 页 inclattentioncost/codec/protocol 全部读完，关键 figure/table/limitations 实际核图。",
+    "methodFlow": [
+      "按段构造 codec 或 frame 输入：HEVC 原 stream 无 reencoding，motion/residualderivedcandidates 每 segment 固定 inputbudget；或 uniformframe/collage，position 从完整 grid 取 4DRoPE 坐标。",
+      "摘要中介跨 segment 交流：Shared100learnableabstracts 各段展开；fullattentionwithinsegment 与 localpatch+globalabstract 层交替，patch 贯穿所有 layers 但不直接跨段交流。",
+      "只监督 compactabstractspace：565Mimages/6.4Mvideos，pooledabstracts 对 image/text/video 不同 teacherembeddingtargets 学 contrastiveinterface，再冻结 ViT。",
+      "按需暴露 finepatch 给 MLLM：Selector 训练 Qwen1.7B/MLP 后冻结，Qwen4BSFT；LLM 可 abstractonly、每 segmenttopK 或 fullpatch，不改变同次 ViT 计算量。"
+    ],
+    "experimentsZh": "实验设置：ViT32H800 contrastive565Mimage/6.4Mvideo，selector1Mimage+1MvideoQwen1.7B，SFT16H800Qwen4B740Kimage+800Kvideo。SameLLM/MLP/instructiondata，OVcodec64frames10368input/outputpatch，frameOV8frames504/SigLIP8frames512，ours64frame224 及 codecmatched504；spatialresolution/temporalcoverage 不是同时一致。\n作者报告 Codec224abstractonly MVBench55.8/MLVU57.8/VideoMME52.9 对 OVcodec504 52.4/46.3/53.4；NExT72.8 低于 OV75.6、LongVideo48.0 低于 50.4，不能宣称全视频 QA 领先。（PDF p.12, Table3）\n作者报告 frame224 retention0→.2 VideoMME53.5→57.0/LongVideo47.3→52.7，但 MLVU61.2→59.8 下降；更多 patch 不单调全任务提升。（PDF p.12, Table3）\n作者报告图像 nativeabstractDocVQA20.5/ChartQA17.4，retention.8 为 75.1/68.8；SigLIPDoc75.0/Chart76.4。摘要严重损失文字细节，全 tokenRealWorldQA53.3 仍低于 SigLIP62.1。（PDF p.13, Table4）\n作者报告 64/S4→256/S16 abstractonly LongVideo47.3→50.3，MLVU61.2→61.3；同 frames128S8/16 LongVideo49.9/50.2 近似，tokens800→1600，未同 contextbudget 分离。（PDF p.14, Table5）\n作者报告 MMEBvideoCLS65.1/RET46.2 有竞争力，但 Qwen3VLEmbedding2B71.9/53.9 更高，image55.1/VisDoc42.6 不强；大小效益不可当 SOTA。（PDF p.10, Table2）\n比较范围：SameMLLMrecipe 是合理 interfacecomparison，embeddingcomparison 混 0.3Bencoder 与 2/8Bmodels、pretraining/teacherdata 不同。Imagezero-shotreference 直接改编 SigLIP2source，notfullyrerun 同 pipeline。Noautoartifactediting/3Dgenerative 评测。\n消融与诊断：Retention/codecvsuniform/framecount/Sconfig 体现 tradeoff；缺 nopooledabstract/nocrosssegment/randomselector/patchmean/同 pretrainingdense 控制、selectorcapacity/固定 Qvary、causal streaming 与 measuredlatency/memory/energy。Fig2 仅 qual 选择不能证明最优。",
+    "insightZh": "Codecselection 已有 OneVision/Mage，learned queries/sparseattention 已有来源；新增组合是预训练 abstract 作为唯一跨段 communication、持续保留 finepatch 并学习可切换 LLMinterface。Nativecompactvisualtokenization 具有明确 architecture/training 边界和 video 信息保留验证，达到 vlm-mllm 接口门槛；foundationlevel 泛化/速度尚不能从 hugetrainingscale 自动推出。",
+    "whyRelevantZh": "Compactsemantic 摘要+细节 evidence 保留是 VLM visual-token 接口设计，面向长 visualworkflow 中效率/精细 grounding 的权衡可借鉴；本文是理解 representation，不是 visualartifactcreation 或 explicitgeometry。",
+    "evidenceZh": "400tokens 为 64frames4segments 送 LLM 的输出预算，非 encoder 只处理 400。（PDF pp.6/8/11–14/21–25, TokenStrategies/AppendicesA–D；Codec 对照 ViTinput10368patch+abstract，LLM400；dense64frames 保留 fullpatch。Q100/S16 对应 1600，不固定任意 length400。）\nCrosssegment 所有 query 读 abstract，global attention 仍有随 segment²增长项。（PDF pp.6/20–23, AttentionRouting/ComplexityEq12–13；N²/S 去掉 densepatch 全连接，但 N·S·Q 和 S²Q²仍在；不是 linearconstantmemorycausal streaming，runtime/FlashAttentionefficiency 未测。）\nSelector 依据视觉 feature 评分，不读取 query 或跨段公平竞争。（PDF pp.7–8/22–23, AppendixA.3；EachsegmenthardtopK，score 乘 selectedfeature 为训练路径，不能给未选 index 直接 grad；dynamic 指 budgetparameter，不是证明 optimalquery-specificevidence。）\nContrasts 来自 teacherembeddings，compact 表现的因果归属仍含 pretrainingprior。（PDF pp.7/25, §3.5/ControlledProtocol；同 Qwen4B/MLPfamily/instructiondata 控制，但新 encoder565Mimage+6.4Mvideo 教师/先前 baseline 训练不同，没有同 data 移除摘要路线控制。）",
+    "caveatZh": "PDF p.15：无 OCRpretraining、SFTscale modest、Q100fixed；future capacityaccuracy/budgetpolicy/efficiency、streaming/audiovisualencoding。\nPDF pp.23–24：complexity 不是 wallclock，codecinput 与 LLMselection 两预算需分开，implementation/dataprocess 影响 speed。\n保留 patch 供后选不恢复 codecinput 先丢失的证据；equalpersegmentbudget 对短事件/稀疏关键 region 未 queryallocation，latency 成本也含 selectorselfattention。\nAbstract 通道被 contrastive 语义监督，不保证细粒度时空 locators/calibratedevidence；压缩严重 OCR 损失，不能默认适合 CADtext/structureddesigninspection。\nEncoder 双向全 segmentglobal 摘要读 future，不是上线 streamingcausal 记忆；测试 64–256sampledframes 不代表任意长视频/real-time。\n新的大型 teacherprior 和 data 与 arch 同改，缺 matchedpretrainablation；所谓节省 prefill 为 budget 推论，未报告 seconds 或峰值 memory。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2601.13886",
+  "slug": "mtv-revisiting-multi-task-visual-representation-learning-2601-13886",
+  "title": "MTV: Revisiting Multi-Task Visual Representation Learning",
+  "authors": [
+    "Shangzhe Di",
+    "Zhonghua Zhai",
+    "Weidi Xie"
+  ],
+  "publishedAt": "2026-01-20",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2601.13886"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "MTV",
+    "VLM / MLLM"
+  ],
+  "abstract": "Current visual representation learning remains bifurcated: vision-language models (e.g., CLIP) excel at global semantic alignment but lack spatial precision, while self-supervised methods (e.g., MAE, DINO) capture intricate local structures yet struggle with high-level semantic context. We argue that these paradigms are fundamentally complementary and can be integrated into a principled multi-task framework, further enhanced by dense spatial supervision. We introduce MTV, a multi-task visual pretraining framework that jointly optimizes a shared backbone across vision-language contrastive, self-supervised, and dense spatial objectives. To mitigate the need for manual annotations, we leverage high-capacity \"expert\" models--such as Depth Anything V2 and OWLv2--to synthesize dense, structured pseudo-labels at scale. Beyond the framework, we provide a systematic investigation into the mechanics of multi-task visual learning, analyzing: (i) the individual and marginal gain of each objective, (ii) task synergies versus interference, and (iii) scaling behavior across varying data and model scales. Our results demonstrate that MTV achieves \"best-of-both-worlds\" performance, significantly enhancing fine-grained spatial reasoning without compromising global semantic understanding. Our findings suggest that multi-task learning, fueled by high-quality pseudo-supervision, is a scalable path toward more general visual encoders.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2601.13886v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2601.13886v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2601.13886v2 全文及 2026-10-06T11:51:55.738602Z 审阅记录；PDF 22 页，SHA-256 51841c1d473cf0d474d842ee50a07fcd1394405f18c0211f9cb0f28c57b2cd52，视觉核验第 1、5、6、11、14、22 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 首页真实 URL 已确认 public repo；当前仅 LICENSE/README/assets，README 的 Training Code、Evaluation Code 未勾选，已发布模型与 inference 示例不等于训练评估源码公开。 未确认公开实现的作者链接（审计用）：https://github.com/Becomebright/MTV",
+    "ideaZh": "MTV 在同一 ViT 中联合 SigLIP 全局语义、DINO 式自监督、region-text grounding 与 pseudo depth，检验监督的互补关系。作者报告同配方多个视觉任务改善。可借鉴 encoder pretraining；强于 CLIP 不等于全面超过 SigLIP2，伪标签、额外计算及单视角边界需保留。",
+    "motivationZh": "语义、局部对应与几何任务需要不同视觉信息，单一 pretraining 目标难以兼顾；希望在共享 encoder 中检验并整合多种监督的互补收益。",
+    "methodZh": "论文把 global image-caption alignment、EMA teacher 的 local/global 与 masked self-distillation，以及由专家生成的 box-text 和 relative-depth 监督统一到共享视觉 encoder。贡献重心是可控多任务消融、模型/数据规模与 gradient synergy 分析，而不是新的 3D part segmentation 或生成表示。模型既做 zero-shot 语义评估，又接冻结 encoder 的 MLLM VQA、linear segmentation/depth 和跨图对应 probe；收益更明显地集中在空间对应与几何表征。",
+    "methodFlow": [
+      "对 web image-caption 样本生成 RAM++实体、OWLv2 box-text 与 DepthAnythingV2 pseudo depth。",
+      "共享 ViT 与 text encoder 计算 SigLIP sigmoid alignment；EMA teacher 提供 local/global 和 masked SSL 目标。",
+      "以 region aggregation/prompter 学习 dense region-text alignment，DPT head 拟合 scale/shift 不变 depth。",
+      "等权组合 VL、SSL、Ground、Depth，联合从头训练共享视觉 representation。",
+      "冻结或轻量 probe encoder，在语义、MLLM VQA、2D segmentation、跨视角对应和 depth 评估迁移。"
+    ],
+    "experimentsZh": "实验设置：DataComp 下载 200M 后过滤至 100M；比较 10M/50M 内部消融及 100M 最终模型，ViT-B/16-224、L/16-256，分别数千及一万余 H200 GPU-hours。评估 ImageNet、COCO retrieval、冻结 encoder 接 Qwen2.5-3B TinyLLaVA 的三项 VQA、ADE linear probe、NAVI/Probe3D 跨视角点对应、SPair 语义对应及 NYU 深度；所有数字为作者报告。\n作者报告 ViT-L/50M 由 VL 到全部 objective，COCO image-to-text46.3→52.3、VQA43.3→45.9、SPair19.8→29.7；强内部比较支持互补但不代表 3D part segmentation 提升。（Table4, p.11）\n作者报告添加全部 head 的训练成本约 1.7×VL；最终 Base/Large 训练约 4400/14400 GPU-hours，100M unique samples 不等于完整 annotation 与训练成本更低。（Table1, p.8; Sec.5.1, p.9）\n作者报告各 objective gradient 平均 cosine0.14–0.27，但 15.9–24.1%的 batches 发生冲突；Depth 小 teacher 亦可使 NAVI 低于无 Depth，互补依赖 label 质量。（Appendix Tables8–9, p.21）\n比较范围：同 architecture/data 配方的 VL、VL+SSL、逐项 dense supervision 是主要可控证据；CLIP/SigLIP/SigLIP2 使用 400M 或 10B 数据且 patch/resolution 不同，仅提供外部表现定位。depth specialist 比较亦受 256 对 518 输入 resolution 影响。\n消融与诊断：独立/边际任务、synergy、data scaling、teacher 大小、gradient 统计、joint vs curriculum 均有检验。平均 synergy 不排除部分 negative 任务组合；超过一定 seen samples 后 correspondence 饱和，single-view depth 不足以保证多视角一致性。",
+    "insightZh": "联合 CLIP/SSL/dense supervision 与专家伪标签并非全新组件；较有用的新意在同数据/同 encoder 的系统因果消融、任务互补与梯度冲突量化，以及将语义和空间目标纳入统一预训练配方。属于值得略读的通用视觉 foundation-method 证据，不应称普遍解决几何推理。",
+    "whyRelevantZh": "提供语义与空间 representation 互补的 encoder 预训练研究，能为 MLLM visual encoder 选型与未来 3D correspondence 理解提供初始证据；与 3D part segmentation、fabrication/native 资产生成的联系仍间接。",
+    "evidenceZh": "共享 encoder 同时优化 VL、teacher-student SSL、grounding 与 depth，dense targets 来自既有专家而非人工 3D 标注。（Secs.3–4, Fig.2, pp.4–8; Appendix A, pp.18–19；方法图及 SSL 公式页已查看；Eq.2 写成 negative KL，与文字中的 distribution matching 存在记号疑点，训练源码尚未公开。）\n作者报告相同 ViT-L/50M 设置从 VL 到完整模型，ImageNet60.8→67.9、ADE37.3→49.1、NAVI39.9→45.9、NYU RMSE0.575→0.421。（Table4, p.11；主消融表实际查看；部分任务在最后添加 Depth 时小幅退步，不能说每个 objective 处处单调改善。）\n作者报告 MTV-L/100M 在 NAVI45.0、NYU0.414 优于列出的 CLIP/SigLIP2，但 ImageNet75.2 低于 CLIP75.5 与 SigLIP2 82.5，VQA47.6 低于 SigLIP2 52.5。（Table6, p.14；表已查看；不同预训练数据、resolution、patch size 与计算预算使跨 family 比較无法完全归因于新配方。）\n作者承认自动伪标签未充分过滤，并仅使用 single-view image training；gradient 正均值仍伴随一部分 batch 冲突。（Appendix B.3/Table9, p.21; Appendix C, p.22；limitations 页实际查看；未证明 video、4D 或 multi-view 物理一致性。）",
+    "caveatZh": "伪 caption、grounding、depth 自动产生且未充分过滤；未来需更强清洗与 noise-adaptive objectives。\n只用 single-view images，video、stereo、optical flow 及 4D consistency 留待未来。\n已有专家提供结构信息，独立样本数优势不能忽略专家 annotation 与 head 训练代价。\n主表外部 baseline 数据、分辨率与计算不同，且在 VQA/ImageNet 等项目落后 SigLIP2。\n相互强化为 aggregate 观察，gradient 冲突、negative synergy 及 depth 质量依赖仍然存在。\nPDF SSL Eq.2 负 KL 记号与 matching 文字不一致；伪 label annotation 的 GPU-hours 单位亦有歧义，需源码核实。\n训练/evaluation 代码 roadmap 仍未发布，本项目未运行或复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2609.37925",
+  "slug": "rollout-marginal-distillation-for-long-horizon-autoregressive-video-generation-2609-37925",
+  "title": "Rollout-Marginal Distillation for Long-Horizon Autoregressive Video Generation",
+  "authors": [
+    "Chenjian Gao",
+    "Zhihao Hu",
+    "Jianqi Ma",
+    "Jun Zhang",
+    "Weidong Zhang",
+    "Tianfan Xue"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37925"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Rollout-Marginal Distillation for Long-Horizon Autoregressive Video Generation",
+    "Video Generation"
+  ],
+  "abstract": "Autoregressive (AR) video diffusion enables low-latency, streamable video generation, but prediction errors often accumulate over long rollouts. Training the generator on its own rollouts exposes it to these imperfect histories. However, existing video-level distribution matching distillation (DMD) scores the whole rollout jointly. Because a chunk is evaluated together with its past and future, its correction can favor matching artifacts in the surrounding context merely to preserve temporal consistency. To provide a clearer visual-quality signal, we introduce Rollout-Marginal Distillation (RMD). RMD retains the generated history for AR prediction but scores each chunk independently against a chunk teacher, ensuring its quality correction is not compromised by an imperfect temporal context. To compensate for the lack of temporal context in independent chunk scoring, RMD subsequently applies video-level DMD to restore temporal coherence. Extensive experiments demonstrate that RMD maintains high visual quality far beyond its training horizon and outperforms video-level DMD baselines. Code and video results are available at https://cjeen.github.io/RMD",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37925v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37925v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/cjeen/RMD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37925v1 全文及 2026-10-06T15:24:09.626108Z 审阅记录；PDF 11 页，SHA-256 639628531d6a42ac2d940ec43f482208baff7aeaa83b5d11d7440568565bb30a，视觉核验第 1、2、5、7、8、9 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1 project page 的 Code 按钮指向作者 public repository；已访问确认 model、pipeline、trainer、configs、train.py 和 inference.py 等实际实现。未运行、下载权重或复现结果。",
+    "ideaZh": "RMD 保留 autoregressive 生成历史，却先让 adapted teacher 独立评分各 continuation chunk，再用 video-level DMD 恢复跨 chunk 一致性。它在不加固定 anchors 的滑动窗口下减少长期 artifact，值得深读；一分钟有定量证据，超长展示仅属定性，chunk marginal 不保证场景记忆或物理状态正确。",
+    "motivationZh": "AR video 首帧与后续 chunks 的 latent 统计不同，持续 rollout 还会累积 artifacts；目标是调整教师监督分布与训练顺序。",
+    "methodZh": "作者分别处理首帧与后续 chunks 的 VAE latent statistics，用原 video teacher 生成的 chunks 适配 continuation teacher。首 chunk 采用随机 exit，后续仅在最后 exit 做独立 DMD，并通过 causal replay 训练。随后降低学习率进行 whole-video refinement。方法改变监督分布和训练顺序，推理继续使用原 causal generator 与滑动窗口。",
+    "methodFlow": [
+      "生成器用自己的历史采样 rollout，分别处理首帧与后续 chunks",
+      "用原 video teacher 的 continuation chunks 适配 chunk teacher",
+      "首 chunk 随机 exit、后续最后 exit，独立计算 real/fake scores",
+      "通过 differentiable causal replay 更新生成器，训练后半窗遮掉首 block",
+      "以低学习率 video-level DMD 恢复跨 chunk 一致性",
+      "推理按完全滑动窗口持续生成，不增加固定 anchors 或额外记忆模块"
+    ],
+    "experimentsZh": "实验设置：Wan causal student 从 Causal Forcing ODE 初始化，在短 self-rollouts 上训练。与 Self/Causal Forcing 在相同无固定 anchor 的滑动窗口协议下比较；消融去掉 marginal stage、video refinement 或 asymmetric exits。用 VBench-Long 评价，并展示更长例子。\n作者报告 chunk-size 1 的一分钟 total score 为 81.26，Self Forcing 为 70.94、Causal Forcing 为 69.88；size 3 为 81.48，对照 77.44/74.88。（p.8 Table1）\n作者报告 RMD quality 从 10 秒的 84.68 变为 60 秒的 84.52；Self Forcing total 从 79.12 降到 70.94。该结果支持特定协议下减少 artifact，不是任意长度保证。（p.8 Fig.5, §4.3）\n作者报告 marginal-only quality 为 84.90、full 为 84.52，但 full semantic 68.24 高于 63.59，temporal flickering 99.41 高于 99.06。（p.9 Table2）\n作者报告定量评价为 944 个 prompts、每条五次 generation，约 60 秒；500 秒不进入 aggregate metrics。（p.7 evaluation protocol）\n比较范围：统一 sliding/no-anchor 协议能比较该部署条件，但未覆盖各 baseline 原生 anchor/cache 配置或更多最新长期方法。Initialization、teacher adaptation 和训练预算仍需公平核对；没有总成本、跨训练 seed 方差或人类偏好。\n消融与诊断：Marginal-only、video-only 和 random exits 支持两阶段分工。未完全隔离 teacher adaptation、initial-block masking、位置混合，以及相同总 steps 的单阶段训练；没有 memory/revisit 或长期物理任务评价。",
+    "insightZh": "核心是从 joint rollout matching 改为有限训练 horizon 下的 pooled continuation marginal，再分阶段恢复时间联系，区别于只调整 causal teacher 或 cache。它依赖 teacher adaptation、exit 规则与 initial-block masking，不能把收益全部归于独立打分。相同 marginal 可以对应不同 joint sequences，理论上没有长程 identity/state 保证。",
+    "whyRelevantZh": "长期 autoregressive video 的监督目标、视觉质量与时间一致性分工具有基础方法价值；本文没有 native 3D 或可编辑 design artifact。",
+    "evidenceZh": "Continuation marginal 平均 generated histories 和 positions；监督独立评分，生成仍依赖历史。（pp.4–5 §3.1–3.2, Eqs.1–5, Fig.3；已核看图与公式；目标定义在有限训练 rollout，不是任意 horizon 的稳定性证明。）\n首帧与后续 chunks 的 VAE statistics 不同，实际方法需要 teacher adaptation 和 asymmetric exits。（p.6 §3.3；最后 exit 的监督通过共享参数也会影响其他步骤，不能称严格只调整局部细节。）\nVideo-level refinement 改善时间指标，appearance quality 存在轻微 trade-off。（p.9 Table2, Fig.6；已核看消融；marginal-only 和 full 各有指标优势。）\n一分钟采用完整 benchmark，超长例子仅作 qualitative 展示。（pp.7–8 Table1, Fig.5; p.1 Fig.1；不能推论所有更长视频可靠或能记住离开窗口的对象。）",
+    "caveatZh": "独立 chunk scoring 不约束跨 chunk 关系，需要随后 joint video refinement。\n定量结果到约一分钟，更长 rollout 主要展示潜力。\nMarginal matching 可能生成局部合理、整体状态不连贯的视频；滑动窗口不保证全场景记忆。\n训练 horizon 下的 pooled marginal 与更长推理历史分布不同，未给稳定性定理。\nCausal replay 使用生成历史，不应把近似 score update 表述为包含所有历史依赖的 exact reverse-KL 梯度。\nTeacher adaptation、exit strategy 和首 block masking 共同改变训练 recipe，收益未独立完全归因。\nLast-exit 监督通过共享参数也会改变其他 steps，不是严格只调整局部细节。\n基线采用无 anchors 协议，不能外推其原生长期配置；缺少跨训练 seed 的不确定性、完整成本或 human validation。\nSmoothness 与 semantic aggregates 不等于真实 physics、identity 或 prompt-switch state 的正确性。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

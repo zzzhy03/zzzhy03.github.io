@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.02835",
+  "slug": "all-work-and-no-play-makes-jack-a-dull-boy-understanding-and-preventing-catastrophic-strat-2610-02835",
+  "title": "All Work And No Play Makes Jack a Dull Boy: Understanding and Preventing Catastrophic Strategy Collapse in RLVR",
+  "authors": [
+    "Qiyuan Huang",
+    "Tianshi Xu",
+    "Meng Li"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02835"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "All Work And No Play Makes Jack a Dull Boy",
+    "LLM",
+    "RLVR"
+  ],
+  "abstract": "During post-training of large language models (LLMs) with Reinforcement Learning with Verifiable Rewards (RLVR), GRPO-style algorithms can exhibit severe late-stage collapse. Prompt-based probing reveals that this is not benign strategic pruning, but a harmful contraction of effective strategy capacity that makes distinct reasoning strategies increasingly inaccessible. To characterize this phenomenon, we define strategies through trajectory-level policy-update interactions and develop a unified theoretical framework combining optimization dynamics and information theory. We prove that major RLVR objectives progressively concentrate probability mass onto a single strategy, while sustaining nontrivial task accuracy requires a minimum strategy capacity. The conflict between these two results provides a mechanistic explanation for catastrophic collapse. We further derive the {Mirrored Entanglement Index (MEI)} as a lightweight online warning signal. To prevent collapse, we propose \\textbf{Mesh Learning}, which exposes multiple reasoning strategies and prevents any single strategy from dominating optimization. Across AIME26, AIME25, MATH-500, GPQA, and LiveCodeBench, Mesh Learning consistently outperforms strong baselines across Qwen and Phi model families, with gains of up to 13.4 pp and 11.5 pp, respectively. These results establish strategy preservation as a key principle for stable RLVR. Code is available at https://github.com/Ayanami-0123/Open-Mesh-Learning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02835v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02835v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Ayanami-0123/Open-Mesh-Learning"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02835v1 全文及 2026-10-06T16:47:27.349488+00:00 审阅记录；PDF 84 页，SHA-256 608d3e29b02f4e947ec6810ddfb8bb3b4427bc90378a66704bb7219680b15dd1，视觉核验第 1、3、4、5、6、8、9、21、29、46、47、52、58、59、63 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF pp.1/10 的 GitHub hyperlink annotation 给出该 URL；已确认 public modified VeRL implementation，actor 中调用 compute_uniform_group_kl_aux_loss，并有 launchers/data layout。未运行复现；README 的 coding score 和 release state 与 exact PDF 有差异，结果引用仅以 PDF 为准。",
+    "ideaZh": "Mesh Learning 在 RLVR 中用离线 Coach prefixes 暴露多种解法，再约束各解法相对 fixed reference 的 log-probability 增长，减少单一 strategy 占据训练的现象。作者报告跨 Qwen/Phi、math/science/code 的收益，CP-only 对照有助于排除单纯提示先验解释；这是值得深入核查的 strategy-preserving training 方案。理论附录存在明显需审查的推导跳步，MEI 也只是待校准的 proxy；收录依据是实证方法与 reasoning-boundary 价值，不能宣传成所有 RLVR 必然 collapse 的已验证定理。",
+    "motivationZh": "持续 RLVR 可能在奖励改善后失去不同解法，随后准确率突然下降；需要区分有效的冗余剪除与 strategy collapse，并检验如何保留可用的推理路径。",
+    "methodZh": "作者从 trajectory Fisher-score inner products 定义 optimizer-centric strategy，并用语义解法名称作为实际训练 proxy。Coach 只生成候选方法与描述，prefix tokens 不计 loss；每个 query 的 rollouts 分配到多个 prefix groups。balancing loss 用各 strategy successful trajectories 的平均 sequence log-probability 减去 fixed reference 得分，经 softmax 后对 uniform target 做 KL，控制相对增长而允许共同改善。MEI 以 rollout logit-gradient alignment 监测 concentration；实验比较 standard RLVR、divergence regularization 与相同 Coach prefixes 的 baselines。",
+    "methodFlow": [
+      "离线生成候选解法：Coach LLM 为训练 query 生成多个策略 prefix，不给计算过程或答案，固定后重复使用；这属于额外数据生成成本。",
+      "分 strategy 采样：同一 query 的 rollout budget 分给多个 prefix groups；policy 检查方法适用性与替代方案，Coach tokens 从训练 loss 中 mask。",
+      "平衡相对增长：successful trajectories 的 mean sequence log-probability 与 fixed reference 比较，softmax 后对 uniform strategy target 加 KL regularization，与 GRPO joint optimization。",
+      "监测并无 Coach 推理：训练时跟踪 MEI；推理不给预生成 prefix，policy 自己提出方法并执行验证，使用相应模型与任务的 token budgets。"
+    ],
+    "experimentsZh": "实验设置：作者在 Qwen2.5-7B-Instruct、Qwen3-4B 和 Phi-4-mini-reasoning 上比较 GRPO/DAPO/GSPO 及 KL/JS regularization，按 task 使用 Hendrycks-MATH、DAPOMath、WildSci 和 coding RL data。Coach prefixes 由 DeepSeek-V4-Pro 离线生成，main Mesh 使用多个 strategies，保持每 query 总 rollout budget 与基线一致。主要结果是 Mean@4，另有 AIME Pass@k 与训练 dynamics。\n作者报告 Qwen3-4B AIME26 Mean@4 从 strongest standard baseline 43.3% 到 56.7%，MATH-500 为 86.8%；Qwen2.5-7B 的 AIME26 仅 13.3%，不同起点与任务不能统一写成普遍高准确率。（Table 2, PDF p.8）\n作者报告 Phi-4-mini-reasoning 的 GPQA Mean@4 为 34.5%，GRPO/DAPO 为 18.4%/23.0%；该 family 对照只覆盖这两个 baselines。（Table 3, PDF p.8）\n作者报告 LiveCodeBench v6 Mean@4：Qwen3-4B Mesh 56.4%，DAPO 52.2%；Phi Mesh 36.3%，DAPO 32.7%。公开仓库 README 的 Qwen coding 数值不同，本 review 严格引用 exact PDF。（Table 4, PDF p.9）\n作者报告 Qwen3-4B AIME26/AIME25 Pass@128 相对最强 baseline 增益为 32.6/28.8 pp；Pass@128 是多次采样可解性，不能转写成单次答案 accuracy 或 oracle-free candidate selection。（Figure 8 and §5.2, PDF p.8）\n比较范围：比较多个常见 RLVR objective 与 divergence baselines，并增加相同 Coach prefixes 的控制，支持实际组合干预的价值。但没有独立 training seeds/置信区间、完整 compute accounting、adaptive entropy/diversity 方法或 early-stopping best-checkpoint 等更强稳定性对照。\n消融与诊断：包含 CP-only 与 strategy count 的有限变体；对 regularizer strength、reference choice、zero-success strategies、MEI calibration transfer 及独立 predictor performance 缺少系统统计。提高策略数量的经验结果不等同于理论 strategy capacity 的严格测量。",
+    "insightZh": "有价值的部分是将 solution-method exposure 与 reference-centered relative-growth balancing 配成一个训练干预，并与 CP-only 控制比较。语义 prefixes 是动态 strategy 的 proxy，不等价于 exhaustive gradient-based partition。collapse、capacity 与 MEI 的理论链条依赖多处额外几何和时间尺度条件，而且附录推导存在未充分支持的步骤；不能仅凭长证明把所有 guarantee 当作 established fact。",
+    "whyRelevantZh": "strategy preservation 关系到长期 RLVR 的 reasoning coverage 与可验证任务优化。训练干预、CP-only 控制与高采样预算结果适合研究多种 solution modes；同时理论和 predictor 的疑点值得深入审查。",
+    "evidenceZh": "balancing regularization 作用于相对 reference 的 successful-strategy scores，控制相对增长。（§4.1–4.2, PDF pp.6–7; Definition 3, PDF p.7; Appendix C.2, PDF pp.52–55；已实际查看 Figures 5–6；successful subsets 需非空，full-support equilibrium guarantee 还条件化于 equilibrium 存在且冻结 deterministic dynamics。）\n作者报告 CP-only 不足以重现 full Mesh 收益，cross-family 与 coding tests 提供经验支持。（Tables 2–4 and §5.3, PDF pp.8–9；作者报告 Qwen3-4B AIME26 56.7%，最强 standard baseline 43.3%；coding exact PDF 中为 56.4%，不使用后续仓库中的不同数值。未独立复现。）\nMEI 在给出的训练轨迹中先于 accuracy cliff 上升，但没有证明通用 calibrated predictor。（§3.3, PDF p.5; Figure 7, PDF p.8; Appendix B, PDF pp.44–47；作者报告 pre-RLVR calibration 的 3σ threshold 1.013；图中也有 Undefined values，未提供独立预测测试的 false-alarm/lead-time 统计。）\ncollapse theory 需要独立审查，不能将关键推导视为仅由 strategy definition 自动推出。（Appendix A Lemmas 2/9, PDF pp.21/29–30; Appendix B Eq.(332), PDF p.46；无限 trajectory 数量不能自动保证 Fisher scores 在空间中 dense；finite-window 非零最小值也不自动给出对 length uniform 的线性下界。不同 trajectories 的 Jacobians 通常不同，Eq.(332) 的 common-Jacobian 差分需要额外条件。）\n完整训练与 inference harness 包含 Coach-generated priors、prompt verification 结构和格式 reward，不能归为仅新增一个 loss 的实验。（Appendix D.1/D.2, PDF pp.56–59；CP-only 控制部分缓解 prior confound，但未清楚报告全部 evaluation harness、checkpoint selection、wall-clock 成本与训练 seed variance。）",
+    "caveatZh": "strategy semantic methods 只是 optimizer-centric classes 的 empirical proxy。\ncapacity theorem 需要初始 non-collapse、固定 probability resolution 与 diverse answer-space collision 条件；GPQA 不满足该解释条件，因此可能不出现 accuracy collapse。\nbalancing convergence 分析冻结 score Jacobians 和 mean RL drift，忽略 sampling noise/feature drift，并要求 full-support equilibrium 存在；作者明确没有普遍 existence guarantee。\n详细 Coach instructions 会引发 reliance/hacking，因此作者采用 applicability、mechanism、challenge harness。\nLemma 9 以 infinite trajectory cardinality 推出 Fisher-score density 缺少证明；Lemma 2 finite-window minimum 与 length-independent Θ scaling 的联系也未建立，影响 universal collapse narrative。\nMEI proof 在不同 trajectories 间共用 Jacobian，且 p.47 的 LayerNorm derivative 简化遗漏 statistics derivative，GELU derivative<1 的说法也不正确；不能视为已验证的 logit/parameter gradient 等价关系。\nMain theorem 使用 step-wise old-policy refresh、small-update 和 scale separation，实际训练配置只列 maximum lengths 不能证明每个实际 rollout 满足全部条件。\n没有详细报告 successful subset 为空时的规则、training seed variation、checkpoint selection 或全部 inference-prompt matching；这些都应在复现前核对。\n离线更强 Coach 是额外训练数据来源，虽无 online Coach 成本，但不等于没有 teacher cost；统计结果不证明 causally unique collapse mechanism。\nmethod 主要验证 language reasoning，迁移到 visual design/CAD 的价值是 reviewer 推断，不是论文实验结论。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

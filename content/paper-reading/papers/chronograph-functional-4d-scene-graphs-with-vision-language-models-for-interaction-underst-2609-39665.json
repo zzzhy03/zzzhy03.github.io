@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.39665",
+  "slug": "chronograph-functional-4d-scene-graphs-with-vision-language-models-for-interaction-underst-2609-39665",
+  "title": "ChronoGraph: Functional 4D Scene Graphs with Vision-Language Models for Interaction Understanding and Grounded Planning",
+  "authors": [
+    "Chenyangguang Zhang",
+    "Malgorzata Gwiazda",
+    "Guanlong Jiao",
+    "Yuanchen Ju",
+    "Federico Tombari",
+    "Koushil Sreenath",
+    "Marc Pollefeys",
+    "Sunghwan Hong"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39665"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "ChronoGraph",
+    "VLM / MLLM"
+  ],
+  "abstract": "Embodied agents must determine where to act, anticipate the resulting scene changes, and interpret observed outcomes to guide subsequent actions. This requires connecting 4D interaction understanding, which explains how past actions changed the scene, with spatially grounded planning, which determines how and where to act toward a goal and anticipates the resulting scene changes. We introduce ChronoGraph, a functional 4D scene graph that links actions on affordance parts to semantic and geometric state changes. By representing observed and anticipated transitions in the same form, it provides a shared basis for understanding and planning. We construct ChronoGraphBench through an automatic data engine that converts human-interaction videos and simulated robot trajectories into graph-annotated questions for training and evaluating Vision-Language Models (VLMs) on both tasks. Using these annotations, we train ChronoGraphVLM by adapting pretrained VLMs in two stages. Graph-as-Chain-of-Thought supervised fine-tuning teaches the models to reconstruct observed transitions and predict future ones as graph traces before answering. Subsequent joint 4D graph reinforcement learning directly rewards graph properties and answer correctness. Experiments across model scales show improvements over the corresponding pretrained baselines and zero-shot transfer to VLM4D. Real-world demonstrations further show that graph-based planning and affordance grounding support mobile manipulation through existing robot skills without additional fine-tuning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39665v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39665v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39665v2 全文及 2026-10-06T11:46:59.311166+00:00 审阅记录；PDF 13 页，SHA-256 bebf4755c666c33ef726b7c765fc29d8a7ba64352f42ba599485edd9b5af6cdb，视觉核验第 1、4、8、9、10 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 第 2 页明确 Code and data will be released，全文没有 public release URL，因此不提供 Code link。",
+    "ideaZh": "ChronoGraph 把 observed interaction 与 future planning 统一为 object/affordance、state、geometry 和 action 更新的 functional 4D graph trace，以 SFT+graph-aware GRPO 训练 VLM。作者报告 9B overall mixed score51.2→75.2，外部 VLM4D accuracy60.5→67.1%；graph intermediate 比 answer-only 更能保留外部迁移。值得精读 structured spatial reasoning，但 teacher-assisted 标签、宽容 box grounding reward 和仅定性 Spot 演示不能证明真实因果或可靠机器人执行。",
+    "motivationZh": "VLM 能回答互动视频问题，却常缺少持久的对象身份、affordance 和动作后状态。目标是用功能性时空 scene graph 支持理解与 grounded planning。",
+    "methodZh": "问题是 VLM 能答视频问题却缺乏持久的 object identity、affordance 和动作后 state 表示。作者从 HD-EPIC、HOI!及 RoboCasa 构建 human/robot 互动 graph，用 GPT、SAM3/SAM3D 与 metric depth、人类审核形成语义和 3D 节点；62 类模板由 graph 生成 observed 理解、history planning 和 static next-action 任务。模型先输出 serialized graph/action sequence 及引用 graph property 的 evidence，再答题或 groundpoint。监督和 RL 奖励图的节点/边/状态变化、action 及 geometry，实验支持 graph trace 的训练价值；生成 graph 本身仍受标注与评分启发式约束。",
+    "methodFlow": [
+      "从 egocentric human/robot 视频抽取 object 及 affordance parts，以 SAM3 mask、SAM3D 与 metric depth 恢复 3D boxes 并建立 state/action graph",
+      "GPT 初始化语义与 goals，自动检查不确定/冲突样本并交给人类审核；graph templates 产生理解、history planning 与 static planning QA",
+      "输入 video prefix 或当前 image+goal，VLM 序列化 observed 或 future graph states，interleave affordance actions 并生成 graph-property evidence 与 answer",
+      "SFT 监督完整 trace；GRPO 按格式、monotone graph alignment、nodes/edges/state/action/3D motion 与 answer/grounding 组合奖励",
+      "在 household-disjoint holdout 和外部 VLM4D 测 structured reasoning；Spot 演示由 prediction groundpoint 配合 measured depth/map 及既有 motion primitives 执行"
+    ],
+    "experimentsZh": "实验设置：作者报告 household/simulator scene disjoint 的 SFT20%、RL68%、holdout12%；holdout202 interactions(129human/73robot)、1811 human-verified QA。以 Qwen3.5-9B/4B、统一 4FPS 输入对照 commercial 与专门 spatial models，另测外部 VLM4D 和 Spot 定性 tasks。\n作者报告 9B overall51.2→75.2，4B48.9→73.0；GPT-Astra79.4 仍高于 9B75.2，不宣称整体超过 frontier。（Table 1, p. 8）\n作者报告 9B static spatial41.7→60.7、grounding29.1→73.7；history action48.8→53.7、affordance45.9→51.4 仍弱。（Table 1, p. 8）\n作者报告外部 VLM4D 9B60.5→67.1%、4B53.7→61.0%，graph+answer RL75.2/67.1 对 answer-only RL73.0/65.4。（Tables 2–3, p. 8）\n作者报告 answer-only SFT overall67.0 但外部 49.4，graph-CoT SFT69.9/64.2；支持中间结构保留迁移价值。（Table 3, p. 8）\n比较范围：统一输入对照直接回答、naive thinking、prompted graph-CoT、answer-only 与 graph supervision 及 RL，包含 external VLM4D；没有独立复现、multiseed 误差条、详尽 ground-truth graph 质量统计或定量 real-robot 成功率。overall 为 per-question 混合 score，不能跨任务当统一 accuracy。\n消融与诊断：SFT 和 RL 均对 answer-only/graph intermediate 比较，可归因部分结构 supervision 价值；reward 各 geometry/state/affordance 权重未逐项分解，也未验证 teacher 误标条件下鲁棒性。",
+    "insightZh": "核心新增是 functional affordance graph 既表达过去又表达计划未来，以及可评分的 graph/action 中间监督与 post-training。图模板数据和组合 reward 形成实质方法，不仅 benchmark。各基础 segmentation、3D lift、GRPO 继承现有工具，teacher-assisted graph 与结构奖励不是数学因果正确性证明；Spot 是应用演示而非新通用控制器。",
+    "whyRelevantZh": "直接贡献是 VLM structured spatial/temporal intermediate 与 grounded post-training，对空间推理和可验证状态更新高度相关；迁移到 editable asset/assembly feedback 有潜力，但论文未测设计生成，不追加设计 agent 类别。",
+    "evidenceZh": "functional 4D graph 以 object 与 affordance part 为 nodes，action 驱动 semantic/geometric/edge 更新，统一 observed 理解与未来计划。（Secs. 3–5, Fig. 1, pp. 1–7；首页及 Fig2 已视觉核验，graph 不是仅文字 CoT 修辞。）\n作者报告 1669 interactions、5143 graph states、15094 QA、357 object categories；graph 构建含 GPT/SAM 与 human-assisted 校验。（Sec. 4, Fig. 2, p. 4; Sec. 6.1, p. 7；不能称全自动人工真值或无限规模数据。）\n作者报告 9B mixed overall51.2→75.2，外部 VLM4D60.5→67.1%，answer-only SFT 外部反降到 49.4。（Tables 1–3, p. 8；主表已视觉核验，overall 混合 MC 与 soft-grounding 非纯 accuracy，外部数是作者报告。）\ngraph-grounding 在 box 内即满分，graph matching 依赖 soft semantic/state 和 monotone alignment 而非严格等价证明。（Secs. 5.2–5.3, pp. 6–7；这个奖励边界必须与 grounding 提升共同呈现。）\nSpot 使用 predicted affordance location 结合 measured depth/robot map 和已有 motion primitives，只展示三类定性任务。（Sec. 6.5, Fig. 3, p. 9；已查看 Fig3，无 trial count 或 success-rate，不补写数值机器人结论。）\n作者承认 affordance/3D annotation cost 限制数据范围，推理 latency 影响实时 replanning。（Sec. 7, p. 10；explicit limitations 页已视觉核验。）",
+    "caveatZh": "affordance 与 3D annotation 成本限制当前 dataset 与 environment 范围。\n完整 graph trace inference latency 妨碍实时 replanning，未来需 distillation 或 streaming graph。\nteacher-assisted labels、templates 和 distractors 存在共同 model bias；atomic 无帧过滤未扩展到 long-horizon，不等同完全排除 language shortcut。\ngrounding point 在 box 内即可满分，不能把 soft score 写成精确 center 或 metric3D 位置 accuracy。\ngeometry/reward tolerances 和 training 超参数披露不足，复现需要额外公开 materials。\nfuture graph 是监督下预测，无法保证真实物理或 affordance 因果正确。\nSpot 三类定性任务没有 success-rate 或 trials，执行使用 measured depth 而非直接信赖 VLM numeric3D，不能外推通用 robot 能力。\n仅 exact13 页 PDF 作者报告，未复现或独立审核 dataset。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

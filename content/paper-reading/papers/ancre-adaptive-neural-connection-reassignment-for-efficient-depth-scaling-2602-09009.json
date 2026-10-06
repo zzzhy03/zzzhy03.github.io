@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2602.09009",
+  "slug": "ancre-adaptive-neural-connection-reassignment-for-efficient-depth-scaling-2602-09009",
+  "title": "ANCRe: Adaptive Neural Connection Reassignment for Efficient Depth Scaling",
+  "authors": [
+    "Yilang Zhang",
+    "Bingcong Li",
+    "Niao He",
+    "Georgios B. Giannakis"
+  ],
+  "publishedAt": "2026-02-09",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2602.09009"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "llm",
+    "image-generation"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "ANCRe",
+    "LLM",
+    "Image Generation"
+  ],
+  "abstract": "Scaling network depth has been a central driver behind the success of modern foundation models, yet recent investigations suggest that deep layers are often underutilized. This paper revisits the default mechanism for deepening neural networks, namely residual connections, from an optimization perspective. Rigorous analysis proves that the layout of residual connections can fundamentally shape convergence behavior, and even induces an exponential gap in convergence rates. Prompted by this insight, we introduce adaptive neural connection reassignment (ANCRe), a principled and lightweight framework that parameterizes and learns residual connectivities from the data. ANCRe adaptively reassigns residual connections with negligible computational and memory overhead ($<1\\%$), while enabling more effective utilization of network depth. Extensive numerical tests across pre-training of large language models, diffusion models, and deep ResNets demonstrate consistently accelerated convergence, boosted performance, and enhanced depth efficiency over conventional residual connections.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2602.09009v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2602.09009v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2602.09009v2 全文及 2026-10-06T16:36:00.000Z 审阅记录；PDF 31 页，SHA-256 d2e365edc8899b20f12dfbdcf6d8ae1abc58acf35a45c7c5068329e1a3c66e93，视觉核验第 1、5、6、8、10、15、18、23、24 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Appendix/checklist 仅称 code 随 submission 上传；公开 PDF 与按标题搜索未确认官方 public method implementation。LLaMA/DiT/ResNet 链接是依赖代码。",
+    "ideaZh": "ANCRe 将固定相邻 residual topology 改为跨层可学习的归一化加权 shortcuts，给 LLaMA、DiT 和深 ResNet 提供共享训练接口。作者报告 1B PPL16.64→15.41、测试配置吞吐开销不到 1%；适合略读训练架构，但只训练到 1B/256 tokens，线性网络的指数收敛不能外推为大模型能力或部署收益。",
+    "motivationZh": "深层网络常把后层学成接近 identity，固定相邻 residual topology 可能限制优化效率；论文希望从数据学习跨层连接，让增加深度更有效。",
+    "methodZh": "所有早层到晚层的 scalar shortcut coefficients 与网络一起学习，以 incoming softmax 限制每层聚合份额；Transformer 采用 block/MHSA input 粒度，保留层内 attention/FFN 结构。方法参数约 K²/2，24blocks 增加 300scalar weights。理论比较特定 small-init deep linear network 的两种 shortcut，实验显示 pretraining PPL/DiT FID 和 goal RL 优化改善。主要贡献是把 inter-layer routing 作为可训练参数，而非新基础模型或 reasoning 训练。",
+    "methodFlow": [
+      "建立每个 i<j 的 inter-layer shortcut coefficient c_ij",
+      "用 incoming softmax 归一化为 p_ij，每层收到早层表示的 convex aggregation",
+      "Transformer 在 block/MHSA inputs 插入路由，ANCRe 参数与 pretrained-from-scratch 模型共同优化",
+      "比较固定 topology、learned 近邻、outgoing/no normalization 和 HC/mHC",
+      "冻结学习后的 topology 重新训练，检查贡献是否来自可转移 connectivity",
+      "大模型 checkpoint/sharding 场景可限制来源层或稀疏 regularize，但此扩展尚未实测"
+    ],
+    "experimentsZh": "实验设置：C4 LLaMA60M/130M/350M/1B，depth8/12/24/24，FullPT/GaLore、HC/mHC 与 normalization/topology 消融。DiT-S/B ImageNet256，400Kupdates；ResNet16/64 四 Gymnasium goal 任务 100Menvironment steps。\n作者报告 FullPT1B PPL16.64→15.41；平均少 34.3%updates 达到 vanilla 最终 PPL，1.85×是目标匹配训练进度的表述。（Fig.5/Table2, pp.7–8）\n作者报告 350M 三 seed PPL19.32±.40→18.46±.15；1B 无同样 seed 不确定性报告。（Table10, p.24）\n比较范围：同 dataset/steps 与 baseline-optimized LR，HC/mHC 强对照有用；HC/mHC 具体 kernel/implementation 未充分给出，吞吐差不能通用化。LLM 只 PPL、小规模短 context，不支持 reasoning/长 context/真实 production 能力；DiT 可迁移证据是 class-conditional raster generation。\n消融与诊断：No norm/all fixed shortcuts/learned 近邻/first+previous 以及 freeze+retrain 支持 learned topology 贡献。理论只固定 shortcut LNN，不是 ANCRe 自适应权重训练证明。Checkpointing/sharding sparse variants 是建议，尚未 benchmark。",
+    "insightZh": "学习跨层 residual layout 而非仅加固定 first-layer 连接，matching topology 控制和 freeze/retrain 比较有参考价值。理论下界是 rank-deficient target、对角且部分相等 init 的存在构造，上界需要极小 init；未证明 learned softmax ANCRe 在非线性 Transformer 的线性收敛或全局最优。",
+    "whyRelevantZh": "Inter-layer residual learning 是可跨 LLM 与 DiT 复用的训练架构选择，图像生成有直接测试。暂适合作为 depth efficiency 方法参考，不表示新的 visual reasoning 或 design capability。",
+    "evidenceZh": "incoming softmax 学习 global inter-layer scalars，MHSA/block 粒度优于 FFN-only。（Eqs.6–8, Fig.4, Table1, pp.5–6；系数是训练得到的 static architecture weights，不是每个 input 动态 token router；LLM 实验τ=.01，主文一般 default .1。）\n作者报告 FullPT1B PPL16.64→15.41，HC16.38/mHC16.14；GaLore1B 仅 16.55→16.45。（Table2, p.8；C4 从头训练、context256、13.1Btokens、100Ksteps，无 instruction/reasoning 下游评价。）\n作者报告 350M 三 seedPPL19.32±.40→18.46±.15，topology 相关性.81。（Table10, Appendix E.5, p.24；误差为 SD 不是 CI；三 seed 只覆盖 60/130/350M，不含 1B、DiT 与 RL。）\n作者报告 DiT-B guided FID22.41→20.53，unguided44.31→41.66。（Table3, Sec.5.2, p.8；ImageNet256/400Ksteps/250DDPMsteps；没有 editing/3D/MLLM 直接验证。）\n作者报告 24blocks350M throughput99.9K→99.2K tok/s，1B17.3K 保持；memory 两位小数未变。（Table6, p.10；特定 H100/batch 配置；跨 layer activation retention/checkpointing/通信成本只是 AppD 方案，未大规模实测。）\n线性理论基于 projected least-squares 目标，不能把 row-orthogonal X 单独当作原 loss 可归零保证。（Case3.1, Thms3.2–3.3, Eqs.9,12, Appendix C/E.1, pp.3–4,15–18,22；Reviewer 推导：n>d 时原 loss 还含.5||Y(I−XᵀX)||²；须 Y=YXᵀX、n=d 或改为 excess loss。文中 toy 实测 d=n=50 满足，但 general stated equality 缺此条件。）",
+    "caveatZh": "理论只覆盖 linear networks，非线性扩展尚待研究。\n大规模测试资源仅到 1B；已优化 residual topology 或缺少可重用中间 features 可能收益少。\n指数收敛是强条件下 toy/excess-objective 性质，general n>d proof 重写需额外 realizability，不能宣称 Transformer 理论保证。\n24 层 300scalar 参数少不意味着任意 depth 的 activation/communication 成本少；checkpoint 方案没有实测。\nMax context256、规模≤1B，无 downstream reasoning、多模态或 vision design 能力验证。\nFrozen topology 重复训练只证明同 distribution 可用，不是跨模型/任务泛化。\n本项目未复现；code 只称随 submission 上传，未确认 public 实现 URL，理论与性能需独立验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

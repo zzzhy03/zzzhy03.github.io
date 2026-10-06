@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.01917",
+  "slug": "mole-mixture-of-latent-experts-for-complementary-visual-reasoning-2610-01917",
+  "title": "MoLE: Mixture of Latent Experts for Complementary Visual Reasoning",
+  "authors": [
+    "Yingcheng Liu",
+    "Tianyi Jiang",
+    "Yujuan Ding",
+    "jiangbo Ai",
+    "Xun Jiang",
+    "Guoqing Wang",
+    "Wei Ye",
+    "Yi Bin"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01917"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "MoLE",
+    "VLM / MLLM"
+  ],
+  "abstract": "Latent visual reasoning equips vision--language models with continuous intermediate states that can process visual evidence without explicit textual reasoning traces or repeated image operations. However, existing methods often allow multiple latent tokens to access the same visual evidence through shared value projections, providing no mechanism for them to extract complementary visual information; simply increasing the latent budget can therefore yield redundant latent representations. We argue that effective latent reasoning should encourage different latent tokens to extract complementary visual information, and thereby act as specialized visual experts. Based on this insight, we propose MoLE, a Mixture of Latent Experts framework that controls both what visual evidence each latent visual expert observes and how it transforms that evidence. MoLE isolates latent visual experts during evidence extraction and uses dedicated latent summary experts to aggregate the complementary representations of latent visual experts. A two-stage training pipeline first forces visual evidence through this latent pathway and then restores direct visual access, requiring neither predefined expert roles nor intermediate visual targets. Across five visual reasoning benchmarks, MoLE achieves an average score of 78.6, outperforming data-matched supervised fine-tuning by 4.9 and the strongest evaluated latent visual reasoning baseline at the same latent budget by 3.6. Representation analyses show lower latent-state similarity and more diverse visual attention, while masking the latent pathway reduces average performance by 9.2. These results demonstrate that specializing latent computation is more effective than merely increasing the number of latent tokens.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01917v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01917v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01917v1 全文及 2026-10-06T13:17:56.022942Z 审阅记录；PDF 22 页，SHA-256 153e547b4e4cf3688648daf966e2b1445519998db7f9f455abe8877ee7e62f05，视觉核验第 1、4、8、9、15、20、22 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：p.10 声称 anonymous 完整 code 在 supplementarymaterial，exactPDF 未给可确认 publicURL；不把匿名 supplement 声明当 publicCode。",
+    "ideaZh": "MoLE 用 routers、expert-specific value adapters 与隔离 visual latents 分工，再由 summary latents 聚合。作者报告同数据和预算下视觉空间指标及多 seed 改善。值得精读 latent reasoning 的计算结构；实际 latency 增加，diversity 不能证明 expert 语义或过程忠实。",
+    "motivationZh": "单一 latent reasoning 通道可能重复关注相同视觉信息，难以形成互补观察；目标是让分工的 visual experts 提取并聚合不同证据。",
+    "methodZh": "QwenVL 在[V,Q,Zvis,Zsum,Y]中 prefix 计算 continuousstates；每 visualtoken 按 layerrouter 选 top2of4experts，用 routinglogprior 调 attention、db32MLP 适配 sharedvalue，visualexperts 彼此隔离，四 summaryexperts 只聚合其 states。两 epochbottleneck 令 prompt/answer 无法直看 image，再一 epoch 恢复直接 visualaccess；LoRA+latent/router/adapters 以 answerCE、loadbalance/zloss 及 adaptercosdiversity 训练，无中间视觉 targets。",
+    "methodFlow": [
+      "vision encoder/projector 冻结，prompt 后加入 visual/summarylatentembeddings。",
+      "layerrouter 按 visualhidden state 选 topKvisualexperts 并 mask 其余连接。",
+      "每 expert 经共享 Wv 后用自己的小 MLP 变换视觉 values，routingprior 调 attention。",
+      "隔离 visualexperts，summarylatents 聚合；answer 可读两类 latent。",
+      "StageI 强制 visualbottleneck，StageII 恢复 directvisualattention。",
+      "prefill 一次形成 latents，answerautoregression 无需额外 imageoperation。"
+    ],
+    "experimentsZh": "实验设置：Qwen2.5VL7B/CoVT63Ktaskbalanced、hash/pHash/DINO/SIFT+geometricdecontam、LoRA16/answerCE、2+1epochs、2PRO6000D 约 20h。CVBench2D/3D、BLINK/RWQA/Vstar/POPE，sameQwenchat 与 per-imagebudgets；Qwen3VLscales 三 seed。\n作者报告 16latentsbest77.8 低于 8latent78.6，8visual0summary75.7；Stage1only69.0/Stage2only75.7 与 full78.6。（Table2, p.9）\n作者报告 RWQAlatency.374478→.460499s、FLOPs+.84%/peakmemory+1.55%；prefill 无额外调用不等 negligibleruntime。（Table10, p.22）\n比较范围：samebackbone/data/epochsSFT/LIVR 及 sharedadapter 强 controls；CoVT/LVR/VisionR1/PixelReasonerreleasedcheckpoints 训练不同，proprietary 外报不同 settings 只 reference。Qwen3extensions 没有 same-dataSFTcontrol，不能将全部增益归 MoLEstructure。\n消融与诊断：routing/ESVA/topology、allocation、stage/objective、density/dbsize、seeds/latentintervention。attentiondiversity 仅 Evisualexperts 对 baseline 全部 M，mask 创造的 differentattention 支持差异但不独立证明 complementarysemanticcontent。",
+    "insightZh": "两 stagebottleneck 继承 LIVR，MoE/adapterloss 亦已有；新组合是 fixedlatentbudget 的 evidenceallocation、expert-specificattentionvalues 和 summarytopology，直接推进 spatial 视觉 reasoning。same-dataepochsLIVR/SFT、parammatchedadapter 与组件消融支持结构价值，不仅 benchmark 微调。",
+    "whyRelevantZh": "直接推进 visual/spatiallatentreasoning 的 architecture 与训练结构，对多 region、多 image 证据聚合和未来 structured design 理解有基础意义；不误归 native3Dreconstruction 或 genericLLM。",
+    "evidenceZh": "router 由 visualtokenhidden state 做 layerwiseTopK，ESVA 只在 selectedexpert→visualedge 生效，summary 不直接看 originalvision。（Secs.3.2/Fig.2 pp.4–6; Fig.4 p.15；两方法图/公式已查看，不是 FFNMoE 或指定 semanticroles；视觉前缀 routing 不直接用 questionembedding。）\n作者报告 same63K/三 epochsSFT73.7 与 LIVR8latents75.0 对 MoLE78.6，CVBench3D87.8/BLINK63.0。（Table1 p.8 / App.A.3 pp.16–17；完整 maintable 实际查看；avg 为五 bench 六 metric，包括 POPEF1。）\n作者报告 parammatchedsharedadapter72.8 对 MoLE78.6，三 seed 平均 78.2±.4；Qwen3VL2/4/8B 增 2.7/1.3/1.5。（Tables6–8, pp.20–21；控制与 seed 表查看，Qwen3 仍 samefamily 非 independentarchitecturetransfer。）\n作者报告 masklatentpath 平均掉 9.2 但直看 image 保留，routing/ESVA/topology 移除掉 2.8/4.3/1.1；latency 增加 22.97%。（Fig.3 p.8 / Table10 p.22；latent 被使用有干预支持，但 mask 也改变 trainedcontext；不能证明 explicitreasoningfaithfulness。）",
+    "caveatZh": "randomize/shufflelatents 引 strongdistributionshift，mask 更 clean 但仍是 inferenceintervention。\nproprietarynumbersdifferentprotocol 只 reference；8→16latents 并不保证增加能力。\n实测 runtimeoverhead 明显大于 FLOPsoverhead。\ncosineorthogonality/diverseattention 可由 routingmask/loss 直接诱导，不证明语义 expert、不同 facts 或多步 faithful 推理。\nrouter 只用视觉前缀 states，queryspecific 内容选择主要在 latentattention，不能称 allroutingquestionadaptive。\nparameter-matchedsharedadapter 对照无同 latent/topologybottleneck，不能单独归所有 gain 于 expert-specialization；组件联合 controls 需一起读。\n仅 Qwen2.5/3family，newarchitecture/largevideo/OODspatial 迁移未知；Qwen3 无 data-matchedSFT。\ndecontam 详但跨 photo/video/nearsemanticduplicate 不可能完全排；泛化不等新 3D 表示恢复。\nencoder 冻结、单次 prefixlatents 不会新增高分辨率视觉信息；视觉 toolagent 或 CADdesign 未实测，本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

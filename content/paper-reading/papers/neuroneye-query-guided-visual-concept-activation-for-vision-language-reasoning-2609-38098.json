@@ -1,0 +1,60 @@
+{
+  "id": "arxiv:2609.38098",
+  "slug": "neuroneye-query-guided-visual-concept-activation-for-vision-language-reasoning-2609-38098",
+  "title": "NeuronEye: Query-Guided Visual Concept Activation for Vision-Language Reasoning",
+  "authors": [
+    "Ruiyu Yan",
+    "Bowen Chen",
+    "Shaowen Wan",
+    "Lin Zhao"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38098"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "NeuronEye",
+    "VLM / MLLM"
+  ],
+  "abstract": "Current vision-language models (VLMs) encode visual information in dense hidden states where object identity, spatial layout, and local attributes are implicitly entangled rather than explicitly disentangled, limiting their ability to isolate and modulate the specific visual evidence required by a given language query. Inspired by sparse population coding and top-down modulation in biological vision, we introduce NeuronEye, a plug-in framework that constructs a sparse, concept-level neuron vocabulary from intermediate VLM representations and selectively activates query-relevant visual concepts during inference. NeuronEye decomposes vision-token states into an overcomplete sparse basis organized by concept-level clusters, uses the language query to activate relevant clusters and localize the patches where selected concepts are expressed, and injects the focused evidence back into vision tokens. A complementary suppression mechanism attenuates dominant perceptual directions to preserve weaker but relevant cues. All operations run in a single forward pass over a frozen VLM backbone. On Qwen2.5-VL-7B, NeuronEye raises CV-Bench overall accuracy by +3.1 with gains of +9.5 on Distance, and improves BLINK Multi-view by +8.3, with similar trends on LLaVA-1.6-7B. These results suggest that sparse neuron vocabularies can serve not only as post-hoc interpretability tools but also as active interfaces for concept-level visual reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38098v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38098v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38098v1 全文及 2026-10-06T12:01:07.270809+00:00 审阅记录；PDF 17 页，SHA-256 ff71b3a61e0591b9c01804f3a5bb0c4459964d06fd16081c8470cc5340958636，视觉核验第 1、5、7、8、9、15、16、17 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 PDF 没有印出 NeuronEye 的 Code/project URL，不推测。",
+    "ideaZh": "NeuronEye 将中间 vision-token activations 分解成 SAE sparse features，按概念聚类后用 query 选择并局部增强，再抑制 dominant directions。作者报告 Qwen CV-Bench distance +9.5、BLINK multiview +8.3；这是一种可操作的概念级视觉证据接口。Frozen backbone 不等于 training-free：除 822M SAE，还要训练 107M router/refiner/cross-attention 模块，推理 latency +19.7%、memory +42%，LLaVA 的 counting 反而下降 8.3 points。",
+    "motivationZh": "同一图像包含多个视觉概念，问题需要的细节可能被 dominant features 淹没；需要根据 query 识别并局部增强相关概念，同时控制对其他证据的干扰。",
+    "methodZh": "贡献是在 patch selection 之外，选择 patch 内的 query-relevant sparse concept directions。离线 SAE 从 VQAv2 activations 学基，Claude 标注 top-activating regions 并监督 cluster routing；推理只进行一次修改后的 VLM forward，保留其他 vision tokens。PCS 在更深层减少 top singular directions，以缓和 focused activation 的表征偏置。17 页正文及完整 appendix 已读，实际查看方法、结果/ablation、concept examples、limitations、overhead tables。它不输出 explicit 3D，也未证明所有 neuron clusters 单义或因果解释正确。",
+    "methodFlow": [
+      "建立稀疏概念词表：VQAv2 中间 vision states 训练 32× expansion、Top32 SAE；过滤罕见 neurons，Claude 描述高激活 patches，再 label-embedding hierarchical clustering。",
+      "训练 query routing 与局部注入：5K VQAv2 query/cluster labels 监督 query router，训练时和 vision scorer 对齐，再以 answer LM loss 训练 refiner/cross-attention。",
+      "一次前向选择概念证据：第 8 层选择 5 clusters、每个 60 top patches，refine sparse codes、SAE decode 并注入选中 tokens；第 20 层抑制 top2 centered singular directions。"
+    ],
+    "experimentsZh": "实验设置：Frozen Qwen2.5-VL7B/LLaVA1.6-7B；SAE 用 VQAv2 train，三组各 5K disjoint supervision samples 得三 models，报告 mean/std；CV-Bench、BLINK、RealWorldQA、MMStar，与一般域以外 medical shift 仅用于边界检验。Greedy decode，RTX PRO6000。\n作者报告 Qwen CV overall78.5→81.6±0.3，BLINK overall52.1→52.8±0.2，主要收益集中 distance/multiview。（PDF p.7, Table 1）\n作者报告 LLaVA relation63.3→75.4，但 count−8.3/depth−3.3；不宣称普遍增益。（PDF p.7, Table 1）\n作者报告 domain-shift overall65.30→63.10，提示 vocabulary coverage 有边界。（PDF p.17, Table 7）\n比较范围：比较 token pruning/merging 和 SAVE/SSL/VISTA representation intervention；不同方法目标及 token budgets 与本方法新增 compute 不完全相同，不把其排名作为等成本 superiority。\n消融与诊断：Dense/random clusters、PCS-only、SNS+NVF、insertion layers、cluster counts，均有三组训练结果；最佳 layer/K 如何独立于测试选择尚未详述。",
+    "insightZh": "从固定 offline SAE steering 转向 query-conditioned cluster routing 和 patch-local intervention，是视觉 reasoning 的实质 representation/control 方法。性能集中在 spatial/multiview，且 random-cluster/dense-injection ablations 支持 sparse organization 价值；生物学类比与可视化不是严格 monosemantic/causal explanation 证明。",
+    "whyRelevantZh": "直接推进持续跟踪的 VLM spatial/visual reasoning 表示：把概念方向作为 query 可控制接口，而非普通 VQA application。可用于研究视觉证据干预，具体 3D/design 迁移仍待验证。",
+    "evidenceZh": "Frozen backbone 外仍有单独 SAE 与 trainable intervention modules，不是零训练。（PDF pp.4–6, Sec.3–4.2; p.14, Appendix B; p.17, Table 9；作者报告 SAE822.08M、adaptation107.16M；实际查看参数表。）\n作者报告 Qwen spatial/multiview 改善，LLaVA count/depth 退化。（PDF p.7, Table 1；Qwen distance76.2→85.7、multiview55.6→63.9；LLaVA count63.3→55.0、depth77.8→74.5。未复现。）\nSparse concept organization 超过单纯 dense injection 或 random clusters。（PDF p.8, Table 3；作者报告 CV overall dense-cross-attn+PCS79.4、random SNS78.6、full81.6；图表已实际查看。）\n单 forward 仍有显著推理与内存开销。（PDF p.17, Table 8；作者报告 0.382→0.457s、16857→23933 MB；约+19.7%/+42%。）",
+    "caveatZh": "PDF p.9：VQAv2 vocabulary coverage 限制 domain transfer；约 20% Claude cluster labels 人工核验，其余可能有误。\nPDF p.9/17：推理约 20% latency 和 42% peak memory increase。\n单一 cluster 可仍包含多义特征，activation/focus maps 不是必要/充分因果视觉证据。\nPCS 抑制 dominant directions 可能删掉任务需要的 cues；LLaVA counting/depth 的退化是实际反例。\n相同 concept inventory 按 backbone 构建/训练，不等于无需适配的跨模型 transfer；具体设计、3D assets 未测试。\nFrozen base + single forward 的表述容易掩盖 offline annotation/training、822M frozen SAE 和 107M adaptation 成本。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

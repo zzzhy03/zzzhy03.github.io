@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2609.38154",
+  "slug": "longlive-plug-once-for-all-distillation-for-video-generation-2609-38154",
+  "title": "LongLive-Plug: Once-for-All Distillation for Video Generation",
+  "authors": [
+    "Shuai Yang",
+    "Luozhou Wang",
+    "Wei Huang",
+    "ZhiFei Chen",
+    "Bohan Zhang",
+    "Xiao Fu",
+    "Qianli Ma",
+    "Chen-Hsuan Lin",
+    "Weian Mao",
+    "Bryan Chu",
+    "Song Han",
+    "Yukang Chen"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38154"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "LongLive-Plug",
+    "Video Generation"
+  ],
+  "abstract": "Video diffusion models are increasingly developed into specialized models for diverse downstream tasks, and this development often includes a distillation stage, for example to accelerate sampling or to improve long-video generation. This stage is typically repeated for every specialized model. We introduce LongLive-Plug, a once-for-all distillation framework that learns reusable capabilities as LoRAs on a base model for training-free, plug-and-play deployment to compatible downstream models. These capabilities include single-pass classifier-free guidance, few-step sampling, and long-context error correction for autoregressive generation. The adapters remain reusable even when downstream models add conditioning branches, expand output channels. Despite training at a fixed guidance scale, our dedicated CFG LoRA provides text guidance control through its inference weight. Combining it with a few-step LoRA simultaneously preserves few-step generation and CFG controllability on downstream tasks. We verify training-free deployment on 54 downstream models across three backbone families and eight task categories, including world modeling, robotics, editing, and multimodal generation. The approach may support additional compatible models. Each capability can thus be distilled once per backbone family and reused without per-target retraining.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38154v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38154v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/NVlabs/LongLive/tree/main/LongLive-Plug"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38154v1 全文及 2026-10-06T16:16:38.677360+00:00 审阅记录；PDF 29 页，SHA-256 25e69e46c110ab9da56a55365711f1ef1fa1f8243cdf0c1be8d5b6985f1435ed，视觉核验第 1、4、5、8、9、19、23、26 页。数字均为作者报告，本项目未独立复现。代码状态 available：exact PDF p.1 Code 指向 NVlabs/LongLive，已确认官方 LongLive-Plug 目录有 train.py、inference.py、trainer/model/configs/scripts 实际实现和 CFG/few-step 模型 collection。不把其他 LongLive 版本的功能当本论文 release；未确认 54target 完整评测/long-context 全部 artifact 均公开，未执行复现。",
+    "ideaZh": "LongLive-Plug 在 base model 上把 CFG、few-step 与 long-context correction 学成可复用 LoRAs，给 compatible descendants 保留 task weights 并直接加 adapter；它还让 CFG weight 成为独立文字引导旋钮。这对编辑、camera/trajectory/control 模型的实际创作复用有价值。作者报告 SCOPE 四步 FVD 478.7，对 native 30 步 382.9、naive 四步 805.5；不是无损加速。54 个模型多属部署覆盖，严格量化集中少数任务，adapter 必须同 family 且 long-context target 已支持 causal AR。",
+    "motivationZh": "每个专用 video model 都重新蒸馏，增加了编辑和控制模型的部署成本。目标是在同一模型家族内复用加速与 guidance 更新，保留专业条件接口。",
+    "methodZh": "常规每个 specialized video model 重做 distillation 昂贵。本文冻结 base，通过 flow regression 训练单次 guided prediction CFG LoRA，以 DMD2 训练 few-step LoRA；few-step 本身使用 guided teacher，另加 CFG-only residual 提供额外 control，而非将 CFG 所有影响完全从 few-step adapter 去除。两更新合并至 target 对应 layers，不改 task-specific branches。另以 streaming long tuning 学 causal-base correction，复用到 ReWorld/MatrixGame。",
+    "methodFlow": [
+      "家族内蒸馏：冻结每 backbone family 的 base，分别训练 guidance regression 与 DMD2 few-step LoRAs；fake score 仅训练使用。",
+      "保留专业模型：将 base-distilled updates 加至兼容 target layers，保留 target conditioning/output branches 和原 task weights。",
+      "独立调 guidance：固定 few-step adapter 权重，改变额外 CFG-only adapter residual；其 weight 是近似 dial，非校准原 CFG 数值。",
+      "可选 long-context：只对已有 causal AR 支持的 targets 复用 long-context error-correction LoRA，不由 adapter 创建 attention mask。"
+    ],
+    "experimentsZh": "实验设置：作者三个 base families 分别蒸馏。主 SCOPE 用 1378 CrossFPS clips，depth ControlNet 用 600 PAI-Bench-C cases/3600outputs，同四 steps 比较 naive/per-target/transfer，native 或官方 reference 另列。long-context 量化为 ReWorld64s 与 MatrixGame62.18s，七 VBench 维度 mean。\n作者报告 SCOPE 四步 transfer FVD478.7，naive805.5、task-specific502.1；native30step382.9。（Table1, p.5）\n作者报告 depth ControlNet si-RMSE1.641、DOVER10.11，task-specific1.515/10.25，有控制和画质权衡。（Table2, p.5）\n作者报告 MatrixGame longest rolloutmean83.73native、84.30officialdistill、84.34+Long，近似持平而非显著巨大改进。（Table3, p.8）\n比较范围：naive 四 steps 和 per-target distillation 提供有用同任务对照。ControlNet official leaderboard 设置未知，仅 reference；H3 native 初始 noise 路径不同，E4/S4 既改 sampler 又加 LoRA，不能隔离 adapter 效应。long-context 主 mean 未完整独立分离 few-step 与 long correction，少数 qualitative 包含该中间对照。\n消融与诊断：rank 与 prompt diversity 保持 teacher/line/optimization 等控制，distinct prompt count 也随 diversity 变化。guidance sweeps 有固定 inputs，但 coupled-collapse 与 decoupled 列使用不同 coupled checkpoints，不能作完全 matched isolation。步数减少倍数不等同 wall-clock 倍数，nativeattention/taskbranch 成本仍在。",
+    "insightZh": "可复用 distillation LoRA 有 LCM-LoRA 等基础，本文贡献是 video descendants 广泛适配、额外 guidance dial 和 AR correction 的模块复用。对控制/编辑创作核心模型有直接 transfer，超过仅单 checkpoint serving tweak；仍不能将一次家族蒸馏写成任意架构通用。",
+    "whyRelevantZh": "兼容的 camera、trajectory、editing、structure-conditioned 模型可复用能力 adapter，直接影响 visual creation 系统迭代与控制接口，满足 video 方向 transfer 门槛；不是 3D 资产或物理准确性的证据。",
+    "evidenceZh": "CFG-only 可调，但 few-step adapter 也已接受 guided teacher。（Secs.3.2/4.1, Eqs.2–4, pp.3–5; Appendix A.2, p.15；独立 dial 增加额外 guidance residual，非严格因素完全解耦。）\n主四步比较保持一定质量但逊于 native 一些指标。（Tables1–2, p.5；作者报告 SCOPE native FVD382.9、transfer478.7，不能声称保真无损。）\n54 entries 是 compatible 部署覆盖，不是 54 套同样严格的定量验证。（Appendix C.1, Table5, p.19; Appendix C.3, pp.22–23；H3 多为 single-seed 例子，adapter 和 sampler 同时变，audio/alpha 未有对应准确性指标。）\n过大 guidance weight 会改变 geometry 与引入伪文字。（Appendix D.2, Figs.17–18, pp.26–27；参数旋钮有真实 creator interface，但不是范围内任意值都安全且效果恒定。）",
+    "caveatZh": "需 compatible base descendants；long-context target 先有 causal AR。\ntransfer 存在 task-dependent 权衡，CFG weight 需调整且近似 control。\n覆盖 inventory 的部署成功不证明所有 control/task semantics 准确保持。\ncamera yaw 被削弱，RGBA 展示 checkerboard 不验证 alpha 精度，audio 输出不由静帧评估。\nbest adapter weight tuning 与 native qualities 差异应纳入实际 creation 选择。\n未给所有 target 多 seed/CI 及统一 latency，不能把 54 模型数量当质量保证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

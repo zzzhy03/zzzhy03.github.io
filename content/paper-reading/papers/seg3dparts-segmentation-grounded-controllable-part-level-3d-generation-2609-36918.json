@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2609.36918",
+  "slug": "seg3dparts-segmentation-grounded-controllable-part-level-3d-generation-2609-36918",
+  "title": "Seg3DParts: Segmentation-Grounded Controllable Part-Level 3D Generation",
+  "authors": [
+    "Jiantao Lin",
+    "Meixi Chen",
+    "Yingjie Xu",
+    "Chenbo Fu",
+    "Leyi Wu",
+    "Hao Chen",
+    "Yinchuan Li",
+    "Ying-Cong Chen"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36918"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Seg3DParts",
+    "3D Generation"
+  ],
+  "abstract": "Part-level 3D assets are essential for editing, reassembly, and interaction, yet recovering such structure from a single image remains challenging due to occlusion, ambiguous boundaries, and the need for coherent multi-part reasoning. Existing approaches struggle to achieve both controllable part-level generation and coherent multi-part structure, as part identity and spatial allocation are typically inferred implicitly. We present Seg3DParts, a segmentation-grounded framework for controllable part-level 3D generation from a single image. By treating segmentation as an explicit grounding signal, our method defines part identity during generation, enabling each component to be anchored to a corresponding image region. To ensure coherent assemblies, we introduce structured cross-part interaction that allows components to exchange global context throughout the generative process. As a result, Seg3DParts directly generates well-aligned part meshes in a shared canonical space without post-hoc alignment, supporting flexible and controllable decomposition. We further introduce PartObjectNet, a large-scale dataset with over 200K objects and 1M annotated parts. Experiments demonstrate that Seg3DParts achieves superior geometry quality, cross-part coherence, and part-level controllability over existing methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36918v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36918v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36918v1 全文及 2026-10-06T16:09:56.315114Z 审阅记录；PDF 18 页，SHA-256 e5d4e2cb173df6f4b9b9d76b2b0efc6aec04d7381743d8d64c3822f0a56e9afe，视觉核验第 1、4、8、9、14、16、17、18 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：exact PDF 未提供本方法 official project 或 public implementation URL；pdfinfo annotations 仅含 arXiv 与参考文献 DOI，未确认可链接的 Code。",
+    "ideaZh": "Seg3DParts 把输入 segmentation 的各部件明确绑定到 part-specific 条件，在两阶段 structured 3D latents 中加入跨 part attention，直接生成同一 canonical space 的独立 meshes。作者报告 part fidelity 与 overlap 改善，适合精读可控部件生成。主要对照给了 GT segmentation，遮挡补全依赖 part 数量与 prior；低 overlap 不等于真实连接、可装配或可制造。",
+    "motivationZh": "三维生成往往缺少输入区域与独立 parts 的明确对应，难控制部件及其组合；目标是让 segmentation 直接约束对齐的 part-level meshes。",
+    "methodZh": "在 TRELLIS 式 sparse structure→structured latents 管线中，global image 通过 cross-attention 提供整体条件，每个 segmented region 的 DINO embedding、timestep 和 part count 通过 AdaLN 调制对应 part tokens。VAE bottleneck 与 DiT 中周期性跨 part 交换 context，利用原资产部件的共同 scale/position 学 canonical alignment；FlexiCubes 解码 part meshes。PartObjectNet 集成已有分解资产作为监督。",
+    "methodFlow": [
+      "从图像 segmentation 为各 part 提取条件；完全遮挡的指定 part 使用 blank condition。",
+      "global image features 提供 cross-attention，part-specific embeddings 调制对应 latent tokens。",
+      "第一阶段 jointly 生成 part sparse occupancy，跨 part attention 协调布局。",
+      "第二阶段 jointly 生成 mesh-aware structured latents，保持部件身份与共同空间。",
+      "解码各 part mesh 并直接组合，按全局几何、对应 part geometry 和 overlap 评测。"
+    ],
+    "experimentsZh": "实验设置：在 held-out PartObjectNet 和 external PartObjaverse-Tiny 评价 whole-object/part CD、FS 和 voxel overlap；主比较包含 PartCrafter、PartPacker、OmniPart 及先 whole-object 生成再 PartField/HoloPart 的 pipelines。组件消融用较小训练子集，segmentation granularity 与 fully occluded case 主要 qualitative。\n作者报告 PartObjectNet global FS@0.1 为 0.917、CD 为 0.085、pairwise overlap IoU 为 0.012，对比 OmniPart 的 0.885、0.108、0.057。（p.8, Table 1）\n作者报告 external benchmark 的 global FS 为 0.810，PartPacker 为 0.802；external part IoU 为 0.702，OmniPart 为 0.429。（p.8, Tables 1–2）\n作者报告小规模消融移除 multi-part interaction 后 part IoU 从 0.649 到 0.434；该实验与主完整模型分数不可混用。（p.9, Table 3）\n比较范围：全局几何覆盖多种 pipelines，但 corresponding part-level 比较仅 OmniPart。conditioning 信息量、训练数据、backbone 和 mesh encoder 也不同；缺少完整 matched-data/matched-compute retraining。\n消融与诊断：移除 cross-part blocks、用全物体条件替代 per-part 条件支持两个设计有用，但只在缩小训练规模下测试。没有 noisy mask、hidden-part count、identity consistency、contact graph 或 manipulation physics 的总体评价。",
+    "insightZh": "继承 TRELLIS/mesh-based latents 与 local/global part modeling，新意在将显式 region 条件贯穿两阶段 part-aware generation，而非先生成整体后做无对应分解。贡献是可控 part asset generation；segmentation 属于条件输入，canonical spatial prior 属于训练数据，未证明能从单图自动确定所有隐藏真实部件。",
+    "whyRelevantZh": "部件 identity、显式条件与 coherent shared-space geometry 直接服务可编辑和可重组 3D assets，是核心 structured 3D generation 研究问题。",
+    "evidenceZh": "per-part AdaLN 条件与 global cross-attention 分开，multi-part interaction 插入 VAE 和 DiT。（pp.4–6, §3; pp.13–15, Appendices B/C；所谓各 part 独立解码指输出分离；decoder 仍有跨 part interaction，不能理解为彼此完全独立计算。）\n主 part-level 比较有显式对应并提供 GT segmentation。（pp.7–8, Figure 3, Tables 1–2；作者报告；未经 noisy SAM 自动 segmentation 的同等总体验证。）\n遮挡部件使用 blank 条件，segmentation 质量差时有失败。（p.16, Appendices F/G；隐藏部件的存在和槽位由输入指定；生成 prior 不等于唯一真实几何恢复。）",
+    "caveatZh": "输出依赖 segmentation 质量，模糊语义边界或碎片 masks 会造成几何退化。\n主评测使用 GT part segmentation，不能直接推断自动 pipeline 的鲁棒性。\n单视角隐藏 part 的存在与数量仍需外部输入，生成的 plausible structure 未必是唯一真实结构。\ncoarse voxel overlap 与 FS/CD 没有验证接触、关节、承载、watertightness 或 fabrication constraints。\n跨源资产可能存在近重复，报告 random object split 没有完整 dedup audit；缺少多 seed、runtime 和复杂 part 数量 scaling。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

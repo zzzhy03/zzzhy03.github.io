@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2604.20733",
+  "slug": "learning-from-the-near-future-temporal-self-distillation-for-rlvr-2604-20733",
+  "title": "Learning from the Near Future: Temporal Self-Distillation for RLVR",
+  "authors": [
+    "Chuanyu Qin",
+    "Chenxu Yang",
+    "Qingyi Si",
+    "Naibin Gu",
+    "Dingyu Yao",
+    "Zheng Lin",
+    "Peng Fu",
+    "Nan Duan",
+    "Jiaqi Wang"
+  ],
+  "publishedAt": "2026-04-22",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2604.20733"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Learning from the Near Future",
+    "VLM / MLLM",
+    "RLVR"
+  ],
+  "abstract": "Reinforcement learning with verifiable rewards (RLVR) is a core post-training recipe for reasoning models, yet pure on-policy learning can be inefficient when useful trajectories are difficult to discover or exploration narrows. Existing self-guided approaches largely reuse capability already available to the current or earlier learner. We instead ask whether learning can also make use of capabilities that emerge later in training: can a model learn from its own future self? We introduce temporal self-distillation, in which a policy receives guidance from a stronger later checkpoint of itself. We hypothesize that the most useful temporal teacher need not be the strongest one: a teacher must provide sufficiently new capability while remaining compatible enough for that capability to be readily transferred, motivating a near-future regime. We study this principle through two complementary mechanisms. Near-Future Policy Optimization (NPO) performs off-policy behavioral transfer using verified future-self trajectories, while Near-Future Policy Distillation (NPD) performs on-policy token-level transfer on learner-generated trajectories. We further introduce AutoNPO, which adaptively determines when temporal guidance is useful and how far to roll back, turning future-self guidance into a repeated self-bootstrap process. Across eight image-text benchmarks, NPO improves GRPO from 60.25 to 62.84 and AutoNPO reaches 63.15, with consistent gains on text-only and video reasoning. Under NPD, a near-future teacher reaches 63.23 after continued RL versus 61.92 with a far-future teacher, despite lower immediate post-distillation performance. Together, these results suggest that effective temporal self-distillation depends not simply on teacher strength, but on a balance between newly acquired capability and learner compatibility.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.20733v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.20733v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2604.20733v2 全文及 2026-10-06T12:11:26.164739+00:00 审阅记录；PDF 19 页，SHA-256 de721d4f1cd32adb757904a92c56131b68e1be119999c2e50bc72a6f3a3d07a5，视觉核验第 1、5、7、9、16、18、19 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact PDF 未印 NPO/AutoNPO/NPD 自身 Code URL；EasyVideoR1 只作为引用框架，不替代本方法公开实现证据。",
+    "ideaZh": "Temporal self-distillation 先训练出更强的后续 checkpoint，再恢复早期 learner，用该 future self 的 verified trajectories 或 token distributions 教它；AutoNPO 自动选择 rollback 与 replay 时机。作者报告 image-text average 从 GRPO60.25 到 AutoNPO63.15，含 rollback/guidance 的同 500 GPU-hour 对照仍优于扩大 rollout 的 GRPO61.14。值得深读的是 teacher 的新增能力与兼容性权衡；不是无监督凭空增长，仍依赖 verifier、训练历史与人工 controller 规则。",
+    "motivationZh": "RLVR teacher 需要更强且与 learner 兼容；外部模型未必满足两者，需要研究后续 checkpoint 的能力如何通过回退与重放传回。",
+    "methodZh": "NPO 在 learner 仍答错时，用未来 checkpoint 的正确轨迹替换 8 个 rollout 中的一个；NPD 用 learner 自产轨迹上的 near-teacher distributions 做标准 on-policy distillation。AutoNPO 跟踪 reward/entropy、mistake pool，探测 current checkpoint 能否解决早先失败题，再按 capability/KL proxy 选择恢复哪个过去 checkpoint。19 页全文和 appendix 均已读，实际查看方法 diagram、主表、compute 对照、distillation 配置、controller 伪代码；没有独立 limitations section，实证和 heuristic 边界在文中/附录及 reviewer 判断中说明。",
+    "methodFlow": [
+      "产生 future-self guide：从 anchor 继续训练出稍后 checkpoint，rollout 并 verify 正确轨迹；再恢复 anchor，future checkpoint 冻结作为 guidance source。",
+      "按失败程度注入指导：Learner 采 8rollouts；group pass rate≤0.6 且有 cached 正确 trajectory 时替换一个 slot，仍用 GRPO relative advantages 与 clipped objective。",
+      "自动选择 rollback：Reward stagnation 和 entropy decline 触发 probe，在 mistake pool 测新能力，按 pass-rate / exponential-KL cost proxy 选择过去 checkpoint 距离。",
+      "Replay 后继续训练：恢复 model/dataloader state，重跑选定 segment 并使用 guidance，catch-up 后 cooldown/re-arm；NPD 另以 near/far teacher token distillation 检验同一 teacher 选择原则。"
+    ],
+    "experimentsZh": "实验设置：主 Qwen3-VL8B，MMFineReason123K（4B-Thinking 四次失败过滤），8image-text/6video/6text benchmarks；GRPO batch256×8rollouts、8192context、lr1e-6，32H200。Text 从相同 LUFFY policy 续训；NPD 用 step40/520 的 same-run8B teachers、JSD top256 token 分布，seed1 固定 dataorder，继续最多 500GRPOupdates。\n作者报告 image-text GRPO60.25、earlyNPO62.12、early+late62.84、AutoNPO63.15；RLEP61.48、ExGRPO61.16。（PDF p.7, Table 1）\n作者报告 video GRPO58.30→NPO59.44；text 同 LUFFY 起点 48.7→52.5，但 baseLUFFY50.1，不能忽略 GRPO 续训退化。（PDF pp.7,15, Tables 2–3）\n作者报告 near/far teacher distillation 后继续 RL63.23/61.92；near immediate validation39.14 低于 far45.14，体现后续学习与即时分数不一致。（PDF p.16, Table 5 and Appendix A.4）\n比较范围：覆盖 on-policy、externalteacher、historicalreplay、farfuture、selfdistillation 与 OPD，但 teachercontext、LR、rolloutgroup、后续 RL 等配置不同；pure32BOPD 未经 RL 的分数不能用于证明 near8Bteacher 全面胜过强 teacher。\n消融与诊断：Rollback range、fixedΔ、guidancegate、importancecorrection、near/farNPD 及同 GPU-hourexpandedrollout。Nearfuture 下去 IS 仅 62.84→62.60，不代表 faroffpolicy 也可安全省略 correction。",
+    "insightZh": "主要新意是训练时间方向的 teacher 选择与 retrospective replay controller，而非另造 GRPO 或 OPD。两个 transfer 机制和包含额外训练成本的对照强化 near-future 假说；Q/V 是 heuristic，不是最优 teacher 或 recursive self-improvement 的证明。",
+    "whyRelevantZh": "主要实证直接是 VLMimage/video reasoning post-training，teachercompatibility 与 verifiedrollout 混合可用于多模态训练研究。Text-only 扩展是补充，不因 retrievalLLM 而套用 landmark 标签。",
+    "evidenceZh": "所谓 future-self 是先完成 later training 再 rollback，不是当前 learner 访问尚不存在的能力。（PDF pp.4–6, Sec.3, Fig.3; pp.18–19, AutoNPO implementation/Algorithm 1；实际查看图和伪代码；verified guide 最多替换一个 rollout slot，不能描述为无需 answer supervision。）\n作者报告同 500 GPU-hour 预算包括 rollback/guidance，AutoNPO 仍有优势。（PDF p.9, Cost analysis/Fig.7; p.17, Table 6；AutoNPO/GRPO8/GRPO16 averages63.15/60.25/61.14；best validation53.43/50.71/51.14。未复现，validation 与 benchmark 不能混用。）\nNPD 比较支持 near-teacher 后续 learnability，但 distillation 时长不相同。（PDF pp.7–8, Sec.4.3; p.16, Table 5/Appendix A.4；作者报告 near/far+GRPO63.23/61.92；near/far OPD 最佳 checkpoint 为 steps95/165，后续 GRPO 配置相同，完整两阶段 budget 不完全匹配。）\nKL exponential 被用为 transfer-cost proxy，不是实际 gradient variance。（PDF p.17, Appendix A.6; p.18, Rollback distance；作者明确 heuristic scale 和 smoothing；不将 quality/cost 示意图当理论保证。）",
+    "caveatZh": "PDF p.2 明确 intervention 是 hand-designed；Sec.6 仅展望让 model 决定自身训练历史上的干预。\nPDF p.17 明确 exponentialKL cost 是 heuristic，并非 gradientvariance 直接测量；p.16 明确 NPD 的 OPDdurations 不同。\nSelf-guidance 依然依赖 verifiablecorrectanswers，若 verifier 错误会重复强化错误；不是 label-freegeneralself-improvement。\nMainmultimodal 仅 Qwen3-VL8B，一次近/远 teacher 对照及 seed1 不能证明普遍存在最优 near-future 距离。\nRepeatedrollback 需要 checkpoint/dataloader 完整恢复与额外 probe/cache，controllerthreshold、optimizerstate 实现细节尚需公开代码核查。\nNPD 即时表现/后续结果受 distillationsteps95vs165 和 checkpointselection 影响，teacherdistance 并非唯一变化。\n没有独立 limitations section，以上范围与风险已明确区分作者陈述和 reviewer 推断。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

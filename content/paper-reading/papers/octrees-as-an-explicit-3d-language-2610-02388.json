@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.02388",
+  "slug": "octrees-as-an-explicit-3d-language-2610-02388",
+  "title": "Octrees as an Explicit 3D Language",
+  "authors": [
+    "Ran Dan",
+    "Si-Tong Wei",
+    "Pengfei Xiong",
+    "Wei Zhang",
+    "Yadong Mu",
+    "Peng-Shuai Wang"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02388"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Octrees as an Explicit 3D Language",
+    "3D Generation",
+    "VLM / MLLM"
+  ],
+  "abstract": "Existing 3D large language models (LLMs) compromise on two fronts: they compress shapes into latent codebook indices or coordinate text, which removes spatial structure from what the model observes, and they acquire the 3D modality by fine-tuning the backbone, which overwrites its general language ability. We present OctLLM, which addresses both limitations. Geometry enters as an explicit 3D sequence of octree occupancy tokens. However, full octree sequences grow rapidly with depth; OctLLM therefore randomly empties penultimate-level nodes and omits descendants while preserving shape, yielding a shorter coordinate- and depth-anchored Sparse Octree (S-Octree) for position-aware mask-modeling generation and 3D understanding. On the other front, existing methods introduce a new modality with full fine-tuning or LoRA, but full fine-tuning is costly, LoRA limits 3D capacity, and both modify the language pathway. OctLLM instead adds 3D capacity in parameters separate from the pretrained ones: mesh tokens are routed through independent trainable branches in a subset of blocks while text and image tokens retain the frozen vision-language pathway, and the two streams interact through shared self-attention. It trains far fewer parameters than full fine-tuning, yet sets a new state of the art among unified multimodal LLMs, lowering image-to-3D FID by $17.4\\%$ and raising render-grounded captioning by $28.7$ points over ShapeLLM-Omni, while matching the backbone on general language benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02388v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02388v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02388v1 全文及 2026-10-06T12:49:12.057817+00:00 审阅记录；PDF 28 页，SHA-256 8228652b098c8360ee4ff8664bb97db67d00340b4fd7429fba45e26e06d26489，视觉核验第 1、4、8、18、26、28 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF pp.1/10 仅指向 project https://plurato.github.io/OctLLM-page/ 并声称 released source/weights；本次 project 访问未成功，exact PDF 没有确认的 public repositoryURL，不冒充可用 Code 链接。",
+    "ideaZh": "OctLLM 把 octree occupancy bytes 连同 3D 位置/depth 作为显式几何语言，LLM 通过独立 full-rank 3D branches 读写，冻结原 text-image pathway；稀疏几何再经 3D U-Net 和现成 TRELLIS 生成 mesh。作者报告 image-to-3D FID 31.58 优于 ShapeLLM-Omni38.21，但 TRELLIS18.15 仍更强。值得精读的是显式空间 token、可确定下一位置的 mask-query decoding 和模态隔离；它不是无需 decoder 的原生高精度 mesh，也尚不支持 editing/appearance understanding。",
+    "motivationZh": "把三维几何接入 LLM 时，稠密坐标序列冗长且难以与文字共存；需要显式、紧凑的空间语言，支持几何读写，同时控制对原有语言和视觉路径的干扰。",
+    "methodZh": "将 depth6/64³ occupancy 按 Z-order 每 8bits 打包 byte，预处理时对 penultimate 层随机删 50% 节点，固定每 asset 的 S-Octree target。每个生成 byte 前加入同位置/depth MASK，历史 MASK 不作 attention keys，推理后实际移除其 KV，partialoctree 决定 nextnode，限定 256bytes 并按结构终止。Qwen2.5-VL7B 的 12/28blocks 新增约 2.80B full-rank QKVO/FFN branches，仅 mesh/MASK tokens 路由其中，其余原路径冻结。S-Octree 也作理解输入，generation/understanding 混训；独立 U-Net 补占据后，TRELLIS 用补全坐标及原条件生成 mesh/material。完整 28 页实质附录已读，实际查看首面、pipeline/branches 图、主表、masked-decoding 算法、组件消融和 limitations。",
+    "methodFlow": [
+      "构造显式稀疏几何序列：归一化 mesh→depth6 occupancy octree→penultimate 节点一次性随机 sparsify→Z-order traversal→8bits occupancy byte，保留 coordinate/depth anchors。",
+      "训练独立 3D token pathway：冻结 Qwen 视觉/语言，用 mesh embeddings/head 及 12 层 full-rank branches 处理 byte/MASK，sharedcausalattention 连通 text/image 与 3D；混合条件生成和 3D captioning。",
+      "结构驱动的位置查询解码：partialoctree 确定 nextnode，附瞬态 MASK 携带 position/depth，sample256occupancybytes，removeMASKKV 再更新 tree，直到 targetdepth complete。",
+      "补全占据并生成最终 mesh：3D U-Net 对 sparsegrid 补全，threshold0.5 输出 occupiedcoords；off-the-shelfTRELLIS 结合原 text/imagecondition 生成 texturedmesh。"
+    ],
+    "experimentsZh": "实验设置：195K ObjaverseXL/HSSD/ABO/ShapeNet assets，585Kinstructions；Qwen3.5-9B 四 renders 生成只谈 geometrycaption，175Ksparsecompletepairs 训 U-Net。69Ksteps/16H20、155KU-Netsteps/8RTX5090，effectivebatch64。HeldoutToys4K1Kassets 评 renderFID/KID 与 CLIP；PointLLM200 对象评 caption，Qwen3.8-Max 做 reference/renderjudges；text 四 benchgreedy。\n作者报告 image-to-3D IncFID31.58/KID0.56，ShapeLLM38.21/1.02；textFID45.61vs52.36，但 TRELLIS 分别 18.15/30.90 更好。（PDF p.8, Table1）\n作者报告 render-groundedcaptionjudge46.88vsShapeLLM18.14（+28.74points），humanreferencejudge26.61vs22.27，PointLLM7B46.06 更高；两 judge 实际均 Qwen 而非名为 GPT 的模型。（PDF pp.7–8, Table2a; pp.20–22, Appendix B.5/C.2）\n作者报告 200prompts RTX5090 autoregressive37.59svsShapeLLM19.92s，输出约 1277method-native tokens；未计 U-Net/TRELLIS/render，不能称全流程更快。（PDF pp.22/25, TableS3）\n作者报告同 4A100 训练 sparse/full peak44/58 GB、epoch1.37/2.17hr；airplanequalityFID26.31vsfull27.54 接近。（PDF pp.27–28, Figs.S6–S7）\n比较范围：明确区分 task-specific 与 unifiedLLM，mainbaselinecheckpoint/training data/size 并非完全匹配；nativeinputrepresentations 和 Hunyuantexturepostprocess 影响 renderjudgments。ImageCLIP 取 24viewsmax 而 text 取 4viewsavg。\n消融与诊断：ShapeNetairplane8branches 独立 protocol，latentVQ→S-OctreeFID33.10→26.31；去 MASK61.08、去 3Dpos32.84、去 suppression28.03；fullrankvsroutedLoRA32.44→26.31 image 但 textKID1.07 差于.98。Placement/capacity/sparsity/completion 等覆盖广，但单 category 子集、不报 multiseed variance。",
+    "insightZh": "Octree/tokenpacking、3DRoPE/depthembedding、positionquery 与 modalitybranches 各有先例；本作实质是将其组成统一理解/生成 LLM，并受控比较 latentcodes、mask components 和 routedLoRA。没有证明首个 general spatial language 或 overall3DSOTA，但显式可定位 geometry 与 frozenlanguagecapacity 之间的设计取舍直接相关。最终细节/材质来自 TRELLIS，不能把 whole pipeline 质量归给 LLMoccupancyalone。",
+    "whyRelevantZh": "直接属于 3D generation 的新显式 representation 和统一接口，同时为 VLM 引入可定位 3Dtoken 及保持原 path 提供方法参考，可对 part-aware/structuredassets 方向深入研究。",
+    "evidenceZh": "稀疏化是每 asset 预处理时一次固定抽样，geometry 并非无损保留全部细节。（PDF pp.3–4, Sec.3.1; p.16, Appendix A.1；删 penultimate nodes 及 finestdescendants，由学习 U-Net 恢复；noindependent 复现。）\n位置/终止由 partialoctree 结构决定，预测 MASK 不是普通 masked-diffusiontoken。（PDF pp.5/17–18, Fig.4/AlgorithmS2；每步只 sample 有效 byte；MASKKV 移除、eos 附加，位置无需 LLM 自由生成。实际查看 p18 算法。）\nUnifiedLLM 优势不等于超越专门 3Dgenerator，text 各指标也非全部最好。（PDF p.8, Table1；作者报告 imageFID31.58vs38.21，TRELLIS18.15；textDINO FID 175.58 差于 ShapeLLM169.28，CLIP22.30 差于 22.46。）\n冻结语言路径保留多个 textmetrics，但 fullmodelIFEval 有未屏蔽 meshhead 的下降。（PDF pp.8–9, Table2b/LanguageAbilityPreservation; p.27, TableS8；作者报告 MMLU/HellaSwag64.65/67.44 相同，GSM83.01vs83.54，IFEval69.87vs75.41；maskmeshvocab 可消除所述 drop。RoutedLoRA 也保留语言，fullrank 不是唯一方式。）",
+    "caveatZh": "PDF p.28 Appendix E：训练平均 1793tokens 比固定 1024 更长，增加训练 time/memory；上游 occupancy 和 U-Net 错误可放大形成 holes。\nPDF p.28：不支持 3Dediting 与 appearanceunderstanding，nativecolor/material 和去 externalgenerator 是未来工作。\nPDF p.9：generaltext 需避免 meshhead 错误开启 3Dsequence，系统输出格式/preamble 影响 structuredgenerationhandoff。\n64³coarsegeometry 加 TRELLISprior 无法保证细部拓扑/manifold/fabrication；renderFID 没有直接 CAD/partconstraint 或 metricgeometry 验证。\n自动训练 caption 和 Qwenjudge 同模型族，renderjudge15 分 appearance 项与 geometry-only 目标并不完全对齐，尚无人类判分可靠性验证。\n2.80B 新增 parameters 不是小 adapter，fullmodel12branches 推论来自 8branchairplane 消融；所谓保留语言仅 text-only 路径，不等于所有 mixed3D/visualreasoning 能力不变。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.37260",
+  "slug": "collision-aware-and-observation-aligned-object-centric-scene-reconstruction-from-point-clo-2609-37260",
+  "title": "Collision-Aware and Observation-Aligned Object-Centric Scene Reconstruction from Point Cloud",
+  "authors": [
+    "Yuxuan Xie",
+    "Xuan Yu",
+    "Rong Xiong",
+    "Yue Wang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37260"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Collision-Aware and Observation-Aligned Object-Centric Scene Reconstruction from Point Cloud",
+    "3D Reconstruction"
+  ],
+  "abstract": "Object-centric scene reconstruction requires completing partial object observations while preserving metric alignment and avoiding collisions with the surrounding. Existing generation-based methods are often image-conditioned and suffer from scale ambiguity and insufficient geometric constraints. We propose COOL, a framework for COllision-aware and Observation-aLigned reconstruction. Based on an object generation model, COOL conditions the generation on instance and background point clouds. Instance geometry anchors generation in scene coordinates, while background geometry provides local context for scene-consistent completion. We further introduce an explicit collision loss and use joint optimization and resampling to reduce collisions during inference. Experiments on 3D-Front and Scan2CAD demonstrate strong scene-level fidelity, observation alignment, and collision reduction. Moreover, additional studies validate its robustness to mask errors and its applicability to real-world scene replicas.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37260v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37260v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37260v1 全文及 2026-10-06T12:49:56.000Z 审阅记录；PDF 8 页，SHA-256 422415161779d567af89750fda7523edaf3c22f8785bf9e1979ddd8cbfc5ea51，视觉核验第 1、3、4、5、6、7 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exact8 页 PDF 无本方法 public code/projectURL 或明确 release promise。",
+    "ideaZh": "COOL 在 TRELLIS sparse-structure flow 中加入 instance/context point-cloud conditions，并对已观测背景 TSDF 的 penetration 作晚期 gradient guidance，再从 4 个样本选较低 collision loss 的结果。作者报告 Scan2CAD collision 从 context-only0.203/0.015 降至 0.027/0.000，object 耗时 3.4→7.8s。值得深读 metric-aligned completion，但不保证未知空间或完整 physics 合法。",
+    "motivationZh": "逐物体 canonical 生成再对齐容易累积 pose errors，并与场景障碍相撞；论文希望直接利用 partial point-cloud context，在原场景位置恢复独立物体。",
+    "methodZh": "重点是从 partial RGB-D geometry 生成已对齐的独立物体，减少 image-only canonical 生成再 pose fitting 的误差累积。Point cloud 的共同 normalization 保留相对尺度，两个 attention encoders 提供局部形状与 instance-aware 背景上下文。随后冻结 generator，通过 decoder occupancy 对 observed-background TSDF 求 gradient 引导最后 13/25steps，四次 noise resampling 补充局部优化。完成场景重建与生成 prior 的连接，但主实验 GT masks、有限室内数据和非 convex guidance 限定泛化。",
+    "methodFlow": [
+      "以 RGB-D、camera projection 和 instance mask 回投 scene point cloud",
+      "instance 中心/尺度同时归一化 target 和 background，FPS512points",
+      "分别用 8-block attention encoders 构造 instance/context 条件，分阶段 fine-tune TRELLIS sparse structure flow",
+      "生成 object latent 并通过 decoder 估计 occupancy，逆 normalization 回 scene 坐标",
+      "只对 observed TSDF 中 inside-background 且 positive occupancy 的点施加 penetration loss",
+      "最后 13/25denoisingsteps 以 bounded gradient velocity correction 优化；4noise multi-start 选 lowest loss，组装独立 objects"
+    ],
+    "experimentsZh": "实验设置：3D-Front8Ktrain/1Ktest scenes，Scan2CAD1.4Kscenes 形成 90Ktrain samples；输入单 view/GTinstance masks 为主。In-domain 方法分别训练对应数据；zero-shot COOL 只用 3D-Front 训练。CD/FScore、volumetricIoU 及 object/object-scenecollision，context/guidance/four-sample 消融；4scene predictedmask 与 1/3/5/allviews 研究。\n作者报告 Scan2CAD in-domain scene/objectFScore0.894/0.745，volumetricIoU0.641，collision0.027/0.000。（Table I, p. 5）\n作者报告 zero-shot objectCD0.068/FScore0.587，逊于 SAM3D0.040/0.691；sceneFScore0.841 与 collision0.041/0.000 则更优。（Table II, p. 5）\n作者报告 context-only→完整 collision0.203/0.015→0.027/0.000，耗时 3.4→7.8s/object。（Table III, p. 6）\n比较范围：AdaPoinTr/InstPIFu/MIDI 为可训练 in-domain，Gen3DSR/SAM3D/3D-Fixer 为 zero-shot 且输入可能多 RGB 条件。主 GTmask 隔离重建，无法表示完整自主场景 pipeline。3D-Front train/test 共享 CAD 库；real replica 仅质性。\n消融与诊断：Guidance 单 sample0.095/0.003，四 sample 无 guidance0.089/0.009，联合 0.027/0.000，显示互补；context 略提高 fidelity，但 fullsceneCD 不如 context-only0.014→0.015。",
+    "insightZh": "主要贡献是 scene-coordinate geometry conditioning 加 observed-space collision guidance/resampling，具有明确可借鉴的 generative scene constraints。并未发明新 3Dlatent 或 flow objective；缺少 global 碰撞/物理可行性保证。",
+    "whyRelevantZh": "直接针对 scene-aligned generative completion、独立 object 资产和可解释几何约束，可用于 3D 重建、scene generation 与 real-to-sim 资产管线。",
+    "evidenceZh": "Instance 和 background 共同归一化、两个 condition attention 模块分阶段训练。（Fig. 2, Sec. III-B/D, pp. 3–4；Fine-tuning 生成模型在 instance 阶段发生，context 阶段冻结主体；不是完全 training-free。）\nCollision loss 仅作用 observed TSDF 且 d<0、occupancy>0 的 locations。（Sec. III-C, Eqs. 5–11, p. 4；未观测区域无此约束；four-sample selection 不是 collision-free 证明。）\nIn-domain 与 zero-shot 协议独立；zero-shot object 几何低于 SAM3D。（Tables I–II, Sec. IV-A/B, pp. 5–6；Scan2CAD full model 已用其 trainset，不应混同 3D-Front-only Ours(zs)。）\nContext、guidance 与 resampling 互补但有耗时 trade-off。（Table III, Sec. IV-C, pp. 6–7；完整 7.8s vscontext-only3.4s，不是免费 constraint。）\nPredicted masks 研究仅 4 Scan2CAD scenes；附近物体误纳入仍困难。（Table IV, Fig. 7, Sec. IV-D, p. 7；不能把 GT-mask 主指标当作 end-to-end perception performance。）",
+    "caveatZh": "几何 condition 缺少 rich RGB 会丢细节；小训练数据限制泛化探索。\nDepth-continuous nearby-object mask 污染仍难处理。\n仅 observed 背景 TSDF 提供 collision 约束，未知 geometry 和非 convexlocal minima 没有保证。\n主实验依赖 GTmask，predictedmask 只 4scenes，no physical deployment 成功率。\nZero-shot 局部几何仍差于 SAM3D，不能说全指标最优。\n完整 GPU/hardware 及 training-cost 细节未报告；7.8s 仅 objectinference，本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

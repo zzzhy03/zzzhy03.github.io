@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.34581",
+  "slug": "counterfactual-attention-policy-distillation-for-temporal-video-grounding-2609-34581",
+  "title": "Counterfactual Attention Policy Distillation for Temporal Video Grounding",
+  "authors": [
+    "Shaobo Ju",
+    "Haiyang Yu",
+    "Xuecheng Wu",
+    "Qiong Wu",
+    "Jiacong Wang",
+    "Fan Shi",
+    "Jun Peng",
+    "Yiyi Zhou"
+  ],
+  "publishedAt": "2026-09-28",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.34581"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Counterfactual Attention Policy Distillation for Temporal Video Grounding",
+    "VLM / MLLM"
+  ],
+  "abstract": "Temporal video grounding is a key capability of advanced Multimodal Large Language Models (MLLMs) for the thorough understanding of video events, which is however often limited by repeated actions and visually similar contexts in long videos. In this paper, we study this issue from the perspective of On-policy distillation (OPD) and propose a new training regime for MLLMs termed Counterfactual Attention Policy Distillation (CAPD). In particular, OPD is a viable solution for MLLMs via providing dense teacher supervision on student-generated trajectories. But its next-token based teacher-student distillation is hard to identify the specific video segments supporting each predicted timestamp, which is critical for temporal grounding. In this case, CAPD measures how masking each temporal group changes the teacher's output distribution. The resulting counterfactual influence calibrates the teacher's attention and weights token-level distillation, allowing the student to learn the temporal evidence that affects boundary prediction. To validate CAPD, we trained it on Qwen3-VL-8B-Instruct using only 2,500 samples for one epoch, and evaluated it on the TimeLens and multiple general video benchmarks. Experimental results show that CAPD improves average recall by 12.0% relative to GRPO on TimeLens while preserving general video understanding, achieving comparable accuracy to the base model.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.34581v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.34581v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.34581v2 全文及 2026-10-06T11:33:59.037054+00:00 审阅记录；PDF 9 页，SHA-256 d14bd241d76c67fa897a151eb745d9ac9d7c396a1d88d9d467af00310eae09c5，视觉核验第 1、3、5、6、7 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：9 页 exact PDF 未找到本方法 public code/release URL；未根据作者或 Video-OPD 相关 repo 猜测。",
+    "ideaZh": "CAPD 逐 temporal group 替换 features，测 frozen teacher next-token JSD 以校准 attention 并加权 OPD，区分 where attended 与 prediction dependence。作者报告 TimeLens 九 recall 均值 55.1，对 GRPO49.2 是 5.9 百分点/12%相对提升，对 OPD52.8 仅 2.3 点；训练由 6.4h 增至 10.2h。可参考视频证据监督，counterfactual 只是特定 mask 下 teacher 敏感性，不保证因果正确。",
+    "motivationZh": "视频定位模型的 attention 可能偏向显眼但不决定答案的片段。目标是估计不同时间段对预测的影响，把更有用的 teacher 证据蒸馏给 student。",
+    "methodZh": "视频 timestamp 预测的 teacher attention 可能关注 salient 但非关键片段。CAPD 在 student 自身 rollout 前缀上比较完整 video teacher 与逐 group 替换 teacher 分布，得到 token/group influence；用 relative gate 修正 teacher temporal attention、加权 attention JSD，同时把总视觉 dependence 变为 capped/mean-normalized token KL 权重。student 仅在训练增加 teacher forward，推理架构不改。单 Qwen student/teacher pair 的 TimeLens 和 general video 对照支持目标能力改进，但时间分组、feature 替换及 teacher 错误限制证据解释。",
+    "methodFlow": [
+      "student Qwen3-VL8B 按 video/query 采 on-policy timestamp response，32B frozen teacher 读取相同 prefix",
+      "把 visual tokens 按 G=8 temporal groups 汇总 last-layer attention，并保留 prompt 及 response-prefix 两类 attention mass",
+      "每次将一 group features 换为其他时间同 spatial 位置的 mean，维持 shape/position 并重新 teacher forward",
+      "完整/替换 teacher next-token JSD 定义 group influence，按总视觉 dependence gate 和 group 标准化修正 attention logits",
+      "student 匹配 calibrated teacher attention policy；total influence 额外产生 capped token weights 供 reverse-KL OPD",
+      "以 weighted OPD+0.25attention loss full parameter 训 oneepoch；推理直接原 student 产生边界"
+    ],
+    "experimentsZh": "实验设置：作者报告 Qwen3-VL8B student、GRPO-posttrained Qwen3-VL32B teacher，2500 Video-OPD 样本/oneepoch、2FPS/8192visual tokens，8 H20/ZeRO3、full parameter 训练、seed42。Charades/ActivityNet/QVHighlights TimeLens 共 3363/4500/1541queries，R@0.3/0.5/0.7；另三 general video 任务。\n作者报告 CAPD 平均 55.1 对 GRPO49.2 为 5.9pp/12% relative，对 OPD52.8 为 2.3pp。（Table 1, p. 5）\n作者报告 attention-only53.3、token-only53.9、joint55.1，OPD52.8。（Table 3, p. 6）\n作者报告训练 10.2h 对 OPD6.4h，约 1.60×，peak memory 多 5.21GiB。（Training Efficiency, p. 6）\n作者报告 G=8/λ0.25 在所测设置 55.1，G2/4/16 分别 54.2/54.0/53.9。（Table 4, p. 6）\n比较范围：matched student training 比较 GRPO/Video-OPD/VanillaOPD/RAL，表内还列 closed/open 模型作为参考。仅一个 student/teacher family、固定 training corpus 与 seed，未报告跨 teacher、multi-seed variance、equal teacher compute 预算或 mask 替换策略对照。\n消融与诊断：attention-only/token-only、G 数量和 loss coefficient sweeps 支持联合 supervision。Figure3 evidence coverage 等 diagnostic 的定义/采样细节未充分展开；不能据概念曲线证明被扰动 group 是所有任务真实因果证据。",
+    "insightZh": "对 OPD/RAL 增加可明确实现的 teacher-output intervention，分别作用于 attention-policy 和 output-token supervision，而非仅 distill raw attention。方法的 counterfactual 属于 representation perturbation 敏感性，不能等同真实 scene intervention 或独立因果模型；其额外模块不改变基础 VLM 架构。",
+    "whyRelevantZh": "明确改变 multimodal temporal grounding 的证据监督，对 visual agents 识别 video 片段及避免 attention-as-evidence 误判有启发；图像/3D 设计 feedback 迁移未验证。",
+    "evidenceZh": "mask 以其他时间同 spatial 位置 mean feature 替换，frozen teacher 保持 same query/student prefix，再以 JSD 评估 group 影响。（Method: Counterfactual Group Importance, Eqs. 7–9, p. 4; Fig. 2, p. 3；方法图已视觉核验；不是删除 frames 后改变 position，也不是 external GT evidence 判断。）\n校准 attention 保留 nonvisual prompt/prefix mass，并联合 visual dependence token 权重。（Eqs. 6,10–17, p. 4；relative gate/standardization 不提供 absolute statistical significance 阈值。）\n作者报告九 TimeLens recalls 平均 CAPD55.1、GRPO49.2、VanillaOPD52.8、RAL53.3。（Table 1, p. 5；主表已视觉核验，12%为相对 GRPO 提升，CharadesR@0.7 仍低于 Video-OPD32.4。）\n作者报告 general Video-MME71.1、LongVideoBench64.0、LVBench52.5，对 base70.8/64.0/53.0，接近而非全面提升。（Table 2, p. 6；general 表已视觉核验，不称 preservation 无误差保证。）\nfixed temporal groups 不适配全部 event duration；多 teacher forwards 增加训练成本。（Conclusion limitations, p. 7; Training Efficiency, p. 6；限制页已视觉核验，无独立 longer-architecture 或 adaptive event grouping 测试。）",
+    "caveatZh": "fixed temporal groups 不覆盖多样 event duration/structure，adaptive grouping 留 future。\n需要多次 frozen-teacher 前向，比 OPD 昂贵，batching 仅是降低 overhead 建议。\nteacher 依赖错误或 mean-feature off-manifold 效应也可产生 JSD，influence 不等同 GT causal attribution。\n总 JSD 的 relative median gate 与 standardization 不足以说明 tiny perturbation 影响统计显著。\n12%相对 GRPO 应和对强 OPD 的 2.3pp 分开，非 12 个百分点。\nonebackbone/teacher/seed 且无 code URL，结果精确复现和泛化仍未确认。\ngeneralLVBench 略降，能力保持仅限三 reported benchmarks。\n所有数字作者报告；本项目未训练、运行或独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

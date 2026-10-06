@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2604.08995",
+  "slug": "matrix-game-3-0-real-time-and-streaming-interactive-world-model-with-long-horizon-memory-2604-08995",
+  "title": "Matrix-Game 3.0: Real-Time and Streaming Interactive World Model with Long-Horizon Memory",
+  "authors": [
+    "Zile Wang",
+    "Zexiang Liu",
+    "Jiaxing Li",
+    "Kaichen Huang",
+    "Baixin Xu",
+    "Fei Kang",
+    "Mengyin An",
+    "Peiyu Wang",
+    "Biao Jiang",
+    "Yichen Wei",
+    "Yidan Xietian",
+    "Jiangbo Pei",
+    "Liang Hu",
+    "Boyi Jiang",
+    "Hua Xue",
+    "Zidong Wang",
+    "Haofeng Sun",
+    "Wei Li",
+    "Wanli Ouyang",
+    "Xianglong He",
+    "Yang Liu",
+    "Yangguang Li",
+    "Yahui Zhou"
+  ],
+  "publishedAt": "2026-04-10",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2604.08995"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Matrix-Game 3.0",
+    "Video Generation"
+  ],
+  "abstract": "With the advancement of interactive video generation, diffusion models have increasingly demonstrated their potential as world models. However, existing approaches still struggle to simultaneously achieve memory-enabled long-term temporal consistency and high-resolution real-time generation, limiting their applicability in real-world scenarios. To address this, we present Matrix-Game 3.0, a memory-augmented interactive world model designed for 720p real-time longform video generation. Building upon Matrix-Game 2.0, we introduce systematic improvements across data, model, and inference. First, we develop an upgraded industrial-scale infinite data engine that integrates Unreal Engine-based synthetic data, large-scale automated collection from AAA games, and real-world video augmentation to produce high-quality Video-Pose-Action-Prompt quadruplet data at scale. Second, we propose a training framework for long-horizon consistency: by modeling prediction residuals and re-injecting imperfect generated frames during training, the base model learns self-correction; meanwhile, camera-aware memory retrieval and injection enable the base model to achieve long horizon spatiotemporal consistency. Third, we design a multi-segment autoregressive distillation strategy based on Distribution Matching Distillation (DMD), combined with model quantization and VAE decoder pruning, to achieve efficient real-time inference. Experimental results show that Matrix-Game 3.0 achieves up to 40 FPS real-time generation at 720p resolution with a 5B model, while maintaining stable memory consistency over minute-long sequences. Scaling up to a 2x14B model further improves generation quality, dynamics, and generalization. Our approach provides a practical pathway toward industrial-scale deployable world models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.08995v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.08995v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2604.08995v3 全文及 2026-10-06T15:49:06.423031Z 审阅记录；PDF 20 页，SHA-256 ca6b9f79032d88b1470d12e6d8e79b21c7da9ffcd5e74440abbc7cdd10035298，视觉核验第 1、7、9、15、16、17、20 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 项目页 matrix-game-v3.github.io 的 GitHub 按钮指向此官方目录；在线 GitHub root 及官方 contents API 确认目录含 generate.py、pipeline、wan、utils 与 test.sh，不只是 README；未运行实现。",
+    "ideaZh": "Matrix-Game 3.0 将 camera-aware memory、error-buffer 训练和双向模型的多段 DMD rollout 接到 interactive video generator。作者报告最高 40 FPS，但使用 DiT 与 VAE 分工的多 GPU 异步部署；长期一致性主要由回访画面的样例支持。可速读其 memory 与部署组合，不宜把展示等同于定量验证的持续世界状态或低延迟单卡交互。",
+    "motivationZh": "交互式视频长程生成易遗忘历史场景，回访时难保持一致；目标是用 camera-aware memory 与 rollout training 改善状态延续。",
+    "methodZh": "数据系统同步采集动作与相机 pose，并混合游戏、合成与真实视频。base model 将 memory、recent history 和 noisy current latents 放入统一 attention，依相机 frustum overlap 取回历史，以 relative Plücker 与实际时间位置编码对齐，并将预测误差注入训练条件。bidirectional student 在多段自生成 history 与 memory 上做 DMD，部署使用 attention INT8、轻量 VAE 和 GPU retrieval。报告给出吞吐与 VAE 重建成本，缺少 memory 质量的系统定量基准。",
+    "methodFlow": [
+      "采集并清理带动作、pose 与 captions 的多源视频。",
+      "训练 action-conditioned bidirectional base，收集误差并扰动历史条件。",
+      "依据相机与 frustum overlap 检索 memory，统一处理 memory、history 和当前 noisy latents。",
+      "以 relative geometry 和 temporal RoPE 表示跨视角及远期条件。",
+      "多段学生 rollout 配合 DMD，让 teacher 与 critic 评分实际生成上下文。",
+      "通过部分 INT8、轻量 VAE 和 GPU retrieval 做异步部署。"
+    ],
+    "experimentsZh": "实验设置：在 Wan 系列基座上训练动作、memory 与蒸馏，并展示场景回访与较大模型的第三人称生成。量化实验主要是移除加速组件后的 FPS，以及 mini test set 的 VAE PSNR、SSIM 和 runtime；未提供 memory benchmark 的数量、统计区间或同条件方法排名。\n作者报告完整异步配置约 40 FPS，移除 GPU retrieval 后为 6.60 FPS；配置使用八张 GPU 做 DiT 加一张做 VAE。（pp.10,14–16, Table 1）\n作者报告 VAE decoder 从 0.76 秒降到 0.13 秒，同时 PSNR 从 33.79 降到 31.14；这些是 VAE 重建测试，不是生成视频质量评测。（p.17, Table 2）\n作者报告并展示回访区域的约半分钟帧序列以及更长样例，但未报告长期场景一致性的总体成功率。（pp.15–16, Figures 9–11; p.1, Figure 1）\n比较范围：没有在相同数据、action、hardware 和 horizon 下对比其他 world models 的质量与控制；加速组件有消融，模型质量组件仅有描述和样例。\n消融与诊断：移除 INT8、MG-LightVAE、GPU retrieval 的吞吐变化清楚；没有 memory-off、error-buffer-off 或 RoPE-off 的定量长期质量控制。",
+    "insightZh": "各组件延续 SVI、DMD 与既有 memory world models，主要是双向 memory generator 的训练及部署集成。报告作为重要 interactive model 迭代有参考价值，但没有隔离 error injection、retrieval、RoPE 和统一 attention 对长期质量的独立贡献。",
+    "whyRelevantZh": "interactive video 中长程 memory 与可部署生成是重要能力组合，系统细节可迁移到 streaming diffusion；目前证据密度适合速读，待更完整定量质量分析。",
+    "evidenceZh": "memory 与短期 history 进入同一 DiT attention，相机 overlap 与 relative geometry 提供检索和对齐。（pp.7–8, §3.2, Figures 4–5；attention 热图仅显示访问权重，不能证明检索内容正确或物理一致。）\nfew-step 训练使用多段学生生成条件，而非仅 ground-truth history。（p.9, §3.3, Figure 6; p.13, §5.1；全文核验；cold start 仍先使用 ground-truth 条件。）\n最高吞吐来自异步多 GPU stack；长期回访质量主要是 qualitative。（pp.14–17, §§5.2.1–5.2.3, Tables 1–2；作者报告；吞吐不等于端到端 action-to-display 延迟。）",
+    "caveatZh": "仍需更高分辨率、更长序列及更先进 memory 机制，结尾提出继续改进复杂交互。\nfrustum overlap 依赖相机 pose，报告未完整量化真实交互 pose 推断误差如何影响检索。\nmemory consistency、动态状态和物理正确性没有系统量化，不能由少量回访样例或 attention heatmap 推断。\n最高 FPS 使用异步多 GPU 与特定精度配置，没有端到端交互延迟和吞吐方差。\n部分展示因出版原因模糊，不能作为视觉比较证据；轻量 VAE 的损失也未转化为完整生成质量对照。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

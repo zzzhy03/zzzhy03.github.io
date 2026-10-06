@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2609.37372",
+  "slug": "think-before-you-score-thinking-reward-model-for-visual-generation-2609-37372",
+  "title": "Think Before You Score: Thinking Reward Model for Visual Generation",
+  "authors": [
+    "Xuehai Bai",
+    "Zhenchen Tang",
+    "Yang Shi",
+    "Dianyi Wang",
+    "Tengfei Liu",
+    "Wanshun Su",
+    "Xuanyu Zhu",
+    "Ruohui Wang",
+    "Haiwen Diao",
+    "Haotian Wang",
+    "Xiaoling Gu",
+    "Yuanxing Zhang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37372"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Think Before You Score",
+    "Image Generation"
+  ],
+  "abstract": "Visual reward models are essential for evaluating and improving visual generation models, yet existing approaches typically map task conditions and candidate outputs directly to scalar rewards, leaving implicit what should be evaluated for each individual case. We introduce Think Before You Score, a paradigm that explicitly determines what matters for each case before judging how well the candidate performs. Following this principle, we propose the Thinking Reward Model (TRM), which formulates case-adaptive rubrics, performs rubric-guided assessment, and produces fine-grained pointwise rewards. We further observe that conventional pairwise preference optimization can induce score polarization, and introduce Pairwise Dual-Group Relative Policy Optimization (PD-GRPO), which leverages pairwise supervision to improve reward discrimination while preserving fine-grained pointwise scoring. Extensive experiments on image generation and editing reward-modeling benchmarks demonstrate that TRM achieves state-of-the-art performance among open-source reward models while remaining highly competitive with proprietary alternatives. Moreover, using TRM as a reward for reinforcement learning consistently improves diverse visual generation models, demonstrating that its fine-grained, case-adaptive rewards translate into effective optimization signals for visual generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37372v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37372v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/bxhsort/Thinking_Reward_Model"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37372v1 全文及 2026-10-06T15:51:18.869224Z 审阅记录；PDF 31 页，SHA-256 529db14d523dc75cd54055faf58c1b87e6a96caa2f0bfea3197562e38461f243，视觉核验第 1、5、8、11、24、25、31 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 官方 project page 可访问，页面 GitHub 指向此仓库；在线确认 src/trm、scripts/infer_t2i.py、infer_edit.py 与 vLLM support。官方明确当前公开的是 inference 实现，training 和 benchmark pipeline 仅在论文描述；未运行复现。",
+    "ideaZh": "TRM 先生成当前图像或编辑任务的 rubric，再逐条判断并输出 pointwise reward；PD-GRPO 用两侧 rollout 的相对均分提供偏好监督，避免持续扩大 score gap。作者报告它能指导多个生成和编辑模型改善。值得精读 reward 的结构化与双组学习；headline 偏好分数排除 ties，rubric 的独立贡献、绝对 calibration 与公开 benchmark 去重仍需更强验证。",
+    "motivationZh": "视觉生成 reward 常只给一个总分，难表达不同请求的评判标准；目标是先构建任务相关 rubric，再学习可用于生成与编辑训练的偏好评分。",
+    "methodZh": "通过 human–AI annotation 收集 rubric、criterion judgments 与总分，训练 Qwen-based reward model。对相同任务的优劣候选分别采样评估回答，以是否超过对侧均分加 margin 构造硬 reward，合并两组做 GRPO；推理仍独立评价单个候选。所得 reward 接入 FlowGRPO，在 image generation 和 editing 的多个基座上验证。方法不产生 editable design 或 agent 操作，其贡献是可迁移的视觉生成 reward training。",
+    "methodFlow": [
+      "构造多源生成与编辑样本，使用专家校准的模型 annotation 生成 rubric、逐项判断和总分。",
+      "以结构化回答做 SFT，学习先确定评估项、再评估及聚合的 pointwise 接口。",
+      "同一任务下分别对优劣候选采样评估 rollout。",
+      "用对侧平均分与 margin 构造饱和的偏好 reward，合并两组执行 GRPO。",
+      "独立输出候选 reward，并以其指导多个生成或编辑模型的 FlowGRPO。"
+    ],
+    "experimentsZh": "实验设置：reward model 比较普通 VLM、专用 RM 与 proprietary judges，另外将 TRM reward 用于多个 image generation/editing 基座的 RL。附录给出模型特定配方、prompt-level 内部 train/validation split、tie-aware 指标及 reward dynamics。没有完整 benchmark-level contamination audit、多 seed 训练或独立人工 downstream preference study。\n作者报告 main non-tie T2I accuracy 为 71.2% 和 67.9%，all-parsed tie-aware accuracy 则为 68.4% 和 63.9%。（pp.7–8, Table 2; p.25, Table 10）\n作者报告 BAGEL 的 GenEval 从 0.86 到 0.89，TIIF-Long 从 75.62 到 81.43；同基座 AlphaGRPO 的 TIIF-Long 为 78.10。（pp.9,11, Tables 4/6）\n作者报告 SenseNova 的 TRM 与 EditScore 结果很接近：ImgEdit 为 4.52 对 4.51，GEdit-CN 为 8.34 对 8.37，TRM 并非全胜。（p.11, Table 6）\n比较范围：有 SFT→RL 增量及 BAGEL/AlphaGRPO、SenseNova/EditScore 的控制；不同 candidate 生成基座有 before/after。不存在同数据同长度的无 rubric SFT 或固定 rubric 对照，不能将全部收益单独归于 adaptive rubric。\n消融与诊断：BT 与 PD-GRPO 的 score histogram 支持较少极化，但没有对应 calibration error 或相同条件的完整 RM 精度对照；更大的 group variance 也不等于更正确的优化信号。",
+    "insightZh": "自适应 rubric 的生成评价沿用 reasoning judge 的思路；实质方法增量是将 pairwise supervision 转成保留 pointwise 推理的 dual-group hard-margin 学习，并验证 reward 可跨多个生成和编辑基座使用。饱和 reward 消除继续拉大间距的动机，却不保证绝对分数 calibration 或所有候选之间可比。",
+    "whyRelevantZh": "reward 是生成模型 post-training 的核心接口；本工作将可解释 checklist 和偏好训练连接，并展示跨多个生成与编辑基座的迁移，超过单一 judge benchmark 包装。",
+    "evidenceZh": "rubric 根据 task 与候选共同生成，随后进行 criterion-level、dimension-level 与总分判断。（pp.4–6, §§3–4; pp.28–31, Appendix A.5；全文核验；每个候选可有不同 rubric，不是固定客观标准。）\nPD-GRPO 用 opposite-group mean 的 margin test 构造 reward，推理仍独立。（pp.6–7, §4.2; pp.19–20, Appendix A.2.2；不是直接回归人类绝对分数的保证。）\nreward-model 与多个 downstream generators 都有结果，但主要 T2I 排名排除预测 ties。（pp.7–11, Tables 2–6; pp.24–25, Table 10；作者报告；appendix 的 all-parsed/tie-aware 指标更接近覆盖整体比较。）",
+    "caveatZh": "MLLM reward computation 增加成本，作者用异步服务及 shared-prefix cache 缓解。\npointwise 的有限分辨率会产生 ties；附录专门提供 tie-aware 评测。\n训练使用 EditCompass 等 benchmark 来源，内部 prompt-level split 不等于与公开 evaluation 按 prompt/source image 全面隔离；论文未完整说明去重。\ncandidate-adaptive rubric 可能改变比较尺度或遗漏缺陷，缺少独立 rubric accuracy 与机制消融。\n饱和 pairwise reward 不保证绝对 calibration；训练 reward 上升也可能包含 reward hacking。\n参数更少不等于总评估成本同比降低；结构化长回答、未报告的失败 parsing 及不同基座配方影响比较。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

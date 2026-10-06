@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.02153",
+  "slug": "mosaichunk-compositing-spatio-temporal-memory-for-autoregressive-video-generation-2610-02153",
+  "title": "MosaiChunk: Compositing Spatio-Temporal Memory for Autoregressive Video Generation",
+  "authors": [
+    "Yiwen Zhang",
+    "Haocheng Xi",
+    "Michael Tian-Yue Liu",
+    "Alexei A. Efros",
+    "Hadar Averbuch-Elor",
+    "Qianqian Wang",
+    "Haiwen Feng"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02153"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "MosaiChunk",
+    "Video Generation"
+  ],
+  "abstract": "Long-horizon autoregressive video generation is limited by a finite context window. When an object or scene falls out of context, its fine-grained visual details may be lost and difficult to recover upon reappearance. To retain access to such visual details, we introduce MosaiChunk, a spatio-temporal memory mechanism that composes a mosaic of selected historical key-value (KV) entries across space and time. Our approach is motivated by the observation that a frozen video generator can directly consume such non-contiguous historical KV and recover the corresponding visual content. We therefore keep the generator fixed and learn only a lightweight router that determines which historical sections to include in the mosaic under a fixed active-memory budget. We further introduce RememBench, a benchmark of long-horizon revisits with prompt-driven text-to-video (T2V) and camera-driven image-to-video (I2V) splits. Our experiments show that MosaiChunk consistently improves revisit consistency over both sliding-window inference and whole-chunk retrieval under matched memory budgets, across both T2V and I2V settings.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02153v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02153v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/mosaichunk/MosaiChunk"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02153v1 全文及 2026-10-06T15:35:26.256409+00:00 审阅记录；PDF 27 页，SHA-256 37d57a069f04a7fdd76fcbfe8a827a34441eaf174afd2ce84571dfe228689d55，视觉核验第 1、4、5、6、7、9、10、16、17、24、25、26、27 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 project https://mosaichunk.github.io/ →官方 Code→public mosaichunk/MosaiChunk；web 与 GitHub API 确认 mosaichunk modules、train.py/test.py/score.py、configs 与 backbone patches，非 README-only。PDF release wording 是未来式，当前公开状态经实际访问确认；未独立复现。",
+    "ideaZh": "MosaiChunk 将历史 KV 分成非连续的 content sections，用只训练 router 的 self-distillation 在固定 active-cache budget 下组合旧内容。作者报告两 chunk far memory 时 T2V revisit CLIP 0.936，相对 whole-chunk MoC 的 0.841；I2V 180° 为 0.863 对 0.807。值得精读可复用 content memory 和 KV transplantation；全部历史仍存 CPU，T2V benchmark 先筛掉不遵循返回动作的场景，pose retrieval 和其他角度也并非都较弱。",
+    "motivationZh": "视频回访场景可能只需要历史 chunk 的一小部分，整块检索会浪费 cache；需要按内容重组历史 KV，在有限 active budget 下复用相关时空证据。",
+    "methodZh": "冻结 H3-AR 或 LingBot-World-Infinity，先对中层 unrotated keys 做 balanced k-means，将每 chunk 划成等大小 sections。多层 mean/max/min pooled keys 经 descriptor encoder 形成 query/key descriptors，以最近 chunk 查询历史，global top-N 选择 sections、soft weights 缩放 values、调整 temporal RoPE 后组合 far memory。Teacher 使用按 prompt/camera 指定的完整 departure chunks，student 用较小 section memory，匹配同 noise/local context 下的预测以训练 router。",
+    "methodFlow": [
+      "分割并归档历史内容：Balanced k-means 将 unrotated keys 分为等大小 sections，同 partition 对应各层 KV；所有 verbatim historical KV 和 indices 存 CPU。",
+      "编码内容 descriptors：多层 mean/max/min keys 经归一化、projection 和 residual MLP，分别产生 query/key descriptor sets，抑制仅匹配近期内容的 bias。",
+      "检索并组合 far memory：最近 chunk sections 查询远期 history，global top-N 在共享 budget 下选 sections；soft weights 缩放 values，保留 spatial positions 并调整 temporal RoPE。",
+      "用 richer-memory teacher 训练 router：冻结 generator，teacher 使用 prompt/camera 指定 departure chunks，student 使用压缩 memory；MSE 经 value weights 回传，不经过离散 top-N，训练含随机探索。",
+      "延续并检验 revisits：Generator 同时读取 sink、最近两 chunks 和 composed history；相同 prompts/noise/active budget 下比较 departure/revisit 的内容一致性。"
+    ],
+    "experimentsZh": "实验设置：T2V router 训练 2,000 prompt schedules，I2V 用 scene-disjoint Sekai conditioning clips；每 backbone 独立 router。RememBench T2V 为 100 compliance-screened scenes，I2V 为 150 DL3DV scenes，测试 rotation 和 outdoor translation。Base 保留额外 recent chunks 匹配 active cache，retrieval 保留两 recent chunks 加 far memory。T2V departure/revisit 人工逐 rollout 标记；I2V 使用 Pi3X reconstructed poses 选 returning frames。\n作者报告两 chunk far memory 的 T2V median CLIP/LPIPS：Base 0.751/0.652、MoC 0.841/0.569、MosaiChunk 0.936/0.500；TempSSIM/Drift 差距很小，不能由 revisit 高分推断全面 rollout quality 改善。（PDF p.6, Table 1）\n作者报告 I2V 180° rotation 两 chunk CLIP/LPIPS：MoC 0.807/0.642、MosaiChunk 0.863/0.609。加入 pose signal 的 WorldKV 为 0.891/0.578，MosaiChunk-Pose 为 0.893/0.577；非 pose router 不是总体最优。（PDF pp.7,26, Tables 2,13）\n作者报告 T2V candidate pool 466 scenes 中保留 100、排除 366 不完整 disappear/reappear rollouts；这是有条件的 memory 评测，而非所有 prompt 的成功率。（PDF p.17, Appendix B.1, Fig.7）\n作者报告 360° 一 chunk rotation CLIP：Base0.716、MoC0.722、MosaiChunk0.717；90° 两 chunk MosaiChunk0.906 也不优于 Base0.907/MoC0.908。收益不跨所有轨迹一致。（PDF p.25, Table 12）\n作者报告公共 WorldMark 一 chunk Revisit Memory80.14→84.89，但 Local Memory95.55→95.29；WBench 两 chunk Segment97.47→94.94。选定回访能力与局部稳定应分开。（PDF p.24, Tables 10–11）\n比较范围：固定 backbone、seed、prompt/camera 与 active visual KV budget 是有意义的 memory 对照。MoC 为在该 backbone 上的 mean-pooled-key adaptation，WorldKV pose rule 另有完整附录，不代表全部原方法训练/机制公平移植。缺少总体 CPU/GPU memory、throughput、检索/传输时间与多 seed uncertainty。\n消融与诊断：Learned descriptors versus mean keys、global selection versus retrained per-query top-k、far-memory budget、pose shortlist 有分析。Descriptor ablation 还用 uniform value weights，不能只归因 embedding learning。训练 top-N 无梯度，但固定 weight normalization mean 使全候选 softmax scores 可受梯度，并用随机替换探索。",
+    "insightZh": "从 whole-chunk retrieval 转向 fine-grained non-contiguous native KV composition，冻结 backbone 仍可恢复指定内容，并用 oracle-memory self-distillation 学习检索 descriptors。这是生成状态复用的一项实质方法贡献；manual cookie-region transplantation 为 content-specific KV 的可交换性提供定性证据，但还不是自动任意 object editing 系统。",
+    "whyRelevantZh": "内容可寻址、可复用并能跨 rollout 移植的 native generation states，直接关联持续视觉创作和局部内容再利用；回访一致性也是视频控制的关键问题。与 CAD/SVG/fabrication 的联系尚是方法迁移判断，不是已验证用途。",
+    "evidenceZh": "非连续 sections 和价值权重可被冻结视频 backbone 直接消费，router 训练不需要 recorded target continuation videos。（PDF pp.4–6, Figs.2–4; pp.14–16, Appendix A；完整阅读 exact PDF 并实际查看方法图；teacher 仍依赖 prompt/camera 识别 departure chunks，训练数据含 conditioning frames。）\n固定 active visual-KV budget 下，T2V 和 180° I2V revisit scores 优于 sliding window 与 adapted MoC。（PDF pp.6–9, Tables 1–4; pp.18–20, evaluation protocol；作者报告；CPU history、retrieval time 和 host-device transfer 没有匹配为总系统资源。）\nPose retrieval、90°/360° 和公共 benchmark 的完整结果限定了收益范围。（PDF pp.23–26, Tables 10–13；作者报告；主表 selected consistency 指标均提高不等于完整附录全部指标提高。）\n手动选出的 cookie KV 在两 rollouts 间交换后可恢复对方 cookie，但保持本 tin。（PDF p.27, Appendix C.4, Fig.14；实际查看 swap 图；仅两个 qualitative cases，manual region selection，未独立运行。）",
+    "caveatZh": "冻结 backbone 保留其 instruction-following 和 generative-distribution 限制，不能保证动作遵循。\n历史 CPU KV 随 rollout 增长，只有 active DiT cache budget 固定。\n90°/360° 收益不一致，完整公共指标中 Local Memory、Segment 等会下降。\n最近生成 chunk 查询 history，未显式输入未来 prompt；目标尚未重新露出或外观大变时检索可能不足，全文未独立量化该失败机制。\nT2V 筛选为 baseline 已完成 appear/disappear/reappear 的有限场景，不能把好 memory 分数解释成总体 long-horizon prompt success。\n逐方法人工/重建选 revisit frames 会受 action timing、camera estimation 与 frame matching 影响，CLIP/LPIPS 不能证明精确 object identity、3D 几何或物理规律。\nCPU 保存各层 BF16 KV 和全历史检索可能随长度增加成本，PDF 未报告这一系统瓶颈。\n少参数 router 仍依赖大 generator 的 rollout/backprop，作者采用多 H200 训练；不是低成本任意 backbone 插件的证明。\nTransplantation 使用人工 region 和两个例子，没有自动控制、跨视角泛化或图形结构输出实验；本文未运行或观看实际 videos。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

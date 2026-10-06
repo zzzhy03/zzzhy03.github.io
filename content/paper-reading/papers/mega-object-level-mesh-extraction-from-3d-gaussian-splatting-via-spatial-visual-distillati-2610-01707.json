@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2610.01707",
+  "slug": "mega-object-level-mesh-extraction-from-3d-gaussian-splatting-via-spatial-visual-distillati-2610-01707",
+  "title": "MEGA: Object-Level Mesh Extraction from 3D Gaussian Splatting via Spatial Visual Distillation",
+  "authors": [
+    "Liwei Liao",
+    "Yingkui Zhang",
+    "Qianqian Tong",
+    "Ronggang Wang"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01707"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "MEGA",
+    "3D Reconstruction"
+  ],
+  "abstract": "Mesh extraction from 3D Gaussian Splatting (3DGS) aims to endow 3D Gaussians with accurate geometric structures, enabling explicit and precise 3D occupancy. However, existing methods primarily focus on scene-level mesh extraction, making them unable to represent object-level occupancy and often resulting in non-watertight surfaces. To overcome these limitations, we propose \\textbf{MEGA} (\\underline{M}esh \\underline{E}xtraction from \\underline{GA}ussians), a ``segment-then-mesh'' framework for extracting object-level, watertight meshes from complex 3DGS scenes. At the core of MEGA are \\textbf{Spatial Visual Distillation (SVD)} and a mask-guided neural surface reconstruction module. SVD treats the 3DGS model as a teacher, sampling diverse camera poses and rendering the corresponding views of each segmented object. These observations are then used to train a mesh reconstruction model through photometric supervision. Extensive experiments on several widely used benchmarks demonstrate that MEGA achieves state-of-the-art performance in recovering accurate object-level 3D occupancy. Moreover, MEGA enables complex physical interactions by combining high-quality object-level meshes for geometric occupancy with 3DGS representations for photorealistic rendering.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01707v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01707v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01707v1 全文及 2026-10-06T12:48:22.000Z 审阅记录；PDF 8 页，SHA-256 45986133188b3a7651fd79b2842829c9ebe6ce218bc5465338e11f3725d9a395，视觉核验第 1、3、4、5、6、7 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文未提供本方法 public code 或 project URL；引用组件仓库不等于 MEGA 实现。",
+    "ideaZh": "MEGA 先以 SAGO 分出 Gaussian object，再从 216 个虚拟视角渲染 RGB/masks 来优化 object SDF，最后 Marching Cubes 得到同坐标系 mesh。可略读从 photorealistic 3DGS 转 editable/collision asset 的接口；91.8/91.4 mIoU 是 2D silhouette matching，并没有 3D surface truth 或量化 physics fidelity。",
+    "motivationZh": "Gaussian rendering 缺少便于碰撞和编辑的显式物体表面，而直接提取 mesh 容易受未观察区域影响；论文希望用空间多视角蒸馏生成独立物体几何。",
+    "methodZh": "论文把 segmentation-then-mesh 与 hemisphere view distillation 组合，显式保留 Gaussian rendering 与 mesh collision 双表示。Hash-encoded SDF 由 teacher RGB/masks、Eikonal loss 监督，边界 trimming 只修 Gaussian 视觉外观。结果说明 teacher-view distillation 对 object mesh 提取有效，但 watertight 与 physics-compatible 主要来自 qualitative demos，不能推导真实质量、稳定性或制造约束。",
+    "methodFlow": [
+      "从 pretrained 3DGS 接收点/框/文本 object prompt",
+      "SAGO virtual drones/SAM2 分割 Gaussian subset 并估计 spatial configuration",
+      "按 object 上半球 3×72 camera poses 生成 teacher RGB 与 SAM2 masks",
+      "Hash-encoded SDF 以 photometric/mask/Eikonal losses 作 per-object optimization",
+      "Dense-grid Marching Cubes 提取对齐 mesh；可选 Gaussian boundary trimming",
+      "Mesh 用于 collision、Gaussian 用于 rendering，接入 VR/physics demos"
+    ],
+    "experimentsZh": "实验设置：单 RTX4090，216 upper-hemisphere viewpoints/object；SPIn-NeRF、NVOS、LERF-Mask 的投影 silhouette IoU/accuracy，Mesh extraction baselines 需 manual segmentation，SAM3D 需 manual alignment。Object interaction demos、sampling density 和 SDF 替换消融。\n作者报告 SPIn-NeRF mIoU/mAcc91.8/97.1、NVOS91.4/98.5；NVOS mIoU 不及 SVD+2DGS91.7。（Table 1, p. 5）\n作者报告 LERF-Mask mean90.1，与 teacher91.0 接近但低于其 mean。（Table 2, p. 5）\n比较范围：主评价是同一 2D segmentation benchmark 的 silhouette，无法验证隐藏面、thickness、surface distance 或物理质量。Gaussian-only 方法准确率更高但无 mesh；baseline human alignment/segmentation 预算不同。\n消融与诊断：3×72 之后 view density saturation；SVD 可改善 2DGS/PGSR；boundary trimming 只质性改善 rendering，不改 mesh。SDF 具体 MLP/空间估计细节引用 appendix 但本 8 页 exactPDF 没有 appendix。",
+    "insightZh": "可迁移的 object-level Gaussian→SDF distillation 系统，核心并非新 SDF 或 renderer。Teacher sampling 为 segmented objects 提供 pseudo multi-view observations，支持 asset extraction；仍依赖已有 SAGO/SAM2 segmentation 和逐物体优化。",
+    "whyRelevantZh": "Object-level reconstruction 到独立可操作 mesh asset 的接口直接相关 3D 重建和交互场景，但不把 demo 包装为 physical generation 或 manufacturing 保证。",
+    "evidenceZh": "Segment-then-mesh 与共享 SAM2 memory 的 teacher views，SDF loss 和 Marching Cubes。（Fig. 2, Sec. 3.1–3.3, pp. 3–4；视角局限 upper hemisphere；隐藏面的闭合不等于几何正确。）\n作者报告 SPIn-NeRF/NVOS silhouette mIoU91.8/91.4。（Table 1, Sec. 4.1/4.2, p. 5；SVD+2DGS 的 NVOS91.7 实际高于 MEGA91.4，不能重复正文所有指标优于的概括。）\nLERF-Mask mean90.1 低于 SAGOteacher91.0，Figurines94.1 略高。（Table 2, p. 5；不是全面超过 teacher。）\nVR grasp、gravity 与 penetration 示例仅质性，仍可能 mesh penetration。（Figs. 4–7, Sec. 4.3–4.5/5, pp. 6–7；没有可报告的物理成功率、collision 误差或 meshing runtime。）",
+    "caveatZh": "Gaussian fitting 与表面不完全一致，交互仍可能轻微 penetration。\n仅上半球 teacher viewpoints，teacher 缺失/错误不会成为 GT；Marching Cubes 闭合不证明真实内外 occupancy。\n没有 3D truth、manifold/self-intersection 统计、物理 sim 成功率或完整耗时。\n主结果没有全面超过 teacher 或 SVD+2DGS。\nPDF 引用 appendix 但 exact 版本只 8 页，架构/配置细节未提供；Code 未确认。\n全部数值为作者报告，本项目没有复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

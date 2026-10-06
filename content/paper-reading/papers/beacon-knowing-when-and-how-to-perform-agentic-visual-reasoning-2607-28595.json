@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2607.28595",
+  "slug": "beacon-knowing-when-and-how-to-perform-agentic-visual-reasoning-2607-28595",
+  "title": "Beacon: Knowing When and How to Perform Agentic Visual Reasoning",
+  "authors": [
+    "Qixun Wang",
+    "Yang Shi",
+    "Letian Cheng",
+    "Zhuoran Zhang",
+    "Yan He",
+    "Yuqi Tang",
+    "Qi Zhang",
+    "Xinlei Yu",
+    "Ruizhe Chen",
+    "Tianrun Xu",
+    "Yuanxing Zhang",
+    "Pengfei Wan",
+    "Haotian Wang",
+    "Xianghua Ying"
+  ],
+  "publishedAt": "2026-07-30",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2607.28595"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Beacon",
+    "VLM / MLLM"
+  ],
+  "abstract": "The fundamental goal of agentic visual reasoning is to improve the success rate of multimodal large language models (MLLMs) on complex tasks. We rethink agentic visual reasoning through two key dimensions of tool use: Mode Adaptiveness and Tool Effect. Mode Adaptiveness characterizes whether an MLLM recognizes when tools are necessary and invokes them accordingly, avoiding unnecessary computational overhead while improving performance on problems requiring tool assistance. Tool Effect characterizes whether tools extend the model's capabilities on problems unsolvable through tool-free reasoning without introducing errors on problems it can already solve. Our analysis quantifies these properties and reveals that existing models exhibit limited Mode Adaptiveness, while tool-use gains on hard examples are largely offset by harm on easy ones. Motivated by these observations, we propose Beacon, a novel agentic visual reasoning model trained with supervised fine-tuning (SFT) and reinforcement learning (RL). Its RL stage combines Necessity-Aware Adaptive Reward and Hint-Guided Capability Expansion. Necessity-Aware Adaptive Reward encourages tool-free solutions when they succeed while preserving full reward for successful tool use when tool-free rollouts fail. Hint-Guided Capability Expansion uses verified, answer-free expert hints to recover learning signals from all-wrong rollout groups, aiming to extend tool-use capability on the hardest problems. Across 13 benchmarks, Beacon achieves the highest average score among the evaluated open-source models and ranks first on 11 benchmarks. On five diagnostic benchmarks, it improves the average tool-available accuracy over its tool-free accuracy by 1.96 points and achieves the largest tool-gain minus tool-harm score (+3.14 points). These results show Beacon's advanced performance, Mode Adaptiveness, and the net benefit of tool use.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.28595v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.28595v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/NOVAglow646/Beacon"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.28595v2 全文及 2026-10-06T15:59:31.870470Z 审阅记录；PDF 35 页，SHA-256 bbabd72bf52076eef9fdb8f161a4e6cb55751de3784d20b849543bf9b8db964d，视觉核验第 1、5、9、10、24、26、28、30、35 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 直接链接官方仓库；在线确认 custom_examples/Beacon recipe、verl、qwen_agent 与 inference_example 的实际训练/推理实现。没有运行代码或下载 checkpoints。",
+    "ideaZh": "Beacon 训练 VLM 自主选择 Python visual tools，并用 tool-free 成功情况塑造 reward、以 expert hints 回收全错 rollout groups。作者报告平均能力和工具净收益改善；可速读其必要性诊断与训练设计。工具 gain/harm 不是因果估计，模型仍偏好工具，easy cases 也常被伤害；hint 的 off-policy 更新及额外 expert 成本限制了能力扩展结论。",
+    "motivationZh": "VLM 既可能缺少必要视觉工具，也可能过度调用工具损害容易题；目标是学习何时使用 Python visual tools，并为困难样本提供有效训练信号。",
+    "methodZh": "先从困难视觉题合成并清理执行过的 code trajectories，与正确普通回答混合 SFT。RL 按当前 group 是否存在正确 tool-free trajectory 降低不必要 code 的 reward；全错 group 由强 expert 解题并提取方法 hint，再用 hinted rollout、hint-free policy ratio 更新。评测拆分 mode adaptiveness、tool gains、tool harms 与工具可用/强制不用工具的准确率，附录同时使用固定 base split 和组件消融。",
+    "methodFlow": [
+      "筛选困难图文题，合成并核验 code-assisted trajectories，再删除无用工具步骤。",
+      "混合工具轨迹与正确普通回答做 SFT，建立共同可选工具接口。",
+      "当前 rollout group 存在正确 tool-free 回答时，降低正确 code 回答的 reward；否则保留 full reward。",
+      "对全错 groups 获取经最终答案核验的 expert trajectory，提取 answer-free hint 并重新 rollout。",
+      "移除 hint 的 current-policy 输入，用 hinted old-policy likelihood 做 clipped update。",
+      "在 tool-available 与 tool-free prompts 下分别诊断 gains、harms 和 invocation adaptiveness。"
+    ],
+    "experimentsZh": "实验设置：以 Qwen VLM 为基座，对多个 visual search、perception、chart、math 与 compositional benchmark 比较 agentic models。diagnostic 多次采样分类 tool-free difficulty；主结果、model-dependent split、fixed base split 和消融各有不同统计范围。答案先规则匹配，失败后由 Gemini semantic judge；未给出独立训练 seeds 或整体置信区间。\n作者报告完整模型跨 benchmark 均分为 58.98，SFT 为 56.91，普通 SFT+GRPO 为 57.10，表明大量提升先来自 SFT。（p.10, Table 4）\n作者报告五个 diagnostic benchmark 的 tool-available accuracy 为 53.53%、tool-free 为 51.57%；gain 为 9.29%、harm 为 6.16%，不能将二者差直接当 accuracy gain。（p.9, Table 3; p.26, Table 7）\n作者报告 easy-case tool avoidance 仅 22.91%，hard-case tool invocation 为 94.75%；full model 的 adaptiveness 低于只加入 NAAR 的变体。（pp.9–10, Tables 3–4）\n作者报告固定 base difficulty split 下 MathVista 的 gain-minus-harm 为 −0.72 个百分点，尽管整体 tool-available accuracy 稍升。（p.25, Table 6）\n比较范围：有主流 Python visual-tool VLM、same-data SFT/GRPO、NAAR/HCE 两因素控制以及固定 split。不同模型 prompts 和基础能力影响 metrics；没有 equal-compute expert SFT、hint-only distillation 或随机化 tool intervention。\n消融与诊断：组件控制支持 NAAR/HCE 比普通 GRPO 有增益，但 HCE 增加 expert attempts 与 rollout；未隔离知识监督、计算增加和 tool-specific exploration。NAAR 的 group best-of sampling 本身可偏置策略，作者报告强制更多 text attempts 的失败。",
+    "insightZh": "研究重心是视觉工具选择与困难题探索的训练信号；NAAR 和 hint-guided rollout 在既有 GRPO、expert guidance 上形成实用组合。诊断将收益与伤害分开，比只看 aggregate accuracy 更有价值；但指标与训练不证明工具的独立因果作用，系统也没有生成或编辑用户的设计 artifact。",
+    "whyRelevantZh": "关注 VLM 如何在视觉感知不足时实际利用工具，以及如何区分工具能力收益和伤害，属于有方法性训练与诊断证据的多模态能力研究。",
+    "evidenceZh": "NAAR 依据当前 group 的正确 tool-free response 调整 code reward。（pp.5–7, §§3.3–3.4, Figure 4；一次成功是有限采样事件，不等于推理模式的真实成功概率最优。）\nHCE 从正确 expert trajectory 提取 hint，实践丢弃原全错 group，仅训练 hinted replacement。（pp.6–7; pp.23–24, Appendix D；current policy 移除 hint，old likelihood 保留 hint；token-level ratio 不构成完整轨迹无偏保证。）\n组件与固定 difficulty split 对照有收益，同时仍存在 harm 和较多 code usage。（pp.9–10, Tables 3–4; pp.25–28, Tables 6–8；作者报告；gain/harm 忽略 ambiguous samples 且与 accuracy difference 并非相同指标。）",
+    "caveatZh": "difficulty 由有限随机 rollouts 定义且随模型变化，仍是经验 proxy。\n仅研究 Python tool interface，未建立其他工具生态迁移。\nHCE 使用强 expert，成本可能很高；causal tool-effect 和明确效率测量留待后续。\n不同 prompt 与额外 token/tool compute 混合，gain/harm 不能认定 tool execution 的因果收益。\nhint 含有已解题 expert 的中间结论，answer-free prompt 不保证监督无答案信息或无 shortcut。\n单 token clipped ratio 没有证明 hinted interaction trajectory 对原 policy 的无偏 transfer。\neasy cases 仍高频调用工具并产生错误；缺少总体 end-to-end latency、expert 预算和重复训练统计。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

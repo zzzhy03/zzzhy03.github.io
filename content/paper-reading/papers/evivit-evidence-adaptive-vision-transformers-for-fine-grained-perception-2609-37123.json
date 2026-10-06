@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2609.37123",
+  "slug": "evivit-evidence-adaptive-vision-transformers-for-fine-grained-perception-2609-37123",
+  "title": "EviViT: Evidence-Adaptive Vision Transformers for Fine-Grained Perception",
+  "authors": [
+    "Yaoxin Niu",
+    "Zhangquan Chen",
+    "Yang Zhang",
+    "Xiang An",
+    "Zhumei Wang",
+    "Chih-Ting Liao",
+    "Hongkun Cao",
+    "Ruqi Huang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.37123"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "EviViT",
+    "VLM / MLLM"
+  ],
+  "abstract": "Fine-grained visual perception enables vision-language models to distinguish subtle attributes and ground their answers in visual evidence. In high-resolution scenes, processing the whole image at greater resolution spends visual tokens on irrelevant content, while isolated crops can lose the context needed to interpret the selected evidence. We introduce EviViT, a lightweight attachment that learns where a pretrained vision transformer should acquire detail. Human visual-search traces supervise a question-conditioned evidence density, which guides regional re-reading from the original pixels and the allocation of visual tokens. A sparse, coordinate-aware bridge then connects the regional features to the global scene, allowing the host to interpret precise evidence in context. Learned with the host backbone frozen, the attachment serves both the base model and compatible post-trained descendants without refitting. Experiments across nine hosts show consistent gains in average fine-grained accuracy. Matched-budget comparisons further show that EviViT outperforms global-only processing at every tested token ceiling while using fewer visual tokens.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37123v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37123v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/YXNiu/EviViT"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37123v1 全文及 2026-10-06T16:02:00.503400Z 审阅记录；PDF 23 页，SHA-256 6e0c3a8e60a315e6ac4df88fd0e2075759718144f5baed93f85f6a13e20dcdac，视觉核验第 1、4、8、10、15、19、20、22 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 直接链接官方仓库；在线确认 evivit_core、component training、evaluation/judging scripts 与 launchers。官方 release 没有 trained attachment checkpoints 或 matched QA/SFT data；human-search sessions 另以官方 Hugging Face dataset 发布，未下载或运行。",
+    "ideaZh": "EviViT 从 human search traces 学 query-conditioned evidence map，在冻结 vision encoder 内选择局部区域、从源图重读并与 global tokens 稀疏融合。作者报告匹配 token ceilings 下仍改善视觉细节能力；值得精读其 evidence allocation 和兼容 host transfer。native pixels、learned bridge 的独立收益较小或混合，减少 tokens 也没有普遍减少 latency，强 post-trained hosts 的普通任务存在退步。",
+    "motivationZh": "统一视觉 token budget 难兼顾细节观察与全局上下文，外部 crop calls 又增加推理负担；目标是在 vision encoder 内主动分配有效观察区域。",
+    "methodZh": "PTEA 将中间 ViT features 与 question embeddings 对齐，用包含探索、最后分支、最后 zoom 与 final box 的 trace map 监督位置。planner 选非冗余 decisive views 和 context view，学习分配预算与修正 boxes。局部源像素进入同一冻结 ViT，bridge 以 source coordinates 与对应 global neighborhoods 交换信息。附件分 host family/scale 单独训练，再转移给兼容后代；语言模型不需要发 crop calls。",
+    "methodFlow": [
+      "将 human cursor/zoom/reset/final-box records 转为 evidence 与 context spatial targets。",
+      "冻结 host，训练 PTEA 对齐 question 与中间视觉 features，预测 evidence density。",
+      "选择非冗余 decisive regions 及 context region，分配局部 tokens 并修正 crop geometry。",
+      "从源像素重读区域，在插入位置与 global tokens 以坐标感知 Sparse Bridge 融合。",
+      "通过剩余冻结 ViT、merger 与 LLM 回答；附件仅转移到结构兼容的后代。"
+    ],
+    "experimentsZh": "实验设置：对 Qwen-family foundation 与兼容 post-trained hosts 做 paired、deterministic、answer-only 比较，使用 frozen semantic judge；token sweep 逐样本按 baseline realized budget 封顶。附录包含 query shuffle、location translation、native interface、identity bridge、resized-global source、human full-trace/final-box 训练、target coverage 与 matched language-LoRA。\n作者报告 Qwen3-VL-8B 的主七项 macro-average 从 61.77 到 67.86；这将 VisualProbe 各难度 tier 分别等权，不能当作所有题目 micro accuracy。（p.6, Table 1）\n作者报告匹配 4K ceiling 下精度从 62.83 到 68.87，realized tokens 从 3.83K 到 3.62K；median E2E 从 1.087 秒到 1.105 秒，并未加速。（p.8, Tables 2–3）\n作者报告完整内部 bridge、native multi-image 以及 resized-global identity control 的 pooled accuracy 均为 66.57，native pixels 并未在这个控制中显示独立优越性。（p.19, Table 13）\n作者报告 full-trace 相比 final-box 的 VP-Hard 为 56.60 对 52.83，但两种完整监督 recipe 同时改变 context targets，不能隔离单项 trace cue。（p.9, Table 5; p.21, Appendix C.4）\n比较范围：包含 paired base、budget scaling、question/location、interface/fusion/source 与训练监督 controls。已有系统的混合 API/reference rankings 仅 contextual，未等完整算力比较现代 tool search；cross-host transfer 仅兼容结构。\n消融与诊断：location controls 保持 crop count/size/tokens，支持选对区域的重要性。full model 的部分总分低于 Boxes-only，identity/native interface 较接近。coverage 显著优于随机布局，但并未覆盖所有目标，top-eight proposal audit 与实际部署少量 regions 不相同。",
+    "insightZh": "把 human-search 过程监督转为 encoder 内的 detail allocation，而不是模仿语言策略的工具操作，有可迁移的 perception-interface 贡献。region selection、native rereading 与 bridge 的组合经过较完整控制；整体不是统一附件无条件服务所有模型，raw-pixel acquisition 的独立优势也未被所有控制支持。",
+    "whyRelevantZh": "直接研究视觉证据如何进入模型：query-conditioned acquisition 和 frozen-host 可复用附件为高分辨率细节感知提供新训练接口，具有跨 answering policy 的迁移价值。",
+    "evidenceZh": "训练 host 完全冻结，query-conditioned density 与 trace-derived context 控制区域和预算。（pp.4–6, §3; pp.13–14, Appendix A；全文核验；不同 family/scale 有分别训练的 attachments。）\n匹配每样本 realized baseline token ceiling 的 sweep 仍改善精度。（pp.7–8, Tables 2–3; p.14, capacity rule；作者报告；主要 unrestricted 主结果使用另一个 native-capacity envelope，应与此 sweep 区分。）\nnative multi-image 与 resized-global control 的 pooled accuracy 接近完整模型，bridge 贡献有限。（pp.15,19–21, Tables 7/13/14；作者报告；selection/coverage 证据较强，不能将全体增益专归 native pixels 或 learned fusion。）",
+    "caveatZh": "human-search 规模有限，进一步扩大对象与场景覆盖是未来方向。\n附件转移要求共享 visual blocks、width、merger 与 coordinate system。\n主数据由研究团队采集 cursor/zoom，不能当作 eye gaze 或普遍人类注意分布。\nordinary tasks 在多个 post-trained hosts 上退步；不能宣称全面保留或升级 host 能力。\nfewer visual tokens 不等于 faster whole-host runtime，低预算额外 native rereading overhead 明显。\nsource-pixel、bridge 机制的独立收益混合；单次监督 recipe 比较没有重复训练区间，评测依赖一个 semantic judge。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

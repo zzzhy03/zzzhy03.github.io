@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.05529",
+  "slug": "dynamesh-dynamic-3d-texture-generation-2610-05529",
+  "title": "DynaMesh: Dynamic 3D Texture Generation",
+  "authors": [
+    "Raj Hansini",
+    "Guan Chen",
+    "Rana Hanocka",
+    "Itai Lang"
+  ],
+  "publishedAt": "2026-10-04",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05529"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "DynaMesh",
+    "3D Generation"
+  ],
+  "abstract": "We present DynaMesh, a dynamic texture generation method for 3D meshes. Given a textureless shape and a text prompt describing an effect, our method produces an appearance that evolves while the object's geometry remains unchanged. Previous works on dynamic 3D content generation have focused on motion, where an object's geometry and position change while keeping its appearance the same. Methods on texture generation sit on the other side of the problem, painting appearance onto a shape as a fixed surface property and not as an evolving process. Neither addresses a visual effect that propagates on a 3D object. A natural route consists of two generators: a video model that shows the effect from a single view, and an image-to-3D generator that lifts each frame to 3D. However, the latter has no notion of time, so running it per video frame produces a sequence that flickers, loses effect details, and yields a different mesh at every video frame. Our method addresses these failures by conditioning a video model on a render of the mesh and the prompt to obtain a reference video, then running a frozen image-to-3D generator on the video with two changes. The conditioning of each frame is blended over a temporal window, and low-rank adapters are fit per shape to restore the lost details. The mesh is encoded once for the whole sequence, so geometry is constant by construction, and the output is a single mesh with a texture per frame. Applied to various objects and effects, DynaMesh substantially improves over recent video-to-4D and texturing methods, and can generalize its temporal effect to different shapes never seen during training. Our project page is at https://threedle.github.io/dynamesh/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05529v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05529v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://threedle.github.io/dynamesh/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05529v1 全文及 2026-10-06T11:42:40.106245Z 审阅记录；PDF 18 页，SHA-256 e01a9cbae31ce6eb6c830ce16b2666f80988ade2ffef92214fceee82c5ebbc04，视觉核验第 1、3、7、8、13、17 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页印出的 project URL 包含 Code 入口，实际指向上述 public repo，本轮确认含 train/bake/render/export 源码。Code 链接使用 PDF 提供的 public URL，未猜测仓库或运行代码。",
+    "ideaZh": "DynaMesh 将单视角 appearance-effect 视频迁到固定 mesh，用共享 geometry/noise、跨帧 DINO-token blending 和每 effect 的 LoRA 保留纹理。作者报告重建与未见视角闪烁改善。值得读 appearance transfer；每个 effect 仍需较长适配，背面细节可能丢失，也非真实物理 weathering。",
+    "motivationZh": "动态三维生成多关注几何运动，固定 mesh 上随时间变化的 appearance effects 仍难制作；目标是把单视角效果视频迁到可多视角渲染的动态纹理。",
+    "methodZh": "已有 4D 生成多关注移动几何与固定 appearance，DynaMesh 相反固定 triangulation 并生成逐帧 texture。输入 mesh 单视角 render 与 effect prompt 生成 camera/object 静止的 reference clip；固定 structured geometry latent，参数免费 temporal blending 耦合邻帧 conditioning，再对 cross/self-attention 少量 LoRA 拟合视频 render loss。输出 mesh 与 time-varying surface maps 可从任意 view 渲染，部分 effect adapters 可迁到新 shape。监督只来自一个 camera，unseen fidelity 主要由 Gemini judge 而非 GT 评价。",
+    "methodFlow": [
+      "以 mesh render 和固定 camera/object prompt 生成 reference appearance-effect video。",
+      "mesh 一次编码为共享 geometry latent，各 frame 沿用同一 sampling noise。",
+      "对同 spatial token 位置的邻近十一帧 conditioning 作 similarity-weighted blend。",
+      "以 reference-video 色彩与 silhouette-aligned render targets 拟合 cross/self-attention rank4 LoRA。",
+      "每 frame 解码新的 surface appearance，保留同 mesh geometry；可将 effect adapter 用于未见 shapes。"
+    ],
+    "experimentsZh": "实验设置：42objects/effects，reference clips121–150frames；TRELLIS.2/DINOv3，LoRA 约 2.33Mparams、30epochs、singleA40。固定 supervised camera 与三个 unseen cameras，supervised 像素 fidelity、unseen temporal metrics；另两 effects 迁移到 11unseen meshes，并用 VLM judge 三 repeats 评估。\n作者报告 cross-attention LoRA 先将 PSNR12.14→23.80、self-attention→24.86；temporal blend→24.89，主要额外改善 flicker0.00702→0.00499。（Appendix Table2, p.12）\n作者报告 unseen-view Gemini judge effect fidelity89.0%，对 frozen TRELLIS.2 为 85.6%，L4GM60.3%；judge 只提供近似语义检查。（Table3, p.13）\n作者报告两个 effect adapters 在 11unseen shapes 保持 Rorschach100%/Lava85.5%judge score，验证范围仍小。（Table4, p.15）\n比较范围：含 MeshNCA、frozen TRELLIS.2、L4GM、SV4D2.0、DreamGaussian4D；不同 inputs/geometry/frame limits 不一致，SV4D conditioned view re-encoding 会抬高 PSNR。强比较是同 geometry frozen/adapted 分支。\n消融与诊断：cross/self-LoRA 与 temporal blending 逐步消融，window-width 与 learned temporal operators 检验组件作用。raw frame-difference flicker 可被静态/过平滑降低，应结合 effect fidelity 与 reference 变化解释；global arrangements 仍未解决。",
+    "insightZh": "将单视角 generative video effect 提升为 fixed-surface evolving texture，并把 temporal conditioning 与 per-scene native3D attention 适配分开。固定 mesh、video-texture 投射、LoRA 和 temporal smoothing 有既有基础；新意主要在任务/可重渲染资产与 appearance-effect 迁移，不是物理材质动力学模拟。",
+    "whyRelevantZh": "直接推进可重渲染 3D asset 的 dynamic texture generation，并将 appearance 变化与 geometry/deformation 分离；可启发 3D rendering/material variation 研究，不能保证 global craft patterns 或可制造 stitch/path。",
+    "evidenceZh": "同 geometry latent 与 noise 保证 geometry 固定，parameter-free temporal blend 仅混合相同 spatial positions，再对 native3D attentions 加 rank4 residuals。（Sec.3.1–3.3, Eq.1–5, Figs.3–4, pp.3–6；方法图已实际查看；camera/object 必须基本静止，否则同位置 token 对齐假设受损。）\n作者报告 42objects/effects、150frames 的 PSNR24.9/SSIM0.798，frozen12.1/0.303；unseen-view flicker0.005/acceleration0.005。（Table1, p.7；主表已查看，PSNR/SSIM 只在 supervised view，SV4D/DG4D 不同 frame grids 不可直接同列比较。）\nunseen-view effect fidelity89.0%、geometry4.89/5 由 Gemini3.6 Flash judge 评出，没有 unseen-camera GT。（Appendix C, Table3, pp.12–13；judge 表实际查看；不是 human study 或精确 ground-truth 一致性。）\n作者报告 per-effect 适配平均 2.8h、inference2.5sec/frame，150frame sequence 约 8min，另有 single-view global-pattern 失败。（Appendix E, Table7 and Runtime, p.17; Fig.9/Conclusion, p.8；runtime 与 limitations 页已查看，不能把 frozen backbone 称为整套 training-free。）",
+    "caveatZh": "每新 effect 需新 fit，尚无 single multi-effect adaptation。\ngeometry 固定，surface deformation 不在范围。\nlocal effects 易迁移，global flower/line arrangement 在 unseen views 会丢细节。\nreference 视频不是真实物理过程，rust/cracks/rot 外观不能当材料/制造证据。\nsupervised-view pixel metrics 没有 unseen GT，Gemini judge 的自生成 effect 问题有共享偏差风险。\n对 single-view silhouette 差异做 nearest-neighbor 填补，reference 内 geometry 动变被排除而非准确重建。\n适配成本显著高于部分 baselines；time-coupling 使用未来 reference frames，非在线 causal streaming 方法。\n对 structured embroidery/global ornament 的空间排布迁移尤其有限；本项目未运行或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

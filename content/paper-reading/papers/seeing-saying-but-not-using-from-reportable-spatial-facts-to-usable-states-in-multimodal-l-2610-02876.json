@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.02876",
+  "slug": "seeing-saying-but-not-using-from-reportable-spatial-facts-to-usable-states-in-multimodal-l-2610-02876",
+  "title": "Seeing, Saying, but Not Using: From Reportable Spatial Facts to Usable States in Multimodal Large Language Models",
+  "authors": [
+    "Jinchang Zhang",
+    "Guoyu Lu"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02876"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Seeing, Saying, but Not Using",
+    "VLM / MLLM"
+  ],
+  "abstract": "A multimodal large language model that correctly reports a spatial fact does not necessarily use that fact in subsequent reasoning. To study this distinction, we introduce \\textsc{SpaceConflict}, a benchmark of 23{,}196 inputs for the construction and use of spatial state. Under a unified Supported/Contradictory/Unknown judgment interface, it covers local fact binding (L1), relational composition (L2), cross-observation consistency (L3), and state judgment under transformation (L4). Posing a direct-state query, a full-transformation query, and an explicit-initial-state query on the same world reveals an availability--utilization gap: models recover the initial state from visual evidence yet fail when that state must drive a transformation. For Qwen3.5-9B, 50 of 100 sequences with a correctly recovered initial state fail the full transformation, and supplying the state explicitly repairs all 50; the gap narrows with scale but does not close. We therefore propose Operational State Supervision (OSS), which supervises task-relevant spatial states and their transformation trajectories and aligns shared facts across contexts. OSS improves paired accuracy on matched judgments most on L3 and L4, the levels that depend on organizing and using state. Evaluating multimodal spatial reasoning thus requires asking not only whether a model can see and state a spatial fact, but whether that fact becomes a usable state in subsequent computation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02876v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02876v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/changcv2021/Seeing-Saying-but-Not-Using-From-Reportable-Spatial-Facts-to-Usable-States-in-Multimodal-Models"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02876v1 全文及 2026-10-06T16:50:36.018911Z 审阅记录；PDF 82 页，SHA-256 4c7c4b47293b07f770217049223e21e1e1d81187d6a2f2ec23ba5b3c173676fe，视觉核验第 1、3、5、6、8、9、20、24、36、41、43、44 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 直接链接 public repo，已查看 actual tree，含 dataset adapters/graphs/transition checkers、formal_training_v4 trainer/engine/plan 与 evaluation code。公开包省略原始媒体、weights、逐样本模型 responses 和 diagnostic inputs/gold；可用实现不等于所有诊断可从该包直接复现，未运行其训练或声称重现结果。",
+    "ideaZh": "SpaceConflict 用 matched spatial claims 与独立 state queries 区分“能报告”与“能用于变换”，OSS 加入 canonical states 和轨迹监督。作者报告 held-out PairAcc 从 balanced answer-SFT 的 73.97 提升至 86.79，但 Unknown 判断仍弱。值得深读行为 controls 与监督设计；这是跨请求的能力差异，未定位内部 state mechanism，全库语料分母和部分百分比有明确冲突。",
+    "motivationZh": "能直接报告空间事实不保证能用它完成后续变换，最终答案评测也难区分两者；目标是诊断这一差异，并监督 task-relevant states 与轨迹。",
+    "methodZh": "以已有空间数据的 scoped facts 构造 Supported/Contradictory 最小语义编辑对及独立 Unknown，覆盖 local binding、composition、cross-observation 与 hypothetical transformations。诊断在同世界分别问初始状态、完整变换及显式给定初始状态的变换；oracle inputs 有明显收益，但不能证明失败请求内部已经正确编码初始事实。OSS 将 annotations/certificates 确定的 task-relevant tuples 序列化为统一 targets，加入跨上下文 state prediction 和中间/最终 transition states 的标准 LM supervision。推理仍仅给原任务输入，不附 gold states，不接 symbolic executor。全文还保留 probe、interchange 与 donor-patching 的负/未跑结果。",
+    "methodFlow": [
+      "按来源的 entity identity、view、time、frame 和 counting scope 归一化 partial spatial facts，保留 provenance。",
+      "固定同一视觉证据，生成可证明支持/反驳的语义编辑对；Unknown 需要两种兼容 completions，而非缺边即假。",
+      "在相同世界分别评测 direct state、full transition、explicit initial state，并增加 symbolic/target-wording 与 matched relation sham controls。",
+      "把已验证的 task-relevant entity/variable/value tuples 转成 deterministic canonical text targets。",
+      "混合原始 label examples、cross-context state examples 和 transformation-trajectory targets，训练同一个 VLM。",
+      "在 audited world split 的 held-out claims 上测 ClaimAcc/PairAcc；推理不注入 gold state 或外部执行器。"
+    ],
+    "experimentsZh": "实验设置：主要 benchmark 给三分类 label/confidence/reason，greedy、thinking off、保留有限输出；未训练模型的全库比较与 OSS 的 held-out test 比较是不同协议。作者报告训练 audited split 为 13,476 original inputs，held-out 为 5,608；count diagnostic 是 80 worlds 的 160 sequences，non-count 是 47 worlds。独立请求不是同一次内部 state trace，两个每世界 sequences 也不是独立 worlds。release inventory 数字存在版本冲突，不合并为单一可信语料总数。\n作者报告 Qwen3.5-9B 的 direct-correct cohort 中，full-transition 失败 50/100，显式给初始 state 后修复 50/50；这是已测条件下跨请求行为差异，不证明失败运行已经具有正确内部状态。（pp.4–5, Table 2; p.29, Table 31）\n作者报告 non-count explicit-minus-sham 为 9B +59.57、27B +70.21 个百分点；4B −2.13，9B depth family explicit 0/7 对 sham 2/7，不能写成普遍三维关系提升。（p.8, Table 5; pp.34–35, Tables 38–40）\n作者报告 held-out overall ClaimAcc/PairAcc：balanced answer-SFT 53.37/73.97、OSS-L4 55.14/78.26、OSS 58.26/86.79；该训练结论不采用冲突的全库统计。（p.9, Table 6）\n作者报告 OSS 的 L4 ClaimAcc/PairAcc 为 82.36/68.44，balanced baseline 为 62.31/38.67；L3 PairAcc 96.05 但 ClaimAcc 45.29，Unknown recall 退化使 paired success 不能当作完整三分类可靠性。（p.9, Table 6 and discussion）\n作者报告 I1 两个冻结 SELECT windows 都为 0/17 rescues，correct-answer LP specificity CI 跨零；I2 主 grid 为 0/384 CF hits，重复 interventions 来自仅 16 pairs/10 families。（p.37, Tables 43–44; p.41, Table 51）\n作者报告 symbolic target wording 可将 S1 查询修复到 panel ceiling，但 9B S2 在 repeated-target condition 从 92/96 降到 74/96，语言澄清不是统一修复。（pp.31–33, Tables 35–37）\n比较范围：含 natural/balanced answer-SFT、partial CoT、OSS-L4/full OSS 及详细 oracle、symbolic、sham、target wording、probe/activation controls。PDF 缺训练超参数/seed-wise 完整表，实际官方 code 文档补充 update-matched 与两 seed 的实现；没有在外部 spatial datasets、未知 DSL/operators 或别的 backbone 上证明 OSS transfer。partial CoT 严重失败可能涉及目标/输出接口，不能据此推断 structured states 普遍优于 CoT。\n消融与诊断：OSS-L4 对 full OSS 支持跨上下文辅助 targets 的组合收益，但 canonical target consistency 是数据标准化，不是显式 hidden-state alignment loss。oracle 同时改变信息与 linguistic organization，inverse count sequence 可使 initial=final；matched sham 的 non-count controls 限于简单反射。线性 probes 不等于 causal utilization，单 token patch family 的失败不排除其它机制。",
+    "insightZh": "贡献在于把 spatial reportability 与 task-conditioned usability 明确分离，并用 source-grounded state/trajectory supervision 做行为改善，而非纯 benchmark 排名。OSS 本质是构造辅助 supervised targets，未提出新的优化原理；神经 state mechanism 没有被 causal interventions 确认。复杂诊断与公开实现使其有深读价值，但版本统计及 Unknown/OOD 边界需要优先核验。",
+    "whyRelevantZh": "直接对应通用 VLM spatial grounding、事实绑定与多步状态计算，OSS 有明确训练机制，超出纯 benchmark 工作；对设计 state supervision 和区分 behavioral/causal claims 有具体参考价值。",
+    "evidenceZh": "Supported/Contradictory pair 共用 evidence，Unknown 以 admissible rules 与兼容 completions 定义，结构 checks 不等于 pixel observability。（pp.3–4, Sec.2; pp.15–18, Appendices B/C；L3 support-view necessity 是 annotation-level audit，部分 local pixel validation 明确未做；source-world axes 不必能从每个 rendering 恢复。）\nOSS 用标准 autoregressive auxiliary examples 监督 canonical states 与 transitions，评测不供 oracle state。（p.6, Sec.4; p.20, Appendix D.3；辅助 target 继承底层 world split；已发现的 cross-source aliases 在 approved_v2 中处理，但 identity recovery 仍取决于来源标识。）\n同世界独立请求体现行为 dissociation，显式初始 state 对部分模型/关系有修复，也有明确反例。（pp.4–5/8, Tables 2/4/5; pp.28–35, Appendices H–K；count legacy register 与 oracle initial condition 的值/位置不匹配；role-specific 的较干净 sham 来自 non-count panel，反射后 identity 只含一次非平凡变换。）\n局部 interventions 与 probes 未定位有效可交换的 state representation。（pp.36–44, Appendices L–P；I1 SELECT 没过 frozen gate，I2 primary grid 没有 CF hits；不能据负结果断言模型没有 state 或必然采用 distributed mechanism。）\n全库统计的分母与百分比不自洽，不能直接采用其 release-wide score/CI。（p.1 abstract; p.3 Table 1; pp.19–20; pp.24–25 Tables 20/22；abstract、正文与 official code frozen inventory 不同；L2 2177/2624 与 89.81% 不匹配，后者对应 /2424，Unknown recall 多处仍对应历史 /2300 而非表写 /2500。）",
+    "caveatZh": "独立报告不证明 full-transition 失败运行内部已有正确 state，也不定位 perception/binding/transition/readout 的唯一失败阶段。\n非计数程序只含一次 reflection；不同规模/关系有负结果，不覆盖任意三维动态或 embodied planning。\ndiagnostic worlds 并非全局未曝光确认集，family summaries 是 post-hoc；engine-equivalence exclusions 与小 cluster 数限制干预判断。\nannotation-level construction proofs 与视觉可观察性不同，受限 upstream media 需自行重建；训练后 Unknown recall 下降。\n当前 exact PDF 的 abstract 为 23,196、正文为 24,396，public frozen code release 为 24,196；部分 accuracy/Unknown 分母/CI 沿用旧 inventory。不要传播 release-wide 数字，需以对应 frozen records 重新核对。\nTable 16 的部分 all-input 行与 Supported/Contradictory+Unknown 行算术不符；正文同时写 L2 有 Unknown 与历史没有，混合版本尚未澄清。\n行为诊断确有测量价值，但 oracle input 增添明确 state reference，也改变 prompt organization；无法单独证明 usable-state 内部机制。\n训练数据中 Unknown 比例远低于 test，PairAcc 只考完整二元 pairs；标签分布变化与确定性回答倾向需要专门 controls。\nOSS 只在自身 source-derived benchmark 上训练/测，未给外部迁移、长轨迹或未知 action family 结果；不能扩写为一般空间 world-model 能力。\nPDF header 自称 ICLR 2027，收录判断不依赖该 venue 自述；未用此作为科学质量证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

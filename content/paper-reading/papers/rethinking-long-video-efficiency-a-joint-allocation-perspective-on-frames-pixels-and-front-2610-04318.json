@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.04318",
+  "slug": "rethinking-long-video-efficiency-a-joint-allocation-perspective-on-frames-pixels-and-front-2610-04318",
+  "title": "Rethinking Long-Video Efficiency: A Joint Allocation Perspective on Frames, Pixels, and Front-End Latency",
+  "authors": [
+    "Sixun Dong",
+    "Wei Li",
+    "Andong Deng",
+    "Qi Qian",
+    "Victor Zhu",
+    "Zhengping Ji",
+    "Chen Chen"
+  ],
+  "publishedAt": "2026-10-03",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.04318"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Rethinking Long-Video Efficiency",
+    "VLM / MLLM"
+  ],
+  "abstract": "Efficient long-video understanding with vision-language models (VLMs) is often framed as selecting informative frames or visual tokens at a fixed native resolution. We show that per-frame resolution can instead be traded for denser temporal coverage, while front-end decoding latency depends on the size of the candidate pool rather than the final token budget. An empirical study across multiple VLMs and long-video benchmarks yields three findings: dense low-resolution sampling outperforms sparse native-resolution sampling at matched token budgets; resolution-sensitive tasks benefit from selected high-resolution frames; and front-end decoding dominates wall time for hour-long videos. Motivated by these findings, we introduce LoHi, a training-free, single-pass framework that combines a dense low-resolution video stream with sparse high-resolution image frames through the VLM's native video and image pathways. LoHi-Anchor selects high-resolution frames using codec I-frame metadata, while LoHi-SemDiv uses query relevance and visual diversity over CLIP features. Across three long-video benchmarks, LoHi improves average accuracy by 10.6 percentage points over the native-resolution baseline at a matched token budget and by 5.2 percentage points over the strongest prior efficiency method. It also reduces front-end decoding latency by up to 7x on hour-long videos. Project page: https://sixundong.com/projects/lohi",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.04318v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.04318v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.04318v1 全文及 2026-10-06T12:15:01.120920Z 审阅记录；PDF 27 页，SHA-256 c5e1cbedfe5cbe2ca0e3623ff047afc28e318fe6a66c208a2df12e7ca21cadb2，视觉核验第 1、5、8、16、22、25、26 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 真实 projectURL 已访问，页面明确 CodeSoon 并承诺随 longvideo-eval 发布；当前未确认 actualpublic implementation，不能当已公开 Code。 未确认公开实现的作者链接（审计用）：https://sixundong.com/projects/lohi",
+    "ideaZh": "LoHi 在 dense 低分辨率 video 与 sparse 高分辨率 images 间分配预算，复用 native pathways 保留时间覆盖和细节。作者报告多个 benchmark 和 TTFT 改善。可读 multimodal interface 设计；大幅 decode 加速只对应特定长片设置，不能认定所有 pruning 方法普遍失效。",
+    "motivationZh": "长视频理解的成本同时来自帧数、像素与解码前端，单独剪 tokens 难兼顾覆盖和细节；目标是在密集低分辨率视频与稀疏高清帧间联合分配预算。",
+    "methodZh": "uniform 或 codecIframeanchor 几乎无 selection 成本，SemDiv 在 LoVgrid 的 CLIPqueryrelevance/diversitykernel 上 greedylogdet 选 HiI。LoV 沿 video mRoPE，HiI 走独立 imagepathway 并用 textcue 解释关系；无需训练。主要贡献为 frame/resolution/frontendjointallocation 及强 resizebaseline 和完整 costprofiles，不是新 foundation model。entropyadaptive 为额外 two-pass 且阈值 benchmarktuned，不能与 main single-pass 混同。",
+    "methodFlow": [
+      "从 video 均匀 requested128frames，nativeRGBdecode 一次后分 resizebranches。",
+      "构造 densequarter-resolutionLoV 与该 grid 内八个 native-resolutionHiI。",
+      "用 uniform、Iframe-nearest 或 CLIP/DPP 选择并按时间顺序提供 HiI。",
+      "LoV 走 native videopathway、HiI 走 imagepathway，textcue 链接两 streams。",
+      "matchedtoken budget 比较 accuracy 与 CPUdecode/selector/visionprefillcost；optionalentropy 先 LoV 后 HiI。"
+    ],
+    "experimentsZh": "实验设置：mainQwen3-VL4B/5760token budget，VideoMMEnosubtitles/MLVU/LVBench；8B/3.5/2.5VL、VideoChat3、VideoLLaMA3transfer，EgoLongQA27B700clips 大 budget。oneH100/CPUdecord，MCQA 最大八输出 tokens；latency100runs30warmups，50Kvideo-bootstrap/exactMcNemar。\n作者报告 LoHiUniformmean59.16 约等 LowRes59.17，SemDiv 增至 62.36；Uniform MLVUactioncount29.13 低于 LoV41.75，SemDiv53.40。（Table3, p.8; Table24, p.22）\n作者报告 Qwen3-VL8B LoHiSemDiv4320tokensmean63.08 对 LowRes5760tokens61.04，但 Uniform60.76/部分 LVBench 低于 densebase。（Table12, p.18）\n作者报告 entropy37%two-passrate accuracy65.71 对 AlwaysHi65.78，θ在 10%heldouttuned；未给累计 two-passrealruntime。（Table18, p.20）\n比较范围：AKS/BOLT/CLIPTopK、VisionZip/FlashVid/MMTok，所有 mainpriorpoolcap256；tokenprunebaseline 压 93.75%使其 visioncompute 仍 nativefull。不能从该 regime 证明现代任意 pruning/resolutionadaptive 设计全劣。\n消融与诊断：HiI 数量/selectors、LoV/HiI 单支、cueplacement/α、PCA/codecvariants、subtitle、MCentropy、crossfamilies/largerbudget 与 CPU/GPUdecode。VideoLLaMA3MLVUanswerformat 修正+16–17points 诚实区分；glogdet 理论仅 objective 近似不是 QAaccuracy 保证。",
+    "insightZh": "SlowFast、多 resolution/selection 与 DPP 已有基础，贡献在训练-freeinputinterface 分离 video 时序与 image 细节、把解码候选 pool 计入资源分配，并证明简单 resize 是不能跳过的强 baseline。实际可迁移 MLLMperceptionbudget，非新 visualrepresentation 理论。",
+    "whyRelevantZh": "直接关系到 MLLM 视觉证据覆盖与 detailbudget、评估真实 cost，能为长 video/spatialagent 的 perceptioninput 设计提供强 baseline；未涉及生成 video 或 native3Dartifact。",
+    "evidenceZh": "128LoVquarter-res 加八 HiI 约 5760tokens，源 frames 复用，textcue 连接 native video 和 imagepaths。（Sec.4/Fig.3/Eqs.2–5, pp.5–7；方法图查看；HiI 无明确 per frametimestampbinding，selector 按时间排序，细节对齐主要 model/textcue。）\n作者报告 SemDiv 三 benchmark66.81/74.38/45.90、mean62.36 对 native51.76、LowRes59.17。（Table3, p.8；主表实际查看；+10.60 为 percentagepoints 非 relative10.6%，主要默认 16framebaseline 缺时间 coverage。）\n作者报告 H100 TTFTLowRes5963→SemDiv3906ms，decode5.4→3.3s；hourclipdenseFPS1 对 uniformdecode53.3→7.2s。（Table5, p.8; Fig.2c, p.4; AppendixB.2–B.3, pp.16–17；profiles 已查看；TTFT 由 cachedtensor 下 model 阶段加独立 CPUdecode 值合成，7×不是整套 runtime 对 maincappedbaseline。）\n作者报告 SemDiv 比 uniform 仅 MLVU 显著+6.76，VideoMME/LVBenchCI 跨 0；有 subtitle 时 LoHi72.13 低于 LowRes73.12 且差不显著。（Table22, p.22; Table28, p.24；pairedstatistic 页实际查看；不能称 selector 处处显著或 subtitle 条件仍优。）",
+    "caveatZh": "依赖 dynamic-resolution 现代 backbones，older/smallmodels 低 res 可能失败。\ntextcue 有轻微 prompt 敏感，frontend/prefill 重点未完整评估 VLMgeneration/thinking。\n细节仍取决 HiI 命中，短暂 event 或弱 CLIPrelevance 可漏；entropythreshold 需 benchmarktuning。\n128 是 requestedoutputframes，codec 仍解内部 P/Bdependencies；constantcost 仅所测 GOP 条件近似，不是任意 video 时长/codec 保证。\n7×decode 比 FPS1densepipeline，而 mainprior 已 cap256；与全 runtime/accuracygain 范围分开。\nsameLLMtokens 不意味着 samevisionFLOPs/completebudget，本文刻意体现 frontend 差异；textcue 与 nativepath 效果不能等同显式 temporalgrounding。\n无 subtitlemainprotocol、MC 八 token 答案、大分辨率 nativeencoding 压极少 tokens 共同形成特定评估环境。\nTTFT 由分段 profiles 合成且不同 load 导致 decode 值差异，未连续测全 pipelineelapseddistribution。\n本项目未运行或复现实验；源称 GitHublogs 公开但 project 目前 CodeSoon。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

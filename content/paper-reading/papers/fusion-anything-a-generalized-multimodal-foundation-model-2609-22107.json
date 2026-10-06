@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2609.22107",
+  "slug": "fusion-anything-a-generalized-multimodal-foundation-model-2609-22107",
+  "title": "Fusion Anything: A Generalized Multimodal Foundation Model",
+  "authors": [
+    "Huizi Cui",
+    "Zongbo Han",
+    "Chenggong Ding",
+    "Naichuan Xiao",
+    "Jialong Yang",
+    "Jingdong Chen",
+    "Guangyu Wang",
+    "Qinghua Hu",
+    "Changqing Zhang"
+  ],
+  "publishedAt": "2026-08-16",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.22107"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Fusion Anything",
+    "VLM / MLLM"
+  ],
+  "abstract": "Making prediction with multimodal data is widely used in diverse scenarios. Existing multimodal fusion models, once deployed, can only handle predefined modalities (e.g., vision, text and audio) and single task, making it difficult to quickly adapt to new downstream applications. Therefore, a natural yet aggressive question arises - whether there exists a general multimodal fusion model that can be applied to arbitrary modality combinations and arbitrary prediction tasks. We argue that a unified multimodal fusion model should not depend on specific modalities and should instead encode transferable patterns of multimodal correlation. To this end, we propose a simple and effective learning paradigm based on training on large-scale synthetic multimodal datasets generated with Structural Multimodal Causal Models (SMCMs), which formally characterizes the generative processes of real-world multimodal data. Building on this framework, we propose the Fusion Anything Model (FAM), a foundation model for generalized multimodal data fusion. By constructing large-scale synthetic multimodal data with diverse correlation patterns, our model encodes transferable multimodal correlations during training and activates appropriate associations through in-context examples during inference. Extensive experiments on 18 real-world datasets spanning 12 modalities and 11 prediction tasks demonstrate that our model achieves competitive performance with specialized models without task-specific adaptation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.22107v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.22107v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.22107v2 全文及 2026-10-06T14:16:23.399140Z 审阅记录；PDF 22 页，SHA-256 f17bf6ae0d8f479c0e5185da358b8bfc3079d64fe219cf6620285cebeab987c7，视觉核验第 1、4、6、9、21、22 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文与附录仅提供引用及 benchmark data links；未发现 FAM 官方 project/public implementation 链接或明确发布承诺。",
+    "ideaZh": "Fusion Anything 把 TabPFN 式 synthetic-task pretraining 扩展到多模态 embedding fusion，用共享/私有 latent 因素生成相关结构，并通过带标签的 in-context examples 迁移。这个训练路线值得留意，但它是固定编码特征上的分类器，不是任意模态的开放式视觉推理模型；平均胜过传统融合 baseline 也不等于普遍超过 TabPFN。",
+    "motivationZh": "多模态 embedding fusion 常需针对每个分类数据集重新训练；目标是用合成任务学习模态间相关结构，再借带标签 context 迁移到新任务。",
+    "methodZh": "论文针对每个数据集都需重新训练融合器的问题，以 Structural Multimodal Causal Models 生成合成 embedding 数据，控制 shared/private 和 label-related 信息。统一 projector 和模态内、跨模态、跨样本 attention 在预训练 TabPFN 上用 LoRA 学习 query-label prediction；部署时使用真实任务的已标注 context，保持参数固定。评价覆盖多领域的分类和 AUC，展示训练路线的可迁移性，但没有 native multimodal generation、grounding、空间 reasoning 或开放标签生成实验。",
+    "methodFlow": [
+      "用 SCM root 生成 label-related 与独立 latent 因素",
+      "以共享/私有节点和不同变换构造多模态 synthetic prediction tasks",
+      "将每种 embedding 经 GLU/projector 与 learned queries 映射为统一 tokens",
+      "在 TabPFN backbone 上学习模态内、跨模态与跨样本 attention，LoRA 更新 backbone",
+      "以 synthetic context/query 的 label likelihood 训练融合能力",
+      "冻结参数，用真实 encoder embeddings 和带标签 context 预测新 query"
+    ],
+    "experimentsZh": "实验设置：作者报告 synthetic tasks 上训练 LoRA/projector/head，再冻结参数，在 real-world 多模态分类数据上利用 context 推理。七类 early/intermediate/late fusion baseline 单独训练；附录列出所有数据集的 encoders/splits，包括 actor-disjoint、patient-grouped 与部分固定随机划分。\n作者报告主文数据集上 ACC 相对传统 fusion baseline 均值平均提升 6.92 个百分点；这个量不是相对最好 baseline 的统一领先幅度。（p.8 §4.2; p.9 Fig.5; p.21 Table 3）\n作者报告 GAMMA 的 ACC 从 TabPFN 的 65.00 升至 85.00，RAVDESS 从 57.92 升至 70.00；GAMMA 的 test partition 仅含 20 个样本。（p.16 Appendix A; p.22 Table 4）\n作者报告 WESAD 上 FAM ACC 81.10、TabPFN 81.62，Trento 上 97.75 对 98.58；TCGA-KIRC 的 ACC 较高但 AUC 72.31 低于 TabPFN 79.34。（p.22 Table 4）\n作者报告 SIIM-ISIC ACC 同为 97.83、F1 同为 49.45，而 AUC 有差异；高 ACC 不能单独代表良好的少数类识别。（pp.21–22 Tables 3–4）\n比较范围：传统 fusion 模型使用不同 seed 的独立训练，FAM 则仅报告固定 context 下 deterministic 输出，没有独立 FAM 训练重复。原始 TabPFN 对照更接近核心路线，但不存在无 CCM/无 synthetic multimodal extension 的同架构消融，完整表格还有多个低于 TabPFN 的任务。\n消融与诊断：PCA/token-count 对齐的 TabPFN 比较、context fraction 和 encoder 替换提供部分支持；UR-FUNNY 的 pooled feature 说明中 FAM/TabPFN 路线与 specialized baseline 使用不同统计特征。缺少模块单独删除、synthetic graph coverage、训练 compute 与 context-budget scaling 对照。",
+    "insightZh": "有价值的部分是把 prior-data fitted learning 的合成相关结构显式扩展到异构模态，而不只是包装一个 domain VLM。它复用 TabPFN 与外部预训练 encoders；模态间 causal graph 是数据生成 prior，不能证明模型识别了真实世界因果关系。现有消融无法独立确认 CCM、synthetic prior、projector 和 LoRA 各自贡献。",
+    "whyRelevantZh": "合成 correlation prior 的 multimodal pretraining 路线可供多模态 representation/fusion 研究参考；与设计、grounding、3D 或视觉 agent 的直接迁移尚未实证。",
+    "evidenceZh": "SMCM 用共同 root、共享/私有节点与非线性结构机制合成模态相关性。（pp.4–5 §3.2, Fig.2, Eqs.1–3；已核看图；合成的是 encoded representations，而不是原始图像、音频或 3D 资产。）\n真实任务推理不更新参数，但需要真实任务的已标注 context，并依赖外部 encoder。（pp.6–7 §3.3–3.4, Fig.3, Eq.5；不是无标签 zero-shot，也不是整个系统从零训练。）\n传统 fusion baseline 上的平均收益不意味着所有任务领先，TabPFN 对照更混合。（pp.21–22 Appendix B, Tables 3–4；已核看完整数据集结果；应区分相对 baseline 均值、最好 baseline 与 TabPFN。）\n编码器替换与 context-size 实验支持一定可迁移性，但没有验证任意任务和开放式视觉推理。（pp.10–11 Fig.6, Table 2; pp.16–21 Appendix A；任务都用固定标签分类协议；部分编码特征经 temporal pooling。）",
+    "caveatZh": "任意 modalities/tasks 是目标表述，实验仅验证预编码 embedding 上的固定分类任务，尚无开放式视觉语言或空间能力证据。\n不更新参数仍需要 labeled examples；实际大 context 的采样、截断、内存和延迟协议没有充分展开。\n多领域平均提升相对的是 baseline 均值；完整结果在若干任务上不及原始 TabPFN。\n未分离 TabPFN 既有 prior、LoRA、projector 与 SMCM/CCM 的贡献；synthetic causal construction 不保证现实因果迁移。\n部分小 test set、随机 split 与 imbalanced classification 限制结论，deterministic inference 不排除训练和 context selection 不确定性。\n没有专门 limitation 段、完整模型规模/硬件成本或真实公开实现证据。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

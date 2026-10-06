@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2609.13006",
+  "slug": "physplan-grounded-physical-state-reasoning-and-graph-guided-optimization-for-physically-pl-2609-13006",
+  "title": "PhysPlan: Grounded Physical State Reasoning and Graph-Guided Optimization for Physically Plausible Video Generation",
+  "authors": [
+    "Minh-Loi Nguyen",
+    "Xuan-Vu Le",
+    "Trung-Nghia Le",
+    "Tam V. Nguyen",
+    "Minh-Triet Tran",
+    "Thanh-Toan Do"
+  ],
+  "publishedAt": "2026-07-16",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.13006"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "PhysPlan",
+    "Video Generation"
+  ],
+  "abstract": "Video diffusion models (VDMs) synthesize photorealistic content, yet they often fail to follow the course that a physical phenomenon should take within a given scene. Recent training-free methods let a vision-language model (VLM) plan the phenomenon and guide a frozen VDM toward the plan; however, such plans are derived from the prompt and consumed as whole keyframes or trajectories, which leaves unspecified where the consequences land in the observed scene and turns incidental visual details into optimization targets. We observe that a phenomenon specified in words unfolds as sparse, local changes to the physical state of the observed scene. Building on this observation, we present PhysPlan, a training-free image-to-video framework that represents a phenomenon as a grounded state graph and uses this graph to decide what, where, and when the guidance constrains. Grounded Physical State Reasoning decomposes the phenomenon into physical deltas, each stating which objects change, to what state, and by which physical rule, and translates each delta into graph edits, verified by deterministic checks, that leave all other objects unchanged. Graph-Guided Test-Time Optimization renders a keyframe for each state, measures the denoised estimates only along the properties selected by the edits, and concentrates the update on the edited objects. On PhyGenBench and Physics-IQ, PhysPlan raises its base model from 0.52 to 0.77 and from 27.1 to 38.2, surpassing the strongest prior I2V method (0.60 and 34.6), and lowers FVD by over 20%. Project page: https://physplan.github.io",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.13006v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.13006v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.13006v2 全文及 2026-10-06T14:12:07.166175+00:00 审阅记录；PDF 25 页，SHA-256 5e2a59d12aab671707c5697f548427fcaf98cce72f07334fdc56fd314e33f40e，视觉核验第 1、3、4、7、8、9、10、19、21、22、23 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF p.10 Reproducibility Statement 承诺 publication 后发布完整代码；实际访问 p.1 官方 project https://physplan.github.io/，可见方法和视频但没有可确认的 implementation Code 链接。",
+    "ideaZh": "PhysPlan 把首帧里包括被动对象在内的 scene graph 变成只编辑相关节点的 event chain，再按编辑类型选择 object-level appearance、area、position、depth 与 count guidance，而不是逐像素追随生成的 keyframe。作者报告冻结 CogVideoX 上的物理合理性和同 keyframe 对照均有改善；值得精读的是从结构化局部编辑到生成约束的接口。verified 只检查图编辑合法性，连续动力学和像素不变性仍没有保证。",
+    "motivationZh": "仅凭 prompt 制定物理计划容易忽略接触、承载和动作后果，整帧 guidance 又会复制无关细节。目标是依据场景状态引导视频中的对象变化。",
+    "methodZh": "问题是 prompt-only 物理计划忽略场景中的承载、接触和被动后果，whole-frame guidance 又把 keyframe 的任意纹理轮廓一起强制复制。GPSR 用 Gemini 解析首帧全部可见对象、定性变化与相对时序，以 UPDATE/LINK/UNLINK/SPAWN/CONSUME 增量维护图并检查 grounding、coverage、lineage 和一致性；每个关键帧从原始首帧和累计编辑生成。GTO 在冻结视频模型的预览中，以 DINO soft occupancy、实例匹配和相对深度测量编辑选中的属性，将归一化梯度在早期按对象区域加权，随后使用全局 guidance 与 re-noising。论文包含同 keyframe Frame Guidance 对照、分领域结果、失败归因和完整成本分析。",
+    "methodFlow": [
+      "Ground scene：首帧与 prompt 解析为含持久 ID、定性属性及 support/contact/containment 等关系的图；包含 prompt 未提及的被动对象。",
+      "Commit typed deltas：预测因果顺序和相对 event 时长，将变化译为局部图编辑；检查 ID、覆盖、lineage 与冲突，复制未编辑节点。检查对象是图结构，物理规则仍来自 VLM。",
+      "Render state anchors：每个累计状态从原始首帧生成 keyframe，用 Grounded-SAM-2 和单目深度形成目标实例、mask 与 depth。",
+      "Guide selected properties：DINOv3 soft occupancy 与实例匹配产生 count、appearance、area、centroid、relative-depth 项；编辑类型选择测量项。",
+      "Sample with staged updates：早期采用区域加权归一化梯度，中期使用无区域权重的 time-travel guidance，后期自由采样；anchor 间连续运动交给视频先验。"
+    ],
+    "experimentsZh": "实验设置：作者在冻结 CogVideoX-I2V-5B 上生成单首帧视频，使用闭源 Gemini 进行图推理和关键帧编辑；评估 PhyGenBench、Physics-IQ、FID/FVD、VBench，并进行盲化的配对用户研究。首帧在 PhyGenBench 中由图像 API 生成并在 I2V 方法间共享，不能直接与 T2V 原始榜单比较。\n作者报告 PhyGenBench PCA 从基础模型 0.52 升至 0.77，同 keyframe Frame Guidance 为 0.51。（p.7 Table 2）\n作者报告 Physics-IQ 加权平均 27.1→38.2，同 keyframe 对照 30.3；Fluid Dynamics 为 31.8，低于 VLIPP 的 34.1，Thermodynamics 为 9.5 且该领域样本较少。（pp.7–8 Table 2, §4.2）\n作者报告去除区域权重为 36.0，全图重写为 30.9；prompt-only + whole-frame L2 为 28.1，grounded + whole-frame L2 为 30.3，后两者差异才对应 grounding 的单独比较。（pp.8–9 Table 4）\n作者报告用户研究相对于基础模型的物理合理性偏好为 76%，相对于 Frame Guidance 为 68%；主文 72%为两种对照合并值。（pp.23–25 Appendix E, Tables 15–16）\n作者报告单 H100、三个事件时全流程 366 秒和 64GB，基础模型 100 秒和 26GB，Frame Guidance310 秒和 58GB；API 费约 0.45 美元是论文写作时估算。（pp.22–23 Tables 12–14）\n比较范围：包含同模型、anchor、keyframe 的 Frame Guidance 对照及主流 I2V；部分 VLIPP/T2V 为文献报告结果，T2V 与 I2V 条件不同。仅一个视频 backbone 的实测，未证明通用模型独立性。\n消融与诊断：有 graph regeneration、prompt-derived planning、whole-frame L2、区域权重及各测量项消融。prompt-only 变体同时采用 whole-frame L2，需以同 loss 的(iii)对照拆分 grounding 效果；没有守恒律、绝对时间或连续动力学约束消融。",
+    "insightZh": "实质新意是 grounded event edits 同时控制测量属性、更新对象和 anchor 时间，区分 scene graph 的状态不变性与 keyframe 的 incidental appearance。它能直接迁移到可编辑视觉生成接口；属于结构化控制方法贡献，不是学习了守恒定律的物理模拟器。",
+    "whyRelevantZh": "对 structured visual generation 的直接价值在于把局部 scene edits 编译成选择性可微目标和时序 anchor，可为可控视频与 scene editing 提供接口。物理合理性提升是作者代理指标和偏好证据；不是可部署的物理仿真或制造约束保证。",
+    "evidenceZh": "图编辑校验覆盖引用合法性、变化对象、lineage 与无冲突/无环关系，并不验证定性物理规则。（pp.4–5 §3.1; pp.15–17 Appendix A.1–A.3；全文和图编辑 vocabulary 已读；物理有效性不能由 JSON checks 推出。）\n区域权重只用于早期更新；同一空间 map 广播到所有时间 index，中期转为未加权梯度。（p.7 Eq.(10) discussion; pp.18–19 Appendix A.5, Algorithm 1；实际查看 Algorithm 1；未变化图节点不等于视频像素锁定。）\n作者报告同关键帧 Frame Guidance 的 Physics-IQ 平均分为 30.3，PhysPlan 为 38.2；流体仍低于 VLIPP。（pp.7–8 Table 2；VLIPP 与多数 T2V 结果引自既有工作；不是所有方法同次重跑。）\n对象测量与局部区域权重有消融支持，但 prompt-only 行同时更改计划和 loss。（pp.8–9 Table 4, §4.4；作者在正文承认 grounding-alone 对应(i)与(iii)的差异，不能把全部下降归因于 grounding。）\n作者报告 failure 主要出现在 keyframe、localization 和 guidance，并披露较大推理开销。（pp.21–23 Appendix C–D, Tables 10–14；lowest-third failure 不是客观物理失败率；正文 396 场景与 66 个最低三分之一视频的样本口径未充分解释。）",
+    "caveatZh": "离散对象和 anchor 状态更适合边界清晰的对象；流体连续运动由视频先验插值，性能仍低于轨迹方法。\n透明、反光、细小和碎裂对象的 occupancy/单目深度不稳定，图计划正确也可能在 keyframe 或 guidance 阶段失败。\n未来需结合场或粒子表示、anchor 间 motion planning，并在更多视频模型评估。\n图检查保证语法与局部状态一致性，不能验证 VLM 物理规则、关键帧真实状态或视频的接触/守恒定律。\n早期区域外允许非零权重，中期无区域权重且 map 广播到全时间轴，不能宣称所有未编辑像素或对象绝对不变。\n固定模型、seed 和闭源推理/编辑组件限制独立复现；多个引自文献的结果不构成严格同预算比较。\nAppendix C 的 lowest-third=66 视频与正文 396 场景存在未解释样本口径，失败归因应作为作者诊断而非总体物理正确率。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.38716",
+  "slug": "spatialcore-confidence-aware-grounded-spatial-reasoning-in-large-vision-language-models-2609-38716",
+  "title": "SpatialCORE: Confidence-Aware Grounded Spatial Reasoning in Large Vision--Language Models",
+  "authors": [
+    "Rafi Ibn Sultan",
+    "Xiangyu Zhou",
+    "Md. Sajid Alam Chowdhury",
+    "Chengyin Li",
+    "Prashant Khanduri",
+    "Marco Brocanelli",
+    "Dongxiao Zhu"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38716"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "SpatialCORE",
+    "VLM / MLLM"
+  ],
+  "abstract": "Large Vision-Language Models (LVLMs) have made remarkable progress across visual perception tasks, yet spatial reasoning remains a persistent weakness, especially for questions that require reasoning over visual space. Recent spatial-reasoning methods incorporate generated grounding, where models predict bounding boxes, masks, or other localization outputs for task-relevant objects as part of their reasoning trace. However, these approaches typically optimize final-answer correctness alone, allowing correct answers to be rewarded even when the model does not reason from confidently localized task-relevant objects. We introduce SpatialCORE (Spatially COnfident REasoning), a post-training framework that turns the model's own confidence in generated grounding into a learning signal for spatial reasoning. Its central idea is to reinforce grounding that is both accurate and confident, encouraging the model to reason from confidently localized task-relevant objects. SpatialCORE realizes this through a self-regulating spatial reward that weights each predicted bounding box's matching quality by its coordinate-token confidence. An answer gate further ties grounding optimization to final-answer correctness. SpatialCORE achieves state-of-the-art results among open-source and specialized spatial reasoning models across diverse benchmarks, and transfers effectively in zero-shot settings to unseen data distributions. The source code is available at https://github.com/rafiibnsultan/SpatialCORE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38716v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38716v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38716v1 全文及 2026-10-06T14:51:48.916614Z 审阅记录；PDF 24 页，SHA-256 42961220e51e768caa77080b7b1ccef0a556f81a824d7f9bfaf4f7f1d2824d15，视觉核验第 1、4、7、8、9、10、18、19、24 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Exact PDF p.1 提供作者 repository；已访问，仅 Figures/README/requirements/license，README 说明 acceptance 后发布 sourcecode，无 training/inference 实现，故为 promised。 未确认公开实现的作者链接（审计用）：https://github.com/rafiibnsultan/SpatialCORE",
+    "ideaZh": "SpatialCORE 把 BBox-coordinate token 的低 entropy 与 pseudo-GT matching quality 联合奖励，并给错误答案的合理 grounding 保留部分 credit。对象中心的 spatial comparison 和 confidence-only 消融有参考价值；confidence 是 token-distribution proxy，pseudo-GT 来自外部模型，尚不能推论经过校准或因果 faithful 的 3D reasoning。",
+    "motivationZh": "空间 reasoning 的最终答案奖励难以区分对象定位是否正确、是否不确定；目标是把显式 BBox grounding 质量与 confidence 纳入训练反馈。",
+    "methodZh": "方法先用固定语言模型从问题/选项提取 object labels、Grounding DINO 生成 reference boxes。已有 Qwen-VL 经 SFT cold start 学会 grounding/think/answer format，随后 language/vision LoRA 用 GRPO 训练。Hungarian matching 将 IoU、词汇 label similarity 和 detector validity 组合，再按 coordinate entropy 降权，以 soft coverage 与 answer gate 得到 trajectory reward。评价包含 in-domain heldout 与未训练的 spatial benchmark。",
+    "methodFlow": [
+      "抽取问题/选项中的 boxable objects，离线生成 reference BBoxes 和 validity",
+      "用 grounded-format SFT cold start 初始化 policy",
+      "生成 BBox lines、reasoning 与 final answer rollouts",
+      "用 IoU 和 lexical label similarity 做 Hungarian 匹配",
+      "coordinate-token entropy 加权 matching，并结合 soft coverage/缺失或额外框 shaping",
+      "以 answer gate 组合 reward，GRPO 更新 language/vision LoRA"
+    ],
+    "experimentsZh": "实验设置：OmniSpatial official train/test 上训练 Qwen3-VL variants；零样本测试 SpatiaLab。主要方法配标准 GRPO 对照，另在 spatialinteraction subset 删除 vision LoRA、confidence、answergate、validity，并人工 audit/扰动 pseudo-GT。\n作者报告 OmniSpatial accuracy 48.46%，base 43.90、GRPO 45.92；allocentric 31.91 反低于 GRPO36.57，收益并非每类一致。（p.7 Table1）\n作者报告 SpatiaLab zero-shot 47.91%，base44.78、GRPO46.21；orientation 与 GRPO 同为 47.52。（p.7 Table2）\n作者报告 matched subset Full56.33%，去 confidence52.33，去 visionLoRA53.00；支持 confidence 贡献但不代表完整数据集相同 delta。（p.9 Table3）\n作者报告 pseudo-GT 人工 audit251/262 正确（95.8%），localizable train samples 有 reference 的 coverage71.0%；confidence–IoU 分析依赖 pseudo-GT 而非全部人工真实 boxes。（pp.17–18 AppendixA.3）\n作者报告 40%reference corruption 后 46.70%，高于未训练 base 但低于完整模型；answer/format 训练和未污染 references 仍存在，不能据此推论不需要 grounding 监督。（p.18 Table5）\n比较范围：同架构 GRPO 与局部 matchedconfidence 删除对照有价值；异构 publishedmodels 不完全同训练预算。SFTcold start、visionLoRA 与额外 reward shaping 共同作用，需核对全表 GRPO 是否完全相同初始化/format。未给跨 training seeds 不确定性。\n消融与诊断：Confidence weighting、answergate、visionLoRA、pseudo-GTvalidity 有 deleteablation，并给 cold start 失败与 referencecorruption。没有随机 confidence、digit-onlyentropy、heldoutcalibration、box 删除/替换干预或 SFT-only 最终能力对照。",
+    "insightZh": "主要创新是将 grounding confidence 加入定位质量 reward，与单独答案或 IoU reward 区分。明确 object-centric spatial 能力的方法推进，超出 generic VQA benchmark 包装；仍是受限 2D grounding post-training，不产生 native 3D 表示，也没有证明 confidence calibration 或 reasoning 必须使用 boxes。",
+    "whyRelevantZh": "直接研究对象定位与 spatial reasoning 的学习信号，可为视觉/空间能力与 groundingreliability 提供参考；没有 native 设计 artifact 或制造约束输出。",
+    "evidenceZh": "Coordinate uncertainty 使用 full-vocab entropy 除 digit-token 规模并 clamp，confidence 是 token 概率 proxy。（p.5 Eqs.5–7；不是预测 BBox 的真实 posterior，也不是独立正确性 probability。）\nPseudo-GT 由外部 entity extraction/grounding pipeline 构造，训练还需要 SFT cold start。（pp.17–20 Appendix A.3–A.4；已核看 appendix；不能写成完全 self-supervised 或不依赖外部定位器。）\nConfidence weighting 相对 matched localization reward 有局部增益。（p.9 Table3；单独 spatialinteraction subset runs，与完整模型表不同 cohort。）\nGroundingentropy 与 pseudo-GT IoU 相关性改变，并有未训练数据集结果。（pp.7–9 Tables1–2, Figs.4–5；已核看图表；相关性不是校准误差/因果证据。）",
+    "caveatZh": "当前为 BBox-basedpost-training，缺少 depth/multi-view 输入和 non-boxable spatialconcepts。\nToken entropy 取决于 tokenization、坐标格式、full-vocab 非 digit 质量与 clamp；不能直接当空间正确性的校准概率。\nPseudo-GT 来源和词汇 BOWsimilarity 有噪声，detectorvalidity 不等于严格置信度；训练仅部分样本有定位 supervision。\nSFTcold start、visionLoRA、attemptbonus/overpredictionpenalty 共同影响结果，不能全部归于 confidence。\nModel-specificentropyquartiles 与 pseudo-GT IoU 只显示相关性，没有 causalboxuse 或可靠性 calibration。\nAllocentric/hypothetical 与 scene-scale 能力收益有限，2DBBox 不能验证真实 3Ddepth/reachability。\n没有 training seed 方差、独立人类 testgrounding 或广域能力 preservation 测试。\n代码仓库目前是发布预告，未确认完整 implementation。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

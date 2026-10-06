@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2609.36937",
+  "slug": "welike2party-in-context-motion-transfer-for-multi-human-image-animation-2609-36937",
+  "title": "WeLike2Party! In-Context Motion Transfer for Multi-Human Image Animation",
+  "authors": [
+    "Sangeyl Lee",
+    "Seunghyun Shin",
+    "Seungho Park",
+    "Wooseok Jeon",
+    "Hae-Gon Jeon"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36937"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "WeLike2Party! In-Context Motion Transfer for Multi-Human Image Animation",
+    "Video Generation"
+  ],
+  "abstract": "Human image animation aims to transfer motion from a driving video to subjects in a reference image. Despite remarkable progress in video generation, achieving high-fidelity animation of multiple interacting subjects remains a challenge. Many existing approaches rely on explicit motion representations such as 2D skeletons or parametric body meshes and struggle to preserve identity-motion binding under inter-person occlusion. To address this limitation, we propose WeLike2Party, a multi-human animation framework built on direct in-context video conditioning without explicit pose or mesh extraction at inference. We further introduce Reference Asymmetric RoPE Conditioning to preserve fine-grained appearance details, and Identity Binding Supervision to associate each reference identity with its intended motion trajectory. To support cross-identity training, we construct MotionTwin, a large-scale synthetic dataset comprising 14.4K cross-identity video pairs with shared subject and camera motions, totaling 84.3 hours of photorealistic video. We additionally present MotionTwin-Bench, a cross-identity benchmark specifically designed to evaluate subject-level visual fidelity and identity-motion binding. Extensive experiments on MotionTwin-Bench and real-world videos demonstrate that WeLike2Party outperforms recent state-of-the-art methods in subject-level visual fidelity, identity-motion binding, and overall perceptual quality, particularly in multi-person interactions with substantial occlusion.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36937v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36937v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36937v1 全文及 2026-10-06T13:33:26.170616+00:00 审阅记录；PDF 24 页，SHA-256 a39ef56d625a2caaf35c24319b1cd71ce9399b25b30def4bbdc4cbf7b598b87f，视觉核验第 1、4、7、8、9、10、18、19、20、21、22、23、24 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Exact PDF p.1 嵌入 officialproject https://wl2pvideo.github.io/ ，本次访问未成功；p.11 明确 training/evalcode/checkpoints/benchdata afterfinaldecision，未确认公开实现，不猜 Code 链接。",
+    "ideaZh": "WeLike2Party 从 driving video 直接 transfer 多人的动作，以 high-resolution reference 的 fractional RoPE 与训练期 identity-binding attention loss 减少 appearance-motion 串位。作者报告 MotionTwin-Bench IAA.9569、实拍 human rank 约 4/5，值得借鉴多实例生成的 reference correspondence 接口。边界是 IAA 主要看 GT region 内 color-signature，非 face identity 或 3Dmotion 精度；同源 synthetic benchmark 优势大、实拍 quality 增益较小，81 帧需单 B2006.5 分钟，不能视交互实时模型。",
+    "motivationZh": "把 driving video 的动作迁移给参考图中的多人时，appearance 和 motion 容易串到错误人物；需要保持实例对应、细节与动作分离，并处理参考图分辨率差异。",
+    "methodZh": "Wan2.1I2V14B 的 reference/driving/target 独立 VAE 后 concatselfattention，observedcleanconditions 和 noisytarget 用既有 maskstream，不推理时提 pose/mesh 或额外 bindingmask。Reference720shortside 用 fractionalspatialcoordinates 压到 targetgridrange；IBS 以 MotionTwinGTsubjectmask 给 tokenlabels，early/highnoise 只在有效≥2subjects 时监督 target-to-reference subjectattentionprobability，normalize 仅 referencekeys 而非放大总 visualattention。SyntheticpairedsameSMPL-Xmotion/camera、differentappearances，训练所有 40blockselfattention4.20Bparams。完整 24 页含 data、bindingmetric、training/realstudy/limits 和纯 figureappendix 读/实际查看完。",
+    "methodFlow": [
+      "生成 cross-identity 配对监督：统一/筛选 publicSMPLXmotion 并 UE5render 两套 avatar/sceneappearance，保持同 motion/camera；reference 并排按 target 初始 subjectordering，提供 GTinstance maps。",
+      "直接 in-contextvideo 条件：独立 VAE 编码 HRreference、driving video 和 noisytarget，concatsequence，原 mask 区分 conditions/target，自 attentionexchangeappearance/motion。",
+      "RARC 定位高密度 reference：Higherresreferencegrid 坐标乘 target/referencewidthheightratio，fractional RoPE 避免超出 targetpositionrange，不强制 pixelalignment。",
+      "训练 IBS 学习 subject correspondence：GTlabel 覆盖≥.7 的 tokens，earlynoiseattention 只在 referencekeys 内 normalize；maximizecorrectsubjectmass，inference 不用 GTmask/IBSloss。"
+    ],
+    "experimentsZh": "实验设置：14,427clips 每个两 appearancevariants=84.3hr1080p，8,270single/6,157multi2–7subjects。4B20034Kstepsselfattention4.20/16.39Bparams，81framestrain640×352/test832×480，ref720shortside，textfixedCFG5。300syntheticcrossidentitytestpairs、161internetrealpairs（36single），human20clips/20MTurkparticipants。\n作者报告 MotionTwinfullFVD35.51vsSCAIL2 120.75、IAA.9569vsSCAIL.8514、cross.9496vs.8422；仅该 color-signature/homogeneousbenchmark，不外推任意 crowd 或 faceID。（PDF p.7, Table1）\n作者报告 vanillapairedmodelIAA.8982/FVD48.81，full.9569/35.51；IBSalone.9303/36.55、RARC.9241/44.07，组件增量比跨不同 data/modelbaseline 差小。（PDF p.9, Table3）\n作者报告 realVquality83.26vsSCAIL82.84/Fquality84.63vsSCAIL2 84.13；bindinghuman rank4.043±1.235vsSCAIL3.153±1.473。Rank5best，非 Likertcorrectnessrate。（PDF pp.8–9, Table2/Userstudy）\n作者报告 singlepersonrealI2V90.15 低于 SteadyDancer94.67；81frame480p 单 B2006.5min，IBS 本身零 inference 额外 cost 不等于整体便宜。（PDF pp.7/20, Implementation/Table4）\n比较范围：MultiAnimate/SCAIL/SCAIL2/WanAnimate2officialpipelines，部分用 SAM3inferenceinstance masks；traineddata/backbones 差异，不能纯归 IBS。Syntheticrefs 同 camera/light/HDRI、初始 ordering，motion/appearance 解耦但 camera 与 subjectmotion 未独立控制。No3Dpose/trajectorydistance/contactphysical 或 longclip 评测。\n消融与诊断：Basepaired、RARC、HRnativeRoPE、IBS 和 full，展示 data 与 interfaces 增量；NoIBShighnoise/blocks/labelthreshold/subjectcountbreakdown/multiseed，合成 colorIAA 未与人类 identityassessment 校准。",
+    "insightZh": "Directincontextconditioning 已有 SCAIL2/DreamActoretal，fractional RoPE 属位置 scale 方法；实质组合是 physicallypairedmultiidentitydataset、HRreferenceinterface 及 subjectattention 绑定监督。强 same-datasetvanillabaseline 提示相当收益来自 paireddata，IBS/RARC 有独立增量。作为多对象 referenceidentity-motion 控制接口可借鉴，不是新 3Dhumanmodel 或领域级 videofoundation model。",
+    "whyRelevantZh": "多实例生成中 referenceappearance 与 motion/control 正确对应，是可控 visual creationworkflow 的直接问题；fractionalreferenceRoPE/attentionbinding 接口可供多 part/subject 设计借鉴，非声称已在 CAD/LEGO 迁移。",
+    "evidenceZh": "IBS 训练只约束不同 referenceidentity 间 attention 分配，不保证所有 generatedtokens 身份/几何。（PDF pp.6–7, Eq.9–11; p.19, Appendix B；Onlyreferencekeynorm、labelthreshold.7、≥2subjects、最多 256queries/subject/highnoiseτ≥.6；没有 fulloccludedtokendirectsupervision。）\nIAA 是 GTmaskregion 内颜色统计匹配，不能当真实 identity 识别准确率。（PDF pp.7/19, Appendix C；27dim meanCIELAB+RGB8bins×3，P≤4exhaustiveassignment；IAAcrossbboxIoU>.1 包含 proximity，并非全部真正 occlusion。）\nRARC 与 HR-only 对照说明坐标 rescaling 有作用，而不是只有像素数。（PDF pp.9/20–21, Table3/Fig.7；作者报告 RARCmLPIPS.0851vsHRnativeRoPE.0947，IAA.9241vs.8969；同 referenceHR，未复现。）\n主大幅数值来自与 training 同 renderpipeline 的 held-outclips；实拍包含另独立 human ranking。（PDF pp.7–9/19, Tables1–2/Benchmarkconstruction；Holdoutclips 明确，但没有 identity/motion-source/HDRI 完全 OODsplit 说明；human20participants×20clipsblindrandomrank，不是绝对评分。）",
+    "caveatZh": "PDF pp.9–10：更多 subjects 每 personpixels 少导致 fineidentity 丢失，subjectfaceembeddings 是 future；计算量大难 interactive。\nPDF p.10：独立 camera/subjectmotionssupervision 尚未来，当前 pair 共享 camera。\nSamepipelinebenchmark 可能奖励 syntheticdomainfitting，subjectcolour 易区分不等于视觉相似身份/face 保持，量化只 P≤4 不能宣称 7 人 bindingaccuracy 已验证。\n训练 reference 按 targetinitialordering，未证明任意 identityremapping 或 nonhumanmultipleobject 迁移；通用 correspondenceloss 借鉴为 reviewer 推测。\nGT regionIAA 假设 motion 已跟随，若 globalplacement/pose 错误可能混 background；没有独立 motionaccuracy 量化或 physicalinteraction 保证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

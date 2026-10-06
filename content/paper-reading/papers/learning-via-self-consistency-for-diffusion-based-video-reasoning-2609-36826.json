@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2609.36826",
+  "slug": "learning-via-self-consistency-for-diffusion-based-video-reasoning-2609-36826",
+  "title": "Learning via Self-Consistency for Diffusion-based Video Reasoning",
+  "authors": [
+    "Zhenghao Ni",
+    "Weimin Qiu",
+    "Meng Tang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36826"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Learning via Self-Consistency for Diffusion-based Video Reasoning",
+    "VLM / MLLM"
+  ],
+  "abstract": "Video generation models have demonstrated emerging zero-shot capabilities for visual reasoning, perception, and other vision tasks. However, diffusion-based video generation is inherently stochastic, while many downstream vision tasks are deterministic. Motivated by the effectiveness of self-consistency in chain-of-thought reasoning for large language models, we investigate whether self-consistency can similarly improve diffusion-based video reasoning. We first introduce a training-free test-time scaling method that samples multiple video generations and aggregates their predictions through self-consistency. Specifically, we aggregate extracted paths, locations, or masks from multiple rollouts into a consensus prediction. To reduce the inference overhead of multi-rollout generation, we read out predictions early in the denoising trajectory, which preserves consensus quality while reducing denoising steps by more than half. We further propose Rejection Fine-Tuning (RFT) to distill consensus predictions into the video generation model. The resulting model internalizes the benefit of multi-sample consensus and requires only a single generation at inference time, while substantially outperforming the original model. Experiments on three tasks, including maze solving, visual search, and referring segmentation, show that both our self-consistency inference and consensus distillation dramatically improve video-based perception and reasoning, without requiring ground-truth videos or task-specific verification. For visual search, self-consistency raises task accuracy from 48.4% for a single generation to 99.0%. The distilled model retains much of the consensus benefit with a single rollout. For 4-by-4 maze solving, consensus-based training improves the single-generation strict success rate from 72.0% to 84.0% with the same inference latency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36826v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36826v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36826v1 全文及 2026-10-06T14:15:18.189053+00:00 审阅记录；PDF 23 页，SHA-256 ef8c078498ef96533edd421a0eeadd7ab01d9f50dc4823eb88d3d78bfe882b20，视觉核验第 1、4、7、8、9、16、17、18、20、21、23 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 exact PDF 未提供自身 public implementation 链接。p.11 提到随附 NumPy offline-statistics package，未给可确认 public URL；不得把基础模型或引用项目链接作本方法 Code。",
+    "ideaZh": "把视频生成当作视觉任务接口：多 rollout 分别提取 path、point、mask，在任务空间聚合，再将 consensus 变成 LoRA 的训练目标。作者用随机 rollout、单 mask 选择和面积匹配对照支持其自监督信号，并通过 early readout 降低采样成本。值得 skim 的是结构化 consensus 的设计；99% 搜索准确率主要对应简单阵列上的假 marker 拒绝，尚不是一般 reasoning 或视觉创作能力的证明。",
+    "motivationZh": "视频生成器的随机外观会干扰迷宫、视觉搜索和分割等需要稳定答案的任务。目标是利用多个生成轨迹的共识，训练更可靠的任务预测器。",
+    "methodZh": "视频生成的随机外观会干扰需要确定答案的视觉任务。方法在 maze 上选择最常见完整 cell path，在 visual search 上聚类 marker 并将低支持预测作 abstention，在 referring segmentation 上对像素投票。提前解码 clean latent 保留 task layout；随后冻结 teacher 生成 consensus，按支持度过滤并构造目标视频或保留选中轨迹，用 flow matching 训练各任务独立的 LoRA student。训练不使用主任务 GT video、GT mask 或正确性 verifier，但 extractor、目标渲染和搜索训练的 marker 区域权重均是 task-specific。",
+    "methodFlow": [
+      "Sample and read early：相同 image/instruction、多 seeds 生成视频，提前在 native schedule 中解码预测 clean latent。",
+      "Extract structured answer：用跟踪得到 maze cell path，用颜色检测得到 marker 或 mask，不把外观差异当答案差异。",
+      "Aggregate per task：maze 取 modal path；search 对邻近 marker 投票、低支持输出无 marker；segmentation 做高支持像素投票。",
+      "Filter and render targets：保留足够一致的输出；search/segmentation 构造 reveal target video，maze 保留 modal 轨迹的 clean predictions。",
+      "Distill consensus：固定 teacher 与目标池，各任务独立训练 LoRA flow matching student，以单 rollout 测试。"
+    ],
+    "experimentsZh": "实验设置：作者主要使用 MiniMax-H3 进行视觉搜索、Frozen Lake maze 和 positive gRefCOCO segmentation；每个任务独立 student，held-out 图像或 layouts，不将测试 GT 用于主 training loss。附录提供 Wan maze 的小规模可迁移性检验，以及预算、投票阈值、target selection controls。\n作者报告 100 个搜索阵列十次 rollout 投票准确率 48.4%→99.0%，specificity0.6%→100.0%，体现假 marker 位置不一致可被拒绝。（p.7 Table 1(a); p.16 Table 6）\n作者报告分割十次 early-readout 投票 gIoU0.487，完整采样 0.489；平均单 rollout 时间 164.43→78.03 秒，但十次 early 总开销仍高于一次完整生成。（p.7 Table 1(c), §4.2; p.15 Figure 5）\n作者报告 held-out4×4maze 单 rollout strict72.0%→84.0%，匹配随机 RFT72.7%，verifier 筛选 RFT84.7%。（p.8 Table 2(b); pp.19–20 Appendix B.5/C.3）\n作者报告分割 student gIoU0.353→0.513，precision0.393→0.595；面积匹配训练对照 gIoU0.423。（pp.8–9 Tables 2(c),3）\n作者报告搜索 consensus RFT 的独立 confirmation 准确率 49.4%→70.6%；78.4%是 development 上额外 counterfactual 训练结果，不能把它当独立 confirmation 结论。（p.8 §4.3; p.18 Table 9）\n比较范围：主要与相同预训练视频模型比较，有 matched random rollout、supervised verifier、固定样本/最一致样本/面积控制。没有与专用分割模型、搜索算法或大型一般视觉推理模型做全面同预算比较；Wan consensus 测试只有两个 maze，不支持跨模型大范围结论。\n消融与诊断：阈值/seed 数完整 sweep 显示高支持 precision-recall tradeoff 及 rounding 不连续；同预算 early 与 full 控制。搜索 counterfactual 数据贡献额外增益，额外 contrast loss 在相同数据上无进一步作用。",
+    "insightZh": "贡献是将视频生成 self-consistency 从离散答案投票拓展到连续结构输出，并把同一 consensus 连接 inference 与 post-training。并非首次发现视频模型视觉能力或 LLM self-consistency；正文也承认此前 video puzzle majority voting。明确的 matched controls 使这项能力提升方法达到 VLM continuous gate，尚不足当成视频创作范式突破。",
+    "whyRelevantZh": "与多模态视觉能力和结构化输出的自监督提升直接相关，尤其可借鉴 task-space consensus 替代像素/外观一致性。对 3D 设计或视频创作的迁移尚未验证；推荐 medium/skim 而非将其作为纯 LLM 或视频创作 landmark。",
+    "evidenceZh": "不同输出结构需要不同聚合；maze 推理仅 modal 选择，不调用 hole validity verifier。（pp.4–6 §3.1–3.4, Figure 2, Algorithm 1; p.14 Appendix A.1；训练目标和 extractor 完整阅读；maze 已知 goal 用于截断，但不查询 hole validity。）\n作者报告搜索增益主要来自 abstention，segmentation 投票提高 precision 同时降低 recall。（pp.7–9 Tables 1–3; pp.15–16 Tables 5–6；数字不能概括成一般视觉 reasoning 正确率。）\n随机 rollout 与面积匹配控制支持 consensus 选择而非仅更小的输出面积。（pp.8–9 Tables 2–3; pp.19–20 Appendix C, Table 12；不同 task student 分别训练，不是统一 multi-task 模型。）\n可选 latent top selectors 使用 GT IoU supervision，不属于无标签主方法。（pp.16–17 Appendix A.5, Table 7；paper 明确标记 supervised add-on；不混入 verifier-free 主结论。）",
+    "caveatZh": "较复杂 maze 的候选 path 分散，一致性仍难形成。\npost-training 只研究 RFT，consensus reward 与 GRPO 尚待评估。\nconsensus 有相关错误和 confirmation bias 风险；可靠性随 task 结构、teacher 准确性及支持阈值而变，没有一般正确性保证。\n搜索人工阵列与小 maze、positive-only 分割评估限制外推；每个 task 有专用 extractor、rendering 和独立 adapter。\n主方法无 GT 训练目标不等于整个研究不使用 GT：阈值评估、结果 audit 与可选 latent selector 仍使用 GT。\n同一 cohort 上的阈值 sweep 最佳点与 headline 阈值重合，分割阈值选择的独立验证不足；teacher 采样和训练成本仍需计入。\n各任务独立训练，无法从这些结果推出通用视频 world model 或视觉创作质量提升。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

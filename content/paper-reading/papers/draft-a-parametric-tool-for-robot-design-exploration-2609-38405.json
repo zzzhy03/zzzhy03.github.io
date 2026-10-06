@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2609.38405",
+  "slug": "draft-a-parametric-tool-for-robot-design-exploration-2609-38405",
+  "title": "Draft: A Parametric Tool for Robot Design Exploration",
+  "authors": [
+    "David Nguyen",
+    "Marcelo Coelho",
+    "Sangbae Kim"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.38405"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Draft",
+    "3D Generation"
+  ],
+  "abstract": "Robot performance is often limited by the cost of iterating on morphology and control together, since every computer-aided design (CAD) change has to be carried into a simulation-ready model before control work begins. Co-design methods attempt to close this gap, but each uses a model generator written for a single platform or lack the use of real-world data to suggest that designs are plausible. We present Draft, a parametric generation tool whose generalized engine compiles any parametric tree of serial chains into a simulation-ready MJCF model, without CAD. It allows engineers to explore design tradeoffs through easily adjustable models and evaluate how changes influence controller performance. Draft grounds the free parameters of each design using trends fitted to a survey of $114$ actuators and $49$ published robot descriptions, so that a generated robot is anchored to real-world hardware. We validate those trends wholistically by building twins of four off-the-shelf robots, whose masses agree to $1.10\\times$ geometric mean fold error. Finally, we demonstrate how Draft exposes design tradeoffs by evaluating three quadrupeds through a two-stage reinforcement learning curriculum.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.38405v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.38405v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/davidhnguyen2000/draft"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.38405v1 全文及 2026-10-06T12:07:32.000Z 审阅记录；PDF 8 页，SHA-256 611b49e53f1f37fc39dafc1df7ac29e22f5bc7356d6a30dc0c334c5fbab957dc，视觉核验第 1、2、3、5、6、7、8 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFp.8 打印 exactrepo URL；已确认 publicrepo 包含 src/datasets/experiments/scripts/tests 与 environment/pyproject，不是 README-only 占位。",
+    "ideaZh": "Draft 把 human-specified parametric serial-chain tree 编译成 visual/collision/inertial/actuation 一致的 MJCF，用 114 actuators 与 49 robot descriptions 的经验 fits 约束物理参数。作者报告 29-joint humanoid/12-joint quadruped 编译 202/50ms，四 Unitree twins 总质量 GMFE1.10×；但惯性与重力误差仍显著。可略读 data-grounded procedural sim-asset generation，设计 optimizer 和实际制造验证仍未实现。",
+    "motivationZh": "机器人 morphology 探索常需反复手改几何与 simulator 描述，容易造成模块耦合与参数不一致；论文希望用参数、运动树和连续形状规则统一可重复的机器人设计。",
+    "methodZh": "这不是仅把现有 CAD 导出为 URDF，也不是自动搜索新机器人 body plans。用户提供 parameter file、symbolic kinematic tree 和 lofted root description，通用 compiler 用四类 primitives 与 data-fitted motor/structure properties 生成 MuJoCo 模型。作者用真实硬件 catalog 及 robot descriptions 拟合参数关系、过滤极端设计，再用四 robot twins 及三 quadruped PPO experiments 评估中等保真资产是否保留 design trade-offs。对 3D asset 生成的价值在物理字段 coupling 与经验 priors，通用 shape/style synthesis 不在其验证范围。",
+    "methodFlow": [
+      "用户给 parameter values、算术表达式 kinematic tree 与 root cross-section polygons",
+      "以 basic/sphere/foot/root 四类 link primitives 编译 serial chains 及 loftedrootgeometry",
+      "从 actuator torque、speed、aspect ratio 推导 mass、gear ratio、volume、rotor inertia；以 segment-class fits 估 structure mass",
+      "Design filter 检查 catalog extremes 与异常 geometry/density，并传播 visual/collision/inertial/actuation 属性",
+      "输出 validated MJCF 供 MuJoCo/mjlab；用户迭代参数，PPO curricula 只用于评价 design capability"
+    ],
+    "experimentsZh": "实验设置：114actuator catalog entries，geared-fit subset103、inertia subset88；118robot descriptions 中 retain29humanoids+20quadrupeds。留一条目/robot 及 vendor-held-out checks；fourUnitree twins 在 300configurations 对比 M/g。三手选 quadrupeds 以 PPO base+task curricula、ten seeds 和 256rollouts/seed 比较 simulatedcapability，未有新 hardware 制造/real-control 部署。\n作者报告 29-joint humanoid 编译 202ms、12-joint quadruped50ms。（Sec. III-A, p. 2）\n作者报告 actuator mass/volume/inertia LOO fold errors1.28/1.30/1.56×；49robot totalmass LOO1.22×humanoids/1.18×quadrupeds。（Table I, p. 3; Sec. IV-C, p. 5）\n作者报告 fourtwinsmassGMFE1.10×；Go2 inertia/gravitymedian errors12.8%/21.4%，G1/H2 不约束 misalignedaxes 时更大。（Fig. 5, Table III, p. 5）\n比较范围：比较 vendor twins、whole-robot-median mass baseline、不同 body-plan fits，以及三种 parameterizedquadrupeds 的 controlledPPO。没有 geometrygeneration 方法 benchmark、optimizer 比较或真实 robotmanufacturing/control success 对照；验证集中 leggedrobots 和同一 vendor 的 fourtwins。\n消融与诊断：Vendor-held-out 检查 catalogsiblings bias；humanoidmisaligned axes held 测试 axiserror；inertia 扰动后不重训 policy 检查 trade-off 趋势。支持 medium-fidelity exploration，不证明所有 generatedmorphologies physicallyrealizable 或找到 designoptimum。",
+    "insightZh": "贡献是 body-plan-independent parametric compiler 与集成 actuator/segment 经验模型的组合，让物理属性随 geometry/specification 一致变化。没有新 geometry primitive、latent shape model 或完整 design optimizer；RL 是 evaluation，不应包装成 agent 自主生成。作为 data-grounded procedural assembly generation 参考，比普通 single-platform CAD export 有方法与数据贡献。",
+    "whyRelevantZh": "纳入 3DGeneration 的 procedural/parametric assembly 分支：方法自动生成具有一致 visual、collision 和 physicalmetadata 的结构化 sim 资产，数据 priors 和字段 coupling 可作为 physicalasset workflows 参考。未归 Fabrication，因为没有实际制造 process/toolpath；未归 visual-design-agents，因为 designer/optimizerloop 仍由人完成。",
+    "evidenceZh": "三输入文件、四 primitives 和 symbolic expressions 生成 MJCF，并联动 collision/inertia/actuation。（Sec. III-A/B, Fig. 2, p. 2；视觉核验 representation 与输入定义；human 仍规定 kinematic topology。）\n经验参数 fits 来自 114 integrated actuators 与 49 retained robot descriptions，并形成 design filter。（Sec. IV-A–D, Fig. 3, Tables I–II, pp. 3–5；Eq.1 截图确有 absolute log ratio，不能依据 pdftotext 漏掉 bars 误判 metric。）\n作者报告四 vendor twins 总质量 GMFE1.10×，但 M(q)/g(q)与 joint-axis mismatch 仍有较大误差。（Fig. 5, Table III, p. 5；质量近似不等于完整 dynamics 近似；所有四 twins 都来自 Unitree。）\n三手选 quadrupeds 以相同两阶段 PPO curricula 检验 speed/terrain/kick/efficiency trade-offs，非自动 design optimizer。（Sec. V, Figs. 6–8, Tables IV–VI, pp. 6–7；作者报告 ten seeds；不同 scale 会改变 ranking，normalized 与 absolute 指标应区分。）\n作者将 co-design loop、dexterous-hand 扩展及更密 design sweep 列为 future work。（Sec. VI, p. 8；不能声称已经自动找 optimal topology 或得到 manufacturing-readyCAD。）",
+    "caveatZh": "Link library 不支持 parallel mechanisms，更多子系统如 dexterous hands 需更广 catalog。\nIntegratedactuator catalog 不覆盖某些 customhighperformance rotor/stator 组合。\nStructurefits 依赖 actuator 归属假设、材料差异和由 motorfits 传播的误差。\nDesignoptimizer 尚未包含，当前只比较三 quadrupeds；需更密 sweep 及 humanoids 扩展。\n生成的是 medium-fidelity sim 资产，不是 machining/assembly/manufacturing instructions 或新 AIshapeprior。\nFourvalidationrobots 全来自 Unitree，geometry 与 torque/speed 来自 vendor，不能当 wildmorphology generalization。\nSome segmentclasses 的 folderrors 可超过 2–3×；总质量一致不证明 dynamicdistribution 准确。\nFig.6 标 Cheetah33kg、TableV 印 30kg，引用该 designmass 时需核对 repo 配置。\n没有实机训练/realworldperformance 验证；所有数值为作者报告，本项目未运行代码。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

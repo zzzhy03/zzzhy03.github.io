@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.02207",
+  "slug": "one-basis-to-animate-them-all-gaussian-blendshape-distillation-for-real-time-avatars-2610-02207",
+  "title": "One Basis to Animate Them All: Gaussian Blendshape Distillation for Real-Time Avatars",
+  "authors": [
+    "Ramazan Fazylov",
+    "Stamatis Lefkimmiatis",
+    "Ivan Laptev"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02207"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.HC",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "One Basis to Animate Them All",
+    "3D Generation"
+  ],
+  "abstract": "3D Gaussian avatars support fast rendering, however, their real-time animation is often challenged by the costly neural inference. We address this bottleneck and show that the animation of pretrained avatar models can be closely approximated by a linear combination of identity-independent blendshapes. Building on this finding, we introduce GALA (Gaussian Animation via Linear Approximation), a distillation method that replaces per-frame heavy neural decoding with a shallow coefficient predictor and a linear blend. To improve fidelity and reduce memory requirements, we propose to construct the basis using block-local PCA under a rendering-aware metric and a memory budget. Our method learns a shallow MLP network to predict blendshape coefficients and applies to various animation architectures without retraining original models. We validate GALA by accelerating the inference of three distinct avatar models for 3D animation of facial expressions and full-bodies with clothing dynamics. Across these models, our distillation generalizes to held-out identities and reduces CPU animation cost by up to three orders of magnitude while preserving most of the rendering quality. Excellent results of our method confirm the shared linear structure of learned avatar representations and enable highly efficient and accurate animation at frame rates reaching up to 60fps on mobile devices. Project page: https://ramazan793.github.io/gala/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02207v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02207v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02207v1 全文及 2026-10-06T12:59:05.568034Z 审阅记录；PDF 25 页，SHA-256 36b0c63e33e8a823aae8518c96499ae180f29d3e353d91e93ecf040ef695e343，视觉核验第 1、4、7、8、9、16、18、24 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 首页 project→官方 Code 按钮 https://github.com/ramazan793/gala；public repo 仅 README/assets，README 明确 Code coming soon，无实现，因此不提供 availableCode link。",
+    "ideaZh": "GALA 将 pretrained Gaussian avatars 蒸馏成共享、局部 blendshape basis，以 rendering-aware PCA 和容量分配保留重要变形。作者报告 CPU animation 明显加速。可速读显式 deformation 表示；仍需 template correspondence 和部分新 subject enrollment，不是任意模型共享通用 basis。",
+    "motivationZh": "高质量 Gaussian avatars 的逐帧神经变形成本较高；目标是将教师变形蒸馏到视觉敏感的 blendshape basis，降低运行成本。",
+    "methodZh": "对不同 identity/pose 减各自 neutralavatar，分 attribute 和 spatialkmeansblocks 估计 residualbasis。随机 renderer-Jacobianprobe 近似每 Gaussian/attribute Hessian，metricPCA 保视觉敏感方向，并按 estimatedvalueperbyte 贪心分配 rank。identity-conditionedMLP/temporal 小网络蒸馏 teacherprojectedcoefficients；neutral 只算一次，运行时线性 blend 再 render。basis 每 host 独立，不跨三个模型共享。",
+    "methodFlow": [
+      "采样 hostidentity 与驱动 pose/expression，缓存 neutralavatar 与 residual。",
+      "按 Gaussianattribute/spatialblocks 拆分，估计局部 rendering 与 optional landmark metric。",
+      "metricPCA 建 localbases，依 valueperbyte 在 memorybudget 内分 rank。",
+      "小 identity/pose-conditioned 网络回归 projectedcoefficients；Flex 作 subjectenrollment。",
+      "每帧预测 coefficients 并 linearblendcachedneutral，保持 hostskinning/renderpipeline。"
+    ],
+    "experimentsZh": "实验设置：AGORA GAN/FFHQ、FlexAvatar image2head/VFHQ/Ava256、DynaAvatar image2body/4DDress；每 host 独立 basis 和小网络，held-outidentities，sameCPU8threadsbatch1。basisbudgets48/48/88.3MB，还需 network1.6/5.9/60.7MB。\n作者报告 AGORA FID3.17→3.47、DynaPSNR23.86→23.22、FlexselfreenactPSNR23.29→22.31，存在 qualitycost。（Table2, p.7）\n作者报告 plainPCA 与 GALA predictedcoefficients FlexPSNR21.41→22.31、Dyna22.59→23.22；实际 deploygain 小于 basisoracle 差距。（Table7, p.19）\n比较范围：samehostoutputs 对 GALA 与 NNdistillation、per-subjectRGBAvatar/GEM/WebAvatar；部分 SOTA 引用 hostpapers 不同协议。FlexAva256inputfitting/enrollment、crossreenact 无 GT，qualityvsidentity 须联合 animation 评估。\n消融与诊断：attribute 分组、localblocks、renderingmetric、equalmemoryrankallocation 及 NNstudentbudget 曲线；无非 avatar/templatefreehost、CPUtotalrenderfps、设备热稳定和 seedsCI。",
+    "insightZh": "Gaussianblendshape/PCA 已有；实质推进是从多 identityhost 提取可复用的共享 basis 并做 local/rendering-budgetallocation，跨 GAN、单图 head、pose-historybody 验证，改变 onlineavataranimation 部署成本。renderingmetric 本身增益小，主要来自 attribute 拆分、locality 与 memoryallocation，不能只突出 Hessian 创新。",
+    "whyRelevantZh": "跨 host 可复用的显式 3Ddeformation 表示与较大部署成本改变，使 avatar 例外达到值得关注的 representationadvance；可给其他 template-anchored3D 内容的 editabledynamics 提供思路，未测普通 object/fabrication。",
+    "evidenceZh": "sharedbasis 严格依赖跨 identity/animation 的 Gaussianindexcorrespondence，本文 templateUVhost 满足；identity 仍由 coefficients 表达。（Sec.3.1/Fig.2, p.4；方法图已查看，onebasis 为每 host 而非所有 architecture 通用。）\n作者报告 CPU 三 host154/234/42917ms 变 5.5/4.4/6.1ms；Dyna 另 10msskinning，mobile60fps 为 GPUbrowserdemo。（Table5/App.D, pp.16–17; Table2, p.7；latency 与 demo 表实际查看；CPUanimation 不含 rendering，mobiledevice 详细型号未给。）\n作者报告 fixedbudgetbasisPSNR 比 simplePCA 提升 9.7/11.5/13.2dB，renderingPCA 方向仅额外.25/.35/.58dB。（Table3/Sec.4.3, pp.8–9；projectedcoefficients 是 oracle 需要 host 运行，不能当作 deployquality。）\nFlexAvatar 有 200stepper-subjectnetworkenrollment，Ava256 重建用 8subject 而 quotedcompetitors 原 paper5subject。（Apps.D/F, pp.16/18；实际协议页查看，host 与 GALA 同子集可信；跨方法绝对排名受协议差异限制。）\n作者展示 coefficientfailure 时 predicted23.6dB 对 projected40.2，薄结构/边界误差仍存在。（Sec.5 p.9 / Fig.9 p.24；failurepage 实际查看，不称完全保真。）",
+    "caveatZh": "coefficientprediction 是主要瓶颈，budget 增大不必然提高 predictedquality。\n固定 32blocks 非最优，host 模型错误继承。\n需要固定 Gaussiancorrespondence 及 parametricdriving 接口，不能直接泛化自由 topology/identity-genericmeshes。\nFlex 每 subject 约一分钟 identityfit/enrollment，不是完全 zeroadaptation。\n每 host 独立 basis，memorybudget 只含 basis 不含 network/cache；Dyna 总 modelstorage 不止 88.3MB。\nCPUspeedup 只 animationsteps，mobile 实际在 GPUshader 上渲染，60fpsdemo 不能直接推 desktopCPUtotalFPS。\nAva256quotedcompetitors 不同 subjectsubset，表述 outperformSOTA 应降为 samehost 近似保真。\nmetricblockapprox 丢 crossGaussianinteraction，greedyrankallocation 是 heuristic 而非全局 integeroptimum；本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

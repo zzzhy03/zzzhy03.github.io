@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.04602",
+  "slug": "organize-primitives-into-semantic-parts-reinforcement-reasoning-for-3d-segmentation-2610-04602",
+  "title": "Organize Primitives into Semantic Parts: Reinforcement Reasoning for 3D Segmentation",
+  "authors": [
+    "Xiaoming Gong",
+    "Ruoyu Wu",
+    "Zhenhong Sun",
+    "Chunlin Chen",
+    "Daoyi Dong",
+    "Huadong Mo",
+    "Zhi Wang",
+    "Hongdong Li"
+  ],
+  "publishedAt": "2026-10-03",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.04602"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "Organize Primitives into Semantic Parts",
+    "3D Segmentation"
+  ],
+  "abstract": "Primitive-based 3D segmentation offers a compact and explicit alternative to dense surface prediction, naturally supporting structural abstraction and boundary localization. However, geometric decomposition alone does not determine how primitives should be organized into semantic parts: a single part may span multiple primitives, while geometrically similar or touching primitives may belong to different parts. We therefore introduce RePart (Reinforcement Part Reasoning), which formulates primitive-to-part organization as a finite-horizon Markov decision process and learns semantic organization through trajectory-level reinforcement reasoning. RePart constructs a Composable Primitive Workspace from fine-grained superquadrics and applies a merge-and-stop policy whose decisions are optimized by their downstream effects on the resulting partition rather than local primitive compatibility. The inferred part identities are then mapped back to the original mesh through Boundary-Aware Surface Labeling, preserving accurate surface boundaries beyond the primitive approximation. On PartNet, RePart achieves the strongest results across all four aggregate partition metrics; on 3DCoMPaT++, it obtains the highest RI and SC without target-dataset fine-tuning. These results demonstrate that reinforcement reasoning provides an effective mechanism for organizing geometric primitives into semantic parts while retaining dense segmentation accuracy. Code is available at https://github.com/EngineeringAI-LAB/RePart.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.04602v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.04602v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/EngineeringAI-LAB/RePart"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.04602v1 全文及 2026-10-06T12:07:17.384873Z 审阅记录；PDF 25 页，SHA-256 a370a5d16fb3500161616ce56a099df6a8505a9b831ce3e64835aab02c712fc1，视觉核验第 1、4、8、10、19、20、21 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF 首页 URL 确认 public repo，含 marching_primitives、repart、mesh_mapping 和 train/evalscript 及源码；核验可访问，未执行。",
+    "ideaZh": "RePart 以 oversegmented superquadrics 为工作空间，学习 merge/stop 的长期 partition 收益，再将结构投回 mesh。作者报告 PartNet 与部分跨数据结构指标改善。直接关联部件推理，值得精读；semantic 主要指 partition identity，merge-only 无法修复已经跨越真实边界的 primitive。",
+    "motivationZh": "局部几何 primitives 不直接对应语义部件，逐步合并的短期收益也未必形成合理整体 partition；需要学习具有长期结构收益的 merge/stop 策略。",
+    "methodZh": "Marching-Primitives 拟合 fineSQ 并固定 point correspondence；geometry-onlyactor 用 surfacepoints、SQ/group/pair features 和预测 partcount 选择κ-nearestgroupmerge 或 stop。训练 reward 为 permutation-invariantIoU 进步加 GTcountshaping，privilegedcritic 读 label 统计但不部署；PPOtemporalcredit 区别局部 classifier/bandit。Boundarylabeling 把 groupSQ 的 surfaceproximity 与 volumetricevidence 汇总到 dihedral 切分 atoms，fallback 确保 fullfacecoverage。没有 LLM、语言类别名或 toolagent，相关 extension 只是 future work。",
+    "methodFlow": [
+      "normalizeinputmesh/SDF，以 MPS 产生固定细粒度 superquadrics 及 point-to-SQassignments。",
+      "geometryactor 编码当前 group 和 pairrelations，生成近邻 merge/stopactions。",
+      "PPO 用 IoU 与 GTcountshaping 的 multistepreturns 学习不可逆 merge，criticprivilegedfeatures 仅训练。",
+      "greedyinference 反复更新 groupfeatures/候选直到 stop 或 horizon200。",
+      "在 meshcurvatureatoms 上投票 nearestgroupSQ，并对 unresolvedatoms 用 volumetricsupport/fallback 赋 partidentity。"
+    ],
+    "experimentsZh": "实验设置：PartNet14categories 按三 groups 各 300train 共 900，category200epochs/参数平均初始化 joint100epochs，singleRTX3090；PartNet/3DCoMPaT 各 200test，后者 noFT。κ4/512actorpoints/max200steps、PPOγ.99GAE.95，greedyeval 但 pointsampling 仍随机。指标 classagnosticpartIoU/RI/VoI/SC，采用 PartFieldcandidategranularity evaluation 需 GTselection。\n作者报告 categoryjointvsdirectmixed PartNet0.5460vs0.5308、transfer0.4476vs0.4236，但 staged 训练额外 specialist 成本。（TableA.1, p.13）\n作者报告 fivefurnitureseeds mIoU0.4247–0.4311/mean0.4271；fulljoint 与 transfer 未同样报 seedCI。（TableA.5, p.16）\n作者报告取消 countpenalty terminalcount 误差 4.15→9.97PartNet、5.92→11.08transfer，显示 GT granularitysupervision 重要。（TableA.4, p.16）\n比较范围：MPS/PartField/P3SAM/SAMPart3D/PrimitiveAnything 含 geometry/VLM/multi-view 路线。evaluationGT 可选 PartFieldcandidategranularity 是 oracle 分析协议，不等于 deploy 能够选 best；与分类标签预测任务勿混同。\n消融与诊断：multistepvsmyopic/bandit/pairBC、stagedjoint、κ/countpenalty/BCwarmstart、groupfeatures、privilegedcritic 及 boundarymapping。critic 去 privileged 显示 rewardcurve 而非 fulltestmetric；初始 primitive 质量和 splitaction 未充分检验。",
+    "insightZh": "primitivefitting、agglomeration、PPO 和 curvaturemapping 并非全新；贡献在固定 primitive 组织的 finitehorizonMDP、trajectorycredit 与 structure-to-surface 分离，并有同 state/action 局部 objective 消融支持。是直接 3Dpartsegmentation 方法，而非 LLMreasoning 或 openvocabulary 理解。",
+    "whyRelevantZh": "直接命中 3Dpartsegmentation 与 explicitprimitive/partorganization，可启发 editableasset 组织或未来 partassembly；paper 无 assembly/fabrication/LEGO 贡献，不添加这些主题。",
+    "evidenceZh": "SQ/pointassignments 固定，actor 只读 geometry；GTlabels/count 供 trainingreward、privilegedcritic 与 countaux 监督。（Secs.3.2–3.3/Eqs.1–10/Fig.2, pp.4–6; AppendixB.1/TablesB.6–7, pp.16–18；方法图实际查看；无需 GT 部署不等于 unsupervisedtraining。）\n作者报告 PartNet 四 aggregatebest：mIoU0.5460/RI0.7965/VoI0.8471/SC0.6891；transfermIoU0.4476 对 P3SAM0.5003。（Table2, p.8；主表已查看；cross-datasetbest 仅 RI/SC，不能说所有指标或所有类别最优。）\n作者报告 samegeometry/action/actor 下 PPO furnituremIoU0.4280 对 GreedyBC0.3757、pairclassifier0.3275、myopicPPO0.2579。（Table4/Sec.4.3, p.8；控制支持 multistepcredit，不是所有 baselines 的 architecture/trainingbudget 完全匹配。）\n作者报告固定 groupoutput 从 facewisenearest 到 curvatureatoms，furnituremIoU0.3310→0.4203，再 SQrescue→0.4247；100%facecoverage 来自共同 fallback。（AppendixC/TableC.8, p.20；boundary 消融实际查看；主要增益来自 curvatureatoms，不把 surfacepostprocess 收益全归 RL。）\nunseen 六 category 只各十 shape，平均 mIoU0.3992 低于 PartField0.4295，VoI/SC 最好；LLMextension 未实现。（AppendixB.4, p.19; D/TablesD.9–10, p.21；unseen 与 future work 页查看，泛化限 relatedstructure。）",
+    "caveatZh": "固定 MPSworkspace 令表现依赖 initialdecomposition，training 仅 900shapes。\n更大 actionspace/类别覆盖待扩展；LLM/agentpolicy 尚未实现，label-freefeedback 和 stopping 仍开放。\nmerge-only 不可 split 初始跨 semanticboundarySQ，早错不可回退；κnearest 与 horizon 限制可达 partition。\nsemantic 指 permutationidentity 而非具名 semanticclass，geometry 相似但语义不同 parts 仍可能混淆。\ntrainingGTreward/count 和 critic 需要 annotations；不是 onlineunsupervised 自纠错或 test-timeRL。\nboundarycurvaturethreshold/sampling/fallback 贡献显著，未报告 perobjectend-to-endruntime/MPSfit 成本。\ncross-datasetmIoU 明显弱于 P3SAM，unseen 仅 60shapes；参数平均 specialists 及随机 pointsampling 造成额外不确定性。\n本项目未运行代码或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

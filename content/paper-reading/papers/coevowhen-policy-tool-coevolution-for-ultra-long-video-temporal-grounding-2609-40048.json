@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2609.40048",
+  "slug": "coevowhen-policy-tool-coevolution-for-ultra-long-video-temporal-grounding-2609-40048",
+  "title": "CoEvoWhen: Policy-Tool Coevolution for Ultra-Long Video Temporal Grounding",
+  "authors": [
+    "Yiduo Jia",
+    "Muzhi Zhu",
+    "Jinchuan Shi",
+    "Hao Zhong",
+    "Yuling Xi",
+    "Ke Liu",
+    "Hao Chen"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.40048"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "CoEvoWhen",
+    "VLM / MLLM"
+  ],
+  "abstract": "Ultra-long video temporal grounding requires balancing long-range evidence search with fine-grained event understanding under a limited visual budget, yet existing agentic methods still rely largely on predefined policies and tool capabilities. Motivated by this, we propose a novel policy-tool coevolution framework that jointly evolves high-level policies and executable media tools from the agentic reasoning trajectories of a VLM, forming a reusable skill without updating model parameters. During evolution, an external skill updater distills transferable task experience in long-video temporal grounding, accordingly refining the orchestration of long-range image-based and fine-grained video-based observations. Alongside these policy updates, the updater employs its coding capabilities to upgrade existing tools or create new ones, adapting the tools to long-video evidence acquisition. Equipped with the evolved skill, the VLM autonomously orchestrates tools under the guidance of the evolved policy, coordinating image and video observations for agentic inference without relying on a separate, stronger planning model. Extensive experiments spanning five benchmarks and three VLMs show that policy-tool coevolution consistently improves temporal grounding accuracy in ultra-long videos while reducing visual token cost at inference, and that the evolved skill yields substantial performance gains on general long-video QA without additional task-specific evolution, demonstrating the effectiveness and generalizability of our framework for long-video understanding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.40048v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.40048v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.40048v1 全文及 2026-10-06T15:57:28.234257+00:00 审阅记录；PDF 26 页，SHA-256 54c93ce2f0f194aa403c63b51589fe8fe43c1304f645837a81cf5ce74e3cca6b，视觉核验第 1、2、5、7、8、24 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：exact PDF p.1 project https://aim-uofa.github.io/CoEvoWhen/→Code→https://github.com/aim-uofa/CoEvoWhen。已检查公开 repo 实际仅 assets/README/index.html 项目展示，未见 agent/evolution/media tool implementation，因此不记 available 或附 Code link。",
+    "ideaZh": "CoEvoWhen 根据长视频 grounding 失败轨迹，同时改搜索策略与取帧/拼图工具，形成冻结 VLM 可复用的外部 skill。作者报告 ExtremeWhenBench mIoU 从 0.1507 到 0.2636，visual tokens 少 11.4%；这是相对增益而非准确率提高 74.9 个百分点。方法对主动证据获取有启发，但离线进化用了标注 intervals 和强 coding updater；未报告完整离线成本与生产延迟，也未公开真实执行工具代码。",
+    "motivationZh": "超长视频定位中，模型的判断受工具提供哪些帧和片段限制，仅优化提示难以补全证据。目标是让 policy 与 observation tools 共同改进搜索和核验流程。",
+    "methodZh": "把工具视为决定 VLM 能看到什么的 observation interface，而不仅是执行指令。冻结 VLM 在演化集产生 search/refine/verify trajectories；每四 queries 将轨迹与 GT intervals 给外部 updater，改 policy documents、tool descriptions/interface/source。最终 skill 用 contact sheets 做 global coverage、多候选保留、局部 frame refinement，只有动态歧义才观察 clip。测试阶段冻结 skill，不更新权重、不调用更强 planner，只有 visual inputs。",
+    "methodFlow": [
+      "记录证据轨迹：冻结 VLM 用 primitive media tools 执行标注 grounding queries，记录 observations、tool calls 和 predictions。",
+      "带标签的离线更新：强 coding updater 根据 trajectory 与 GT feedback 同时修正通用策略和实际取帧工具，每批保留 previous skill。",
+      "冻结技能推理：同 VLM 根据新问题用固定 skill 进行 global image search、多候选比较与局部 refinement。",
+      "按需动态核验：仅在动作顺序/连续性证据不足时请求短 clip，再输出 source-video intervals 或 QA option。"
+    ],
+    "experimentsZh": "实验设置：作者从不同视频挑选 100 个 VUE-LVTR queries 做一次 evolution pass，剩 307 query held-out，另测 ExtremeWhen2273/CoMET1599 queries 和 LVBench/LSD QA。Qwen3.5-27B/9B/Qwen3.6-27B 分别 evolve；同模型 greedy、thinking、最多 24 rounds，visual tokens 重复历史重入也计数，invalid predictions 仍计入平均。\n作者报告 ExtremeWhenBench mIoU 0.1507→0.2636，visual tokens 227.10K→201.17K/query。（Tables1–2, p.7）\n作者报告 VUE held-out IoU AUC 0.4107→0.5137，visual tokens 202.58K→141.89K。（Tables1–2, p.7）\n作者报告同 grounding skill 直接用于 QA，27B LVBench45.45%→54.10%，LSD61.27%→69.25%。（Table3, p.8）\n比较范围：same-VLM base/evolved comparisons、policy-only/tool-only、image-only/video-only 有用。base skill 刻意只含 primitive protocol，并非精心手写的强 expert workflow；没有 matched manually engineered skill 或不同 updater/budget 控制。VUE 声明 query disjoint 且 100 evolution videos distinct，未明确所有 held-out source videos 全部 disjoint。\n消融与诊断：两类共同 evolution 与观察模态限制展示组合收益；online plot 在 evolution queries 不是 held-out learning curve。cross-VLM 每模型独立演化不能说明一套工具对所有 VLM 即插即用。visual token metrics 不涵盖 output/thinking tokens、tools CPU decoding、updater 离线成本或 wall-clock。",
+    "insightZh": "将 policy refinement 与 executable observation tools 同时更新，针对 VLM active perception 的具体现实瓶颈；与已有 skill/tool evolution 相比贡献主要是 media acquisition 的共同适配。模型不同的实验分别重新 evolve skill，并非同一 skill 跨模型零样本 transfer。",
+    "whyRelevantZh": "主动选择并改变 visual evidence interface、管理多候选及精读边界，直接关联 VLM grounded perception/tool-use；可借鉴创作素材定位，但论文未测试编辑执行或 3D design。",
+    "evidenceZh": "离线更新使用 GT intervals 与外部 updater，测试阶段才只依赖固定 skill 和主 VLM。（Sec.3.2.2, p.5; Sec.4.1, p.6; Appendix B.1.3, p.15；training-free 仅指冻结模型权重，非无监督自进化。）\n主 matched baseline 统一问题、decoding、interaction budget 与 scorer。（Appendix B.2.3, Table 8, p.18；外部系统的 frame budgets 不同，主因果比较以 base/evolved skill 为准。）\nimage-first search 降低 repeated clip observations，但整体事件定位仍不强。（Tables 1–2, p.7; Appendix C.3, Table 14, p.21；作者报告 CoMET 27B mIoU 0.1635、多于 16 events 的 F1@0.5 0.0529，不能写成可靠完整检索。）\n可复用的政策与工具组合优于单独进化。（Fig.3/Table 4, p.8; Sec.4.3, p.9；缺演化随机 seeds 与完整 update budget 报告，优势应限于该实验路线。）",
+    "caveatZh": "演化来自单来源有限 labeled queries，无标签、大规模、多来源 evolution 尚待研究。\n目前仅视觉，audio/transcripts 与 observation subagents 未纳入。\n测试节省 tokens 不能抵消或忽略 GT 与强 updater 的离线成本。\n缺 evolution seed variance 和完整工具代码限制复现。\n短事件、重复/多事件绝对定位指标仍低，case studies 只是选择示例。\n外部技能知识改进不表示 VLM 内部表示或语义能力已更新。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.05249",
+  "slug": "articutable-generating-instance-level-interactive-rigid-articulated-3d-tabletop-scenes-fro-2610-05249",
+  "title": "ArticuTable: Generating Instance-Level Interactive Rigid-Articulated 3D Tabletop Scenes from a Single Image",
+  "authors": [
+    "Kai Lv",
+    "Yibo Yin",
+    "Lijun Guo",
+    "Heng Fan",
+    "Kaihao Zhang",
+    "Xingping Dong"
+  ],
+  "publishedAt": "2026-10-04",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05249"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "ArticuTable",
+    "3D Reconstruction",
+    "Visual Design Agents"
+  ],
+  "abstract": "Embodied agents benefit from 3D environments that combine visual fidelity to real-world observations with physical interactivity. Existing single-image tabletop reconstruction methods recover plausible scene geometry but typically represent objects as monolithic rigid bodies, limiting interaction to whole-object rigid motion and precluding executable part-level articulation. Meanwhile, recovering a scene layout consistent with the input view remains challenging because a single observation may admit multiple plausible pose-scale configurations. We present ArticuTable, a single-image 3D tabletop reconstruction framework that recovers both executable part-level articulation and an input-view-consistent scene layout. For object modeling, we introduce generation-robust articulation modeling (GRAM), which combines joint fitting guided by a multimodal large language model with semantic state reasoning to recover reliable joint parameters and valid motion ranges from imperfect monolithic proxy meshes, thereby converting them into executable articulated assets. For scene layout, we introduce progressive semantic-geometric scene registration (PSGSR), which progressively narrows the pose-scale search space under complementary metric, planar, and input-view constraints and resolves orientation ambiguity through structure-aware semantic correspondences, yielding a scene layout consistent with the input view. We further contribute ArticuTable-100, a curated collection of 100 simulation-ready tabletop scenes. Extensive evaluation, including a user study, demonstrates strong performance across visual fidelity, input-view consistency, articulation quality, physical plausibility, and simulation readiness.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05249v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05249v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/bryceyin13/articutable-code"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05249v1 全文及 2026-10-06T16:06:33.340Z 审阅记录；PDF 25 页，SHA-256 6b4f8bd93e704451aad15eb6fff4a496a9c41cf7f6ff05a72d1db98c1c137aed，视觉核验第 1、4、7、9、19、22、24 页。数字均为作者报告，本项目未独立复现。代码状态 available：官方仓库实际含 gram、pipeline、prompts、psgsr 和运行命令，非仅项目页；本项目只核对公开实现存在，未运行或复现。",
+    "ideaZh": "ArticuTable 将单张桌面图拆成实例资产，用几何接触证据与 MLLM 恢复 articulated links、关节轴和语义零位，再分阶段配准并导出可交互 USDZ。值得精读的是不完美生成 mesh 到可执行关节资产的接口；150 场景的定量输入为生成图，82.8% 关节资产通过率排除了无法判断的样本，尚不能等同真实物理参数恢复。",
+    "motivationZh": "单图桌面重建多把物体作为 monolithic rigid bodies，缺少可执行关节且 pose/scale 不确定；论文希望联合恢复实例级 articulation 与符合输入视图的场景布局。",
+    "methodZh": "系统先生成辅助 top view，以匿名 mask 和几何匹配建立实例清单，TRELLIS.2 独立重建 proxy。GRAM 将 P3-SAM primitives 分成共运动 links，用局部接触初始化关节，再由 MLLM 修正并区分 observed state 与 canonical zero。PSGSR 从点云、top view 到 input view 逐步优化，DINOv2 patch correspondence 与 normal variation 排序 yaw。贡献是可执行 articulation、support placement 和相机配准的组合，而非训练新 foundation model。",
+    "methodFlow": [
+      "单张 RGB → 辅助 top view；SAM 3 匿名实例检测与 Hungarian 几何关联",
+      "MLLM 理解实例、尺寸和 support hierarchy；生成条件图 → TRELLIS.2 proxy meshes",
+      "P3-SAM primitives → MLLM functional links/kinematic tree；接触区域初始化轴与 pivot",
+      "几何闭合与 semantic state reasoning 分开恢复 canonical zero、观测状态和 intrinsic limits",
+      "VGGT/table scale → 点云配准 → top-view 配准 → DINOv2/normal-weighted yaw selection → input-view refinement",
+      "URDF/GLB 导出；Isaac Sim 中 per-link SDF collision、独立 scene-conditioned limits 与 USDZ 验证"
+    ],
+    "experimentsZh": "实验设置：150 image-generated tabletop references，与四种 scene pipelines 在兼容处统一 TRELLIS.2/GPT-5；Lightwheel 243 meshes 官方 articulation protocol；425 生成候选资产专家 audit；59 人各 10 场景匿名排序；100 精选包 initial-state integrity。\n作者报告 LPIPS 0.2398、ColO 0.3819%、ColS 10.67%；仍有相交场景。（Table 1, p. 7）\n作者报告可判断资产通过率 82.8%；59 人排序中 first-place 85.59%，每方法 590 rankings 来自重复人/场景。（Tables 5–7, pp. 9, 19–20）\n比较范围：统一兼容的 upstream components，retrieval baseline 保留原范式。Scene consistency 没有真实 3D GT，GPT-5 既是 reasoning module 又是 1–7 分 scorer；真实输入与下游机器人政策表现未系统定量验证。\n消融与诊断：GRAM 为 2×2 factorial、边际效果跨另一组件平均；轴误差 40.06→17.17 度。PSGSR 删除 top view/SASPS 的共享资产消融有效，但结构权重主要质性两场景，完整 E2E 成本未给出。",
+    "insightZh": "将生成 mesh 的局部接触几何与全局功能语义分工，并明确保存零位、观测状态、场景状态和 intrinsic/scene-conditioned limits；top view 降低 yaw search 的渲染成本。这些设计对交互式场景资产有参考价值，但各 foundation components 已有，物理参数来自固定密度和默认 simulation settings。",
+    "whyRelevantZh": "直接覆盖单图实例级重建与 visual agents 的几何/语义闭环，输出显式运动树、关节状态和可编辑 simulation assets；可借鉴对生成 mesh 的可执行约束与分阶段注册。",
+    "evidenceZh": "GRAM 由 primitives 建立运动树，接触几何初始化并以 MLLM 校正轴，单独恢复零位和可动范围。（Sec. 3.3, Appendix B.1–B.4, pp. 5, 15–16；固定材质密度计算 mass/inertia，不是由图像识别真实动力学参数。）\n作者报告 150 生成图场景 LPIPS 0.2398、DINOv2 0.8991，含物体间相交的场景占 10.67%。（Table 1, Appendix D.1, pp. 7, 18–19；ColO/ColS 排除与支撑桌面的 pairs；真实图为质性展示，定量不是 paired 3D ground truth。）\n作者报告 Lightwheel 243 assets 的 joint AE 17.26°、LE 0.034，但几何 recall/IoU 不全面领先 Particulate。（Table 2, Appendix D.2, pp. 8, 19；任务无专门训练不代表 foundation models 无预训练。）\n作者报告 425 候选资产中 418 可判断，346 通过结构与运动审查；第二专家抽查 20%的 κ 为 0.476。（Tables 6–7, Appendix D.3, pp. 19–20；七个无法判断样本排除；asset 按最差 joint 评分，漏关节计失败。）\nPSGSR 平均 141.4 秒；front-only 2.09×/3.32×成本比较只针对 Fig.5 两场景。（Tables 9–10, Appendix F, p. 23；单 RTX4090，排除 queueing；不是含生成和 API calls 的端到端运行时间。）\n100 精选 USDZ 验证包与初始状态；动态交互集中在一代表场景。（Appendix G, Fig.6, pp. 10, 23–25；100 成功场景集不是 150 场景全部动态验证；关节 link 使用 SDF collider，普通 rigid objects 用 convex decomposition。）",
+    "caveatZh": "Pinhole camera 与输入镜头/投影可能不匹配，强 off-axis 下局部姿态仍有误差。\nTop view 与重建条件图为生成假设，遮挡形状与语义关节范围可能 hallucinate。\n绝对尺度依赖估计 table width；固定密度、无驱动 stiffness/damping 不等于 calibrated digital twin。\nColS 检查排除桌面，100 包为精选成功场景，动态验证是一场景。\n专家 asset κ=0.476 为中等一致性；82.8%分母排除无法判断样本。\n本项目未复现；模型评分、渲染相似度与一例接触演示不能证明通用 manipulation success。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2604.12035",
+  "slug": "confidence-under-visual-token-pruning-removed-evidence-and-risk-controlled-token-budgets-f-2604-12035",
+  "title": "Confidence under Visual Token Pruning: Removed Evidence and Risk-Controlled Token Budgets for MLLMs",
+  "authors": [
+    "Kaizhen Tan",
+    "Yang Feng",
+    "Heqing Du",
+    "Hanzhe Hong",
+    "Siru Tao",
+    "Xin Xu"
+  ],
+  "publishedAt": "2026-04-13",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2604.12035"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Confidence under Visual Token Pruning",
+    "VLM / MLLM"
+  ],
+  "abstract": "Visual token pruning speeds up multimodal large language models (MLLMs) by keeping a small subset of the visual tokens, and pruning methods are compared by the accuracy they retain. We study what pruning does to the confidence of these models, across common selectors, several MLLMs, and different output formats. Pruning errors concentrate on questions whose evidence the selector removed, and confidence does not register the removal. When the queried object loses all of its tokens, accuracy on these questions drops from 59% to 17%, while confidence stays at the unpruned level. Returning a few object tokens to the kept set recovers most of the lost accuracy. Selectors that keep the most attended tokens remove such evidence most often and produce confident errors, which temperature scaling cannot re-rank. Selectors that avoid keeping redundant tokens stay close to the calibration of the unpruned model. We then use the confidence of the pruned model to set a per-question token budget. The model answers with few tokens first and again with all tokens when its confidence is low. Conformal risk control sets the threshold to bound the expected deviation from the unpruned model. With coverage-based selection, this cascade needs about a third of the prefill tokens of the unpruned model, while with FastV it needs more than the unpruned model. The savings come mainly from how well the confidence ranks the answers that differ from the unpruned ones.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.12035v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.12035v4"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2604.12035v4 全文及 2026-10-06T11:53:42.336579Z 审阅记录；PDF 19 页，SHA-256 36936db94d2ee7f9c4041f7c6a85ba951d522cd4eabe78f14c1e50eb2f4e544a，视觉核验第 1、5、7、8、13 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：全文及 PDF URI annotations 仅含 arXiv 链接，未找到本方法公开 code URL；不猜测作者 repo。",
+    "ideaZh": "论文把 visual-token pruning 的评测扩展到 evidence 与 confidence：移除目标 tokens 后，错误回答仍可能自信，补回少量证据则能救回 accuracy。作者报告 coverage cascade 在部分 batch 设置下节省 prefill。值得精读证据保留问题；约束相对未剪枝答案而非真值，单请求甚至可能更慢。",
+    "motivationZh": "visual-token pruning 可能删去目标证据，却保留错误回答的高 confidence；需要同时检查证据保留与风险，并据此决定是否追加完整视觉计算。",
+    "methodZh": "在九类 selector、LLaVA 与 Qwen2.5-VL 和 yes/no、选择、开放回答、长描述上检查剪枝后的校准。以 COCO masks 测目标证据保留，并在固定 budget 下恢复/移除 object tokens 直接验证失误来源。用低 budget 回答 confidence 决定是否追加 full-token pass，按 image 作为 exchangeable 单位校准 monotone-envelope conformal threshold；效果取决于 confidence 能否排序与 full model 的 disagreement。",
+    "methodFlow": [
+      "记录 selector 实际保留的 indices，删除输入和 KV 位置，保留原 rotary coordinates。",
+      "用 answer probability 衡量 confidence，并结合 COCO masks 定位 pruned object evidence。",
+      "固定 token budget 恢复/移除 object tokens，以非 object replacements 为 control。",
+      "先以少量 tokens 回答，confidence 低于校准 threshold 则重新以 all tokens 回答。",
+      "用 image-level average disagreement 的单调 upper envelope 执行 conformal risk control，并计入双 pass 实际 prefill。"
+    ],
+    "experimentsZh": "实验设置：LLaVA1.5 7B/13B、Qwen2.5-VL3B/7B/32B；九 selectors（Qwen 五类），POPE9000questions/500images、ScienceQA-IMG2017、GQA12578、500image 长描述。greedy 固定 prompts；image-cluster bootstrap 与 200random calibration/test splits，input 及 in-LLM 剪枝均检查 all-token 路径一致。\n作者报告 LLaVA7B POPE64token FastV ECE0.214/AUROC0.674，对未剪枝 0.040/0.801；coverage0.025/0.810，但 GQA64token 所有 selector 校准仍劣于未剪枝。（Table2, p.5）\n作者报告 per-selector temperature scaling 能把 ECE 降至≤0.07 但不改变 AUROC，answer-aware logistic 可改善 POPE ranking，却依赖 yes/no 结构。（Table4/Sec.4.4, p.6）\n作者报告 coverage cascade batch32 A100 为 2.3×，batch1 H200 raw coverage128token72.2ms 对未剪枝 52.7ms；额外 vision/greedy selection 可超过省下的 LLM 成本。（Table8/Table10, p.14）\n比较范围：attention CLS/VisionZip/FastV/PDrop 与 coverage/SCOPE/DivPrune/CDPruner/random 完整 grid；二阶段、多阶段、input-adaptive、random/perfect score 与 learned gate 对照。新 cascade 不是新 selector，最强效果集中 POPE。\n消融与诊断：GT-mask object 恢复/移除及 nonobject control、zeroing vs 真删除、temperature/answer-aware recalibration、ten-sample uncertainty、不同 budget/cascade 与 runtime 完整拆分。mean disagreement control 不可修复 full-model 既有 wrong answers。",
+    "insightZh": "conformal cascades 与 coverage/diversity selectors 来自既有工作，本文的新贡献是将 selector—evidence removal—confidence 失灵链条连接起来，以干预而非单纯相关支持诊断，并说明同一 risk 保证下 confidence ranking 决定计算是否真节省。",
+    "whyRelevantZh": "关系到可靠 MLLM 的 visual evidence allocation，尤其当空间/小对象 tokens 被稀疏化时能否保留 grounding 证据；受控干预比单纯 speed/benchmark 对照更有研究价值。",
+    "evidenceZh": "作者报告目标完全消失的七 selector/两 budget 答案 accuracy 约 59%→17%，confidence0.80→0.82；FastV 尤其常去掉目标。（Secs.4.1–4.2, Fig.2/Table2, pp.4–5；主表/图已查看；这是 present-object mask 子集与重复 selector observations，不是每道题都如此。）\n作者报告固定 64tokens 恢复最多八个 object cells，CLS accuracy12.5→61.7，FastV5.0→64.6；nonobject controls13.3/5.2。（Appendix B/Table6, pp.11,13；干预表实际查看；恢复用 GT mask，是诊断实验，不能当部署时可获得的 oracle selector。）\n风险保证为 exchangeable calibration/test images 下新 image 各问题平均答案与未剪枝答案偏离的 expectation≤epsilon。（Sec.5, Eqs.2–4/Fig.3, p.7; Appendix C, pp.13–14；方法图与公式已查看；不是每题、高概率、分布偏移或真实 accuracy 的绝对保证。）\n作者报告 epsilon2%时 coverage prefilling0.36、FastV1.05；实际 batch32 runtime477→207s。（Sec.6/Table5, p.8; Table10, p.14；成本计入 escalation，两 passvision tokens reuse；小 batch 与不同 task 收益明显较小。）",
+    "caveatZh": "direct evidence measurement 依赖 COCO masks；开放回答主要通过校准/遗漏 objects 间接观察。\nrisk bound 依赖 exchangeable images，覆盖 image 内 question 平均。\n诊断恢复使用真实 mask，不提供部署时未知对象的保证或自动修复机制。\nagreement loss 可保留 full-model hallucinations，并可能改变正确答案；expectation 不等于单次 deployment 高概率保证。\nScienceQA 本身文本 shortcut 较强，POPE 收益不可推广到长视频、细粒度空间推理或任意答案格式。\n长描述中 coverage/diversity 增加 mention recall 却可提高 hallucination 比例，未解决所有 grounding 失败。\nbatch1 多 selector 更慢；batchedgreedy 实现 98.8%pruned answer reproduction 有数值路径差异。\n本项目未执行代码或复现实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

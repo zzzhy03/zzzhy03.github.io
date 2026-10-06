@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.02021",
+  "slug": "task-adaptive-grounded-3d-programmers-using-2d-vlms-2610-02021",
+  "title": "Task-Adaptive Grounded 3D-Programmers Using 2D VLMs",
+  "authors": [
+    "Arman Raayatsanati",
+    "Sombit Dey",
+    "Anna-Maria Halacheva",
+    "Jan-Nico Zaech",
+    "Luc Van Gool",
+    "Danda Pani Paudel"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02021"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "Task-Adaptive Grounded 3D-Programmers Using 2D VLMs",
+    "Visual Design Agents",
+    "3D Generation"
+  ],
+  "abstract": "Recent vision-language models (VLMs) exhibit remarkable generalization and reasoning abilities, yet 3D understanding in these models is limited by data scale, training diversity, and reasoning capacity. Instead of naively extending these models into 3D, we take a different approach: we enable powerful 2D VLMs to operate reliably in 3D by introducing 3D grounding and iterative feedback loops with two novel concepts: Canonical Coordinate Framing (CCF) and Task-Adaptive Feedback (TAF). CCF serves as a unified visual representation that anchors both inputs and outputs to a shared Euclidean coordinate system, solving common challenges in 3D grounding such as axis ambiguity, inconsistent metric scale, and floating references. Complementary to this structured framing of the 3D inputs, TAF closes the reasoning loop with task-adaptive dynamic feedback that enables 2D VLMs to perform varied open-vocabulary tasks within their native visual context. Building on this foundation, we introduce 3D-Prog, a 3D understanding, reasoning, and generation framework that jointly employs the capabilities of CCF and TAF together with powerful VLMs. Without requiring any retraining, 3D-Prog performs open-vocabulary 3D understanding, manipulation, and generation across both object-level and scene-level tasks. Our experiments show that the joint use of CCF and TAF transforms 2D VLMs into geometry-aware 3D programmers, achieving consistent, interpretable, and high-quality results across diverse 3D tasks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02021v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02021v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02021v1 全文及 2026-10-06T15:06:46.844Z 审阅记录；PDF 18 页，SHA-256 b1d63b9294bf6f3edb0742fa0129d7dbe87ac8ac8a58454bedb63056f2a1e99c，视觉核验第 1、3、7、15、16 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：18 页全文含详细系统/judge prompts 和伪代码，但没有本方法 public code URL；相关 datasets/基础库不等于 3D-Prog 实现。",
+    "ideaZh": "3D-Prog 把带 axes/scale 的六个 orthographic views 作为共同坐标语言，让 VLM 写 OpenUSD 和任务自定 Python 分析图，再由独立 VLM judge 反馈修订。闭环能生成、编辑和简化 3D assets，值得深读视觉设计 agent 接口；作者报告 completion Chamfer0.19 vs Claude0.42，但每 task 仅五个 assets、平均约 11 轮/256 秒。Scan2Sim 只验证简化几何与 USD 输出，未证明物理参数或仿真可用。",
+    "motivationZh": "二维 VLM 对三维代码任务容易混淆坐标、尺度与参考系，静态截图也缺少针对错误的反馈；论文希望用统一视觉坐标和任务适配诊断支持迭代 3D 编程。",
+    "methodZh": "CCF 显式渲染原点、三轴和 metric marks，TAF 允许生成 height histograms、density maps、clustering overlays 等随任务变化的诊断。Programmer 执行 USD 与 analysis 代码，judge 检查多视图 overlay 及任务要求，最多 20 轮。使用现有 VLM 且无 finetuning，统一 generation/understanding/editing 接口。实际效果依赖 backbone；四人 ratings 和极小任务样本仅支持可行性及接口价值。",
+    "methodFlow": [
+      "将已有 3D asset 渲染成六个共同原点/axes/metric scale 的 orthographic views，加 perspective context",
+      "VLM 结合自然语言任务，编写 OpenUSD geometry/manipulation 与 Python 任务分析代码",
+      "执行并渲染生成 asset，任务分析产生 height/density/clustering 等 diagnostic visuals",
+      "将生成与输入 reference 的六视图 overlay 连同 TAF 图送独立 judge",
+      "judge 输出 completion、errors 和 suggestions，programmer 修订代码和分析",
+      "最多 20 轮或 judge 批准停止，保存终态 USD 与任务预测"
+    ],
+    "experimentsZh": "实验设置：Objaverse/OpenUSD synthetic、Articulate3D 与 ScanNet++ scan；各 task 五 assets，四名 evaluators 评 editing/composition。Claude/Kimi framework 对比现有 VLM，20 轮上限；CD、mAP、mIoU、motion axis error，另 SQA3D/Nr3D 但未说明完整官方 test 规模。RTX5090 记录 runtime。\n作者报告 Claude completion CD0.19 vs0.42，Scan2Sim0.08 且 bareVLM 均无 validUSD；articulation axis median3.5°/Kimi0.64°。（Table 2, p. 5）\n作者报告去 CCF/TAF 的 completion0.33/0.58，full0.19；平均每 task256s/11.4 轮。（Table 3, p. 6; Table S3, p. 13）\n比较范围：同任务 prompts 但 bareVLM 缺多视图坐标与额外迭代工具预算；无 matched-call 固定 diagnostics/axes-only 控制。每 task 五 assets、QA/caption 数据规模未明，不能宣称完整 benchmark SOTA。\n消融与诊断：CCF/TAF 与 singleasset translation/rotation 测试；去 CCF 变单 view，去 TAF 变 singlepass，混杂信息量/compute。45°rotationfullCD0.18 稍差 baseline0.17，没有 formal equivariance。",
+    "insightZh": "贡献是 metric-grounded visual interface 与自主任务诊断 scratch-space 的系统组合。不是新 VLM 或 3D 生成 backbone；CCF 消融同时去六视图和 coordinate framing，TAF 消融同时去迭代和分析，所以没有隔离 axes 或 adaptive diagnostics 的独立必要性。坐标显式化不构成几何无歧义的数学证明。",
+    "whyRelevantZh": "直接提供可编辑 3D artifact 的观察—Python 分析—程序修改—render—judge 闭环，属于 visual design agents 并可迁移 3D generation/editing。",
+    "evidenceZh": "CCF 与 task-generated analysis 和独立 judge 构成可编辑 USD 闭环。（Sec. 3.1–3.3, Figs. 2–3, pp. 3–5; Algorithm 1/Fig. S4, p. 16；没有 training；judge 负责 convergence 不是 oracle correctness。）\n作者报告 Claude completion0.19 vs0.42、instance mAP0.42 vs0.21；各 task 五 assets。（Tables 2–3, Sec. 4, pp. 5–6；Kimi object detection 仅 0.04、editing3.59 与 baseline 相同，不是每任务/backbone 全面收益。）\nTAF case study 几何修好了却保持错误 semantic labels。（Appendix D.2, Fig. S1, pp. 14–15；说明 judge/视觉 refinement 不能保证标签或语义正确。）\nruntime 与用户评价规模有限。（Appendix B/C, Tables S3–S5, pp. 12–13；平均 11.4iterations、256s，4evaluators；physical-property 标准以视觉/属性判断，没有真实动力学验证。）",
+    "caveatZh": "依赖 VLM 推理/细节能力；judge 可能批准 suboptimal output；CCF 受 context 限制。\n小样本、四人 rating、无置信区间/多 seed 或 matched-call 基线。\nScan2Sim 主要简化 mesh/生成 USD，未展示 collision/inertia/friction calibration、仿真 rollout 或制造有效性。\nsemantic-label 失误可跨多轮保留，judge completion 不等于任务正确率。\n公开 prompts 本身含相互张力的 primitive rotation 规则；只有 prompt 和 algorithm，未确认 implementation。\n本项目未复现，数字均为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

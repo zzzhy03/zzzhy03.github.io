@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.39709",
+  "slug": "btc3d-blended-tile-conditioning-for-detail-enhancing-image-to-3d-generation-2609-39709",
+  "title": "BTC3D: Blended Tile Conditioning for Detail-Enhancing Image-to-3D Generation",
+  "authors": [
+    "Junyu Li",
+    "Qiuyu Chen",
+    "Pengcheng Wang",
+    "Shiqi Yang",
+    "Alexandra Gomez-Villa",
+    "Joost van de Weijer",
+    "Ruilin Li",
+    "Kai Wang"
+  ],
+  "publishedAt": "2026-09-30",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.39709"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "BTC3D",
+    "3D Generation"
+  ],
+  "abstract": "Recent diffusion-based pipelines have achieved promising progress in image-to-3D synthesis. However, generating high-fidelity details remains challenging, especially when the input image contains rich details. Existing approaches often rely on globally encoded conditioning features, which compress spatial information and limit the model to reproduce fine-grained details. This common design often leads to a phenomenon we term detail attenuation. Moreover, improving image-to-3D synthesis quality typically requires retraining or fine-tuning large diffusion models, which can be computationally expensive and impractical for complex 3D pipelines. In this work, we present Blended Tile Conditioning for image-to-3D generation (BTC3D), a training-free inference time framework that enhances fine-grained detail preservation in image-to-3D diffusion pipelines. To alleviate detail attenuation, we first examine the image feature additivity in image-to-3D models. Based on this property, we introduce a blended tile embedding that extracts local conditioning signals from split image regional patches, allowing the diffusion model to better preserve fine-grained visual details. To integrate the global and local conditioning guidance stably, we propose a dynamic conditioning schedule that gradually increases the influence of tile-level conditioning during later low-noise stages of diffusion. Our proposed method BTC3D operates entirely at inference time and can be seamlessly integrated into existing image-to-3D diffusion pipelines. Experimental results demonstrate that the proposed approach significantly improves texture quality and visual fidelity of the base model while maintaining global structural consistency in a training-free manner.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.39709v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.39709v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.39709v1 全文及 2026-10-06T14:13:56.241349Z 审阅记录；PDF 30 页，SHA-256 b9c3237df7e510f72ec9160ac9c0d57196964e453ca479fb21239701b6c39ef1，视觉核验第 1、5、7、14、21、25、30 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Appendix A（p.14）承诺 peer review 后发布源码、推理和评价脚本；当前 exact PDF 未提供 BTC3D public code/project URL，未确认可运行实现。",
+    "ideaZh": "BTC3D 在不训练 backbone 的情况下，把前景加权的局部 DINO crop features 混入 image-to-3D 的纹理采样，并随时间扩展参与的 tile 范围。跨三个生成器的改善和交互式用户偏好有参考价值，但收益主要是 appearance；特征均值并不证明空间 correspondence，额外编码开销也不能一概称为可忽略。",
+    "motivationZh": "单张全图的 image-to-3D conditioning 容易压缩掉局部纹理细节；目标是无需重训生成器，将前景局部 crop features 与全局条件结合。",
+    "methodZh": "问题是单张整图的 conditioning 会削弱细节。方法分别编码全图与网格 crop，以前景覆盖率加权局部 features，再用 rank-dependent sigmoid 调度重分配 tile 权重，固定比例混入全局条件，复用预训练 flow generator 的形状和纹理流程。作者报告跨 TRELLIS、TRELLIS.2 与 Hunyuan3D-2.1 的纹理指标及偏好提升。全文明确目标是生成包括未见区域的完整资产，因此属于原生 3D generation；它没有验证真实几何、材料参数或制造约束。",
+    "methodFlow": [
+      "从输入图像提取前景 mask，并保持原有 shape generation",
+      "分别用原 DINO encoder 编码全图及网格 crops",
+      "按每个 tile 的前景覆盖率归一化权重并排序",
+      "用时间相关 sigmoid 在高优先级 tile 与更广 tile 范围之间重分配局部权重",
+      "以固定 alpha 混合全图和动态局部 features，驱动原纹理 flow sampler",
+      "解码纹理化 3D asset，按配对协议和交互用户偏好评价"
+    ],
+    "experimentsZh": "实验设置：作者使用 3D-Arena 和类别平衡的 Toys4K 子集，三个预训练 image-to-3D backbone 保持权重不变；比较同一 backbone 加/不加 BTC、静态 tile conditioning、调度方向、网格尺度与 alpha/beta。补充提供相同视角的局部区域比较、频率响应和交互式盲评。\n作者报告 TRELLIS.2 在 3D-Arena 的 PSNR 从 20.6741 升至 21.3149，ULIP-2 从 0.3676 升至 0.3837；这些指标分别反映特定渲染协议和带颜色点云的语义对齐。（p.7 Table 1）\n作者报告 Toys4K 配对区域上 TRELLIS.2 的 Region PSNR 从 19.8568 升至 20.4711、SSIM 从 0.8113 升至 0.8470；其他两个 backbone 同样提升。（p.21 Table 9）\n作者报告交互盲评中 20 位参与者共作出 400 次投票，BTC3D 获 269 票（67.25%）；没有给出按参与者/资产聚类的独立重复不确定性。（pp.22–25 §C.4, Fig.13）\n作者报告含预处理但不含导出的 TRELLIS 推理从 2.96 秒增至 4.89 秒，TRELLIS.2 从 15.88 秒增至 18.30 秒；因此不能笼统称额外成本可忽略。（p.20 Table 7）\n比较范围：同一 backbone 前后比较与静态/动态消融有说服力；shape-only 方法缺乏纹理指标，不能据此宣称全面超过所有几何模型。渲染视角和单张条件之间可能不匹配；摘要里的 training-free 是新增模块无需训练，不表示所有 baseline 每次推理需要训练。\n消融与诊断：作者报告静态 tile 的 ULIP-2 为 0.3733，加入 DyCond 为 0.3837；local-to-global tile expansion 优于逆向调度。N、alpha、beta 的选择在同一 3D-Arena 集上完成，缺少单独调参集或跨集合冻结参数后的检验；高频输入响应不能直接等价为生成纹理忠实度。",
+    "insightZh": "新意在于原生 image-to-3D appearance conditioning 的简单推理期组合，而不是新 backbone 或可编辑几何表示。BTCemb 与 DyCond 的独立消融支持组合有效；所谓 feature additivity 是余弦/t-SNE 与生成现象的经验观察，没有线性分解或空间对齐保证。固定 alpha 使全局与局部始终存在，变化的是局部 tile 覆盖和相对权重。",
+    "whyRelevantZh": "直接面向原生 3D asset 的 appearance conditioning，适合借鉴到细节保持和图像引导的纹理生成。它没有 editable 2D/CAD、制造约束或视觉设计 agent 闭环贡献。",
+    "evidenceZh": "方法在纹理阶段混合全图与前景加权 tile features；全局/局部融合比例固定，动态变化来自 tile 权重。（pp.5–6 §3.2, Fig.3; pp.29–30 Algorithms 1–3；已核看方法图与伪代码；不能概括成早期仅全局、后期才引入局部条件。）\n三个 DINO-conditioned 生成 backbone 均有 appearance 与 semantic-alignment 改善。（p.7 Table 1; p.21 Tables 8–9；作者报告；ULIP/Uni3D 使用带 RGB 点云，主表渲染相似性不是 ground-truth 几何指标。）\n配对区域和用户 study 补充了全局相似度指标，但仍以视觉细节和偏好为核心。（pp.21–25 §C.3–C.4, Table 9, Figs.12–13；已核看区域结果及用户界面；重采样区域数量不是独立生成重复次数。）\n额外 tile 编码有可测的总推理成本，且只验证 flow/DINO texture pipelines。（p.20 Table 7; p.14 Appendix A；不包含 asset export；相对成本随 baseline runtime 显著变化。）",
+    "caveatZh": "主要验证 flow-matching 与 DINO-based 原生 3D pipelines，其他视觉 encoder 或生成范式可能需要重新调参。\n主要改进纹理，自动指标难以完整反映 geometry–texture coherence 和细粒度 material/detail fidelity。\n全局与 tile features 的均值会丢失显式空间 correspondence；余弦相似和 t-SNE 不是 feature additivity 的数学证明。\n主表 PSNR/SSIM 受姿态和渲染影响，ULIP/Uni3D 带 RGB；没有真实几何误差或材料 ground truth。\n正文和附录对完整 3D-Arena 与共同可用预计算子集的说明存在范围歧义，需要 released manifest 澄清。\n局部指标重采样与少量参与者投票不能替代跨独立生成 seed、对象和参与者的统计检验。\n默认超参在主要评价集上选择，额外多 crop 编码对短 baseline 可造成明显相对延迟。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

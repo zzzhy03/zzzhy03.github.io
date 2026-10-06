@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2609.02847",
+  "slug": "roge-novel-view-synthesis-via-end-to-end-implicit-reconstruction-and-generation-2609-02847",
+  "title": "RoGe: Novel View Synthesis via End-to-End Implicit Reconstruction and Generation",
+  "authors": [
+    "Xiaolei Lang",
+    "Ze Kang",
+    "Zehao Huang",
+    "Naiyan Wang"
+  ],
+  "publishedAt": "2026-09-02",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.02847"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "RoGe",
+    "Video Generation"
+  ],
+  "abstract": "Novel view synthesis from sparse inputs requires both geometric grounding from the observed views and generative priors of unobserved regions, motivating recent hybrid methods that combine reconstruction and generation. However, existing methods bridge the two with rendered images or explicit 3D representations such as point maps or 3D Gaussians. Generation is thus conditioned on a lossy and imperfect projection of the scene, inheriting its errors, and reconstruction receives no signal from generation to correct them. We present RoGe, an end-to-end unified reconstruction and generation framework that removes this explicit bridge. It targets roaming within a scene anchored by sparse views: given a few posed images and a camera trajectory, it synthesizes a temporally coherent video along that trajectory. From the sparse input views, RoGe builds an implicit scene representation with a feed-forward reconstruction model, and queries it with camera rays to obtain per-view geometric features. These features are injected into a video diffusion model as conditioning, without any explicit 3D intermediate. Both modules are trained jointly, so the generation objective directly shapes its own geometric conditioning. We conduct extensive experiments, where RoGe outperforms reconstruction-based, generation-based, and hybrid baselines in terms of image-level quality and video-level temporal and geometric consistency. Ablations confirm that ray-queried implicit features outperform both raw reconstruction tokens and rendered RGB as conditioning, and that joint training brings further gains. Our code will be released on https://jerry-locker.github.io/roge/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.02847v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.02847v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.02847v3 全文及 2026-10-06T11:46:40.164106+00:00 审阅记录；PDF 14 页，SHA-256 d1101752af97f05e9c4c797b2413cc541018bbca313f905413aabed7eed5ac8b，视觉核验第 1、4、7、9 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF p.1 仅印出 project page https://jerry-locker.github.io/roge/，本次访问未成功；全文未印出可核验的 Code repository URL，不推测代码存在。",
+    "ideaZh": "RoGe 将 camera-conditioned VGGT 的隐式场景特征按目标 rays 查询后注入 Wan video DiT，并用 photometric + flow matching 联合微调，绕开先重建显式 3D、再渲染 RGB 的串联瓶颈。作者报告 DL3DV 上同分辨率 joint training 的 PSNR 从 20.07 提高到 20.40；最终 21.50 还包括高分辨率训练，不能全归因于联合训练。它提供可迁移的几何条件接口，但主要输出仍是 sparse-view NVS video，尚非可编辑 3D asset 或通用 4D world model。",
+    "motivationZh": "稀疏视角生成新视图时，先重建几何再渲染图像的串联流程可能传递误差；需要让几何表示与视频生成器共同适配，并直接查询目标 rays 的条件。",
+    "methodZh": "问题是稀疏 posed images 既不能完整确定未观察区域，又要求目标轨迹的视频保持相机与几何一致。方法继承 LagerNVS 的 camera-conditioned VGGT 与 ray-scene attention，在相同 world frame/scale 中得到每视角 implicit geometry，按 video VAE 的时间压缩组织 geometry/ray 条件后加入 Wan2.1-I2V-14B 的 patch embeddings。低分辨率阶段 jointly train LoRA、adapter 和 patch embeddings，以 target latent flow loss 与 RGB photometric loss 避免 geometric forgetting；高分辨率阶段冻结重建分支。其主要价值是让生成损失影响自身几何 conditioning，而不是新的显式 3D 表示。全文 14 页已读，视觉检查 Fig.1、Fig.2、Fig.3 和主表；没有独立 limitations section。",
+    "methodFlow": [
+      "固定相机坐标与隐式场景：输入 3–9 张带内外参的 sparse context images，以第一 context 为 world frame，归一化 translation；camera-conditioned VGGT 形成 implicit scene tokens。",
+      "按目标 rays 查询几何：Plücker ray tokens 经 ray-scene attention 查询场景，得到目标与 context 的 per-view geometry features；不实例化 depth、point cloud 或 3DGS。",
+      "对齐 video latent 条件：context 单帧编码、target 连续视频编码；adapter 将 geometry features 和完整 packed rays 对齐 VAE 的空间及四帧时间压缩，加入 DiT patch embeddings。",
+      "联合重建与视频生成：以 target-slot flow matching 和 auxiliary RGB photometric loss 联合微调两个分支；随后高分辨率微调冻结 reconstruction branch，采样 81-frame trajectory chunks。"
+    ],
+    "experimentsZh": "实验设置：训练用过滤后的 RE10K 6,527 与 DL3DV 6,264 sequences；低分辨率 15,000 steps、高分辨率 500 steps，均报告 192 H20 GPUs。测试 RE10K/DL3DV/ACID 各 10 sequences，分别 3/6/9 context views，额外 ScanNet extrapolated trajectories；image metrics 与 FID/FVD/MEt3R/TSED/pose error 联合评估。\n作者报告 DL3DV 6v PSNR/LPIPS 为 21.50/0.104，LagerNVS 为 20.90/0.193，FrameCrafter 为 19.85/0.121。（PDF p.7, Table 1）\n作者报告跨数据集 ACID 9v PSNR 26.30、FVD 36；LagerNVS 为 24.11/133，FrameCrafter 为 24.58/88。（PDF p.8, Table 3）\n作者报告 joint training 同分辨率 PSNR 增益 0.33 dB；高分辨率微调额外提高 1.10 dB。（PDF p.9, Table 5）\n比较范围：覆盖 reconstruction-only、generation-only 与串联 hybrid 方法；FrameCrafter 追加同数据/步数训练，NeoVerse 以聚合 Gaussians 适配 sparse NVS。不同方法原生分辨率与任务不完全一致，比较依赖统一裁剪和适配。\n消融与诊断：Table 5 对 no geometry、raw VGGT tokens、camera-conditioned tokens、rendered/predicted RGB、ray features 与 joint training 分层比较。未报告多个 seed、显著性或预算完全相同的高分辨率对照。",
+    "insightZh": "创新是 query-aligned implicit geometry 与生成模块的联合接口，而非另造 VGGT、Wan 或新的 3D supervision。Table 5 在同分辨率隔离了 ray-queried features 和 joint training，支持其比 raw VGGT tokens / RGB bridges 更有效；4D retargeting 则需 VKitti 再训练，只有示例，不能视为已证明的通用动态场景生成能力。",
+    "whyRelevantZh": "对几何一致 video/4D creation 的直接迁移点是 camera-aligned ray-query interface 和让 generation objective 优化 conditioning，而非 pure NVS 排名。建议 skim 方法与 Table 5，保留其与 editable 3D 的边界。",
+    "evidenceZh": "生成条件采用 ray-queried implicit features，并保留 camera frame/scale；没有显式 3D 中间输出。（PDF pp.4–6, Fig.2, Sec.3.1–3.3, Eqs.(4)–(11)；已阅读方法并实际查看 Fig.2；joint 指 LoRA 与新模块的联合优化，而非全参数训练。）\n作者报告 RE10K 3v / DL3DV 6v 的 PSNR 为 33.35 / 21.50，LPIPS 为 0.021 / 0.104。（PDF p.7, Table 1; p.8, Sec.4.2；每个数据集仅 10 个测试序列，最终评估 crop/resize 至 192×192；本项目未复现。）\n作者报告 DL3DV 同分辨率 ray features 的 PSNR 20.07，joint training 后 20.40；480×832 微调后 21.50。（PDF p.9, Table 5 rows #6–#8 and Sec.4.3；实际查看表格，不能把 #6 到 #8 的全部增益解释为 joint training。）\n4D retargeting 是追加 VKitti 训练的适配，并非 static sparse-view 模型零样本即可处理动态视频。（PDF pp.8–9, Extension for Video Retargeting; p.1, Fig.1；作者报告额外 5,000 steps / 16 H20 GPUs；全文未提供该扩展的定量主表。）",
+    "caveatZh": "Sec.4.1–4.2 明确 trajectory 无 absolute scale，因此 APE translation 归一化；ACID 近直线使 rotational APE 不可靠，改用 RPE。\nSec.4.3 说明 raw VGGT tokens 的 world frame/scale 不能简单经 Sim(3) 重表达，直接接入可能反而下降。\n主要任务仍是忠实 sparse-view NVS，不能将未观察区域补全自动等同为独立 3D content creation；没有可编辑几何输出或 fabrication 验证。\n跨域测试仅 ACID 10 sequences，动态扩展只有额外微调后的示例，不能据此宣称通用 world model。\nMEt3R/pose errors 由现有模型估计；真实几何 ground truth、动态 retargeting 定量与部署 latency 尚未充分给出。\n全文没有独立 limitations section；以上风险为 reviewer 判断。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.02023",
+  "slug": "sphere-adaptive-vr-indoor-scene-generation-via-llm-enhanced-spatial-preference-learning-an-2610-02023",
+  "title": "SPHERE: Adaptive VR Indoor Scene Generation via LLM-Enhanced Spatial Preference Learning and Human-in-the-Loop RL",
+  "authors": [
+    "Hyeonmin Lee",
+    "Zheng Wei",
+    "Kyungmin Kwon",
+    "Jumin Seo",
+    "Jiwon Park",
+    "Hayoung Oh"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02023"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.HC"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "SPHERE",
+    "Visual Design Agents",
+    "3D Generation",
+    "VR",
+    "LLM",
+    "RL"
+  ],
+  "abstract": "While Large Language Models (LLMs) advance 3D indoor scene synthesis, current pipelines fail to retain user-specific preferences across sessions, making immersive authoring a repetitive and physically fatiguing process. We present SPHERE, an adaptive VR generation framework that transforms isolated synthesis into continuous human-AI co-creation. SPHERE extracts persistent spatial preferences from natural multimodal interactions (speech and controller edits). To ensure geometric resilience against spatial distortions, it abstracts these raw edits into hierarchical constraints modeling both local functional and global topological contexts. Furthermore, a human-in-the-loop reinforcement learning mechanism dynamically updates retrieval policies based on the user's final edited scenes. A mixed-design user study ($N=42$) and an offline ablation demonstrate that SPHERE significantly reduces corrective edits and physical demand, preventing bias toward shallow object-level traits to yield geometrically resilient, profile-aligned layouts. Ultimately, SPHERE demonstrates how capturing demonstrated spatial logic enables controlled spatial adaptation, establishing a reliable, governed human-AI collaboration framework for immersive authoring. Project page and source code will be available at: https://github.com/hyeonmin11/SPHERE",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02023v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02023v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02023v1 全文及 2026-10-06T13:02:37.000Z 审阅记录；PDF 11 页，SHA-256 a8ef0452ae246ed7be1bfeebd5c48acf2ddccd62c41aa849868fbfbaf2b4b430，视觉核验第 1、3、4、5、6、7、8、9 页。数字均为作者报告，本项目未独立复现。代码状态 promised：Exact PDFp1 承诺 github.com/hyeonmin11/SPHERE；已访问 publicrepo，当前仅 README.md，无实现，因此不提供 Code 链接。",
+    "ideaZh": "SPHERE 把 VR 用户终态 edits 抽成 object/intra-area/inter-area preference memory，用 dual retrieval+LoRA reranker 将约束注入下一次 Holodeck 场景生成。作者报告 42 人 study 平均 edits8.52→5.62，但这是三种指定 profile、三轮 living-room 的受控适配；RL 贡献未隔离、overall workload 不显著，值得略读跨 session 视觉设计记忆。",
+    "motivationZh": "VR 室内设计的用户偏好不只关乎单个物体，还包括空间关系与功能区域；论文希望从编辑结果和交互记录中提取这些偏好，并用于下一次场景生成。",
+    "methodZh": "系统不仅翻译 speech/controller 成 sceneoperators，还从终态 scene 与完整 log 建立 DBSCANlocalzones、functionalroles 和 roomconnectivity，LLM 把偏好写成 symbolicconstraints。之后 GTEretrieval/cross-attentionreranker 采样 memory；VLM 看 terminaltop-downrender 给 realizationsignal，policygradient 更新 LoRA reranker。实验说明整个 memory-enabledauthoring 系统有用，尚不能证明 rerankerRL 或 deterministictopologyguarantees。",
+    "methodFlow": [
+      "Holodeck+Objaverse 以 instruction 和 retrievedmemory 生成初始 scene，Unity/VR 同步 scenegraph",
+      "Whisper/controller 指向解析语义并执行 Add/Move/Rotate/Scale/Light/Remove",
+      "仅 session 结束时由 terminalJSON/log 构建 DBSCANfunctionalzones、local/geometricrelations 和 globalconnectivity",
+      "LLM 从层级 context 提取 affordance 并映射 relationaltriplets，保存 preference memory",
+      "GTEtopK→cross-attentionrerank/Gumbelsampling→scene/affordance 检索",
+      "VLM 对 terminaltopdownrender 评价 realization，similarity-weightedpolicygradient 更新 LoRA reranker；约束 union 进入下一次 generation"
+    ],
+    "experimentsZh": "实验设置：42 大学/社区 novices，MetaQuest3，2memoryconditions×3living-roomrounds，指定 FunctionalViewer/SocialConnector/SpatialMinimalistprofiles；geometryscale/aspectratio 扰动。Edits、NASA-TLX、SUS、attribution；offline 同 Round1 数据 fullcontextvsrawcoords，由 GPT4 和 2humanraters 评价 constraints。\n作者报告平均 editcount8.52→5.62，Welcht4.86/p<.001；SUS73.2→78.3/p.034。（Sec. 6.1/6.4, pp. 6–7）\n作者报告 NASA-TLX3.10→2.89 但 p.185，不显著；physicaldemand/effort 子项较低。（Sec. 6.3, Fig. 5, p. 7）\n作者报告 contextalignment.511vs.422，object-onlyfraction.35vs.75；ProfileB.467vsbaseline.533。（Table 2, p. 8）\n比较范围：No-memoryHolodeck 整体 baseline，缺 fixedmemory/noRL、local-only/global-only、其他 personalizedsceneagent 对比。离线 context 是 constraintjudgement 而非 end-to-endgeneration；userstudyprofile 受控不等于 wildpreferences。\n消融与诊断：Fullcontextvsrawscene/logs 隔离 contextabstraction 但没有隔离 LoRA rerankerRL；moderateraterκ>.560，GPT4judge 可能偏向更长/结构化描述。",
+    "insightZh": "把 useredits 跨 session 结构化成局部/全局空间规则并学习 memoryretrievalpolicy，直接用于 visualartifact generation，而非仅 UIchange。但借用 Holodeck/既有 retrievalpersonalization，核心算法贡献未有 component-levelRL 对照。",
+    "whyRelevantZh": "真实 sceneartifact 编辑反馈转为下一次 creation 约束，有直接 visualdesignagent 与 3Dlayoutgeneration 迁移价值；不是 MLLMcapability 或 fabrication。",
+    "evidenceZh": "Hierarchycontext、symbolicrelations 和 postsessionmemory 构造。（Figs. 2–4, Sec. 3.1/3.2, pp. 3–4；Left/right 等仍依赖∆x/∆z，absolute-distance 判定缺 normalizedthreshold，不能宣称普遍 topologicalscaleinvariance。）\nVLMtopdownrenderrealizationsignal 与 similarityreward 驱动 LoRA reranker。（Sec. 3.3, Eqs. 2–6, pp. 4–5；Reward 来自 modeljudgement 非 deterministicgeometryproof；dotproductsimilarity 范围/采样 logprob 细节未定义。）\n42novices 执行 assignedprofiles 和 3living-roomgeometryrounds，非自由长期个性化。（Sec. 4.2, pp. 5–6；跨 round 适配与真实多 session 长期变化不同。）\n作者报告 edits 减少和 SUS 提高，NASA-TLXoverall 不显著。（Fig. 5/7, Sec. 6.1/6.3/6.4, pp. 6–7；不包装为普遍减少 cognitiveworkload。）\nContextablation 测 inferredconstraints，不测 RLenabledgeneration 的独立效果。（Sec. 6.5, Table 2, pp. 7–8; Sec. 7.3/8, pp. 8–9；No component-levelpolicy/frozenretrievalbaseline；ProfileB 反而略退。）",
+    "caveatZh": "Pointing 不精确会膨胀 microeditcount。\nExtremegeometry 无 constraintrelaxation，conflictingpreferences 会 clutter。\nPostsessionadaptation 不及时；需要 longitudinaldrift/contradiction 管理。\n验证是 controlledprofileadaptation 而非自由长期 personalization。\nSymbolicpredicate 阈值/normalization、DBSCAN 和 retrievalK/M/N、rerankertraining 配置、generationLLM 与 runtime 成本未充分报告。\nTopdownVLMreward 不能证明 functionalaccessibility，dotproduct 未说明 bounded 而 reward 公式假定 similarity 范围。\n虽然不 fine-tunefoundation model，LoRA reranker 确有 training，不宜叫所有模型 zero-shot。\nBaseline 与 RL 个别模块贡献未分离；数字为作者报告，本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

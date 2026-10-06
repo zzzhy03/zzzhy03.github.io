@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2508.13744",
+  "slug": "mitigating-cross-image-information-leakage-in-multi-image-understanding-with-large-vision-2508-13744",
+  "title": "Mitigating Cross-Image Information Leakage in Multi-Image Understanding with Large Vision-Language Models",
+  "authors": [
+    "Yeji Park",
+    "Minyoung Lee",
+    "Sanghyuk Chun",
+    "Junsuk Choe"
+  ],
+  "publishedAt": "2025-08-19",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2508.13744"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Mitigating Cross-Image Information Leakage in Multi-Image Understanding with Large Vision-Language",
+    "VLM / MLLM"
+  ],
+  "abstract": "Large Vision-Language Models (LVLMs) exhibit strong performance on single-image tasks. However, their performance degrades significantly when handling multi-image inputs. While this degradation has been observed in prior work, its nature remains poorly understood. We empirically observe visual elements from different images become entangled in the model's representations and responses. We refer to this phenomenon as cross-image information leakage. To address this issue, we propose FOCUS, a training-free and architecture-agnostic method. FOCUS masks all but one image with random noise, guiding the model to focus on the single clean image. This process is applied across the target images to obtain logits under partially masked contexts. These logits are aggregated and then refined using a noise-only reference input, which suppresses the leakage and yields more accurate outputs. FOCUS consistently improves performance on diverse multi-image benchmarks. We further show that FOCUS generalizes to video understanding, extending its applicability beyond static multi-image inputs. This demonstrates that FOCUS offers a general solution for enhancing multi-image reasoning without additional training or architectural modifications.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2508.13744v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2508.13744v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yejipark-m/FOCUS"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2508.13744v3 全文及 2026-10-06T15:53:30.770134Z 审阅记录；PDF 19 页，SHA-256 4d4cba5ae5a3389565237456d1231dd096cc74b43b33032f08790f1a9a003b54，视觉核验第 1、4、6、9、14、17、18、19 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDF p.1 直接链接官方仓库；在线确认 model、eval、utils、analysis 与 demo 实现及多模型 runners，不是 README-only；未执行复现。",
+    "ideaZh": "FOCUS 通过逐图保留、扰动其他图像，再合并 logits 并扣除噪声 reference，缓解多图回答中的内容混淆。作者报告跨多个模型及多图 benchmark 的收益，可作为无需训练的 inference 干预速读。它需要额外分支和按模型、benchmark 调参；相似度与 merged-caption 证据并不一致，不能认定 cross-image leakage 是已隔离的统一失败机制。",
+    "motivationZh": "多图理解中，不同图像的内容可能混入同一回答，影响逐图比较和计数；目标是通过逐图干预与 logit 组合减轻内容混淆。",
+    "methodZh": "对每个 image position 构建保留该图的输入，其余图像在 normalized pixel space 混合 uniform noise。所有分支保留原位置、问题及共享已生成前缀；得到的 logits 相加并以 fully-noised reference 调整。小预算下用 batching 缓解额外推理成本。实验强调多图判别、比较与计数，并补充视频对和有限长上下文任务；收益依赖 noise strength 与 contrastive weight。",
+    "methodFlow": [
+      "保留每个目标 image，按原序对其他图像混入 uniform noise。",
+      "在共享问题与回答前缀下计算各 focused branch logits。",
+      "额外计算全噪声 reference logits。",
+      "合并各分支并扣除 weighted reference，再进行 token decoding。",
+      "用 batching 执行分支，并在 validation 上选择 noise 与 contrastive 参数。"
+    ],
+    "experimentsZh": "实验设置：冻结多个 VLM family，对多图 benchmark、视频对和长上下文子任务改 decoding。按模型与 benchmark 选参数；无官方 validation 的 benchmark 从 test 中抽取调参数据，报告剩余 test 表现的具体排除需 implementation audit。相似度诊断是关联指标，不是控制 inter-image attention 的因果干预。\n作者报告 Qwen2.5-VL-7B 的 Winoground Image score 从 39.75 到 58.50，Mantis accuracy 则保持 70.05，MuirBench 从 29.92 到 29.73。（pp.5–6, Tables 1/4）\n作者报告 Qwen3-VL-4B 的 Vinoground Video score 从 17.60 到 25.80，较大模型从 35.60 到 37.00，不能泛化为所有视频任务的提升。（p.6, Table 5）\n作者报告 synthetic 成本测试在 16 张图时 latency 从 2.47 秒到 14.26 秒；batching 比逐分支串行快，但实际 overhead 仍显著。（p.14, Table C2）\n比较范围：比较 per-image caption aggregation、VCD 与作者重实现的 SoFA，并含多模型 scales。缺少等算力 ensemble、sampling temperature 与 logit averaging 的匹配对照，额外推理资源也是收益解释之一。\n消融与诊断：noise type、strength、contrastive weight 和 reference type 有 sweep；小 validation 上的大步长变化没有区间或 repeated seeds，不能证明稳定通用参数。",
+    "insightZh": "逐图 contrastive decoding 是 VCD 的多图扩展，跨模型的多图 evidence isolation 实验有方法参考价值。它保留位置及部分上下文，但完全遮蔽时不存在联合视觉输入；logit 聚合不能保证任意跨图关系推理。所谓 leakage 的统一因果解释仍不足。",
+    "whyRelevantZh": "多图 evidence isolation 是 VLM 的实际能力问题，inference 干预能为 cross-image grounding 诊断提供对照；方法与诊断价值足以速读，但不构成通用跨图能力保证。",
+    "evidenceZh": "实际 masking 混合原图与 noise，部分设置保留其他图像内容。（p.4, §3; pp.13–14, Appendix C；全文核验；不将所有 branch 描述为完全单图输入。）\n多图和视频对评测总体有收益，但并非各模型各任务皆改善。（pp.5–8, Tables 1–8; pp.15–18, Appendix D；作者报告；MuirBench、MIRB 和 long-context 的一些行下降。）\n大模型的 merged-caption 和 representation similarity 诊断不一致。（pp.14–16, Figures D1/D2；Qwen3-VL 的 merged selection 下降但 accuracy 仍下降；另一个模型 joint similarity 未增，因此机制证据有限。）",
+    "caveatZh": "generation settings 与 prompts 影响 baseline 可复现性。\n参数按模型及 benchmark 调优，未验证无 validation 的迁移。\n额外 inference branches 增加成本，long-context retrieval 任务表现混合。\nrepresentation cosine 的变化可反映正常上下文整合，未隔离 leakage 因果机制。\nlogit 相加同时改变 sampling sharpness，缺少对应匹配控制。\n部分 benchmark 用 test 子集调参；需要核对最终排除和调参覆盖，不能称完全无任务适配。\n保留 image order 不等于保留任意跨图信息关系，完全遮蔽与长上下文扩展有天然边界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

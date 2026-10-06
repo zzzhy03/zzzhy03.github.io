@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.05033",
+  "slug": "code2games-enabling-coding-agents-for-gaming-world-generation-2610-05033",
+  "title": "Code2Games: Enabling Coding Agents for Gaming World Generation",
+  "authors": [
+    "Wei Wu",
+    "Ziyang Xu",
+    "Zeyu Zhang",
+    "Yang Zhao",
+    "Hao Tang"
+  ],
+  "publishedAt": "2026-10-04",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.05033"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "Code2Games",
+    "Visual Design Agents",
+    "3D Generation"
+  ],
+  "abstract": "Generating a high-quality gaming world from a natural-language game intent requires joint reasoning about scene structure, spatial layout, gameplay objectives, interactive entities, and executable gameplay logic. Existing coding agents can generate individual assets, scenes, or scripts, but often struggle to maintain consistency across these components. We propose Code2Games, an agentic framework that builds a structured gaming world upon a base Blender world generated from the same game intent. Code2Games coordinates scene analysis, gameplay planning, constrained gaming-world generation, and gaming-engine customization through a shared scene-gameplay representation with persistent element correspondence. After world generation, Code2Games adapts the generated world to Unreal Engine 5 and employs an execution-guided reconstruction process that uses compilation diagnostics, runtime feedback, and gameplay test results to resolve inconsistencies arising during engine adaptation. To systematically evaluate gaming-world generation, we introduce the GameCode4D benchmark, which comprises ten fixed game prompts spanning different levels of scene and gameplay complexity. We evaluate the generated results across four dimensions: visual quality, interactive fidelity, multimodal artifact quality, and playable-game quality. Experiments demonstrate that, compared with direct gaming-world generation by coding agents and existing baseline methods, Code2Games consistently improves the visual quality and interactive fidelity of generated gaming worlds, as well as the quality of the resulting games after engine adaptation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.05033v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.05033v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AIGeeksGroup/Code2Games"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.05033v1 全文及 2026-10-06T16:16:41.919267+00:00 审阅记录；PDF 42 页，SHA-256 64274708ec8da689dd47f72cf63ff4bb42c5b76c740aee9044d06ec46d622907，视觉核验第 1、4、6、7、8、9、14、17、23、24、28、30、35、36、42 页。数字均为作者报告，本项目未独立复现。代码状态 available：PDFp.1 Code URL 明确；实际访问 public repo 确认 shared_representation、scene_and_gameplay_planning、game_realization、gameplay_logic 与 generate_gaming_world.sh，非 README-only。Current 公开 pipeline 输出 gaming_world.blend/gameplay.mp4，需 animatedFBX、Hunyuan3D 与 base scene；Unreal 完整 reconstruction/repair 未确认公开，不扩大 Code 范围。",
+    "ideaZh": "Code2Games 用 shared scene/gameplay representation 和 persistent IDs 串起 Blender 场景分析、玩法规划、受约束资产摆放与 Unreal 重建/反馈修复。作者报告十个固定游戏 prompts 上，Claude 配置 Human77.5 对直接 Claude Code63.8，Build97.7；后者是 engine checks 平均通过率，不是 97.7% 的完整游戏成功率。值得精读实体对应与 local repair 设计，但公开实现目前主要是 Blender staging/video，Unreal 完整闭环与任意玩法泛化仍需验证。",
+    "motivationZh": "从描述生成游戏世界时，场景实体、玩法条件与引擎对象容易失去对应，资产也可能碰撞或不可达；需要共享状态和持久标识支撑约束检查与局部修复。",
+    "methodZh": "系统以同 intent 的 Code2Worlds Blender base 为 substrate，表示 semantic regions、boundaries、accessibility 和 affordances。Gameplay spec 定义 objective、actors、elements 和 trigger/precondition/state-update interactions；candidate placement 先通过 support/raycast、bbox collision 与 navmesh reachability 检查，再由 top-down VLM 选位置。Physical assets 与 logical zones 分开实例化，IDs 关联 Blender objects/annotations、Unreal Actors/Trigger Volumes 和 logic units。作者方法在 Unreal 执行后根据 engine/gameplay diagnostics 定位并修复关联组件。",
+    "methodFlow": [
+      "理解已有场景与空间约束：从 Blender renders/metadata 提取 regions、geometry、accessibility 与 affordances，先保留 objective visual evidence 而不直接生成坐标。",
+      "定义玩法与 persistent 元素：将 intent 转成 objectives、actors、elements 和 interactions，给每元素稳定 ID 及跨 Blender/Unreal/logic 的 correspondence record。",
+      "选取几何可行且语义适当位置：筛选 surface support、non-collision、reachable candidates，VLM 只选已验证 candidate IDs，再生成/检索 GLB assets 与 logical region annotations。",
+      "绑定视觉资产与交互逻辑：按 persistent IDs 将触发 event、precondition 和 state action 绑定到 scene entities，区分可见 mesh 与无形 trigger/spawn。",
+      "重建引擎并局部修复：作者流程在 Unreal 编译、启动和执行 scripted gameplay tests，根据 IDs 定位失败 components 并 repair，迭代至 objectives 通过或 budget 耗尽；公开代码范围另有限定。"
+    ],
+    "experimentsZh": "实验设置：GameCode4D 十 fixed prompts，各 artifact 两段约 50 秒未剪 rollouts，共 20videos/method，按先 routes 再 games 平均。比较 OpenGame、AutoUE、三 coding-agent/backbone 和对应 framework 配置；MUSIQ/RAFT/AMT 自动 visual metrics，其余多为 Qwen3.8-Max temperature0 judges。Human 是 15raters 观看匿名随机 videos 评分 M/D/V/A，不是独立游玩长时用户体验。\n作者报告 Claude-backbone framework 相对直接 Claude Code：Setting80.0→87.5、Inter66.0→75.8、Physics68.4→73.9、Human63.8→77.5；M56.8→68.8、D42.2→56.7、V46.0→61.0、A41.5→57.0。（PDF p.8, Table1）\n作者报告 Build 为 97.7，相对直接 Claude94.5。定义是 compilation/launch/level/predefined-route checks 平均 passrate，且所有 projects 至多五 repair iterations 达到 executable 状态，不能解释为 97.7%game-level 成功率。（PDF pp.8,17, Build definition）\n作者报告去 scene representation 的 Setting87.5→78.2，去 gameplay spec 的 Inter75.8→69.8，去 scene constraints 的 Physics73.9→66.2；这些支持组件各自作用，但没有 geometry 精度或 general safety 保证。（PDF p.9, Table2）\n作者报告初始→engine repair→gameplay repair 的 Build78.5→88.7→97.7，Inter58.0→59.0→75.8；additional geometry-selection 组合将 M58.0→68.8。没有统一 wall-time/token/cost 或多 seeduncertainty。（PDF pp.9,14, Tables3–4）\n比较范围：同 prompts 和对应 LLM backbones 的对照较有意义，但 Code2Games 以生成的 base scene 为额外 substrate，是否所有 direct agents 获得同一 base 与相同 API/tool/asset/repair 资源未充分交代。最终 metrics 多由同一 Qwen judge 评估，不是独立 physics simulation/完整 mechanics correctness。两 routes 来自同 artifact，不是两次 independent generation。\n消融与诊断：分别删除 representation/spec/constraints，逐步加入 engine 与 gameplay feedback，再将 region compatibility、geometric feasibility、semantic selection 逐步组合。Persistent-ID mapping 本身没有单独删除对照，local repair 收益不能完全归因 IDs。",
+    "insightZh": "核心不是新 3D diffusion backbone，而是将 editable spatial world、gameplay semantics 和 engine code 通过稳定实体 correspondence 连接，并把几何 checks、视觉选择和 execution repair 组合成创作流程。该设计可借鉴到 structured visual/3D agent 工作流；正文系统较完整，但实证仅十个 prompts、多数主观代理，公开 repo 尚未覆盖所有声称的 engine 阶段。",
+    "whyRelevantZh": "这是实际创建 editable3D world/assets 与 engineartifacts 的 agent workflow，包含规划、工具执行、视觉观察与 feedback repair，直接符合 visual-design-agent 范围。Persistent IDs、logical/physical elements 与硬几何 checks 可迁移到 structured3D 设计；未涉及 LEGO/CAD 或 fabrication 验证。",
+    "evidenceZh": "Shared representation 包含 scene constraints、gameplay spec 与跨 artifact persistent mapping。（PDF pp.4–7, Fig.3, Eqs.1–17；完整阅读 exact42 页与全部 prompts，实际查看 method figure；不把可见 frames 当独立验证 engine execution。）\nCandidate selection 先几何验证、后 VLM 语义排序，assets 与 logical zones 分别实现。（PDF pp.5–6; pp.38–42, candidate/asset prompts；bbox/raycast/navmesh 是有限 checks，生成后 mesh/support 细节仍需后续 validation，未证明任意物理合理性。）\n作者报告 scene constraints 和 engine/gameplay feedback 消融改善相关评分。（PDF pp.8–9, Tables1–3; p.14, Table4；作者报告；指标需结合十 prompt/两 routes 和 judge scope，本文没有执行 projects。）\nAppendix route-planner 明确为 cinematic Blender staging 而非真实 playable collision planning，公开 repo 也主要提供该 stage。（PDF pp.35–36, top-down route planning; public repository README scope；这限定公开可复现范围，不证明正文所有 Unreal 实验不存在；Code 仅标已确认 public 部分。）",
+    "caveatZh": "Blender→engine 材质、procedural shaders、lighting/rendering 会改变颜色、surface detail、透明和 atmosphere，尚不能严格保留视觉 appearance。\n只有十 fixedprompts 和有限 routes，没有任意玩法、长时 progression、开放输入或多 seed 泛化证据。\n用户研究观看 videos，不能等同 participants 实际控制/游玩；Human 与 judge 评分未给 uncertainty 或 agreement calibration。\nAppendix route 规划偏 scenic staging 并明确不做 true playable collision planning；engine 可执行证据应来自 runtime checks，不能从 staged frames 推断。\n公开 repo 确认 Blender modules、GLB 生成与 renderedvideos，未确认 Unreal project reconstruction/repair implementation，因此无法把 Code scope 说成完整 end-to-end playable pipeline。\nBBox collision 和有限 scripted traces 会漏 complexmesh/contact/rare state errors；自生成 gameplay tests 可能共享 spec 盲点。\n缺少完整 token/compute budgets、asset 生成成本、repair 分布和 test pass 分母细节；最终 executable 也不证明完整 intent 功能。\n3D 资产依赖 Hunyuan3D/baseCode2Worlds 与 preparedrigs，framework 不证明新的 3Dasset model、part 结构或 manufacturing 约束。\n本文仅核验 PDF 文本和静态 screenshots，未执行/观看真实 game recordings；结果均为作者报告。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

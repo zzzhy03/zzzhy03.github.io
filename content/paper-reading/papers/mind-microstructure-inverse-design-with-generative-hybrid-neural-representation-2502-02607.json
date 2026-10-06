@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2502.02607",
+  "slug": "mind-microstructure-inverse-design-with-generative-hybrid-neural-representation-2502-02607",
+  "title": "MIND: Microstructure INverse Design with Generative Hybrid Neural Representation",
+  "authors": [
+    "Tianyang Xue",
+    "Longdu Liu",
+    "Lin Lu",
+    "Paul Henderson",
+    "Pengbin Tang",
+    "Haochen Li",
+    "Jikai Liu",
+    "Haisen Zhao",
+    "Hao Peng",
+    "Bernd Bickel"
+  ],
+  "publishedAt": "2025-02-01",
+  "updatedAt": "2026-10-03",
+  "collectedAt": "2026-10-06",
+  "venue": "SIGGRAPH '25: SIGGRAPH Conference Papers, Article 125, 1-12 (2025)",
+  "identifiers": {
+    "arxiv": "2502.02607",
+    "doi": "10.1145/3721238.3730682"
+  },
+  "venueIds": [],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "fabrication",
+    "3d-generation"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "MIND",
+    "Generative Fabrication",
+    "3D Generation"
+  ],
+  "abstract": "The inverse design of microstructures plays a pivotal role in optimizing metamaterials with specific, targeted physical properties. While traditional forward design methods are constrained by their inability to explore the vast combinatorial design space, inverse design offers a compelling alternative by directly generating structures that fulfill predefined performance criteria. However, achieving precise control over both geometry and material properties remains a significant challenge due to their intricate interdependence. Existing approaches, which typically rely on voxel or parametric representations, often limit design flexibility and structural diversity. In this work, we present a novel generative model that integrates latent diffusion with Holoplane, an advanced hybrid neural representation that simultaneously encodes both geometric and physical properties. This combination ensures superior alignment between geometry and properties. Our approach generalizes across multiple microstructure classes, enabling the generation of diverse, tileable microstructures with significantly improved property accuracy and enhanced control over geometric validity, surpassing the performance of existing methods. We introduce a multi-class dataset encompassing a variety of geometric morphologies, including truss, shell, tube, and plate structures, to train and validate our model. Experimental results demonstrate the model's ability to generate microstructures that meet target properties, maintain geometric validity, and integrate seamlessly into complex assemblies. Additionally, we explore the potential of our framework through the generation of new microstructures, cross-class interpolation, and the infilling of heterogeneous microstructures. Code and data for this paper are at https://github.com/TimHsue/MIND.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2502.02607v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2502.02607v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/TimHsue/MIND"
+    },
+    {
+      "label": "DOI",
+      "href": "https://doi.org/10.1145/3721238.3730682"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2502.02607v2 全文及 2026-10-06T13:18:19.000Z 审阅记录；PDF 15 页，SHA-256 fc15a7ff9b6085c85bfde1655dfc87dd0559a7ba1153a0334867461a21a95650，视觉核验第 1、4、6、7、9、13、14 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDFp1 打印官方 repo，已确认 public contents 含 src/scripts/checkpoints/pyproject，实现存在；未运行代码或复现。",
+    "ideaZh": "MIND 用 symmetry-aware Holoplane 同时重建 SDF 与 homogenization displacement fields，让 latent 几何/elasticity 对齐，再以 target tensor 条件 diffusion 生成 microstructures 并 blend 边界。作者报告 validity99.2%、range-normalized property 平均误差 1.27%（best-of8 为 0.29%）。值得深读 functional geometry 生成，但仅 cubic、linear-elastic 单材质，printability 靠 64 候选筛选，不是全制造保证。",
+    "motivationZh": "目标机械性能到微结构的 inverse design 通常依赖既定参数化，难以兼顾多种拓扑与连续性能控制；需要可生成、可组装的表示连接材料性能目标与实际几何。",
+    "methodZh": "这是 SIGGRAPH2025 已发表工作，因 2026-10-03 的 v2 更新进入当前 discovery，首次 canonical 收录应诚实保留 2025 发表信息。180K truss/tube/shell/plate 合成数据由参数 families 产生，Holoplane 把 SDF 和 displacement field 训练到共同 latent；differentiable homogenization tensor loss 校正 geometry-only latent 的 property alignment。EDM/CFG 生成新非参数 structures，compatibility guidance 和 noisy latent interpolation 接缝，FEM property allocation 用于 heterogeneous 打印资产。保留 valid-sample、selection 和 linear physics 边界。",
+    "methodFlow": [
+      "生成 180Kcubic microstructure data 并用 homogenization 算 tensor/displacement fields",
+      "Symmetry-awareCNN 将 128³SDF 压 Holoplane，两个 MLP decoder 预测 SDF 与 displacement fields",
+      "SDF/field reconstruction 和 differentiable homogenization tensor loss 联合训练 physics-aware latent",
+      "18stepEDM 以 C11/C12/C44 条件和 CFG7 生成候选 Holoplanes，decode SDF/Marching Cubes",
+      "Heterogeneous boundary 由 latent compatibility gradient+noisyslerp 空间 blend 连续化",
+      "FEM 优化目标 property field，每 cell64candidates 按 printability/volume fraction/accuracy 筛选后打印"
+    ],
+    "experimentsZh": "实验设置：180Kcubic 四 family，validation/test 各 1000；1000targets×8samples，Yang2024/NFD/NFD+physics 比较，几何 validity、range-normalizedtensorerror 与 train-similarity。4A40：AE72h/diffusion120h，0.13sgen+.02sdecode，不含 homogenization 筛选/FEM/打印。不同 precision 的 4×4×1prints 和 392cellbracket。\n作者报告 MIND Call1.27%/Cbest.29% vsNFD+Phy1.68%/.44%、Yang2.96%/1.33%；validity99.2%vs95.7%。（Table 1, Sec. 7.1, p. 7）\n作者报告 Fig12 两打印 precision.6/1.2mm，最小 feature.62/1.25mm，propertyerror.2/.4%；不是实测 materialtensor 误差。（Fig. 12, p. 9）\n作者报告 bracketmaxFEMdisplacement 初始.039m、优化.032m、生成 infill.034m；physical 只 load 示例。（Fig. 13, p. 9）\n比较范围：同测试 targets 与 8sample budget，但 invalid 样本排除，best8 非 singlepass。四 family 均来自参数生成，随机 split 不等于 unseenmorphologygeneralization。物理测量协议、repeats、公差/失败率缺乏，未作全制造比较。\n消融与诊断：NFD+Phy 与 MIND 拆 physics/symmetryrepresentation，tSNE 只辅助 visualization；boundarygradient 与 blend 例子，未全面量化 blend 后 localproperty 漂移。",
+    "insightZh": "几何与 physics-field 共同 latent 比只回归 scalarproperty 有更明确物理 coupling，symmetry 和 latentdiffusion 使多 family 结构可连续生成。制造约束只部分进入表示与 selection，不覆盖 supportiveness/pockets；boundary 连续性不自动保持每 cell 原 target tensor。",
+    "whyRelevantZh": "核心是自动生成 targetproperty、boundarycompatible 且 printerresolutionfiltered 的新几何，直接属于 GenerativeFabrication，而非材料 characterization 或只 downstreamprint demo；同时独立贡献 3Dcontentgeneration。",
+    "evidenceZh": "Holoplane 重建 SDF 与 displacement，并由 homogenization 算 propertyloss。（Fig. 3, Sec. 4.1/4.2, Eqs. 4–6, pp. 4–5; Appendix A, p. 13；Linearstaticelasticity，不验证 nonlinear、thermal 或 optical 性质。）\nCompatibilitygradient 不完美，额外 blend 达到所示 boundaryIoU100%。（Sec. 5.2, Fig. 5, pp. 5–6；Fig5 局部 surface 匹配不等于 globalmanufacturability 或 targetproperty 不变。）\n作者报告 validity99.2%，tablemean1.27%与 best8 .29%不同。（Sec. 7.1, Table 1/Fig. 7, p. 7；Invalidconnectivity/symmetry 样本排除，Err 按 datasetcomponentrange 归一化，非 targetrelativepercent。）\nPrinterfeaturefilter 和每 cell64candidates 用于 assembleddesign。（Sec. 6.5, pp. 6–7; Fig. 12, p. 9；Propertymatch/printability 不是一次 unfilteredgeneration 的保证。）\n作者报告 392cellbracketFEM 位移与打印/负载示例。（Fig. 13, Sec. 7.6, pp. 8–9; Appendix C, pp. 13–14；Numeric.039/.032/.034m 为 simulation，physicalpanel(g)只展示装载；caption 误指(f)，未有完整 measuredforce-displacement/repeat 统计。）",
+    "caveatZh": "Self-supportiveness 和 closed pockets 仅 post-filter，需 loss integration。\n仅 cubicgroups 和 Young/Poisson/shear，更多 symmetry/thermal/optical 为 future work。\nPropertyerror 为 dataset-range 归一化而非 relative-to-target；near zero 量应特别核验。\nLowtrain-similarity 不能单独证明 no memorization 或全 property space 可达。\n64candidate/selection 与 linearFEM/homogenization 假设限制完整 pipeline 速度与 manufacturing guarantees。\nboundary blending 可能改变 local tensor，physicsloadpanel 不提供定量 real validation；本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2603.08233",
+  "slug": "rapid-identification-based-data-driven-topology-design-independent-from-high-information-e-2603-08233",
+  "title": "Rapid identification based data-driven topology design independent from high-information entropy initial dataset",
+  "authors": [
+    "Jun Yang",
+    "Ziliang Wang",
+    "Shintaro Yamasaki"
+  ],
+  "publishedAt": "2026-03-09",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "Engineering Structures 369 (2026) 123810",
+  "identifiers": {
+    "arxiv": "2603.08233",
+    "doi": "10.1016/j.engstruct.2026.123810"
+  },
+  "venueIds": [],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "physics.comp-ph"
+  ],
+  "topicIds": [
+    "fabrication"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "Rapid identification based data-driven topology design independent from high-information entropy",
+    "Generative Fabrication"
+  ],
+  "abstract": "Topology optimization (TO) has been widely adopted in engineering design; however, it is prone to being trapped in local optima, particularly in strongly nonlinear problems. Sensitivity-free data-driven topology design (DDTD) offers a promising alternative. Nevertheless, existing DDTD-based methods still depend heavily on prior information or sensitivity-based TO methods for initialization, limiting their generality and independence in engineering applications. In this study, an efficient DDTD-based framework capable of being driven from low information-entropy initial datasets is proposed while improving computational efficiency. To reduce the dependence on high information-entropy initial datasets, a mesh-independent mutation module is introduced as a supplementary source of geometric features, enabling stable exploration under low information-entropy initialization. To alleviate the computational bottleneck in DDTD, where all candidate structures require numerical evaluations, a non-AI-based rapid identification algorithm is developed to efficiently identify potential high-performance structures, thereby significantly reducing the number of expensive high-fidelity simulations. The framework generates material distributions on body-fitted meshes to maintain consistency between numerical simulations and physical manufacturing. A signed distance field-based minimum length constraint is further incorporated to ensure reliable mesh generation. Numerical experiments on strongly nonlinear stress-related problems, together with comparisons with sensitivity-based TO methods, demonstrate the effectiveness of the proposed method. In microfluidic reactor and shell design problems involving non-differentiable constraints, the proposed method successfully addresses scenarios that remain challenging for both sensitivity-based TO and conventional DDTD-based methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.08233v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.08233v3"
+    },
+    {
+      "label": "DOI",
+      "href": "https://doi.org/10.1016/j.engstruct.2026.123810"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.08233v3 全文及 2026-10-06T16:28:57.000Z 审阅记录；PDF 34 页，SHA-256 6f19e74f000dc44d214ab5b8f1cb60c3ced50f52aac0608a44f98df0a2e9dcf6，视觉核验第 1、9、17、19、23、25、28、31 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：Exactv3 全文未给该方法 public code URL；MATLAB/COMSOL 及参考实现不等于本方法公开代码。",
+    "ideaZh": "这篇 DDTD 工作从低质量随机初始结构出发，用 polygon mutation 扩展拓扑、PCA-VAE 生成候选，再以 MDS+少量 FEA 插值筛选值得仿真的结构。SDF 最小长度与连通性过滤帮助 body-fitted meshing；适合略读其昂贵仿真前的生成—筛选闭环，所有结果是数值设计，未证明实际制造或全局最优。",
+    "motivationZh": "Data-driven topology design 依赖高质量初始结构且大量 FEA 昂贵；论文希望从简单随机结构起步，通过几何 mutation 和候选筛选探索受物理约束的设计。",
+    "methodZh": "算法反复选取 Pareto elite，训练 8 维 PCA-VAE 并生成材料分布。初期大量 mesh-independent polygon 增删材料，后期更多 VAE 生成；候选的二值设计变量 Euclidean distances 映射到低维 MDS，随机子集经 FEA 标注后 natural-neighbor interpolation 估计其他候选，以 rank/crowding 筛入高保真计算。拓扑孔数通过有限 log penalty 处理。新意集中在低质量初始化与 simulation filtering，而非新神经模型或制造过程。",
+    "methodFlow": [
+      "从 solid 随机挖空或简单 parametric shapes 建立初始材料分布",
+      "body-fitted FEA→Pareto nondominated/crowding 选择最多 400 elites",
+      "PCA→8 维 VAE 训练 100epochs→inverse PCA/threshold 生成；polygon mutation 增删材料",
+      "候选 binary-design Euclidean distance→MDS；随机 10%或示例 300 结构 FEA 后插值 objective field",
+      "按预测 Pareto/crowding 选潜力候选，SDF minimum-length 与 adjacency connectivity 先过滤",
+      "高保真 FEA 确认后合并 elite；以 outside-area 稳定/iteration cap 结束，孔数罚项控制复杂度"
+    ],
+    "experimentsZh": "实验设置：数值几何非线性 L-bracket stress/volume 多目标，microreactor 反应与 pressure/孔数，薄 shell compliance/volume/孔数。最多 400elites、8 维 VAE100epochs、100core Linux；L-bracket448iter，shell150iter。\n作者报告 L-bracket outside-area 由初始.7126 降到.2796，常规 DDTD 为.5980。（Fig.13, PDF pp.25–26）\n作者报告 early RI 仅 1.04min 但 FEA43.76min/iter；83.25%候选免 FEA 包含 8.90%约束过滤。（Table2/Fig.9, PDF pp.22–23）\n比较范围：常规 DDTD 相同初始/FEA 设置、相似总 data；COMSOL gradient TO 没有同非线性优化条件，降低 stress 不能全归算法。没有现代 Bayesian/surrogate-assisted evolutionary search 或等 wall-clock baseline，没有多初始 seed/CI、实际打印与测量。\n消融与诊断：展示 low-quality init 常规 DDTD 比较与有无孔数 constraint；未独立隔离 mutation、MDS dimension、RI false-negative 或 SDF thresholds，三个模块的因果贡献与泛化仍有限。",
+    "insightZh": "从依赖优质初始数据的 DDTD 转到 component mutation 驱动，并用非神经 MDS/interpolation 少做 FEA，形成具体工程生成闭环。所谓 physics embedding 先按形状距离 MDS，再以 FEA 响应插值，不是从 physics 学得 embedding；低信息熵用作初始质量/多样性描述，未量化 Shannon entropy 或证明独立所有先验。",
+    "whyRelevantZh": "直接生成受物理响应与几何/拓扑约束的结构，符合 generative fabrication；昂贵 FEA 前的轻量筛选与 minimum-feature validity 可借鉴。",
+    "evidenceZh": "VAE 沿用 PCA-DDTD，polygon 在连续 domain 定义、再按 element centers 赋 0/1。（Secs.2.2–2.3, Figs.3–5, PDF pp.9–14 (printed pp.7–12)；Mesh-independent 指 mutation 参数定义，不代表结果/FEA 对 mesh 完全不敏感。）\nMDS 按 binary-design Euclidean distance，FEA 随机子集插值，再筛潜力结构。（Secs.2.4.1–2.4.2, Fig.6, PDF pp.15–18；不是预测所有 candidate 真实 physics；sharp corner vs fillet 虽近形状可有截然不同 stress。）\n作者报告单 3848 候选例 300 随机+350 筛选 FEA，83.11%省评估，threshold-specific 识别 accuracy98.42%。（Fig.6 discussion, PDF p.18；用于验证该例时额外计算全部 validation FEA；98.42%依赖 threshold 且含 class imbalance，不是全任务保证。）\n作者报告 L-bracket early phase 排除 FEA83.25%，其中 8.90%由几何约束、74.35%由 RI。（Fig.9, Table2, PDF pp.22–23；early 平均 48.74min/iter、FEA43.76min，100core 机器；不等于 83%端到端加速或总成本被消除。）\n同初始化常规 DDTD outside area .5980、提出方法.2796；sensitivity baseline 未考虑 large-deformation nonlinearity。（Figs.12–13, PDF pp.24–26；前者 matching 较好但总数据量只称相似，无等 FEA/time/随机 seed 控制；COMSOL baseline 比较不完全公平。）\nMicroreactor 与 shell 通过 log penalty 选择孔数，最小 length 为 mesh-feasibility 过滤。（Eqs.9–11,14–15, Figs.16–19, PDF pp.19–20,27–32；有限λ=100 罚项不自动等价 hard genus equality；示例满足不证明所有生成严格满足或 printable。）",
+    "caveatZh": "Euclidean shape 距离难捕捉局部 stress 差异、会误筛或漏优质候选。\n未来需 self-supporting 等额外 3D-printing 约束与 GPU/numerical 加速。\nRI false negatives 可能排除 Pareto 优质区域，后续 mutation 会找回的论断没有 global 保证。\nMDS 全 pair distance 与 retraining 仍有规模成本；100core、数百 iterations 不是廉价 interactive 设计。\nFinite logarithmic penalty 没有 hard-genus equivalence 证明，术语 genus 在这些 2D 有边界 domains 实指孔数。\n最低 feature length 主要保证 meshing，不涵盖支持、刀具、材料、装配或制造精度；无实际 fabrication。\n本项目未复现；高保真 FEA 是模型响应而非真实物理 ground truth，示例数量/seed 有限。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

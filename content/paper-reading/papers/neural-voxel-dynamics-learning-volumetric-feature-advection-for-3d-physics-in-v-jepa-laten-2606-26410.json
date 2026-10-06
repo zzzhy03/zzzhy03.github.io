@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2606.26410",
+  "slug": "neural-voxel-dynamics-learning-volumetric-feature-advection-for-3d-physics-in-v-jepa-laten-2606-26410",
+  "title": "Neural Voxel Dynamics: Learning Volumetric Feature Advection for 3D Physics in V-JEPA Latent Space",
+  "authors": [
+    "Zican Wang",
+    "Niloy Mitra"
+  ],
+  "publishedAt": "2026-06-24",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2606.26410"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Neural Voxel Dynamics",
+    "3D Generation",
+    "Video Generation",
+    "JEPA"
+  ],
+  "abstract": "We present Neural Voxel Dynamics, a self-supervised framework for learning 3D latent dynamics from monocular video. While generative video models now produce visually compelling motion, their predominantly 2D representations provide limited geometric structure for modeling and controlling physical interactions. Instead, we learn dynamics in a lifted volumetric latent space. Specifically, we unproject semantic Video Joint-Embedding Predictive Architecture (V-JEPA) features into a voxel grid using monocular depth priors, producing a geometrically grounded representation that retains rich video features. We then introduce Volumetric Feature Advection, an action-conditioned transition model that predicts the evolution of these latent features directly in 3D. Unlike hybrid approaches that assume access to privileged physics-engine states or explicit simulation during training and/or inference, we learn only using video-derived supervision and, if available, actions, allowing a single latent dynamics model to represent heterogeneous material-dependent phenomena, unifying rigid-body and fluid dynamics. We evaluate across multiple datasets (synthetic and real) and unseen scenarios (e.g., new boundary conditions, OOD generalization), measuring both predictive fidelity and 3D geometric consistency. We report physical plausibility with Physics-IQ using videos decoded from predicted latent states and videos generated from predicted optical flow. Our results show that geometrically lifting pretrained video latent representations provides a scalable route toward dynamic world models that learn structured 3D physical dynamics without access to privileged simulator state.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.26410v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.26410v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.26410v2 全文及 2026-10-06T15:26:22.786Z 审阅记录；PDF 27 页，SHA-256 80800ece7d3a515c87f1fe6c6f9d84fa326610c29907f2130588d27d673dea0a，视觉核验第 1、4、7、8、9、16、17、20、22、23、24、25 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDFp10 写 subjecttoacceptancerelease；官方 projectHTTP200 仅 PDF/videos/experiments，Code 链接为#，未确认 public implementation。",
+    "ideaZh": "Neural Voxel Dynamics 把 V-JEPA 与 monocular depth lift 到固定 25³ voxel state，学习带 occupancy/unseen channels 的 conditional flow-matching dynamics，再投影成视频或 motion tracks。3D latent dynamics 与 force conditioning 值得略读 4D 表示，但不是守恒物理 solver 或完整世界生成：无法扩展未见 voxels、长 rollout 退化，真实 Physics-IQ 子集仅 0.391 vs Wan-Move 无 tracks0.389。hand-picked 小测试、代理 depth/latent 指标和未公开实现限制结论。",
+    "motivationZh": "二维视频 latents 缺少稳定三维空间来表达交互与物理变化；论文希望把预训练视频特征 lift 到 voxel grid，学习由观察与动作条件驱动的状态演化。",
+    "methodZh": "冻结 V-JEPA2.1 与 MoGe，从初始 4 帧构造两 latent states，固定 initialbounds/lattice。五层 localspatial+causaltemporal transformer 与卷积分支预测 features/occupancy/occlusion 的 flow matching velocities，以 diffusionforcing/historyguidance 生成未来 states；velocity 是 noise→state 的 latentdenoising 量，不是显式物理 3D 速度或 material 参数。投影后 7.46M mapper 接冻结 imageVAE，或 latent-to-optical-flow head 驱动 Wan-Move14B。主张统一 implicitmaterials，但没有 rigid/fluid conservation constraints、objectcompletion 或 unseenvoxels 生成。",
+    "methodFlow": [
+      "冻结 V-JEPA 按两帧 tubelet 编码 1408 维 features，MoGe 估 depth/camera 并 trilinear lift 至固定 initialbounds 的 25³grid",
+      "维护 feature/occupancy/unseen channels，仅 contextactivevoxels 加 neighbor dilation 进入 localtransformer",
+      "5blocks local5³spatial、causaltemporalattention 与 history 卷积分支，融合可选 12Dforce 及 physicaltime",
+      "jointfeature/geometryFM 和 softprojectionloss 训练，generatedhistory 而非 GTendpoint 用于 rollout；diffusionforcing/historyguidance 抑误差",
+      "20Eulersteps 从 noise 生成未来 states，hardfirsthit 投影回 2Dfeatures，继续 fixedgridrollout",
+      "以 firstframeappearanceanchor 的 mapper+frozenVAE 解码 240px 视频，或 flowhead 产生 tracks 供 40stepWan-Move"
+    ],
+    "experimentsZh": "实验设置：三训练 sources、5%hand-pickedtest 及 30Kubriczero-shot；sharedV-JEPAlatent objective2Dbaseline 与 PhysGen/PhysGaussian/PhysCtrl/CogVideoX，physGaussian 多 views。预测 4initialframes→16futureframes，FM20Eulersteps；latent/flow/occupancy、RGBPSNR 及 PhysicsIQ10%子集，多个 depth/DF/guidance/projection/channel controls。\n作者报告 Kubricflowmagnitude.917±.059、direction23.1°±9.7；2Dbaseline.981±.030/29.24°±19.9。（Table 2, p. 8）\n作者报告 5Ksteps/24frames 的 FM+DF+HGoccupancyIoU.709，regression.208；真实 PhysicsIQ 子集.391vsWan-Move.389 且 CogVideoX.405。（Table 15, p. 22; Table 3, p. 8）\n比较范围：训练目标与 latentreencode 指标偏向 V-JEPA，本作者承认；2D 相近 capacitycontrols 有所缓解。physGaussian 多 views、forceinputs 不同，Fig3ours4frames/CogVideoX1frame，不能所有 baseline 视为同信息预算。decoder 有 datasetadaptation 与 native240px。\n消融与诊断：2Dvs3D、depthestimators/views/grid/projection/channels、regression/DF/HG 与 geometrylosscontrols 较完整；generative 完整 variant 组合多个训练/采样因素，优于 regression 不等于唯一必要。无现实 forcevalidation/longhorizondynamicscalibration 或 equalE2Ecost。",
+    "insightZh": "可迁移价值在 monocular semanticfeatures 的 volumetric grounding、占据/遮挡显式通道及同目标 2Dbaseline 控制，探索无需显式 materialsolver 的 4D latent 生成。Flowmatching 不是物理 advection PDE；geometrytargets 大多来自 estimateddepth，不是 3DGT 物理状态。最终 videoquality 也有下游 mapper/adaptation 及大 generator 贡献。",
+    "whyRelevantZh": "3D-groundedlatentdynamics 与 force-controlled4D 内容生成可迁移到 dynamic3D representation，并辅助 video 控制；不产出 editablemesh 或真实物理 solver。",
+    "evidenceZh": "fixedgrid/sparseactiveupdate 与 jointFMstate，未见 voxel 不生成。（Sec. 3, pp. 4–6; Appendix A.1/A.4, pp. 14–16; Limitations, p. 9；当前实现 singlefixedcamera；不将 probabilityflowvelocity 写成 physicalflow 或完整 camera-invariantworld。）\n训练/测试数据及 forceannotations 有明确来源范围。（Sec. 4, p. 7; Appendix A.5, p. 16；自制 1000CLEVRER-styleMuJoCoclips 加 force；PhysInOne 仅 200 公开 valvideos、PhysGaia17scenes，各 5%手选 test，Kubric30zero-shot。splitbyview/scene 未明确。）\n作者报告 Kubricflowmagnitude.917 vs2Dbaseline.981，Physics-IQ 不是全面最佳。（Tables 2–3, p. 8; Table 8, p. 20；真实 PhysicsIQ 子集.391vsWan-Move.389、CogVideoX.405 更高；PhysGaia.271 低于.303。不重复 intro 的+0.2 说法。）\noccupancy 是 estimateddepthproxy，massratio 不表示实际守恒。（Appendix B.3, Table 7, pp. 18–19；Kubricmassratio 约 1.61、PhysInOne1.31；场景体积/可见性误差不等于真实 mass。）\nRGB 与 motion videos 由不同下游路径实现，native240px 及 datasetadaptation。（Appendix C.1–2, pp. 22–24; Table 9, p. 20；mapper 按 datasetfine-tune；输出 resize/interpolate/tailhold，realmotion 可 stretch 到 81timestamps。示例视频不直接测 predictor 准确率。）",
+    "caveatZh": "V-JEPA 分辨率与 monoculardepth 限制 geometry；fixedgrids 不适合 unbounded/movingcamera/highfrequency，longrolloutnoise；不生成 unseenvoxels。\nhand-picked 小 test、17PhysGaiascenes 和 5%split 边界未明，zero-shot 仅 30；没有完整 PhysicsIQtest。\nlatent/occupancy 评估使用 sameestimateddepth/featureprior，不能当实测 3D 或质量守恒。\nphysicsIQ 真实子集提升仅.002 且非最佳；视频可能 hallucinate 并由大 Wan-Move 贡献 perceptualquality。\nmapper 按数据适配、resize/frameinterpolation/tailhold 与 motiondurationstretch，不能当 nativehighres4Dsimulation。\n代码尚未 release，trainingtotal/latency 缺完整数据；本项目未复现，数字为作者报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.01999",
+  "slug": "from-reasoning-failures-to-composable-video-spatial-intelligence-2610-01999",
+  "title": "From Reasoning Failures to Composable Video Spatial Intelligence",
+  "authors": [
+    "Pengzhan Sun",
+    "Junbin Xiao",
+    "Ramanathan Rajaraman",
+    "Shiu-hong Kao",
+    "Angela Yao"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-01",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.01999"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "From Reasoning Failures to Composable Video Spatial Intelligence",
+    "VLM / MLLM"
+  ],
+  "abstract": "Spatial reasoning benchmarks evaluate vision-language models across diverse tasks, but task-level scores do not reveal which underlying capabilities account for success or failure. Each task requires recovering spatial evidence, representing geometry, and reasoning over it. We disentangle these capabilities by comparing predicted and ground-truth spatial context under a shared schema and coordinate contract. This comparison reveals four recurring sources of error: inaccurate perception, missing information in the spatial context, selection of the wrong measurement, and errors in reference frames or in tracking position and orientation. Guided by this diagnosis, we develop CROSS, a training-free library of typed geometric operators and spatial skills that function over available evidence to support reliable video spatial reasoning. The resulting library supplies verified context to non-coding VLMs or callable skills to a SpatialClaw agent. We evaluate \\methodname{} on five benchmarks. \\methodname{} raises the average score from 55.9\\% to 60.2\\% on ReVSI and improves the SpatialClaw result from 62.8\\% to 66.3\\% on DSI-Bench. These gains demonstrate that explicit handling of spatial conventions can repair systematic reasoning failures without additional training.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.01999v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.01999v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.01999v1 全文及 2026-10-06T15:31:51.450654+00:00 审阅记录；PDF 26 页，SHA-256 900d7a029f1274bd6ab41daf3bd02202f3b09be1f500914da340a81c9b9d3581，视觉核验第 1、5、6、8、18、19、20、26 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：已阅读全文和实现附录，给出 operator inventory、graphs 与 integration protocol，但 exact PDF 未提供 CROSS public implementation 或官方 code/project 链。不能用引用的 SpatialClaw code 代替本方法 code。",
+    "ideaZh": "CROSS 把 surface distance、reference frame、SE(3) composition 与 heading update 固定成带单位、误差和 validity codes 的空间 operators，供 VLM 读计算结果或 agent 调用。它的价值是明确证据契约与可复用外部计算。作者报告 ReVSI 55.9→60.2、DSI-Bench agent 62.8→66.3；部分收益来自拒绝不可靠 context 后回到视频回答，诊断表还包含调 gate 的场景，不能写成模型学会内部空间算法或所有任务净提升。",
+    "motivationZh": "视频空间问答失败可能来自 perception、变量缺失或量测方式错误，通用推理难以区分。目标是通过诊断建立可组合的几何、集合与时序 operators。",
+    "methodZh": "通过同 schema/coordinate contract 下的 predicted 与 GT context 比较，区分 perception、缺少变量、错误量测、frame/state 错误。依据诊断建立 frame、geometry、set/decision、temporal/state 原子 operators，并组合成固定任务技能。规则 router 读 benchmark task label 与问句角色，先冻结几何估计再匹配选项；context interface 加 validity gate 与 filter，不能处理时回退视频，code agent 则直接调用技能。",
+    "methodFlow": [
+      "显式证据契约：统一 ego-anchored gravity frame、单位、pose transform 方向、实体 extents 与时间轨迹；分别从 GT 或 SAM3/DA3 生成 context。",
+      "按任务构造量：规则匹配角色，组合 surface gap、observer basis、SE(3)、path/state operators，输出量、单位、误差与 validity codes。",
+      "门控与筛选：context 分支用启发式 uncertainty/ambiguity gate 决定加入计算结果和支撑记录，或回退直接 video reasoning。",
+      "两种推理接口：VLM 读取 derived block，SpatialClaw 可调用同 operators/skills；新 benchmark 需要人工组合任务技能。"
+    ],
+    "experimentsZh": "实验设置：作者诊断 823 ReVSI-Tiny 与 775 ReSTI-Tiny questions，用固定问题/帧预算对比 video-only、predicted/GT context 及 code agents；更大评测覆盖 ReVSI/VSI/STI/DSI。context sampled decoding 每 arm 一次，point estimates 无显著性检验。\n作者报告 ReVSI Qwen context 路线 direct 55.9、predicted context 52.2、加 CROSS 60.2；route planning 从 direct 51.6 降为 49.1。（Table 3, p.8）\n作者报告 DSI full-set SpatialClaw reproduction 62.8，加 CROSS 66.3。（Table 6, p.9）\n作者报告 VSI screened context 52.8、CROSS 61.4、direct 59.8。（Table 11, p.19）\n比较范围：同 backbone/interface 的 direct、context、agent comparisons 有用；published systems 参数/frames 不同只提供描述参照。context 分支 GT intervention 有 sufficiency/target checks。CROSS 同时增加 calculated block、support fields、gate 和 filtering，缺单独 gate-only 及完整字段预算控制，不能将整体增益全部归于 operators。\n消融与诊断：比较 32/64 trajectory density 和 screened context；更多 samples 未改善。relative direction 的 screened 与完整 CROSS 都为 62.6，计数等任务回退得到 direct 分数，支持机制分解。没有所有 component 独立 matched ablations，GT-rule audit 与 selected examples 不是 unique causal attribution。",
+    "insightZh": "不是新几何公式，而是由具体失败诊断导出的 typed operator contract、技能组合与两种推理接口，适合借鉴可靠 spatial evidence 的工程组织。跨 benchmark 复用的是冻结 operator basis，DSI 增加人工 task compositions；外部 precompute 部分答案不证明模型内部空间推理提升。",
+    "whyRelevantZh": "对 VLM 空间证据契约、确定性几何工具和 validity-aware 推理有直接方法价值，可迁移到设计 agent 的坐标与测量接口；当前实验只建立 benchmark QA 改进，没有 CAD/制造执行验证。",
+    "evidenceZh": "GT 与 predicted context 的一致 schema 支持受控证据比较，但不能使 perception/reasoning 成为独立因果机制。（Sec.3, pp.3–4; Appendix E, pp.19–20；failure rule matches 表示与机制一致，不唯一确定错误原因。）\noperators 输出类型化几何证据，answer options 只在 estimate 固定后的匹配使用。（Fig.3, p.5; Appendix C.1–C.3, pp.17–18；router 使用 benchmark task label，泛化到开放自然指令尚未建立。）\n部分 predicted-context 增益实际来自 video fallback。（Appendix D.1, p.19; Fig.12, p.26；counting/object size/room size 与 video-only 分数相同；计数案例强制 derived count 仍错，并非 dedup 修复。）\ndiagnostic report 包含 gate 的 development scenes。（Appendix C.3, p.18；阈值在 30% scene-disjoint dev split grid search，Table 2 包含这些场景，不能将其全表当纯 held-out 推广结果。）\n相同 agent 加 CROSS 在 DSI 的完整集合提高分数。（Table 6, Sec.5.4, p.9；作者报告 62.8→66.3，冻结 primitives 后加四个新 composed skills；外部 1,000-question 已发表结果只作背景。）",
+    "caveatZh": "predicted geometry 有 recall、metric scale 和 rotation drift，启发式 gate 无法检出全部错误。\nindoor 规则未证实适合 outdoor；未覆盖 acceleration/appearance order。\noperators precompute 部分答案，不说明模型获得内部 spatial algorithm。\npublished protocols 不匹配，单次 point estimates 无 significance tests。\n诊断表含 gate tuning scenes；最终主要结论应优先使用更大 benchmark 的匹配 baseline。\nbenchmark task label router 与手工技能组成不是开放任务自动规划。\nfallback、额外 support fields 和 deterministic derived block 混合贡献。\nquantities 随 target definition 改变，surface gap/bounding box、稀疏 path 和 coordinate conventions 必须保留。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

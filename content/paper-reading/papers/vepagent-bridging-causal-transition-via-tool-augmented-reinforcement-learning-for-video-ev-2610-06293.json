@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.06293",
+  "slug": "vepagent-bridging-causal-transition-via-tool-augmented-reinforcement-learning-for-video-ev-2610-06293",
+  "title": "VepAgent: Bridging Causal-Transition via Tool-Augmented Reinforcement Learning for Video Event Prediction",
+  "authors": [
+    "Qiutong Chen",
+    "Yuchan Guo",
+    "Zhenlong Yuan",
+    "Haobo Yang",
+    "Fangfang Lin",
+    "Xinyi Long",
+    "Yin Wang",
+    "Zijian Song",
+    "Rui Lan",
+    "Shi Qiu",
+    "Boyuan Pan",
+    "Yang Luo",
+    "Yuyin Zhou"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.06293"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VepAgent",
+    "VLM / MLLM"
+  ],
+  "abstract": "Multimodal Large Language Models (MLLMs) have demonstrated remarkable potential in video understanding, yet their reliance on retrospective summarization and text-centric priors often limits their ability to bridge unobserved causal transitions when applied to Video Event Prediction (VEP). To address this, we propose VepAgent, an agentic framework that integrates causal-transition reasoning with tool-augmented reinforcement learning (RL) for robust VEP. Unlike prior methods that passively project future trajectories from historical dependencies, our approach explicitly models the logical progression from terminal observed states to future events. Specifically, we first construct futurebench-4K, a high-quality chain-of-thought dataset for supervised fine-tuning (SFT) that effectively bridges the causal-logic gap by structuring the deduction of unobserved intermediate states. Subsequently, we develop a diagnostic tool library integrating state tracking, frame retrieval, and region magnification, enabling the agent to dynamically augment reasoning with external tools to recover missing spatio-temporal evidence and resolve visual ambiguities during inference. Moreover, we propose a composite reward mechanism that jointly optimizes prediction accuracy, causal coherence, and reliable prior, compelling the agent to rely on genuine visual grounding rather than superficial textual similarities. Extensive evaluations on FutureBench and NEPBench datasets demonstrate that our method achieves state-of-the-art performance, significantly outperforming larger MLLMs and validating the empirical effectiveness of our agentic, future-oriented reasoning paradigm.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.06293v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.06293v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.06293v1 全文及 2026-10-06T11:15:10.080985Z 审阅记录；PDF 27 页，SHA-256 41138f0e9734a473f69e638694d6d6317b4b9fa11820a9fe6380214887811fb2，视觉核验第 1、4、5、7、9、18、25、26 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 首页提供匿名 Code URL https://anonymous.4open.science/r/VepAgent-42F8，但本轮网页工具不可访问、直接 GET403；无法确认 public source code 实际可获取，不发布 Code link。",
+    "ideaZh": "VepAgent 从已观察的状态和未完成动作出发，选择诊断工具后预测下一事件，以 SFT+GRPO 学习证据获取。作者报告两个预测 benchmark 有收益。可速读其按需工具策略；所谓 causal reward 实际是文本相似度，部分工具调用外部 VLM，不能视为因果世界模型验证。",
+    "motivationZh": "视频未来事件预测需要从未完成动作和当前状态推断下一步，固定观察容易漏掉关键细节；希望学习按需调用诊断工具，获取更有效的预测证据。",
+    "methodZh": "针对视频未来事件预测，方法构建约 4K teacher-validated CoT 进行 SFT，并用约 5K trajectories 做 GRPO。policy 先一次性选 STT、FRE、RFM、VDE 的子集，再接收观察段上的 state summaries、dense frames、crops 或 detail descriptions 后输出下一事件。复合 reward 重视正确预测及 reference state/transition 相似度，并对文本上较难猜的正确选项额外奖励。两个 VEP benchmarks 与工具/奖励消融显示系统收益，未测试一般视频理解或视觉设计任务。",
+    "methodFlow": [
+      "输入部分观察视频、问题与 candidate future events；形成 terminal-state/unfinished-action hypothesis。",
+      "一次选择 STT/FRE/RFM/VDE 工具子集；不在结果返回后重新选工具。",
+      "工具只处理观察段：OpenCV/Pillow 抽帧/crop，DashScope VLM 生成 state/detail 文本。",
+      "将原观察与工具证据融合，按 terminal state、unfinished action、transition、future event 格式推理。",
+      "以 teacher-vetted CoT SFT 冷启动，再用 format-gated accuracy、MiniLM causal-similarity 和 anti-prior GRPO 优化。"
+    ],
+    "experimentsZh": "实验设置：Qwen3-VL-4B-Instruct，FutureBench train splits 构造 SFT 约 4K 与 RL 约 5K trajectories；8×RTX A5000，SFT 一 epoch、GRPO250steps，final group size8，component ablations group size4。FutureBench 评 1/2/3hop/interpolation，NEPBench 包含 Charades/VidSitu/YouCook2。\n作者报告 FutureBench AVG81.44% vs 先前强 reported baseline66.86%，同 4B 原模型 59.09%；NEPBench70.20% vs47.50%/42.17%。（Tables1–2, p.7）\n作者报告 G=4 完整 system AVG78.79%，SFT-only71.59%、SFT+RL 无工具 75.09%；去 STT 后 75.66%、去 RFM 后 78.31%。（Table3, p.9）\n作者报告 Dynamic 工具选择 AVG78.79%、平均 1.13calls；Random76.99%、1.85calls，但 Random 的 3-hop 高于 Dynamic。（Table4, p.18）\n比较范围：比较多规模 native MLLMs 与 same-size4B；主要 baseline 为 reported values，而本方法具有额外 SFT/RL/hosted-VLM 工具能力。32 初始 frames 不包含 FRE 新增 dense evidence 和 STT/VDE 调用，未提供 matched total visual-token/API 预算。\n消融与诊断：SFT/RL、单工具删除、reward components、rollout 数、动态/静态/随机工具与时空工具分组消融支持组合价值；删除 reward 时不重归一剩余权重，会改变总 reward 尺度。无外部 VLM 替换、成本/方差或视频 masking causal tests。",
+    "insightZh": "将 future-event-specific transition 格式、一次自适应工具选择与 anti-prior shaping 组合成 post-training recipe；基础 SFT/GRPO 和视觉工具已有先例。其所谓 causal coherence 是语言参考匹配的操作化代理，未建立 counterfactual causal identification 或完整生成式 world model。",
+    "whyRelevantZh": "按需补充 temporal/spatial evidence 和显式 state transition 可启发 visual reasoning/设计反馈工具，但论文只验证 VEP，未实证 SVG/3D design agent 或制造规划。",
+    "evidenceZh": "工具选择仅一轮、选中工具执行一次，所有工具只访问已观察视频，不读取 future frames。（Sec.3.1, Fig.2, p.4; Appendix C, Table6, p.25；实际看过 pipeline 与 tool table，不将其描述为无限迭代闭环。）\ncausal-gap reward 以 MiniLM 计算生成 terminal/transition 与参考文本的 cosine similarity，并按最终正确性 gate/cap。（Appendix A.2, Eq.8–9, p.18；reward 公式已视觉核验；语义相似不证明真实因果链或视觉事实。）\n作者报告 FutureBench AVG81.44%、NEPBench70.20%，同 4B baseline 为 59.09%/42.17%。（Tables1–2, p.7；表格已实际查看；训练数据/工具和额外 VLM 访问不同，不是纯同计算 budget 比较。）\n作者报告 G=4 时 Dynamic selection78.79%、1.13 calls，All Tools74.91%、4calls，No Tools75.09%。（Appendix A.3, Table4, p.18；支持选证据比无条件全工具更有效；未报告完整 wall-clock/API 成本。）",
+    "caveatZh": "Conclusion 明确本次只评 FutureBench 和 NEPBench，broader video-understanding settings 未测试。\n“causal-gap”奖励以 reference text similarity 为主，不能据此声称学到真实因果规律或强视觉因果 grounding。\nSTT/VDE 调用 DashScope-hosted VLM，4B 对比大模型不能解释为单 4B 模型自身全面优越。\nanti-prior 奖励取正确 option 与 query 的文本相似 rank，并非直接惩罚模型真实走了 shortcut。\n没有错误条、API/tool 完整 latency 或 token 成本；同 32frames 不等于同总证据预算。\nAppendix D 说有 prompt templates 但实际未给完整模板，复现实操细节有限；code link 本轮 403，未确认 public 可获取。\n本项目未执行或复现；数值只为作者报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

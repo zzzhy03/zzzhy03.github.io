@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.04139",
+  "slug": "from-sight-to-foresight-predictive-spatial-reasoning-in-vision-language-models-2610-04139",
+  "title": "From Sight to Foresight: Predictive Spatial Reasoning in Vision-Language Models",
+  "authors": [
+    "Feiran Wang",
+    "Xiaoqi Wang",
+    "Ziwei Li",
+    "Wenbin He",
+    "Yan Yan",
+    "Liu Ren"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.04139"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "From Sight to Foresight",
+    "VLM / MLLM"
+  ],
+  "abstract": "Predicting future spatial states supports collision avoidance and timely decision-making in dynamic environments. However, existing vision-language models (VLMs) and benchmarks for spatial reasoning primarily focus on observed scenes, leaving predictive spatial reasoning beyond the observed interval underexplored. To this end, we introduce SpatialMind, a metric-scale VLM for spatial reasoning and future prediction. Its metric depth adapter anchors spatial reasoning to real-world scale, while its progressive state chain establishes current spatial states and observed dynamics as the foundation for future prediction. Given a video prefix, SpatialMind predicts distances, motion directions, and spatial relations in both observed and unseen future frames. For training and evaluation, we build a scalable data engine that grounds entity descriptions in metric geometry to generate question-answer pairs and state supervision. Using this engine, we construct the SpatialMind-30K dataset and the SpatialMind-2K benchmark, both covering driving and everyday egocentric scenes. The benchmark spans eight tasks across three levels: current-state understanding, observed-dynamics understanding, and future prediction. Experiments show that SpatialMind substantially outperforms both general and spatially specialized models on our benchmark while achieving competitive zero-shot performance on VSI-Bench, OSI-Bench, and VLM4D.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.04139v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.04139v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.04139v1 全文及 2026-10-06T16:42:25.701218Z 审阅记录；PDF 27 页，SHA-256 f8f12899571d9d10d371768732320ccd551e46bf0c6fd1fd0246d77ec8246fe0，视觉核验第 1、6、7、9、17、18、19、21、24、26 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 官方 project page 指向 Brack-Wang/spatialmind；已核验 repository 只有 README/assets，明确 Code & data coming soon，未确认可执行实现，不标 available。",
+    "ideaZh": "SpatialMind 用 metric depth adapter 把几何信息接入 VLM，再按 current state → observed dynamics → future state 监督视频推理。作者报告同数据 SFT 到完整方法的混合 benchmark score 从 45.70 提升至 52.65，几何和 state chain 都有贡献。值得深读数据引擎与尺度校准；但 egocentric future-distance 标签有强 persistence，不能将这些结果视为可靠的长期预测或闭环驾驶能力。",
+    "motivationZh": "VLM 空间推理多解释已观察画面，缺少 metric scale 与动态信息来预测未来状态；目标是从视频 prefix 推断后续距离、方向和关系。",
+    "methodZh": "问题是 VLM 空间推理通常只解释已观察帧，缺少基于动态证据预测未来。论文将 Waymo 的 LiDAR/tracks 与 Ego-Exo 的 landmarks/poses 接到 dense-depth alignment、entity grounding 和逐题几何规则，构造当前状态、运动及未来状态问答。模型冻结视觉/几何 backbones，用 bounded depth correction、metric/motion encoders 与视觉 token cross-attention 接入尺度和轨迹，再对 Qwen3-VL 进行 LoRA 与分段 state-chain supervision。预测只给观测 prefix，future geometry 用于标签。全文展示内部 benchmark 与外部空间测试，但没有闭环控制或长期预测验证。",
+    "methodFlow": [
+      "选择可追踪 target，以 appearance description 与 reverse localization 核验 entity grounding。",
+      "将 dense depth 对齐 source metric anchors，通过 poses、tracks/masks 生成世界坐标轨迹与当前/未来状态标签。",
+      "对 pretrained metric depth 学习有界 log-scale correction，并编码 depth、camera rays 与 lifted coordinates。",
+      "编码相对 camera motion 与时间位置，经 learned cross-attention/residual 融入 VLM visual tokens。",
+      "混合 direct answers 和分段 state-chain supervision，依次推理当前几何、观察动态与未来状态。",
+      "在 numeric MRA 与 categorical accuracy 的混合协议下评测，不把生成推理链当作 causal faithfulness 证明。"
+    ],
+    "experimentsZh": "实验设置：作者报告 SpatialMind-30K 含 30,677 QA，测试 2,000 QA 来源于 357 clips/172 recording groups；题目来自 Waymo 与 Ego-Exo。内部覆盖八类当前、运动和未来任务，五类 numeric tasks 用多容差 MRA、三类 categorical tasks 用 accuracy；另测 VSI-Bench、OSI-Bench 与 VLM4D。多题共享 clips，未明确说明 recording-level train/test isolation 的完整实施。\n作者报告 overall 52.65，对同数据 SFT 45.70、原始 Qwen3-VL-8B 20.20；该分数不是 exact-answer accuracy。（p.7, Table 1）\n作者报告固定 state-chain 训练时 RGB-only 50.42、DA3 51.30、VGGT-Ω 51.20、完整模型 52.65，几何接入提供有限额外收益。（p.9, Table 3）\n作者报告固定 adapter 下 direct-answer training 49.95、完整 state chain 52.65；去掉 grounding 的未来层分数 57.58 略高于完整方法 57.47，不能声称每层都单调改善。（p.9, Table 4）\n作者报告 VSI overall 46.4，低于 SpatialMLLM 48.4；OSI 35.0 与 VLM4D 53.4 表示外部迁移竞争力，不构成普遍最优。（p.9, Table 2）\n作者报告 GT-current persistence 的 egocentric future-distance primary-tolerance pass rate 为 81.8%，driving 为 34.5%；此诊断暴露标签可预测性差异，不能作为实际 RGB 模型性能。（pp.18–19, Appendix E.1）\n比较范围：含通用/专用 spatial VLM、same-data SFT 与几何/链路消融。外部模型尺寸与来源不完全匹配；未给 learned RGB constant-velocity/persistence baseline、独立训练多 seed uncertainty 或 source-recording split audit。free-form CoT baseline 未接受同样训练，不能隔离格式与额外监督。\n消融与诊断：Table 3 隔离几何 branches，Table 4 比较 direct/state-chain supervision；可支持组合收益。不是完整 factorial：深度误差、camera trajectory 误差和 entity grounding 失误传播未系统量化，也没有证明文字 chain 因果忠实。",
+    "insightZh": "贡献是通用 metric/predictive spatial data engine 与显式几何接入、progressive state supervision 的组合，驾驶只是部分来源。geometry adapter 的独立收益有限而可定位，state chain 相对同训练 direct answers 有实证收益；并非输出完整三维重建，也不是已验证的 collision-avoidance planner。",
+    "whyRelevantZh": "直接推进通用 VLM 的 metric spatial grounding 与从视觉动态推断 future states；外部 egocentric/spatial benchmarks 支持超出驾驶场景的方向关联。",
+    "evidenceZh": "future tasks 只向模型给观察 prefix，标签由 future camera/target geometry 构造；不同题目的 distance、speed、route conventions 明确区分。（pp.4–6, Secs.3–4; pp.14–17, Appendix A；evidence chain 是几何标签计算一致性；不保证估计深度无误或未来推理链真实反映内部决策。）\nmetric adapter 以 bounded log corrections 更新基础 depth，并将尺度与相对 motion 注入冻结 VLM。（pp.6–7, Sec.4, Fig.3; pp.20–21, Appendix D；有界性针对相对基础预测的修正，不能据此宣称绝对 metric depth 正确。）\n同数据训练与 geometry/chain controls 支持方法贡献，但外部测试并非全部领先。（p.7, Table 1; p.9, Tables 2–4；Table 1 overall 混合 MRA 与 accuracy；free-form CoT 对照是未训练原模型，不是 matched trained CoT ablation。）\n未来标签存在明显 persistence，尤其 egocentric range。（pp.18–19, Appendix E.1, Tables 5–6；该诊断使用 GT current state 且单一 primary tolerance，不是 RGB baseline，不能直接与模型 MRA 数值比较。）",
+    "caveatZh": "结果限定在所采集几何可用的视频与短期 future targets；不支持 unrestricted long-horizon forecasting。\n推理状态文本不是 causal faithfulness 保证，深度与实体 grounding 误差可能传播。\n附录的 GT-current persistence 显示部分 future labels 对近似静态假设友好，应补输入受限的真实预测 baselines。\nrecording-level split/dedup 与部分模型/训练实施细节未充分公开，多个 QA 共享视频，不应按独立样本解释显著性。\naggregate MRA/accuracy 混合不可当作统一物理精度；surface range、centroid range、route 与 sampled speed 的测量边界不同。\n未测 closed-loop control、规划安全或系统延迟；论文的 collision-avoidance 动机不是相应实验结果。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

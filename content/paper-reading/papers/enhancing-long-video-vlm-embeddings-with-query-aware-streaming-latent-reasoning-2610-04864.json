@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.04864",
+  "slug": "enhancing-long-video-vlm-embeddings-with-query-aware-streaming-latent-reasoning-2610-04864",
+  "title": "Enhancing Long-Video VLM Embeddings with Query-Aware Streaming Latent Reasoning",
+  "authors": [
+    "Haozhe Chi",
+    "Song Jin",
+    "Yang Jin",
+    "Yadong Mu"
+  ],
+  "publishedAt": "2026-10-04",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.04864"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Enhancing Long-Video VLM Embeddings with Query-Aware Streaming Latent Reasoning",
+    "VLM / MLLM",
+    "VLM"
+  ],
+  "abstract": "Long-video embedding requires capturing sparse query-relevant evidence under a limited visual-token budget. Uniform sampling can miss brief events in videos spanning minutes or hours, whereas encoding more frames in a single context increases memory and computation. We introduce \\textbf{Query-Aware Streaming Latent Reasoning} (QASLR), a post-training framework that accumulates evidence across clips while keeping the embedding size fixed. QASLR selects a bounded set of frames, restores their temporal order, and processes them clip by clip with a vision-language backbone. A compact set of persistent think tokens cross-attends to each clip's features, while an embed token reads out a normalized representation after every update. This design integrates evidence across multiple backbone calls without requiring all selected frames to share a single context. Training combines final contrastive learning, step-wise contrastive supervision, and final-embedding self-distillation. Intermediate supervision trains partial-video readouts for retrieval, while self-distillation regularizes them toward the final representation. Query-aware selection produces query-conditioned representations for candidate-set scoring and reranking, whereas query-independent selection enables reusable corpus indexing. Under the full training recipe, HourVideo retrieval Hit@1 increases from 54.2 to 70.7 and from 57.4 to 72.8 for 2B and 8B Qwen3-VL-Embedding backbones, respectively. Gains extend to the evaluated moment-retrieval and video-QA tasks, and the streaming head transfers to a second Qwen-family embedding backbone. These results support streaming latent aggregation as an effective approach to integrating long-video evidence into fixed-dimensional representations.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.04864v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.04864v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.04864v1 全文及 2026-10-06T14:27:01.519605+00:00 审阅记录；PDF 22 页，SHA-256 96277867c77450a56495fad2f1e9f2d73ce52aa378a1d7b1f479bcfd4a79db50，视觉核验第 1、4、7、8、15、16、17、18、19、20、22 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 exact PDF 未提供自身 public code 链接。p.16 承诺发布 evaluation sets，不等于承诺或已经发布 method implementation；引用 Qwen/RzenEmbed 不是本方法 Code。",
+    "ideaZh": "QASLR 在冻结 VLM 的 clip features 上递归更新 persistent think tokens，并用 embed token 逐步读出固定维度表示；重点是长视频证据聚合，而非简单少看几帧。作者提供聚合器、memory reset 与辅助 loss 控制，retrieval 增益具有支持，但 headline 还包含 sub-batching 与更大 negative pool。query-aware 版本是候选 reranking，QA 收益混合，early exit 没有实验保证。",
+    "motivationZh": "长视频检索的静态 embedding 容易淹没与 query 有关的事件，完整重编码又昂贵。目标是用紧凑的 streaming memory 汇聚证据，形成检索表征。",
+    "methodZh": "先用 Q-Frame 选择与 query 相关的帧、恢复时间顺序、按 clip 编码，将 hidden states 压成 evidence bank；固定规模 latent memory 跨 clip 更新并输出 embedding。训练只更新 streaming head，采用最终与逐步 contrastive loss 及 final embedding stop-gradient distillation。query-independent 路径可建一次索引，query-conditioned 路径需每 query/candidate 重编码。论文分别报告完整 recipe、sub-batched control、聚合器/时序 memory 与 loss 消融，并明确检索是小候选集合上的 ranking。",
+    "methodFlow": [
+      "Select ordered evidence：用 query 相关或 uniform selection 获取帧索引，恢复时间顺序并切 clip；这是预选 clip 的 streaming，不等于在线未知视频处理。",
+      "Encode and compress clips：冻结 VLM 分别编码 clip 与允许的 query conditioning，按 cosine similarity 压为有限 evidence bank。",
+      "Update persistent memory：think tokens 对当前 evidence cross-attend 并 FFN 更新，跨 clip 保留固定规模 state。",
+      "Read and supervise embeddings：embed token 读 memory、投影归一化；最终 InfoNCE、逐步监督与 detached 最终 embedding 蒸馏训练 head。",
+      "Index or rerank：独立 query 的视频 embedding 可复用索引；query-aware 路径在第一阶段 shortlist 上逐 candidate 处理。"
+    ],
+    "experimentsZh": "实验设置：作者基于 LLaVA-Video 与 ActivityNet post-training，在 long-video retrieval、classification、moment selection 和 multiple-choice QA 上测试冻结 Qwen3-VL embedding 及另一 Qwen-family 模型。source videos 声称 training/evaluation 不重合；retrieval/classification 是构造子集且完整 evaluation 数据待发布，candidate 通常只有少数选项。\n作者报告完整 recipe HourVideo Hit@1 2B54.2→70.7、8B57.4→72.8；同 sub-batching single-round 控制为 66.1 和 67.3，对应净差 4.6 和 5.5 点。（pp.7–9 Tables 1–2; p.17 Appendix A.5）\n作者报告 2B QASLR 相对同 sub-batching PT 在 MovieChat/LVBench QA 分别低 3.6/4.9 点；QA 改善依 task 与 scale。（p.8 Table 2; p.17 Appendix A.5）\n作者报告同 features Transformer aggregator HourVideo66.2、QASLR70.7；reset memory60.3，但后者是 test-time 变化。（p.18 Table 5）\n作者报告只 final loss 的 final retrieval67.9，加入两种 auxiliary loss 后 70.7；早期 checkpoint43.8→55.6，但不保证已观测到 query 所需证据。（pp.18–19 Table 6, Appendix A.8）\n作者报告 H100 warm-cache two-stage latency1.26→1.72 秒，在同 shortlist recall95.8 条件下提高 Hit@1；不是无额外计算的收益。（pp.17/19 Table 4, Appendix A.10）\n比较范围：有同 data post-training 及 sub-batching 拆分、同 features alternative aggregator 和 within-Qwen-family transfer。retrieval 多为小 candidate set，Hit@5 在候选少于五个时天然包含 positive；未证实大规模全库或无关模型跨 family 泛化。\n消融与诊断：2×2auxiliary losses、时序 shuffle/reversal、memory reset/lastclip 与 alternative aggregators。head 约 200M/600M 新增 trainable 参数，alternative aggregators 的容量预算细节仍不完整；完整 recipe 的 sub-batching、batch 和 negative 改变不能单因果归因。",
+    "insightZh": "复用 latent bottleneck/recurrent memory 与 deep supervision，贡献在 VLM embedding 的跨 clip 证据聚合和中间 readout 训练接口。对照支持其 retrieval 能力方法价值；不把 think-token 名字或 test-time 扰动直接当作内部 reasoning 机制证明，也不把整个 post-training recipe 增益全归因于新 head。",
+    "whyRelevantZh": "对多模态长视频表示、检索与证据保留直接相关，可为 visual agent 的视频资料组织提供方法参考。核心是 representation capability，非通用 serving/pruning 优化；没有直接 3D/fabrication 贡献，推荐 medium/skim。",
+    "evidenceZh": "query-conditioned 候选 embedding 不能跨 query 复用；同 query 对正负 candidate 使用同 conditioning，first-stage misses 计入最终失败。（pp.4–6 §3.1/§3.4; pp.16–17 Appendix A.4, Table 4；不是全库预索引的 query-aware dense retrieval。）\nsub-batching 同时改变 effective batch 和 negative pool，matched control 保留 retrieval 优势但 QA 并非全面占优。（pp.8–9 Table 2, §4.4; pp.16–17 Appendix A.2/A.5；实际查看原表和拆分讨论，区分完整 recipe 与 aggregation 贡献。）\n聚合器与 memory 控制使用相同 selected features；shuffle/reset 仅 test-time 实施，包含 distribution shift。（pp.17–18 Appendix A.6, Table 5；可支持 memory usefulness，不能识别具体 internal reasoning algorithm。）\nearly exit 理论依赖 history-conditional calibration，reported retrieval 仍用 full steps；memory 固定不保证端到端 compute 降低。（pp.19–22 Appendix A.10/A.12/A.13/A.14；全部理论已读；agreement bound 不是 GT 正确率或已验证 earlyexit speedup。）",
+    "caveatZh": "遗漏的 selected frames 无法由 latent memory 恢复；query-conditioned 路径需重复 candidate processing。\nretrieval 优势较一致，QA 提升 task-dependent，transfer 仅 Qwen family。\nwarm-cache latency 与完整 online 成本不同；固定 state 不代表总 compute 减少。\nthree-seed 平均未建立统计显著性，early exit 条件未被实验证明。\n构造 evaluation subsets、确切 candidate distribution 与完整释放仍不足，当前不应作为标准全 benchmark 榜单直接比较。\nhead 新增数亿参数，compact state 不等于微小 model capacity 或训练内存；alternative aggregator 同容量匹配不明。\nstep distillation 的 final teacher 看到早期未见证据，是 regularization 而非证明早期因果证据足够。\nQ-Frame 选择与 hidden-state cosine compression 具体复现细节较少，public implementation 未确认。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2609.36638",
+  "slug": "pe-opsd-internalizing-prompt-enhancement-into-flow-matching-models-via-on-policy-self-dist-2609-36638",
+  "title": "PE-OPSD: Internalizing Prompt Enhancement into Flow-matching Models via On-Policy Self-Distillation",
+  "authors": [
+    "Mingfeng Lin",
+    "Chengfei Cai",
+    "Lin Xu",
+    "Chengqian Ma",
+    "Yuxiang Wei",
+    "Liang Han"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2609.36638"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "PE-OPSD",
+    "Image Generation",
+    "PE",
+    "OPSD"
+  ],
+  "abstract": "Text-to-image users often provide concise and underspecified prompts, whereas generative models benefit from detailed textual conditions for reliable instruction following. Existing systems bridge this gap with Prompt Enhancers (PEs) that rewrite raw prompts at inference time, introducing additional latency and leaving prompt elaboration external to the generator. We instead view enhanced prompts as privileged training information and ask whether their benefits can be internalized. We propose Prompt-Enhanced On-Policy Self-Distillation (PE-OPSD) for text-to-image flow-matching models. During training, a raw-prompt student follows its own generation trajectory, while an enhanced-prompt teacher provides vector-field targets at the states visited by the student. This on-policy supervision distills the behavior induced by enhanced prompts into the raw-prompt student without requiring additional text--image pairs. At inference, both the PE and teacher are removed, and the student generates directly from raw prompts. Across multiple model families, PEs, and benchmarks, PE-OPSD achieves the strongest aggregate prompt fidelity among the evaluated baselines, yields positive aggregate visual appeal gains, and retains the base-model inference efficiency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.36638v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.36638v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.36638v1 全文及 2026-10-06T16:17:48.559393Z 审阅记录；PDF 27 页，SHA-256 aadc5fb31f3ea21cfdd07479f2b586d853e0d74600093f3b34571c05f7313f45，视觉核验第 1、4、5、7、13、16、18、23 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF p.1 直接链接 sleepy1231/PE-OPSD；在线确认 official repository 仅 README，并明确 The code is coming soon，未提供可验证训练或推理实现。",
+    "ideaZh": "PE-OPSD 让 raw-prompt student 采样自己的 flow states，用 enhanced-prompt EMA teacher 的 vector field 做监督，部署移除 prompt enhancer。作者报告跨多个 image generators 的 compositional gains 与较低请求成本。可速读其 privileged-condition transfer；它内化的是 PE 选择的一种 elaboration，训练与推理 schedule 不同，部分 counting/style 指标退步，确定性 L2 也不是完整 trajectory KL 的无偏优化。",
+    "motivationZh": "prompt enhancement 能改善生成，却增加每次请求成本并依赖外部改写；目标是将增强条件的收益蒸馏进使用原始 prompt 的 flow 模型。",
+    "methodZh": "离线构造并检查 raw/enhanced prompt pairs；学生沿 raw 条件的 Euler path rollout，教师在相同 latent/time 下读增强条件。对 velocity、Euler transition 或 clean-latent targets 做匹配，差别只是 timestep weighting；状态与教师输出 detach，teacher 通过 EMA 更新。实验在 multiple backbones 上与 inference PE、pseudo-image SFT 和 enhanced-condition teacher trajectories 的 off-policy distillation 比较，并测试外部 compositional benchmarks。",
+    "methodFlow": [
+      "离线生成 enhanced prompts，并以 consistency judge 检查显式 subjects、counts、attributes 与 relations。",
+      "raw-prompt student 生成自己的 flow trajectory，逐步 detach visited states。",
+      "EMA teacher 在相同 states/time 下接收 enhanced prompt，提供 vector-field target。",
+      "以加权 L2 匹配 student predictions，再更新 EMA。",
+      "部署只保留 student，按原 inference schedule 从 raw prompts 生成。"
+    ],
+    "experimentsZh": "实验设置：共同 raw/enhanced prompt mixtures 和训练步数，比较 Base、Base+PE、SFT、off-policy distillation 与 PE-OPSD；包含多种 PEs、多个模型、EMA/loss/CFG/schedule controls、OOD compositional evaluation 与真人 forced-choice preference study。不同基座使用不同 steps/CFG，所有测试采用限定图像分辨率。\n作者报告 Z-Image-Turbo 的 GenEval 从 0.737 到 0.863、GenEval2 GM 从 0.341 到 0.501；GenEval aesthetics 从 5.289 到 5.274，说明并非所有视觉质量指标提高。（p.7, Table 2）\n作者报告三位 assessors 的多数票在 test prompts 上为 PE-OPSD 对 Base 的 fidelity 66%、visual appeal 58%；没有 ties 或区间，未直接做 Ours-vs-PE preference。（p.7, Figure 5; p.16, Appendix C）\n作者报告 Z-Image 的 inference time 为 Base/PE-OPSD 9.69 秒，而部署 PE-32B 为 43.74 秒；offline prompt generation 和 filtering 不包含在此请求时间。（p.17, Table 12）\n作者报告 FLUX.2-klein 的 GenEval counting 从 0.847 到 0.747，EvalMuse overall 从 3.724 到 3.710；需要保留个别任务退步。（pp.21,23, Tables 14/18）\n比较范围：off-policy 对照在同 budget/teacher/objective 下只换 state source，较有解释力；SFT 有完整 pseudo-target generation 成本。缺少 raw-prompt self-distillation control、同算力重新训练 baseline、多 seeds 与 diversity/style coverage；不同 pretrained 模型非同协议 SOTA 排名。\n消融与诊断：EMA 太快更新导致退化，支持 teacher stability。μ/x0/v 的效果是时间权重取舍，不能当作三种不同信息 supervision。train/test discretization 不同，CFG 拿掉节省训练但部分 benchmark 下降。",
+    "insightZh": "on-policy distillation、EMA 和 privileged conditions 延续已有方法，新意是把 prompt enhancer 的生成行为传到无需外部 rewrite 的 flow generator，并有多基座和 state-provenance controls。并未学习恢复唯一用户隐含意图，也不保证保持所有有效风格和多样性。",
+    "whyRelevantZh": "将外部文字条件的收益内化到视觉生成模型，有跨生成基座的直接训练迁移价值，并提供可比较的 on/off-policy controls；适合在 prompt fidelity post-training 中速读。",
+    "evidenceZh": "训练匹配发生在 raw-condition student 的 states，teacher 接收 enhanced condition，三种 loss 仅改 timestep weights。（pp.4–6, §3; pp.13–14, Appendix A；deterministic transitions 的 KL 可无限，论文仅借 Gaussian pointwise optimum 解释 surrogate。）\ntraining rollout schedule 少于 inference，on-policy 指 states 来源，不是推理过程完全相同。（pp.14–15, Appendix B；全文明确 sampler discretization 的边界。）\n多个 generators 的平均 fidelity 改善，但 individual metrics/externals 有下降。（pp.7–9, Tables 2–8; pp.18,21–23, Tables 13–18；作者报告；aggregate relative-gain index 不能替代各任务结果。）",
+    "caveatZh": "PE 的语义失真或过度具体化会形成不良监督。\n计算移至 offline prompts 和 post-training，更多 teacher evaluations 有成本。\n单个 elaboration 可收窄 raw prompt 的合理风格/构图分布，语义过滤不验证多样性或 hidden user intent。\ndetached on-policy states 的 local regression 不等于完整 trajectory KL gradient，不能据此保证全局分布吻合。\n自定义 aggregate index 混合相对尺度，小 denominator 会放大 headline；应结合原指标和退步。\n缺 repeated training uncertainty；真人研究只与 Base forced-choice、三评审，不能证明超过所有 alternatives 的 human quality。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

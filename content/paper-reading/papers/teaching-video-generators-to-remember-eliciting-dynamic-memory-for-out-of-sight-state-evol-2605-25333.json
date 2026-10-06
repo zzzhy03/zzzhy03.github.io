@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2605.25333",
+  "slug": "teaching-video-generators-to-remember-eliciting-dynamic-memory-for-out-of-sight-state-evol-2605-25333",
+  "title": "Teaching Video Generators to Remember: Eliciting Dynamic Memory for Out-of-Sight State Evolution",
+  "authors": [
+    "Tianshuo Xu",
+    "Yichen Xie",
+    "Depu Meng",
+    "Chensheng Peng",
+    "Quentin Herau",
+    "Bo Jiang",
+    "Yihan Hu",
+    "Wei Zhan"
+  ],
+  "publishedAt": "2026-05-25",
+  "updatedAt": "2026-09-29",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2605.25333"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Teaching Video Generators to Remember",
+    "Video Generation"
+  ],
+  "abstract": "Video world models should maintain evolving states when evidence is unobserved, yet current generators often freeze hidden states upon interruption. This is not simply a capacity problem: pretrained video diffusion transformers already possess KV-cache mechanisms capable of non-local retrieval, but they are rarely trained to use them as dynamic memory. We introduce ReMind, a framework eliciting dynamic memory behavior via memory-oriented data, event-aware training, and cache adaptation. Organized around a taxonomy of 100+ dynamic events, we build a camera-annotated training mixture combining VLM-filtered real videos, generated hard dynamics, synthetic camera loops, and memory-interruption augmentations. Each clip is converted into a frame graph with protected anchors, degraded intervals, and explicit temporal gaps. A node-structured curriculum -- including node-drop, noisy memory, frontier continuation, and reference-cache training -- forces the model to retrieve relevant past states across interruptions rather than relying solely on local continuity. PM-RoPE, an elegant camera-phase RoPE extension, unlocks spatiotemporal retrieval at a single-attention cost while preserving pretrained pathways. ReMind achieves the best overall scores on STEVO-Bench and recovery tasks. Furthermore, general image-to-video evaluations confirm this curriculum avoids catastrophic forgetting. We have released our code, data, and models on our project page \\href{https://remind-applied.github.io/}{https://remind-applied.github.io/}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.25333v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.25333v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Applied-Intuition-Open-Source/ReMind"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.25333v3 全文及 2026-10-06T16:21:58.205Z 审阅记录；PDF 26 页，SHA-256 2a866532b4cca3eef12deab56b7ec83ffa5a97f998a02e3e1a85070242980a9a，视觉核验第 1、5、9、14、19、20、25 页。数字均为作者报告，本项目未独立复现。代码状态 available：官方仓库有真实 inference.py、pipeline、wan、prope 与 I2V/V2V presets；当前公开 5B inference，training 和 1.3B checkpoint 仍 coming soon，causal probe 完整 artifacts 未全部发布。本项目未运行。",
+    "ideaZh": "ReMind 用 interruption-aware 数据、node curriculum 和 camera-conditioned PM-RoPE 教 causal video DiT 从可靠旧 anchor 恢复遮挡后的状态。可精读其匹配控制与 anchor knockout；作者报告的 State Progress 只有 14.5%，空 RoPE gap 不会推进状态，长时物理模拟并未成立，不能把“还能读取旧帧”写成“世界状态持续演化”。",
+    "motivationZh": "视频生成器在关灯、遮挡或镜头移开后常冻结或重置隐状态；论文希望教 native KV cache 选择可靠的历史 anchor，改善重新观察时的短期状态恢复。",
+    "methodZh": "方法将 clean anchors、遮挡/关灯/镜头移开与 recovery 组织为 frame graphs，混合 all-history、noisy-memory、node-drop、V2V frontier 和 reference-cache 训练。稀疏 cache 保留原位置，PM-RoPE 在已有 attention 上叠加 camera phase 与 zero-init V/O residual；实现是 camera embeddings learned projections 而非精确 projective backprojection。1.3B 主 leaderboard 与 5B 控制实验分开：data-only 已学会大量短期恢复，完整 stack 主要在视角改变时增益，长空 gap state sweep 是负结果。",
+    "methodFlow": [
+      "真实 general/dynamic clips、独立生成 hard dynamics、rendered camera loops 四并行 source streams",
+      "同 clip 内加入 light/occluder/camera interruptions，标记 protected anchor、peak 和 recovery nodes",
+      "cache 保留 non-contiguous 原 RoPE positions；normalized camera/focal embeddings 调 QK phases 与 V/O residual",
+      "随机 all-history、noisy-memory、node-drop、V2V suffix/frontier、reference-cache regimes 训练 chunk-causal flow matching",
+      "warmup2000 步后加 0.2·exp(−5 variance) temporal-delta auxiliary loss",
+      "I2V 生成 interruption 及 recovery；V2V 只读给定 prefix 生成 suffix，分别评估 state/control/coherence"
+    ],
+    "experimentsZh": "实验设置：1.3B STEVO exact221variant snapshot；5B paireddata/full/no-light recovery、24single-seed cases 与 fog transfer、duration、anchor knockout。200clips Qwen ablations、matched5B VBench、单 A100 streaming efficiency。1.3B 主 fine-tune30Ksteps、5Bmatched6Ksteps；两个 families 不要混算。\n作者报告 STEVO StateProgress14.5%、ObservationControl41.6%、Coherence96.4%；高 coherence 仍不等于执行遮挡并进展。（Table1, p.8）\n作者报告 full/data-only light+pan PSNR18.3/16.6、SSIM.87/.82；空 gap state advancement 未随 G 改善。（Tables6,10, pp.18,20）\n比较范围：STEVO baselines 为 official leaderboard aggregates 而非统一 localreruns；matched5B 控制更能解释贡献。VBench1.3Bvs5B 跨 scale 描述，matcheddata/full 都 dynamicdegree 约 38.6，不能声称 equivalent/noninferior 无 CI。Dynamic-loss 比较 sourceweights 也变化，非 clean onefactor。\n消融与诊断：1.3B PM-RoPE QK/VO/dual 控制；data mixtures bundled、loss+samplingweightsconfounded 需匹配 rerun。24case anchor knockout 与 duration 有 fixedprefix/conditions 但仅单 seed；longgap 明确负结果和 attentionaddressability 拆开。",
+    "insightZh": "把缓存使用目标从近邻 continuity 转为可靠 anchor 检索，camera/time addressing 与 memory-specific training 有明确组合价值。Single attention path 是有效 inductive bias 而非表达能力必要性定理；相比 vanilla 仍增加 latency。核心证据是短 horizon recovery 与有限 cache 干预，不能推导符号 world state、elapsed-time extrapolation 或物理守恒。",
+    "whyRelevantZh": "视频 world-model 中的 hidden-state recovery、cache intervention 和可靠历史信息选择直接相关，可借鉴长 horizon generative consistency 的评估方式。",
+    "evidenceZh": "PM-RoPE 加 camera phases 与 zero-init V/O residual，实际实现为 latent/camera embeddings 线性投影。（Sec.3.2, Fig.3, Eqs.1–3, pp.5–6；Focal-only、principal-point 置零；公式 projective 术语不等于具真实 geometry 的精确 backprojection。）\n作者报告 1.3B STEVO221 任务 variant StateProgress14.5/Coherence96.4/ObservationControl41.6，Total300.9 为五分之和。（Table1, Appendix E.2, pp.8,17；85underlying projects，不是 221 独立 scene；25steps/seed1000，Gemini2.5Flash 三 vote majority。）\nmatched5B data-only 已实现 light17.6dB，full17.8；light+pan full18.3vs16.6。（Table6, Appendix E.4, p.18；24fixedseed cases，6000steps/64A100，相同 data；full 组合未拆 curriculum vs PM-RoPE。）\n作者报告 24cases duration probe K4 time-matched-vs-prestate SSIM 差 teacher+.144、student+.164，95.8%positive。（Table8, Appendix E.5, p.19；这里有 rendered dark event content；空 position-gap-only probe 不 advance，不是 95.8%I2V 通用物理成功率。）\n去 clean anchor PSNR18.32→16.34；longgap state advance 近零，Spearman mean−.19。（Tables9–10, Appendix E.6, pp.19–20；cache 干预保留其他 conditions 只支持局部 causal 贡献；5B 该 checkpoint 的 reference-cache probability=0。）\n作者报告 5B PM-RoPE4.88s、vanilla3.95s、dual6.05s；PM cache3.02GB vs dual6.04。（Table11, Appendix E.7, p.20；DiT-only streaming 单 A100/81frames/sevenchunks，4denoise+1contextwritecalls，非含 VAE/text 的 E2E。）",
+    "caveatZh": "强证据集中短 horizon 遮挡/关灯恢复，camera lookaway 小样本及长 gap 仍挑战。\nCamera/depth 估计误差影响监督。\n空 RoPE gap 不提供 elapsed-time evidence，不能 extrapolate physical time。\nStateProgress14.5%仍低，ObservationControl41.6%说明不少例没完成指定 interruption；五指标 sum 不是 jointsuccess。\n恢复 SSIM 可能偏 appearance；没有 physical state GT/simulator-leveldynamics 或广泛 longtime 验证。\nRelease1.419M rows 非 uniquevideos 或历史 trainingexposure；原 1.3B 没有冻结 stepcensus/dedupaudit。\n多数 probe24 例单 seed、无 CI；VLMscorers/selectedattentionmaps 不能提升为 population 因果证明。\n本项目未复现；部分 training/evaluationartifact 尚待 release，available inference 不覆盖 1.3B mainpaper 完整复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

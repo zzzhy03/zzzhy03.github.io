@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2602.08277",
+  "slug": "pisco-precise-video-instance-insertion-with-sparse-control-2602-08277",
+  "title": "PISCO: Precise Video Instance Insertion with Sparse Control",
+  "authors": [
+    "Xiangbo Gao",
+    "Renjie Li",
+    "Xinghao Chen",
+    "Yuheng Wu",
+    "Suofei Feng",
+    "Qing Yin",
+    "Zhengzhong Tu"
+  ],
+  "publishedAt": "2026-02-09",
+  "updatedAt": "2026-09-30",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2602.08277"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "PISCO",
+    "Video Generation"
+  ],
+  "abstract": "The landscape of AI video generation is undergoing a pivotal shift: moving beyond general generation - which relies on exhaustive prompt-engineering and \"cherry-picking\" - towards fine-grained, controllable generation and high-fidelity post-processing. In professional AI-assisted filmmaking, it is crucial to perform precise, targeted modifications. A cornerstone of this transition is video instance insertion, which requires inserting a specific instance into existing footage while maintaining scene integrity. Unlike traditional video editing, this task demands several requirements: precise spatial-temporal placement, physically consistent scene interaction, and the faithful preservation of original dynamics - all achieved under minimal user effort. In this paper, we propose PISCO, a video diffusion model for precise video instance insertion with arbitrary sparse keyframe control. PISCO allows users to specify a single keyframe, start-and-end keyframes, or sparse keyframes at arbitrary timestamps, and automatically propagates object appearance, motion, and interaction. To address the severe distribution shift induced by sparse conditioning in pretrained video diffusion models, we introduce Variable-Information Guidance for robust conditioning and Distribution-Preserving Temporal Masking to stabilize temporal generation, together with geometry-aware conditioning for realistic scene adaptation. We further construct PISCO-Bench, a benchmark with verified instance annotations and paired clean background videos, and evaluate performance using both reference-based and reference-free perceptual metrics. Experiments demonstrate that PISCO consistently outperforms strong inpainting and video editing baselines under sparse control, and exhibits clear, monotonic performance improvements as additional control signals are provided. Project page: xiangbogaobarry.github.io/PISCO.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2602.08277v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2602.08277v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/taco-group/PISCO"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2602.08277v3 全文及 2026-10-06T13:03:50.720940+00:00 审阅记录；PDF 18 页，SHA-256 8fc56a364022e4f968d73244ffb2bae61724d7c1dc458cf10827d61f52769d77，视觉核验第 1、5、6、7、9、10、11、12、13 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1 官方 project https://xiangbogaobarry.github.io/PISCO/ 的 section.html 正式 Code 链接指向 taco-group/PISCO；已实际访问 Publicrepo 确认 diffsynth/inference/training/eval/utils 真实实现及 Sept30release。未执行/复现，release 设置与 PDF 有差异。",
+    "ideaZh": "PISCO 用 RGB/mask/depth/availability channels 把少量 keyframe cutouts 接入 Wan/VACE，实现实例插入与时间传播。实用增量是把 nearest-frame fill 送进 temporal VAE 后再 masklatents，缓解直接零帧 conditioning 的 artifact。作者报告 14B 首尾控制 whole-video FVD204 vsVACE371，但评测主要是 removal 后重插原实例，且无定量组件消融/物理验证。适合作为可控视觉编辑接口 skim；不能声称严格保持背景或准确生成 counterfactual dynamics。",
+    "motivationZh": "视频插入实例时，只给少量 keyframe cutouts 容易出现身份变化和时间传播错误；需要明确表达实例外观、位置与可用帧，并让稀疏控制进入生成模型。",
+    "methodZh": "训练从 video/masks 构造 target 与 ROSE 生成的 background pair、DA3 估计 depth；randomavailability 覆盖 single/sparse/denseguidance。DPTM nearestavailableframefillinstanceRGB/depth→temporal VAE→按 availabilitymasktokens，另将 compressionwindow 的 frameavailability 打包为 channels，区分 filled 与 truecontrols。改 VACEinputprojection 并分 stage 训 adapter/backbone，追加 pseudo-amodalcompletion 与 IC-Lightrelighting。本文 18 页全读；actualview 首面、pipeline、depth/DPTM/augmentationqualitatives、主表、inputprotocol、qualcomparison 和 broaderapplications。没有独立 Limitations section 或实质 appendix，不能编造。",
+    "methodFlow": [
+      "准备 instance/background 配对与 depth：ROSE 去除真实 video 的 instance 产生 background，SAM-like 现有 mask/DA3depth 形成 instanceRGB/mask/depth 和完整 background/depthcontrols。",
+      "随机采样稀疏 controlavailability：VariableInformationGuidance 是 trainingcontextdropout，覆盖 singleframe 至 dense，背景条件保持可见。",
+      "先补帧再编码并显式 mask：Nearestavailableframes 填补 input→temporal VAE→latentmask，availability 按 temporalcompression 打包，送多 channelVACEadapter。",
+      "训练并传播用户指定 instance：先新 inputlayer、再 adapter、联合 backbone，随后 amodal/relightLoRA 与长高分辨率 stage；inference 用 sparsekeyframes 条件 50steps 生成 editedvideo。"
+    ],
+    "experimentsZh": "实验设置：16,642filteredrealclips≥49frames，Wan2.1VACE1.3B 与 Wan2.2VACEFunA14B 两 denoisers、H100AdamW 五 stages；本文缺 LR/stepcounts 等完整 hyperparameters。100BURSTheld-out、832×480/49frames/50steps，first 或 firstlastcontrols，额外随机中间三帧 fiveframe 参考。FVD/LPIPS/PSNR/SSIMwhole/maskedforeground 与 modifiedmaskedVBench。\n作者报告 14BfirstlastwholeFVD204/LPIPS.097/PSNR 26.58 vsVACE371/.103/25.55；firstonly337/.116/24.81 不在全部 metrics 优于 VACE。（PDF p.10, Table2）\n作者报告 14BforegroundfirstlastFVD138/PSNR 33.58 vsVACE273/30.55；fiveframesFVD75/PSNR 35.94，但 gtmaskzero 背景 metric 不是 trajectoryaccuracy。（PDF p.10, Table2）\n作者报告 subjectconsistency91.57vsVACE90.29，background94.20vsCoCoCo94.63；14Bfirstonlyaverage64.56 低于 UniVideo65.18。FiveframeTemporalStyle15.57 低于 firstlast15.64，非所有 metric 单调改善。（PDF p.11, Table3）\n比较范围：NanoBananaPro+WanI2V、CoCoCo/VideoPainter、VACE/UniVideo；统一 frames/resolution 但 input/modalities、training/taskadaptation 不匹配。无 InsertAnywhere 等 geometryinsertion 同 benchmark、human study、instanceposition/occlusion/shadow 专用 physicalmeasure。\n消融与诊断：depth、oddframeDPTM、relighting 有 qualitative 例图；controlcount 有 quantitative 趋势，但无 numeric VIG/DPTM/availability/amodal/relight 逐项 ablation 或 seed variance。720p120frames 扩展仅 described，主评测仍 49frames。",
+    "insightZh": "随机 control-densitytraining、VACEchannels/depth 和 completion/relighting 各有先例，主要实用贡献为 arbitrarysparseinstancecontrols 与 temporal VAE 的先 fill 再 mask 接口。不是 3D/4Dgeometry 生成或新 videobackbone；直接视觉实例编辑及 motionpropagation 符合 video-controlworkflowtransfer，尚不足 landmark。",
+    "whyRelevantZh": "精确实例/稀疏时间控制与 scene-contextpropagation 可直接作为视觉内容编辑 workflow 控制原语；其泛化稀疏 conditioning/temporal VAE 接口比纯 videostylebenchmark 更相关。",
+    "evidenceZh": "PISCO-Bench 的 cleanbackground 由 removalmodel 生成，target 是原 video。（PDF pp.8–9, Sec.4.1/5.1；100BURSTvideos 无 trainingoverlap，manual 修 mask；不是独立拍摄配对真实 absence/presence，removalartifact 可能影响结果。）\nDPTM 以填帧/latentmask 缓解 conditioning 问题，没有统计分布保持或硬 physical 保证。（PDF pp.5–6, Fig.2/4/Sec.3.3；Nearestrepeat 不等于真实 naturalvideo 统计；Fig.4 仅 oddframequalcomparison，未复现。）\n不同 baseline 有不同 input 能力，部分获 densemasks，文本/appearance 条件也不同。（PDF p.9, Table1/Sec.5.3；VACE 有 allmasks/refimage+text、inpainting 无 instanceRGB，PISCO 有 depth/sparseframes；不能当只测 DPTM 的等条件对照。）\nForegroundmetrics 对生成/reference 乘 GTmask，低 LPIPS 可能受大片 zero-background 影响。（PDF p.10, Sec.5.4/Table2；Metric(V′⊙M,Vhat⊙M)公式直接支持遮罩方式；不等价于 independentobjecttrajectory/placementerror 测量。）",
+    "caveatZh": "PDF p.11 Sec.5.5：firstframeonly trajectory 可 drift，首尾 controls 缓解 ambiguity；无独立 limitations section。\nPDF p.13 Sec.6：broaderediting/simulation 仅 representativeexamples，鼓励继续研究，不是 downstreamcounterfactualvalidity 验证。\nReferenceinverse-removalbenchmark 偏向 recoveroriginalinstance，未测试任意新对象/新 trajectory 约束与真实 contact/reflectionphysicalaccuracy。\nAbsentcontrolframe 的 latents 仍由插值视频编码，compressionwindows 如何对应 mask 需实现核验；distributionpreserving 仅 heuristic，无误差/encoderdistributionquantification。\nBackgroundmetrics 为 featureconsistency 不是 unchangedpixel 保证，image/videoediting 将重绘 scene；不能复述 strictpreservation 或 professionalready 保证。\n作者公开 implementationtraining data 说明 20,590synthetic+VPData 且三 stages，与 exact PDF16,642real/fivestages 不同，复现时需对齐 release/checkpoint 而非认定完全相同。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.03141",
+  "slug": "behavior-pack-optimization-for-video-mllm-post-training-2610-03141",
+  "title": "Behavior Pack Optimization for Video MLLM Post-Training",
+  "authors": [
+    "Zhaolu Kang",
+    "Shiyu Liu",
+    "Tailong Luo",
+    "Wei Zhang",
+    "Yingjie He",
+    "Lei Wei",
+    "Guansu Wang",
+    "Liang He",
+    "Siheng Wang",
+    "Guangyuan Dong",
+    "Jiaqi Su",
+    "Shuang Chen",
+    "Haoyu Ji",
+    "Qishi Zhan",
+    "Kaiyue Zhou"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03141"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Behavior Pack Optimization for Video MLLM Post-Training",
+    "VLM / MLLM",
+    "MLLM"
+  ],
+  "abstract": "Video multimodal large language models (MLLMs) keep climbing video question answering benchmarks, yet shuffling the frames, masking the segment that supports the answer, or occluding the target object barely changes their predictions. The accuracy rests on appearance and language priors, not on the temporal evidence the question asks for. We trace this to the unit of post-training: rewards are computed on a single response to the original clip, so the model is never asked to behave consistently across views. We propose Behavior Pack Optimization (BPO), which replaces the single response with a behavior pack of outputs across counterfactual views chosen by question type, scored jointly. The pack reward asks for stability when the intervention is irrelevant, sensitivity when key evidence is removed, and abstention when no evidence remains. To keep this objective stable at small pack sizes, BPO uses an anchor-relative advantage: the response on the original view serves as a per-prompt reference instead of a group mean over mixed views. On TempCompass, MVBench, and NExT-QA, BPO improves the macro accuracy of Qwen2.5-VL-7B-Instruct by 4.7 pp, the temporal-hard subset by 7.8 pp, and abstention F1 by 20.0 pp over a budget-matched vanilla GRPO baseline from the same SFT checkpoint. The gains transfer to Video-MME, LongVideoBench, and to LLaVA-Video-7B; ablations confirm they follow the view sets, not the rollout count. We hope this pack-level perspective offers a useful starting point for the video MLLM and multimodal post-training community as the field moves toward evidence-grounded video reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03141v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03141v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03141v1 全文及 2026-10-06T14:41:11.454592+00:00 审阅记录；PDF 23 页，SHA-256 c43be8e50a6e30d163ab1931e4e51326cead396e13598e8dd9fb3aa3475510e1，视觉核验第 1、4、5、7、9、13、16、17、18、19、21、22 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：完整 exact PDF p.21 声称 anonymous release package 含 code/config/audit CSV，但未给可访问 URL 或实际 publicrepo；不将声称 release 视为已确认 implementation。",
+    "ideaZh": "BPO 把原视频、关键/非关键 mask、时序变化等视图组织为 behavior pack，用同 prompt anchor 比较 stability、evidence sensitivity 和 abstention，再更新非 anchor 输出。作者提供 Stage-B 预算匹配的控制、reward 拆分与跨 backbone 检验，适合 skim 这类视觉行为训练接口。方差分析是简化 reward 模型上的信号比较，mask artifact 和错误 anchor 仍可能制造虚假的证据依赖。",
+    "motivationZh": "视频模型只按答案正确性训练，可能忽略事件顺序或无关对象变化。目标是定义跨视频干预的行为要求，让回答、对象状态与时间证据共同接受监督。",
+    "methodZh": "Stage A 先 SFT 安装 Entity-State-Temporal 输出供 verifier 解析。Stage B 按 question 规则选择 mask/event 或 reverse/shuffle views，每 view 生成一次回答；reward 合并当前 view answer、frame evidence、EST 合法性和相对原 view 的行为 contract。原 view 作为 GT-scored reference，anchor-relative RL advantage 为 intervened reward 减 anchor reward；anchor 无自身 RL term 但仍参与 KL 和 baseline。训练 vision encoder 冻结、LLM 更新。方法价值在定义跨干预行为监督，不是视频生成或内部因果模型已经被证明。",
+    "methodFlow": [
+      "Install EST interface：SFT 学习 entity/state/temporal records，供格式、event order 和 frame-evidence verifier 解析。",
+      "Build typed intervention pack：按 question 规则从 key/non-key mask、span drop、reverse、shuffle 等预缓存 views 中选择一个小 pack，保留原 view。",
+      "Score answers and contracts：结合 view-specific target 与 stability/sensitivity/insufficient-evidence contracts，审核格式和 evidence 引用。",
+      "Compare against anchor：GT-scored 原 view 提供 perprompt baseline，只对 non-anchor RL 项采用 reward difference；所有 views 使用 reference KL。",
+      "Audit behavior：原视频 accuracy、temporal-hard 及干预指标并测，检查 verifier 错误、mask seams 和 anchor 歧义。"
+    ],
+    "experimentsZh": "实验设置：作者基于 Qwen 视频 QA 模型，在 TempCompass/MVBench/NExT-QA 做 Stage-B 预算匹配训练比较，另有 Video-MME/LongVideoBench 与 LLaVA 测试。EST-SFT 与 counterfactual/evidence metadata 用于训练；主指标和人工 verifier audit 共同观察行为。论文未给实际可访问 release URL。\n作者报告 BPO 相对 vanillaGRPO macro62.7→67.4、temporal-hard53.4→61.2、abstentionF1 0.47→0.67，主 RL 表为多 seed 平均。（p.7 Table 1）\n作者报告同 view/reward 的 batch-normalized pack64.5，anchor-relative65.8，typed 完整 67.4；表支持逐模块变化但不等于单一机制的全部增益。（p.7 Table 1）\n作者报告去掉 sensitivity contract 的 key-sensitivity54.6→38.4，去 abstention 使 F1 0.67→0.43；这些指标贴近训练 contract。（p.9 Table 4）\n作者报告 LLaVA macro61.3→65.9，并在 extendedVideo-MME macro54.3→58.1；Table1 LLaVA seed 描述与 Table10 三 seed 有口径差异，不外推统计确定性。（pp.7–8 Tables 1–2; p.21 Table 10）\n作者报告 200 样本 verifier audit 准确率 0.93，reward-hacking trace 低于 2.3%；该诊断是样本范围内的经验值，不是未来无 hacking 保证。（pp.9/21–22 Appendix F.2, Figure 6）\n比较范围：包含 same-SFT vanillaGRPO、pack/baseline/type 拆分及 Video-R1/TPO 内部重实现；后两者 recipe 有修改，不能替代各方法最佳 release 全面比较。原始标准 benchmarks 上的提升与人为 intervention 集合的指标需分别解释。\n消融与诊断：reward 组件、viewfamilies、oracle/predictedquestionrouter、budgetfrontier 和 verifiernoise。SFTaugmentation 对照保留原答案于可能改变答案的 reverse/shuffle，因此不能证明正确重标注的 ordinarySFTaugmentation 一定不足。多 view 理论和有限 manualaudit 不识别完整 causal 机制。",
+    "insightZh": "组合 question-type view sets、cross-view contracts 与 anchor-relative 优化，改变 video MLLM post-training 行为目标，超过单纯更多 rollout 或 benchmark 设计。已有 counterfactual/RL 研究提供各单轴基础；它不证明所有 single-response training 必然失败或内部真实 reasoning 已被识别。",
+    "whyRelevantZh": "与 VLM evidence-grounded 视频理解能力直接相关，可借鉴跨干预行为目标与 reliabilityaudit；未产生 video 或 3D 资产，因此主归 VLM 而非 video-generation。方法超过 purebenchmark，满足 continuousattention 门槛。",
+    "evidenceZh": "anchor 的 self-relative advantage 为零，仅 non-anchor 应用 RL log-prob term，原 view 参与 reference KL 和 baseline。（p.5 §3.3 Eqs.(9)–(10); p.17 Algorithm 1；实际查看公式，不能写成各 views 一起接受同一 RL advantage。）\nvariance theorem 比较 exchangeable rewards 下两个不同目标的 unnormalized update signals，不是同一 policy-gradient estimator 的一般最优性。（pp.12–14 Appendix A.2, Proposition 2；equal variance/correlation 与 population baseline 假设；gradient/Jacobian/normalization 并未包含。）\n作者提供相同 SFT、Stage-B 预算的 control ladder 及 component ablations。（p.7 Table 1; p.9 Table 4; p.18 Table 6/Appendix B.8–C；预算仅 Stage B，offline mask/annotations 与 Stage A 不在 headlineratio 内。）\n作者承认 mask seam 能使 key sensitivity 看似高，anchor 歧义和 schema 外问题仍失败。（p.22 Appendix F.5；干预敏感不自动等于语义证据依赖或因果 grounding。）",
+    "caveatZh": "依赖 useful interventions 和可靠 verifier，当前 schema 集中在 evidence removal、order 和 abstention。\n复杂/开放问题、densevideos 或 largermodel 需新 views 与更强 audit。\n有 schema-out-of-scope、ambiguousanchor 和 mask-seam 伪敏感失败。\n改变答案和证据是否充分需 view-specific 验证，简单 reverse/shuffle 或 mask 不总构成忠实语义干预；rule 默认路由仍有覆盖边界。\n方差证明不涵盖真实 normalized gradient variance 或最优 policy 目标，不能宣称普适优于 GRPO。\nStage-B 预算不计 offlineSAM/关键帧注释/SFT；确切 data volumes、reward 主权重和 optimization 超参的 release 仍需确认。\n原 viewanchor 也由 sharedpolicy 采样，虽无直接 RL 项仍会随参数改变，不能宣称 reference 完全固定。\npack-size sweep 到更大 m 超过列出的 viewcatalog，构建细节与少 seed 统计有限，避免用其支撑广域普适结论。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

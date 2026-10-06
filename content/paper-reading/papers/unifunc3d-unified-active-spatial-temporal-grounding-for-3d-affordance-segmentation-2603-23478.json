@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2603.23478",
+  "slug": "unifunc3d-unified-active-spatial-temporal-grounding-for-3d-affordance-segmentation-2603-23478",
+  "title": "UniFunc3D: Unified Active Spatial-Temporal Grounding for 3D Affordance Segmentation",
+  "authors": [
+    "Jiaying Lin",
+    "Dan Xu"
+  ],
+  "publishedAt": "2026-03-24",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2603.23478"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "UniFunc3D",
+    "3D Segmentation",
+    "VLM / MLLM"
+  ],
+  "abstract": "Affordance segmentation in 3D scenes requires an agent to ground implicit natural-language instructions into precise masks of fine-grained interactive elements. Existing training-free methods typically rely on fragmented pipelines, which introduce visual blindness during task parsing and limit accuracy through single-scale spatial and temporal processing. We present UniFunc3D, a unified and training-free framework that treats the multimodal large language model as an active observer. By utilizing a unified MLLM backbone, UniFunc3D performs joint semantic-temporal-spatial reasoning to ground task decomposition in direct visual evidence. Our approach introduces active spatial-temporal grounding with a coarse-to-fine strategy. This allows the model to select correct video frames adaptively and focus on high-detail interactive parts while preserving the global context necessary for disambiguation. On SceneFun3D, our UniFunc3D achieves state-of-the-art performance, surpassing prior training-free methods by a large margin with a relative 59.9\\% mIoU improvement, and even outperforming training-based methods without any task-specific training. Code is available on our project page: \\url{https://jiaying.link/unifunc3d}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.23478v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.23478v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.23478v2 全文及 2026-10-06T11:09:27.279245Z 审阅记录；PDF 28 页，SHA-256 1798a291559132962072342cc50e8d1895ba0957ff8058640214e6fe9a42f54a，视觉核验第 1、4、7、10、14、15 页。数字均为作者报告，本项目未独立复现。代码状态 promised：PDF 首页给 project page 并称 code available，但 Appendix A.2 及 Checklist5/13 写将在 acceptance 后公开；本轮访问该 project page 返回 503，未确认 public repository 存在。",
+    "ideaZh": "UniFunc3D 先看低分辨率视频，再获取候选附近的原生完整帧，定位功能部件、核验 SAM 3 masks 并多视图 lifting 到 3D。作者报告 SceneFun3D split0 mIoU 为 24.30。主动观察与 mask verification 值得借鉴；极小部件和重遮挡仍会漏检，同 backbone 比较也并非全部胜出。",
+    "motivationZh": "隐含操作指令要求定位可交互的细小部件，整物识别和单帧观察容易漏检；目标是主动获取有效视图，将功能部件可靠地定位到三维场景。",
+    "methodZh": "任务要求从隐含操作指令找到可交互的细粒度 part，而非识别整件家具。方法用 Qwen3-VL 冻结 backbone，四轮错位低分辨率采样同时输出 functional-object name、frame index 与 point，再对候选附近的高分辨率完整帧逐帧定位。SAM3 按 points 生成 masks，同一 MLLM 看红色 overlay 去除 parent-object 过分割，经 depth/pose lifting 和跨视图 agreement 得到 3D mask。收益在 SceneFun3D 验证，未训练新模型，亦不提供机器人操作成功保证。",
+    "methodFlow": [
+      "输入 posed RGB-D views、point cloud 和隐含 natural-language task。",
+      "多轮错位低分辨率采样；统一 MLLM 联合识别 functional object、候选 frame 与 affordance points。",
+      "围绕各候选处理 dense temporal window 中的 native high-resolution 完整帧，重新定位细粒度 parts。",
+      "SAM3 从 points 生成 masks；同一 MLLM 核验 overlay 是否仅包含目标 part。",
+      "用 depth/camera poses 将保留 masks 投到 3D，以 multi-view agreement threshold 输出 functional-point mask。"
+    ],
+    "experimentsZh": "实验设置：SceneFun3D 的 30-scene validation split0 与 200-scene split1；冻结 Qwen3-VL-8B/30B，coarse 每轮 64frames、四 offset 轮，fine 窗口 native high resolution；SAM3 confidence0.5、agreement0.7。报告 AP/AR at0.25/0.5 与 mIoU，统一 8×H100 平台计时。\n作者报告 UniFunc3D-30B split0 AP50=31.24、AP25=51.01、mIoU=24.30；split1 mIoU=17.09。（Table1, p.7）\n作者报告 8B 约 53sec/query、16min/scene，30B 约 99sec/query、26min/scene；Fun3DU 约 332sec/query、82min/scene。（Table7, p.14）\n作者报告 8B 用 SAM 替换 SAM3 的 mIoU20.78 vs20.92，表明主要收益不依赖新版 segmentor。（Table5, p.10）\n比较范围：比较 OpenMask3D/LERF/OpenIns3D、Fun3DU、TASA、AffordBot，采用 reported/reproduced 较优结果；原 training-based methods 只在 split0 比较，split1 用于其训练。backbone 年代、规模与任务训练有差异，同 72B 对照并非所有指标领先。\n消融与诊断：两阶段、temporal window、多 sampling、overlay verification 和 base-model 替换均有消融；window/verification 收益依 candidate pool。SAM 替换变化很小，支持观察流程作用；尚未全面分离 backbone 视觉能力、prompt 与 data-pretraining 影响。",
+    "insightZh": "主要是统一视觉任务解析、coarse-to-fine 完整帧观察、错位多轮采样和视觉 mask verification 的系统方法贡献；多视图 lifting 沿用前作，不能声称训练新的 3D segmentor 或消除全部启发式/阈值。",
+    "whyRelevantZh": "直接命中 language-grounded object/part 3D segmentation，完整帧高分辨率观察和 mask 验证可启发 part-aware editing/assembly pipelines；LEGO 或 fabrication 迁移仍需另行实证。",
+    "evidenceZh": "coarse 多轮 offset frames 与 fine 高分辨率完整帧相结合，SAM3 masks 由同一 MLLM visually verify 后 lifting。（Sec.3.2–3.5, Fig.2, pp.4–6；Fig.2 已查看；Table9–11 给出 grounding/verification prompts。）\n作者报告 30B 在 split0 mIoU24.30、AP50 31.24，Fun3DU 分别 15.2、16.9；split1 mIoU17.09。（Table1, p.7；主表已视觉核验；59.9%为 split0 relative mIoU gain，不是绝对准确率。）\n作者报告同 Qwen2.5-VL-72B backbone 下本方法 AP50 22.02，低于 TASA26.9，但 AP25 40.90 与 mIoU20.07 高于 28.6/19.7。（Table4, p.10；表格已查看，正文关于“across all metrics”的措辞不可泛化到同 backbone 配置。）\n作者报告 8B 完整设计 mIoU20.92；低→高单帧 12.71，加入多轮采样 18.10、单独 temporal window17.26。（Table2, p.8; Table3, p.9；支持组件互补，verification 不是 oracle；K 和 window 仍需设定。）\n作者列出极小 part 与重遮挡限制，效率是在 8×H100 平台测得；未报告 error bars。（Appendix A.1–A.3, pp.14–15; Checklist7, p.24；限制与 runtime 页均已视觉核验；没有实机 interaction 成功评估。）",
+    "caveatZh": "Appendix A.3 指出极小 functional parts 和 severe occlusion 仍具挑战，未来需显式 3D geometric reasoning 及 interactive correction。\nChecklist7 说明没有 error bars；Appendix A.2 尚未重测单 H100 平台。\n证据限于 SceneFun3D indoor scenes，不能推断对 LEGO 细小接触/connector 或实机可操作性已验证。\n正文称替代全部 hand-crafted rules，但实际仍有 sampling 次数、window、SAM threshold 与 agreement threshold。\n同 Qwen2.5-VL-72B 的 AP50 低于 TASA；不能把优势全归因于系统而忽略新 backbone 差异。\nMLLM verification 可能与 grounding 共享偏差，depth/pose lifting 依赖输入几何可靠性。\n本项目只读该 exact PDF，数字均为作者报告，未运行或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

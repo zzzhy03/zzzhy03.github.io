@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2603.11048",
+  "slug": "comic-agentic-sketch-comedy-generation-2603-11048",
+  "title": "COMIC: Agentic Sketch Comedy Generation",
+  "authors": [
+    "Susung Hong",
+    "Brian Curless",
+    "Ira Kemelmacher-Shlizerman",
+    "Steve Seitz"
+  ],
+  "publishedAt": "2026-03-11",
+  "updatedAt": "2026-10-04",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2603.11048"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV",
+    "cs.MA",
+    "cs.NE"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "video-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "COMIC",
+    "Visual Design Agents",
+    "Video Generation"
+  ],
+  "abstract": "We propose a fully automated AI system that produces short comedic videos similar to sketch shows such as Saturday Night Live. Starting from character references, the system employs a population of agents loosely modeled on roles in real production studios and structured to optimize the quality and diversity of ideas and outputs through iterative competition, evaluation, and refinement. A key contribution is the introduction of LLM-based critics aligned with real viewer preferences through the analysis of a corpus of comedy videos on YouTube, enabling automatic evaluation of humor. We further propose multi-island relativistic evolution for script improvement, along with script-conditioned rendering critics that perform shot- and video-level tournaments. In both human and automated evaluations, COMIC receives higher scores than agentic and video generation baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.11048v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.11048v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/SusungHong/COMIC"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.11048v2 全文及 2026-10-06T14:15:32.905561+00:00 审阅记录；PDF 20 页，SHA-256 0192fca251971e55f77db53642752ce5ff9603fd90c943a3a98dce8e92f0e4a9，视觉核验第 1、4、6、7、8、9、14、17、18、19、20 页。数字均为作者报告，本项目未独立复现。代码状态 available：Exact PDF p.1officialproject https://susunghong.github.io/COMIC →Code→publicrepo；实际确认 video_eval/evaluate_videos.py 与 critic/asset 数据，非 README-only。当前公开的是 evaluation 实现，完整 generation/inference 仍 TODO 且 PDFp20 承诺 uponacceptance，不能称整 productionpipeline 已开放。",
+    "ideaZh": "COMIC 将多 island 脚本竞赛与视频实际渲染后的 critic 修改连起来：保留角色/背景/前 shot 资产，shot 历史与整 video 分别 tournament 选优，避免默认最后一次修改最好。适合 deep 借鉴 open-endedvisual creation 的多候选、反馈和回退。作者报告比 agentbaselines 更好，但人类 funniness 仍 3.45/7、低于 moderatelyfunny4，closed models 视觉一致性更强；YouTubeviews 对齐、不同计算预算和小 human study 限制结论。",
+    "motivationZh": "多镜头喜剧视频同时要求脚本有趣、角色和背景连贯，且渲染会暴露文字阶段看不到的问题；需要保留多个候选并依据实际视频反馈选择和修改。",
+    "methodZh": "先按五 comedychannels 的 projectedinfiniteviews 分 tiers，metaLLM 采 critics/validationselect；各 island 用不同 criticcommittee roundrobin 评价，只 rewrite loser，G4 后 globalleague 选 top4 scripts。SceneDirector 产生 JSONshotlist、referenceassetbank 和 previousshot，FLUX/TTS/Wan 渲染；multimodalcritics 实际看 shot 并改方向，historysingleelimination 恢复优选，再在 D 完整 scene 版本选 video。算法无 parameterupdates，依赖外部 API 与采样/选择。完整 20 页 inclmodels/hyperparameters/JSON/human study 读完，纯图 page19 实际完整查看避免 extractrotation 乱码；主 loop/表格/失败修订/限度视觉 QA 完成。",
+    "methodFlow": [
+      "生成并筛选多口味 critics：真实 YouTube 各 channel engagementtiers 提供 incontextexamples，10 候选 critic 在 top-bottom/top-middlevalidation 任务选，benchmarkvideojudge 独立采样/选择。",
+      "island 脚本相对竞赛：各 population/committee 分开 roundrobin，critic 反馈让 loser 重写并吸收 winner 优点；G4 后合并 league 再 selectedtop4，不要求文本 score 单调保证。",
+      "有资产记忆的 shot specification：JSON 明确 character/background/voice/reference_shots/firstframecomposition/videoprompt，director 先规划，assetbank 保存角色背景和已选 shotlastframe。",
+      "render-observe-edit 并保留历史：生成图像/声音/video 后 multimodalcritic 观察并调整，historyshot tournament 按原 script/priorcontext 挑优选，多个 direction 完整 video 再 tournament，避免仅采用 latestiteration。"
+    ],
+    "experimentsZh": "实验设置：Base K3scripts3critics3、D2rendercritic1，G4；singleH200 约一天+API 约$5，未包含硬件租赁总成本。四 videos/method、blindrandomhuman110responses=22×5，7pointscales；automatedvsheld-outmiddle-tierprofessionalYouTubevideos，winrate/intervariance/intravariance 归一化。BackbonecontrolledVGoT/MovieAgent 另表。\n作者报告 funniness3.45vsSora2 2.73、narrative4.50vs3.36；Realism4.27vsSora5.73、Consistency4.50vs5.50。VsHuman3.05<comparable4，不表示已达到 professionalcomedy。（PDF pp.7–8, Table3/§4.3）\n作者报告 automatedprofessionalreferencewinrate.44/.39，高于 Sora.075/.175 但均<.5；SingleBestintradiversity.682 低于 Sora.722，与正文全部 diversity 最高的文字不一致，按表核对。（PDF p.7, Table4）\n作者报告 same backboneNoRefinewinrate.30→full.44/Channel.31→.39，VGoT*.03/.17、MovieAgent*.02/.13；控制 backbone 仍没有等预算 selection/numberrenders 对照。（PDF p.8, Table5）\n作者报告 critic-free 对照 funniness62%/script57% 偏好 full，consistency100% 仅 nonneutralresponses；未提供 A/B 样本数/CI，不解读为绝对 correctness。（PDF pp.9/18, Fig9/AppendixH）\n作者报告 writingcriticheld-outTopMiddle.578/TopBottom.716，低于 validation.644/.830；task-wise 比 singlebest.554/.670 强，但细微喜好预测仍有限。（PDF p.4, Tables1–2）\n比较范围：VGoT/MovieAgent 与 Sora/Veo，closedclips 更短且 realism/consistency 不同 tradeoff；Table5 换相同 generationbackbones 帮助排除仅 base 质量，但 calls/GPUs/time/length/numbercandidates 仍不相等。Academic-audiencecritic 挑 top4，非对所有 initialsamples 平均。\n消融与诊断：Generations/islands/scales、same backboneNoRefine 及 humanNoCritics；singlevsmulti 保持 iterations 但其他 committee/populationpressure 同时改变。Noequalbudgetbest-of-N/randomcritics、nohistorytournament/memory 单拆、externalmodelversions/stochasticgeneration 影响 repro。",
+    "insightZh": "Genericroles/evolution/tournaments 不是全新，贡献是以生成并选择的 diverseengagementcritics 驱动 scriptislands，及 script-conditioned 真实 video 反馈、depth-history 与 breadth-video 选择共同组成可执行视觉工作流。符合 visual-design-agents focusedgate；textscript 只是前段，最终 artifact 是多 shot 视听作品。移植意义是生成评审和回退策略，不把 relativefitness 故事当 optimizationguarantee 或新 videobackbone。",
+    "whyRelevantZh": "Planning/toolgeneration、artifactobservation、feedbackedit、referenceassetmemory 和失败回退构成 visual-design-agent 实质闭环；多口味评价与历史 candidate 保留可迁移 open-endeddesign。本文未验证 SVG/embroidery/CAD，迁移范围是 agentworkflow 机制。",
+    "evidenceZh": "Renderingcritic 接收真实 shot 与 context 后修改，而非只评 script。（PDF pp.5–6/8/17, Eq7–10/Fig4/6/JSONschema；资产 memory、previousshots 和 script 提供约束；历史选择可恢复旧 candidate 但仍依赖 critic 判断，非质量 monotonic guarantee。）\nAlignedcritics 只是 YouTube projectedviews 的 generate/select，不是直接训练 humanhumorreward。（PDF pp.3–4/13–14, §3.3/AppendixB/Fig11；Per-channellogisticcross-videofit，4940 采样中 tiers 共 450 进入 split；views 受 topic/distribution/明星/ageconfounding。图 11 散点很宽，未给 goodnessoffit，growthcorrection 不能消除全部噪声。）\nBenchmarkcritics 与优化 critics 独立采样/selection，但同类 LLM/engagement 偏好仍可能相关。（PDF pp.3/7/15, §4.3/Table7；Rendering 与 benchmark 使用 Gemini3FlashPreview，不能将 independentprompts 误写独立 humanjudges。）\nHumanstudy A/B percentages 排除 ties，100%consistency 不是全体受试者或所有 video 保持一致。（PDF pp.9/17–19, Fig9/AppendixH；三选 A/tie/B，neutral 排除；A/B 人数未明确，主 110=22×5responses 不是 110 独立 participants。）",
+    "caveatZh": "PDF p.9：iterativerefinementcost，normalizedYouTubeviews 是 noisyhumorproxy；future soundeffects/originalityattribution。\nPDF p.20：stochastic/API 更新影响 exactreproduction，fullcodeuponacceptance。\nIslands relativefitness 不保证逐代提升或 Paretofrontier；promptedcritics 偏好可相关，normalizedprobvariance 不等于真实 semantic/visualdiversity。\nOnly4videos/method/110responses，未完整 participantsassignment/uncertainty，humancomparable 以记忆中的 professionalcomedy 为参照非直接 matchedpair。\nCritic 可选择性规避 hardshots，长 video 与 shortfrontier 不同长度/资源预算；多 render 效果未与相同 sample budget 搜索分离。\nVisualmemory 保存 images/lastframes 非显式 editable3Dscene 或身份几何保证；paperqual 仅代表 shotfix，未验证 duration-scale 物理/连续 camera。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

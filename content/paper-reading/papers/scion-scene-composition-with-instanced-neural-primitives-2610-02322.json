@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.02322",
+  "slug": "scion-scene-composition-with-instanced-neural-primitives-2610-02322",
+  "title": "SCION: Scene Composition with Instanced Neural Primitives",
+  "authors": [
+    "William Koch",
+    "Amogh Joshi",
+    "Cyrus Vachha",
+    "Cheng Zheng",
+    "Felix Heide"
+  ],
+  "publishedAt": "2026-10-01",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.02322"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "SCION",
+    "3D Reconstruction"
+  ],
+  "abstract": "Real-world scenes are compositional: bricks, blades of grass, pebbles, and tree leaves recur across human-built and natural environments. Existing neural scene representations model these elements independently. Most 3D Gaussian Splatting and follow-up abstraction and compression methods treat each element as unique, fitting millions of independent Gaussians per scene. Prior methods like Splat and Replace fit template objects, but they require mostly manual selection of repeated elements. As a result, these representations store redundant parameters and provide weak manipulation handles for downstream tasks. We introduce SCION, a hierarchical compositional scene representation that replaces independent Gaussians with a compact vocabulary of reusable primitives and lightweight world-space instances that place transformed copies throughout the scene. We fit this representation to multi-view captures via a joint optimization over discrete and continuous scene parameters, combining two-level densification over splats and instances with an adversarial loss that preserves detail across shared primitives. The recovered structure yields a compact, controllable representation while maintaining high quality even at 1.2 MB. SCION achieves rate-distortion favorable to existing Gaussian compression methods, and it enables instance-level scene editing and animation without retraining. Our results show that neural scene representations need not memorize scenes as independent primitives; they can discover reusable parts. Project webpage: https://light.princeton.edu/SCION",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.02322v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.02322v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.02322v2 全文及 2026-10-06T11:06:40.853112+00:00 审阅记录；PDF 13 页，SHA-256 ee372bc523fc289f571d94d68c6338ad6082916a45591b129ecabc359810810b，视觉核验第 1、3、7、9 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 只印 project page https://light.princeton.edu/SCION；未见 public code URL，project page 访问未成功，故不推断 code 存在。",
+    "ideaZh": "SCION 把 scene 恢复为共享 Gaussian primitive vocabulary 与轻量 instances，给重复 foliage/masonry 可直接编辑和动画的结构。作者报告 1.204 MB 时 Mip-NeRF360 PSNR 22.01、LPIPS 0.431，明显弱于同量级 HAC++/OMG；价值在结构而非最佳压缩 fidelity。DINO 初始硬分配训练中固定，不能称联合学习语义类别。",
+    "motivationZh": "真实场景中的枝叶、砖石等重复结构通常被存成独立 Gaussians，难以整体修改；需要共享 primitive 与实例表示，让重建结果更便于编辑和动画。",
+    "methodZh": "输入 calibrated posed RGB 与 sparse COLMAP points，DINOv3 初始化 primitive assignments；模板 local splats 与 instance pose/scale/opacity 分开两 pass 更新，分别 densify 并用 patch adversarial loss 抑制共享模板的平均化。四组标准重建数据检验 size/quality，editing/风动画仅定性。可复用 primitive 对 part-based 编辑有价值，既非 LEGO 专用方法，也非新的 generative model。",
+    "methodFlow": [
+      "输入 posed RGB、calibrated cameras 与 sparse COLMAP point cloud",
+      "Frozen DINOv3 初始化 fixed primitive assignment；每模板存 local Gaussians",
+      "Instance transforms 装配 world Gaussians，分别 stop-gradient 更新模板和 instances",
+      "模板内 birth/relocation 与 instance clone/subdivision 控制覆盖和容量",
+      "Photometric/LPIPS 加 splat-pass adversarial patch loss 保持共享细节",
+      "输出 primitive vocabulary＋instance handles，可插入、替换或整组施加动画"
+    ],
+    "experimentsZh": "实验设置：Mip-NeRF360、Tanks&Temples、DeepBlending、Synthetic-NeRF 标准 camera splits；通常 30kiterations。主 matched-storage 目标约 1.5 MB，garden anchor ablation Small/Large 各 n=3。\n作者报告 Ours-Small1.204 MB、PSNR 22.01、SSIM0.605、LPIPS 0.431；OMG1.353 MB、26.25/0.770/0.271。（Table1, p.7）\n作者报告 garden Large 加 adversarial 后 LPIPS 从 0.33 到 0.27，而 PSNR 从 23.09 到 22.88；体现 perceptual/fidelity tradeoff。（Table2, p.8）\n比较范围：matched-storage rerun ContextGS/HAC++/OMG，不能压至 2 MB 的 PCGS 未纳入。明确承认标准高 fidelity 压缩方法 metrics 更好；无结构恢复 ground-truth 或量化编辑/动画 benchmark。\n消融与诊断：累积添加 instanceDC、LPIPS、adv；adv 改善 perceptual LPIPS 但损 PSNR/SSIM，单 garden 限制因果泛化；全文引用 S1/S2 补充表但所获 13 页 PDF 未附此 supplement，未假称读取。",
+    "insightZh": "主要新意是把具体共享几何 primitive 而非参数 codebook 作为可恢复结构，并设计两层 densification/交替优化。硬分配固定和现有 MH birth/DINO 初始化限定了“端到端学习 repetitions”的含义；不将 editing editor 或 GAN loss 单独称首次。",
+    "whyRelevantZh": "自动发现可复用重复 primitive 并暴露 instance edits，对 part/assembly representation 和 editable3Dassets 有清晰迁移。论文不是 LEGO 研究，砖墙只是 repetition 示例；从 reconstruction 到 generativeinstanceprogram 属于作者展望而非已验证。",
+    "evidenceZh": "模板 local splats 与 world instances 按 pose/scale 装配，stored 参数随 vocabulary＋instances 而非 assembled Gaussians 增长。（Sec.3.1, Eq.1–4, pp.4–5；依据该 exact PDF；未独立复现。）\nAssignments 由 DINOv3 初始化并在 reconstruction 中固定；两 pass 分离 primitive/instance gradients。（Sec.3.1–3.2, p.5；依据该 exact PDF；未独立复现。）\n作者报告同 storage Ours-Small22.01PSNR/0.431LPIPS，对 HAC++26.51/0.299、OMG26.25/0.271，显示 fidelity 显著落后。（Table1, p.7；结果表已实际视觉核验；本项目没有复现。）\nInstance handles 允许可复用模板增删替换与 coherent wind motion，但只是定性应用。（Sec.4.4, Fig.5, pp.8–9；依据该 exact PDF；未独立复现。）\n无真实重复或强 instance variation 会 underfit；fixed assignments 不能交换 primitive，training 比 vanilla3DGS 更贵。（Limitations, p.9；依据该 exact PDF；未独立复现。）",
+    "caveatZh": "共享先验只适合真实 repetition；unique geometry/per-instance variation 会 underfit 或退化 one-offtemplates。\nHard assignments 固定阻止模板间迁移；view-dependent higher-order SH 被省略。\n两 pass、discriminator 与 LPIPS 使 training 更昂贵。\n本 PDF 完整读至第 13 页；正文指向 S1/S2 但归档未含 supplement，初始化/算法细节证据不完整。\n定性 editing/animation 未证明 semantic part 准确性或物理可制造性。\n只减少 stored representation，rasterizer 仍随 assembled Gaussian 数增长。\n证据仅作者报告与页面视觉检查；未运行代码或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

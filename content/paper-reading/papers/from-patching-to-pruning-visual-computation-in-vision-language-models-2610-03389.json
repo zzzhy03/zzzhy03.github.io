@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.03389",
+  "slug": "from-patching-to-pruning-visual-computation-in-vision-language-models-2610-03389",
+  "title": "From Patching to Pruning Visual Computation in Vision Language Models",
+  "authors": [
+    "Rahul Chowdhury",
+    "Timothy A Rupprecht",
+    "Xuan Shen",
+    "Shaoyi Huang",
+    "Pu Zhao",
+    "Yanzhi Wang"
+  ],
+  "publishedAt": "2026-10-02",
+  "updatedAt": "2026-10-02",
+  "collectedAt": "2026-10-06",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.03389"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "From Patching to Pruning Visual Computation in Vision Language Models",
+    "VLM / MLLM"
+  ],
+  "abstract": "Vision language models (VLMs) incur substantial inference cost because every visual token is processed by the attention and MLP projections of every decoder layer, even when token-specific visual computation is unnecessary at many depths. We introduce Patch-to-Prune (P2P), inspired by Mechanistic Interpretability, a training-free framework that converts activation patching from a diagnostic tool into an inference-time computation bypass. P2P performs validation-guided forward and backward layer sweeps to identify decoder regions whose visual-token projection outputs can be replaced by fixed neutral proxy activation vectors within a user-specified accuracy tolerance. Unlike conventional token-pruning methods, P2P preserves the sequence length, token order, positional information, attention mask, and residual pathways, thereby pruning computation without removing tokens or modifying the pretrained model weights. We evaluate P2P on four VLMs from the Qwen2.5-VL and LLaVA families across seven multi-modal benchmarks using mutually disjoint calibration, validation, and test partitions. P2P at a 3% tolerance retains around 94% of dense accuracy while reducing FLOPs by 55%. Beyond these efficiency gains, our layer-wise analysis suggests that visual processing in VLMs is non-uniformly distributed across decoder depth: early and late layers often require little token-specific visual computation, whereas intermediate layers appear to perform most task-relevant visual integration, enabling later reasoning to rely largely on visual information already embedded in shared residual and textual representations. This makes P2P both an efficient inference framework and a causal lens into visual information processing in VLMs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.03389v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.03389v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.03389v1 全文及 2026-10-06T11:41:54.413706+00:00 审阅记录；PDF 15 页，SHA-256 59c36c01af74b410da3003536932e57d2c7af875115e43959d4d309de1824077，视觉核验第 1、2、7、8、15 页。数字均为作者报告，本项目未独立复现。代码状态 not-found：PDF 没有本方法 public code URL，不能凭引用的 opensourcebackbone 提供 Code 链接。",
+    "ideaZh": "P2P 用 calibrated visual activation means 替代部分 decoder projection 输出，按 validation prefix/suffix sweeps 选择 bypass 层，保留所有 tokens/residuals。作者报告 3%tolerance 平均约 55%FLOPs/22%latency 降低、94%accuracy 保留；3% 只是 validation 选择参数，不是 test 保证，TextVQA/CVBench 可明显掉分。是视觉计算路径研究，资源换准确率而非无损剪枝。",
+    "motivationZh": "VLM 的视觉计算并非在所有 decoder layers 都同样有用，但直接删 token 会丢失证据；需要研究哪些视觉投影可被校准表示替代，以及准确率代价。",
+    "methodZh": "每 model/dataset 取 100calibration 估各 layer/module 视觉均值，100 有标签 validation 测 forward/backward 累计替换，选 prefix/suffixunion。Test 跳过 visualrows 的 QKV/O 和 MLPmatmuls，以均值填入；textrows 照常。四 VLM 和七 benchmarks 支持近似固定 visualcontribution 可复用，LoRA 为可选补偿，不属于 training-free 主结果。",
+    "methodFlow": [
+      "100calibrationexamples 等权估每 layer/projectionvisualmean",
+      "另 100validation 测 forwardprefix/backwardsuffix 累计 patching",
+      "按 relativeaccuracyτ边界取 union，固定到 test",
+      "Safe 层 visualprojection 直接填 cachedmean，textrows/unselectedlayers 照常",
+      "保留 tokens/positions/residualpath，输出答案；可选 patched-graphLoRA 补偿"
+    ],
+    "experimentsZh": "实验设置：Qwen2.5VL3B/7B 与 LLaVA-v1.6Vicuna7B/13B；WhatsUp 两 subsets、POPE、ScienceQAIMG、GQA、TextVQA、CVBench、AI2D。100stats/100validation/disjointtest；τ1/3/5%；LoRA 仅 optionalablation、rank1、100statssamples10epochs。\n作者报告四 models/eightcolumns 平均 3%setting 保留 94%accuracy、减 55%FLOPs/22%latency。（Sec.5.2,p.8）\n作者报告 LLaVA7B3%accuracy0.601，FastV0.635/PyramidDrop0.639，P2P 速度/FLOPs 更低但 accuracy 更差。（Table1,pp.7–8）\n比较范围：相同 models/prompts/precision/tests 下 dense、FastV、PyramidDrop；缺 productionruntime/hardware 明确规格、sameaccuracybudgetPareto 匹配和新任务无需重 calibrate 迁移。\n消融与诊断：Mean 胜 zero/noise/randomtoken；100stats 后收益稳定，optionalLoRA 恢复部分 accuracy。Prefix/suffix 独立 sweeps 的 union 无统一 testguarantee；model/dataset 特定 means 与 frontiers。",
+    "insightZh": "将 activationpatching 从执行后干预转成实际 visual-rowmatmulbypass，与沿 sequence 删 token 正交。Depthsensitivity 只支持给定 proxy/intervention/任务下可替换性，不证明独立语义因果分工；全 graph/validationtolerance 仍可能泛化失败。",
+    "whyRelevantZh": "将视觉信息位置/深度与计算预算区分，可启发 VLMdesign-agent 观察的计算路径检查；未实测 CAD/SVG 或 3Ddesign 迁移。保持 residual/sequence 而删 per-tokencompute 是可复用机制。",
+    "evidenceZh": "Means 按 example 等权，separate100calibration/validation；fixedprefix/suffixunion 用于所有 test 样本。（Sec.3.2–4.3,Eq.1,pp.3–5；Fig1 实际查看，不称 label-free 选择。）\n作者报告 LLaVA7B3% TextVQA0.601→0.524、CVBench0.598→0.506。（Table1,p.7；主表已视觉核验，drop 可大于τ。）\n作者报告 LLaVA13B3%average latency0.619→0.462s，averageaccuracy0.693→0.657。（Table1,Sec.5.2,pp.7–8；不同 tradeoff 点，不全面胜 tokenpruningbaseline。）\n作者明确 testdrop 可超 tolerance，高τ也可能 FLOPs 降低但 latency 增加。（Sec.5.2,p.8；该限制讨论页已实际查看。）",
+    "caveatZh": "Testaccuracydrop 在部分 dataset 可超τ。\n更 aggressivepatching 可能降 FLOPs 却增 latency，非 monotonic 加速。\nTextVQA/CVBench 对 patching 更敏感，可需 LoRA。\nSafe 是 empiricalvalidationlabel，不是统计或语义保证；testpreserve94% 已经超 3%drop。\nMeans/sweeps 按 benchmark 获取，新设计任务或 visualdistribution 需重做校准。\n跳过 visualprojections 仍保留 denseattentionsequence，不能假称 token 数或全部 attentioncomplexity 下降。\n公开 code/hardware 计时详情有限，FLOPs 不等于普遍 walltimespeedup。\n完整 15 页含 Qwen 表/sweeps/testsizes 已读；实际 visual1/2/7/8/15，数字为作者报告。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
