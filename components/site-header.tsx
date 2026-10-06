@@ -1,18 +1,18 @@
 import Link from "next/link";
 import type { Language } from "@/content/site";
 
-type Page = "home" | "publications";
+type Page = "home" | "publications" | "tools";
 
 const routes = {
-  en: { home: "/", publications: "/publications" },
-  zh: { home: "/zh", publications: "/zh/publications" },
+  en: { home: "/", publications: "/publications", tools: "/tools" },
+  zh: { home: "/zh", publications: "/zh/publications", tools: "/zh/tools" },
 } as const;
 
 export function SiteHeader({ language, page }: { language: Language; page: Page }) {
   const labels =
     language === "en"
-      ? { home: "Home", publications: "Publications", cv: "CV" }
-      : { home: "首页", publications: "论文", cv: "简历" };
+      ? { home: "Home", publications: "Publications", tools: "Tools", cv: "CV" }
+      : { home: "首页", publications: "论文", tools: "工具", cv: "简历" };
 
   return (
     <header className="site-header">
@@ -22,9 +22,11 @@ export function SiteHeader({ language, page }: { language: Language; page: Page 
         </Link>
         <div className="header-actions">
           <nav aria-label={language === "en" ? "Primary navigation" : "主导航"}>
-            <Link href={routes[language].home}>{labels.home}</Link>
-            <Link href={routes[language].publications}>{labels.publications}</Link>
+            <Link className="nav-home" href={routes[language].home} aria-current={page === "home" ? "page" : undefined}>{labels.home}</Link>
+            <Link href={routes[language].publications} aria-current={page === "publications" ? "page" : undefined}>{labels.publications}</Link>
+            <Link href={routes[language].tools} aria-current={page === "tools" ? "page" : undefined}>{labels.tools}</Link>
             <a
+              className="nav-cv"
               href={
                 language === "en"
                   ? "/cv/hanyou-zheng-cv.pdf"
@@ -33,7 +35,7 @@ export function SiteHeader({ language, page }: { language: Language; page: Page 
             >
               {labels.cv}
             </a>
-            <a href="https://github.com/zzzhy03" target="_blank" rel="noreferrer">
+            <a className="nav-github" href="https://github.com/zzzhy03" target="_blank" rel="noreferrer">
               GitHub
             </a>
           </nav>

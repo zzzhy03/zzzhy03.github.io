@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { PublicationEntry } from "@/components/publication-entry";
 import { SiteHeader } from "@/components/site-header";
+import { academicWorkflow } from "@/content/tools";
 import {
   honors,
   news,
@@ -16,6 +17,9 @@ const copy = {
     news: "News",
     selected: "Selected Publications",
     viewAll: "View all publications",
+    tools: "Open-source Tools",
+    viewTools: "Explore tools",
+    toolDetails: "Learn more",
     honors: "Honors",
     teaching: "Teaching",
     teachingRole: "Teaching Assistant",
@@ -24,6 +28,9 @@ const copy = {
     news: "动态",
     selected: "代表性论文",
     viewAll: "查看全部论文",
+    tools: "开源工具",
+    viewTools: "查看全部工具",
+    toolDetails: "了解更多",
     honors: "荣誉与获奖",
     teaching: "教学经历",
     teachingRole: "助教",
@@ -109,7 +116,7 @@ export function HomePage({ language }: { language: Language }) {
   return (
     <>
       <SiteHeader language={language} page="home" />
-      <main className="page-shell">
+      <main className="page-shell" lang={language}>
         <section className="intro" aria-labelledby="intro-name">
           <div className="intro-layout">
             <h1 id="intro-name">
@@ -179,6 +186,30 @@ export function HomePage({ language }: { language: Language }) {
               />
             ))}
           </div>
+        </section>
+
+        <section className="section" aria-labelledby="tools-title">
+          <div className="section-heading-row">
+            <h2 id="tools-title">{t.tools}</h2>
+            <Link href={language === "en" ? "/tools" : "/zh/tools"}>{t.viewTools}</Link>
+          </div>
+          <article className="home-tool" aria-labelledby="home-tool-name">
+            <h3 id="home-tool-name">
+              <Link href={language === "en" ? "/tools#academic-workflow" : "/zh/tools#academic-workflow"}>
+                {academicWorkflow.name}
+              </Link>
+            </h3>
+            <p>{academicWorkflow.summary[language]}</p>
+            <ul className="tool-tags" aria-label={language === "en" ? "Topics" : "主题"}>
+              {academicWorkflow.tags.map((tag) => <li key={tag.en}>{tag[language]}</li>)}
+            </ul>
+            <div className="tool-links">
+              <Link href={language === "en" ? "/tools#academic-workflow" : "/zh/tools#academic-workflow"}>
+                {t.toolDetails} →
+              </Link>
+              <a href={academicWorkflow.repository} target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+          </article>
         </section>
 
         <section className="section standalone-list-section" aria-labelledby="honors-title">
