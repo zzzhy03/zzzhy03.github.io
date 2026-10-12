@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2602.19171",
+  "slug": "histcad-constraint-aware-parametric-cad-histories-for-evaluating-editability",
+  "title": "HistCAD: Constraint-Aware Parametric CAD Histories for Evaluating Editability",
+  "authors": [
+    "Xintong Dong",
+    "Chuanyang Li",
+    "Peng Zheng",
+    "Chuqi Han",
+    "Jiaxin Jing",
+    "Hailong Shen",
+    "Yanzhi Song",
+    "Zhouwang Yang"
+  ],
+  "publishedAt": "2025-12-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v4",
+  "identifiers": {
+    "arxiv": "2602.19171"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "HistCAD",
+    "Constraint-Aware",
+    "Parametric",
+    "CAD",
+    "Histories",
+    "Evaluating",
+    "Editability"
+  ],
+  "abstract": "Sketch constraints specify geometric conditions for constructing and modifying parametric CAD models. We study whether predicted constraints allow a given history to reproduce the required initial model and support prescribed dimensional edits. We introduce HistCAD, an executable representation and dataset whose Academic and Industrial collections contain 180,495 parametric construction histories with entity-referenced sketch constraints and retained feature operations. Predictors receive these histories with the geometry and feature definitions retained and explicit sketch constraints removed. They generate constraints for every sketch without seeing the edit request. The benchmark compares models built with alternative constraint sets for the same history under the same dimensional edit. An edit succeeds when the model reproduces the required initial geometry, reaches the target value, preserves specified relations and unedited dimensions in the target sketch, and rebuilds through the complete history. A predictor trained on both collections and supplied with descriptions of the input histories achieves overall edit success of 52.4% on Academic and 29.0% on Industrial. Models retaining only endpoint-connectivity constraints in the target sketch and the history's constraints elsewhere can reach the target and rebuild while failing preservation. For all-sketch predictions, we retain the target-sketch prediction and restore the history's constraints in other sketches. More models then reproduce the required initial geometry, and some of these newly matched models complete the edit. HistCAD connects constraint learning to the construction and revision of parametric CAD models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2602.19171v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2602.19171v4"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2602.19171v4 的 29 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "HistCAD v4 实质更新了 all-sketch constraint prediction、pre-edit geometry matching 和 native replay 的 editability protocol，并新增 history-only/same-history/shuffled text 与 non-target restoration 实验；旧v3主要从 text生成整个CAD评估。作者报告新protocol Academic OES52.4%、Industrial29%，不能和旧v3 73.33%跨不同任务直接比较。值得精读约束恢复和可编辑性验收。",
+    "motivationZh": "生成或恢复 CAD 后，几何外观相近并不代表 sketch constraints 与 parametric history 足以支持后续编辑。需要在保持初始形状和建模操作相同的条件下，检验约束恢复能否维持受控参数修改后的模型可用性。",
+    "methodZh": "HistCAD从DeepCAD/SketchGraphs关联constraint、Fusion360及Industrial native histories统一180495histories、19constrainttypes、extrude/revolve/helix/fillet/chamfer。Qwen3-8B LoRA预测all-sketchconstraints，不见editrequest；同初始primitives/featuredefs下Fusion360重新solve/replay，目标sketchpreserve指定relations/unediteddimensions并检验后续history。任务先选Full与Connectivity起始match且Full目标sketch可编辑的500+500heldoutcases，保留后续featurefailure。Textdescriptions生成时看过constraint，收益是额外设计信息而非纯language reasoning；强可借鉴处是executable representation和多阶段editabilityevaluation。",
+    "methodFlow": [
+      "保存可执行history与局部entityIDs：flatline/arc/circle/ellipse/NURBS primitives、独立constraintsets、featureparameters/point-basedreferences按orderedJSON储存；solver恢复regions执行features。",
+      "生成all-sketchconstraints：移除explicitconstraints但保留geometry/features，Qwen3-8B LoRA在historyonly或pre-removaltextdescriptions输入上输出每sketchdictionary，不见editrequest。",
+      "验证起始geometry：准备modificationdimension后replay，targetsketch与Fullmatch、bodycount/assignedbbox/volume/sampledsurface均过tolerance，否则不applyedit。",
+      "执行prescribededit并检验：更新/补一个equivalentdimension，其他约束/feature/reference固定；检查targetT、指定preservationP和fullrebuildV，OES以所有assignedtasks为分母。"
+    ],
+    "experimentsZh": "180495histories/3476914constraintentries，Industrial18352且54.1%multioperation；4predictor singletrainingruns、same/shuffled/historyonly6conditions；Academic/Industrial各500edits各半addition/modification，source/designvariant分组划split及10Kbootstrap。 以下结果为作者报告：作者报告最佳OESAcademic52.4/Industrial29.0%；jointtraining工业提升19.8→29.0，95%CI[3.3,15.9]pp；Academic提升CI包含0。（PDF pp.7–8, Table2; p.24, Table15）；作者报告工业predictionavailabilityjoint95.19%vsAcademictrained52.57%，trainingdomain和responsecoverage也是效应组成。（PDF p.23, Table14） 对照范围：同QwenLoRA训练域/输入对照与Full/Connectivitycontrols，没有先进constraintgenerationmethodshead-to-head；targetsketchonly和all-sketchscope区分清楚。 消融与诊断：description correspondence、industrialdata、non-target restoration、highF1failurestage、unique-predicteddimension；singlepredictorruns，bootstrap只衡量tasksampling不涵盖trainingvariance。",
+    "insightZh": "主要是constraint-aware executableCADrepresentation和evaluation，baselineLoRA没有新foundationarchitecture；属于用户coreCADstructured/executablegeneration方向，价值在把syntacticconstraintF1和真实修改行为分离。",
+    "evidenceZh": "geometry相同不保证编辑后保留设计关系。（PDF pp.5–6, §4.1–4.4/Figure2; p.8, Table3）；同historydescriptions给额外constraint信息。（PDF pp.4,6,8; p.17, AppendixA.5; pp.21–22, AppendixC）；industrialall-sketchprediction仍只有29.0%整体成功。（PDF p.7, Table2; pp.24–25, Tables16–17）；高constraintF1不是可编辑保证。（PDF p.9, Table5; pp.25–26, Table18）；v4相较May29 exactv3实质改变任务/数据/验收：Industrial8093→18352histories；从text-to-CAD到fixedhistoryallsketchconstraintrecovery，加入pre-edit匹配/responseavailability/明确Vgate、same/shuffled/history-only和non-targetrestoration对照。新protocol结果29%Industrial不能直接当旧64%下降，科学对象/分母不同。（v1(previous v3) PDF pp.5–7/10 Tables 11–13 versus current v4 PDF pp.4–9 Tables 1–5）",
+    "caveatZh": "保留primitive/featuredefinitions，只预测constraints；每history一项prescribededit，successiverevisions未测试。；FunctionalType是AI可能用途而非验证label；textdescriptions可含已移除constraints。；Fix/Mirror不测preservation，Normal相关candidate排除/预测执行reject；underconstrainedsketch允许。；Fullfeasible目标sketch的taskselection有selectionbias，不能当任意useredit成功率。；nativeimplicitconstraints/constructionhelpers仍保留，不是完全无constraint从rawgeometry恢复。；sampledsurfmatch和冻结point-basededgereferences有各自容差/失败机制；匿名code端点返回not_connected，未确认publicimplementation。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接是可执行、结构化、constraint-awareCAD生成/修改评估，适合把程序生成从geometrymatch提升到designintentpreservation，high/deep。"
+  }
+}

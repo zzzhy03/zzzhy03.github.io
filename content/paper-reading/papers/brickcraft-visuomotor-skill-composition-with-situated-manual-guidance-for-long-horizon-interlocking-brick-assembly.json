@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2605.07605",
+  "slug": "brickcraft-visuomotor-skill-composition-with-situated-manual-guidance-for-long-horizon-interlocking-brick-assembly",
+  "title": "BrickCraft: Visuomotor Skill Composition with Situated Manual Guidance for Long-Horizon Interlocking Brick Assembly",
+  "authors": [
+    "Jichuan Yu",
+    "Bowei Li",
+    "Zhenran Tang",
+    "Guanxing Lu",
+    "Chuxiong Hu",
+    "Ruixuan Liu",
+    "Changliu Liu"
+  ],
+  "publishedAt": "2026-05-08",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.07605"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "lego",
+    "fabrication"
+  ],
+  "primaryTopicId": "lego",
+  "keywords": [
+    "lego",
+    "BrickCraft",
+    "Visuomotor",
+    "Skill",
+    "Composition",
+    "Situated",
+    "Manual",
+    "Guidance",
+    "Long-Horizon",
+    "Interlocking",
+    "Brick",
+    "Assembly"
+  ],
+  "abstract": "Autonomous robotic assembly of interlocking bricks demands seamless integration of long-horizon task reasoning, spatial grounding, and fine-grained manipulation. This paper presents BrickCraft, a compositional framework designed for long-horizon and generalizable interlocking brick assembly. BrickCraft models the assembly process using a relative formulation, where each step is anchored to a reference brick within the partial structure, thereby decomposing complex tasks into a finite set of reusable primitive skills. BrickCraft bridges the gap between high-level assembly plans and physical execution through situated manuals, which provide explicit spatial guidance for learned visuomotor skills by projecting the assembly intent onto real-time robot observations. Finally, BrickCraft employs a modular execution pipeline that chains these spatially grounded skills to accomplish long-horizon assembly tasks. Extensive experimental validations demonstrate that BrickCraft acquires proficient assembly skills from a limited set of demonstrations and effectively composes them for diverse long-horizon assembly tasks. The project website is available at https://intelligent-control-lab.github.io/BrickCraft.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.07605v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.07605v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.07605v2 的 9 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "BrickCraft 把 Duplo assembly 写成 reference-brick 相对关系与可复用技能，再将 symbolic plan 渲染成 mask 并对齐实景，以 background dimming 引导 diffusion policy。值得精读的是合法积木结构到物理执行的接口和约束；作者报告单步 240 次试验成功率 86.25%，但最长 9 步任务全程成功仅 2/6，completion rate 不是整件装配成功率。当前仅两种砖、七类技能，依赖已知 CAD、近似视角对齐和人工初始锚点，尚无自主失败恢复。",
+    "motivationZh": "把合法的数字积木结构变成机器人可执行的长序列装配，需要同时处理连接稳定性、拆装顺序、局部技能与实景视觉对齐。单纯给出symbolic plan不足以指导每一步的实际抓取和连接。",
+    "methodZh": "目标是把给定 interlocking-brick digital design 转成可执行装配。DFS 搜索满足连接、相机可见性、垂直移除无碰撞与 StableLego 稳定性的 disassembly，再倒序成 assembly plan。六维 task encoding 表示 reference/target 相对 stud-grid 平移、旋转与砖型；Blender reference masks 经 YOLOv8-seg、ECC affine alignment 和 SAM 2 tracking 转成 situated manuals，背景降至 25% 亮度。双相机视觉、task embedding 与含末端力的 proprioception 输入 U-Net diffusion policy，pick/assembly 链以 mask IoU 检查状态。作者以 Kinova Gen3 实验验证局部技能和组合，未证明任意 LEGO 设计或任意相机姿态都可执行。",
+    "methodFlow": [
+      "输入已知 CAD 的目标结构，以 DFS assembly-by-disassembly 检查 connectivity、observability、vertical swept-volume collision 和 StableLego stability，反转可行序列。",
+      "每步以 reference brick 为锚点，编码相对 stud-grid translation、planar rotation 和两块砖型，映射到已有 primitive skill。",
+      "Blender 渲染当前结构/reference masks；YOLOv8-seg 提取实景结构，ECC affine alignment 将 reference mask 映射到 camera view，SAM 2 跟踪 target/reference。",
+      "将非关键区域亮度降至 25%，将 situated workspace image、wrist image、task encoding、pose/gripper/force 送入 diffusion policy 生成 action chunks。",
+      "依次执行 pick 与 assembly；用 observed/expected structure-mask IoU 进行 pre/post-condition 检查，推进下一个装配步骤。"
+    ],
+    "experimentsZh": "Kinova Gen3+Robotiq 2F-85、wrist/table RealSense，2×2/2×4 LEGO Duplo 三色；865 demonstrations、7 task encodings、80+ configurations，约50标注图 fine-tune perception。单步三技能各8 seen+8 unseen structures×5 trials=240；七个 long-horizon tasks 每个6 trials。 以下结果为作者报告：作者报告单步总体成功率 86.25%，GI-DP/GI-π0.5 均低于50%；比较包含 task-encoding/visual-guidance 的输入差异。（Fig.4, Sec.IV-B, PDF pp.5–6）；作者报告 40 次表示消融中 Dimming/BBox/Hard Mask/Sep.Mask 为85.0/72.5/67.5/50.0%；含末端力/去力为90.0/67.5%。（Fig.6, PDF pp.6–7）；作者报告 L1–L7 full-task successes 为5/6、6/6、6/6、2/6、3/6、2/6、2/6；平均完成比例为95.8%、100%、100%、81.0%、85.7%、90.7%、87.0%。（Fig.7, PDF p.7） 对照范围：同 demonstrations fine-tune GI-DP 与 GI-π0.5，前者同 U-Net、后者 pretrained VLA。基线不含 situated manual 和 task encoding，不能将全部差距单独归因于 dimming；long-horizon 未给同任务完整基线曲线。 消融与诊断：比较四种 mask representations 和末端力，各40次。未独立消融 relative encoding、DFS/稳定性约束、ECC/SAM tracking 或 post-condition checker；没有跨硬件/更多砖型评测。",
+    "insightZh": "对照v1全文方法与实验及完整raw差异，v2从仅2×2、4D相对编码、3skills/692demos扩为2×2/2×4、6D含砖型编码、7skills/865demos；新增force ablation(90.0→67.5%)、四类manualrepresentation、7个long-horizon任务的cumulative/full-task成功率及空间扰动展示。原240次单步86.25%不是本次新结果。实质方法/实验增量落在本次updated event中，首次收录合法，非历史metadata回补。 贡献是 reference-relative skill abstraction 和 symbolic-plan-to-visual-grounding 接口，使有限 demonstrations 的技能可跨结构组合。Diffusion policy、SAM 2、YOLO/ECC 均为已有组件；不宣称新 foundation model、通用 3D segmentation 或 LEGO shape generation 方法。",
+    "evidenceZh": "v2增加brick-type条件、skills/data和force/long-horizon评测，构成窗口内实质更新。（v1 §III/Fig.2 pp.3–4, §IV pp.6–7; v2 Fig.2/§III, Fig.6–7 pp.6–7）；任务覆盖 planar baseplate 上的 rectangular stud-grid bricks，六维编码与四项拆卸约束决定装配可行性。（Sec. III-A/B, Fig. 2, PDF p.3）；situated manual 通过 render/segment/ECC/track 将计划对齐实景，workspace background 变为 25% 亮度。（Sec. III-C/D, Fig. 3, PDF p.4）；作者报告三类技能、48 seen/unseen structures 的 240 single-step trials 成功率 86.25%。（Sec. IV-A/B, Fig. 4, PDF pp.5–6）；作者报告 long-horizon completion rate 均高于 80%，但 L6 与 L7 full-task success 各为 2/6。（Fig. 7 and accompanying text, PDF p.7）；mask IoU post-check 不直接测隐蔽接触质量；长程错误会累积且 autonomous recovery 尚为 future work。（Sec. III-E, Sec. IV-B, Conclusion and Appendix B/Fig. A2, PDF pp.5,7–8）",
+    "caveatZh": "misalignment、collision 和 partially supported structures deformation 会失败；长 horizon 错误积累。；force 与高维视觉简单拼接存在 modality imbalance；自主 re-grasping/deformation correction 是 future work。；仅两种 Duplo 砖、七类技能，供料按颜色/形状预先分轨；首次 reference brick 人工放置，不等价于任意 LEGO set 从散料到成品。；render-camera 粗略对齐与 silhouette IoU 可能不能确认隐蔽连接和真实 mechanical stability。；局部 86.25%/completion >80% 不能代表整件装配成功；长程未比较其他系统，本项目未复现。；代码范围：PDF p.1 官方 BrickCraft project 已访问，明确 Code (Coming Soon)。独立 BrickSim simulator 不是本方法 policy/planner implementation，不提供 Code link。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "LEGO 是研究对象本身，reference-relative primitive 与连接/碰撞/稳定性约束直接关联 brick representation、assembly planning 与可执行结构设计；可借鉴生成设计如何输出可验证步骤，本文未提出 LEGO geometry generator。"
+  }
+}

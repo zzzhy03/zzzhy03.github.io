@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2607.22043",
+  "slug": "scaling-native-multimodal-pre-training-from-scratch",
+  "title": "Scaling Native Multimodal Pre-Training From Scratch",
+  "authors": [
+    "Haoyuan Wu",
+    "Aoqi Wu",
+    "Hai Wang",
+    "Jiajia Wu",
+    "Jinxiang Ou",
+    "Bei Yu"
+  ],
+  "publishedAt": "2026-07-24",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2607.22043"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Scaling",
+    "Native",
+    "Multimodal",
+    "Pre-Training",
+    "Scratch"
+  ],
+  "abstract": "Although large language models (LLMs) exhibit remarkable reasoning capabilities, their reliance on text-only pre-training restricts the perception of the multimodal physical world. Native multimodal pre-training avoids this limitation by training models from scratch on multimodal inputs, thereby achieving deep cross-modal integration and mitigating optimization asymmetries inherent to traditional late-fusion architectures. Despite these advantages, the scaling properties of this paradigm remain incompletely characterized. To address this gap, we investigate the optimal model size and token count for training a Transformer-based vision-language model under a fixed computational budget. Our study demonstrates that minimal objective loss adheres to a predictable compute law, whereas compute-optimal model sizes and token counts scale as power laws. Notably, language and multimodal objectives manifest distinct allocation trends. The language allocation exponents lie in a similar range across the different data mixtures. The multimodal model-allocation exponent decreases modestly with the multimodal token ratio, indicating a relative shift toward token allocation. Additionally, our scaling analysis yields a budget-compensation rule. Specifically, an additional multimodal-token budget can offset the text-efficiency penalty caused by incorporating visual information into native multimodal pre-training under a fixed compute budget. Downstream evaluations further reveal that native multimodal pre-training is associated with improved spatial reasoning and multimodal few-shot learning. Generally, this empirical research establishes the essential groundwork for predictably scaling multimodal foundation models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.22043v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.22043v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.22043v2 的 20 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "这项native multimodal scratch pretraining研究的v2重估scalingfit，以budget-compensation替换原jointPareto叙述，并补完整拟合细节。Γ<1仅在可重分配model/tokens的共同拟合范围说明额外compute足以补textloss，不是固定模型免费加视觉；基础预算研究有参考价值，但仅traininglossproxy/单architecture，适合skim。",
+    "motivationZh": "从头训练 native multimodal 模型时，文字与视觉数据共同消耗计算，如何分配模型规模、tokens 和数据比例并不明确。论文关注不同目标的 compute frontiers，以及增加视觉数据所需的预算能否补偿文本效率损失。",
+    "methodZh": "six-scale decoder-onlyMoE无pretrainedvisionencoder，single patch embedding与text一起训练；loss只在text tokens计算，vision tokens masked，所以不是统一image generation objective。250Btext与0/25/50/75Bmultimodal，r=Dmm/Dtext，C≈6NactiveD。用same training runs的IsoFLOP quadratic minima与curve envelope拟合N/D exponents，sharedoffset/sharedβ textfrontier反求compensation Γ。另固定text-exposure评16text/23VL及0/1/3shot，mainfewshot曲线排两个不稳定CoT tasks只21项。完整20页与全部A–C fitting和benchmark tables已读。",
+    "methodFlow": [
+      "scratch MoE以patch embeddings直接处理image-text/interleaveddocuments，无预训练visionencoder，仅texttokens算next-tokenloss。",
+      "在六activeparam规模及r0/.1/.2/.3混合比训练，记录objective-specifictext/mm loss与C_s=6ND_s。",
+      "同预算对logN二次拟合取IsoFLOP最佳配置，以training-curve lower envelope作same-run sensitivitycheck。",
+      "分别拟loss-powerlaw，再sharedoffset/decay的jointtextfrontier反求匹配pure-textloss所需totalcompute。",
+      "用固定250Btext-exposure跨语言与multimodal benchmark评价spatialtransfer及fewshot随scale/data的变化。"
+    ],
+    "experimentsZh": "MoE128experts/8active、71/128/340/590/874M与3Bactive；250Btext与最多75Bmultimodal。Muon、8Mtokenbatch、context4096、warmupstable、scratchpatch32²。MC用lowestoptionperplexity、openanswersEM/codepass1，23VLbench。1/3shot visualbudget512 vsmax1536，主曲线21项排ScienceQA/LogicVistaCoT；appendixTables均23项。 以下结果为作者报告：作者报告language allocation a≈.65/b≈.35；mm a在r.1→.3由.686→.622，b.314→.378，只在观察范围成立。（Figs.3–6, PDF pp.4–5）；作者拟合Γ=.952/.915/.899，对应totalcompute比puretext多4.7%/9.8%/16.9%，不是零代价或固定model保证。（Fig.7 and Eqs.(6)–(8), PDF pp.5–6）；作者报告A3B固定250Btext时textSpatialEval35.95(r0)→41.43(r.3)；21taskfewshot三shotgain约2.43点，23tasktableavg则31.77→36.56。（Tables9/12, PDF pp.18–19; Sec.4.3/Fig.10, PDF pp.7–8; Tables13/15, PDF pp.19–20） 对照范围：主要同MoEfamily不同mixture/scale；无equal-totalcompute native-vs-latefusion对照，也无去掉images但保留pairedcaption的control。训练corpus私有且缺公开dedup/heldoutlosscorpus说明，modelsize与active FLOPsapprox不能当实测hardwarecost。 消融与诊断：r/scale/data curves与两same-run estimator支持经验趋势；没有跨architecture/corpus重复fit、bootstrap CI或actualoptimizedallocation retrain验证compensation，fewshot改变visualbudget亦是潜在confound。",
+    "insightZh": "贡献是native多模态的objective-separated资源配置和budgetcompensation实证，scratchpatchMoE/compute-optimal方法都有先行工作。frontier-analysis本身有基础训练价值，但文中native-vs-latefusion优势没有同budgetarchitecture直接验证，不能说证明新的modelparadigm优于现成fusion。",
+    "evidenceZh": "只texttokens计算loss，images作为continuouscondition而非要生成的tokens。（Sec.2.3, PDF p.3; Appendix A Table1, PDF p.13）；compensation独立于loss目标来自sharedoffset/shareddecay假设，且允许model/data allocation变化。（Sec.3.3 Eqs.(4)–(8), Fig.7, PDF pp.5–6; Appendix B.4, PDF p.14）；两个frontier estimator使用同trainingruns，不是independentvalidation。（Appendix B.1–B.3, PDF pp.13–14）；native visualtraining与textspatial成绩相关，fewshot收益主要在较大scale而OCR/counting未普遍改善。（Sec.4.2–4.3, Figs.9–13, PDF pp.7–9; Tables12–15, PDF pp.19–20）",
+    "caveatZh": "Sec.2.1 PDF p.2仅以smoothedtrainingloss替代testloss。；Sec.3.3 p.6说明commonfitrange之外extrapolation且不保证fixedN/fixedtextloss recovery。；Appendix B p.14两estimator同runs，只sensitivitycheck，main21task/appendix23task均值不同。；sharedβ/offset使Γtarget-independent，若frontier真实shapes不同补偿比例可能变化，未独立量化fituncertainty。；r较大增加totalcompute与multimodalcaption文本，textspatial gains非视觉贡献的严格因果证据。；71M–3B active MoE与有限mixtures不能未经验证直接套到dense/largevision models或公开foundation training预算。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究native multimodal foundation pretraining的model/token/compute预算及视觉数据混合，v2修正原scaling解释并给fittingprocedure，符合pretraining基础研究；不把lossfrontier当设计能力验证。"
+  }
+}

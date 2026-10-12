@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.12442",
+  "slug": "lego-a-lifting-free-approach-for-exocentric-to-egocentric-video-generation",
+  "title": "LEGO: A Lifting-Free Approach for Exocentric-to-Egocentric Video Generation",
+  "authors": [
+    "Suhwan Cho",
+    "Yonwoo Choi",
+    "Soongjin Kim",
+    "Jicheol Park",
+    "Taegyu Lim"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12442"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "LEGO",
+    "Lifting-Free",
+    "Approach",
+    "Exocentric-to-Egocentric",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Generating an egocentric video from a single exocentric recording is a challenging case of novel view synthesis, as the two cameras share little overlap and much of the target view is unobserved. Current state-of-the-art methods reconstruct the scene explicitly by estimating depth, lifting the video into a point cloud, and re-rendering it from the egocentric camera to condition a video diffusion model. This deterministic mapping assigns each pixel to a single reprojected location, which preserves texture but translates depth errors into misplaced content. We ask what a video diffusion model should receive as its condition and propose a lifting-free answer: a learned view synthesizer, an LVSM-style transformer fine-tuned to render the egocentric view directly without depth, point clouds, or reprojection, resolving cross-view correspondence internally. In contrast, its probabilistic mapping averages each region over candidate source locations according to a learned correspondence distribution, preserving structure while fine texture is averaged away. We argue that this trade-off suits a diffusion generator, whose denoising training excels at restoring detail, so an effective condition should prioritize structural alignment over sharpness. This distribution's concentration also yields a per-region confidence, used both to mask low-confidence regions and to guide the generator toward high-confidence areas during early layout-forming denoising steps. Our approach consistently outperforms the state-of-the-art explicit pipeline and generalizes to other datasets without retraining. The synthesizer thus supplies view structure, and the diffusion model its detail.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12442v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12442v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12442v1 的 24 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "LEGO 用fisheye-adapted LVSM直接合成ego-view条件，再以attention concentration gate和early ARC引导Wan；不再估depth/pointcloud。作者报告EgoX rerun seenPSNR15.57→20.28、unseen13.53→15.91；可skim借鉴“alignment优先于condition sharpness”，但ARC在unseen测试调参、颜色塌缩与camera calibration依赖限制泛化，积木只是demo。",
+    "motivationZh": "从 exocentric video 生成相机运动不同的 egocentric video，需要补全未见视角并处理 fisheye 等相机差异。显式 3D lifting 容易传递几何误差，纯生成又难同时保持 source identity、camera control 与动态一致性。",
+    "methodZh": "单exo-frame与exo/ego Plücker rays由fine-tunedLVSM预测softtargetrender，不做explicitlifting。最后8layers跨sourcekeys的attention平均作为correspondencedistribution，top16mass给confidence；低于.3的tokens灰化作condition。WanI2V14B以exo-ego widthcanvas训练LoRA，ARC在前80%denoisesteps将cleanlatent估计按c²混至ungatedrender，再交原solver继续。same-recipeablation支持camera适配后的render和confidence/ARC组合，crossdataset两Ariafisheye任务有收益；blur/shapealignment经验不代表attention是校准geometryposterior，unseencolor仍明显灰化。",
+    "methodFlow": [
+      "把camera calibration转per-pixel Plücker rays，以rawegoGTphotometric/perceptual loss对LVSM fine-tune，之后冻结F。",
+      "逐latentframe由exoimage/rays预测ego-render，平均最后8层/heads跨sourceattention，top16probmass计算局部confidence。",
+      "对confidence<.3设neutralgray，VAEencodegatedrender填ego conditioninghalf，同时保留sourceexo tokens。",
+      "WanI2V14B在相同双canvasrecipe以LoRA适配；inference前80%steps把ego cleanestimate按c²与ungatedrender blend，转换velocity给UniPCsolver。",
+      "余denoisesteps自由补detail，输出ego-frame序列；requires两viewsposes，无depthlifting。"
+    ],
+    "experimentsZh": "EgoExo4D seen/unseen；LVSM24blocks768width/12heads，10Ksteps/4H2003.5h；Wan2.1I2V14B rank256LoRA20Ksteps/4H200约4days，49frames448×1232doublecanvas。EgoXreleased同scoringstackrerun+same-recipecondition/ARCablation；EgoHumans/Nymeria各200untrainedclips，seed42。image/FVD只ego448²，VBenchTF/MS/DDfullcanvas。 以下结果为作者报告：作者报告seenPSNR20.28/LPIPS.310对EgoXrerun15.57/.466，unseen15.91/.504对13.53/.542；不是对quotedpublishedrow的完全same-stack比较。（Table1, PDF p.6）；作者报告新datasetsEgoHumansPSNR15.52对13.74、Nymeria15.23对11.64；两者FVD332.41/210.27对421.83/296.98。（Table4, PDF p.9）；作者报告renderalignmentDINO .586对pointcloud.476，但sharpnessratio .28对.97；unseencoloroutputchroma约.45，gating部分回到.62，不是所有visualattributes都由generator恢复。（Table3 PDF p.8; AppendixC.1–C.2 PDF p.18）；作者报告singleH200 endtoend577.9s对EgoX666.7s、peak68.2GiB对69.9；4.7vs69.2s只是condition construction，不是全clip时间。（Table6, PDF p.19） 对照范围：EgoX†releasedcheckpoint是主要same-stackbaseline，其他rowquote原paper。双方训练GPU/budget不同；同recipe组件比较最可靠。objectmatching协议为复现EgoXpublishedmetrics做search并改Contour定义，seenrow无法精确复现，不宜用作独立GT几何结论。 消融与诊断：none/pointcloud/untunedF/tunedF、confidence/exotokens与GGA/ARC组成拆分；confidence排序与windowluminanceerror支持有信息但不是calibrateduncertainty。ARC h/c²在unseentest上选择，未多seed统计；crossdatasettest有更独立证据但samecamera。",
+    "insightZh": "用learnedsoftalignedrender替代deterministicpointcloudcondition，并复用confidence做mask和training-freeARC，是conditionalvideo接口设计。LVSM/Wan架构基本沿用，Fcameraadaptation与generator训练不可省；所谓bias/variance对比是经验解释，非所有learnedconditions保证更准确的统计定理。",
+    "evidenceZh": "LVSM直接由sourceRGB/rays预测targetframe，attention分布只是featuremixing近似对应，不是pixelposterior。（Sec.3.1 Eq.(1)–(3), PDF p.4）；confidencegate与ARC不同：gate灰化condition，ARC引导cleanestimate towardungatedrender。（Sec.3.2–3.3 Eq.(4)–(7), PDF pp.5–6）；同recipeablation显示收益来自fisheye适配而非untunedLVSM architecture本身，ARC对错误pointcloud反会伤害。（Table2, PDF p.7）；ARC关键hyperparameters是在unseen test split选取，跨dataset共享camera有范围限制。（AppendixA.3/B.5, PDF pp.15,17–18）",
+    "caveatZh": "F逐frame看singleexoimage，未观察ego内容靠generatorprior补，correspondenceuncertainty导致blur。；陌生scenes颜色collapse会传至output；gating只部分恢复chroma。；lifting-free仍需要双方cameraposes/calibration，F必须adapt到fisheye，不是任意rawvideo即用。；attentiontopKmass可peaked却错，不保证物理correspondence；结构alignment优先结论限定本任务和训练数据。；unseentest调ARC导致optimism，跨dataset观察camera相同且Nymeria选择nearstaticobserver，不能扩到任意ego/exo域。；VBenchfullcanvas含unchangedexo部分且指标饱和，不能当独立ego-motion真实性证据；数字未复现。；LEGO是方法缩写，minifigures仅teaserdemo，不构成brickgeneration/representation贡献，不归coreLEGO。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为3D-awarevideo创作研究提供learnedcondition对齐/可靠性与generationdetail分工思路，但目标是exo2egovideo，不是积木结构或fabrication。"
+  }
+}

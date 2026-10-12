@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2605.19551",
+  "slug": "anchorflow-learning-anchor-placement-for-faithful-and-editable-svg-reconstruction",
+  "title": "AnchorFlow: Learning Anchor Placement for Faithful and Editable SVG Reconstruction",
+  "authors": [
+    "Mengnan Jiang",
+    "Christian Franke",
+    "Michele Franco Adesso",
+    "Antonio Haas",
+    "Grace Li Zhang"
+  ],
+  "publishedAt": "2026-05-19",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.19551"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "2d-design",
+    "AnchorFlow",
+    "Learning",
+    "Anchor",
+    "Placement",
+    "Faithful",
+    "Editable",
+    "SVG",
+    "Reconstruction"
+  ],
+  "abstract": "Raster-to-SVG reconstruction requires faithful geometry and a compact control structure for editing. A central challenge is deciding where to place anchors: raster appearance alone does not determine how a contour should be divided into Bézier segments. We present AnchorFlow, which learns anchor placement from designer-authored SVGs to reconstruct accurate curves with sparse controls. Our key idea is a sparse anchor field that jointly encodes contour geometry and reference segment junctions, including those along smooth contours. An anchor decoder predicts explicit anchor proposals from features learned under field supervision. These proposals guide boundary-constrained fitting and local refinement to recover cubic Bézier paths. On clean single-path inputs, AnchorFlow achieves 99.52% mean IoU while using 56.6% fewer anchors on average than AdaVec, with lower boundary error and closer agreement with source-SVG anchor layouts. Under boundary perturbations, it maintains high fidelity with limited anchor growth. Integrated into a component-based pipeline, the same path module also produces compact, faithful full-image reconstructions. On four local-editing tasks, our outputs require less median active time and fewer actions than AdaVec and LIVE while retaining high target-shape accuracy.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.19551v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.19551v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.19551v2 的 22 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "AnchorFlow 将 designer-authored SVG 的 segment junctions 学成 sparse anchor field，再预测显式 anchors 并约束 Bézier fitting。作者报告 clean paths 的 IoU 99.52%、较 AdaVec 少 56.6% anchors；共同 fitting backend 和局部编辑实验支持其 control structure 的价值，但完整图像复用 AdaVec decomposition，复杂图像更慢，不能视为通用 SVG generation。",
+    "motivationZh": "忠实vectorization容易产生过多锚点，少锚点的简化又可能破坏曲线与局部编辑结构。目标是在重建raster轮廓的同时，恢复接近designer-authored SVG的控制点组织。",
+    "methodZh": "针对 raster contour 忠实重建与 sparse editable controls 的冲突，先用 AFNet 学 contour band 与 designer junction peaks，再冻结 feature encoder，以 attention set decoder 输出 anchor coordinates/existence。anchors 经 contour snapping、排序、regularized least-squares cubic Bézier fitting、bounded insertion 和 merge 得到闭合路径。完整图像依赖现有 component decomposition，随后全局优化。",
+    "methodFlow": [
+      "Learn sparse anchor field: 从原 SVG junctions 与 contour band 构造 field targets，训练 CNN encoder-decoder；包含平滑轮廓上的 junctions。",
+      "Decode explicit anchors: 冻结 AFNet features，learned queries 经 local sampling、self/cross attention 预测 coordinates/existence；Hungarian matching 监督。field head 仅用于诊断，不是 inference decoder 输入。",
+      "Fit boundary-constrained curves: 按 contour arclength 排序并 snap anchors，固定 endpoints，regularized least-squares 求两个 cubic Bézier handles。",
+      "Refine compact path: adaptive confidence、有限高误差 insertion 与 fidelity-constrained merging 控制 anchor 数量；完整图像组合已有 decomposition 的路径并全局优化。"
+    ],
+    "experimentsZh": "训练来自 15996 SVG files 的 31950 paths；测试 2400 clean/paired perturbed paths 和 Noto/Fluent/HeisenVec 各100 full images。两阶段训练各60 epochs，A100 80GB 合计作者报告14.6小时。另有18人、4任务、4条件的 counterbalanced local-editing study。 以下结果为作者报告：作者报告 clean IoU99.521、CD.072 px、K9.53；perturbed IoU97.687、CD.317、K12.55，对照 AdaVec94.992、7.144、36.89。（PDF p.6, Table 1）；作者报告 full-image anchors Noto176.49 vs281.13、Fluent70.27 vs157.49、HeisenVec892.11 vs926.84；Fluent MSE 略差，HeisenVec172.64 s vs79.96 s，完整图像并非全面领先或更快。（PDF p.8, Table 2）；作者报告 matched-count/common-backend Stage B IoU .995833 vs error-greedy .991846，K10.098 vs10.478，GOSPA .025928 vs .040808。（PDF p.9, Table 5）；作者报告四项局部编辑 pooled median15.5 s、4 actions，final IoU99.04%；shorten/curve 任务 source SVG 更快，不能将局部案例概括为普遍编辑优势。（PDF pp.9–10, §4.5; p.14, Table 6） 对照范围：包括传统 tracers、AdaVec/LIVE 与 generative baselines；decoder/field peaks、joint/two-stage、相同 backend 和匹配初始数量均有对照。生成模型为单次 candidate 且不同 token caps，CPU/GPU timing 和失败处理范围不同，比较不能解释为等预算系统排名。 消融与诊断：Table 3 decoder 比 peak sampling 用更少 anchors，但 IoU 略低；Table 5 排除部分 backend 混杂；Table 7 adaptive threshold 相对固定.2减少 anchors，同时小幅牺牲 fidelity。",
+    "insightZh": "exact v1/v2对照显示实质方法改动：v1用field local maxima/NMS的deterministic hard resolver与inference latent field refinement/SDF pulling；v2增加learned explicit-anchor set decoder及Hungarian supervision，直接读取field-supervised encoder features，改用boundary-constrained LS handles和bounded insertion/merge。训练从17k混合procedural/SVG-Stack单stage140epochs改为designer-authored31950paths两stage60+60，评测加入共同backend/matchedinitialcount placement controls与四项真实local-editing任务。不是title/stamp/排版更新，本轮首次收录由此实质updated event触发。 主要增量是用 designer junction supervision 学可编辑 segment layout，并通过显式 set decoder 将该先验与 geometric fitting 接合；Table 5 的共同 backend、matched initial count 消融支持 initializer 的独立作用。不是 flow matching 或 diffusion，也没有提出新的层级 decomposition。",
+    "evidenceZh": "v2将field→hardpeak parsing/latentrefinement替为learnedanchor proposals及geometry fitting，并提供新的控制结构/编辑评测。（v1 §3 pp.3–6, Figure2 p.4, App.C/D; v2 §3 pp.3–5, Tables3–6 pp.9/14）；学习的 junction prior 经 features 解码 explicit anchors，随后由几何 backend 拟合路径。（PDF pp.3–5, §3; Fig.2 p.4; Appendix A.1 pp.11–13）；作者报告 clean paths IoU 99.521、9.53 anchors，AdaVec 为 99.254、21.95 anchors。（PDF p.6, Table 1）；共同 backend 与相同初始 anchor 数下，学习初始化仍改善 fidelity/compactness。（PDF p.9, Table 5）；四项局部编辑任务的作者用户实验显示输出有较低的 pooled median 时间/操作数。（PDF pp.9–10, §4.5; p.14, Table 6）",
+    "caveatZh": "完整图像的 component decomposition 可能遗漏或合并细节；局部误差及复杂场景优化成本仍存在。；局部编辑研究只覆盖四个选定任务；参考 SVG 的 anchor layout 本身不是唯一正确分解。；真实照片、任意 topology、材料约束或制造质量未被这些 contour/SVG 数据验证。；完整图像 timing 在复杂 HeisenVec 上明显较慢；不能只引用 single-path 对 AdaVec 的加速。；作者称 accompanying code 包含 pretrained inference scope，但论文及 exact-version 官方页面未给可核实的本方法 public implementation 地址。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接提供可编辑 SVG control structure 与 designer junction supervision，适合研究 structured vector reconstruction、compact primitive representations 和编辑成本评价；转移到 embroidery 或制造仍需要另行加入材料、路径及可执行性约束。"
+  }
+}

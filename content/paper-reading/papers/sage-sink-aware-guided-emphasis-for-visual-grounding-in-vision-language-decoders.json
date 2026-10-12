@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.11469",
+  "slug": "sage-sink-aware-guided-emphasis-for-visual-grounding-in-vision-language-decoders",
+  "title": "SAGE: Sink-Aware Guided Emphasis for Visual Grounding in Vision-Language Decoders",
+  "authors": [
+    "Jeonghyo Song",
+    "YoungJoon Yoo"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11469"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "SAGE",
+    "Sink-Aware",
+    "Guided",
+    "Emphasis",
+    "Visual",
+    "Grounding",
+    "Vision-Language",
+    "Decoders"
+  ],
+  "abstract": "Recent large vision-language models (VLMs) pair a visual encoder with a large language model (LLM) and perform well on diverse image-text tasks, yet their reliability is often limited by decoder attention pathologies that suppress visual evidence and exacerbate hallucinations. In this paper, we revisit visual attention sinks and uncover a structured, layer-dependent behavior: across prompts, early and late decoder layers exhibit prompt-invariant attention collapse onto the same few image regions, which we term PIS (Prompt-Invariant Sinks), whereas mid layers become prompt-conditioned and drive vision-language alignment. This split suggests that treating sinks as a uniform effect is incomplete. Building on this insight, we propose SAGE (Sink-Aware Guided Emphasis), a lightweight intervention that steers decoder attention away from PIS and toward query-dependent regions of interest (ROIs) using token-aligned ROI masks derived from standard vision backbones such as CLIP, ViT, and DINOv3. Evaluated on diverse vision-encoder + decoder-only LLM VLM families, SAGE improves visual grounding, reduces hallucinations, and yields consistent gains across public downstream vision-language benchmarks, including fine-grained visual discrimination settings where localized evidence is crucial, when instantiated with backbone-derived ROI masks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11469v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11469v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11469v1 的 23 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SAGE 发现early/final decoder的prompt-invariant visual sinks与mid-layer响应差异，用token-alignedROI在选定layer加α/减βbias重分attention。主表是逐benchmark oracle-layer上界；作者另报label-freefixedL24使LLaVA7B TextVQA44→54.6/GQA57.1→62.3。可skim研究decoder证据路由，但只有CLIP mask依query，saliency/固定mask不保证复杂多区域推理。",
+    "motivationZh": "VLM decoder 的 attention 可能集中在与当前问题无关的视觉 sink，妨碍读取局部回答证据。需要在保留 pretrained weights 的条件下将注意力引向可靠 ROI，并检验选层和 ROI 对结果的影响。",
+    "methodZh": "方法从CLIP patch-text similarity或ViT/DINO CLS saliency得到binarytopkROI，并按nearest-neighbor对齐VLMtokengrid。选定decoderlayers的visual-keylogits，ROI+5/nonROI−2，textkeys不变；mask固定全heads/steps，模型不训练。promptpairtop5%attention sinkIoU与logitSVD concentration诊断depth，mainpeaktables按benchmark选择最佳layer；fixed-protocol7BL24用无labels统计选层，再与matchedrandomROI/VCD对照。localizedVQA收益有证据，跨family固定setting只有moderate aggregate gains；simplefixedROI可抑制真实非ROI证据，不能概括为全层消除PIS或通用hallucination解决。",
+    "methodFlow": [
+      "用CLIP query-awarepatchsimilarity或ViT/DINO query-agnosticCLSsaliency生成topk binaryROI，对齐各VLMvisualtokengrid。",
+      "以sameimage多prompts的top5%sinkIoU和logitSVDρ1诊断decoderdepth；oracle研究可逐benchmarksweep，部署验证改用fixedlabel-freeL24。",
+      "在指定selfattention层visual-keylogits对ROI加α5、非ROI减β2，textkeys不变，mask广播所有heads/querypositions。",
+      "greedygenerate，无weights更新；结束移除hooks，保留baseline其他decodingsettings。"
+    ],
+    "experimentsZh": "LLaVA1.5-13B/Qwen2VL7B/InternVL3-2B/NVILA8B主peak，另LLaVA7Bfixedcontrol；CLIP/ViT/DINO masks、α5β2、greedyFP16A6000。TextVQA/GQA/POPE/SQA/MME/MMVPfamilies/MMVet，single/multilayer/spectral/skipablation。四familyfixedtop48maskaggregate与VCD同protocol附录；main每benchmark/layersource有oracle搜索。 以下结果为作者报告：作者报告fixedLLaVA7BL24 TextVQA44.0→54.6/GQA57.1→62.3，POPEacc72.7→73.1、SQA68.1→68.6、MMVPpair35.6→35.7变化小；randomROI回到或低于baseline。（Table3, PDF p.9）；作者主oracleLLaVA13B TextVQA55.50→61.94(CLIP)、MMVPpair11.85→38.52(ViT)；这些是benchmark-selectedlayers，只作peak研究上界。（Table1, PDF p.7）；作者报告sameprotocolVCD TextVQA50.8/GQA59.5低于fixedSAGE54.6/62.3；跨4familiesfixedsettingaggregateGQA+2.55/TextVQA+1.58/MMVPpair+6.67，未给完整per-family表。（AppendixD.1–D.2, PDF pp.17–18）；作者报告early(1,2,3)三层干预TextVQA1.12%，而mid/final组合约62%，显示不良层选择可灾难性降质。（Tables7–9, PDF p.18） 对照范围：no-intervention、matchedrandomROI和同模型VCD控制比较有力，但仅一existingmethod/singlefamily，不是inferenceinterventions全面排名。多sources/层扫及peaktable不消除ROI来源、gridalignment与labelselectionconfounds。 消融与诊断：pull/push单边/strongbias、single/multi/skip层与randomROI支持depth/content依赖。低秩logitSVD与sinkIoU相关是empiricaldiagnostic；uncenteredlogitmatrix受offset/scale影响，不能直接证明sink形成机制或每tokencausalnecessity。",
+    "insightZh": "主要新发现是PIS在depth上的非均匀结构，以ROIlogitintervention/层扫验证证据路由作用；非新的visionencoder/learner。它是depth-aware而非逐token识别/删除sink，且fixedsetting收益比oracle主表窄，需以可部署结果作为主要依据。",
+    "evidenceZh": "CLIP是query-conditioned，ViT/DINOv3只提供query-agnostic saliency。（Sec.3.2, PDF p.4; Limitations, PDF pp.9–10）；visual-onlypush/pullbias改变relativeodds，allheads/queries同mask。（Eq.(1),(6), PDF pp.4,6; AppendixA.2, PDF p.14）；mainresults用per-benchmarkbestlayer，是upperbound而非fixedrule；fixedL24有真实对照。（Sec.4.2/Table1, PDF pp.6–7; Table3/Sec.4.5, PDF p.9）；错误ROI可让SAGE错，即使attention更加集中也不证明正确grounding。（Fig.8/F.1, PDF p.20）",
+    "caveatZh": "ROIquality不稳会引导错误region，尚无confidence-gatedintervention。；staticmask全heads/steps适合singledecisiveregion，multi-regiondescriptions/多步reasoning受限。；sink-aware仅depthlevel，explicitpertokensinkclassifier和normalizeddepth跨familytransfer未测；PIS形成原因未解释。；Table1选择benchmarkbestlayer包含oracleoptimism，应优先表3fixed结果，不把peak当无需标注部署性能。；bias强度大且earlylayers有严重failure，query-agnosticmasks会压掉真实证据；no训练不等于任何ROI安全有效。；spectral/attentionmass变化不等于实际信息使用因果证明，缺任务难度/多seed统计与deployruntime；数字作者报告未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "decoder视觉证据路由和ROI干预可为VLM设计工具读取localizedrender/details提供研究思路；不等于直接SVG/CAD/3D设计实验。"
+  }
+}

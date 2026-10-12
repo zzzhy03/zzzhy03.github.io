@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2605.18162",
+  "slug": "self-evolving-spatial-reasoning-in-vision-language-models-via-geometric-logic-consistency",
+  "title": "Self-Evolving Spatial Reasoning in Vision Language Models via Geometric Logic Consistency",
+  "authors": [
+    "Junming Liu",
+    "Yuqi Li",
+    "Yifei Sun",
+    "Maonan Wang",
+    "Yiming Cheng",
+    "Rui Qian",
+    "Piotr Koniusz",
+    "Yirong Chen",
+    "Ding Wang"
+  ],
+  "publishedAt": "2026-05-18",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.18162"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Self-Evolving",
+    "Spatial",
+    "Reasoning",
+    "Vision",
+    "Language",
+    "Models",
+    "Geometric",
+    "Logic",
+    "Consistency"
+  ],
+  "abstract": "Vision-Language Models (VLMs) have made striking progress, yet their spatial reasoning remains fragile. Models that answer an original input correctly can still fail under valid transformations with predictable answer mappings, revealing a gap between instance-level correctness and robust spatial reasoning. To address this, we propose Spatial Alignment via Geometric Evolution (SAGE), a self-evolving framework that improves robust spatial reasoning through geometric and linguistic duality operations. SAGE incorporates duality consistency into GRPO training, encouraging models to produce coherent answers across original and transformed inputs. SAGE co-evolves duality generation and solution, allowing the model to continually expose and address its own reasoning weaknesses. A dynamic operation pool identifies challenging operations and retires mastered ones, keeping training focused on informative duality signals. SAGE is model-agnostic, data-efficient compared to prior post-training methods, and can be applied as a lightweight adaptation stage to any existing VLM. Experiments on video and spatial reasoning benchmarks demonstrate consistent improvements over strong baselines and enhanced generalization to unseen data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.18162v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.18162v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.18162v2 的 36 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本次 v2 相比 5 月 v1，新增共享 proposer–solver 的 policy update、可执行 proposal 验证与双侧 correctness-gated 训练，替换单纯 consistency 调度，并扩展到三个 Qwen backbone；这是训练算法与诊断实验的实质更新。 以可执行input transform＋bijective answer map＋applicability合同构建original/dual题对，共享VLM提出新operations并按one-sidedfailure/jointcorrectness调度GRPO训练。作者报告多view空间能力明显提升，值得深读curriculum和validity边界；一致性bonus在binaryaccuracy＋groupconstantformat下被GRPO normalization抵消，不能把所有收益归因于新增consistencyreward。",
+    "motivationZh": "VLM 在原图上答对空间关系，却可能在翻转、视角变化或选项重排后给出不符合已知答案映射的回答。需要区分真正的关系理解、单侧正确与两侧一致但同时错误，并让训练持续针对新的不一致模式。",
+    "methodZh": "本次 v2 相比 5 月 v1，新增共享 proposer–solver 的 policy update、可执行 proposal 验证与双侧 correctness-gated 训练，替换单纯 consistency 调度，并扩展到三个 Qwen backbone；这是训练算法与诊断实验的实质更新。 SAGE先用1000teacher-generatedoperationexamples教serialization，再对10Kvideo/spatiallabelleditems做pairedGRPO，8original+4dualrollouts。Seedflip/rotation/appearance/optionpermute/negation/paraphrase各有排除domain；runtimeverifier只checkcode和declaredmap，不prove语义正确。Operationpoolmax50/active3按U×Jpriority管理候选、mastered及forgettingreactivation，proposerutility由feedbackbuffer打分，conflictgradient向solver优先投影。三个Qwenbackbones在13bench与unseenoperations提升，但主要single-run、部分publishedbaselinesprotocol不同，code/data/weights承诺acceptance后释放。",
+    "methodFlow": [
+      "定义可验证duality合同：T=(TX,TA,S)，语义应满足a*(TXx)=TAa*(x)；测CC/CW/WC/WW及jointcorrect，不将wrongconsistent当成功。",
+      "共同提出并筛查operations：sharedproposer/solver每100steps生成restrictedtransformcode/answer mapping/domain，经deterministicoperationalchecks及trainingfeedbackbufferprobe，supportedU≥threshold入pool。",
+      "适应式pool调度：候选priorityU×J填active3，lowU/highJretire，spotcheckmastered再失败reactivate；scoreEMA和hysteresis避免频繁误切换。",
+      "两侧GRPO及sharedupdate：两侧task/formatreward＋gatedmappedagreementbonus，分别groupnormalize并jointupdate；proposergradient冲突时投影掉solver反向分量，AdamW实施。"
+    ],
+    "experimentsZh": "Qwen2.5VL7B/Qwen3VL4B/8B；1000proposerSFT＋10KlabelledRL，16A100oneepoch、8+4rollouts；六video/七spatialfullscopes与validpairdiagnostics，trainingprobebuffer和evaluationdisjoint。 以下结果为作者报告：作者报告ablationbackboneavg43.8→52.9，jointcorrect24.1→45.7、wrongconsistent37.3→30.2；unseenjoint22.31→43.11。（PDF p.9, Table3; p.29, Tables8–9）；作者报告60generatedproposalsvalid88.33%/novel70.00%/useful56.67%；SAGE26.8GPUh vsseparateroles39.0但originalonly18.7，非equalrolloutcost。（PDF pp.9,29–30, Tables3/10–11） 对照范围：samebase+SAGE为controlled主要证据，manypublishedfrontier/specialistrowsframe/token/data异构；adaptive/scheduling对照较好，但dualaugmentation同时改变reward与sequentialupdates，不能净归因reward。 消融与诊断：gating/operationfamilies/poolpolicies/discovery-retirement-reactivation/roleprojection/λ/K/unseenops；λ0仍51.6接近52.9，largerbenefit来自paireddata/update/pool组合，multiple-seed未给。",
+    "insightZh": "新意在可执行变换合同、动态operationcurriculum与sharedgenerativesupervision组合，equivariance/augmentation/gradientprojection各有先例。理论主要形式化正确性边界，不保证nonconvexgeneralization或真实AdamW无冲突。",
+    "evidenceZh": "validoperation与wrongconsistency明确区分。（PDF pp.3–6, Definitions1–2/Eqs.(12)–(16); pp.31–32, AppendixF.2–F.3）；跨bench提升在samebackbonein-house对照下较大。（PDF p.8, Tables1–2; pp.23–27, AppendixD）；adaptiveoperations与correctnessgating有各自control。（PDF p.9, Table3; pp.27–30, Tables8–13/AppendixE）；理论与efficiency不应超范围解释。（PDF pp.6,32–33, Eq.(18)/AppendixF.4–F.5; p.29, limitations）；Exact-version 科学差异：v1 仅用 consistency/novelty priority 调度、original-side GRPO 与 ungated 一致性 bonus，主要报告 Qwen2.5-7B/28K 数据；v2 明确定义 proposal SFT/policy-gradient、verifier admission、U×J hysteretic pool、双侧 gated reward 和 solver-priority projection，以 10K RL 数据报告三个 backbone，并新增 unseen-operation、wrong-consistency、proposal-quality 与 affine-normalization 边界分析。（prior 2605.18162v1 PDF pp.5–10/16/19–20 vs current 2605.18162v2 PDF pp.3–9/27–33）",
+    "caveatZh": "executablechecks不proofsemanticvalidity，color/orientation/viewpoint/negation可能ambiguous。；consistency≠correctness，wrongconsistent残余；additionalrolloutcost。；single-run为主，更多seeds/backbones必要；richer3D/multiviewoperations未来。；operationnovelty/useful汇总未展示完整新增operations/archive，activevalidation规则的语义oracle边界需code核验。；‘10Kdataefficient’另有1000DeepSeekgeneratedformatSFT及新增pairedrollouts，不等价固定compute/data与priorposttraining比较。；tolerantnumericalreward与exactcanonicaltheory不同，Qwenfamily-only不支持‘anyVLM’强普适。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "空间变换一致性与可执行合同直接适合VLM空间推理以及visualdesignagent的constraint-aware训练；high/deep尤其读bonus归一化边界与semanticvalidity。"
+  }
+}

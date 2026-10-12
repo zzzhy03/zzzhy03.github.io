@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2607.08016",
+  "slug": "lightcrafter-pbr-conditioned-video-diffusion-refinement-for-controllable-and-consistent-relighting",
+  "title": "LightCrafter: PBR-Conditioned Video Diffusion Refinement for Controllable and Consistent Relighting",
+  "authors": [
+    "Zixin Guo",
+    "Yehonathan Litman",
+    "Yifeng He",
+    "John Miller",
+    "Chuhan Chen",
+    "Deva Ramanan"
+  ],
+  "publishedAt": "2026-07-09",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2607.08016"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "LightCrafter",
+    "PBR-Conditioned",
+    "Video",
+    "Diffusion",
+    "Refinement",
+    "Controllable",
+    "Consistent",
+    "Relighting"
+  ],
+  "abstract": "Video relighting requires balancing long-form temporal consistency with a physically grounded understanding of light transport, which depends on accurate estimation of intrinsic scene properties such as materials, geometry, and illumination. Existing methods follow two paradigms: (1) reconstruct a video's photometric properties via inverse rendering and relight them to a target illumination via forward rendering, using physically-based rendering (PBR) or a neural renderer; these suffer from noisy reconstructions and struggle with hard-to-model effects such as global illumination. (2) Frame the task as generative video-to-video translation conditioned on relighting targets (a target environment map or text); this limits relighting control and temporal stability, since diffusion models struggle to translate long-form videos, and is constrained by the availability of input/relit training pairs. We propose LightCrafter, a hybrid pipeline that reformulates video relighting as video translation of a proxy video: rather than translating the input video directly to the target, we translate a PBR rendering of the input under the target illumination to the final target. This bakes illumination targets into the PBR proxy, removing the need to teach the diffusion model illumination concepts like environment maps, and enables more intricate lighting control while naturally providing long-form temporal consistency. We show PBR renders alone already outperform some prior art but struggle with effects like global illumination; to capture these, we leverage photometric priors in video generation models by post-training CogVideoX on synthetic video pairs and real-world unpaired videos. We outperform prior state-of-the-art on existing real-world relighting benchmarks and contribute a synthetic benchmark for further analysis. We will release our dataset, benchmark, metrics, and code.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.08016v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.08016v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.08016v3 的 23 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "LightCrafter v3 保留 PBRproxy→videoDiT refinement 主方法，实质新增16participants/704choices用户study、geometry/material误差隔离与indoorlightediting对照。作者报告geometryerrorrefinement+4.79dB、relightingpreference67.6%；DL3DV仍只是roundtrip保真，49frame端到端约15min。值得skim其可控3D-guidedvisualediting，而不把旧主表成绩当本版新模型提升。",
+    "motivationZh": "视频 relighting 既要服从明确的灯光控制，又要保留原场景结构并避免时间闪烁；纯 PBR 渲染受估计几何、材质误差影响，纯生成编辑又难保证物理控制。需要在可控光照与视觉真实感之间建立可检验的联系。",
+    "methodZh": "DiffusionRenderer恢复albedo/roughness/metalness/normal，MegaSAM提供worlddepth/poses并mesh化。targetenvmap/explicitlights经MitsubaPBR渲染；sourceenvmap优化仅构造realpseudo-trainingpairs，推理不需估source光。CogVideoX5B-I2V冻结VAE、把noisyproxy与targetlatentschannelconcat，关闭text训练noise预测。训练artifact-matchedsynthetic3200、realDL3DV1200source-reconstructionpseudo、MIT750staticmulti-lightpairs；长video49window/12overlap在每denoisingstep融合tentweightednoise，再共同schedulerupdate。",
+    "methodFlow": [
+      "以现成inverse-renderers恢复worldgeometry/camera与intrinsicphotometry，生成可控PBRscene-state。",
+      "把userenvmap或3Dlights/material/objectedits渲染为目标光照proxyvideo。",
+      "用经过同一noisyreconstructionstack的synthetic/realpairs训练CogVideoXproxyartifactrefiner，冻结VAE、禁text。",
+      "对长video在globalnoiselatent上扫描49framewindows、12frameoverlap并逐step平均noise，再共同更新。",
+      "输出photorealisticrelitvideo，保留PBRcontrols的scene/spatial先验。"
+    ],
+    "experimentsZh": "synthetic400train/50unseen scenes，disjointObjaverseIDs但sameHDRpool；train3200/eval200videos×4HDR。DL3DV100train/30evalscenes；MIT30trainbuilding/10heldoutEverettscenes（static49frameclips）。Cogfine-tune48h/batch1accum4、50DPMsteps、CFG6；syntheticlong200frames。 以下结果为作者报告：作者报告syntheticfull24.16PSNR/0.2096LPIPS，对DiffusionRenderer20.92/0.2867和PBR19.59/0.3106；MIT20.27PSNR/0.2114LPIPS。（Table1, PDF p.8）；作者报告16participants×11comparisons×4criteria，relightingpreference67.6%、temporal60.8%、overallvisual57.4%、contentpreservation45.5%。（App.A.6 Table6, PDF p.18） 对照范围：LightX/UniRelight/DiffusionRenderer、sameIRPBR、selfimplementedPCRPvideo；indoorGR3EN/LuxRemix附录，LuxRemix缺singleviewstage以maskcomposite替代。不同methods按自身trainingwindow拼接而ours用overlapfusion，非严格相同longcontext机制；dynamicrealmulti-lightGT不足。 消融与诊断：去synthetic控制差、去real结构/metal泛化差；geometry-vsmaterialnoise隔离显示geometryrefinement+4.79dB而material+1.43；MIT有metal/glare帮助。未独立消融allnoiseaug/windowfusion/PBRcontroldegrees。",
+    "insightZh": "将illuminationconditioning从diffusion隐式理解转为renderer显式控制，并以真实inverse-renderererrors匹配训练，分开可控physicsproxy和perceptualrefinement。source-lightoptimization和windowfusion是recipe的重要部分，非新physicalsimulator或generalvideo基础模型。",
+    "evidenceZh": "PBRproxy是soleimagecondition，scene-state固定worldlighting；sourceestimate仅训练pairs。（Sec.3.1–3.3 Eqs.(1)–(5), PDF pp.4–5; App.A.1 p.15）；long-video在每step对overlappingnoise做tent-weightedfusion，保持同一globallatenttrajectory。（App.A.2 Eqs.(10)–(13), PDF pp.15–16）；作者报告syntheticPSNR24.16、MIT20.27、DL3DV19.55；DL3DV只roundtrip代理。（Table1 PDF p.8; App.A.5 p.17）；作者报告49frame480×720端到端15m18s/A6000，极大IRerrors/verylongsequence会失败。（App.A.3 Table4 PDF p.16; App.A.8 p.19）；ExactJul15v2已有PBRmethod/windowfusion和主表synthetic24.16/real19.91，未有v3新增的runtimebreakdown、16human×11videos×4criteria、geometry-vs-materialGTisolation/Table5与GR3EN/LuxRemixindoorcomparison。v3还明确三类trainingpairs与MITstatic/realvideo边界，构成新增实验与科学protocol，不仅格式。（previous v2 PDF pp.6–9/14–15 vs current v3 PDF pp.16–19 Tables 4–6/Appendix A.5–A.7）",
+    "caveatZh": "specular/transparent/metal、weakparallax/thinstructure/motionblur可能IR失真（pp.9、19）。；verylongsequences可累积slowappearance drift（p.19）。；realDL3DV是roundtrippreservation而非relightingfidelity（p.17）。；neuralrefiner可hallucinate而非恢复真实structure，不能以PBR条件宣称outputphysically准确。；syntheticmetric空间align用了GTcoordinate/scale，real部署无此GT纠正。；source/targetphysicalgeometry估计和15m级preprocess限制practicalediting；user11videos小样本不能保证普适。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "PBRscene-state和video生成prior的分工直接支持3Dguidedvisualcreation/appearanceediting；不把IRsource估计推广为高精度3D恢复。"
+  }
+}

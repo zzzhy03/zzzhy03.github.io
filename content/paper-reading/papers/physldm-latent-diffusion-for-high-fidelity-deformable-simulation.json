@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.07609",
+  "slug": "physldm-latent-diffusion-for-high-fidelity-deformable-simulation",
+  "title": "PhysLDM: Latent Diffusion for High-Fidelity Deformable Simulation",
+  "authors": [
+    "Yu Zhang",
+    "Xudong Xu",
+    "Xingang Pan"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2610.07609"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "PhysLDM",
+    "Latent",
+    "Diffusion",
+    "High-Fidelity",
+    "Deformable",
+    "Simulation"
+  ],
+  "abstract": "Neural simulation of high-fidelity deformable bodies is a foundational challenge in computer graphics and physical AI. Long-horizon prediction for high-resolution 3D volumetric meshes is difficult: autoregressive methods are susceptible to error accumulation, while direct multi-frame prediction at native resolution is computationally prohibitive. This motivates a compact spatiotemporal latent representation, which is largely unexplored for mesh-based volumetric physics. Meanwhile, it remains unclear whether deterministic regression or generative diffusion is the more appropriate predictive paradigm. To address these coupled challenges, we introduce PhysLDM, a unified latent-diffusion paradigm for one-shot volumetric deformable simulation. Its core is a holistic spatiotemporal VAE that avoids the \"staircase\" artifacts of standard temporal compression (as in common video VAEs), achieving ~2.48 mm reconstruction precision on meter-scale scenes at up to 78x token compression. Based on this reliable latent space, we systematically compare regression and diffusion methods. Our experiments uncover a key modeling insight: complex deformable dynamics are often chaotic, and in this regime deterministic regression tends to produce non-physical averages, whereas diffusion better models their distribution. Accordingly, we employ a latent diffusion model that effectively learns from the chaotic data to generate physically plausible trajectories. Trained purely kinematically on an Objaverse-scale dataset, a single PhysLDM generalizes zero-shot to unseen OOD datasets (GSO and Toys4K). Its differentiability further enables efficient solution of inverse problems and higher-order design optimization. To our knowledge, PhysLDM is the first high-fidelity spatiotemporal autoencoder and latent-diffusion paradigm for volumetric deformable dynamics, offering a scalable and robust approach to neural simulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.07609v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.07609v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.07609v2 的 45 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "用rigid-free spatialVAE与holistic temporalqueries压缩完整变形轨迹，再latentflowDiT生成64帧future；独立rigidpath避免大运动淹没细deformation。作者报告重构2.48mm/最高78×tokens、预测显著好于matchedregression；可深读3D物理latent，但kinematic监督不硬保证physics，realzero-shotprediction875mm失败，fine-tune结果为训练子集。",
+    "motivationZh": "高保真可变形物体仿真需要昂贵的数值求解，直接学习顶点轨迹又容易把整体刚体运动与局部形变混在一起。目标是在给定初始几何、姿态和速度后，更快地预测保持网格拓扑关联的三维运动序列。",
+    "methodZh": "每frameKabsch将worldvertices分RigidRt/ct与canonicaldeformation，512learnedqueriescrossattend空间编码，temporalMqueries全时序attention且rigid走linearpath形成4104tokens。FrozenSTdecoderGNN保topologycoupling，170MDiT以initialgeometry/pose/velocity/Econdition，50flowsteps生成约1.07s的64frames。Objaversedrop大量IPCtrajectories、GSO/Toys4KsamephysicsOOD与chaosreruns支持stochasticfuture模型；真实手部操作STVAE重构可迁移，但模型无手部forceconditioning，futurezero-shot失败，in-samplefine-tune不证明generalphysics。",
+    "methodFlow": [
+      "分离rigid与canonicaldeformation：每frame对restmeshKabsch闭式fit，x=R(r+d)+c，spatialqueryVAE只压canonicalvertices，restqueries+GNNdecode。",
+      "holistic时空压缩：axialspatial/temporalattention后每spatialtoken的Mlearnedqueries读取整Tframes，rigidtoken走专门linearpath，组合M×513×48latent。",
+      "分阶段学习表示：spatialVAECharbonnier+KL预训，STVAE全时序deformation/rigidloss+KL/anchor；mainBasejointtunespatial后frozen用于dynamics。",
+      "conditionallatentflow生成：initialspatiallatentcrossattention，pose/velocity/logstiffnessAdaLN，12block170MDiTrectifiedflow，20/50Eulerdenoisesteps后一次decodeall64frames。",
+      "可微inverse/design：对logEtrajectorymismatchgradientdescent；fixedroughE下maxrigidtrajectorysensitivityoverreleasevelocity，higherorderautograd并在GTsolver replaycheck。"
+    ],
+    "experimentsZh": ">30KObjaverseobjects、63397singledrop/16078multibodytrajectories，singlemain90/5/5scene split，GSO1015/Toys3814samephysicsOOD；300scenes/setwithin500–5000、300largeVAEcheck；64framesdt1/60，3–3000kPaStableNeoHookean。 以下结果为作者报告：作者报告GSOworlderr14.0vsreg19.9/AR78.4mm、Toys35.6vs42.6/79.1；physicsmedians，不是无限longhorizon。（PDF p.8, Table2）；作者报告H200bf16生成64frames约1.5s50steps/0.8s20steps，约42/80frames/sec；训练三阶段约7days8H200，rawmeshcost移到decoder/STstage。（PDF pp.17–18, AppendixA; pp.31–32, Table10）；作者报告七E估计40steps均<0.06dex；onebodylocalthrowdesign30steps7min，GT rigid sensitivity13×/vertex1.85×，非generaldesignoptimal。（PDF pp.38–40, Figures15–16） 对照范围：capacitymatchedoneshotregsameSTlatent最有力，MGNAR为retrainedbaseline；concurrentrawcoordDiT≤1000vertexsamebudgetcontrol和memorytest，但未广泛全部neurosimulator公平fullaccuracy对照。 消融与诊断：standardtemporal/velocity/spectral/adaptive、worldcoordinate、dedicatedrigid、spatialpretrain、GNN、nativewithoutlatent、chaotic/nonchaotic8samples、ARAPenergy/realsequences；trainseedCI未给。",
+    "insightZh": "volumetricphysics的holistictemporalrepresentation和dedicatedrigidpath结合latentdiffusion，是可迁移3Dgenerativephysicslatent推进；queryVAE/axialDiT已有先例。‘first’限作者定位；constitutive-agnostic指数据/架构不含energy表达式，不等于traineddynamics跨所有materiallawszero-shot。",
+    "evidenceZh": "temporalrepresentation改善timing与precision。（PDF pp.5–7, Figure2/Table1; pp.21–23, Figures5–6; p.29, Table7）；预测physicchecks相对改善但没有严格physicsguarantee。（PDF p.8, Table2; pp.19–20, AppendixB.4; p.29, Table8）；chaoticmultisamples支持分布建模，最佳sample是oracle。（PDF pp.24–27, Tables5–6/Figures7–8）；realrepresentationtransfer与futureprediction须分开。（PDF pp.43–45, Tables16–17/Figure18）",
+    "caveatZh": "64frameone-shot，AR延伸未来。；thinindependentfeatures受固定latent容量限制，birdcagebars distorted/tangled，9.9mm重构。；LDMtrainedphysics依赖数据；ARAP37.5mmvsNeo23.9、realzero-shot失败；multibody需单独训练仅qualitative。；OODobjects是samegrounddrop/materialparameter设定，非新forces/contacts/environment/energygeneralization。；fps是entirehorizonbatchthroughput不是causalinteractivestreaming；‘singlepass’包含50diffusionforwards。；kinematicphysicschecks不能保证拓扑/rigidity/contactenergy；sameinitialsimnondeterminism不证明所有deformables本质多模态。；真实handforces未观察，in-samplefinetunefit可能memorize，不能当realinteractionworldmodel证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接提供deformable3Dtrajectorylatent与可微设计/物理生成基础，适合3D创作/可制造设计系统考虑material-awaremotion，high/deep。"
+  }
+}

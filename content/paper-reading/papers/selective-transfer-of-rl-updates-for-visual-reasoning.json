@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.08659",
+  "slug": "selective-transfer-of-rl-updates-for-visual-reasoning",
+  "title": "Selective Transfer of RL Updates for Visual Reasoning",
+  "authors": [
+    "Suxin Ji",
+    "Hungtao Wan",
+    "Mingjun Liu",
+    "An Zhang"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.08659"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Selective",
+    "Transfer",
+    "RL",
+    "Updates",
+    "Visual",
+    "Reasoning"
+  ],
+  "abstract": "Model merging provides a training-free way to transfer reasoning capabilities from language models to vision-language models (VLMs), but endpoint-based transfer can conflate pre-existing model differences with changes acquired during reasoning post-training. We instead formulate capability transfer around the training-stage update, isolating the parameter changes induced by reinforcement learning (RL). Yet transferring this update in full remains suboptimal: we find that its components differ substantially in cross-model transferability, with dominant directions transferring more effectively than the complete update. Based on this finding, we introduce Selective-RL, which isolates the RL-stage update, retains its dominant matrix-wise directions with magnitude preservation, and transfers them to the language modules of a VLM. Across three model families and five visual-reasoning benchmarks, Selective-RL improves full-update interpolation in 12 of 15 comparisons, including an 8.55 percentage-point MathVision gain on the Qwen recipient. Matched controls show that update magnitude or arbitrary low rank alone does not reproduce these gains. These results highlight a distinction between what is acquired during post-training and what remains transferable across models, providing a training-stage perspective on cross-model capability transfer. Code is available at https://anonymous.4open.science/r/selective-rl.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.08659v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.08659v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.08659v1 的 26 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "把 reasoning donor 的 actual pre-RL→post-RL update 与 donor/recipient 既有差异分开，再逐矩阵保留 dominant rank-one direction、恢复 Frobenius magnitude，训练后直接合成标准 VLM。作者报告跨三架构五任务12/15优于 full-update interpolation；控制实验支持方向选择确有价值，但不能将 singular vector 等同于独立的视觉推理能力。",
+    "motivationZh": "把 RL checkpoint 的全部权重位移迁移到另一个模型，会同时搬入 pre-RL 初始化差异和 RL 真正获得的更新。需要识别哪些更新承载可迁移的视觉推理收益，并避免把整段训练位移等同于新增能力。",
+    "methodZh": "常规 endpoint merging 同时搬入 pre-RL initialization displacement 和 RL acquired update。Selective-RL 在对齐的 attention/MLP matrices 上用 actual checkpoint difference 做 stage attribution，独立 SVD 截断并 norm-match，支持 reconstructed-donor interpolation 或纯 update addition；λ 在 H1 held-out validation 选定后固定于 H2/H3。Qwen 主实验提供 paired outcomes、rank/scale/random/trailing direction controls、三 donor seeds 和 DynaMath cluster bootstrap，是关于可迁移更新结构的实证结论；仍需要对应架构和真实 pre-RL checkpoint。",
+    "methodFlow": [
+      "分离训练阶段：以实际 donor initialization B 与 RL donor R 相减得 Δ=R−B；Γ=B−V 表示预先存在的 donor/recipient displacement。",
+      "选择并恢复 update magnitude：对每个对齐 q/k/v/o 与 gate/up/down matrix 独立SVD，默认保留首个 singular direction，再缩放到原矩阵Δ的 Frobenius norm。",
+      "离线合成 recipient：W=V+αΓ+βZ；interpolation α=β=λ，direct route α=0。视觉模块、embeddings、heads、norm/bias固定，最终仍是dense VLM。",
+      "校准与受控评估：H1 held-out选择λ0.05后冻结跨family；比较等norm随机/尾方向、全量reweight、不同rank及不同stage reference。"
+    ],
+    "experimentsZh": "三个8B recipients，matched DAPO donors在Math17K训练150steps；MathVista1000/MathVerse1000/MathVision304/DynaMath5010/MMStar1500，并评估broader perception和output audit。 以下结果为作者报告：作者报告Qwen Full→Selective MathVista76.70→81.00；paired95%CI gain[2.14,6.46]pp。（PDF p.6, Table 1; p.22, Table 23）；作者报告mean output575→430tokens，offline构建90s；另有3GPU-h validation search，donor training不包含。（PDF pp.23–24, Tables25,29–30） 对照范围：TaskArithmetic/TIES/DARE/STAR/IP/FRISM/AdaRank及附录TSV/LoRE；FRISM/AdaRank含target adaptation，某些baseline任务结果缺失，完整cross-family主对比主要对Full。 消融与诊断：actual/earlier reference、direct/interpolation、norm选项、module support、rank1–16、global/matrix scaling、random10draws、three donor seeds及非RL post-training sources。",
+    "insightZh": "方法组合继承 task vectors、spectral truncation/rescale；突出新意在实际RL阶段的 provenance isolation 和跨模型 transferability 的受控拆解。rank-one是经验规则，源模型低秩重建最优不证明 recipient transfer 最优。",
+    "evidenceZh": "stage isolation 与 transfer composition 分开定义。（PDF pp.3–5, §3.1–3.4, Eqs.(1)–(4); p.15, Algorithm 1）；三family五任务中12/15比较优于full interpolation，并保留回退结果。（PDF p.6, Table 1; p.17, Table 6）；优势不能仅由rank或magnitude解释。（PDF p.7, Table 2; pp.18–20, Tables 8,14,16–18）；donor variation及paired statistical evidence支持主实验的稳定性。（PDF pp.21–22, Tables 22–24, Appendix E）",
+    "caveatZh": "rank-one是经验选择；spectral ordering和源模型重建不直接识别 reasoning semantics或causal mechanism。；effect不是RL-exclusive：SFT及distillation update也有收益，存在task-dependent regressions。；outcome-selected qualitative cases不代表benchmark抽样。；需要架构、head ordering和参数坐标一致，不能无条件跨不同大小模型迁移。；Qwen证据最充分；其他families扩展baseline coverage有限。；anonymous repository URL访问返回错误，尚未核实public implementation；结论为作者报告，未独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "提供无需recipient gradient的新视觉推理迁移方法和可借鉴的因果控制设计；没有直接3D/CAD/编织生成结果，中等相关skim。"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.12229",
+  "slug": "vibeedit-image-editing-with-canvas-instructions",
+  "title": "VibeEdit: Image Editing with Canvas Instructions",
+  "authors": [
+    "Jinjing Zhao",
+    "Fangyun Wei",
+    "Yitong Wang",
+    "Xiuyu Wu",
+    "Yunuo Chen",
+    "Yang Yue",
+    "Sirui Zhang",
+    "Wenbo Wang",
+    "Hongyang Zhang",
+    "Dong Chen",
+    "Yan Lu",
+    "Chang Xu"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12229"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "VibeEdit",
+    "Image",
+    "Editing",
+    "Canvas",
+    "Instructions"
+  ],
+  "abstract": "In text-guided image editing, describing the desired change is often straightforward, but identifying the intended object or region can be cumbersome, especially when several objects look alike. We introduce a new image editing interface that lets users place spatial marks and optional short notes directly on the image. Together, these annotations form a canvas instruction that specifies where to edit and what to change. Our editor, VibeEdit, follows these instructions to perform object addition, removal, replacement, attribute modification, and movement without a separate text prompt. We construct 1.55 million source-target edit pairs with object masks and structured edit descriptions, from which we render canvas instructions during training. We adapt Qwen-Image-Edit with layer-decoupled conditioning that separately encodes source images and canvas instructions for image editing. We train the model with region-weighted supervised fine-tuning, followed by rubric-guided reinforcement learning to improve edit completion, local edit quality, and preservation of unedited regions. We evaluate VibeEdit on an independently constructed, human-curated benchmark of 419 cases emphasizing target selection among similar objects. VibeEdit achieves a VLM rubric score of 79.9 and an outside-region PSNR of 32.8 dB, compared with 67.4 and 24.0 dB for FireRed, the highest-scoring text-instructed baseline in our evaluation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12229v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12229v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12229v1 的 22 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "VibeEdit 把圈、scribble、arrow和短notes写在canvas上，以clean source与annotation分开VAE编码，解决多相似object中“改哪一个”的指令绑定。作者在419案例报告rubric79.9/outsidePSNR32.8，支持局部视觉设计控制；不是没有语言，而是没有额外prompt，复杂多target/多turn与开放手绘grammar未验证，code目前coming soon。",
+    "motivationZh": "仅用文字描述编辑位置，在多个相似物体或细小局部上容易产生指代歧义，用户还需要把已经在画布上看见的目标重新翻译成 prompt。论文关注让圈画、箭头、scribbles 和短 notes 直接表达编辑意图。",
+    "methodZh": "1,554,062syntheticeditpairs保存object masks与structuredchanges，在线随机rendercanvas和可逆edit方向。Qwen2.5VL读annotatedA理解语义，VAE分别encodecleanI和gray-backgroundC，DiT rank128LoRA输出annotation-freeedit。SFT把object及annotationunion dilation50px以λ1.5加权，避免unchangedpixels压低edit信号；再用DiffusionNFT对3520high-reward-variance conditions的success/outside/localquality binaryrubrics及outsidePSNRpenalty做RL。完整22页含NFT方程、renderergrammar、corpus统计、font/color/humanjudge、全部data-selection/evaluationrubrics已读；无单独limitations节。",
+    "methodFlow": [
+      "Florence proposals→GPT选择verifiable object/change→SAMmask→不同editor合成source-targetpairs，保存可逆editfields。",
+      "在线rendercircles/notes/scribble或source-targetarrow，同时形成annotatedA与独立graycanvasC。",
+      "冻结QwenVLencodeA语义，VAE分别encodeI/C，rank128DiTLoRA条件noisytarget生成edit。",
+      "object+annotationmask dilation50px做region-weightedflowSFT，保证改object并消除instructionmarks。",
+      "DiffusionNFT以edit-success、outside-preservation/local-qualityrubrics和PSNRpenalty优化，再输出cleaneditedimage。"
+    ],
+    "experimentsZh": "SFT1.55Mstoredpairs(online可逆不重复计数)，12Ksteps、global128、1024²buckets、lr5e-5；LoRAattention/modulation707.8Mtrainable，32A100。RL3520conditions/12rollouts8steps，512²/newrank128，220steps；evaluation419cases oneoutput/~1024²，base30stepsCFG4/RL16stepsCFG1，fixedGPT5.6judge+PSNRoutside。 以下结果为作者报告：作者报告ours79.9/32.8dB vsbase67.8/27.0、besttextFireRed67.4/24.0；movement76.4/27.1是五类中最低。（Table1, PDF p.8）；作者报告sameVLinputA时VAEI、A、I+C rubric24.7/58.6/67.8，outsidePSNR21.3/24.2/27.0。（Table2, PDF p.8）；作者报告三rewardgroups79.9/32.8 vseditsuccess-only69.2/28.6；RLhighvariance79.9 vsrandom79.3，选样收益较小。（Tables4–5, PDF p.10） 对照范围：6publiceditors visual-only与detailedtext两个inputregimes，GPTImage1只visual条件；没有同训练data/adapters的其他spatialeditor公平对照。ours和basesampling步数/CFG不同，RL增益并非严格固定inferencebudget；主指标selfbenchmark/fixedjudge。 消融与诊断：source/canvas编码、loss+dilation、reward组成、RLselection、LoRAtarget、taskcomposition、annotationcolors/fonts、removalcues及humanjudgeverification。证明layerdecouple重要；font200humanpreference无详细participant分布，不能广义断言所有handwriting。",
+    "insightZh": "新意为visual/textintent同canvas的通用5operationgrammar及layer-decoupledsource/annotationconditioning；regionloss与rubricRL使reference保留和target正确性一起优化。LoRA/NFT/GPTjudging都非新机制，训练与benchmark针对canvasgrammar而非普通editor全面优劣。",
+    "evidenceZh": "clean source与annotationlayers单独编码，避免生成path混入marks。（Sec.4.1, Fig.3, PDF pp.5–6）；regionweightmask只作为训练loss，不作为inferencegroundtruthmask输入。（Sec.4.2 Eqs.(1)–(2), PDF p.6）；独立human-curatedmulti-instance benchmark支持canvasbinding，但输入interface不完全相同。（Sec.3.2/Table1, PDF pp.5/8）；human validation仅同model100outputs证明judgeagreement，不能自动证明baseline偏差相同。（Appendix A Table10, PDF p.15）",
+    "caveatZh": "Sec.3.1 PDF p.5承认GPTfilter未能除全部syntheticpair错误，RL仅缓解残余noise。；Appendix p.19对象选择排除entangled、ambiguous、结构surface/反射等难场景，trainingcoverage因而受限。；canvas中仍有自然语言semanticnotes；withoutseparateprompt不等同纯手势理解或prompt-free生成。；一目标单操作5grammar对复杂多区域、conflictingannotations和multi-turnhistory泛化未测。；PSNRoutside可能奖励保source，但与editrubric联合才有意义；不同judge模型不消除rewardfamily偏好。；VLM/human校验仅oursoutputs，baselinecomparisons的interface与sampling差异需保留。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接提升visualcreation中局部targetselection与可控raster编辑，layer/source保留机制可参考designworkflows；输出没有SVG/layer/stitch结构，因此主要归imagegeneration。"
+  }
+}

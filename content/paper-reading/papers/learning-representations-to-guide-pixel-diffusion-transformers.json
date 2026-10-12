@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.12978",
+  "slug": "learning-representations-to-guide-pixel-diffusion-transformers",
+  "title": "Learning Representations to Guide Pixel Diffusion Transformers",
+  "authors": [
+    "Zihao Pan",
+    "Mengting Chen",
+    "Cheng Shi",
+    "Taihang Hu",
+    "Zhengrong Yue",
+    "Zikang Wang",
+    "Yuan Wang",
+    "Wei Li",
+    "Sibei Yang"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12978"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Learning",
+    "Representations",
+    "Guide",
+    "Pixel",
+    "Diffusion",
+    "Transformers"
+  ],
+  "abstract": "Visual representations are largely developed for understanding, yet what makes them useful for generation remains unclear. We study this question in pixel diffusion transformers and uncover two key insights. First, better representation quality does not necessarily translate into greater generative utility, as externally aligned semantics can be progressively lost during pixel synthesis. Second, architectural separation with specialized pixel decoders mainly redistributes semantic and spatial modeling, without necessarily yielding representations better suited to generation. These insights suggest that a useful generative representation must be both properly formed and actively exploited. Motivated by these insights, we introduce Representation Guidance (RG), which directly forms and exploits internal representations while retaining a plain Transformer architecture. A low-dimensional bottleneck forces generation-relevant information into a compact representation, which is then explicitly used to guide decoder generation by modifying the flow-matching target according to its induced prediction offset. RG learns clearer semantic and spatial structure while scaling efficiently in both parameters and computation. On ImageNet 256x256, RG-L/16 with only 459M parameters outperforms substantially larger pixel diffusion transformers, while RG-XL/16 achieves an FID of 1.55. RG further reaches an FID of 1.74 at 512x512 and extends to text-to-image generation, achieving 0.89 on GenEval and 87.1 on DPG-Bench.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12978v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12978v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12978v1 的 26 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "在 plain pixel Transformer 的encoder/decoder之间加入128D bottleneck，并用有/无该representation的velocity offset修正训练target，迫使紧凑表示参与生成。作者报告ImageNet256 FID1.55、512 FID1.74与T2I GenEval0.89；有价值的是representation formation与use的联合设计，不能从ImageNet内部probe推断普适生成语义机制。",
+    "motivationZh": "Pixel diffusion 中，即使中间层受到语义表征监督，最终像素预测仍可能丢失这些结构信息。问题是让生成目标持续利用已学到的表征，而不只在中间层增加一个随后被弱化的辅助损失。",
+    "methodZh": "JiT中REPA的语义改善可能在像素预测层流失。RG复用plain Transformer blocks但独立decoder patch embed，bottleneck表示通过token-wise adaLN条件decoder；drop representation得到shared decoder reference，EMA双无梯度forward计算offset，在t>0.3时把stop-gradient offset加到flow-matching target，同时训练encoder/decoder并保留中层DINO REPA。提供长训练、component/routing-width/depth/teacher ablations和T2I迁移；纯guidance无REPA/bottleneck反而失败，且2个extra EMA forwards影响训练成本。",
+    "methodFlow": [
+      "形成compact internal representation：noisy pixel tokens经encoder，linear down/up bottleneck d128作为decoder token-wise adaLN条件；decoder有独立patch embedding。",
+      "计算representation-induced offset：共享EMA decoder对保留r和drop r做两个gradient-free forwards，Δvrep=vwith−vwithout，reference branch用plain flow matching。",
+      "训练guided target：vRG=v+(s−1)sg(Δvrep)，默认s1.4/t>0.3，loss gradient经r回encoder；加中层DINO REPA，默认20epochs warmup。",
+      "像素空间sampling：每个denoise step重新计算internal representation；50step Heun和interval CFG，RG offset不增加sampling branch，但常规CFG仍双预测。"
+    ],
+    "experimentsZh": "ImageNetB/L/XL256/512，200epoch ablations和600epoch主要结果，FID50K、50Heun；T2I CC12M+120K mixture512、frozen341M FLAN-T5，1024internalfine-tune仅qualitative。 以下结果为作者报告：作者报告RG-B600epochFID2.64，JiT-B3.66；RG训练extra2EMA forwards，forwardGFLOPs28.47vs25.22不是总训练开销。（PDF p.10, Table8; p.21, Figure14）；作者报告online teacher FID3.18 vsdefaultEMA3.28，single runs；teacher/pretrained target/CFG均影响结果。（PDF pp.10–11, Figure9; p.20, Figure13） 对照范围：广泛pixel/latentliterature结果训练budget不同；受控decoder对比REPA layer与x-pred相同，InternalGuidance移植到pixelrecipe未独立最优化，不能否定其原latentsetting。 消融与诊断：BNwidth64–512、alignment layer3/6/8、E/Dsplit、REPA/BN/guidance组成、s/interval、DINOvariant、EMA/online、warmup与CFG；绝大多数single-run。",
+    "insightZh": "bottleneck encoder/decoder继承DDT/JiT，trainingtarget guidance与Internal Guidance/MG有关；新点是用紧凑learned representation有/无差异定义offset并通过其学习generative representation。所谓semantic manifold sharpening是类比解释，不是严格distribution或causal证明。",
+    "evidenceZh": "representation-guided target与bottleneck互相必要。（PDF pp.6–7, §3.2–3.3, Eqs.(4)–(5); p.10, Table8）；ImageNet图像生成达到较强参数/质量tradeoff。（PDF pp.7–8, Tables2–3）；相同T2Irecipe基线改善幅度较小。（PDF p.8, Table4/§4.1–4.2）；有效guidance解释依赖convergence假设，4×训练说法是epochs。（PDF p.16, AppendixA.2 Eq.(7); pp.20–21, Figures13–14）",
+    "caveatZh": "实验集中image generation；更大规模/video/3D/audio尚属未来工作。；FID不度量可编辑性、空间约束或真实细节恢复，没有SR或3D直接证据。；generation机制解释主要来自noisyfeatureprobe和single-runablation；统计稳定性待检验。；官方README明确code/weights未来几周发布，当前不是可复现released implementation。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "属于新的pixeldiffusionrepresentation/training方法，可为图像生成基础架构与detail/semantics分工提供参考；未展示3D或设计工具应用，中等相关skim。"
+  }
+}

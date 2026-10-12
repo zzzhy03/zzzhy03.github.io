@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.10782",
+  "slug": "vico-visual-environments-co-evolving-for-vision-language-model-reasoning",
+  "title": "VICO: Visual Environments Co-Evolving for Vision-Language Model Reasoning",
+  "authors": [
+    "Meng Lu",
+    "Ligeng Zhu",
+    "Olivia Xiao",
+    "Yuchen Zhuang",
+    "Zihan Wang",
+    "Kuncheng Wu",
+    "Bangya Liu",
+    "Yu Wang",
+    "Charles Fleming",
+    "Wenqi Shi",
+    "Xuan Wang"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10782"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "VICO",
+    "Visual",
+    "Environments",
+    "Co-Evolving",
+    "Vision-Language",
+    "Model",
+    "Reasoning"
+  ],
+  "abstract": "Reinforcement learning with verifiable rewards (RLVR) has become a standard recipe for post-training vision-language models (VLMs), but it typically assumes a static training environment. As the actor improves, fixed tasks drift out of its learning frontier: many become trivial, others remain unsolvable; and the learning signal collapses. We argue that VLM post-training should evolve the visual environment alongside the actor, not just the actor itself. We propose VICO, a co-evolutionary framework in which an actor and an Environment-as-Rewriter (EnvRewriter) are trained jointly: the EnvRewriter edits verifiable image-side structures, such as scene graphs, chart tables, or protected region masks, and re-renders them to produce label-valid training samples whose difficulty is calibrated to the actor's current ability through a pass-rate-based reward. This loop continuously realigns task difficulty with actor capability without any additional human annotation. Across nine multimodal benchmarks spanning mathematical reasoning and visually grounded understanding, VICO-8B improves over its base model by up to +5.0% on out-of-domain tasks, surpasses the strongest self-evolution and text-editing co-evolution baselines by +4.3% and +8.4% respectively, and stays comparable to chart-specialized RLVR methods using 16-160 times fewer labeled samples. By shifting from human-labeled supervision to image-editing co-evolution, VICO offers a scalable path beyond static-corpus RLVR for visual reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10782v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10782v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10782v1 的 42 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "训练Actor同时训练EnvRewriter，用actor8rolloutpassrate将scene/table/受保护region编辑调到0.35–0.65的learnable band；ActorGRPO、RewriterRWR共享反馈。作者报告ChartQA76.9→89.12%，新意在视觉environmentco-evolution；labelvalidity除CLEVR外带heuristic assumptions，zero新QA annotation不等于无GPTteacher supervision或少总生成/计算。",
+    "motivationZh": "固定视觉推理训练集无法持续暴露 solver 当前的薄弱点，简单改图又可能破坏原问题的答案。问题是让可执行视觉环境随模型能力演化，并保证生成的新训练题仍有可核验的视觉证据与标签。",
+    "methodZh": "2K CLEVRscene/program、2K Charttable或1K ZwZregionalannotations作为seed；Rewriter先从GPT5 verifiededitdemonstrationsSFT学格式与strategy，再onlineedit/render。CLEVRrecomputequestionprogram，ChartTier1 uniqueanswer-valuecellanchorlookup/Tier2fixvalues，ZwZprotecttargets改complement。每editedsample8actorrollout判answer+format，bellrewardexp(−4(p−.5)^2)加bandfilter、repeatedweightedSFTtrainrewriter，Actorpool累积validedits与originalregularization。三个domains/三backbones和same-backboneablation支持新curriculum方法，但ChartTier1uniquevalue不是完整questionprogram，理论与latersaturation归因仍只stylized解释。",
+    "methodFlow": [
+      "初始化可执行visual editor：同backbonefamily独立Actor/EnvRewriter，GPT5提出actor-conditionedverifiedtool-edittrajectories供RewriterSFT，不承担GTlabelsjudge。",
+      "编辑可验证结构：CLEVRscenegraph+Blender+programrelabel；ChartCSV+matplotlib按twoTier规则；ZwZprotectanswer-targetmasks、externaledit非targets。",
+      "共享rollout困难度：每edit8Actorresponses得到answer/format±1reward及empiricalpassrate，ActorGRPO，Rewriter仅valid且band0.35–0.65transitions获bellweight。",
+      "co-evolve两模型：RewriterLoRA64RWR把transition按floor5w重复SFT、ActorGRPO更新，保存validpool累积到下一round；Chartoriginal2Kregularization维持source。"
+    ],
+    "experimentsZh": "5rounds三domain，主要Qwen3VL8B九math/chart/visionbench，Qwen2.5VL7B及InternVL3chart扩展；inhousezero-shottemp.7，reportedexternalrows混合；R1three-seedCLEVRchecks不是fullfive-roundvariance。 以下结果为作者报告：作者报告ChartQA76.90→85.24R1→89.12R4；错误变正确365、正确变错64/2500，净+12.04pp，与summary+12.22小差异保留作者表。（PDF p.26, Table13; p.33, Table19）；作者报告R1three-seedChart85.0±0.4、MathVista72.8±1.1；20%blank/labelmismatchnoise平均66.8→66.0，但不能替代semanticvalidity检验。（PDF p.31, Table16; p.9, Table7） 对照范围：in-houseDirect/SupervisedGRPO、textedit/staticteacher较直接；externalRLVR/selfevolutionmodel训练量/源/格式异构；overallAvg先mathgroup再visiongroup等权不是9bench简单macro，OOD8另排Chart。 消融与诊断：RewriterSFT、visual/textedit、static/dynamic、noise20%、R1seeds、round/typeanalysis；未给teacher-initializationstrategysplit、finalseeds或samecompute步数对照。",
+    "insightZh": "difficulty-alignedenvironmenttraining继承GenEnv/RWR，但把可编辑visualstructure作为onlinecurriculum与Actor共同适应；新意是image-side taskevolution。并未新建foundationarchitecture、zero-data or未证明autonomous开放worldimprovement。",
+    "evidenceZh": "label机制随domain变化，不能统一称deterministicrecompute。（PDF p.4, Table1; pp.18–20, AppendixC）；视觉co-evolution有同backbonecontrols，强数据教师不够解释全部gain。（PDF pp.6–9, Tables2/4–7; pp.29–31, AppendixG/H）；训练throughR4有效，R5出现饱和而非无限提升。（PDF pp.26,32–34, Tables12–13/17–20）；少seed/零labeltoken不代表无教师/少全部cost。（PDF pp.16–18, AppendixB.3/Tables9–10; pp.29–30, Table14/AppendixG.3）",
+    "caveatZh": "依赖scenegraph/table/可靠protectedregions，其他domain难适用。；两policy和multirollouts额外compute比offlineaugmentation高。；只verifiableimageQA，openended/dialog/real-timeoutside scope。；fixeddifficultyband后期收益下降，需adaptiveα未来。；理论boundedscore只提供bound，不保证gradientnorm∝p(1−p)或最大learninggain在.5，baselineb=p通常不是一般variance-minimizer，属于stylizedmotivation。；naturalimageannotationprotection不是semanticproof；ChartTier1需完整question-groundedcell映射才能排除valuecoincidence。；bandpassrate8rollouts仅离散估计，SFT重复weights/CLIPstyle变化也可影响learnability；未执行或独立复现。；论文公开code仅planrelease，没有verifiedimplementationURL。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "视觉reasoningtrainingparadigm可迁移有可执行constraints的design/3D/CAD环境curriculum，超普通QA小改进；high/deep重点verifiableediting合同和co-evolution边界。"
+  }
+}

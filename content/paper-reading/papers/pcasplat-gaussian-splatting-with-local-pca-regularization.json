@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.11011",
+  "slug": "pcasplat-gaussian-splatting-with-local-pca-regularization",
+  "title": "PCAsplat: Gaussian Splatting with Local PCA Regularization",
+  "authors": [
+    "Vitor Matias",
+    "Filipe Nascimento",
+    "Kiyohiro Nakayama",
+    "João Paulo Lima",
+    "Márcus Lobo",
+    "Gordon Wetzstein",
+    "Leonidas Guibas",
+    "Afonso Paiva",
+    "Tiago Novello"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11011"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "PCAsplat",
+    "Gaussian",
+    "Splatting",
+    "Local",
+    "PCA",
+    "Regularization"
+  ],
+  "abstract": "Gaussian splatting has emerged as a flexible representation for 3D reconstruction from posed images. However, existing methods are optimized primarily using rasterization-based losses, which supervise a splat only when it contributes to sampled camera rays. Gaussians that are occluded or contribute little to the sampled view therefore receive weak or no geometric gradients and may drift away from the underlying surface, producing undesired floaters. We introduce PCAsplat, a geometry-aware regularization framework for Gaussian splatting based on differentiable local principal component analysis (PCA). Our PCA regularizer acts directly on neighborhoods of Gaussian centers and can therefore update Gaussians that do not contribute to the current training view. We regularize the PCA eigenvalues to encourage Gaussians to move to the underlying surface with isotropic tangent-plane coverage. We also align each Gaussian normal with the PCA-estimated neighborhood normal to enforce consistent orientation. Experiments on DTU, Tanks and Temples, and NeRF Synthetic show that the splats produced by PCAsplat better approximate samples of the reference surface while substantially reducing undesired floaters. These surface-aligned splats enable downstream geometry-processing tasks, including point cloud segmentation, and direct Poisson reconstruction. Additionally, PCAsplat remains competitive under conventional novel view synthesis and mesh extraction tasks. Code will be released.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11011v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11011v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11011v1 的 17 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "PCAsplat 用Gaussian-center邻域的可微PCA直接约束surface thickness、tangent isotropy和normal，而非只靠被相机ray看到的splat提供梯度。价值在让重建splats可直接接Mask3D、cropping和Poisson mesh；作者报告ScanNet++ Top1 mIoU24.35% vs VGGT-Ω10.54%。这属于可用资产/segmentation的明确迁移，需区分“centers贴surface”与TSDF/NVS指标，后者并未全面领先。",
+    "motivationZh": "用于渲染的 Gaussian splats 可以产生好看的新视角，但其 centers 未必构成贴合真实表面的点云，妨碍 mesh extraction、裁剪和 3D segmentation。论文关注提高重建几何本身的可用性，而不仅是渲染图像质量。",
+    "methodZh": "posed images优化RaDe-GS/PGSR式3DGS时，occluded/低opacity Gaussians缺geometric gradients，形成内部与外部floaters。对每个center的KNN covariance作PCA，最小eigenvalue压local thickness，λ3−λ2弱权重促tangent coverage，Gaussian最小scale轴对齐PCA normal并surfel压缩。和RGB及base multi-view losses联合训练，不另学SDF。完整17页、appendix implementation、visible-mesh reference、asset cropping/TSDF/NVS与curvature-density材料已读。",
+    "methodFlow": [
+      "从posed images按baseGS objective训练7K iterations，获取Gaussian centers/rotation/scales/colors。",
+      "对KNN centers计算covariance与batched3×3 eigendecomposition，形成local surface tangent/normal。",
+      "压λmin与tangent anisotropy，并以PCA normal约束Gaussian orientation及smallest scale。",
+      "继续优化至bounded20K/unbounded30K，保留RGB与PGSR式multi-view几何损失。",
+      "将surface-aligned centers/colors/normals直接送Mask3D、cropping或Poisson/TSDF extraction。"
+    ],
+    "experimentsZh": "DTU15 scenes、Tanks&Temples、NeRF Synthetic visible-surface refs；ScanNet++ Mask3D downstream。单RTXA5500 24GB，custom CUDA eigensolver、7K warmup、20K/30Ktotal；authors rerun most pointcloud baselines指定配置，NeRF Synthetic统一DTU超参；TSDF相关表含paper-reported results与rerun差异。 以下结果为作者报告：作者报告DTU Gaussian-center CD0.519mm vs RaDe-GS0.662mm，runtime22.3 vs14.5分钟；与COLMAP-D0.519mm相等。（Table1, PDF p.6）；作者报告ScanNet++ Mask3D Top1/Top3 mIoU24.35%/24.84%，VGGT-Ω10.54%/10.58%，oracle30.41%/30.56%。（Table5, PDF p.8）；作者报告TSDF DTU CD0.471 vs RaDe0.485，但T&T mesh F1 .50 vs GW .54；center-point T&T F1 .387 vs COLMAP-D .515。（Table3, PDF p.7; Tables6–7, PDF pp.14–15） 对照范围：3DGS/2DGS/PGSR/GS-Pull/MILo/RaDe/GW及VGGT/COLMAP references。Mask3D同pipeline控制明确；NeRF visible-mesh新reference仅可见surface，TSDF表有无法复现RaDe最佳值的footnote，需分reported与rerun。 消融与诊断：PCA/normal分别与组合、插到2DGS/PGSR/MILo不重新tune的CD改善；缺KNNsize、degenerate eigenvalues、thin/highcurvature结构与depth-based floater cleanup的独立控制。",
+    "insightZh": "将classic local PCA变成作用于所有scene-space neighbors的可微Gaussian regularizer，补render-gradient盲区；比增加auxiliary SDF/mesh representation更轻量。新意为监督位置与下游可用性，不是新segmentation network或foundation reconstruction paradigm。",
+    "evidenceZh": "PCA covariance与eigenspectrum直接对Gaussian center位置回传，而非通过当前view contribution。（Secs.3.2–3.3, Eqs.(2)–(5), Fig.2, PDF pp.4–5）；相同Mask3D pipeline下改善reconstructed pointcloud的semantic instance segmentation。（Sec.4.3, Table5 and Fig.7, PDF pp.8–9）；PCA spectrum承担主要CD改善，normal loss独立收益很小。（Sec.4.2, Table4, PDF p.8）；surface-center指标的优势不等同所有mesh/renderer指标state-of-art。（Appendix C, Tables7–8, PDF pp.15–16）",
+    "caveatZh": "Conclusion PDF p.9承认training overhead、需depth-based处理distant floaters和normal sign disambiguation。；Sec.4.3 PDF p.8承认textureless white walls仍难分割。；Appendix Table7 footnote p.15无法re-run RaDe论文TSDF最佳结果，使用reported与本地rerun说明。；surface regularization是local self-consistency，不保证真实surface、watertightness或manufacturability；sparse/thin/multisurface邻域可能误合。；pointcloud gains与Mesh extraction/NVS gains不一致，不能用center-F1替代最终asset质量。；curated visible-reference剔除hidden geometry，无法证明未观察区域忠实恢复。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "重建表示直接支持3D segmentation及可crop/mesh的asset处理，满足selective明确下游迁移门槛；Lego仅NeRF synthetic示例，论文主对象并非积木，因此不归LEGO。"
+  }
+}

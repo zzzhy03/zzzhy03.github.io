@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.11498",
+  "slug": "parametric-trajectory-distillation-for-few-step-video-generation",
+  "title": "Parametric Trajectory Distillation for Few-Step Video Generation",
+  "authors": [
+    "Lan Feng",
+    "Peter Karkus",
+    "Maximilian Igl",
+    "Julius Berner",
+    "Yuxiao Chen",
+    "Shuhan Tan",
+    "Alexandre Alahi",
+    "Boris Ivanovic",
+    "Marco Pavone"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11498"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Parametric",
+    "Trajectory",
+    "Distillation",
+    "Few-Step",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Video diffusion and flow models require many sequential evaluations, making generation computationally expensive. Few-step distillation reduces this cost but poses a capacity allocation problem: a student must match the teacher's iterative generation with far less sequential computation. Existing trajectory methods ask the student to reproduce teacher transitions that are highly curved at high noise, which can exceed its capacity and degrade fine detail. We introduce Parametric Trajectory Distillation (PTD), which lets the student parameterize teacher trajectory segments as polynomials and learn from teacher guidance along its own predicted path. PTD is designed to let the learned curvature adapt to the backbone's predictive capacity, preserving motion and diversity. The curvature head is used only in training; inference keeps the original backbone architecture. On Wan2.1-14B, four-step PTD sets a new state of the art for trajectory distillation, significantly improving dynamic quality and naturalness over PDD, the best-performing trajectory-only method on this model, under the same training setting. On the 33B audio-video MiniMax-H3, LoRA-trained PTD significantly improves diversity and naturalness over the state-of-the-art LightX2V Turbo. Blinded human votes give PTD 55.1% and 63.4% preference shares against PDD and LightX2V Turbo. Project page: https://alan-lanfeng.github.io/PTD/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11498v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11498v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11498v1 的 32 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "PTD 一次studentforward预测meanvelocity和endpoint-vanishing Legendrecurve，用teacher在studentcurve上的速度训练，inference丢curvaturehead只做4次endpointjump。作者报告H3diversity2.81vsTurbo1.55及人类63.4%tie-split偏好；Wan55.1%偏好p=.36不显著，且H3最后hop仍8步teacher march，不能宣称所有设置纯两query或motion全面领先。",
+    "motivationZh": "少步视频生成需要用大步跳跃近似弯曲的 teacher 轨迹，但简单 endpoint 蒸馏难以同时保留动态细节、质量与多样性。论文研究如何让少量 student 评估更充分地表达这些轨迹变化。",
+    "methodZh": "各hop曲线x+Δ(τh+Στ(τ-1)Pjcj)，h严格等于该curve均速度，dj解析导数无需networkJVP。两个halfinterval各uniformqueryteacher，states/teacherstopgrad，studentcarryendpointdetach。实现把LS分mean/centeredresidual并对c在mean项stopgrad；H3rank128perhopLoRA且finalhop8Eulerendpoint，Wanfullfinetune全hopcurve。完整32页证明、gradientrouting、recipes、全部judge/human/featureprobe与basisdiagnostics已读。",
+    "methodFlow": [
+      "固定shift6四hopgrid，student一次输出原widthmean h和K8latent-sizedcurvaturevectors。",
+      "构造endpointvanishingLegendrecurve及analyticlocalvelocity，default每halfhop采1teacherquery。",
+      "teacher在detachedstudentcurveposition评速度，同residual监督h/curvature并使用finitequerygradientrouting。",
+      "训练在自身endpointrolloutstates继续，H3最后hop用8步teacher-marchedendpointtarget替代curve。",
+      "inference完全移除curvaturehead，每hop x加Δh；H3按hop使用LoRA，Wan保fullyfinetunedbackbone。"
+    ],
+    "experimentsZh": "H333B:55879promptcorpus、rank128perhopLoRA、150hopupdates/global512/64GPU，4updates一fullrollout，trainnoactualvideos。Wan14Bfullupdateglobal256/128GPUvsPDD64GPU，sameViMix/teacherCFG5+SLGlayer12/lr1e-5，bestPTD64vsPDD96(64/96/256evaluated)。100heldoutlive/actionprompts各3seeds+fourblindAstraframejudgecalls，human10raters161totalvotes；VBench946×5。 以下结果为作者报告：作者报告H3diversity2.81vs1.55 pairedCI+1.26[1.15,1.36]、naturalness3.09vs2.98 CI+.11[.06,.17]；dynamic/staticCI跨0。（Table4, PDF p.23）；作者报告WanAstra dynamic2.43vs2.16 CI+.27[.17,.36]、naturalness2.82vs2.60+.22[.13,.32]，diversity/static无显著差。（Table4, PDF p.23）；作者报告humanH3tie-split63.4%(82votes)/Wan55.1%(79votes)，non-tieWilsonH354-76%p.01/Wan44-69%p.36。（Table8, PDF p.25）；作者报告WanVBench84.57vsbestreproducedPDD83.67，quality85.44vs85.24，Dynamic76.11vs85.83而motionamount不同于realism。（Tables6-7, PDF p.24） 对照范围：Wanmatchedbase/prompt/teacher/updateconfigPDD但bestcheckpoints及teacherqueries/time不同，publishedPDD84.92/others84.95不在同setting不能称全领域SOTA。H3只releasedTurbov1.1未知trainingbudget/differentaudio/video sampler，无其他releasedFastH3或hybrid方法同budget比较。Audio不评测，Astra12framemosaics只proxyhumanfullplayback。 消融与诊断：Wan1.3B40updates8stepteacher-march vs8/2studentqueryqual，Kfits/linearprobes、two/threequerydiagnostic。teacherquadrature在teacherpathbank100与studenterrorbank96不同且teacher-anchored非deploymentstudentcurve，因此“八分之一”不等于actualteacherlabel噪声估计。highnoise8promptsbendprojection1.4%很小，teacherfit90%不代表student能力。",
+    "insightZh": "限定Lagrangianflow-map为固定hoppolynomial使localderivativeanalytic、head可移除，teacherquery与studentrepresentablecurve共同适配，比再堆critic/DMD更简洁。on-policyteacher/localflowmap已有，作者正式承认是restrictedansatz；implementedc-gradientrouting与ordinaryLSsemigradient不等价。",
+    "evidenceZh": "endpointidentity确实无curvature依赖，但h目标为studentcurve上的teachermean而非真实teachertrajectorymean。（Sec.3.1-3.2 Eqs.(1)-(5), PDF p.4; Appendix A.1/A.3 pp.15-16）；实际gradientrouting保loss值/h梯度但改变c梯度，twoqueries单draw只能rank2约束9outputs。（Appendix A.1-A.2, PDF pp.15-16; scope p.18）；H3最后hopteacher march且lossmodalitynormalized，不能直接泛称统一两queryobjective。（Sec.4.2, PDF p.6; Appendix B.2-B.3 pp.20-21）；Wan人类偏好无significance且publishedPDD另protocol，H3信号更强。（Table1, PDF p.7; Table8, p.25）",
+    "caveatZh": "无独立limitations节；Appendix A.3-A.4明确fixedgrid/finitepolynomial与Lipschitzresidualbound的ideal条件，routing改变gradient。；Appendix B.3H3最后hop额外teacher march，model-specificrecipes。；Appendix C/Table8披露Wan人类p.36、publishedPDDprotocol差；Audio不评估。；bestVBenchcheckpointselection在同benchmark，未提供training-seed方差；不能用test最大点作无偏generalquality保证。；humanvotes重复raters/prompts，简单Wilson/sign-test未clusteradjust，H3有效sample不等82独立human/场景。；H3perhopadaptersets存储/部署切换仍有成本，originaltopology不等sameweights或无storage。；无定量promptadherence/AVsync/longvideo评估；project6step精选电影不能替代4stepbenchmark证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "fewstepvideo模型的teacher监督与capacity分配实质改变，无需critic/networkJVP，跨14B/33B适配对visualgeneration效率与diversity有方法价值。"
+  }
+}

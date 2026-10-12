@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2602.01683",
+  "slug": "freshmem-brain-inspired-frequency-space-hybrid-memory-for-streaming-video-understanding",
+  "title": "FreshMem: Brain-Inspired Frequency-Space Hybrid Memory for Streaming Video Understanding",
+  "authors": [
+    "Kangcong Li",
+    "Peng Ye",
+    "Lin Zhang",
+    "Chao Wang",
+    "Huafeng Qin",
+    "Jiayuan Fan",
+    "Tao Chen"
+  ],
+  "publishedAt": "2026-02-02",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2602.01683"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "FreshMem",
+    "Brain-Inspired",
+    "Frequency-Space",
+    "Hybrid",
+    "Memory",
+    "Streaming",
+    "Video",
+    "Understanding"
+  ],
+  "abstract": "Transitioning Multimodal Large Language Models (MLLMs) from offline to online streaming video understanding is essential for continuous perception. However, existing methods lack flexible adaptivity, leading to irreversible detail loss and context fragmentation. To resolve this, we propose FreshMem, a Frequency-Space Hybrid Memory network inspired by the brain's logarithmic perception and memory consolidation. FreshMem reconciles short-term fidelity with long-term coherence through two synergistic modules: Multi-scale Frequency Memory (MFM), which projects overflowing frames into representative frequency coefficients, complemented by residual details to reconstruct a global historical \"gist\"; and Space Thumbnail Memory (STM), which discretizes the continuous stream into episodic clusters by employing an adaptive compression strategy to distill them into high-density space thumbnails. Extensive experiments show that FreshMem significantly boosts the Qwen2-VL baseline, yielding gains of 5.20%, 4.52%, and 2.34% on StreamingBench, OV-Bench, and OVO-Bench, respectively. As a training-free solution, FreshMem outperforms several fully fine-tuned methods, offering a highly efficient paradigm for long-horizon streaming video understanding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2602.01683v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2602.01683v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2602.01683v2 的 28 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：v1将端到端训练列为未来方向；v2新增ViT/Projector/LLM component-wise fine-tuning与更多骨干实验，LLM微调在StreamingBench作者报告82.31%，训练免费版仍74.20%。这个新训练扩展是实质实验更新，但不得把82.31%声称training-free。 FreshMem 并行保留近期window、衰减Fourier history与episode thumbnails，以少量高norm residual补细节。作者报告Qwen2-VL training-free StreamingBench69→74.20、OV46.30→50.82；82.31来自LLM微调，不能归入无需训练收益。可作为streaming视觉记忆组合skim，但『brain/logarithmic/topology』主要比喻，frequency重建和sampling公式不够明确，实际计算/显存约+17%。",
+    "motivationZh": "Streaming video 无法持续保留所有历史 frame tokens，而仅短窗口会忘记较早事件，压缩又会丢失瞬时细节。需要在长期 temporal gist、关键空间片段与当前高保真观察之间分配有限记忆。",
+    "methodZh": "MFM递推累积有限logspacedfrequencycoefficients、指数衰减并保存高normtokens，通过IDFT式读出gist；STM按邻framecosinesimilarity切episode，adaptive采样与相邻centroidmerge限制容量。projector将两种memory与近期visualtokens交给原MLLM。三个online MCQA及两个offlinebenchmark、额外modelfamily评估和componentfine-tune。",
+    "methodFlow": [
+      "近期窗口：visionencoder当前features先保留5framewindow，overflow并行进入MFM/STM。",
+      "频率记忆：16频段以γ.9递推complexcoeff，保存top10%highnormresidual，读取时有限frequency合成historygist。",
+      "episode压缩：cosine阈值.4划episode，采样rate1/16–1/4，自邻episodecentroidsimilarity>.3merge，40episode容量。",
+      "回答与可选微调：concatenatefrequency/thumbnails/windowtokens接projector/LLM，分别微调ViT/projector/LLM可另增性能。"
+    ],
+    "experimentsZh": "Qwen2VL7B/InternVL2-2B主要baseline、另InternVL3.5/DeepSeekTiny。online仅问题timestamp前video，MCQA；RTX4090/H200，memory/defaultsTable7，numbers作者报告。 以下结果为作者报告：作者报告Qwen trainingfreeStreaming69.00→74.20/OV46.30→50.82/OVO52.19→54.53；LLMfinetuneStreaming82.31。（PDF pp.6–7 Tables1–3）；作者报告OVOforwardactive48.86→48.25，MLVUactioncount20.4→16.5；不能写所有memory任务改善。（PDF pp.6/16 Tables2/8–9）；作者报告OVAVA subsetaccuracy45.63→47.42、totalruntime81→95min、peakmemory17→20GB。（PDF p.14 Table6） 对照范围：online/offline模型多为引用结果，baseframe/tokenbudgetmatched设置未完整公开；没有与同预算现代强VLM memory公平完整对照。 消融与诊断：SW/STM/MFM组合、capacity/frequency/eventthreshold和componentfine-tune；缺residualnorm替代saliency、衰减vsfrequency隔离、长期needle/staleness检验。",
+    "insightZh": "工程贡献是frequency-history与episodevisualmemory互补；没有neuroscience机制实验或拓扑不变量定义，blur/tSNE可视化不能证明生物同构。 v1将端到端训练列为未来方向；v2新增ViT/Projector/LLM component-wise fine-tuning与更多骨干实验，LLM微调在StreamingBench作者报告82.31%，训练免费版仍74.20%。这个新训练扩展是实质实验更新，但不得把82.31%声称training-free。",
+    "evidenceZh": "frequencycoeff与salientresidual并行维护history。（PDF p.5 §3.2.1 Eqs.(3)–(5)）；episode通过cosineboundary与邻centroidmerge，并非明确空间地图。（PDF p.6 §3.2.2 Eqs.(6)–(9)）；training-free与LLMfinetune必须分开。（PDF pp.6–8 Tables1–5）；v1将端到端训练列为未来方向；v2新增ViT/Projector/LLM component-wise fine-tuning与更多骨干实验，LLM微调在StreamingBench作者报告82.31%，训练免费版仍74.20%。这个新训练扩展是实质实验更新，但不得把82.31%声称training-free。（Prior 2602.01683v1 PDF p.8 Conclusion; current v2 PDF p.7 Table 3, pp.10–11 Appendix A.2/A.5, Table 10）",
+    "caveatZh": "MFM随时间遗忘、频率buffer覆盖，远history只能gist；episode长时被压缩。；memory额外计算/显存、容量/threshold影响性能，AppendixA/B给出tradeoff。；§3.1借Weber-Fechner设inverse-logdensity并无计算保证；logfrequency指数递推不是标准全historyDFT，IDFT normalization/读取网格不明。；ρ∝clamp(N)与长episode更重压缩文字有歧义；无code则难复现精确memory。；82.31LLMfinetune具体数据/steps与算力不足，『lowcostcomponent-wise』不能自动等于小参数训练。；Checklist称§5讨论limitations，实际§5只有conclusion；声称deterministic故无需uncertainty忽略benchmark采样/finetune变异。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "连续视觉观察/创作agent可能参考保近期细节与历史episode的memory接口，但未经真实artifact编辑状态/空间精确记忆验证。"
+  }
+}

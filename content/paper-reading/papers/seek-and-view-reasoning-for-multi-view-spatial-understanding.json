@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.11810",
+  "slug": "seek-and-view-reasoning-for-multi-view-spatial-understanding",
+  "title": "Seek-and-View Reasoning for Multi-View Spatial Understanding",
+  "authors": [
+    "Qixiang Chen",
+    "Cheng Zhang",
+    "Fucai Ke",
+    "Chi-Wing Fu",
+    "Jianfei Cai",
+    "Jingwen Ye"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11810"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Seek-and-View",
+    "Reasoning",
+    "Multi-View",
+    "Spatial",
+    "Understanding"
+  ],
+  "abstract": "Existing approaches to multi-view spatial reasoning operate largely on sparse input views. Vision-language models (VLMs) are thus restricted to understand a scene and infer spatial relations within these fixed views, leading to fragile cross-view alignment and geometry-to-language bottleneck. To address these issues, we formulate a novel Seek-and-View reasoning approach to find implicit cross-view spatial evidence by locating a question-relevant view to support the spatial reasoning. To realize this approach, we propose Vantage, a training-free model-agnostic reasoning framework that pairs a VLM with a 3D foundation model: a viewpoint-grounded reasoning stage for question analysis and view planning, followed by a geometry-grounded evidence augmentation stage to effectively synthesize and incorporate visual evidence into the final reasoning. Comprehensive experiments on six VLMs demonstrate consistent improvements on five benchmarks without fine-tuning. Overall, by revealing spatial evidence through view-grounded reasoning, Vantage can largely reduce reliance on language-based cross-view alignment and improve multi-view spatial understanding. Our code is available at https://github.com/q1xiangchen/Vantage.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11810v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11810v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/q1xiangchen/Vantage"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11810v1 的 26 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Vantage 先把spatialquestion拆为referenceview/observationgap，再从17类cameraaction选新视角，用G3Tpointmap重投影而非language串联跨view。作者报告6VLM平均分都有提升，但Qwen8B仅40.6→40.9，Qwen4B多数增益已来自analysis文本；值得借鉴主动inspection，新增view只重排已见pixels，不等于得到真实遮挡后证据。",
+    "motivationZh": "多视图空间问题常涉及不同参考系，输入视角也未必清楚暴露回答所需的几何关系。仅在原视图上反复语言推理难以补足观察缺口，因此论文关注面向问题的主动视角检查。",
+    "methodZh": "questionanalysis建立camera-centric north/left frame，第二VLMcall选17action×coarselevels并写guidance；G3Tgravity-alignedpointcloud+estimatedcamera将relativeaction映射pose，sceneunit为camera间均距离，120°FoV及2×raster再downsample合成view。finalVLM读原views+render+analysis/guidance，formaterrorfallbacktext。完整26页含promptrestrictions、backend/FoV、benchmarksubset、600failures与全部examples已读。",
+    "methodFlow": [
+      "VLM解析questionanchor/relativeframe/neededregion，选referenceimage而不直接answer。",
+      "第二call从pan/translation/orbit/bird-eye等17actions选coarsemagnitude，并记可见anchors与观察guidance。",
+      "G3T重建gravity-alignedpointcloud/cameras，依camera spreadscale实例化relative6DoFaction。",
+      "重投影已观察pixels成新view，未观测surface为空，保原views作为crosscheck。",
+      "finalVLM结合synthview与分析/guidance回答；structuredformat失败fallback原views。"
+    ],
+    "experimentsZh": "6models GPT5.4/Gemma4-31B/Qwen3.6-27B/InternVL3-8B/QwenVL8B/4B，openmodel+G3T2H200。MindCube-tiny、MMSI PR/Attr、BLINKMV、OmniPerspective、SPINDynRot/Trans；排除MMSImulti-step/motion等。三VLMcalls+3Dreconstruction+viewrender相较baseonecall，无完整walltime/token/compute门禁。 以下结果为作者报告：作者报告Qwen4B五benchmean38.1→43.1、GPT46.7→53.4、Gemma49.8→54.5，而Qwen8B40.6→40.9。（Table1, PDF p.7）；作者报告Qwen4BMindCube26→38.9，QA-only34.8/random33.0/6DoF34.6；Qwen8B31.3→31.6且插值32.4。（Tables3–4, PDF p.8）；作者报告Qwen4Bthreebenchviewonly35.3、analysis+guidance36.6、full39.9vsbase32；Gemma48.9/49.4/51.4vs47.3。（Table5, PDF p.8）；作者报告G3T与VGGTω+GeoCalib平均comparable，后者backendtime约1.4×，FoV80°vs120°Gemma−2.5pp。（Tables7–8, PDF pp.15–16） 对照范围：sameVLMbasecontrol+crosssourceanalysis、trainedSenseNova及235Bagentreportedcomparison。后者model/data/compute不同不能宣称效率优越；没有matched3-callCoT/samplebest或parallelviewbudget对照，noCI/repeatedseeds。paper不列各subsettotalcounts完整eval复现需code。 消融与诊断：QA-skip/QA-only、structuredactionvsrawpose/random/interpolation、finalview/text分解、FoV/backends；支持某些modelsview有效，notuniversalplanninggain。cguide在看render前产生并强调不得inventobjects，finalprompt视synth为support非GT。",
+    "insightZh": "贡献是question-conditionedobservationplanning与geometrybackendinterface，不是newVLMweights；将render视角用作reasoning工具超普通固定VQA微调，但各component现成且single-shot非iterativeactive3Dsensing。新view只重新组织已有证据，spatialprior为重建model提供。",
+    "evidenceZh": "synthesizedview不补真实未见surfaces，只重排已observedpixels。（Sec.3.3 Eqs.(3)–(5), PDF pp.5–6）；analysis本身有很大增益，questionrelevantview不是每model都更好。（Tables3–5, PDF p.8）；sixmodelaggregatemean提高不等于每benchmark/subset提高。（Table1, PDF p.7）；failure诊断是抽样incorrectpredictions再errorweightmacro，不是600randomalltasks。（Fig.3, PDF p.9; Appendix C/Fig.5, p.17）",
+    "caveatZh": "Sec.5 p.9依赖VLM/3DFM能力，variedrolloutquality；主要错误是questionframe与cameraaction。；Sec.4.4 p.9反射/透明/遮挡/暗/blur导致synthesis不可靠，仍需finalreasoning。；Sec.3.3 p.6unobservedsurface为空；Appendix动作非metriccamera规划，scale源cameraspread。；viewplanningtext可能先造错frame并锚定finalanswer，synth不能自动校正。；singleview数据无othercameracenters的scalehandling未详述，空surface不可当negativeobjectevidence。；不更新underlyingmodel/没有3D/CAD/design任务，贡献为spatialinferenceworkflow而非foundationcapabilitytraining。；增compute+subsetselection及nonsignificant小gain边界需保留。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "主动选择inspectionview对3D视觉理解/设计asset检查有明确可参考接口，研究对象是multi-viewspatialreasoning，较常规VQA高迁移价值；尚未实测设计transfer，mediumskim。"
+  }
+}

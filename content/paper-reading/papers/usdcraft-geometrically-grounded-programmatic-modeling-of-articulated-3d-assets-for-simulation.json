@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.11322",
+  "slug": "usdcraft-geometrically-grounded-programmatic-modeling-of-articulated-3d-assets-for-simulation",
+  "title": "USDCraft: Geometrically Grounded Programmatic Modeling of Articulated 3D Assets for Simulation",
+  "authors": [
+    "Chuanrui Zhang",
+    "Zaijia Yang",
+    "Duomin Wang",
+    "Lu Shi",
+    "Daquan Zhou",
+    "Ruihua Zhang",
+    "Ziwei Wang"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11322"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "USDCraft",
+    "Geometrically",
+    "Grounded",
+    "Programmatic",
+    "Modeling",
+    "Articulated",
+    "3D",
+    "Assets",
+    "Simulation"
+  ],
+  "abstract": "Geometrically faithful and functional articulated 3D assets are essential for real-to-sim robot manipulation, where policies trained in simulation must transfer to physical objects. Recent mesh-based methods learn to infer articulation from annotated 3D assets, but deployment remains challenging when real-world objects fall outside the training distribution or their meshes are incomplete or corrupted. To address these limitations, we formulate articulated asset reconstruction as programmatic modeling grounded in partial geometric evidence and introduce USDCraft, a framework in which a pretrained LLM writes and revises executable programs for simulation-ready articulated assets without task-specific training. We propose source geometry analysis, which converts the source mesh into a metric textual description that distinguishes observed surface from unknown space, and iterative geometric rechecking, which re-encodes each candidate in the same representation so that discrepancies point to program edits while unobserved regions remain open to completion. Visual feedback and physical authoring guidance complete the modeling process, which produces articulated USD assets with explicit physical properties that load into Isaac Sim without manual adjustment. Experiments demonstrate leading articulation recovery on two benchmarks and validate USDCraft's effectiveness for real-to-sim-to-real robot manipulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11322v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11322v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11322v1 的 30 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "USDCraft 从 partialmesh+image 以 metric axial encoding、局部measurement和candidate rechecking 驱动 LLM 改写 CadQuery/SDF asset program，输出可编辑parts/joints/PhysX USD。作者报告100objectbenchmark F1 84.83 vs same-backbonegenericworkflow74.48，并在三真实操作各20trials达到85–90%。值得精读几何grounded设计agent；补全unknown与mass/friction仍是hypotheses，staticUSD和posedrenders不等于任意物理真实。",
+    "motivationZh": "从部分扫描恢复仿真资产时，未观测区域既可能是合理补全，也可能是错误新增结构，单一全局距离难以区分。需要忠实恢复可见几何与关节结构，并让程序化模型和仿真资产保留米制尺度及局部误差含义。",
+    "methodZh": "Sourcegrid区分采样surface与unknown，避免扫描缺口被视作free-space。Agent读metricbounds/XYslice，按需render/measureface；candidate同grid缺sourcecoverage是directerror，新增surface可能是合理补全。局部firstsurface residual分medianoffset与profileP90以区分placement/shape错误。单agent写program、compile、render不同jointposes并repair，authoringSDK设置parts、axes/origin/limits、collision/inertia与PhysXfields；generation无mesh时仅image/text和visualfeedback。",
+    "methodFlow": [
+      "建立partialgeometry的metrictext：源meshunits/Z-up frame，fine192grid转预算内32/24/16axialslices，surfacecells之外标unknown；用localbounds/face测量补细节。",
+      "编写可修改assetprogram：CadQuery solids与SDF primitives建新geometry、parts/joints/PBRappearance，直接authorPhysXmass/contact/jointproperties并编译USD/URDF。",
+      "同表示重新量测candidate：Source/candidate surfacegrid求missedobservations与unknowncompletions，sixdirectionfirstsurface和partdepthmedian/P90区分translation/profile。",
+      "视觉观察与程序修复：Agent选source/candidateview和jointpose检查missingparts、appearance、clearance，局部改program后freshcompile/validate/recheck。",
+      "验证重建与sim-to-real：量测partgeometry/kinematics，选三实物任务用simulation200demo训练DiffusionPolicy并directrealdeployment；generation另用anonymousassetjudge。"
+    ],
+    "experimentsZh": "USDCraftbench100assets（60agentgenerated+40Hunyuan/scans）48categories，Lightwheel243/14categories；GTpart/kinematicmetadata从inputs剥离，人工referenceannotation。100Ksurfacesamples，partmatching带jointtype/axis/locationthreshold且missingpartpenalties。ThreeAstraruns，其余mostlyonce。Generation每setting50text+50image；threeobjectUR7e/Robotiqpolicy20trials/setting。 以下结果为作者报告：作者报告benchAstra F1 84.830、staticgIoU.694、AE6.833°、LE.044；MiniAstra74.480/.512/21.141/.117。（PDF p.6 Tables 1/3）；作者报告LightwheelunguidedF186.983 vsInstructParticulate83.4、LE.009vs.018；wholeOC.011差于segmentation.004、mIoU.683差于.724。（PDF p.6 Table 2）；作者报告真实opening/lever/switch成功90/85/85%（Astra），sim100/90/85%；20trials每setting，非普遍物体成功率。（PDF p.8 Table 4; p.23 protocol）；作者报告samebackboneUSDAstra4.2min/.851USD vsMini3min/.462USD，新增geometrictext增加tokens与cost；10Klibrary未以10K独立物理tests验证。（PDF p.6 Table 3; p.21 Table 12; p.8 §4.5） 对照范围：ArtLLM/SIMART/Particulate/Articraft与genericMiniWorkflow，Lightwheel引用publishedmodelresults，inputs/tasks目标不同。ArtLLM排除28failedcases但提供matched72casecheck，source-exclusion/refframe支持非仅ownbenchmark优势。Realbaselines均用USDAstra的supportassets，机器人/table/camera人工calibration。 消融与诊断：Authoringharness、sourceanalysis、rechecking、visualfeedbackcumulative和independentremove；independentobservationagent反而降低。Mostgain来自SDK和initialgeometryanalysis，visualfeedbackgeom不总赢；只Astra/Mini三runs。",
+    "insightZh": "有意义的programmaticreconstructionharness：measurements可被LLM读取，missedsource与unknowncompletion不对称处理，反馈可定位至programparameters；并非仅使用VLM打分。主要任务为specificobjectfaithfulrecovery，主归3d-reconstruction，独立toolloop归agent，text/imagecreation为secondarygeneration。",
+    "evidenceZh": "Observed/unknown区分与同坐标candidate对比避免把missingmesh当实测空区。（PDF pp.3–4 §3.2/3.4 Eqs.(1)–(2); p.13 A.4; pp.29–30 G.6）；作者报告同backboneharnesscomparison有大joint/geometry改善，Astra三独立runs波动小于margin。（PDF p.6 Table 3; p.15 Table 9; p.9 Tables 6–7）；作者在三实际manipulationtask做directsimulationtrainedpolicy，单setting20sim/20realtrials。（PDF p.8 Table 4; pp.20–23 Appendix E）；Mainmetric独立center/scale，可隐藏globalerrors，但reference-frame表单独保留metricframe误差。（PDF p.14 C.1; p.20 Table 11）；Statickinematicmotionjudge与scriptphysicalparameters不证明dynamics；deformablesrestgeometry未验证。（PDF pp.23–24 Appendix F; pp.25/27 G.1/G.3）",
+    "caveatZh": "Fine lattice/racketstrings/cartwire spacing与connectivity重建不可靠。；Flexiblecord/canopy仅restgeometry/annotations，deformabledynamics未IsaacSim验证。；未知物理属性是modelingassumptions，staticchecks/posedrenders不能建立successfuldynamics。；Axialrepresentation有lossygrid与budget，细geometry需agent正确追加测量；unknowncompletion可与真实隐蔽mechanism不同。；Jointmatching阈值部分宽，mainnormalization抹scale/translation，参考frame结果较诚实但仍非所有物理parameter实测。；Real只有drawer/toaster三tasks×20trials、各policytrainingonce，无CI，support统一USDAstra且workspacecalibrated，不证明openworldrobustness。；Generation由samefamilySoljudge，静态jointposes不证动态function；10K资产library不是经过10Ksim验收的数据。；官网code/dataset仍TODO，SDKdetails和prompt完整参数未全部公布，无法独立复现实验；常识mass/friction非物理identified参数。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可编辑articulatedobjects、programmaticgeometry与metricfeedback直接命中3D/CAD逆向工程和visualdesignagent，且有限real-to-simtransfer能评价几何误差的功能后果。"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.11857",
+  "slug": "pose-free-feed-forward-3d-inpainting-via-learnable-mask-attention-and-support-token-refinement",
+  "title": "Pose-Free Feed-Forward 3D Inpainting via Learnable Mask Attention and Support Token Refinement",
+  "authors": [
+    "Jingyi Pan",
+    "Dan Xu",
+    "Qiong Luo"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11857"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Pose-Free",
+    "Feed-Forward",
+    "3D",
+    "Inpainting",
+    "Learnable",
+    "Mask",
+    "Attention",
+    "Support",
+    "Token",
+    "Refinement"
+  ],
+  "abstract": "3D scene inpainting aims to recover missing or occluded regions in edited 3D scenes, while ensuring geometric and textural consistency. Existing approaches, however, typically require accurately calibrated camera poses, which restricts their applicability in casual, in-the-wild scenarios and introduces additional preprocessing overhead. To overcome this limitation, we present FreeInpaint, a novel feed-forward framework that generates complete and 3D-consistent scenes directly from unposed multi-view images with masked regions. At its core, FreeInpaint extends a 3D foundation model to propagate masked regions from a reference view to other unposed views, bridging 3D reconstruction and scene inpainting while preserving the model's native ability to recover camera poses and scene geometry. Our method addresses two key challenges in adapting feed-forward 3D foundation models to masked inputs. First, masked regions can corrupt cross-view correspondence reasoning, degrading pose estimation and geometry recovery. To address this, we introduce a Learnable Mask Attention mechanism that preserves the spatial anchoring of reliable observations while allowing masked regions to progressively absorb useful context in deeper layers. Second, under severe occlusions, a single forward pass often lacks sufficient appearance evidence for high-fidelity completion. Therefore, we propose a Support Token Refinement strategy, which injects diffusion-generated support evidence as confidence-weighted auxiliary tokens to refine under-observed regions while preserving the original spatial anchor. Extensive experiments across diverse datasets demonstrate that FreeInpaint achieves superior inpainting quality, eliminating the reliance on pre-computed camera poses while keeping a fast inference speed. The project page is https://rorisis.github.io/FreeInpaint/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11857v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11857v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Rorisis/FreeInpaint"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11857v1 的 20 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "FreeInpaint 将DA3改为unposed multi-view scene inpainting：mask-initialized attention bias保护可靠跨view几何，低opacity blind spots再由diffusion支持视图补证据。作者在4–8views报告更好masked-region效果与约0.4秒forward，适合精读pose-free asset editing；“confidence”实际是缺observations的opacity启发式，1–2views仍失败，生成支持不是可验证真实几何。",
+    "motivationZh": "多视图场景移除物体后会留下同时涉及外观和几何的空洞，逐视图补图难以保持一致，而传统 3D inpainting 常依赖已知相机 pose。论文关注在未标定视图下完成场景补全，并处理缺少观察支持的区域。",
+    "methodZh": "输入clean或2D-inpainted reference和masked unposed views，DA3-Giant联合预测camera/depth/GS。每cross-view layer的8D轻conv网络在binarymask suppressionstate上做residual update，learnable key-side bias让maskedtokens随深度吸context。冻结原DA3给unmaskeddepth作为teacher，学生以held-out novel-view RGB+maskeddepth学习。推理renderopacity选最低visibility anchor，SDEdit+IPAdapter生成supportview，mask×(1−opacity)^γ平滑权重注入aux tokens，最多3passes。完整20页与A.3–A.7 mask/LCM/depth、pose、viewcount、wild/failure附录均已读。",
+    "methodFlow": [
+      "准备reference、masked sources及patch-levelbinarymask，不输入camera poses。",
+      "DA3 cross-view attention以mask prior初始化suppressionstate，再由feature-conditioned layer-wise residual动态调bias。",
+      "训练时用unmasked frozenDA3 depth distill geometry，novel-view RGB/LPIPS优化inpainted GS。",
+      "初始预测render回source masks，低opacity定位blindspots并选anchor。",
+      "4stepLCM SDEdit+IPAdapter给支持视图，按opacity/mask启发式weight injectsupporttokens，更新GS并输出editedscene。"
+    ],
+    "experimentsZh": "DL3DV10K15frameclips训练DA3Giant，8A6000、perGPUbs2accum2、280×504，random:geometricmask=.4:.6；先heads再maskmodules/crossview fine-tune。测试SPIn/LLFF4views、360USID8views；cropobjectboundingboxmetrics。支持LCM4steps、threshold.97/max3passes；额外GS2510scenes/Co3D15scenes，8views同reference。 以下结果为作者报告：作者报告SPIn PSNR17.79/LPIPS.2819，360USID18.58/.2526；singleforward约.4s，严重遮挡support至约1.8s。（Table1, PDF p.6）；作者报告360 mask策略learnableATE.0340/RPEt.0644/RPEr.7069 vsnomask.0462/.0803/.7766；hardmask亦改善。（Table5, PDF p.9）；作者报告MAT/MLLAM/ours PSNR18.13/18.06/18.58；wildCo3DCFID325.44 vsInstaInpaint330.41，提升幅度有限。（Appendix Tables11/13, PDF p.17） 对照范围：per-sceneNeRF/GS methods与LaMa/MVInpainter→DA3 frozenpipeline；后两与作者taskfinetuned模型训练预算不匹配。appendix含posedInstaInpaint和同backbone mask variants较有力；mask crop metrics不评全scene保留或真实removed-object geometry。 消融与诊断：fine-tune→mask→support累计，hard/MAT/MLLAM、depthguide、maskmix、view4–32、refseeds10/viewchoices4、SDEdit/IPAdapter、threshold/loops；支持机制但support小subset6/3scenes，没有calibratedcertainty与独立depthGT验证。",
+    "insightZh": "重要的是将pose-free geometricfoundation的correspondence protection与generative support分开：先保持valid anchor再补观测缺口。mask attention继承相关learnablemask思路，depthselfdistill和SDEdit/IPAdapter也非新基础模块；新组合对unposed3Dediting有实质任务能力。",
+    "evidenceZh": "mask prior经layer residual形成cross-view key-sidebias，保护pose/geometry又逐层允许context。（Sec.3.2 Eqs.(1)–(4), Fig.2, PDF pp.4–5; Appendix A.3, PDF p.14）；supportweight来自opacity表示缺证据，而不是校准generatedtexture是否正确的概率。（Sec.3.3 Eqs.(5)–(6), Fig.3, PDF pp.5–6）；mask-aware geometry改善有同DA3backbone策略对照。（Table5, PDF p.9; Appendix Table11, PDF p.17）；稀少views及多次diffusionrefinement仍可破坏3D一致性。（Appendix A.5–A.6, Tables8–9 and Fig.11, PDF pp.15–17）",
+    "caveatZh": "Appendix A.6 p.16承认2Ddiffusionprior限制3D质量，需native3D/multi-viewprior。；1–2restrictedviews复杂360scene仍难、supporterroraccumulation，Fig.11 p.17展示artifact。；Appendix p.15高threshold .99令overrefine破坏原3D一致性。；.4秒为feedforward，不包括所有PowerPaintreference生成、mask准备、模型load，不能称完整用户workflow即.4秒。；“confidence-weighted”无realcorrectness calibration，可能将缺观测区域的错误generatedsupport赋高权。；teacherdepth来自原DA3而非实测GT，保证student遵循prior不能证明completion物理真实。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接使3Dscene removal/replacement可从uncalibratedcaptures生成editedGSassets，符合3Dgeneration；未验证part connectivity/manufacturing。"
+  }
+}

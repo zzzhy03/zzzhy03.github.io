@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2610.12156",
+  "slug": "connected-self-forcing-beyond-local-learning-in-video-autoregression",
+  "title": "Connected Self Forcing: Beyond Local Learning in Video Autoregression",
+  "authors": [
+    "Dongbin Zhang",
+    "Chaoda Zheng",
+    "Kangjie Chen",
+    "Xiangyu Li",
+    "Shijia Chen",
+    "Jinhao Deng",
+    "Yuqi Zhang",
+    "Guangfeng Jiang",
+    "Hongbin Lin",
+    "Choo Sin Wai",
+    "Minqi Wang",
+    "Puyi Wang",
+    "Jingye Zhang",
+    "Yu Zhang",
+    "Xianming Liu",
+    "Boyang Wang"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12156"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Connected",
+    "Self",
+    "Forcing",
+    "Beyond",
+    "Local",
+    "Learning",
+    "Video",
+    "Autoregression"
+  ],
+  "abstract": "To stream long videos while maintaining visual quality and temporal consistency, Self Forcing mitigates exposure bias through self-rollout training on self-generated histories with key-value (KV) caching. To keep memory manageable, it detaches historical caches, preserving forward dependencies between chunks but severing the backward gradient paths. We introduce Connected Self Forcing, a training framework that reconnects gradient paths across autoregressive chunks, allowing feedback from later predictions to guide how earlier context is generated. These connections go beyond historical KV-writing: gradients pass through generated latents into the computations that produced them, linking the generation of earlier context to its use in later predictions. To make this connected training memory-efficient, we develop shortcut gradient replay, which recovers cross-chunk gradients without retaining the full rollout computation graph. Integrated with distribution matching distillation, Connected Self Forcing trains historical chunks according to both their direct supervision and their contribution to subsequent generation. Experiments on autoregressive video generation show improvements in long-horizon visual quality and temporal consistency, without changing the inference procedure.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12156v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12156v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12156v1 的 25 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Connected Self Forcing 用 shortcut replay 把futureDMD梯度经historicalKV写入再传回“生成context的latent/参数”，超过只训练memorywriter的SGF。作者报告240s三初始化Avg6稳定提升且inference不变；这是选择性梯度而非fullBPTT，耗时1.27×，TF/ODE动态幅度降低，不能只用排除Dynamic的平均分宣称全维度进步。",
+    "motivationZh": "自回归视频训练通常只对当前 chunk 分配误差，未来生成质量无法充分反向影响产生历史 context 的过程。这样容易学到局部合理、长期却导致漂移的上下文，论文关注如何恢复这部分跨时间学习信号。",
+    "methodZh": "先detach自rollout并存exit/noise/timestep/latent/KV，DMD real/fake-score给各chunk直接outputgrad。反向replaylaterchunk把historicalKV视leaf，replaytargetwriter拿到latentgrad，再replaytargetgenerator；writer-only反馈可传到earlierwriter但其generatedlatentdetach，避免recursivegenerationchain。direct与crossgradλ1相加一次optimizerupdate。完整25页包括allreplay实现、time-seriescontrol、memoryprofiling、framewise/shortvideo、bootstrap和gradientconflict附录已读。",
+    "methodFlow": [
+      "按selfrollout生成七个3-latentchunks，历史detach并存每chunk stochastic-exit状态及KV。",
+      "冻结14B real-score与online1.3B fake-score计算wholegeneratedvideo DMD outputgrad。",
+      "reverse replaylatergenerator，对直接可读historyKV收VJP并累计crossfeedback。",
+      "重放targetKVwriter获取latentgradient，再重放该历史chunk生成过程；停止earliergenerationrecursion。",
+      "directDMD+λcross反馈更新共享generator，fake-score普通denoising；inference恢复原四步ARcache。"
+    ],
+    "experimentsZh": "Wan2.1T2V1.3B causalgen/fakescore、14Bfrozenreal，~250KVidProMpromptonlyposttraining无additionalrealvideo。21latentframes7chunks，sink3/recent6，globalbatch8、1200fake/239genupdates，4samplingsteps。832×480/16fps，60s40VBenchLongprompts、240s128fixedMovieGenprompts；fixed2sclips不scene-split，seedmatched。 以下结果为作者报告：作者报告240sAvg6 CSF .8520/.8701/.8531 vsSF.8420/.8545/.8431 (CD/TF/ODE)；pairedCI三种vsSF均正。（Table2, PDF p.7; Table8, p.24）；作者报告TF240sDynamic.5539vsSF.7131/SGF.9200，ODE.5003vs.5506/.6306；CD.6899vsSF.4126但略低SGF.7056。（Table2, PDF p.7）；作者报告chunkprofiledevice88.46GiBvsSF103.65/fullBPTT148.65，time1.27×SF；framewiseCSF88.42vsSF184.48、1.41×，fullBPTTOOM。（Table5/D.1, PDF pp.18–20）；作者报告toy20steptrain/124testmeanMSE.02709vsSF.03088/fullBPTT.02625，10pairedseeds；toy非video证明。（Appendix C, PDF pp.17–18） 对照范围：SF/SGF独立由相同3causalinitializationsretrain，同prompt/update/cache/inferenceseeds；FullBPTT/serialrecursion在CDablation。较集中控制优于crossmodelheadline，但only1.3Bposttrain、没有humanstudy/actionconditionedworldstatebenchmark，长durationpromptsets不同不能横比60/240score。 消融与诊断：fullBPTT、serialrecursion、crossλ.5、negative-gradientprojection。λ.5提高Dynamic.8484但Avg6.8429下降；GradProj也增Dynamic降Avg6，支持部分反馈可能damping。FullBPTT.8529<CSF.8589单CD40prompts不证明一般更差。",
+    "insightZh": "新意在futuregradient不仅优化KVwriter还回到早先context生成，selectedshortcut路径区别SGF的detachedlatents与fullBPTT。Memory靠recompute/localgraphrelease，未增加参数；这不是等价全sequencegradient，也不证明越多historygradient越好。",
+    "evidenceZh": "CSF回传到context生成，但target前生成分支仍detach。（Fig.3/Sec.3.3 Eqs.(5)–(6), PDF pp.4–6）；quality比较matchedoptimizerupdates而非GPUtime。（Appendix B.1, PDF p.15; D.1/Table5, pp.18–20）；240s平均quality增益较稳但动态明显tradeoff。（Tables1–2, PDF p.7; Table8, p.24）；framewiseTF对SF并无稳定总体改善。（Table7, PDF p.22; Table8, p.24）",
+    "caveatZh": "Appendix E pp.24–25明确selectivepaths不重现exactfullsequencebackprop，historyselection仍open。；replayhistory多或model大时计算增长；实测memory下降源于schedule非增加gradient内在节省。；futuregradient可能保守temporal evolution，controlledmotion/worldmodel只是futurework。；Avg6排除dynamic与semantics，稳定外观可能靠低motion；应与Dynamic联合看。；40/128promptsbootstrap只evaluationuncertainty，所有video实验nominalseed42没trainingvariation。；proxyfixed2sclip评测不足证明4minnarrativecausal/longrangeeventmemory。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "实际改变ARvideogenerator学习跨chunkcontext的gradient范式，对longhorizonvisualcreation有直接模型价值；没有额外inferencepath。"
+  }
+}

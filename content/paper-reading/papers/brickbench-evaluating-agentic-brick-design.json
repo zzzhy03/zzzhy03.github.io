@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.12452",
+  "slug": "brickbench-evaluating-agentic-brick-design",
+  "title": "BrickBench: Evaluating Agentic Brick Design",
+  "authors": [
+    "Peter Kulits",
+    "Yiqing Xu",
+    "R. Kenny Jones",
+    "Cordelia Schmid",
+    "Jiajun Wu"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12452"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "lego",
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "lego",
+  "keywords": [
+    "lego",
+    "BrickBench",
+    "Evaluating",
+    "Agentic",
+    "Brick",
+    "Design"
+  ],
+  "abstract": "We propose BrickBench, a benchmark for agentic text-conditioned LEGO-set design. Given a prompt, an agent is tasked with producing an assembly that not only satisfies semantic and design criteria, but that can also be physically built. To do so, it must select parts from a discrete library and reason jointly about local and global constraints. We score validity, alignment, and design across three settings that vary in scale and part availability. We provide BrickAgent, an environment for coding agents to construct, inspect, and validate their designs. We find that leading agents largely satisfy verifiable physical and semantic requirements, but fall short of human designs. We release our benchmark and environment at http://www.brickben.ch",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12452v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12452v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kulits/BrickAgent"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12452v1 的 22 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "BrickBench 将 LEGO generation 扩展到最多 4000 parts 和固定库存，并提供可 search/place/render/validate 的 BrickAgent 环境。作者报告强 agent 几乎都通过模拟 validity、最佳 VQA 达 0.954，但去掉工具后 validity 明显崩落，设计质量仍有缺口。值得精读的是 typed-connector 工具和 validity/semantic/design 三轴评测；“可搭建”仅是 rigid-component gravity proxy，不测 stud holding force，human 对照也只匹配 part count，不能据此宣称实物结构或同题设计质量已被完全验证。",
+    "motivationZh": "积木生成的评价需要同时回答结构是否有效、是否符合设计意图、是否有设计质量，还要覆盖大模型与固定库存约束。只测少量砖或单一图像相似度，会遗漏工具使用和可搭建结构的失败。",
+    "methodZh": "300 prompts 分为 Model≤400 parts、Set 400–4000、Alt-Build 使用 set 10698 的783件/104类型库存。BrickAgent 在 LDraw/BrickNet typed connectors 上提供 part search、connector placement、subassemblies、rendering 与可解释 collision/stability feedback，coding agents 可反复修改构造。评测将 validity 与八视图 DSG question-graph VQA 分开，再由四视图 pairwise design/alignment judgment 拟合 Bradley–Terry ELO。它是直接 LEGO 设计环境与评测贡献，不是新的训练 backbone；公开实现可作为 agentic brick design 的环境参考。",
+    "methodFlow": [
+      "定义 text prompt 与 Model/Set/Alt-Build 的 part-count 或固定库存约束，将库中零件连接表示为 typed connector frames。",
+      "让 coding agent 搜索零件、按位置或 connector placement 构造 subassemblies，调用 render 和解释性 validator，依据反馈迭代。",
+      "检查 part requirements 与 geometry overlaps；将 connected components 当 rigid bodies 在 PyBullet 高摩擦/无反弹条件下检查 gravity stability。",
+      "将 prompt 拆为有 dependency 的实体/属性/关系 yes-no graph，用八视图 VQA 得到 bounded semantic score。",
+      "用四视图 pairwise alignment/design judgments 拟合相对 ELO，并以 human judgments 校验排序、另做 part-count-matched human-design 对照。"
+    ],
+    "experimentsZh": "300 prompts/三个设置各100，十一agents加BrickNet-14B/BrickGPT（仅Model）；每agent每prompt最多300 turns。八视图VQA与四视图pairwise ELO均不以validity过滤。Human design judge校验覆盖九reference agents，另有part-count-matched人类设计辨认研究。 以下结果为作者报告：作者报告 overall Astra Valid=1.00、VQA=0.954、ELO=1297±22；GPT-6.1 Sol为1.00、0.945、1293±23。Cost是论文记录的API token成本，不是本项目当前定价建议。（Table1, PDF p.7）；作者报告无BrickAgent时 Astra validity降到0.40、Luna低于0.01；Luna VQA从0.792升到0.813、ELO从898升到960。（Table2, PDF p.11）；作者报告human/VLM排序一致34/36、Kendall tau=0.89；人类设计辨认中323/360选中human模型。（Secs.5.3–5.4, PDF pp.11–12） 对照范围：包含多模型agents、低成本trained baselines和环境移除实验；两trained baselines只能适用Model。BrickNet Valid不包含stability，Gravity frame未定义；通用agent有工具/300turn预算与完整part库，不能把所有差距只归于model architecture。 消融与诊断：只对Astra/Luna整体移除BrickAgent工具而保留CLI/container/LDraw/任务约束；没有逐项分离 connector placement、renderer、part search和validator，也没有equal-budget训练或真实物理搭建对照。",
+    "insightZh": "直接核心贡献是 set-scale/库存约束的 LEGO task、可执行设计工具与物理错误反馈，以及区分功能合法性、语义和视觉设计质量的评测。沿用 BrickNet connectors、LDraw、PyBullet、DSG 和现成 agents；不把 agent 使用现成模型误写成新 foundation model，也不把 benchmark score 当实物耐久性。",
+    "evidenceZh": "三个设置共300 prompts，并提供可构造、查看和验证的 BrickAgent 环境。（Secs.4.1–4.3, PDF pp.5–6）；模拟 stable 的定义不包含连接强度，connected components 被当作 rigid bodies。（Sec.3.2 and Sec.6, PDF pp.3–4,12）；作者报告工具环境显著提升 validity，但 semantic/design metrics 不必同步提升。（Table2, Sec.5.2, PDF pp.10–11）；作者报告 VLM Design ELO 与九个reference agents的human排序在34/36 pairs上一致。（Sec.5.3 and Fig.5b, PDF pp.10–11）；与human设计对照只匹配part count，不能解释为同prompt任务下的优劣。（Secs.5.4–6, Fig.6, PDF pp.11–12）",
+    "caveatZh": "Rigid-body stable不测连接 holding force 或结构deformation，真实模型可能松脱或下垂。；Human对照不是prompt-matched；完成同题human designs需要另行委托。；VQA和ELO对invalid designs也评分；高semantic/design不能代替buildability，多个disconnected components本身也允许代表scene。；Design judge对human preferences的验证仅九reference agents，不能保证任意更新模型或新prompt分布。；模型/parts/tools/turn budgets不同，所谓trained models被替代同时伴随900–6800倍成本边界；本项目未复现。；代码范围：由PDF p.1 printed brickben.ch官方站点追溯公开repo；实际目录含src/brickagent、benchmark、scripts、Dockerfile和pyproject。只确认公开实现，未执行或复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究 text-to-LEGO assemblies 与agentic design。Typed connectors、可解释结构错误反馈、库存约束和独立design score可用于LEGO generation/设计agents的任务设计和评测；需补真实连接强度与同题human对照才能验证实际产品设计。"
+  }
+}

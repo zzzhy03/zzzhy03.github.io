@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2610.12099",
+  "slug": "unitas-a-3d-native-world-action-model-for-embodied-manipulation",
+  "title": "UNITAS: A 3D-Native World Action Model for Embodied Manipulation",
+  "authors": [
+    "Ruixiang Wang",
+    "Yongyi Su",
+    "Wenlve Zhou",
+    "Bo Yue",
+    "Hengyan Liu",
+    "Dekun Lu",
+    "Yuxin Tian",
+    "Yihan Fang",
+    "Zerui Wu",
+    "Xing Hu",
+    "Jietao Chen",
+    "Yong Guo",
+    "Ziyan He",
+    "Junbin Yuan",
+    "Guiliang Liu",
+    "Xiaofen Xing",
+    "Kui Jia"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12099"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "UNITAS",
+    "3D-Native",
+    "World",
+    "Action",
+    "Model",
+    "Embodied",
+    "Manipulation"
+  ],
+  "abstract": "World action models (WAMs) aim to answer a coupled physical question: given a task instruction, what motion should the robot execute, and how will that motion change the surrounding world? Most existing WAMs build on pretrained video generators and represent world evolution through images or visual latents. Robotic interaction, however, takes place in metric three-dimensional space, while images are view-dependent projections whose pixel distances do not directly encode physical distances. We introduce UNITAS, to our knowledge the first 3D-native world action model that unifies observations, actions, and scene dynamics in a shared metric 3D frame within each interaction, using a common representation across robot embodiments and human hands. Action flow represents human hands and robot grippers as 3D point trajectories, while scene flow describes scene-point displacements conditioned on these trajectories. World-aligned 3D positional embeddings ground visual tokens with or without depth input, and a physical-time trajectory tokenizer encodes each point trajectory as one token anchored at its current 3D position. This interface supports both direct action execution and action-conditioned scene prediction. With 1.7B parameters, UNITAS achieves the best action-conditioned scene prediction on RoboTwin among the compared methods, with up to 49% lower displacement errors than PointWorld, and state-of-the-art manipulation success, including 99.8% on LIBERO and an average of 85% across real-world tasks. The code is available at https://github.com/DexForce/UNITAS.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12099v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12099v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12099v1 的 27 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "把observations、robot/human action flow和scene flow映射到同一metric3D窗口，用physical-time trajectory token及耦合DiT同时训练可执行动作与场景响应。值得深读其3D交互表示；作者报告LIBERO99.8%、RoboTwin movingADE0.427cm，但policy inference可完全跳过未来flows，因此不是每次动作都先模拟，也不生成不可见完整场景。",
+    "motivationZh": "2D 视频预测与机器人 action 往往使用不同表征，物体运动、视角变化和机械臂动作难以在同一坐标体系内关联。需要把可见场景的三维变化与可执行动作共同建模，以减少从观察到控制的表征错位。",
+    "methodZh": "Florence2 visual tokens用depth backprojection或64ray-depthcandidate router做world-alignedPE；每条point trajectory压成一个256Dtoken并以current3Danchor定位，robot20gripperpoints/arm、人手21keypoints。Pointdynamics与smalleractionexpert层耦合、causal masks及KVcache分离action/scene条件，rectifiedflow训练；policy-only只生成EEFcommands，simulator可用外部actionflow。九sources mixedpretraining与simulationscene监督，定量评估在RoboTwin和多policybench，真实scene仅qualitative。统一metric representation是主要新意，不是已证实generalphysics或长期3Dworld生成。",
+    "methodFlow": [
+      "world-align视觉与动作：depth/相机calibration反投影到每predictionwindow固定metricframe；无depth时imagefeatures对0.1–2m的64candidate depths加权PE，可靠depth监督Fourierfeatures。",
+      "物理时间轨迹tokenization：以seconds/Tmax3s的FiLM编码不同rate的point displacement trajectories，maskedpool每point成一个latent；URDF/MANO保持pointcorrespondence，currentanchor单独加PE。",
+      "耦合experts学联合任务：28层pointdynamicsDiT及width640actionDiT共享contextKV；scene仅attendclean demonstrated actionflow，command不读futureflow，available-target maskedrectifiedflow联合训练。",
+      "选择执行或模拟模式：10Eulersteps直接生成commands；可并行generateactionflow后condition scene，或输入externalflow；policy-only跳过futureflows，scenequerycoordinates仍需depth或geometry。"
+    ],
+    "experimentsZh": "1.7B，Florence2初始化+九来源200Kstepsbatch1024；LIBERO、LIBERO-Plus10030episodes、RoboTwin50×100episodes、VLABench五tracks；550heldoutclip外部motionprediction及三任务60closedlooptrials。 以下结果为作者报告：作者报告LIBERO99.8%、LIBERO-Plus89.1%、RoboTwinClean92.94/Random93.04%；pretrainingw/oLIBERO99.5显示已近saturation。（PDF p.7, Table1; pp.20–21, Tables10–12）；作者报告closedloopmovingADE1.211cm/Acc1cm64.26%，沿各model自身rollout；RTX5090Dpolicy55.77ms vsjointbothflows1024queries305.49ms。（PDF p.22, Table13; pp.18–19, Table8） 对照范围：VLA/videoWAM/3Dawarepolicies较广，部分来源结果或任务缺失；nativepointvs视频lift比较包括sensor/reconstruction差别，closedloop也不同horizons/rollouts。 消融与诊断：3DPE/actionflowloss/history/sceneflowloss及pretraining；no-depth同checkpoint测试，physicaltime/tokenizer提供heldoutreconstruction但无frame-indexcontrolledablation；未给multiple-seedCI。",
+    "insightZh": "3Dflow已有PointWorld/LaMP等，贡献是统一spatial/physicaltime interface与policy/simulatorfactorization及cross-embodimentco-training。‘first’是作者定位，不独立确证；world-coordinate只固定单窗口，不是persistent globalmap。",
+    "evidenceZh": "command与futureflows可分离，3Dscene输出依赖当前可见querypoints。（PDF pp.4–6, Eq.(3), §3.3–3.5/Figure2; p.23, AppendixG.1）；heldoutscene预测有明确protocol与metricadvantage。（PDF p.9, Table4; pp.21–22, AppendixF.1）；3DPE与motion监督支持policyrobustness，scene监督边际较小。（PDF p.8, Table3; p.19, Table9）；真实policy仅两任务20trials，source内有结果不一致。（PDF p.3 introduction; p.8, Table2/§4.3）",
+    "caveatZh": "长期interactionprediction和broaderrealdeployment属于futurework。；real scene-flow examples无GT，simulationqualitative用trainingclips，非heldoutaccuracy。；scene supervision仅available annotations，scene inference requirescurrent3Dcoordinates，camera calibration/state始终存在。；actionflow和command条件独立生成，sceneeffects一致性只是间接证据，未硬保证两者运动一致。；仅可见pointflow、无occludedsurface synthesis/long-termmap；contact/rigidity/conservation不硬约束。；真实trial少且PackBall摘要正文结果不一致；官方README releaseplan显示implementation/checkpoints仍待发布，paper‘codeavailable’不能照抄。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接为3D-native生成表示与可执行interaction提供foundationarchitecture：可迁移到结构化3D创作、动作/geometry约束的设计，但应用目前是robotmanipulation而非CADasset生成。"
+  }
+}

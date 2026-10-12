@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2605.07604",
+  "slug": "sam-3d-animal-promptable-animal-3d-reconstruction-from-images-in-the-wild",
+  "title": "SAM 3D Animal: Promptable Animal 3D Reconstruction from Images in the Wild",
+  "authors": [
+    "Xuyi Hu",
+    "Jin Lyu",
+    "Jiuming Liu",
+    "Yebin Liu",
+    "Silvia Zuffi",
+    "Liang An",
+    "Stefan Goetz"
+  ],
+  "publishedAt": "2026-05-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.07604"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "SAM",
+    "3D",
+    "Animal",
+    "Promptable",
+    "Reconstruction",
+    "Images",
+    "Wild"
+  ],
+  "abstract": "3D animal reconstruction in the wild remains challenging due to large species variation, frequent occlusions, and the prevalence of multi-animal scenes, while existing methods predominantly focus on single-animal settings. We present SAM 3D Animal, the first promptable framework for multi-animal 3D reconstruction from a single image. Built on the SMAL+ parametric animal model, our method jointly reconstructs multiple instances and supports flexible prompts in the form of keypoints and masks which enable more reliable disambiguation in crowded and occluded scenes. To train such a model, we further introduce Herd3D, a multi-animal 3D dataset containing over 5K images, designed to increase diversity in species, interactions, and occlusion patterns. Experiments on the Animal3D, APTv2, and Animal Kingdom datasets show that our framework achieves state-of-the-art results over both existing model-based and model-free methods, demonstrating a scalable and effective solution for prompt-driven animal 3D reconstruction in the wild.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.07604v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.07604v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/GeorgeHux/SAM3D-Animal"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.07604v2 的 28 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SAM 3D Animal 从整图恢复最多30个可动画SMAL+动物；v2新增拥挤程度、速度与图像质量实验，显示4/5+动物无prompt模式明显掉点，GTbbox crop仍较强。值得skim其setprediction与landmarkediting接口，不能把四足template或有GTprompts的优势当开放动物3Dfoundation。",
+    "motivationZh": "单动物 crop 的重建方法难以直接处理整图中的多只动物，拥挤、遮挡和相似肢体会增加实例关联与姿态歧义。论文关注如何恢复可动画的动物 mesh，并让少量用户 landmarks 帮助消除这些歧义。",
+    "methodZh": "ViTHuge512image→32square×1280features，6layerpromptabledecoder含30hypotheses的shape/box/26×2D/26×3D与previousestimatetokens，加keypointcoordinate/labeltokens。前5layers将projectedkeypointfeatures与pelvis-centered3Dposition反馈，Hungarianbox/conf/keypoint匹配训练，SMAL+145shape/35jointLBS输出3889vertexmesh。Herd3D以knownmultiSMALgeometry控制QwenControlNet合成5K+images/118species。完整28页正文、inferencealgorithm、failure/data/metric附录与checklist已读。",
+    "methodFlow": [
+      "用SMAL+quadrupedshape/pose构造2-8animal布局，canny/depthControlNet与Qwenfacingprompt合成multi-instance训练pairs。",
+      "fullimageViTHugeencode，30learnedhypotheses+optionalkeypoint/maskconditioning进入SAM-styledecoder。",
+      "每layer预测SMAL/camera/box，再从projection处sampleimagefeatures及3Dcoords反馈迭代alignment。",
+      "Hungarianmatching将hypotheses与GT按box/conf/visiblekeypoints一对一对齐，多taskmesh/pose/boxloss训练。",
+      "一次forward输出scoredSMAL+meshes，optionalViTPose或人工landmarks增强交互，confidence筛output。"
+    ],
+    "experimentsZh": "49.2Kimages含AnimalPose/APT/AwA/Stanford/Animal3D/Herd3D；AdamW2e-5、250+250epochs、4RTX4090gradacc16、maskdrop.5/kpdrop.2。Animal3DPA-MPJPE及visiblekeypointOKSsigma.05/mAP50:95，APT6035fullimages按animalcount分层，AnimalKingdomOOD。GT/ViTPose/no prompts分开，singleinstancecropbaselines256 vsoursfull512。 以下结果为作者报告：作者报告Animal3DPA-MPJPE80.7无prompt/75.8GT vsAniMer81.0，ViTPose80.7不改善3D该列；AP92.8vs93.4略低。（Table1, PDF p.7）；作者报告AnimalKingdommAP12.6无prompt/14.5ViTPose/17.7GT vsAniMer10.4；GT不是自动部署性能。（Table1, PDF p.7）；作者报告5+动物无prompt28.9PCK/13.3AP/4.0mAP vsAniMer46.7/31.5/10.4；GTcropours57.7/37.8/14.9。（Table2, PDF p.8）；作者报告ours79-85ms/image RTX4090，AniMer7.6ms/animal，5+group总59.5ms仍更快；前处理/detection/ViTPose/SAM不计。（Table6/Appendix E, PDF p.18） 对照范围：AniMer/GenZoo/model-free3DFauna，inputcrop/resolution与parametricprior不同，不能称所有regimebetter。3Daccuracy仅Animal3D，APT/AnimalKingdom主要2Dlandmark投影非真实3D场景或riggedassetquality。GTprompt可能包含用于2D评测samejoints，未报告heldoutunprompted-jointmetrics。 消融与诊断：Herd3D removal、kp/maskdrop、0/5/10/15GTlandmarks、252commonvisible4anatomiclocations/random5seeds。keypointdominantmaskmarginal；随density总体趋势非每metric严格monotonic。Visibilityerrorbars按bucket内visibilitycountsstd非training-seedCI，checklist承认主表无significance。",
+    "insightZh": "新意是全图多animalsetprediction+promptableparametricmesh与syntheticmultianimalcorpus，不是新动物shapeprior；借用SAM3DBody、DETR/DNDETR、SMAL+/GenZoo机制较多。promptinference带直接landmark监督，不能把2Dprompt增益视为无额外信息modelunderstanding。",
+    "evidenceZh": "template限定quadruped-like且depthorder未显式约束。（Sec.3.1, PDF p.3; Sec.6 limitation, p.10）；no-cropmulti-instance在密集group劣于使用GTbox单体baseline。（Table2, PDF p.8）；GTpromptheadline与automaticprompt/无prompt应明确分开。（Table1/3, PDF pp.7/9）；syntheticknownmeshes不保证ControlNetimage与geometry严密对齐。（Appendix C/Fig.9, PDF pp.16-17）",
+    "caveatZh": "Sec.6 p.10SMAL+quadrupedshape限制、interanimaldepthordering无约束。；Appendix C syntheticorientation/partfusion错误；Appendix E方法比AniMer/GenZoo慢且时间不含其他stage。；p8无prompt4/5+crowd下降；p24主实验缺repeatedrun/significance。；30只是fixedquerycapacity，train2-8animals/密集5+弱，不是已验证30animal可靠reconstruction。；generictemplate可动画但未有motion/assetedit/texturephysicalvalidity实验，topology细节有限。；Herd3D扩data没有等量其他syntheticcorpus对照，不宜断言收益不是数据volume。；GTprompt2Dgain含辅助观测，PAaligned忽略globalplacement与depthorder。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "parametricmesh输出具可控shape/articulation，对referenceimage到animatable3Dasset以及交互landmarkediting有具体迁移价值；动物域/有限prior因此mediumskim，非单纯2Dpose检测。"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2605.08098",
+  "slug": "reinforcement-learning-for-inverse-silhouette-design-and-rapid-laser-cutting-of-compact-parallelogram-quad-kirigami-prototypes",
+  "title": "Reinforcement learning for inverse silhouette design and rapid laser cutting of compact parallelogram quad kirigami prototypes",
+  "authors": [
+    "Milad Yazdani",
+    "Shahriar Shalileh",
+    "Dena Shahriari"
+  ],
+  "publishedAt": "2026-04-16",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.08098",
+    "doi": "10.1016/j.matdes.2026.116545"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "fabrication"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "fabrication",
+    "Reinforcement",
+    "learning",
+    "inverse",
+    "silhouette",
+    "design",
+    "rapid",
+    "laser",
+    "cutting",
+    "compact",
+    "parallelogram",
+    "quad",
+    "kirigami",
+    "prototypes"
+  ],
+  "abstract": "Kirigami is an increasingly useful fabrication method to produce shape-programmable metamaterial structures. However, inverse design remains difficult because deployment is nonlinear, and feasible cut layouts must satisfy discrete compatibility rules, avoid overlap, and map one target shape to valid designs. We present RL-Kirigami, an inverse design framework that combines optimal-transport conditional flow matching (OT-CFM) with reinforcement learning to generate compatible ratio fields for compact reconfigurable parallelogram quad kirigami. A marching decoder enforces global geometric compatibility, and Group Relative Policy Optimization (GRPO) aligns the generator with nondifferentiable rewards for silhouette matching, feasibility, and ratio-field regularity. Across procedurally generated target shape instances, a single sample from the pretrained OT-CFM prior reached $94.2\\%~\\mathrm{sIoU}$ and outperformed solver baselines while reducing forward simulator evaluations from hundreds to $1$. GRPO improved accuracy to $94.91\\%~\\mathrm{sIoU}$ and, with regularity included, reduced $\\mathrm{TV}(\\mathbf{x})$ from $0.95$ to $0.81$ while maintaining $94.83\\%~\\mathrm{sIoU}$. Generated layouts were exported to DXF and laser cut in $50~μ\\mathrm{m}$ polymeric sheets to produce deployable prototypes in $8.0\\pm 1.0$ minutes per part. These results support a manufacturing-aware inverse design workflow for deployable kirigami metamaterials under geometric feasibility constraints. Code is available at https://github.com/milad1378yz/RL-Kirigami.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.08098v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.08098v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/milad1378yz/RL-Kirigami"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.08098v2 的 21 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "RL-Kirigami 用 OT-CFM 生成 ratio fields，marching decoder检查平面 quad兼容，再用reward-weighted flow regression偏好对齐并输出可laser-cut DXF。v2 实质新增37个OODsilhouettes和失败分析：作者报告整体sIoU71.2%、holes组50%，明显界定原94.2%in-distribution成绩的适用边界。值得精读fabrication流程；这是几何单状态匹配，不是mechanics-aware设计或完整部署路径保证。",
+    "motivationZh": "目标轮廓到 kirigami 切割参数的逆设计存在多解、几何不可行与自交问题，逐个优化也妨碍快速制作。需要在有限网格与部署条件下生成可展开的轮廓设计，并检验分布外形状和不同离散精度下的失败边界。",
+    "methodZh": "Condition是targetmask、fixedboundary和checkerboarddeploymentangle。Generated10×10ratiofield经constructiveparallelogrammarching、invalid/overlapfilter和rasterization，与target做ProcrustesalignedIoU。OT-CFM先学5000可行训练pair，GRPO-style按组relativeadvantages变positiveweights重加权CFMloss；改accuracy/TVpreferences。三PA薄片prototype从decodedlayout直接DXF、connectortrim、laser切割与人工展开。当前v2新增独立OODtargets、gridablation和明确材料/机械边界，主模型与94.2/94.91主结果延续v1。",
+    "methodFlow": [
+      "限制可构造的设计family：Fixed10×10parallelogramquadvoids、固定boundaryanchors与checkerboardφ；sharedverticesmarching生成globalgeometry并检测invalid/overlap。",
+      "学习silhouette条件ratiofield：Sobol采可行ratiofields和128×128targetmasks，OTpairing训练maskconditionedUNetvelocity，Euler8steps生成一candidate。",
+      "以不可微几何reward对齐：G4samples计算alignedsIoU、invalid/overlappenalties及TV；exp(groupadvantage/T)归一化为positiveweights重加权CFMregression，不是PPOclippedpolicygradient。",
+      "检验OOD边界与制造：独立37target形状测试并识别overlap/hole/poorboundary失败；decodedflatlayout加入connector和trimcuts导DXF，在50μmPA切割/人工部署。"
+    ],
+    "experimentsZh": "Train/val/test5000/500/500同ratiofamily，10×10grid、128×128mask；500testK1、Euler8、successalignedIoU≥.85且overlap≤.02。4generators与CMAES/PSO/local/Powell，同workstationThreadripper与2RTX4090；prior约2h。Threeevaluationseeds；RL10kmodel-envcalls。v2另独立37OODtargets、6–12gridablation，三PAcuttingprototypes。 以下结果为作者报告：作者报告prior94.2%alignedsIoU/98.7%success，CMA93.8%/97%，generator1次geometryforward vs solver625–1000；训练前期simcalls不计入inference1次。（PDF p.8 Table 1）；作者报告v2 OOD71.2%vsPowell62.0%，35/37outside99%PCAvalidationcontour；hole组50.0%vs47.2%。（PDF pp.8–10 §3.3/Table 2/Figure 4）；作者报告accuracyweightedfinetune94.91%/TV.98，hybrid94.83%/TV.81，prior94.2%/TV.95；fine-tuneaccuracygain约0.7pp。（PDF p.12 Table 4）；作者报告三薄片prototype8±1min，generation/export各<10s，laser约5min，deployment/imaging约2min；未提供照片对simulation的quantitativeIoU。（PDF pp.12–13 §3.6） 对照范围：Conditionalmodels共享几何decoder；solverbudget1000cap并保留最多12feasible择最佳，对priorcomparison使用singleforward并摊销约2hpretraining。OOD只对Powell，非所有solvers；不同families和3Dmechanics不覆盖。 消融与诊断：Generator/steps/K、accuracyvsregularity、v2grid6/8/10/12和OODindependentmask；grid每大小重新训练，speedcurve不是unseenresolution泛化。TV与manufacturingreliability关系未机械实测。",
+    "insightZh": "贡献在generator+constructivecompatibilitydecoder+rewardpreferencealignment与cutting输出闭环；GRPO名称实际指rewardweightedCFMregression。v2相对exactv1新增OODtest及designresolutionablation，实质改变适用范围判断，故本次是scientificversionevent；仅title/journal/codechanges不作为收录依据。",
+    "evidenceZh": "v2新增独立37OODtargets与PCAshift/evaluation，不存在于exactv1的对应scientificbody。（v2 PDF pp.8–10 §3.3/Table 2/Figure 4, pp.18–19 Appendix B; v1 PDF p.6 §3.3 and pp.19–21 appendices）；Simulator只是single-state geometry与rasterization，TV只是ratiofieldregularity，不能预测mechanicalresponse。（PDF p.5 §2.2; pp.14–15 Discussion）；作者报告原in-distribution94.2%vsOOD71.2%，hole/literal显著降低，且3OODcases被invalid/overlapfilter拒绝。（PDF pp.8–10 §3.3 Table 2/Figure 4; p.19 Figure B.1）；Fabricationprototype从prior而非RLvariant选出，三PA样本展示可切割与可展开但非性能验证。（PDF pp.12–14 §3.6 Figures 7–8; p.17 Figure A.1）；Gridscalingprotocol在v2纠正为每resolution重新训练，与v1 no-retraining说明不同。（v2 PDF p.8/p.18 Appendix A.4/B.1; v1 PDF p.6/p.19）",
+    "caveatZh": "Planarparallelogramquad、固定boundary/singleφ，spherical需不同decoder。；Geometrysim不求forcebalance或stress/fracture/fatigue，manufacturing为qualitativeproof。；OODconcave/literal/holes性能下降，固定topology限制但非formal不可行证明。；PAcompliance支持展开，aluminumconnector失败显示material/thickness/geometry耦合。；Procrustes消除translation/rotation/isotropicscale，94.2%不保证精确目标尺寸/姿态或boundary对齐。；Constructive兼容与finalstatefilter不保证完整deploymentpathcollision-free。；RLgain小且reportedseeds主要samplingevaluation，不同trainruns未证明；“GRPO”实际rewardweightedregression。；Prototype由prior生成，未实测RLTV改善的strength/durability；三targets不可推广任意材料。；v2首页版本说明只谈backmatter，但实际新OOD/协议变化已核实；日报应突出真实scientificdelta，避免再宣传旧94.2%为新增。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接产出物理可部署cutpattern和制造路径，non-differentiableconstraintfilter与preferredregularity学习能为fabrication设计生成提供具体参考。"
+  }
+}

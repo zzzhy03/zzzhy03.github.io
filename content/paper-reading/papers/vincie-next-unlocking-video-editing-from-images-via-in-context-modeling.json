@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.12104",
+  "slug": "vincie-next-unlocking-video-editing-from-images-via-in-context-modeling",
+  "title": "VINCIE-NExT: Unlocking Video Editing from Images via In-Context Modeling",
+  "authors": [
+    "Leigang Qu",
+    "Feng Cheng",
+    "Ziyan Yang",
+    "Bangbang Yang",
+    "Zhaoyang Huang",
+    "Wei Chow",
+    "Yicong Li",
+    "Wenjie Wang",
+    "Tat-Seng Chua",
+    "Yan Zeng"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12104"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.MM"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "VINCIE-NExT",
+    "Unlocking",
+    "Video",
+    "Editing",
+    "Images",
+    "In-Context",
+    "Modeling"
+  ],
+  "abstract": "Building a capable video editor remains significantly harder than a video generator: editing requires (source, instruction, edited) triplets that are prohibitively expensive to annotate and difficult to synthesize at scale, whereas image editing has already reached maturity with millions of such pairs readily available. In this work, we introduce VINCIE-NExT, a unified framework that transfers editing capability from images to videos through in-context visual demonstrations, alleviating the need for large-scale paired video editing data. VINCIE-NExT decomposes video editing into a structured chain of composable sub-tasks (Video -> Image -> Image -> Video), routing editing intent through the image domain and enabling scalable joint training from heterogeneous image and video corpora under a unified diffusion objective. An image editing pair, synthesized by the model or supplied by the user, is prepended as an in-context visual demonstration that serves as a spatial appearance blueprint for every output frame. To ground appearance edits across the interleaved context, we introduce a novel position encoding that links image demonstrations and video frames in a shared spatial coordinate system, enabling pixel-faithful propagation of appearance changes to every output frame. Chain-of-Editing further provides principled test-time scaling: by executing the sub-task chain as progressive diffusion stages, editing quality can be improved by investing additional compute without retraining. Comprehensive experiments on OpenVE-Bench demonstrate the state-of-the-art performance across diverse editing categories, with ablations confirming the effectiveness of each component.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12104v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12104v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12104v1 的 38 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "VINCIE-NExT 将video编辑分解为sourcevideo→sourcekeyframe→editedkeyframe→targetvideo，用同DiT读取imageeditpair作为持续appearance示范。作者报告OpenVE overall3.08 vsOpenVEEdit2.49，imageinterface和temporalrandomizedRoPE有明确transfer价值。值得deep，但fullmodel仍用2.45M pairedvideo数据；只1.63M chain数据那部分不依赖pairedvideo，单keyframe错误会传播，camera/新物体与长动态视频仍弱。",
+    "motivationZh": "复杂视频编辑同时要求服从指令、保持未改内容与跨帧一致，训练却依赖昂贵的配对编辑视频。如何从未配对 raw video 和 image edit pairs 学到可组合的编辑能力，是该工作的实际目标。",
+    "methodZh": "3BMM-DiT、sharedvideoVAE、FlanT5以interleavedshot序列联合学习多subchains，TDF3DRoPE结合全局shotoffset与局部spatial/timecoordinates，image训练temporalrandomization。CoE先生成editframe，将latent直接作为第二video采样condition，也可plug外部editor。OmniEdit/OpenVE与GPT4o+Seedream4.5 perframechain三source训练；消融、不同judges/humanpair/qualitymetrics。",
+    "methodFlow": [
+      "建立editingchain：提取sourcevideo中间frame或任意trainingframe，准备source/targetimagepair作为示范，flattentext+visualshots。",
+      "共享position与diffusion：共享VAElatent/DiT，intershotglobal与intrashotlocalRoPE相加；image位置随机化避免time0=imagemodalityshortcut。",
+      "joint多源训练：I2I、pairedV2V改写subchain、rawvideo+perframeimageedittriplet，cleanconditions/targetnoisyflowobjective。",
+      "两stage编辑：先Vs/Is生成It，再directlatent插入Vs/Is/Itcondition，生成Vt；外部It可替换无需再训练。"
+    ],
+    "experimentsZh": "32H100≈150h/42Ksteps，stage1 256²、stage2 640×480；主65frames12fps32stepsCFG2.5，431OpenVE8categories自动judge；10rater全部431pair，numbers作者报告。 以下结果为作者报告：作者报告Gemini2.5overall3.08 vsOpenVE2.49/Runway3.65；globalstyle4.17，但camera2.06 vsRunway4.53。（PDF p.7 Table1）；作者报告stage1PureV2V2.32→decompV2V+CoE2.57→full2.65；加入I2I+chain≈6%visualtokens不等仅6%总compute。（PDF pp.26–27 Tables8–9）；作者报告humanfullvsV2V prompt38%win24%lose39%tie，cons28/9/63；visual15/14/71，非压倒多数偏好。（PDF p.27 Tables10–11）；作者报告H20050stepstwo-stage53.5s vsLucy39.8/ICVE118.1；64image-stagescaling用不同judge，不能和主3.08直接比。（PDF pp.28–29 Tables13–14） 对照范围：7openmodels/Runway defaultinference不同resolution，AnyV2V另judge，cannot allsameprotocolrank；samebackbonepureV2V控制能隔离部分数据/chain贡献，但trainingcompute/多source不同。 消融与诊断：sourcecombination、CoE、RoPE、temporalrandomization、mixtureratio、externaleditor、denoisingsteps、human/quality；仅stage1ablation，最终higherresolutioncause未全控。",
+    "insightZh": "可复用imageedit示范作为videoappearanceanchor与同模型chain训练有贡献，区别只外部单framepropagation；数学分解是chainrule/固定keyframe不是planningagent。RoPE局部component同坐标不代表最终combinedrotation所有patch零相对位移。",
+    "evidenceZh": "fullmodel大量pairedvideo仍是监督重要组成。（PDF pp.6–8 §4.1/Table2; pp.22–24 C.1/Table3）；CoE实际生成keyframe并latent直连video。（PDF pp.4–6 §3 Eqs.(1)–(4); p.19 A.2）；data/position/chain各有收益，也有局部退化。（PDF pp.8–9 Table2/Figs.4–6; pp.25–27 Tables5–10）；testscaling主要测image-stage denoisingsteps而非多轮agentchain。（PDF pp.28–30 D.8/Table13/Limitations）",
+    "caveatZh": "It是hardanchor，badedit会传播；singlekeyframe无法描述大camera/temporalvariation。；两diffusionstage增加cost，long/highdynamic未测，仅OpenVE。；scope是shortappearance，physical/longrange/structural新增删除目标不可靠；cameraedit弱。；最终position是global+localfrequency合成，不能将intra-component零offset等同明确物体对应/严格pixelfaithful保证；移动/occlusion需内容推断。；数据annotation每frame需independentlyeditable，限制动作/动态编辑；method不是检验/规划/反馈agent。；不同judge替换实验scaling结论限withinexperiment，强backbone公平描述不意味着defaultresolution/steps严格匹配。；项目pagePaper链接指向旧2510.07940，本次summary保持2610.12104v1 exactPDF链接。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "visualcreation可把用户认可的imageedit作为统一video控制接口，并让成熟imageeditor升级直接传给video；不含structured2D/3D或manufacturing约束。"
+  }
+}

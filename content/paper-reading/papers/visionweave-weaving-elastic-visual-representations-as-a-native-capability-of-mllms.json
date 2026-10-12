@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2610.07987",
+  "slug": "visionweave-weaving-elastic-visual-representations-as-a-native-capability-of-mllms",
+  "title": "VisionWeave: Weaving Elastic Visual Representations as a Native Capability of MLLMs",
+  "authors": [
+    "Yuan Feng",
+    "Qize Yang",
+    "Ruizhe Chen",
+    "Sibo Song",
+    "Haolin He",
+    "Muzhi Zhu",
+    "Zihan Liu",
+    "Yunfei Chu",
+    "Xize Cheng",
+    "Yuxuan Wang",
+    "Jin Xu",
+    "Xike Xie"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.07987"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "VisionWeave",
+    "Weaving",
+    "Elastic",
+    "Visual",
+    "Representations",
+    "Native",
+    "Capability",
+    "MLLMs"
+  ],
+  "abstract": "Multimodal large language models have become the dominant paradigm for visual understanding, but incur substantial costs by encoding inputs into dense, fixed-size patch tokens. However, visual information is unevenly distributed: some regions require fine-grained detail, while others admit compact representations. Downsampling sacrifices this detail, while existing token pruning and adaptive approaches remain limited in content-adaptive granularity, task generalization, and integration with modern MLLMs and serving infrastructure. Overcoming these limitations calls for foundation models that learn, end to end, where-and at what granularity-to allocate visual representations, a native capability we term elastic visual representation weaving. We introduce VisionWeave, establishing this capability in frontier-level MLLMs through large-scale training. It combines two components: a gated spatial pooler constructs coarse-grained representations alongside native fine-grained representations within a shared MRoPE coordinate, while a granularity router learns their content-adaptive allocation. Through self-distillation alone, we validate this capability on Qwen3.5-4B and scale to Qwen3.8-27B with over 30K A100 GPU-hours. Based on Qwen3.8-27B, VisionWeave adaptively adjusts token savings to visual content, saving 43.0% tokens on average while retaining 98.9% native performance across eight benchmarks, versus only 88% performance preserved for token pruning baselines with a fixed 50% savings target. Extensive evaluations confirm robust efficiency-quality trade-offs across diverse tasks, resolutions and video frames. When deployed on SGLang serving engine, our method achieves a 2.3x throughput gain while reducing mean TTFT by 54.4% and mean TPOT by 60.6%. Together, we believe these results position elastic visual weaving as a promising capability for next-generation multimodal models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.07987v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.07987v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/FFY0/VisionWeave"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.07987v1 的 25 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "以 learned pooler 和 block-level router 把完整图像覆盖编织为粗细两种 visual tokens，再通过三阶段 self-distillation 让 MLLM 原生适应混合序列。作者报告 27B 八任务平均节省 43.0% tokens、相对平均损失 1.08%；贡献在内容自适应表示，2.30× throughput 只对应指定长视频部署配置，不能泛化为所有任务加速。",
+    "motivationZh": "MLLM 的统一降采样容易丢失小字和局部细节，而 token pruning 可能直接移除 grounding 需要的图像区域。问题是在较少 visual token 下保留完整空间覆盖，并让不同复杂度区域使用合适的表示粒度。",
+    "methodZh": "固定缩放丢失文档细节，token pruning 又可能移除 grounding 目标。VisionWeave 在 4×4 patch block 上选择四个 native fine tokens 或一个 gated-pooler coarse token，MRoPE 保留空间中心和完整覆盖。router 读取 ViT 多层局部及全局特征，不读取用户问题。先训练全粗粒度 pooler，再 soft routing 训练 router，最后 hard routing 蒸馏 pooler 与 LLM；Qwen3.5-4B/3.8-27B 八个图像视频任务和 SGLang 验证了该表示的可迁移性，但训练成本高且模型权重尚未发布。",
+    "methodFlow": [
+      "构造两级空间表示：native 2×2 merger 构造 fine tokens；gated pooling 合并 2×2 patch features 后复用 merger，一个 coarse token 覆盖四个 fine tokens。",
+      "学习 block-level granularity：learnable query 读取 ViT 第0、中间和末层特征，local/global cross-attention 输出 coarse probability；router 不以用户 text query 为条件。",
+      "分阶段自蒸馏：Stage1 全粗训练 pooler；Stage2 保持四位置 soft mixing 训练 router 并平衡比例；Stage3 冻结 router 和 ViT，在 hard-routed 混合序列上训练 pooler/LLM，forward KL 保留 teacher top512 logits。",
+      "生成混合序列：按阈值选择每块一个 coarse 或四个 fine，保持 raster order；coarse 使用半整数 MRoPE，layout metadata 在请求调度前确定。"
+    ],
+    "experimentsZh": "两个 Qwen backbone、八任务、输入分辨率/视频帧数及路由阈值扫描；27B 777K training examples，三阶段超过30K A100 GPU-hours；SGLang 指定长视频负载。 以下结果为作者报告：作者报告4B平均73.25→72.59、35.8% token savings；27B77.65→76.73、43.0% savings。（PDF p.9, Table 4）；作者报告27B LongVideoBench throughput0.90→2.07 requests/min；mean TPOT355.64→140.29ms。（PDF p.11, Table 5） 对照范围：native/downsampling/VisionZip 和为 SGLang 改为 post-ViT pruning 的 FastV†；Appendix E.3 提供按dataset匹配 savings 的比较，4B平均优势仅0.39/0.69分。 消融与诊断：pooler 对 pixel-unshuffle、Stage3 removal、on/off-policy、spatial router shuffle；shuffle 相同数量仍损伤质量，27B平均−5.36但排除GUI仅−1.53。",
+    "insightZh": "将 token compression 变成经训练的混合粒度视觉表示而非仅推理期剪枝，且给出完整空间覆盖和 serving integration。创新主要是可部署 architecture/training 组合；两级路由不等于任意多尺度、也不等于 query-adaptive routing。",
+    "evidenceZh": "fine/coarse 共同覆盖完整空间并采用同一 MRoPE 坐标系。（PDF pp.4–6, §2.2, Eqs.(1)–(13)）；27B 八任务平均43.0% token savings、相对平均损失1.08%。（PDF p.9, Table 4; p.25, Table 8）；hard-routing 最终训练阶段对 grounding 尤其重要。（PDF p.21, Appendix E.1, Table 7）；2.30× serving throughput 由长视频特定配置测得。（PDF p.11, Table 5; p.25, Appendix E.4）",
+    "caveatZh": "高训练成本限制 alternative router/architecture 的系统探索。；只有两种 granularity；多尺度与 pre-training 原生植入尚属未来方向。；路由只看图像内容，细粒度保留不保证匹配具体问题。；性能均作者报告，无独立复现/统计区间；2.30×仅指定硬件与长视频负载。；官方仓库提供 inference/setup implementation，但 README 明确 trained weights 当前不可获得，复现论文质量仍受限制。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "新 native visual representation 架构与 grounded detail retention 可为视觉语言基础模型的空间输入设计提供参考；与3D创作/CAD的直接联系有限，推荐skim architecture和matched-budget结果。"
+  }
+}

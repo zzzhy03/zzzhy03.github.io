@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.13681",
+  "slug": "physforge-material-controllable-3d-reconstruction-with-separable-components",
+  "title": "PhysForge: Material-Controllable 3D Reconstruction with Separable Components",
+  "authors": [
+    "Yuchen Wang",
+    "Yanqi Bao",
+    "Zheng Gu",
+    "Zhengqing Chen",
+    "Jieqi Shi",
+    "Jing Huo"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13681"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "PhysForge",
+    "Material-Controllable",
+    "3D",
+    "Reconstruction",
+    "Separable",
+    "Components"
+  ],
+  "abstract": "Recent advances in physical 3D generation have enabled visually faithful assets with simulatable mechanical behavior. However, existing methods provide limited control over material behavior beyond appearance-based inference and struggle to estimate physical properties from complex interactions between objects and semantic parts. Therefore, we present PhysForge, a Video Diffusion Model (VDM)-based framework for addressing these challenges, comprising two complementary modules for material-controllable physical fitting and componentlevel interaction modeling. The first, PhysFit, leverages material-conditioned VDM dynamics as references for physical-property fitting, introducing windowed fitting to focus on material-revealing interactions and Hallucinated Forcing to disentangle nonphysical motion hallucinated by the VDM from material responses. The second, PhysComp decomposes complex interactions into individual objects and semantic components, enabling their physical parameters to be optimized independently and flexibly composed for joint simulation. Experiments on PhysAssets and Google Scanned Objects demonstrate that, compared with existing methods, PhysForge provides stronger control over material-dependent physical responses while supporting component-level physical modeling for complex interactions. It achieves the best CLIP and physical controllability scores on both common and uncommon materials, with qualitative comparisons, component-level ablations, and a user study further supporting these improvements. Our project page is available at https://masterwanna.github.io/PhysForge.html .",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13681v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13681v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13681v1 的 16 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "PhysForge从material-conditioned视频prior构造可拆component的3DGS物理资产：PhysFit只拟合碰撞/形变窗口，并把异常加速度与材料响应分开；PhysComp逐部件label、place并组装MPM/rigid bodies。作者报告PC4.6/4.0与human win60.56%，但PC是VLM五分judge、eval/user人数未交代，不能当真实材质system identification。官方repo目前只有README/assets。",
+    "motivationZh": "外观重建并不能确定物体材料或受力响应，而生成视频中的运动也可能违背真实动力学。问题是把材质可控的形变、接触证据与可分解几何联系起来，并明确哪些物理参数无法由这些观察可靠辨识。",
+    "methodZh": "Qwen3.5-4B分析对象/parts及初始物理参数，Wan生成不同material dynamics，SAM3/depth tracks恢复incoming positions/velocities。mask contact与relative approach定位informative window；Hallucinated Forcing用reference acceleration显式解释非物理motion。SAM3D/TRELLIS、P3-SAM和FoundationPose形成有persistentcomponent labels的3DGS，按attachment/relative motion划分simulation bodies。Taichi MPM/rigid simulator拟合deformation、contact duration、penetration与弱material prior regularizer；更换材质需重生成referencevideo和refit。输出是以generativeprior合成material behavior的资产，非忠实测量真实参数。",
+    "methodFlow": [
+      "给定input image与material prompt，VLM监督VDM生成材质条件视频并建立object/component inventory。",
+      "用SAM3与DepthAnything3追踪mask/centers，按接触与approach/settling选择材料响应窗口，恢复incoming state和reference acceleration。",
+      "用3D backends重建、P3-SAM分component并FoundationPose放回共享坐标，保留对象/partIDs。",
+      "按attachment和relative motion划分MPM/rigid bodies，把geometry转surface/interior particles并赋VLM material prior。",
+      "在事件窗口联合优化deformation/contact/penetration损失与0.01prior regularizer，输出可分component的material-conditioned simulation。"
+    ],
+    "experimentsZh": "PhysAssets（全集>24kassets）与GSO（全集>1k扫描objects）在两RTX4090评估；实际used samples和train/test划分未明确。MPM150frames/30FPS，八substeps，grid100–300cells/axis；最多20fit rounds。common/uncommon material prompts、CLIP与VLM PC、人类对七匿名视频rank。 以下结果为作者报告：作者报告PhysForge CLIP common0.258/uncommon0.264，PC4.6/4.0；best baseline PCcommon4.4、uncommon3.2。（Table1, PDF p.7）；作者报告human win60.56%和mean rank1.9056；次高win12.22%，无sample-size/uncertainty报告。（Table2, PDF p.9） 对照范围：DreamPhysics、PSIVG、PhysRVG、WMReward、DeforM、PhysGM涵盖VDM/SDS、simulator-guided与feed-forwardprior；未见真实material参数或力/位移曲线、物理identifiability、runtime及judge independence控制。 消融与诊断：Fig.5去PhysFit看fitting loss/time曲线，去PhysComp看合并body后丢relative motion。窗口选择与hallucinated forcing未分别消融，component与更强3Dbackends的各贡献也未量化。",
+    "insightZh": "相对whole-video物理拟合，强调material-revealing窗口与显式hallucinated-motion处理；相对object-as-single-body，允许semantic components独立参数和动态分组。依赖已有segmentation/reconstruction/VLM/simulator，核心新意是fitting及component物理组合。",
+    "evidenceZh": "window由mask接触、approaching run与rest/separation确定，reference acceleration为显式轨迹项。（Sec.3.2.1–3.2.2, PDF pp.5–6）；component标注的3DGS被分为simulation bodies，并以deformation/contact duration/penetration及material prior联合拟合。（Sec.3.3, Eqs.(4)–(6), PDF p.6; App.A.1 p.13）；作者报告common/uncommon PC4.6/4.0与CLIP0.258/0.264，PC由VLM五分量表评估。（Table1 PDF p.7; Evaluation Metrics p.8）；作者报告human ranking win60.56%、average rank1.9056；更换material需additional video generation/refit。（Table2 PDF p.9; Sec.5 p.10）",
+    "caveatZh": "material改变需再次video generation和physical fitting（p.10）。；依赖generated video是否表达物理行为，现有PhysFit只能部分缓解hallucinations（p.10）。；VLM PC与CLIP不等同真实physical correctness，human study缺人数/试次数。；物理parameter和external forcing可相互补偿，窗口法未给identifiability保证。；实际asset evaluation样本/划分与baseline resource budget不清楚。；官方public repo当前README/assets，无实现；未来重现将有助核验复杂pipeline。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "material-controllable、可分component的explicit3D资产对可编辑object/assembly与dynamic3D生成直接相关；不构成manufacturing-ready或真实材料验证。"
+  }
+}

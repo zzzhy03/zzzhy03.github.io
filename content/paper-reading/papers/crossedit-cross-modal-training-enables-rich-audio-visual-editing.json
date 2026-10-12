@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2610.10264",
+  "slug": "crossedit-cross-modal-training-enables-rich-audio-visual-editing",
+  "title": "CrossEdit: Cross-Modal Training Enables Rich Audio-Visual Editing",
+  "authors": [
+    "William Chen",
+    "Prem Seetharaman",
+    "Ke Chen",
+    "Oriol Nieto",
+    "Kevin Duarte",
+    "Siddharth Srinivasan Iyer",
+    "Mamshad Nayeem Rizve",
+    "Zhiwen Cao",
+    "Shinji Watanabe",
+    "Yuanjun Xiong",
+    "Jianming Zhang",
+    "Zeyu Jin",
+    "Justin Salamon"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10264"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.SD",
+    "eess.AS",
+    "eess.IV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "CrossEdit",
+    "Cross-Modal",
+    "Training",
+    "Enables",
+    "Rich",
+    "Audio-Visual",
+    "Editing"
+  ],
+  "abstract": "Multimedia editing requires generative models to interpret complex, compositional instructions and modify only the desired elements across modalities, a capability largely beyond existing systems. Current approaches are typically limited to simple, single-attribute edits within one modality, since diverse, high-quality editing pairs are hard to obtain, especially for cross-modal tasks where aligned audiovisual (AV) data is scarce. We present CrossEdit, a unified omni-modal editing model for images, audio, and video that performs AV movie scene edits zero-shot through cross-modal transfer. Our key observation is that complex instruction-following, once learned in any modality, generalizes to others. We exploit the additive nature of acoustic signals to procedurally generate large-scale audio editing pairs with compositional instructions, and show that fine-tuning on this synthetic data and self-supervised AV masked reconstruction, alongside a targeted set of curated cross-modal tasks, induces instruction-following that transfers zero-shot to unseen modality and instruction combinations. To evaluate this capability, we release CrossEditBench, a human-annotated benchmark of AV edits on movie scenes, and propose AV-FES, a metric that jointly scores instruction following and consistency. We show that our proposed techniques improve performance on zero-shot AV movie scene editing, while maintaining or improving performance on lip-synced speech editing and standard image, video, and audio editing benchmarks. Demos are available at https://wanchichen.github.io/crossedit/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10264v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10264v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10264v1 的 27 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "CrossEdit 的亮点是把可大量合成的 audio edit instruction 与 AV masked reconstruction 组合，在已预训练omni编辑模型上获得未训练过instruction组合的AV scene editing。作者human-rated AV-FES .26→audio .35→mask .43，支持跨模态transfer与同步补足；不是没有AV训练的zero-shot，模型已见lip-sync/inpainting与I2I/V2V。方法值得deep，但内部base/data不发布，长视频和真实噪声场景未验证。",
+    "motivationZh": "现有音视频编辑模型多只控制其中一个模态，或依赖具体配对编辑指令，跨模态更改容易破坏 lip-sync 与未编辑区域。目标是让音频和视频编辑能力组合成统一指令编辑行为。",
+    "methodZh": "12B MoE/3B active DiT以各模态VAE与Qwen3-VL语义输入条件生成音/视频。通过真实waveform混合、toolcalling生成audio scene editpairs和随机spatiotemporalmasking，SFT10K。新benchmark100public-domainmovie clips覆盖六种edit类型；AV-FES把instruction增益和consistency做harmonic mean，以人及两种MLLM评估。",
+    "methodFlow": [
+      "准备跨模态base：各modalityVAE token与Qwen3-VLclean语义条件进入共享DiTMoE，先学习生成、单模态编辑和lip-sync。",
+      "合成复杂audio edits：2–4真实speech/music/bg/SFX混合或toolcallingLLM生成scene，再编辑components得到input/target与组合instruction。",
+      "AV自监督重建：随机temporal/spatial/spatiotemporal mask，部分同时zeroaudio，以统一inpaint指令恢复原AV。",
+      "联合SFT与编辑：新增数据与保留tasks训练10K步，双CFG控制input fidelity与instruction，50flowsteps联合输出AV。"
+    ],
+    "experimentsZh": "100movie clips/六edit类型，86保留crowdraters344ratings/system；两MLLMjudge，600internalcelebrityclip lip-sync、EditVerseBench/ImgEdit与audio sets，所有数值作者报告。 以下结果为作者报告：作者报告human AV-FES base.26→audio.35→full.43；visualcons2.37→2.94→3.21，audiocons2.80→2.81→3.44。（PDF p.8 Table3）；作者报告Gemini CrossEdit.30±.04 vsMiniMaxH3.23±.04；Qwen .77±.07 vs .63±.09；两judge各自尺度下有收益，overlapCI不构成paired显著性。（PDF p.25 Tables9–10）；作者报告ImgEdit overall3.69→3.72但background3.88→2.82；lip-syncWER10.3→10.9和LSE-C5.87→5.64下降。（PDF p.9 Tables4/6） 对照范围：cascades、AvED、AVI-EDIT、InstructAV2AV、MiniMaxH3；baselineparameter/compute不同，human comparison未含全部强系统。主因果证据base/audio/full增量而非总体SOTA。 消融与诊断：base→audio→mask staged ablation，跨edit类别与lip-sync；缺base matched额外训练/模态混合ratio控制，无独立多seed。",
+    "insightZh": "实质贡献是audio instruction学习转移到视觉/AV，以及maskedreconstruction提供同步scene更新约束；核心并非新DiT架构。zero-shot定义限于AV2AVinstruction种类，而非AVtraining-free。",
+    "evidenceZh": "zero-shot任务是已学单模态指令在AV2AV新组合，不是无AV训练。（PDF pp.3/5 Table1/§3.5; pp.19–20 AppendixA/B）；audioalone改善instruction，但损伤某些sync类型，maskedreconstruction补回。（PDF p.8 Table3 Fig.5）；human与MLLMjudge相对排名方向相同但绝对FES差大。（PDF pp.7–8 Tables2–3; pp.24–27 Tables9–13）；code/checkpoint明确不公开。（PDF p.11 Ethics/Reproducibility）",
+    "caveatZh": "仅短视频≤10s，没有noisyhomevideos/reverberantaudio测试，long-form仍open。；内部代码、data、base/checkpoint不公开，仅提供方法和evalrelease计划。；judge consistency ceiling与leniency不同，FES只能同judge比较；人agreement系统数很少。；base广泛pretraining未知规模，不足推出任意modality训练可泛化；增量训练量/数据覆盖可能是混杂。；FES零headroom/untargetedmodality取值依judge与特殊规则，非真正precision/recall概率；平均audio/video未直接保证temporal同步。；344ratings依rater/clip相关，CI是否cluster处理未清晰；100movieclip覆盖有限。；部分任务明显退化，『保持/改善全部能力』需限定具体metric。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "创作编辑的跨模态instruction数据策略可启发visualcreationmodel：利用更易合成的任务学习最小改动，再用视觉selfsupervised任务约束同步；尚无structured2D/3D制造证据。"
+  }
+}

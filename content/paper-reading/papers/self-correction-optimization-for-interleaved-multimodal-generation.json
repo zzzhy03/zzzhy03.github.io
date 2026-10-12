@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.10400",
+  "slug": "self-correction-optimization-for-interleaved-multimodal-generation",
+  "title": "Self-correction Optimization for Interleaved Multimodal Generation",
+  "authors": [
+    "Xin You",
+    "Zhiwei Ning",
+    "Zukai Chen",
+    "Minghui Zhang",
+    "Xuanke Shi",
+    "Hanxiao Zhang",
+    "Jingsong Liu",
+    "Jie Yang",
+    "Quan Wang",
+    "Yun Gu"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10400"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Self-correction",
+    "Optimization",
+    "Interleaved",
+    "Multimodal",
+    "Generation"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) have made significant progress in visual understanding and generation. However, generating interleaved image--text content remains challenging, as it requires tightly integrated multimodal understanding and generation capabilities. Although existing MLLMs provide promising solutions, most rely on additional training with augmented data, which is computationally expensive and remains limited in preserving visual subjects, temporal consistency, and physical plausibility. In this work, we propose self-correction optimization (SCO), an effective training-free method for consistent interleaved generation. SCO treats the classifier-free guidance update as a reference and performs minimal self-correction under two complementary constraints, including new-event and state-preserving constraints. Specifically, the new-event constraint promotes temporal consistency across image--text sequences, while the state-preserving constraint maintains the coherence of visual subjects throughout subsequent generation steps. Experiments on challenging interleaved multimodal generation benchmarks demonstrate significant improvements in temporal coherence and visual-subject preservation. Furthermore, SCO can be extended to video generation and improves the modeling of physically grounded processes, including robot manipulation and long-horizon handcrafting.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10400v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10400v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10400v1 的 20 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SCO 用full/counterfactual/event-only/unconditional四个sampling branches估new-event与history-state方向，再做有独立预算的二维CFG最小修正；无需改weights。作者报告多种interleavedmodels改善，但MiniGPT5/OpenING多数指标下降，video还需GPT规划；可skim借鉴“改变vs保留”联合约束，训练free不代表推理cost-free或真正验证图像/physics正确。",
+    "motivationZh": "Interleaved multimodal generation 面临“执行新 event”与“保留历史 state”的冲突，模型可能照抄旧图或让主体和布局漂移。统一提高 CFG 不能独立约束这两个目标。",
+    "methodZh": "一串生成images容易保守地复制历史而不执行新event，或执行event时漂移subject/layout。SCO固定同latent分别eval四种conditions，以vf-vcounter和vf-vevent估两个response方向，要求CFGupdate的内积达到scheduledthreshold。Gram matrix处理两方向协同/竞争，boundedcorrectioncoefficients限制扰动并在冲突时允许softslack。对模组/统一image-textgenerators在OpenING/ISGbench评FID、CLIP/DINO一致性和GPTjudge，videoextension先由requiredGPT5planner安排events/frames，再对jointspatiotemporalupdates各framecomponents修正。结果给跨models可用性，但方向语义取决于promptrewriting与conditionalbranch质量，不是sourceimage正确性判别器。",
+    "methodFlow": [
+      "从multimodalhistory与当前event构造fullcondition、删除event的counterfactual和删除history的event-only；video另由GPTplanner分配eventframes。",
+      "同noisy latent执行unconditional/full/counterfactual/event-only预测，形成CFGreference与new/state两个差分方向。",
+      "按samplingprogress至τend设方向projectionthreshold，构造两方向Gram matrix量化interaction。",
+      "求bounded二维最小correction，独立Mnew/Mstate限制coefficients；预算或冲突不足时保留softconstraintresidual。",
+      "将correctedupdate替换CFG继续采样，frozenmodelweights，更新image-texthistory或jointvideo输出。"
+    ],
+    "experimentsZh": "OpenING5400instances/ISG1150覆盖7modular/unifiedgenerators，PyTorch2H100，baselineconfig照officialrepos。SenseNovaOpenING对InterleavedCFG/CFG++/TCFG与hyperparameters；videoVideoWorld2/VideoCraftBench、Cosmos2.5/3的InterleaveVLA subset，附录还LanguageTableIRASim qualitative。FID/CLIPI/T、DINOsubject/CLIPbackground、同GPT5.6Sol的J1/J2；未列实际videoevalsubset数量或多seedCI。 以下结果为作者报告：作者报告SenseNovaOpenING FID67.2→55.9、CLIPI .325→.376、GPTJ2 .574→.602；CFG++为60.4/.358/.577。（Table2 PDF p.7; Table3 PDF p.8）；作者报告DuoGenISG FID45.7→41.4、Cs .39→.41、GPTJ2 .621→.659；MiniGPT5OpenING GPTJ2 .344→.319、CLIPI .149→.138，不全为正。（Tables1–2, PDF p.7）；作者报告VideoWorld2 FVD178.0→146.3、Cosmos3 138.9→119.3，Cosmos3GPTJ2 .651→.705；这些phys评分是judge代理。（Table5, PDF p.9） 对照范围：samebackbone加SCO与多种CFG法提供公平inference对照；comparison缺additionalbranchforward次数/latency与commercialplanner消耗测量。各model实现条件branch是否等价未详细分解，performance不代表一般architecture间排名。 消融与诊断：state-only提升Cs但可压event，新event-only增加变化但会drift，联合FID/Jscores较好而Cs稍弱；α0=1、sstate≈.7–.9、Mnew6/Mstate≈10、τend.5为OpenING调参region。未明确held-out hyperparamvalidation，因此数字与tuningscope需保留。",
+    "insightZh": "把现有CFG扩成两种对比condition方向的jointboundedprojection，以小二维优化处理eventstate冲突，而不是简单独立guidances相加。语义隔离来自promptrewriting，不是已证明的因果disentanglement；所称self-correction是samplingupdate层修正，非tool/rendercriticagent。",
+    "evidenceZh": "event与state方向来自同latent不同conditions的model输出差，而非额外reward网络或gradient训练。（Sec.3.2–3.3, Eq.(2)–(6), PDF p.4）；jointprojection考虑Gram cross-term，finitebudgets可使constraints未完全满足。（Sec.3.4, Eq.(8)–(13), PDF pp.4–5）；多model改善有重要例外，MiniGPT5在OpenING除FID外基本下降。（Table2, PDF p.7; Sec.4.3, PDF p.8）；videoextension要求GPTplanner而非直接从任意videoGenerator零cost插件应用。（AppendixA.1 Eq.(14)–(17), PDF p.14; Fig.7, PDF p.17）",
+    "caveatZh": "MiniGPT5/OpenING的负面结果显示branchquality/separability限制SCO。；strongconstraints/lateapplication抑制合理statechanges或details，weakconstraints无法防drift，存在固有tradeoff。；boundedµ不足或方向竞争时residualslack>0，semanticconstraints可被放松。；四branches及GPTpromptrewrite/planner增加推理调用，training-free不等于免费加速；无latency/cost报告。；差分方向混合非event语义与promptchange效应，不保证局部identity、geometry或physicalforces正确。；physJ1/J2同judge，videoevalsubset/seed统计缺失，subject/background region提取细节不完整，作者数字未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "“新操作与保持历史状态”采样层约束可为连续视觉设计编辑/多模态生成提供方法参考，但未输出SVG/layers/explicit3D或验证core项目。"
+  }
+}

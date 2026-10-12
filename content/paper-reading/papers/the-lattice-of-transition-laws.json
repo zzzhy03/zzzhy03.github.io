@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.11216",
+  "slug": "the-lattice-of-transition-laws",
+  "title": "The Lattice of Transition Laws",
+  "authors": [
+    "T. Y. Tsui",
+    "Jiatao Gu",
+    "Lingjie Liu"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11216"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Lattice",
+    "Transition",
+    "Laws"
+  ],
+  "abstract": "Diffusion and autoregression (AR) have long been seen as different categories of generative models, with diffusion specialising in continuous fields and AR specialising in discrete tokens. Recent work seeks to combine the advantages of the two models, and each hybrid fixes its decoding schedule by design. In this paper, we ask whether the performance of decoding schedules of one model can be predicted before decoding at a fixed number of steps. We describe diffusion, AR, and models in between as paths on one corruption lattice, and define the cost of a schedule as the dependence its parallel steps discard. The cost shows that the fewest steps of a zero-cost schedule are set by the geometry of the data, in the same way for tokens and for continuous fields. In particular, for data that are Markov on a graph and dependent along its paths, the fewest steps equal the graph's treedepth, which is logarithmic in the length of a sequence and linear in the side length of a grid. With fewer steps than the treedepth, every schedule pays a positive cost, whose ranking we predict before decoding with a kernel of pairwise dependence estimated from pretrained weights. Across text generation, image generation, and video generation, we verify most of the predictions about the rankings of different schedules under different metrics and benchmarks. This work therefore provides a design principle for decoding for future AR models, diffusion models, and anything in between. Our code is available at https://github.com/TSUITUENYUE/The-Lattice-of-Transition-Laws.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11216v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11216v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/TSUITUENYUE/The-Lattice-of-Transition-Laws"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11216v1 的 26 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "把AR、diffusion和混合decoder看成corruption lattice路径，以并行advance丢弃的totalcorrelation计cost，解释为何few-step应分散token而非raster。作者报告MAR8stepFID13.02→spread9.44/low-discrepancy8.32，无需改weights；treedepth定理要求faithfulMarkov，pairkernel仅lowerbound且有ranking反例，不能当任意model的质量预言器。",
+    "motivationZh": "AR、diffusion 和混合解码器都需要决定每一步更新哪些 tokens，但少步并行生成常以启发式安排顺序，缺乏统一的依赖损失解释。论文关注生成路径如何在并行速度与保留 token 间相关性之间取舍。",
+    "methodZh": "exactjointtransition与independentconditionaltransition的pathKL等于沿exact路径期望conditionalTC，finishedsampleKL仅不超过该cost。Markov+沿未揭示路径持续dependence下，zero-costresolve每component至多onevertex，最少steps=treedepth。低于budget时以pretrainedpairMI或MARpredictiondisplacement/informationproxy累计consecutivepairfloor，设计spread/Morton/Halton/min-distance规则。完整26页正文、全部证明/architecturetraining、kernel/反例、gradedchannel、freegeneration/repetitioncontrol/HumanEval与videoappendix已读。",
+    "methodFlow": [
+      "给每coordinate定义mask/Gaussiannoiselevel，decoder成为从allcorrupt到allclean的monotone路径。",
+      "对每step比较jointlaw与productmarginals，累积conditionaltotalcorrelation定义discardeddependencecost。",
+      "在faithfulMarkovgraph分析revealedseparator与eliminationtree，得zero-costbudgettreedepth。",
+      "用pretrainedweights估pairdependence随distance/state变化，或continuouspredictionresponse近似kernel。",
+      "固定steps/weights按spread、lowdiscrepancy或confidence+mindistance选择advancepositions，再对实测quality与floor排序核验。"
+    ],
+    "experimentsZh": "text8 85M/26M models、CIFAR10pixel16patch、SiT-BImageNet256及releasedMAR-B/LLaDA8B/SkyReelsV2DF1.3B。MAR16²tokens、50Ksamples每cell、100diffusionsteps/token、CFG2.9，onlyorderchange；text8 teacherforce192prefix+64characters并补fullfreegen；LLaDA1319GSM8K/164HumanEval、每prompt独立。 以下结果为作者报告：作者报告MAR8step random13.02FID、spread9.44、low-discrepancy8.32、raster139.80；16step4.10/3.27/3.13，64step非raster差<.1。（Table3, PDF p.7）；作者报告LLaDA8/16stepmin-distanceGSM8K相对confidence+9.7±.8/+7.6±.9pp，64/128stepgreedy差不显著。（Table4, PDF p.8）；作者报告text8pairedestimate8stepcontiguous.62bitsvsmeasured1.82、spread.06vs.09、separator.01vs.06，幅值低估但粗ranking有效。（Table5, PDF p.8）；作者报告MARlatticeSiT同步FID43.3vsdedicated39.9，而同lattice sequential98.7；两corners可达但quality不等。（Table8, PDF p.15） 对照范围：主要同weights固定stepsorder对照、three-seed部分MARcells；mostFIDsinglecellseed，text8teacherforcing并另freegen，LLaDAperplexityGPT2largeproxy且重复度control。MARkernel/displacement不是exactMI/TC，video仅3prompts四predeclaredmetrics。lattice和dedicatedtext8validationminimumsteps不同(25K至510K)，不能将其当严格equalcompute模型质量对比。 消融与诊断：distance vsseparator、kernelstate/26M→85Mtransfer、tripletterms、widthprofiles、gradedclass→characterchannel、conditionalschainerrors、LLaDArepetitionregression及timing。kernel估计在generation前，但spread-then-rasterfloors与confidenceactualsets部分postdecode，作者caption明确；no universalallpredictionpreregisteredclaim。",
+    "insightZh": "贡献是把既有absorbingtokenTC恒等式推广到continuous/interiorpaths、保留positiongeometry并联系treedepth，与可计算predecodekernel构成schedule设计原则。MAR/LLaDA只改sampler实验证明实践价值；非提出更强trainedgeneratormodel，也不保证真实dataMarkov或proxycost全序。",
+    "evidenceZh": "严格等式针对pathKL，finishedsample只upperbound，并未含conditionals及Gaussianmeanstep误差。（Proposition1/Sec.3, PDF p.4; proof Appendix C, pp.16–17）；zero-costtreedepth要求每laterstateMarkov且connectedunresolvedpairsdependent。（Theorem1, PDF pp.4–5; proof p.17）；MARfewstepspread有效但kernel不总rank对nested/Halton。（Tables2–3, PDF pp.6–7; conclusion p.9; C.4 p.21）；video只3prompts，增加history未改善不是通用longvideo结论。（Appendix D/Table28, PDF pp.25–26）",
+    "caveatZh": "Sec.7 p.9明确trainedconditionalerrors不在cost，closefloor时可reverseranking；bound只firstorderreference紧。；realtextrevealedcharacter不separate；gridnested与Haltonranking反例实际存在。；B.2/B.3 pp.14–16singlemodel跨corner仍finitecapacity/trainingcoverage/supervisiondensity代价，不能宣称无qualitygap。；pairfloor忽略higherorderstructure，spatiallatentgeometry只是proxy，不能无条件用treedepth压所有sampler至logsteps。；precomputedkernels成本与运行selection分开：selection<1%forward，但README作者估MARkernel~3.5L40h，非完全free。；video弱样本与textteacherforcing不宜包装全面跨modal胜利。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接给generativeimage/maskedtoken decoding的spatialcorrelation与fewstepdesign原则，对可控spatialcreation及video解码可迁移；不像常规单benchmark微调。"
+  }
+}

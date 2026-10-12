@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2610.10429",
+  "slug": "sgf-decoupling-gradient-flows-for-autoregressive-video-generation",
+  "title": "SGF+: Decoupling Gradient Flows for Autoregressive Video Generation",
+  "authors": [
+    "Zihan Su",
+    "Junhao Zhuang",
+    "Yaowei Li",
+    "Siwen Lu",
+    "Haoran Li",
+    "Lingen Li",
+    "Haoyu Wu",
+    "Weiyang Jin",
+    "Songchun Zhang",
+    "Haoyang Huang",
+    "Chun Yuan",
+    "Zeyue Xue",
+    "Nan Duan"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2610.10429"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "SGF",
+    "Decoupling",
+    "Gradient",
+    "Flows",
+    "Autoregressive",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Autoregressive video generation requires denoising the current frames while writing their key-value representations as context for future predictions. However, these two roles typically share parameters, and we find that their gradients exhibit distinct patterns and systematic negative alignment, hindering the joint optimization of visual quality and temporal consistency. We introduce Self Gradient Forcing Plus (SGF+), which assigns separate parameters to context writing and denoising while preserving their interaction through causal attention. Both roles are jointly optimized using the original generation objective without auxiliary losses, with context writing supervised through its contribution to future predictions. This simple change improves visual quality and long-horizon consistency over the evaluated baselines in both framewise and chunkwise generation, without additional video training data or a longer training horizon. Trained on only 5s rollouts, SGF+ supports continuous generation for up to 24 hours without long-video fine-tuning. These results highlight role-specific parameterization as an effective design principle for high-quality autoregressive video generation and native long-horizon extrapolation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10429v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10429v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Zihan-Su/Self_Gradient_Forcing_Plus"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10429v2 的 25 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SGF+ 将“写历史KV”与“去噪当前chunk”复制成独立参数，在原DMD目标下避免共享weights的梯度抵消。作者报告240s背景/subject/aesthetics改善，81frameinference约4.969s几乎不变；总generator参数1.4→2.8B、memory增加，低Dynamic不能一概解释成更好motion，24h只少量展示，适合细读role-specificarchitecture。",
+    "motivationZh": "自回归视频生成中，同一组参数既负责写入历史 KV，又负责当前 chunk 去噪，两种角色的训练梯度可能相互抵消。论文关注这种角色冲突是否阻碍长期视频质量，即使推理结构本身不变。",
+    "methodZh": "沿SGF两pass：nogradARrollout记录detachcleanX与sampledexitnoisyZ；并行causalmaskreconstruction以writerCθc生成可微KV，denoiserDθd消费KV并产DMDsample。futureloss同时训练两套parameters但sampledlatents仍detach，不像CSF回到原rolloutgeneration。完整25页包括TF/SGFgradient分析、5sfullVBench、cache配置、24h样例、18qualitative对比与product-space局部理论均已读。",
+    "methodFlow": [
+      "由同TF-initializedARcheckpoint复制contextwriter与denoiser两套完整参数。",
+      "nogradrollout交替denoise(t>0)与writer(t0)，记录cleanlatents与随机exitnoisylatents。",
+      "第二pass用causalreconstructionmask并行重建writerKV与targetdenoising，X/Z保持detach。",
+      "原DMDloss经KV训练writer、经currentprediction训练denoiser，各自更新而非共享梯度相加。",
+      "推理同sink/FIFO/4stepcall schedule，writer写清洁历史、denoiser读历史，不执行trainingreplay。"
+    ],
+    "experimentsZh": "Wan2.1-1.3Bcausalstudent/fakescore、14Bfrozenteacher，CausalForcingTFinit，VidProMfilteredexpandedpromptDMD，5srollouts。AdamWgen2e-6/critic4e-7 onegenperfivecritic；4steps。chunkcache3sink+6recent+3current=12，frame4+16+1=21；60sVBenchLong、240s128MovieGenmatchedinit/prompt/seed。PDF未完整提供trainingiteration/batch/hardwareprofiling细节。 以下结果为作者报告：作者报告240schunk SGF+subject98.21/background97.31/aesthetic64.74 vsSGF97.72/96.90/62.54；Dynamic56.92vs56.97/SF93.90。（Table1, PDF p.7）；作者报告240sframe SGF+98.74subject/63.95aesthetics/53.96Dynamic vsSGF97.07/61.89/65.68；60sframeimaging71.11低于SGF71.52。（Table1, PDF p.7）；作者报告81frameinfer4.969svsSGF4.962s，memory27.96vs24.85GB；trainingstep12.76vs11.79s约+8.2%。（Table3, PDF p.8）；作者报告attention/FFNmeangradientangles104.2°/106.3°与512pairedcos全部负；TFselected梯度亦多数负。（Fig.3/Appendix C Fig.7, PDF pp.3/13） 对照范围：同TFinit、同prompt/seedSF/SGF，仅1.3B系列主quant，没有等参数共享2.8B或equalFLOP/trainingtimebaseline。不同cachegranularity无需直接比较frame/chunk绝对值；CSF不同论文评分protocol不能横表排序，无humanmotionqualityCI。 消融与诊断：Attentiononly、FFNonly、fullsplit支持两module都需适配，FFNonly优于attentiononly但劣于full。gradienttSNE多layerrole silhouette .014–.175较小需看原cos而非projectedclusters。Localtheoryfixedrollout/fixedDMDsurrogate在sharedpoint，fixedbudget和sameLR不同结论明确。",
+    "insightZh": "简单但实质架构设计：cleancontextwriting和noisydenoising不再共享参数，保留forwardcoupling/originalobjective。相比restoredgradientSGF、CSF不同维度；gradientobservations支持motivation但角色复制也增加capacity，理论只fixedsurrogate局部下降不是长视频全局保证。",
+    "evidenceZh": "latentsdetach但writerKV可微，copyfullparam而非论文实验LoRA。（Fig.4/Eq.(5), PDF pp.4–5; Sec.4.1 pp.5–6）；512gradientpairs为selectedAttention/FFNfamily，不自动证明fullbatchgradient条件。（Fig.3, PDF p.3; Appendix G.5, p.24）；大多数longmetrics改善但motionamount下降，24h没有quantitativeevaluation。（Table1, PDF p.7; Appendix D/Fig.8, p.13）；近乎不变compute并非参数/memory无成本。（Table3/Sec.4.4, PDF p.8）",
+    "caveatZh": "无独立limitations节；Sec.4.4 p.8明确doublinggenerator存储和memory成本。；Appendix G pp.22–24局部理论只固定replaysurrogate，匹配productspacedisplacement不匹配parameter/compute，negativeindividualmodule不等于fullminibatch。；Appendix H p.25WAMtransfer/lightwriter/KVcompression均futurework，未有实验。；24hqualexamples不能宣称无限时长质量保证、actiondynamics或narrativememory。；低Dynamic既可能去除漂移也可能motiondamping，无humanstudy/explicitmotioncontrol区分。；额外capacity与gradientseparation混合，只有复制/partialsplit非isoparam对照。；单初始化/seed及无CI，小SGF+gain需谨慎，训练run配置在PDF不完整。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "role-specific架构改变longARvideogeneration核心训练及memoryconstruction方式，有直接visualgeneration方法价值；WAM/3D迁移只futurework。"
+  }
+}

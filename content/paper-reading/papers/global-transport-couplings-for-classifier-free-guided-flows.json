@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.07555",
+  "slug": "global-transport-couplings-for-classifier-free-guided-flows",
+  "title": "Global Transport Couplings for Classifier-Free Guided Flows",
+  "authors": [
+    "Katarina Petrović",
+    "Zander W. Blasingame",
+    "Danyal Rehman",
+    "İsmail İlkan Ceylan",
+    "Michael Bronstein",
+    "Stephen Y. Zhang",
+    "Lazar Atanackovic",
+    "Alexander Tong"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.07555"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Global",
+    "Transport",
+    "Couplings",
+    "Classifier-Free",
+    "Guided",
+    "Flows"
+  ],
+  "abstract": "Optimal-transport couplings have been shown to reduce training variance in unconditional flow models, but their role in conditional generation remains unclear. A natural approach constructs separate couplings for each condition, but this is impractical for large or continuous conditioning spaces found in modern image foundation models. We introduce Global Transport (GT), a global class-agnostic optimal-transport coupling, computed without class labels. GT can associate different conditions with different regions of the source noise, and consequently worsens performance without guidance. However, when combined with classifier-free guidance (CFG), GT consistently improves generation across domains, model scales, and sampling budgets. This reversal suggests that couplings for conditional flows should be evaluated both empirically and theoretically under the guided flow used at inference, rather than on unguided generation. We evaluate GT over both discrete class and continuous text conditioned image generation across model scales, and investigate how coupling choice alters guided trajectories. These results identify coupling design in the guided flow setting as a simple training time axis to improve performance without modifying existing architectures, samplers, or guidance mechanisms.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.07555v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.07555v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.07555v1 的 40 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Global Transport 直接在 batch 内做忽略条件的 noise–data OT assignment；它破坏每个 condition 的原始 noise marginal，unguided generation 变差，却在 CFG 下获得更好的 ImageNet 生成和更宽的 guidance 工作区间。训练耦合必须围绕实际 inference rule 评价，是值得 deep-read 的范式提醒；prediction-gap 定理仅对训练路径成立，不能读作 guided quality 保证。",
+    "motivationZh": "条件 flow 的 noise–data coupling 通常按 unguided generation 设计和评价，而实际生成常使用 CFG，两者的优劣可能相反。逐条件计算 OT 又难以扩展到大量类别或连续 caption，因而需要重新理解训练 coupling 与 guided inference 的关系。",
+    "methodZh": "正文及补充理论、配置、附加数值和全部 uncurated grids 已读。GT 在 model input space 按平方距离用 Hungarian assignment 重排 Gaussian noise，保留 data 对应的 class/caption 和标准 condition dropout，然后仍训练线性 FM、使用原 CFG sampler。无需 class-specific batch，能用于连续 text embedding。半离散 OT 是另一个有预处理成本的 approximation，并非主 minibatch 实现。作者用40-GMM、SiT-B/L/XL、DMF distillation、captioned ImageNet 和 single-cell data 研究 coupling 对条件/无条件 velocity gap 与 guided contraction–expansion 的影响。",
+    "methodFlow": [
+      "采样 Gaussian noise、带 class/caption 的 data 和 flow time；在 input space 建立全 batch 平方距离矩阵。",
+      "用 Hungarian OT assignment 重排 noise，完全忽略 class/caption；也可使用预先拟合 semi-dual potential 的 semi-discrete approximation。",
+      "对 data condition 做标准 dropout，在线性 noise–data interpolant 上回归 data-minus-matched-noise velocity。",
+      "保持模型架构与 sampler，用 conditional/unconditional velocity 的原 CFG 组合生成，分别 sweep guidance scale 与 interval。",
+      "可在原 independent teacher 的 meanflow distillation 阶段使用 GT pairing，检验少步生成的耦合迁移。"
+    ],
+    "experimentsZh": "ImageNet256 latent SiT-B/L/XL 130M/459M/675M，batch256、800K训练steps、CFG dropout.1、AdamW1e-4/EMA.9999；DMF400K steps从 pretrained SiT self-distill。16/32/64及500 reported NFE、adaptive dopri5，FID/FDDINOv2并sweepguidance/interval。captioned ImageNet使用 frozen DFN5B CLIP ViT-H/14 pooled1024d；非open-world highresolutionT2I。40-GMM4classes研究trajectories；3个single-cell datasets另有three-seed统计。 以下结果为作者报告：作者报告最佳SiT-XL+GT配置500NFE/675M的FID1.91，对SiT-XL+guidance interval2.06；不超过MAR-H/2 1.55等跨架构结果。（Table1, PDF p.7）；作者报告64NFE最佳FID B5.16→4.15、L2.95→2.69、XL2.78→2.59；各设置均tuneguidance，FID和FD分开选最优。（Table2, PDF p.8）；作者报告B fullinterval无guidance FID26.44→31.16；guided w2为5.16→4.15，显示必须以guided deployment判断coupling。（Table9, PDF p.31）；作者报告B独立teacher仅GTdistill 2/4NFE FID4.21/4.18接近GTteacher4.17/4.14；1NFE5.88未优ind5.82，L1NFE也退化。（Table3, PDF p.9）；作者报告single-cell GT在6个distribution metrics中3个最好3个第二，平均three seeds；不作为图像语义能力证据。（Table5, PDF p.10） 对照范围：同训练budget独立pairing、class-conditional OT与GT，以及B semi-discrete；class-conditional βm10阻止cross-class，ImageNet1000classes/batch256使多数class batch非常小，因此其接近independent不能否定大class-specific OTbatch。text-conditioned仅ind vs GT，captionedImageNet/FID/FD不测试复杂prompt遵循。跨架构Table1仅context，不是matchedSOTA结论。 消融与诊断：guidance与interval sweep、model sizes、NFE、adaptive solver、ind/GTteacher distillation、GMM/state/velocity/gap及image轨迹。无图像trainingseed variance/CI、没有causal intervention将prediction gap与其他coupling因素分离。Gaussian plug-in理论fixeddimension n>d的大n expansion不是实际高dim Hungarian精确解析。",
+    "insightZh": "OT-CFM 与 Hungarian pairing 本身已有，新增点是明确采用跨条件的 global coupling，并把 unguided source mismatch 与 CFG 下反转的表现共同作为设计对象；并非新 guidance 公式。训练耦合与 inference rule 的联动比单 FID 改善更有研究价值，理论谨慎限定于 population regression 的训练 interpolants。",
+    "evidenceZh": "GT 保 overall source marginal，但不同条件的 conditional source distribution 不必等于原 prior，因此 unguided sampler 的目标分布没有标准保证。（Sec.3, Algorithm1 and conditional source mismatch, PDF p.4）；transport excess cost upper-bounds mean squared prediction gap，只沿 linear training interpolants 且假设 population least-squares minimizers。（Proposition4.1, PDF p.6; Appendix B.1 pp.18-21; Limitations p.11）；同一 backbone 的最佳 guided FID 改善，同时 unguided FID变差；指标最优 guidance 是分别 sweep 的。（Table2, PDF p.8; Tables9-10, pp.31-32）；可只在 distillation阶段用GT，但1-NFE并非统一提升，semi-discrete也不总优于minibatch。（Tables3-4, PDF p.9）；实际测得Hungarian训练开销3.1%，较正文“通常<2%”措辞更高。（Table8 and text, PDF p.30; complexity statement p.4）",
+    "caveatZh": "p.11明确prediction-gap bound不控制CFG轨迹的learnedfields，也不保证generation-quality排序。；GT降低unguidedconditional质量；semi-discrete需要昂贵preprocessing，大batch exactassignment成本会增大。；与其他guidance/posttraining交互和进一步跨领域迁移仍待研究。；deterministic exactOT在训练support使condition冗余，不能把逐渐逼近exactOT假设成收益单调；semi-discrete的FD实际可能更差。；ImageNet32/64step results按每个metric单独sweepw，最佳FID与最佳FD不一定同checkpoint/samplerconfiguration。；图像结果缺seedvariance/CI，text只同ImageNet分布caption，尚无现代大规模T2Ialignment/human评估或视频实验。；实际Table8 overhead3.1%而非正文通常<2%，大batch/HungarianCPU-GPU同步成本需目标系统复测。；yo-yo图和curatedguidance稳定例支持现象，但不证明lowergap是质量改善的唯一因果来源。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究conditional image generator训练耦合和实际guidance策略的联动，跨规模/少步/连续condition有实证与严格证据边界，适合深入参考训练范式。"
+  }
+}

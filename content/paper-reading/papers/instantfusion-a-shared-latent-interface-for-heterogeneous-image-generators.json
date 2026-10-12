@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.13944",
+  "slug": "instantfusion-a-shared-latent-interface-for-heterogeneous-image-generators",
+  "title": "InstantFusion: A Shared Latent Interface for Heterogeneous Image Generators",
+  "authors": [
+    "Xuanlang Dai",
+    "Jiazi Bu",
+    "Yujie Zhou",
+    "Yuhong Liu",
+    "Beichen Zhang",
+    "Penghui Yang",
+    "Ziyu Liu",
+    "Yuhang Zang"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13944"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "InstantFusion",
+    "Shared",
+    "Latent",
+    "Interface",
+    "Heterogeneous",
+    "Image",
+    "Generators"
+  ],
+  "abstract": "Diffusion/flow models have emerged as the de facto paradigms for image generation, giving rise to a diverse family of modern generators with increasingly heterogeneous architectures and representations. Despite their remarkable generation capabilities, the cross-model alignment of latent representations and the consistency of their underlying denoising dynamics remain underexplored. In this work, we uncover an intriguing cross-model compatibility: independently trained generators exhibit similar latent spatial organization, while directly handing off intermediate states between unaligned models can still preserve coarse visual content. Motivated by these observations, we propose InstantFusion, a lightweight shared latent interface that connects the denoising trajectories of heterogeneous image generators. Specifically, to enable flexible cross-model state translation, model-specific Latent AutoEncoders (LAEs) are introduced to project intermediate states from different generators into a shared latent space and decode them into the latent space of a target generator. This shared space is constrained by two complementary objectives: aligning intermediate states derived from the same image at matched noise levels and synchronizing their corresponding local denoising velocities. Once trained, InstantFusion allows denoising to seamlessly transition across frozen generators without requiring a dedicated mapping for every model pair. The versatility of InstantFusion is demonstrated across acceleration, multi-preference composition, cross-architecture on-policy distillation, and cross-model composition, achieving competitive performance across these diverse settings.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13944v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13944v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/InternLM/InstantFusion"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13944v1 的 26 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "InstantFusion 为各冻结generator学习小型LAE，将state reconstruction、同图同noise对齐与一步denoising displacement对齐结合，实现跨架构接力。作者报告Qwen→SD3 GenEval-v2 22.14→35.06；接口思路有迁移价值，但全文明确仍要求共享VAE/time parameterization。adaptive switching公式与『顺序不变』声明有内部矛盾，不能包装成任意异构latent无缝互通。",
+    "motivationZh": "不同 image generators 的中间状态与局部 denoising dynamics 不对齐，直接接力采样会损害质量，跨模型蒸馏也难共享状态。需要一个轻量接口在明确的 VAE/time 假设下把模型优势组合起来。",
+    "methodZh": "方法将每模型中间state编码到32channel共享空间再用接收者decoder译回，对冻结模型一步rollout在共享空间的displacement匹配。演示跨模型composition、fewstep接力、multi-reward experts与SD3 LoRA OPD。native16channel、50KVisPrompt、每LAE约1.532M参数；结果有效但多轮roundtrip明显退化和部分speed/质量tradeoff。",
+    "methodFlow": [
+      "构造共用noisy state：同图通过共享冻结VAE，在匹配noise/time生成x_t；各模型time-conditionedconv LAE编码。",
+      "保留信息并对齐：优化native reconstruction、跨模型encoded state MSE与小权重norm consistency。",
+      "同步局部动力学：冻结generator在重建state走相同Δt一步，再encode对应displacement，加入跨模型MSE。",
+      "接力或distillation：senderencoder→receiverdecoder转换state后继续denoise；训练OPD时冻结interface/teacher，只更新student LoRA。"
+    ],
+    "experimentsZh": "50KVisPrompt训练，仅LAE更新，shared32hidden64/resblocks3，8GPUbatch32；SD3/FLUX/Qwen/ZImage与fewstep系统，多种benchmark，数字作者报告。 以下结果为作者报告：作者报告Qwen→SD3 GenEval22.14→35.06/CVTG .3682→.6488，Qwen→FLUX22.86→36.54/.5180→.6983。（PDF p.8 Table2）；作者报告ZImageTurbo→Qwen4.373s vsQwen18.84s，但GenEval33.34 vs41.73且ZImage单独39.21；加速伴tradeoff。（PDF p.8 Table3）；作者报告singletrip三模型32.397dB/.9511 vs10trip20.119/.7808；OPD HPS仅+ .19。（PDF p.8 Table1） 对照范围：T-Stitch、convbridge、individual/fewstep/cache与multireward比较；跨autoencoder、unseen新增模型和相同效果matchedcost未验证。 消融与诊断：去rec、去dyn OPDdivergence声明伴未解析Fig.??引用、timeconditionedresblockvsconv、6种schedule、roundtrip。adaptive criterion只有qualitative结构稳定例，缺定量阈值扫。",
+    "insightZh": "相对pairwise statebridge/T-Stitch，新增shared interface与动态一步对齐；实际共同VAE约束大幅缩窄『heterogeneous latent』范围，不能称cross-autoencoder方法。",
+    "evidenceZh": "实际training使用共同VAE/noise/time，并联合对齐state与displacement。（PDF pp.4–6 §§3.3–3.4 Eqs.(3)–(10); p.11 §5）；跨模型composition提高较弱baseline部分能力。（PDF p.8 Table2）；三阶段顺序并非实际数值不变。（PDF pp.10–11 §4.5 Table7）；多trip丢细节、OPD增益较小。（PDF pp.8/19 Tables1a–b/11）",
+    "caveatZh": "sharedautoencoder与compatibletime要求；多backbone驻留提高memory/storage。；新model仍需自有LAE训练，通用pretrainedinterface为future。；重复roundtrip重建误差累积。；Eq.(13)是normalizedcleanprediction差（越小越稳定），Eq.(14)却用≥threshold且称similarity，定义/符号不一致，adaptive切换不可照公式实现。；Table7并不支持execution-orderinvariance，关键泛化声明需降级。；Table3与Table8Qwenlatency基线不同，hardware未完整说明；NFE不增不代表memory/总算力少。；少量OPD增益、proxyrewards与未解析figure引用削弱成熟程度。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "visualcreation专家能力组合可参考共享state接口；当前不覆盖跨VAE或3Drepresentation，适合方法启发而非现成通用adapter。"
+  }
+}

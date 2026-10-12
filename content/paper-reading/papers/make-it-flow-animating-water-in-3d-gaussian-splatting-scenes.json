@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.13860",
+  "slug": "make-it-flow-animating-water-in-3d-gaussian-splatting-scenes",
+  "title": "Make It Flow: Animating Water in 3D Gaussian Splatting Scenes",
+  "authors": [
+    "Kjell Keune",
+    "Florian Hahlbohm",
+    "Jannis Möller",
+    "Susana Castillo",
+    "Martin Eisemann",
+    "Marcus Magnor"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13860"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Make",
+    "It",
+    "Flow",
+    "Animating",
+    "Water",
+    "3D",
+    "Gaussian",
+    "Splatting",
+    "Scenes"
+  ],
+  "abstract": "Explicit 3D scene representations such as 3D Gaussian Splatting (3DGS) have recently enabled high-quality, real-time novel view synthesis. However, these methods assume static scenes, limiting realism in the presence of dynamic phenomena ubiquitous in real-world environments. While coherent motion (e.g., humans or vehicles) can be captured and reconstructed, high-frequency effects such as flowing water remain intractable under casual capture conditions, where dense multi-view, high-speed acquisition is not feasible. We present a method to animate water in static 3DGS scenes, enabling visually plausible motion without requiring dynamic capture or physical simulation. Our approach estimates 2D optical flow from reference images or model renderings and lifts it into a consistent 3D Eulerian motion field. We propose a cinemagraph-inspired algorithm that applies this motion field to deform Gaussian primitives, producing temporally seamless looping animations. The resulting representation retains real-time rendering performance, significantly enhances perceptual realism, and preserves free-viewpoint navigation within the scene. We evaluate our method on a newly captured dataset of in-the-wild waterfall scenes and demonstrate clear improvements over prior work in dynamic Gaussian splatting and 3D cinemagraph generation in visual quality and computational efficiency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13860v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13860v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13860v1 的 14 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Make It Flow把静态3DGS中的水面变成可自由视点观看的loop：多view fluid-flow prior融合Eulerian voxel field，以unscented transform传播Gaussian mean/covariance，双向实例opacity crossfade消除接缝。作者报告七scene平均333FPS、3.8GiB，比LoopGaussian少内存；核心是可控3D动态内容生成，不是物理fluid simulation，不能补回原重建缺失的细节。",
+    "motivationZh": "静态 3DGS 中的水面缺少运动，完整流体仿真又难以从少量用户提示建立适配场景的动力学。目标是在用户指定局部流向后，生成跨视角一致、可持续播放的三维水流视觉运动。",
+    "methodZh": "用户在3D scene标少量motion hints，投影到各view后用SAM3水域masks、distance interpolation和现成SPADE流预测network得到2D motion。用3DGS渲染depth将多view投影Jacobian normal equations积累到voxel centers，一次GPU求解再根据static/dynamic hits及view count清理。每Gaussian七sigma points由motion field反复位移，用unscented transform更新covariance；forward/backward trajectories分别渲染，共用参数buffer，sin² opacity crossfade且random time offsets弱化重复pattern。附录给fusion伪码、sparse grids、keyframe/alpha/positional-offset tradeoffs。motion不遵守Navier-Stokes，也不忠实恢复动态输入。",
+    "methodFlow": [
+      "在静态3DGS上定义3D motion hints并投影，结合water masks与pretrained flow network预测多view2D流。",
+      "按rendered depth反投影，将每voxel的多view Jacobian normal equations融合为3D Eulerian velocity field。",
+      "用static/dynamic hit ratio和minimum view counts抑制错误motion，保存sparse voxel field。",
+      "以七sigma-point unscented transform传播dynamic Gaussian mean/covariance，预计算正/反向keyframe trajectories。",
+      "渲染两个virtual instances并用opacity crossfade、random temporal offsets和keyframe interpolation输出无缝free-viewpoint loop。"
+    ],
+    "experimentsZh": "七casual waterfall/creek/weir scenes，67–333views；COLMAP poses与4×downsample训练static3DGS。RTX4090比较4second/240frames novel-view loops，3D-Cinemagraphy只60frames（更多帧会退化）。动态Gaussian12k–182k，3D hints8–14/scene。 以下结果为作者报告：作者报告本方法平均333FPS、3.8GiB，static3DGS416FPS/2.0GiB；4DGS392FPS/2.7GiB，但水motion质量为定性比较。（Table2, PDF p.7）；作者报告preprocess平均55s（masks32s、flow18s、fusion5s）vsLoopGaussian6m01s；sparse field平均2.1MB、fusion peak13.4GiB。（Table3, PDF p.8） 对照范围：4DGS、LoopGaussian与single-imageLDI3D-Cinemagraphy；作者向LoopGaussian提供dynamic mask并集成same renderer，LDI scale/camera alignment不完全一致。没有dynamic ground truth、physical metrics或human preference，质量仅静态samples与视频。 消融与诊断：Fig.6–8去opacity/state offsets、static-hit/view-count refinement与single vsmultiple hints；App.D改变covariance传播和sigma spread，8keyframes可降memory但需加speed，过大会退化；App.E多positional实例增加density也会丢细节。",
+    "insightZh": "把2Dcinemagraph的symmetric warping改为volume-aware3D Gaussian deformation与separate-instance opacity blending；融合多viewmotion并维持explicit realtime资产，而不是重训4DGS或逐Gaussian MLP。流预测network、SAM与unscented transform本身已有。",
+    "evidenceZh": "motion field由multi-view optical flow、rendered depth和3×3 voxel normal equations融合，再用static/view-hit过滤。（Sec.3.1–3.2 Eqs.(3)–(6), PDF p.4–5; App.B Algorithm1 p.12）；七sigma points传播mean/covariance，双向instance opacity之和为原opacity并在端点crossfade。（Sec.3.3.1–3.3.3 Eqs.(7)–(10), PDF pp.5–6; App.D Fig.11–12 p.13）；作者报告七scene平均333FPS/3.8GiB，LoopGaussian322FPS/6.1GiB。（Table2, PDF p.7）；作者明确不能恢复static3DGS缺失细节，流大体局限已重建水面。（Sec.5, PDF p.9; Fig.10 p.10）",
+    "caveatZh": "依赖static3DGS depth与水面重建质量，reflective/ambiguous surfaces可能缺Gaussians（p.9）。；不能恢复未重建fluid细节，motion主要在可见surface；physically responsive field属于future work（p.9）。；静态capture无GTmotion，质量主要定性评估（p.6）。；7scene且人工8–14motion hints；复杂拓扑、collision/interaction及非流体动态没有量化泛化。；covariance线性interpolation非严格rotation插值，−M不是一般inverse flow。；render低开销不涵盖13.4GiB预处理与原3DGS训练。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "向静态explicit3D资产添加可控动态内容，可借鉴局部motion editing、跨view一致及资产实时动画；没有LEGO/embroidery或manufacturability证据。"
+  }
+}

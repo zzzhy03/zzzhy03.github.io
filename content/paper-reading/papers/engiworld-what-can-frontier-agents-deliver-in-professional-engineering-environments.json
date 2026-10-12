@@ -1,0 +1,94 @@
+{
+  "id": "arxiv:2609.37686",
+  "slug": "engiworld-what-can-frontier-agents-deliver-in-professional-engineering-environments",
+  "title": "EngiWorld: What Can Frontier Agents Deliver in Professional Engineering Environments?",
+  "authors": [
+    "Hongcheng Gao",
+    "Hailong Qu",
+    "Yu Lei",
+    "Henghui Sun",
+    "Haoyang Li",
+    "Yipeng Wei",
+    "Naihao Xue",
+    "Xiaohan Yu",
+    "Zhuo Tao",
+    "Yihe Zang",
+    "Yajiao Wang",
+    "Jingyi Tang",
+    "Yi Li",
+    "Jingjing Zhou",
+    "Jie Luo",
+    "Bohan Zeng",
+    "Chengyu Shen",
+    "Hao Jiang",
+    "Chong Chen",
+    "Bowen Qu",
+    "Olive Huang",
+    "Zeqiang Wang"
+  ],
+  "publishedAt": "2026-09-29",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2609.37686"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "fabrication"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "EngiWorld",
+    "What",
+    "Can",
+    "Frontier",
+    "Agents",
+    "Deliver",
+    "Professional",
+    "Engineering",
+    "Environments"
+  ],
+  "abstract": "Autonomous agents have made rapid progress in general-purpose computer use, yet reliable automation of professional industrial engineering remains out of reach. Engineering workflows require reasoning over geometric and physical constraints and keeping dependencies consistent across software and design stages. We present EngiWorld, a benchmark designed around the capabilities that real engineering projects require, from operating a single application to solving engineering problems end to end. It contains 1,301 expert-curated tasks spanning six engineering domains (CAD, CAE, CAM, BIM, EDA, and DCC) and 26 professional software applications, with both GUI and CLI interfaces. The tasks are organized into six types, corresponding to capabilities that real engineering projects require. We further introduce an artifact-centric evaluation methodology built on a unified suite of domain verifiers. The verifiers programmatically check whether final and intermediate artifacts are geometrically valid, physically feasible, and compliant with design rules. Beyond binary success, they also score how well optimized designs meet their specifications. Evaluation of seven frontier models reveals a substantial capability gap: the strongest model scores only 44.7/100, and just 3.6% of runs on tasks that require cross-software coordination succeed. EngiWorld provides a rigorous foundation for measuring progress toward agents that operate professional engineering software end to end.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.37686v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.37686v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Hongcheng-Gao/EngiWorld"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.37686v2 的 28 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本次 v2 相比 9 月 v1，主评测从 300 扩为 306 任务，覆盖全部十个 open-environment 任务，新增同 model/software/interface 的 task-type 控制、完整执行成本分解及更多 paired workflow 结果。更新主要是评测覆盖与诊断，1301-task benchmark 和核心 verifier 并非本次新提出。 EngiWorld 将工程 agent 的验收落在真实产物：STEP/DXF/IFC、仿真参数、规则和跨文件依赖，而非只看截图或完成声明。作者报告七模型在306任务子集上的最高EngiScore44.7，跨软件24任务×7仅6次成功；适合精读约束验收设计。3.6%同时包含指定工具链/交付格式失败，不能全解释为几何或物理推理不足。",
+    "motivationZh": "工程 agent 的截图或完成声明不足以证明产物满足几何、物理设置与跨文件依赖；普通桌面 benchmark 也难定位跨软件流程的断点。需要以真实工程交付物验收能力，并区分建模不足与流程、格式义务造成的失败。",
+    "methodZh": "本次 v2 相比 9 月 v1，主评测从 300 扩为 306 任务，覆盖全部十个 open-environment 任务，新增同 model/software/interface 的 task-type 控制、完整执行成本分解及更多 paired workflow 结果。更新主要是评测覆盖与诊断，1301-task benchmark 和核心 verifier 并非本次新提出。 构建1301expertcuratedtasks，26软件/6工程领域、37VM环境，覆盖single-software、selection、drawingmodeling、optimization、crosssoftware、openenvironment。Agents通过GUI或CLI执行，episode后parser/nativeAPI重开产物检查几何、topology、assignments、simulation、connectivity与stageconsistency。Optimization先hardfeasibility，合格再按目标值连续评分；其他任务全部criteria成立才成功。",
+    "methodFlow": [
+      "建立可执行工程任务：Expert定义目标、输入、reference与criteria，AI辅助标准化和verifier实现，最终目标软件执行和人工复核。",
+      "恢复环境并运行agent：Windows/Ubuntu VM snapshot给出任务状态；GUI截图/PyAutoGUI或CLI脚本，保留最近15turns，普通任务100/200turns并限5h。",
+      "重开产物检查工程属性：OCCT、IfcOpenShell、ezdxf、软件API等检查尺寸/solidvoid/topology/物理assignments/跨stage引用；missing或unreadable失效。",
+      "先可行性后质量评分：Binary任务要求所有criteria通过；optimization infeasible为0，可行后按baseline/reference或weightedcost计算0–1 quality，汇成EngiScore。",
+      "审计verifier与失败类型：Reference、alternativevalid和defective产物测试；对实际runs按completion、turnlimit和handoff失败分析。"
+    ],
+    "experimentsZh": "七frontiermodels相同306任务子集，158CLI/148GUI，highestreasoningeffort；26software/六领域。GUI200turn/CLI100turn，cross300/150，max5h，history15；统一domainartifactverifiers。五项observation/historyablations三模型在明确子集运行。 以下结果为作者报告：作者报告最高EngiScore44.7（Claude），GPT38.6；所有模型GUI低于CLI；129/306任务七模型均0。（PDF p.8 Table 2; p.21 Figure C.2）；作者报告231optimizationruns有169zero、53partial、9full；ZBrush任务中Gemini0.804虽valid但低于initial0.880。（PDF pp.21–22 Tables C.3–C.4）；作者报告四个pairedcross版本28/28失败，open版本13/28成功；open减少交付件并允许自由软件方案。（PDF pp.27–28 Table D.4）；作者报告声明完成和turnlimit占main分析失败94%；GUI55.3%失败到turnlimit，CLI60.6%失败因completion。（PDF p.11 Figure 9; p.25 Table D.2） 对照范围：比较七通用frontiermodels统一harness，没有新agent算法或specializedengineeringagent对照；prices/modelversions与highestreasoning设置属于作者报告的特定快照，不能作为当前产品榜单。 消融与诊断：Initialdrawingpresentation、runtimeimageaccess、a11y、screenresolution、history；结果显示更长history/更多视觉不总改善。GUI/CLI任务不是同task完全配对，不能直接把scoregap全归因interface。",
+    "insightZh": "跨六领域统一artifact-centric验收，加入softwarechoice、continuousoptimization和crosssoftwaredependencies；作为designagentbenchmark基础有价值，并非提出新VLM或CAD生成器。评估仍是任务定义范围内的工程properties，不是任意物理安全/工业认证。",
+    "evidenceZh": "Artifact-based评估涵盖中间stage和task-specifictolerances，且continuousquality不一定意味着优于初始设计。（PDF pp.18–19 Appendix B.1–B.3, Eq.(B.1)）；作者报告44.7来自stratified306子集而非全部1301任务，crosssoftware成功6/168。（PDF pp.7–8 §4.1/Table 2; p.16 Table A.1）；跨工具失败还包括预定API/格式/文档约束，paired open任务不是纯粹只移除handoff的等条件实验。（PDF pp.26–28 Appendix D.4–D.5, Figure D.2/Table D.4）；作者报告validatedreferenceaudit96/96，但negativeaudit主要是empty或missingartifact，尚不能估计全部复杂checker误报。（PDF p.19 Table B.2）；Exact-version 科学差异：v1 评测 300 任务/四个 open-ended，配对只含 task 02/09；v2 评测 306 任务/全部十个 open-environment，paired task 02/04/05/09 从原两组扩为四组，新增 matched model/software/interface 的 extended-task 对照及 task-type 的 turns/wall-clock/API cost 表。Figure 7 显示 raw task-type 排名受到软件构成混杂，same-stratum 比较才揭示新增能力要求后的下降；这属于新评测与分析。（prior 2609.37686v1 PDF pp.7–9/18–23 vs current 2609.37686v2 PDF pp.7–9/19–22/27–28）",
+    "caveatZh": "Renderedviews不能确认精确depth/angle，产物测量仍必要；imageaccess可触发不必要revision。；更长history不是freegain，需要模型特定设置；positivequalityscore可能仍低于initialdesign。；306stratifiedsubset与全1301taskmix不一致；主表每task/model单次，无seed/CI。；跨软件约束检查部分把语义等价物理load、列名、minlogbytes作为失败；更低成功率包含proceduralcompliance而非仅engineering能力。；Verifieraudit96参考解经repair后全通过，缺复杂缺陷负例的广泛independentaudit。；不能把native模拟符合tasktolerance推广成realworldphysical验证或manufacturingcertificate。；37environment不全部公开，官方README说15publicarchives≈98GB，其他snapshot需用户准备匹配环境；repro成本及商业软件许可可能限制普遍复用。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "提供CAD、CAE、CAM、BIM等产物的几何/物理/文件依赖检查范式，可直接借鉴于fabrication和visualdesignagent生成结果验收；核心是evaluation基础，非新的3D生成能力。"
+  }
+}

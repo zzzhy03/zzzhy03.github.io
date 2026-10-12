@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2610.13947",
+  "slug": "towards-physically-grounded-articulated-3d-assets-a-multi-agent-pipeline-and-benchmark",
+  "title": "Towards Physically Grounded Articulated 3D Assets: A Multi-Agent Pipeline and Benchmark",
+  "authors": [
+    "Xudong Cai",
+    "Ruijie Zhu",
+    "Haoliang Shang",
+    "Ruining Li",
+    "Marc Pollefeys",
+    "Shangzhe Wu",
+    "Andrea Vedaldi",
+    "Chuanxia Zheng"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13947"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Towards",
+    "Physically",
+    "Grounded",
+    "Articulated",
+    "3D",
+    "Assets",
+    "Multi-Agent",
+    "Pipeline",
+    "Benchmark"
+  ],
+  "abstract": "In this paper, we study physically grounded articulated 3D asset generation---moving the goal from reproducing how objects look to capturing how they move and function. Inspired by the literature on procedural and agentic generation, we present Artisan, a system that extends the latest method Articraft by introducing a multi-agent pipeline with physical simulation feedback, enabling comprehensive attributes beyond geometry, appearance, and physically plausible articulation, such as collision-free motion, stability under gravity, and accurate mass and material properties. Furthermore, we construct a unified benchmark spanning four key aspects: spatial fidelity, physical plausibility, downstream task performance, and overall quality. The benchmark encompasses 100 reference assets from ArtVIP and LightWheel, 50 stability prompts, and 50 ABO objects with reference masses, with protocols evaluating various metrics. Through extensive evaluation of more than 10 representative models, Artisan achieves competitive spatial fidelity while attaining the lowest collision rates and highest stability rates among the evaluated methods. Together, our system and benchmark establish insights for advancing 3D generation towards physically plausible, functionally usable assets.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13947v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13947v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/physicalvision/Artisan"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13947v1 的 39 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "ARTISAN 把design blueprint、程序建模、独立review与MuJoCo反馈连接，生成可编辑rigidparts/joints/PBR/mass及taskbindings。作者报告ArtVIP singlejointcollision1.7%、multi13.0%、rest/openstability98/96%，明显优于不做physics的版本。对3Ddesignagent/连接结构很值得deep；『physicallygrounded』限模拟测试，不代表mass真值、全configuration碰撞保证或制造可行；RoboCasa只有44%资产可生成示范。",
+    "motivationZh": "从描述或图像创建 articulated 3D asset 不只要外观相似，还需部件、joint、collision、mass 等可执行物理结构一致。单次 mesh 生成或代码生成难以同时满足这些约束并定位仿真失败。",
+    "methodZh": "扩ArticraftSDK的标准hinge/rail等六family、anchorplacement及mass/inertia参数。designagent制作textblueprint与generateddesignboard，coding修改Python资产，review只写独立测试并渲染/geometryprobe；CoACDcollisionmeshes与sampledmotion/stabilityreport驱动最多五repairrounds。benchmark联合appearance/partgeometry/kinematics/material/mass/physics/robotutility与interactivehuman。",
+    "methodFlow": [
+      "设计明确结构：text/image→parts/joints/coupledmotions/function blueprint，imagegenerationdesignboard只作visualreference。",
+      "可编辑程序构造：SDK标准connectors及ATTACH/CENTER/SNAPanchors求pose，输出partmeshes/kinematic/PBR/mass与任务接触region。",
+      "模拟验证：CoACD凸分解、single/pair/randommulti配置查penetration，gravitysettling查tilt并回report。",
+      "独立review并修复：review依据render/probes/tests及physics反馈核对设计功能，coding修代码并复验；不允许用缩motionrange掩盖问题。",
+      "导出与任务测试：rigidasset+taskmanifest进入robotdemo生成/π0.5训练，qualification与heldoutnativepolicytest分别评估。"
+    ],
+    "experimentsZh": "ArtVIP50/LightWheel50、stabilityprompts50/ABOmass50，spatialICP/endpointpair/Hungarian匹配；physics有限configuration与GTcontact排除。π0.5 LoRA3Twin8Casa tasks、human30students/275validresponses；numbers作者报告。 以下结果为作者报告：作者报告GPT6AstraArtVIPcollision1.7/3.7/13.0% single/double/multi，rest/openstability98/96%；不代表0collision。（PDF pp.8/27 Tables2/9）；作者报告同GPT5.6无physics single35.7/multi73.2→full1.9/16.4%，openstability90→96%，massAPE.628→.566；部分geometry略低。（PDF p.28 Table11）；作者报告massAPE.260/ADE5.86kg/MnRE.773；AgyADE5.49/MnRE.775更优，不能称accuracy全部SOTA。（PDF p.27 Table9）；作者报告native+assetTwin80→84%/Casa39→43%；generatedonly63/27低于native80/39，Casa95%physicsqualified但44%demogen。（PDF pp.9/33–35 Tables3/14–18）；作者报告约34min/$5.79每asset vs同modelArticraft5.4min/$.95，Top1human43.3%不是多数。（PDF pp.10/32 Fig.6/Table12） 对照范围：task-specific、Articraft/ArticulateAnything、generalcodingagents多LLM；相同LLM不等相同API/toolbudget，morecost/turns混杂harness效果；feedforward输入/输出各scope不同。 消融与诊断：去design/review/physics同GPT5.6；不同LLM容量、materialontargetgeometry与densitymass；robotnative/generated/mixed。缺simparametersensitivity、multi-seedCI与equalcomputeagentcontrols。",
+    "insightZh": "贡献是3Dagentharness里明确角色/功能review与物理simulatorfeedback、标准连接/anchorplacement，加联合物理utilitybenchmark；建模SDK沿用Articraft，不是训练新meshgenerator。独立context不等统计独立或已完全消除selfevalbias。",
+    "evidenceZh": "review与physics各识别不同缺陷，真实traces保motionrange修周围geometry。（PDF pp.37–39 AppendixF Figs.16–17）；physics是碰撞改善主要因素，multiagent不是每metricbest。（PDF pp.8/28 Tables2/11）；模型直接估partmass，非density×volume。（PDF pp.19/26–27 A.1/C.1 Tables9–10）；physicallyfeasible不等robotdemocompatible。（PDF pp.34–36 AppendixE Tables16–18/Fig.15）",
+    "caveatZh": "simassets真实robot用途需额外验证；有限simulator只能支持当前rigid/contact/gravity现象。；测试通过不保证control可达或mechanicalengagement；真实trace显示functionalreview必要。；demotrajectorytransfer有机制不匹配失败，物理可行和benchmarkreadiness分离。；finitegrid+200randommotion、CoACDproxycollision与GTcontact排除可能漏细接触/合法顺序问题，未证明整个configspacefree。；mass/inertia/friction为LLM估值，不是测量；PBRroughness不是mechanical/materialstrength，不能称制造validated。；SDKconnector清间隙未模拟公差/elastic/friction/load/寿命，不能当实际assemblyinstruction。；约6×API/时间增加且sameLLMagents相关，multiagenteliminatesbias因果声明过强；human小且无CI。；mixedrobot训练assets/demos更多，+4pp不能唯一归assetquality/generalization，generatedonly表现仍弱。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可编辑part/joint生成、标准connectors与外部sim闭环直接迁移到LEGO/assembly约束及3Ddesignagent；制造/真实物理结果尚需专门约束与实验。"
+  }
+}

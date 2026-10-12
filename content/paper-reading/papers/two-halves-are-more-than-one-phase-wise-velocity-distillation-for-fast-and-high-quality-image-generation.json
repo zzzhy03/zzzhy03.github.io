@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2610.08070",
+  "slug": "two-halves-are-more-than-one-phase-wise-velocity-distillation-for-fast-and-high-quality-image-generation",
+  "title": "Two Halves are More than One: Phase-wise Velocity Distillation for Fast and High-Quality Image Generation",
+  "authors": [
+    "Zhen Guo",
+    "Rongyuan Wu",
+    "Qiaosi Yi",
+    "Chenxi Xie",
+    "Xinyu Wei",
+    "Lei Zhang"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.08070"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Two",
+    "Halves",
+    "are",
+    "More",
+    "than",
+    "One",
+    "Phase-wise",
+    "Velocity",
+    "Distillation",
+    "Fast",
+    "High-Quality",
+    "Image",
+    "Generation"
+  ],
+  "abstract": "Recent diffusion-based image generation backbones have grown substantially in scale, making the network inference cost increase rapidly. While diffusion distillation techniques can reduce the number of inference steps, high-quality image generation within a single full-backbone-forward compute budget remains challenging. Existing one-step methods typically allocate this budget to a single evaluation of a monolithic student. However, approximating the heterogeneous coarse-to-fine transport with a single monolithic mapping is difficult and often leads to over-smoothed outputs. To address this issue, we propose Phase-wise Velocity Distillation (PVD), which partitions the generation timeline into a coarse and a fine phase, and models the transition within each phase via the average velocity. A dedicated half-sized expert is assigned to each phase, decoupling structural composition from detail refinement while keeping the cumulative computation equivalent to one full-backbone forward pass. We show that the use of two half-sized phase-specific experts outperforms a single full-size monolithic student. On class-conditional image generation, PVD achieves an FID of 1.48 on ImageNet 256 x 256. On more complex text-to-image (T2I) tasks, PVD-distilled models (Stable Diffusion 3.5-Medium, FLUX.1-dev, Qwen-Image) produce results competitive with their multi-step teachers, significantly outperforming prior distillation methods. Moreover, across the evaluated T2I backbones, PVD reduces active parameters by 49.10-50.89% and peak VRAM by 45.76-48.36% compared to the corresponding teachers. Source code and distilled models are available at https://github.com/PolyU-VCLab/PVD.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.08070v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.08070v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/PolyU-VCLab/PVD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.08070v1 的 33 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "PVD 把noise-to-image拆为两次half-depth expert transport，以局部MeanFlow速度目标+T2IphaseGAN减轻一整model单jump过平滑。作者报告ImageNetFID1.48、QwenGenEval.8846，在约一full-forward FLOPs下保较强quality；实际两networkcalls，VRAM只backbone，Qwen额外NFT、early复用两次GenEval.6754接近full.6948，不能把全部gain归严格coarse/fine角色。",
+    "motivationZh": "将长 diffusion/flow 轨迹压成很少的生成步骤，会要求模型一次跨越困难的 noise-to-image 映射，容易损失细节或出现过平滑。论文关注有限计算预算下的图像质量，而不只减少采样步骤的数字。",
+    "methodZh": "保teacher前后各3blocks并均匀抽intermediate到半depth，先teacherinstantaneousFM对齐。time[0,.4]/[.4,1]独立专家追加intervaltimeembedding，SD/fullC2I为两fullytrained模型、FLUX/Qwen shared半backbone+两LoRA。MeanFlowidentity用JVP alongteachervelocity构stopgradselfconsistentaveragetarget，T2Iteacherfeaturephase-specifichingediscriminator并行refine；最终earlyendpoint输入late。完整33页正文、数学、trainingdatasets/NFT、categoryresults、cost、ablation和failure已读。",
+    "methodFlow": [
+      "抽teacher半depth保early/lateblocks，fulltimeFM模仿teacherinstantaneousvelocity初始化。",
+      "冻结sharedhalfbackbone或fulltrain分支，给early/late分别intervaltimeembedding及phaseparameters。",
+      "在assignedinterval的data-noiseinterpolations计算teachervelocity和studentJVP，蒸馏localmeanvelocity。",
+      "T2I用teacherfeaturediscriminator的各phasehingeGAN对intervalendpoint做adversarialrefinement。",
+      "推理先early[0,.4]一次transport再late[.4,1]一次，LoRA共享base且两phase权重切换。"
+    ],
+    "experimentsZh": "C2ILightningDiT256half338M×2，ImageNetdata，140Kinit+39Kphase32A800；T2ISD1.11Bphasefull/FLUX5.82Bbase+rank64/Qwen10.25Bbase+rank32。BLIP3olong35Kinit、BLIP3o60K/Echo4o phase30K/4K/8KPPU。Fullteacher50step(部分CFG两pass)vs2halfexperts累计Nflops~1；GenEval/DPG/WISE/TIIFmini/QIBench/perceptualproxies。 以下结果为作者报告：作者报告ImageNetFID1.48/IS295.89/Nflops1 vsFACM1.76/iMF1.72；Lightningteacher1.35/500FLOPs非同trainingregime。（Table1, PDF p.7）；作者报告QwenGenEval.8846vsTwinFlow.8338/teacher.8720，但DPG86.54低于TwinFlow86.75/teacher89.10，QI46.85低于teacher48.78。（Table3, PDF p.8）；作者报告Fluxlatency.86s vsonefullSenseFlow.76s，PVDpeak12.28GiBvsteacher22.64；SD.16s/2.67GiB、Qwen.81s/19.84GiB，仅backbone。（Table14, PDF p.26）；作者报告SDfullmonolithiconecallGenEval.4142/twocall.5695 vsPVD.6948/noGAN.5599；支持budget配置但GAN也是主要收益。（Table16, PDF p.30） 对照范围：多数releasedcheckpoints在~1FLOPs极低budget，与方法native多step不同可重现配置细节未完全表述；classcomparison部分scratch vsPVDdistilled，T2Iadditionaldatasets/NFT不同。no repeatedrunCI/humanpreference。单PPUpeakbackbone相对teacher减45.76-48.36%，不能直接宣传consumerdevicefullmemory。 消融与诊断：133MC2I split/overlap/sharedrepeat、SDfullsizecomputebudget+GAN+reorder，QwenMeanFlow数字外部论文非retrainedmatchedNFTdata。Unsplash200prompts10seeds提高aesthetic/DreamSimdiversity但GenEval均降，不能称全部designalignment提升。",
+    "insightZh": "新意是把累计onefullbackboneFLOPs分配到orderedhalf-depthphaseexperts，结合localmeanobjective及modelcompression。Timeexpert/MeanFlow/GAN已有；两个定理是samepathintegralerror与boundedvelocitymarginalshift基础界，只motivateshortphase，不证明halfcapacity足够或必优单体。",
+    "evidenceZh": "onefull-forward是normalized累计FLOPs，实际两halfnetworkcalls且phaseweights分离。（Fig.3/Sec.3.1-3.4, PDF pp.4-6; Algorithms1-2, p.19）；Qwen比较有额外NFTbackboneposttraining，qualitygain不完全isolatesphasearchitecture。（Appendix D/Table6, PDF p.20）；GAN与phase都提升，但earlyreuse很接近指定order。（Appendix I/Tables16-17, PDF pp.30-31）；memory/latency只backbone测量，不代表整pipeline精确减半。（Appendix G/Table14, PDF p.26）",
+    "caveatZh": "Sec.5 p.10number/partition经验选择未优化，densecount/uncommonspatialrelations仍失败。；Appendix J p.32 35macaron输出36、pencil穿mugwall非handle；teacher也失败。；Unsplashfurthertraining降低GenEval，aesthetic与preciseconstraints折衷。；训练两phase在data-interpolatedstates，后phase部署在early-generatedendpoint，exposuremismatch尚未isolated。；globalbounduniformC/L对实际unboundedGaussianprior/neuralfield未验证，theorems不保证最优halfdepth。；NFT/data/GAN及capacity配置混合，phase优越性不可从alltableheadline单归因。；onlybackbonecost、PPUhardware具体型号不清，latency与batch/weightoffloading部署细节需复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "imagegeneratorcapacity/timefactorization直接改善fewstepvisualcreation，提供半backbone+phaseconditioning方法；不是普通serving减少dtype，highdeep。"
+  }
+}

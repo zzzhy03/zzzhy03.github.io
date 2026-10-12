@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2603.29847",
+  "slug": "cadreasoner-iterative-program-editing-for-cad-reverse-engineering",
+  "title": "CADReasoner: Iterative Program Editing for CAD Reverse Engineering",
+  "authors": [
+    "Soslan Kabisov",
+    "Vsevolod Kirichuk",
+    "Andrey Volkov",
+    "Gennadii Savrasov",
+    "Marina Barannikov",
+    "Anton Konushin",
+    "Andrey Kuznetsov",
+    "Dmitrii Zhemchuzhnikov"
+  ],
+  "publishedAt": "2026-02-18",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.29847"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.HC"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "CADReasoner",
+    "Iterative",
+    "Program",
+    "Editing",
+    "CAD",
+    "Reverse",
+    "Engineering"
+  ],
+  "abstract": "Computer-Aided Design (CAD) powers modern engineering, yet producing high-quality parts still demands substantial expert effort. Many AI systems tackle CAD reverse engineering, but most are single-pass and miss fine geometric details. In contrast, human engineers compare the input shape with the reconstruction and iteratively modify the design based on remaining discrepancies. Agent-based methods mimic this loop with frozen VLMs, but weak 3D grounding of current foundation models limits reliability and efficiency. We introduce CADReasoner, a model trained to iteratively refine its prediction using geometric discrepancy between the input and the predicted shape. The model outputs a runnable CadQuery Python program whose rendered mesh is fed back at the next step. CADReasoner fuses multi-view renders and point clouds as complementary modalities. To bridge the realism gap, we propose a scan-simulation protocol applied during both training and evaluation. Across DeepCAD, Fusion 360, and MCB benchmarks, CADReasoner attains state-of-the-art results on clean and scan-sim tracks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.29847v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.29847v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/zhemdi/CADReasoner"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.29847v2 的 13 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "CADReasoner 用 target/current-render 的八视图 overlay 和 nearest-surface offsets 指导同一个 2B editor 逐轮重写 CadQuery；staged SFT 用自身错误轨迹教几何修正，适合精读可编辑 CAD 恢复的反馈接口。作者报告模拟 scan 下明显优于所测 baselines，但 fusion 不是每项最佳，IR=0 是筛除无效候选后的最终结果；五步 N=5 beam 最多需105次render，尚不能据论文的“equal compute”措辞认为成本已完全对齐。CC3D仍为虚拟scan，不是传感器实测泛化。",
+    "motivationZh": "从mesh或scan-like输入恢复可执行CAD程序时，一次生成容易遗漏局部几何细节。需要把目标与当前程序的差异转为编辑器能定位并修正的视觉和几何反馈。",
+    "methodZh": "输入目标mesh或scan-like mesh，输出可执行CadQuery Python program。视觉分支把目标/预测八个canonical view放入G/R channels；point分支从约30k surface samples中各取128个最大跨形状误差点并附nearest-surface offsets。Qwen2-VL-2B editor同时看几何差异和旧代码，重写完整脚本，执行后再反馈。三阶段SFT分别在disjoint目标上生成一/二步rollouts，监督始终为GT program，推理维护CD best-so-far。该工作贡献于忠实重构可编辑程序，未验证任意生成、新通用VLM能力或真实制造约束。",
+    "methodFlow": [
+      "将目标与当前预测置于共同归一坐标系，提取八视图G/R overlays，以及各128个最大误差surface points和nearest-surface offsets。",
+      "用geometry tokens和previous CadQuery code条件化Qwen2-VL-2B，输出完整updated Python program。",
+      "执行程序生成mesh，与目标重新计算geometry discrepancy，把新的render/code喂入下一轮。",
+      "以disjoint data上的自身一/二步rollouts做staged SFT，教同一checkpoint初始化与纠错；不是RL奖励训练。",
+      "采用greedy或N=5 geometry-pruned beam，丢弃invalid candidates并保留best-so-far；scan track候选选择声明使用scan evidence。"
+    ],
+    "experimentsZh": "约1M procedurally generated CAD-Recode programs训练；DeepCAD8046、Fusion3601725、MCB约5000 filtered/category-balanced shapes，clean与自制scan-sim两tracks。greedy t1/5与N5 sampling，CD在8192-vs8192 points上归一计算、volumetricIoU、最终invalid rate；另有1000 MCB train/test组合和CC3D虚拟scan迁移。 以下结果为作者报告：作者报告greedy pc在MCB从t1 CD1.03/IoU41.3/IR16.2到t5的0.52/49.1/3.1；fusion t5为0.71/48.2/2.8，fidelity并不全面更好。（Tables2–3, PDF pp.4–5）；作者报告clean sampling MCB pc CD0.40/IoU53.4/IR0，对cadrille-RL pc0.40/55.2/2.9；CD持平、IoU更低。（Table4, PDF p.6）；作者报告scan-sim fusion在DeepCAD/Fusion360的CD0.16/0.15、IR0；CC3D image w/scan-sim t5的scan CD0.37、IoU66.7、IR0。（Table5 p.8; Table7 p.13） 对照范围：CAD-Recode、cadrille-SFT/RL与部分CADCrafter/CAD-SIGNet/MiCADangelo。图像证据由4views变8views，baseline scan adaptation和总candidate/render预算没有充分matched说明；不把equal-compute或all-metrics宣传当独立验证。 消融与诊断：给出modality、iteration、greedy/sampling与scan train/test对照；但未逐项隔离几何offsets、overlay、data规模和curriculum，也没有真实hardware scan/multi-seed uncertainty或wall-clock成本。",
+    "insightZh": "对照exact v1全文差异及实验页，v2保持原editing/SFT/beam方法与主要benchmark数字，但新增CC3D外部virtual-scan评测：v1明确说未能取得CC3D，v2删除该footnote并在supplement Table7给出clean/proprietary virtual-scan下多baseline结果。新w/scan-sim t5 CD.34/.37、IoU66.9/66.7，提供不同扫描生成pipeline的科学增量；仍不是真实传感器scan，不将原main结果或appendix重排当新增。 实际价值是把显式几何残差放入训练后的program editor，并以模型自身错误构造SFT curriculum；比固定VLM外部口头critic更具体。没有独立消融offsets/overlay/loop的全因果贡献，训练数据规模、8vs4views与scan augmentation也影响比较；不扩大为基础模型原生空间推理进步。",
+    "evidenceZh": "本次v2新增此前无法访问的CC3D评测，比较不同virtual-scanning pipeline下的scan-sim训练迁移。（v1 p.3 footnote1; v2 supplementary §B/Table7 pp.12–13）；模型接收multi-view overlay、point-cloud offsets与previous program，输出updated CadQuery并执行。（Secs.3.1–3.3, Fig.1, PDF pp.2–5）；staged SFT在disjoint D1/D2/D3上形成一/二步自身rollout，GT program作为各步目标。（Sec.3.5, PDF p.5）；beam实际render计数为N+(s−1)N²，并保持CD best-so-far。（Sec.3.6, PDF pp.5–6）；作者报告scan-sim条件下CC3D image branch CD0.37、IoU66.7、IR0，对cadrille-RL0.67/60.3/0.1。（Supplementary B/Table7, PDF pp.12–13）；cross-modal不是每项优于单分支或RL baseline，reporting target描述也有不一致。（Tables3–5, Secs.3.6/4.2, PDF pp.5–8）",
+    "caveatZh": "MCB复杂shape上t1较弱，refinement可非单调；best-so-far可能不是最后iteration。；point-only有较弱global cues；fusion与image-only常相近，MCB某些fidelity指标pc-only最好。；所有scan证据都是simulation/proprietary virtual扫描，不能称已验证真实LiDAR/RGB-D泛化。；候选过滤和105render上限影响IR/compute比较；原始样本validity和总runtime不足。；§3.6与§4.2的scan reporting target不一致，且训练数据/视图/augmentation未完全matched；本项目未复现。；代码范围：PDF p.1 GitHub annotation明确指向官方repo。已确认public tree含test.py、evaluate.py、train_group.py、training_curriculum.sh、pc_cm和scanning_simulation；源码/README快照归档，未执行。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "从具体shape忠实恢复可运行、可编辑CAD程序，符合Reconstruction对editable assets的迁移门槛；可借鉴几何反馈如何指导设计agent修正结构，但没有LEGO/embroidery制造验证，也不额外归Fabrication或通用VLM。"
+  }
+}

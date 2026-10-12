@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.10990",
+  "slug": "omni-diffusion-distill-few-step-distillation-of-unified-multimodal-diffusion-large-language-models",
+  "title": "Omni-Diffusion-Distill: Few-Step Distillation of Unified Multimodal Diffusion Large Language Models",
+  "authors": [
+    "Hong Huang",
+    "Chenhongyi Yang",
+    "Junzhe Sun",
+    "Animesh Sinha",
+    "Wuyang Chen",
+    "Yifan Jiang"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10990"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Omni-Diffusion-Distill",
+    "Few-Step",
+    "Distillation",
+    "Unified",
+    "Multimodal",
+    "Diffusion",
+    "Large",
+    "Language",
+    "Models"
+  ],
+  "abstract": "Unified multimodal diffusion large language models (dLLMs) offer a single architecture for both image generation and multimodal understanding, but their iterative decoding requires tens to hundreds of forward passes. Existing few-step distillation methods largely focus on either image generation or text generation, making it unclear how to compress a fully discrete multimodal dLLM into a single efficient student while preserving both generation and understanding. We introduce Omni-Diffusion-Distill, a unified two-stage distillation framework that retains strong generation and understanding capabilities while substantially reducing the inference cost of a unified multimodal dLLM. Omni-Diffusion-Distill aligns the distillation of both generation and understanding, for both images and text, in the discrete token space. In the first stage, the student is trained to skip decoding steps by replaying cached teacher trajectories, and in the second stage the student is refined on intermediate states along its own rollouts. We further remedy two sources of degradation in unified distillation with a pairwise collision penalty that reduces repetition under parallel text decoding, and entropy-matched guidance that prevents entropy collapse caused by fitting the sharpened teacher distribution in image generation. Omni-Diffusion-Distill achieves state-of-the-art trade-offs between decoding efficiency and generation and understanding performance for multimodal dLLMs, reducing image generation from 128 to 8 decoding steps and multimodal understanding from 512 to 64, giving 18.2x and 21.2x wall-clock speedups. Under these budgets, it scores 0.828 on GenEval and 83.0 on DPG-Bench for text-to-image generation, while reaching GPT judge scores of 20.0 on MM-Vet and 57.2 on COCO captioning (twice the teacher's 28.4 at the same steps) for multimodal understanding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10990v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10990v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10990v1 的 35 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Omni-Diffusion-Distill 在同一discrete multimodal dLLM中联合压缩image/text decoding：teacher trajectory replay后on-policy refine，image采用entropy-matched CFG、text用sequential targets与pairwise collision penalty。作者报告8步GenEval.828、64步COCO judge57.2；方法接口值得skim。其21.2×包含block-causal KVcache且仅sampler计时，详细caption仍19.6 vsfullteacher44.5，不能称全能力无损或适配所有unifiedmodel。",
+    "motivationZh": "Discrete diffusion MLLM 的多步采样影响实际部署速度，而压缩 image generation 步数时又容易丢失样本质量和多样性。文字与图像离散输出的分布及训练目标不同，也使统一蒸馏更难。",
+    "methodZh": "Lumina-DiMOO8B shared token vocabulary student由teacher初始化，cachedteacherkeyframes监督skipsteps/consistency/path/GT；imageonpolicy remask输出、auxiliaryfake estimator给logit surrogategradient，text本blockteacher逐token生成conditional targets并JS匹配。训练用referencepreference/GT anchors，部署去auxiliaries并按32tokenblockdecode可复用cache。",
+    "methodFlow": [
+      "缓存teacher轨迹：记录commitstep/keyframes及sparse top-R probabilities，image预合CFG，离线收集一次。",
+      "off-policy快进：earlierstate学习laterteachercommitdistribution与studentselfconsistency、finaltokenpath、GTmaskedCE。",
+      "imageon-policy：studentrolloutpredictions采image后remask，fakeauxiliary与entropy-rescaledteacher差直接作为studentlogitgradient。",
+      "texton-policy：teacher在studentmaskedblock逐tokencompletion供JS目标，全pair相同tokenprobabilitypenalty减parallelrepetition。",
+      "fewstep部署：image无unconditional额外forward，textblockcausalcache，单checkpoint支持8/4/2image及64/32/16textsteps。"
+    ],
+    "experimentsZh": "51K多taskmixture，32A100总3546GPUh含teachercollection1616；onecheckpoint所有budgets，17bench同teacher/updates与DiMO/CDLM/T3D扩跨模态，GPT5.5judgeopenended。numbers作者报告。 以下结果为作者报告：作者报告8stepsGenEval.828 vsfull128×2 .867/DiMO.810；DPG83.0 vs83.8；I2I2.31 vsDiMO2.38/fewteacher2.59。（PDF pp.7–8 Tables1–2）；作者报告64stepsMMVet20.0 vsfull21.3、COCO57.2 vs67.2/few28.4、DeCap19.6 vs44.5。（PDF p.10 Table4）；作者报告A100batch1samplerT2I106.4→5.84s、MMU80.7→3.81s/cacheoff13.12，mem16–21GB相同。（PDF p.26 Table8）；作者报告ρ.7GenEval.828，而ρ.9 .176/fixedtemp2 .015，显示熵强度很敏感。（PDF p.34 Table21） 对照范围：同teacher/data/update/sampler的蒸馏比较明确；原method跨模态扩展不等于各自最优specialist；仅一个8Bfullydiscrete model，无currentAR/hybrid成本matched比较。 消融与诊断：stage1/2、selfmaskedvsremasked、marginalvssequentialteacher、adjacentrepeatvspaircollision、entropyρ/fixedtemperature；没有多seed/longanswers对合法重复/rareentities专测。",
+    "insightZh": "贡献是fullydiscrete统一任务的off/on-policy框架及modality-specific熵/重复控制，不是新foundationpretraining。imagegradient为人为指定surrogate，不是严格可微生成distributionKL推导。",
+    "evidenceZh": "两模态共享loop但matching/state/teacher目标不同。（PDF pp.4–6 Fig.3/Algorithm1 Eqs.(1)–(3); pp.23–24 Eqs.(7)–(8)）；全paircollision改善异常重复但不禁止重复。（PDF pp.6/31/33 Eq.(3), Tables18/20）；stepcost与wallclock有不同组成。（PDF pp.24–26 Tables6–8）；最强fewstep仍明显低于fullteacher某些任务。（PDF pp.8–10 Tables2–4; p.30 Table16）",
+    "caveatZh": "仅fullydiscrete token统一maskedmodels，验证只Lumina-DiMOO。；text rendering/detailedcaption仍大gap；editing不如同fewstepteacher。；少steps也导致2stepGenEval下降.553，熵参数过软崩塌。；allpaircollision非dependency建模，可能削弱必要repetition/grammar；输出仍有brokenphrases，20MMVet较弱。；onpolicyimage指定r−p logitsupdate不像真实distributiongradient有严格保证，fakeestimator误差可能改变优化。；速度是sampler且cache结构改变，不能归因仅8×steps或声称完整端到端21×。；仅proxyjudge与trainingonce未提供variance，case量/协议需分清COCO自定义score不等CIDEr。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "统一understand/create模型的fewstep压缩可用于visualcreationagent，特别保持imageedit可控性与语言输出质量；无structuredSVG/3D具体迁移验证，medium/skim。"
+  }
+}

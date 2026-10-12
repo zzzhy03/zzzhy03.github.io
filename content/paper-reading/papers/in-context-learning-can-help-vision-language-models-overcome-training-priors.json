@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.12942",
+  "slug": "in-context-learning-can-help-vision-language-models-overcome-training-priors",
+  "title": "In-Context Learning Can Help Vision-Language Models Overcome Training Priors",
+  "authors": [
+    "Kun Wang",
+    "Xindi Wu",
+    "Sanghyuk Chun",
+    "Olga Russakovsky",
+    "Esin Tureci"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12942"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "In-Context",
+    "Learning",
+    "Can",
+    "Help",
+    "Vision-Language",
+    "Models",
+    "Overcome",
+    "Training",
+    "Priors"
+  ],
+  "abstract": "Vision-language models (VLMs) learn strong statistical regularities during training, which can make them fail to properly respond to visual evidence when input images violate those regularities. It is challenging to disambiguate these prior-induced errors from errors caused by the model missing the underlying visual capabilities. In this work, we use controlled visual in-context learning to encourage the model to focus on the visual evidence, and demonstrate that this alone is frequently sufficient to correct the errors -- suggesting that the models in fact do possess the relevant visual capabilities. Specifically, we show that across five vision-centric tasks, demonstrations yield large gains on prior-conflicting counterfactual examples ($+27.2\\%$ for Qwen3-VL 235B and $+15.1\\%$ for Qwen3-VL 32B) while leaving accuracy on prior-aligned examples nearly unchanged. These findings generalize across five VLM families with gains from $+9.7\\%$ to $+30.3\\%$. We analyze visual representations and find that demonstrations indeed redirect attention toward grounding cues while reducing reliance on cues that support the learned prior. Finally, we find that in-context learning is limited when the underlying visual capability is weak or absent. Together, these results show that current VLMs possess visual grounding capabilities that standard evaluations may overlook, underscoring the need for controlled evaluation design in diagnosing and improving model capability.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12942v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12942v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12942v1 的 35 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本文以label-balanced视觉示例诊断VLM为何忽视反常image：作者报告Qwen3-VL235B反事实+27.2pp但常规+2.9，32B +15.1/-1.6。prior-cue masking也改善两family，支持部分失败是证据使用问题。适合skim借鉴test-time grounding控制，但不能把ICL失败反推『能力不存在』；direction的real/CF标签分离、长context与cueproxy限制因果结论。",
+    "motivationZh": "模型在预训练中形成的视觉或任务先验可能与上下文例子的规则冲突，单看 ICL 成功率无法判断模型究竟读取了例子还是依赖旧规律。需要受控任务来测量这些先验何时能被新证据覆盖。",
+    "methodZh": "五任务count/color/shape/orientation/relation、simple/no-prior/complex设置，complex用同Geminigenerate/regenerate/edit域及双盲label验证。0–32shots每任务10context，五family；logit/LatentLens识别prior/groundingtokens，answergeneration-onlymask匹配randombudget，highcount弱能力、blank/unrelated/shuffledlabels等控制。",
+    "methodFlow": [
+      "配对任务与反事实：保持entity/context，仅改答案定义的视觉property；prior-aligned与conflicting图都Gemini再生成、两人盲验。",
+      "平衡context：同task/setting均衡label及real/CF取0–32imageQA示例，query图严格排除，10固定context跨模型共享。",
+      "拆解行为收益：分real/CF、small/large、highcount及无明确targetname控制，区分prioroverride与task-rule specification。",
+      "内部干预：logitlens/LatentLens+Kneedle标cuetokens，按query-imageattention分析，answer生成时maskpriorcuevs非cue随机匹配。"
+    ],
+    "experimentsZh": "原complex1160（650real/510CF），synthetic各240–320；CF936candidate双人接受510。五family、10固定contexts，greedymechanism与stochasticbehavior不同；single4H200约400GPUh不含mechanism。numbers作者报告。 以下结果为作者报告：作者报告235B CF+27.2/real+2.9pp；32B+15.1/−1.6；约30B五familycomplexoverall+9.7至30.3。（PDF p.6 Table1/Fig.4）；作者报告greedyQwen32Bcount prior-mask32.1→46.3/random28.2/16shot54.4；Gemma31B40.9→58.8/random36.5/ICL73.9。（PDF p.32 Table13）；作者报告smallQwen3.5-4B simplecount95→23.3±33.5，large/longcontext增益非单调；16–32shots可能>100Kcontext。（PDF pp.25–26 Table7）；作者expanded约400/task全部addCF，确切总count缺失，32Bcount23.5→48.3±12.1；不能把它当严格matched扩集。（PDF p.28 Table9） 对照范围：samepromptlabels/context跨models；blank、shuffledlabels、same/crosstask、visiononly、maskprior/ground/random。未比较更直接taskinstruction/显式要求ignoreprior与同算力alternative。 消融与诊断：cueattention/生成mask、count8–16、thinkingvsnon、explicitlanguageprior、expandeddataset；groundingmask仅三identityprior任务，contextcontrols主要count。",
+    "insightZh": "贡献是ICL的controlleddiagnostic与mechanistic/tokenablation，非新ICLarchitecture。latentcapabilitycomposition公式为解释框架，未从训练过程直接测得训练prior或证明唯一因果机制。",
+    "evidenceZh": "counterfactual收益大于real，在大模型更明显。（PDF pp.6–7 Fig.4; pp.25–28 A.3.2/Table8）；cue干预在固定prefill后改变answerattention。（PDF pp.7–8 Figs.5–6; pp.32–34 Table13/A.4）；directionlabelrare与prior无法完全分离。（PDF pp.19–20/24 A.2.1–2 Tables2–3）；context能教任务绑定但弱计数不稳。（PDF pp.9/21/29–30 §4.3/A.3.4–6）",
+    "caveatZh": "训练free但非compute-free，32shotcontext增加memory/latency；更小modellongcontext退化。；direction与spatialproxyprior证据较弱，real/CF标签分布不同；训练frequency不可得。；ICL不稳定强化highcardinalitycount，expandedexactcounts未报告。；ICL成功支持task可被context解决，失败不能唯一诊断capabilityabsence，可能context干扰/示例选择/序列化问题。；cue由approximateprobe与metadata定义，maskrandom排除groundingcue，选择性control不等causal训练prior唯一来源；mask仅生成不移除prefill路径。；全部complex同Geminisynthetic域，near-duplicatebase/edited图demo排除query但未说明sourcefamily排除，泛化到真实设计伪差未验证。；real/CFcounterfactual编辑也改难度，均衡labels无法消除姿态/稀有性/高count难度；attentionwithinquery归一化不代表总visual reliance。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "视觉design输出出现不常规形状/颜色/部件时，可用balanced视觉示例和cue干预区分prior偏差与感知难度；当前没有具体artifactcreation/fabrication实验。"
+  }
+}

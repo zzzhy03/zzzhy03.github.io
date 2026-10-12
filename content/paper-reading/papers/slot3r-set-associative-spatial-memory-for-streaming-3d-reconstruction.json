@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.12282",
+  "slug": "slot3r-set-associative-spatial-memory-for-streaming-3d-reconstruction",
+  "title": "Slot3R: Set-Associative Spatial Memory for Streaming 3D Reconstruction",
+  "authors": [
+    "Xiyuan Zhang",
+    "Yanming Yang",
+    "Kaiyuan Xu",
+    "Ruibo Li",
+    "Chi Zhang"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12282"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Slot3R",
+    "Set-Associative",
+    "Spatial",
+    "Memory",
+    "Streaming",
+    "3D",
+    "Reconstruction"
+  ],
+  "abstract": "Streaming 3D reconstruction must preserve evidence from each frame while processing an expanding scene online. Spatial memory is a natural fit because it organizes history by reconstructed 3D location. Yet Point3R uses spatial proximity both to associate a new observation with an existing memory entry and to decide whether to fuse it, conflating co-location with state identity. Because pointers summarize image patches, nearby pointers may encode distinct surfaces, viewpoints, or visibility conditions; averaging them can destroy complementary evidence before later frames disambiguate it. We argue that location should determine address, not whether observations must merge. Slot3R realizes this principle as a training-free, set-associative retrofit that lets multiple states coexist at a shared address while keeping the pretrained Point3R backbone frozen. A bounded sparse readout further decouples persistent storage from per-frame decoder access. At 300-500 sampled frames, Slot3R reduces Point3R's point-cloud accuracy error (Acc) by 57.1%-63.1% on 7Scenes and 64.0%-72.0% on NeuralRGBD, lowers Sim(3)-aligned absolute trajectory error (ATE) on all three pose benchmarks, and remains competitive on video-depth estimation. It completes all evaluated settings from 600 to 1000 sampled frames at about 19 FPS under the same protocol, whereas Point3R and InfiniteVGGT run out of memory at 800 frames and beyond.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12282v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12282v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Westlake-AGI-Lab/Slot3R"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12282v1 的 18 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Slot3R把“空间地址相同”与“证据相同”拆开：冻结Point3R，每个spherical-hash bucket最多8states，由feature similarity/confidence决定merge或retain；decoder只读640local/global tokens。作者报告7Scenes500frameAcc0.0275vs0.0745，并完成1000frames。可借鉴3Dscene记忆表示，但metricdepth与RPE并非全面改善，整段先编码的benchmark不等于完整online延迟。",
+    "motivationZh": "Streaming 3D reconstruction 若持续保留历史帧，查询成本随视频增长；固定 FIFO 缓存又容易忘记离开视野但仍重要的场景区域。问题是在有限读取预算下保留可靠、互补的空间信息，而不是只保存最近观察。",
+    "methodZh": "address由azimuth/elevation/log-radius quantization确定，frameconfidence先去底25%；与snapshot中的最近cosinefeature比较，可靠相似候选加权merge，可靠distinct候选插入或替leastconfidentstate。readout用前frame同patchpointmap近似current位置，邻bucket取localstates并加128uniformglobalanchors，deduplicate后截到640。可选独立viewpointbank以posequeryagreement/motiongate提供context。无新增training，memory和readout两个机制分离，storage仍随coverage与固定hash范围变化。",
+    "methodFlow": [
+      "冻结Point3R，从currentframe与历史readout预测pointmap/depth/pose并生成position-feature-confidence候选。",
+      "以sphericalazimuth/elevation/log-radius分bucket，过滤frame底25%confidence。",
+      "按cosinesimilarity0.90及confidence，在每bucket最多8slots中snapshotbatchedmerge、insert或replace，保留distinct证据。",
+      "由previous-framepatchpositions检索相邻bucket，加uniformglobalanchors，最多640tokens送同一decoder。",
+      "可选viewpointbank调整posequery，无第二decoderforward；输出streaminggeometry并写回memory。"
+    ],
+    "experimentsZh": "7Scenes/NeuralRGBD300/400/500sampleframes(k2)，extended600–1000(k1)；ScanNet94scene/Sintel14/TUMDynamic8pose；Bonn/KITTI/ScanNetdepth。RTX409024GB，releasedPoint3Rweights，K8/hash16×8×32/radius0.05–50/d1/read640/anchor128/q0.25，同fusedRoPEkernel。 以下结果为作者报告：作者报告7ScenescoreAvg19.17FPSvsPoint3R16.77，NeuralRGBD19.02vs18.01，Acc降57.1–72.0%。（Table1, PDF p.7）；作者报告metricBonnAbsRel0.087vsPoint3R0.081、KITTI0.179vs0.169；coreSintelRPErot2.0687vs1.5450，VPC-A为1.1529。（Tables2–3, PDF p.8） 对照范围：CUT3R、TTT3R、StreamVGGT/STream3R、Infinite/RetrieveVGGT、Spann3R、Point3R及ZipMapstream。部分geometry引用publishednumbers而FPS本地；主taskbackbone仅Point3R，缺其他foundationbackbone和abrupt低overlap场景的系统验证。 消融与诊断：K1弱、K2大幅改善、K8饱和；read128→512改善后640附近饱和；q影响depth与reconstruction相反；spherical优voxel；current-frameprior需要第二pass，FPS19.28→12.29；fusedRoPE贡献被单独控制而非计入本方法。",
+    "insightZh": "改写existingspatialpointermemory的identity语义，set-associativemulti-state避免单位置平均破坏互补证据；boundedreadout将存储与访问cost拆开。hash和confidence规则为具体实现，VPC源于已有ray-awarememory，非新foundationgeometrybackbone。",
+    "evidenceZh": "location只决定bucket，featureagreement和confidence决定fusion或distinctslot，K8。（Fig.2 Sec.3.2–3.3, PDF pp.4–5; App.A.3 Algorithm1 pp.14–15）；作者报告7Scenes500framesAcc0.0275vsPoint3R0.0745，NeuralRGBD0.0589vs0.2106。（Table1, PDF p.7）；作者报告1000frameNeuralRGBDAcc0.0618，平均18.91FPS；Point3R800及以上OOM。（App.A.2 Table6, PDF pp.13–14）；evaluationharness先编码整段sequence，decoder/writecausal；metricdepth有mixedresults、coreRPE未一致提升。（Sec.4.1 PDF p.6; Tables2–3 p.8; Conclusion p.9）",
+    "caveatZh": "persistentstorage随coverage增长且依赖fixedchoices，futurework是adaptivegloballybudgetedmemory/crossbackbones（p.9）。；metric-scale改善不一致，coreRPE不一致（pp.7–9）。；previous-frame同patchprior在rapidmotion或lowoverlap时可指错空间，globalanchors只提供粗context。；固定radius/hashcapacity带来长距离binclipping与aliasing；1000frame证据不代表任意scene范围。；benchmark先全sequenceencoding会影响OOM/end-to-endonline含义，需实时implementation单独测。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "空间多状态memory可保留细粒度3Dassetviewevidence，并为生成/reconstructionmemory提供表示启发；不支持partsegmentation或制造推论。"
+  }
+}

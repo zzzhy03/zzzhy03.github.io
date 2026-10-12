@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2605.23891",
+  "slug": "smart-insertion-v-photorealistic-video-insertion-via-a-closed-loop-feedback-dual-stream-framework",
+  "title": "Smart-Insertion-V: Photorealistic Video Insertion via a Closed-Loop Feedback Dual-Stream Framework",
+  "authors": [
+    "Xiao Cao",
+    "Yansong Qu",
+    "Xiangzhen Chang",
+    "Wen Xiao",
+    "Jiakui Hu",
+    "Heyuan Li",
+    "Jialun Liu",
+    "Zhiyong Huang",
+    "Xuelong Li"
+  ],
+  "publishedAt": "2026-05-22",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.23891"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Smart-Insertion-V",
+    "Photorealistic",
+    "Video",
+    "Insertion",
+    "Closed-Loop",
+    "Feedback",
+    "Dual-Stream",
+    "Framework"
+  ],
+  "abstract": "Mask-free video object insertion has emerged as a challenging task, requiring harmonious integration of reference objects into source videos. However, existing methods struggle when references exhibit severe stylistic domain gaps with the source scene. To overcome this, we propose \\textit{\\textbf{Smart-Insertion-V}}, an end-to-end \\textbf{Dual-Stream} framework that concurrently conducts video insertion and image style transfer. Within this framework, the image stream synchronously guides the video generation process, while a \\textbf{Closed-loop Feedback} mechanism is further incorporated to ensure robust insertion. Inevitably, integrating these diverse conditioning signals results in feature entanglement and style leakage. To tackle this issue, we design \\textbf{Dual-World-View RoPE} to distinguish different signals via spatial-temporal offsets without incurring heavy training overhead. Furthermore, to facilitate spatial grounding and stylistic adaptation, we introduce a \\textbf{Decoupled Guidance Module} that leverages a Vision-Language Model for semantic reasoning while preserving original temporal guidance with native text encoder. To bridge data gap for harmonious reference insertion task, we propose a data curation pipeline and will release an \\textbf{open-source dataset}. Experiments demonstrate that our method can insert objects into plausible positions while achieving the most harmonious results.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.23891v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.23891v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/massyzs/smart-insertion-v"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.23891v2 的 12 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：v2新增Runway Aleph2.0 baseline、位置/尺度/风格/motion人类评测与ablation评测，明确semi-attention作用域与每feedback8.14s/3%成本；主体方法和四项原数值v1已有。RoPE reference-image temporal offset旧F=N、现F=0而正文仍谈temporal weak condition，属于需保留的协议/措辞边界，不能包装为无歧义新理论。新增人类与商业baseline实验足够构成本轮科学更新。 Smart-Insertion-V 将reference图像harmonization与video insertion联训：image-stream中间预测给VLM feedback，再更新两个stream的guidance；Dual-RoPE与asymmetric attention隔离条件减少style leakage。作者报告比串行image-edit→insert更协调，适合skim细读条件隔离/feedback设计；精细位置控制、复杂contact仍弱，完整stage2 weights未公开。",
+    "motivationZh": "Mask-free video insertion 既要选合理位置、尺度和 motion，也要让 reference object 与源场景风格协调。直接插入或先独立图像harmonization再视频编辑，容易破坏物体identity、周边内容与跨帧一致性。",
+    "methodZh": "任务是把视觉风格不匹配的raw object reference插入source video，不要求手工mask。方法用VLM分支处理first-frame spatial/style reasoning、保留T5处理motion，再训练image-style-transfer和video-insertion双流。source video、raw reference与harmonized image features通过不同spatiotemporal RoPE ranges及scope-constrained semi-attention提供条件，避免互相污染。inference从image stream预测clean image，将其重编码为VLM guidance继续当前denoising而非独立重启，形成内部generation/inspection/refinement闭环。论文约0.7M synthetic quadruplets的curation流程依赖segmentation、remover、Nano-Banana与dual-verification；正文定量表支持harmonization，但其所引用详尽supplementary evaluation protocol未含在12页PDF内，因此未知test集大小和rater统计不能补写。",
+    "methodFlow": [
+      "构造source/target videos与raw/harmonized object references四元数据，text segmentation/removal及style perturbation后dual-verification筛选。",
+      "用first-frame captioning预训练VLM-to-DiT adapter；fine-tune时VLM处理spatial/style instructions，native T5保留motion context。",
+      "联训image harmonization与video insertion，image stream的intermediate features为video stream提供scene-matched object conditions。",
+      "以Dual-RoPE空间/时间offset区分strong/weak conditions；target可看所有conditions，condition只在自身scope内attention。",
+      "denoising中decode image-stream clean estimate交VLM检查，再替换guidance与condition继续generation，输出插入视频及harmonized reference。"
+    ],
+    "experimentsZh": "mask-free reference insertion，基于约0.7M synthetic video/reference quadruplets；正文比较TeleOmni、UniVideo及Q-Former variant、VACE、Runway-Aleph2.0，另给前置Qwen-Image-Edit-2511的cascade variants。评估GT-based FVD、Video-LPIPS、DINO，以及ChatGPT harmonic score和position/scale、style、motion human rating。官方repo当前标明Wan2.1-T2V-14B与Qwen3-VL-8B；模型型号来源为code docs，不补充为paper所列训练参数。 以下结果为作者报告：作者报告Ours FVD/100=1.055、Video-LPIPS=.125、DINO=.746、harmonic=.842；Runway分别1.697/.218/.727/.540，VACE1.302/.235/.738/.526。（Table1, PDF p.6）；作者报告Human Avg4.267对Runway3.300，Human Style4.500；这些是作者评分，不视作本项目复现或普遍偏好率。（Table1, PDF p.6）；作者报告w/o feedback harmonic .662、HumanAvg3.777；w/o Dual-RoPE .563/3.233；single-stream .474/3.157。DINO w/o feedback .749略高于完整模型.746。（Table2, PDF p.8） 对照范围：涵盖mask-free/generic video editors与image-edit cascades，支持联合训练优于这些构造的比较；正文没有test sample count、human rater数、confidence intervals或同compute消融，详尽protocol引用外部Supplementary Material。 消融与诊断：去image loss的single-stream、替换FullDiT RoPE、关闭feedback分别验证联合stream/条件隔离/闭环。部分LPIPS/DINO差小，harmonic/人评改善较大；未独立消融DGM、semi-attention与各data curation steps，因果贡献仍部分耦合。",
+    "insightZh": "实质设计是联合harmonization/insertion并将intermediate predictions作为feedback，加上task-specific condition coordinate ranges和asymmetric attention；不是简单把VLM接到独立image editor之后。共用既有Wan2.1/Qwen3-VL/T5（型号由官方implementation明确），不能称为新foundation video模型或已解决所有physical insertion。 v2新增Runway Aleph2.0 baseline、位置/尺度/风格/motion人类评测与ablation评测，明确semi-attention作用域与每feedback8.14s/3%成本；主体方法和四项原数值v1已有。RoPE reference-image temporal offset旧F=N、现F=0而正文仍谈temporal weak condition，属于需保留的协议/措辞边界，不能包装为无歧义新理论。新增人类与商业baseline实验足够构成本轮科学更新。",
+    "evidenceZh": "image stream的一步clean estimate用于反馈VLM并更新后续guidance。（Sec.4.1–4.2, Fig.3, PDF pp.4–5）；RoPE offsets与scope-constrained attention隔离多种conditioning sources。（Sec.4.3–4.4, Fig.4, PDF p.6）；联合模型比多种原版与cascade baselines的主表harmonization更强，但证据不代表完全物理正确。（Table1, Sec.5.2, PDF pp.6,8）；feedback与Dual-RoPE有独立ablation，但反馈并非每项指标单调改善。（Table2, Fig.6, PDF p.8）；v2新增Runway Aleph2.0 baseline、位置/尺度/风格/motion人类评测与ablation评测，明确semi-attention作用域与每feedback8.14s/3%成本；主体方法和四项原数值v1已有。RoPE reference-image temporal offset旧F=N、现F=0而正文仍谈temporal weak condition，属于需保留的协议/措辞边界，不能包装为无歧义新理论。新增人类与商业baseline实验足够构成本轮科学更新。（Prior 2605.23891v1 PDF p.6 Table 1/§4.3; current v2 PDF p.6 Table 1/§4.3–4.4, p.8 Table 2/§5.2）",
+    "caveatZh": "coarse semantic instruction降低fine-grained spatial controllability，8B VLM对复杂scene和objects的误判可导致错误placement。；context/style误判会形成conditioning与generation不一致，造成identity drift。；分离的motion guidance面对occlusion、contact或复杂interaction仍会不准。；只看first-frame style的feedback不是逐帧物理验证；不能把harmonized image当成full video interaction correctness证据。；数据依赖多个closed models且occlusion completion会hallucinate；公开pipeline和future复现可能受model-version影响。；当前官方repo提供training/inference代码与stage1 weights，明确stage2 finetuned模型因policy restrictions不发布，需要自行训练；不是即用完整模型。；正文引用的detailed supplementary protocols未包含在exact12页PDF里，未知rater/test规模需保持空缺，数值未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接服务video visual creation，joint style/placement约束与intermediate-generation feedback对视觉设计agent有可迁移价值；未验证3D/LEGO/fabrication物理约束。"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.11770",
+  "slug": "from-video-clips-to-creation-trajectory-sora100k-for-ai-native-video-creation",
+  "title": "From Video Clips to Creation Trajectory: Sora100K for AI-Native Video Creation",
+  "authors": [
+    "Sicong Yang",
+    "Ruihuan Yang",
+    "Jian Lu",
+    "Jianfei Yuan",
+    "Xiaodong Cun",
+    "Xiuli Bi"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11770"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Video",
+    "Clips",
+    "Creation",
+    "Trajectory",
+    "Sora100K",
+    "AI-Native"
+  ],
+  "abstract": "AI-Native video creation is shifting from isolated video clips toward iterative video creation workflows. However, existing datasets remain largely video clips, representing video generation and editing as separate tasks rather than connected stages of a video creation workflow. In this paper, we introduce Sora100K, a dataset that represents the AI-Native video creation workflow as a structured video creation trajectory. Specifically, we first identify video creation trajectories and decompose them into three subsets according to their structural roles: text-to-video generation records as roots, single-turn video editing records as editing edges, and multi-turn video editing records as complete trajectories. Then, we use a VLM to assign semantic annotations for generation roots and editing-operation annotations for editing edges. A strict construction pipeline further reconstructs source-to-edit lineage, editing order, and intermediate video states while ensuring data quality. Finally, we perform lightweight adaptation on LTX-2 models to assess the supervision value of Sora100K. The results show improvements in visual quality, multi-shot generation, and cross-shot consistency, while successive-turn evaluation reveals that following multi-turn editing instructions remains challenging. Sora100K establishes a new data foundation for AI-Native video creation beyond isolated video clips and toward structured video creation trajectory. The dataset and supplementary materials are publicly available at https://huggingface.co/datasets/ysicong/Sora100K.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11770v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11770v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11770v1 的 18 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Sora100K 把初次generation、单次edit和多轮intermediate states按source lineage串成creation trajectories，适合研究“生成→反复修改”的视频创作。全文实验只分别LoRA roots/edges再重组，two-turn edit effectiveness平均仍43.0，与base相同，收益主要是aesthetics；当前公开的是metadata/retrieval层而非全部稳定视频或训练实现，宜skim其数据表示，不能说已解决multi-turn creation。",
+    "motivationZh": "现有视频创作数据多把最终视频视为孤立样本，缺少原始生成、编辑指令及中间结果之间的对应关系。这样难以研究同一内容如何经过多次修改形成最终作品，论文关注完整 creation trajectory 的数据表示。",
+    "methodZh": "从约180K公开Sora2记录经accessibility、VBench quality与traceability筛到103,439结构化entries：18,451roots、76,964edges、8,024trajectories；各子集是同creation tree不同views，不能当103K互不重复独立clips。Qwen2.5VL7B作root semantic和edit operation annotation，人核验taxonomy。由于无完整trajectory training模型，分别用3000root与3000edge训练LTX2/LTX2-IC LoRA，再successive-turn评价。全文18页含appendix字段/类别/训练config/多turn例图均已读。",
+    "methodFlow": [
+      "恢复公开Sora2记录的prompt、edit instruction与source references，过滤accessibility、quality与traceability。",
+      "按root/edge关系重建creation trees，保留ordered intermediate videos；3+states构multi-turn paths。",
+      "Qwen标generation semantics与editing taxonomy，保存sample/source/edited IDs、chain length及audio/multi-shot attributes。",
+      "3000roots与3000edges分别LoRA适配LTX2 generator/editor，而非整体trajectory训练。",
+      "依序用root generation与此前edited输出作为下一turn输入，测各状态质量和edit effectiveness。"
+    ],
+    "experimentsZh": "两个LoRA各3000samples、rank32、DiT attention projection、lr1e-4、5epochs、单H100约40GB；generator512×768×121frames，editor81frames含audio/sourcecontext。generation同200heldoutprompts比base/Panda70M，同config；single/two-turn用QwenVLM和VBench评分，完整tree-level train/test分离及evaluation样本数未充分给出。 以下结果为作者报告：作者报告generation average76.43 vs base72.17/Panda70M70.41；ArcFace59.70 vs48.30，motion99.56 vs99.60基本不变。（Table3, PDF p.7）；作者报告single-turn instruction43.4→47.9、effectiveness38.7→44.2、overall56.0→59.4；subject consistency92.0→91.7略降。（Table4, PDF p.7）；作者报告two-turn overall60.6→62.4，但Seff平均43.0不变；second turn ours32.0 vs base34.0。（Table2, PDF p.6） 对照范围：仅LTX2及Panda70M同size generation adaptation；未和已有高质量edit数据同sample/compute控制，未比较native trajectory model、long-turn memory模型或audio-sync收益。 消融与诊断：分generator与editor验证监督stage来源，比仅trajectory总score更清楚；缺tree-lineage vs shuffled-edge、chain-length、annotation/noise与audio独立消融，无法隔离trajectory表示本身的必要收益。",
+    "insightZh": "实用新意是source-to-edit lineage与中间状态的trajectory组织，比单triplet编辑集更适合multi-turn研究；并未提出新generation model或agent训练算法。数据保持audio/multi-shot有潜力，但实验主要验证单stage supervised adaptation。",
+    "evidenceZh": "三个subsets是creation-tree的root、edge及path视图，保留lineage和order。（Structure-Level Characteristics Eqs.(1)–(4), Fig.1, PDF pp.1–3）；实验并未直接train complete multimodal trajectories。（Experiment and Experiment Setting, PDF p.6; Appendix Table6, PDF p.15）；two-turn平均收益来自aesthetic，edit effectiveness没有提升。（Table2 and Trajectory-Level Results, PDF p.6）；公开资源为metadata layer及source-recovery指引，视频access可能依赖短期URL。（）",
+    "caveatZh": "PDF p.7承认兼容open-source models少、完整creation trajectory能力仍主要在closed-source系统。；PDF p.6承认跨turn错误累积、editing effectiveness未提高。；平台单模型/自然偏斜分布可能继承Sora生成偏好，跨模型创作泛化无证据。；quality/traceability阈值、人annotation样本规模及tree-level leakage控制不够详细；98.19%taxonomy accuracy不证明全部lineage正确。；metadata发布依赖source availability与可能过期links，尚不构成稳定全量video training release。；appendix前后scene/temporal edit比例命名有不一致，应避免复述不确定细分统计。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接支持visual creation中的multi-turn edit history、跨shot身份保留与agent设计反馈数据；没有3D显式geometry或structured2D验证。"
+  }
+}

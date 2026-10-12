@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.13941",
+  "slug": "images-talk-back-guiding-mmdits-by-suppressing-image-to-text-feedback",
+  "title": "Images Talk Back: Guiding MMDiTs by Suppressing Image-to-Text Feedback",
+  "authors": [
+    "Yucheng Yang",
+    "Xiaoxiao Sun",
+    "Shusheng Yang",
+    "Jiakang Chen",
+    "Serena Yeung-Levy"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13941"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Images",
+    "Talk",
+    "Back",
+    "Guiding",
+    "MMDiTs",
+    "Suppressing",
+    "Image-to-Text",
+    "Feedback"
+  ],
+  "abstract": "Multimodal diffusion transformers (MMDiTs) allow the evolving image to update internal text representations through joint attention. These representations then guide subsequent image updates, raising a question: does this feedback help correct deviations from the prompt, or preserve them? We find that image-to-text (I2T) feedback can preserve the objects and attributes already represented in the evolving image, including errors. Transplanting I2T messages can rescue failures or disrupt successes. At matched intervention strengths, suppressing the influence of I2T feedback improves generation, whereas opposite controls degrade it. These findings motivate Semantic Feedback Guidance (SFG), which suppresses the influence of I2T feedback by guiding away from an auxiliary branch that strengthens this feedback and weakens text-to-image conditioning. The in-place variant, iSFG, directly suppresses I2T feedback and strengthens text-to-image conditioning, requiring no extra model evaluations. Temporal interventions motivate running the SFG branch during the first 20% of image sampling steps, requiring about $1.2\\times$ the base NFE without classifier-free guidance (CFG). Experiments across three image-generation backbones show gains in alignment and preference-model scores. On FLUX, adding SFG to CFG raises GenEval from $0.6661$ to $0.7479$; on SD3.5M, iSFG adds $+1.33$ HPSv2.1 over CFG at zero extra NFE. The control also transfers to text-to-video and image-to-video generation, improving VBench scores. Code is available at https://github.com/yyc1215lll-creator/SFG.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13941v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13941v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yyc1215lll-creator/SFG"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13941v1 的 26 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SFG 针对 MMDiT 的 image→text→image 回路：强化反馈的negative branch再guidance远离它，或iSFG直接压低I2T、增强T2I message。作者报告FLUX CFG GenEval .6661→.7479；in-place不用额外NFE但实测约+2.9%时间。机制与跨图像/视频控制值得deep，但feedback并非一律有害，成功轨迹也会被破坏，probe的配对warning覆盖不能当通用失败检测。",
+    "motivationZh": "Multimodal diffusion transformer 的 image-to-text 反馈可能维持已生成的对象或属性遗漏，普通 CFG 难以辨认这种失败来源。需要通过内部 message 干预分清 cross-modal interaction 的有益与有害部分，再形成低开销的生成 guidance。",
+    "methodZh": "本文用same-prompt成功/失败轨迹message transplantation与等范数random对照，定位I2T反馈对对象/属性遗漏的维持作用。保持joint softmax normalization、仅缩放value aggregation的跨模态term，构造signed guidance。三图像backbone的alignment/preference和HunyuanVideo T2V/I2V测试，附录包含window、opposite sign、baseline sweeps、probe诊断和低overhead实现。",
+    "methodFlow": [
+      "分解joint message：在joint attention softmax后分出I2T A_i→t V_i与T2I A_t→i V_t，保持logits与normalization。",
+      "negative branch：auxiliary branch放大I2T并衰减T2I，正常prediction外推远离此branch，可叠加未修改unconditional CFG。",
+      "限制早期窗口：图像前20%steps做额外branch；视频按task选7/25，后续正常采样。",
+      "in-place替代：直接对conditional I2T乘.8、T2I乘1.2的value stream进行低overhead聚合，无auxiliaryforward。"
+    ],
+    "experimentsZh": "图像1024²、GenEval553×6、CompBench300×8、HPS800×4同prompts/seeds；SD3M、SD3.5M与FLUX不同guidance设定。Hunyuan848×480/121frames24fps/25steps，numbers作者报告。 以下结果为作者报告：作者报告FLUX CFG GenEval .6661→SFG .7479，counting .6458→.8167，position .1850→.3033；SD3.5M .6890→.7110。（PDF p.7 Table2）；作者报告SD3.5M iSFG HPS31.65→32.98、GenEval.6890→.7047；A800timing10.800→11.108s，三pairedruns。（PDF pp.7/18 Tables3/20）；作者报告T2V七quality dimensions aggregate82.58→84.25，I2V八dimensions88.50→90.04；不是完整VBench标准total跨论文排名。（PDF pp.7–8 Tables4–5） 对照范围：PAG/SEG/S2/TACA/PromptReinjection及CFG，若干weight sweep；权重固定层/不同系统版本，有超参数test-set选择且未显式独立tuning split。 消融与诊断：opposite signs12matched settings、I2T/T2I组件、early/fullwindow、message donor/path/random、probeheldoutthreshold；种子SD作者报告但非完整permetricCI。",
+    "insightZh": "区别TACA/Attend-and-Excite仅T2I强化，核心控制I2T反馈及negative branch符号，并有对向因果干预；不是删除或改写用户prompt，text stream每denoiser call重置。",
+    "evidenceZh": "transplant成功I2T可救失败，也可由失败message破坏成功。（PDF pp.3–5 §2.2 Figs.3–5; p.20 Table21）；message scaling保留jointsoftmax，再signed branch或直接缩放。（PDF pp.4–5 Eqs.(3)–(5); pp.17–18 pseudocode/D.1）；CFG叠加提升GenEval，iSFG零extraNFE但非零runtime。（PDF p.7 Tables2–3; p.18 Table20）；warning与guidance都有明确漏检/副作用。（PDF pp.21–23 Tables22–25）",
+    "caveatZh": "cosine gap overrandom不保证positive absolute cosine或最终质量；用有限intervention直接验结果。；probepairedcoverage不是heldout detection；suppression也disrupt成功。；finite strengths下SFG与iSFG不必一致，optimalwindow依task。；明确成功/失败trajectory选择与oracle donor构成mechanism实验，不是线上自动corrector。；HPS/ImageReward为preferenceproxy，无实际human preference试验；VBench只部分dimensions。；原FLUXdev built-in guidance1与de-distilledCFG不是同checkpoint，应分开描述。；querymessage处理需要native jointattention访问，encoder/architecture迁移未验证；图像控制不等于编辑结构化design。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可直接借鉴visualcreation模型的text/visualfeedback权衡与composition稳定控制；对设计agent渲染后反馈仍须区分语义强化和真实correctness。"
+  }
+}

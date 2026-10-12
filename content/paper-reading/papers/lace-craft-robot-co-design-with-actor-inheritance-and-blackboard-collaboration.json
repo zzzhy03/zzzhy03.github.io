@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.09283",
+  "slug": "lace-craft-robot-co-design-with-actor-inheritance-and-blackboard-collaboration",
+  "title": "LACE-CRAFT: Robot Co-Design with Actor Inheritance and Blackboard Collaboration",
+  "authors": [
+    "Yuhan Wen",
+    "Jiawei Wang",
+    "Qixuan Zhang",
+    "Calvin Zhang",
+    "Yusen Qin",
+    "Lan Xu"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2610.09283"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "fabrication",
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "fabrication",
+    "LACE-CRAFT",
+    "Robot",
+    "Co-Design",
+    "Actor",
+    "Inheritance",
+    "Blackboard",
+    "Collaboration"
+  ],
+  "abstract": "Robot co-design couples morphology search with policy learning, yet training every new design from scratch discards acquired control experience. We present LACE-CRAFT, which compares continued learning on the current robot with policy adaptation to new morphology-reward pairs. LACE resumes the incumbent's full learning state and initializes compatible challengers with its actor parameters and observation statistics. A fixed task metric selects among both branches and the frozen incumbent. CRAFT coordinates Feedback, Morphology, Reward, and Integration roles through shared experimental records and behavioral replays to generate and cross-review paired proposals. A generative extension converts generated meshes into editable articulated models with configured joints, actuator interfaces, and consistently updated simulation assets. Across five locomotion benchmarks, mean scores over three evaluation seeds are 6.4-91.9% higher than D2C. Both methods train 30 new morphology-reward pairs over five rounds; LACE additionally uses four continuation training units. Five-task ablations examine policy inheritance and replay-derived feedback. A fabricated prototype demonstrates indoor walking and illustrates the geometry-to-hardware workflow.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09283v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09283v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09283v3 的 16 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "LACE–CRAFT 在 robot body/reward co-design 中同时竞争‘继续训练当前机器人’和‘把actor+normalizer迁移到新形态’，用固定任务metric选优，并以共享blackboard/replay驱动四agent提案。作者报告五任务固定policy评测比D2C高6.4–91.9%，但LACE多4个trainingunits且search重复不齐。Generatedmesh→joint/motorinterface→实物walking示范有价值，紧固设计仍人工，未验证arm移动操控或最终searchpolicy真实迁移。",
+    "motivationZh": "机器人 co-design 中，新形态的短期分数混合了形态质量与策略重新学习的难度；不公平的训练预算或不兼容的策略继承会扭曲搜索。问题是在受限 RL 预算下比较继续训练与新形态，并把设计反馈传给后续候选。",
+    "methodZh": "形态搜索限制固定kinematictree与action/observationsemantics。Continuation恢复完整PPO/SACstate，challenger只复制actor与observationstatistics、重建critic/optim/replay；两支均从roundstart而非续训后的policy初始化。CRAFT Feedback读取replay和taskmeasurements，Morphology/Reward独立draft后crossreview，Integration配六候选。最终返回morphology+policy；generativeextension用Rodin/BANG生成parts，script编译关节、motorcavities、collision/inertia与hardwaremapping。",
+    "methodFlow": [
+      "保留工程与学习状态：Record链接geometry、reward、checkpoint、score和behaviorreplay；固定tree、jointordering与网络接口确保可直接继承actor。",
+      "竞争continuation与新design：Continuation恢复fulllearner；六challengers复制roundstartactor+normalizer，critic/optimizer/SACbuffer从新初始化，各训练同Bsteps。",
+      "四agent生成配对提案：共享最近五selectionrecords和当前replay；feedback提出假设，body/reward交叉审稿，integration输出六个完整pairs供执行。",
+      "固定metric验收并留优：用episode累计rootdistancefromorigin区别于trainingreturn评测，比较newcandidates与cachedincumbent，tie保留原design，再更新blackboard。",
+      "编译与fabrication：Rodinmesh/BANGparts经repair/alignment、configuredjointtree、motorboolean接口，导出URDF/collision/inertia/limits；screwholes/fastening人工，硬件另适配controller。"
+    ],
+    "experimentsZh": "Ant/HalfCheetah/Hopper/Swimmer/Walker2D，GPT5.6-sol六LLMrolecallslogicalround；六initialdesign+四轮六challengers与continuation。TaskbudgetAnt8M/HC5M/Hopper400K/Swimmer350K/Walker500Ktransitions，各128parallelrollout、threeevaluationseeds0/1/2。固定rootdistance积累metric而非forwardreturn，分开storedselectionscore和freshfinalpolicymean。 以下结果为作者报告：作者报告Ant63,396.82 vs D2C33,044.51（+91.9%），Walker18,466.68 vs17,362.33（+6.4%）；其余+15.0–46.7%。（PDF p.6 Table III）；作者报告NoActor/normalizerjointreset在Swimmer只达full44.0%、Walker59.1%；NoReplaySwimmer49.6%。（PDF p.6 Table IV/Figure 4）；作者报告Ant三个完整Fullsearch的selectedscore57,560.79/55,259.83/64,252.91，最新search供应maincheckpoint；RLseed都0。（PDF p.13 Table S8）；作者展示arm-freeindoorwalking，20HzR17controller，实物照片mountarm但未walkingwitharm；manipulationinitialtrials差。（PDF p.7 Figures 5–6; pp.15–16 Appendix F.C–D） 对照范围：D2C30designreproduction与Default单budget；非原80policy/multiseedD2C完整协议。LACE34trainingunits，final输出policy而D2C输出pair再训练，notexactcomputematched。没有替代multiagentframework完整对照。 消融与诊断：NoActor同时移除normalizer，NoReplay移除frames/behavior及diagnoses，保留四roles/crossreview；所有variants34units但各自己initialpopulation。未独立消融blackboard/crossreview/continuation且searchvariance仅AntFull3次。",
+    "insightZh": "把continuedlearning作为co-design竞争选项、明确transferboundary与recordbinding，是closed-loop物理design搜索的方法贡献；四agent/replay协作与generatedgeometry硬件接口是系统扩展。不是任意topologyrobot生成，也不证明身体+reward+多agent各组件都独立有效。",
+    "evidenceZh": "Actor inheritance保留接口语义，topologychange不在transfer范围，continuation/challenger状态严格分开。（PDF p.3 Table I/Eqs.(6)–(12); p.9 Appendix A）；作者报告五benchmark提高，但D2C30units vs Full34units、三seed仅评固定policy。（PDF p.6 Table III; pp.12–13 Appendix C.G/C.I）；独立generatedrobot演示不等于benchmarkco-designpolicy被真实部署验证。（PDF p.7 §IV.D/Limitations; pp.15–16 Appendix F）；Hardwareprocessing明确保留manualfastening且thinconnections曾fracture。（PDF p.5 §III.D; p.7 Limitations; p.15 Appendix F.B）",
+    "caveatZh": "Replay解读可有多个原因，需任务measurement佐证；三evaluationseeds不估计search/trainvariance。；Screwholes/fastening人工、printedparts未structuralsim且thinconnections易fracture。；Sim-to-real差异需realvideo/jointmotion闭环；armwalking与quantitativetransfer尚未验证。；Full比D2C多13.3%trainingunits、仅一D2Csearch，不能把gain全归因actorinheritance或协作。；Rootdistancefromorigin可奖励侧向/不稳定远离而非特定locomotionmechanics，balance/contactdiagnoses只有proxy测量。；Fixedtree与interface允许geometry变化但不支持变jointcount/semantic；generateddemonstration另manualconfiguredtopology。；Arm照片不是mobilemanipulation成功，R17controller与geometry/Braxpolicies不同；physicalcropframes不能测距离/耐久。；未确认官方publicimplementation，logicalLLMcall数不含retries，generationlatency/APIcost/failedtraining未计入trainingunit图。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接将robotgeometry、reward和controller联合优化并连接生成mesh到hardwareinterfaces，符合物理约束fabrication与visualdesignagent，可借鉴状态继承/约束编译/实验recordbinding。"
+  }
+}

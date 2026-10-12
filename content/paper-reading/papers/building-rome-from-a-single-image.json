@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.08790",
+  "slug": "building-rome-from-a-single-image",
+  "title": "Building Rome from a Single Image",
+  "authors": [
+    "Jiraphon Yenphraphai",
+    "Fang Li",
+    "Tianshuo Xu",
+    "Depu Meng",
+    "Quentin Herau",
+    "Yihan Hu",
+    "Raymond A. Yeh",
+    "Wei Zhan"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.08790"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Building",
+    "Rome",
+    "Single",
+    "Image"
+  ],
+  "abstract": "Single-image scene generation aims to produce a complete 3D scene mesh from a single image, including surfaces the camera did not observe. While pretrained 3D object generators encode a strong shape prior, they are mainly designed for isolated objects in a fixed canonical volume and focus mostly on indoor scenes, since diverse 3D data for outdoor scenes are quite limited. In this work, we present a method that redesigns such an object-centric generator, e.g., Trellis 2, to work on both indoor and outdoor scenes while retaining its prior. We accomplish this by (a) partitioning the scene into adaptive chunks that scale relative to the distance to the camera; nearby chunks have a smaller size to keep the finer detail, while distant structures, e.g., buildings, are covered by large chunks; (b) making the generator capture explicit 2D-3D correspondence by lifting image features and making the model aware of the free space, observed surface, and unobserved region; (c) synthesizing around 4,000 outdoor scenes to broaden the training data, as existing scene datasets are largely indoor. Experiments on Tanks and Temples, ScanNet++, and in-the-wild images show that our method outperforms all baselines in geometric accuracy and perceptual quality across both indoor and outdoor scenes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.08790v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.08790v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Applied-Intuition-Open-Source/BuildRome"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.08790v1 的 20 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "BuildRome 将TRELLIS2的object prior扩为single-image scene mesh：near/far不同scale chunks、surface-only DINO lift与free/surface/hidden标记分别指导忠实恢复与生成补全，再以overlap latent clamping拼场景。作者在室内/室外扫描与wild images报告更好geometry，适合精读大场景prior转移；输出无texture、不保证watertight，metric scale仍依赖monocular depth，不能把隐藏补全当真实结构证据。",
+    "motivationZh": "单图场景重建只能观察部分表面，monocular depth 又不足以给出完整、尺度跨度很大的场景 mesh。论文关注怎样把主要在物体上学到的 3D prior 扩展到场景，同时区分可见区域的忠实恢复与隐藏区域的合理补全。",
+    "methodZh": "MoGe3预估camera/pointmap确定ground-aligned chunks，canonical3m cubes的physical size随depth/height增长；不同scale一致缩camera translation/depth保持projection。DINOv3仅lift到surface附近，signed clipped depth residual给SS stage区分freespace与behind-surfaceunknown；SLat只收liftedfeature。训练rank32LoRA+新conditioning，用SAGE/Infinigen及4000agent-synthetic outdoor scenes。生成由near开始autoregressive，每step重施overlap cached latent，跨scale trilinear resample，最终decode完整geometry。全文20页及chunk allocation、limitations、agent data/refinement与qual附录已读。",
+    "methodFlow": [
+      "从single image估MoGe3camera/pointmap和groundframe，按depth/height分physical-scale不同的overlap chunks。",
+      "将每chunk的geometry/depth/camera translation共同scale到canonical3m，保持2Dprojection。",
+      "仅在surface tolerance内lift DINOv3 features；SS stage再加入signed-depth/free-hidden Fourier encoding。",
+      "rank32LoRA适配TRELLIS2 SS/SLat，以indoor与4000syntheticoutdoor训练完整scene chunks。",
+      "near→far生成，copy并每stepclamp已covered overlap latents，跨scale重采样后decode整scene mesh。"
+    ],
+    "experimentsZh": "Trellis2init、100Ksteps、16A100、bs64、newmoduleslr1e-4/LoRA3e-5；indoorSAGE/Infinigen16render views与4000syntheticoutdoor。测试7TanksTemples/32ScanNet++/121wild(53indoor68outdoor)，singleRGB，各predICP对齐；CD按medianGTdepth归一、F1阈10cm；wildDreamSim/normalCLIP与blindpairwisepreference，参与人数未清楚给。 以下结果为作者报告：作者报告T&T CD1.99/F1.506，对比最佳CD VolFill2.63及最佳F1 Lyra.388；ScanNet++5.01/.702 vsWorldTracing5.21/.690。（Table1, PDF p.10）；作者报告wildDreamSim.221/CLIP-N.870，pairwise对GenRecon胜率73.0%、对其他baseline88.9–94.4%。（Table1, PDF p.10）；作者报告adaptivechunks5min vsfixed15min；单280m例15chunks26GB vsfixed约200chunksA10080GBOOM。（Table2, PDF p.10; Appendix A.1, PDF p.15） 对照范围：EvoScene/Extend3D/3D-RE-GEN/Lyra2/VolFill/GenRecon/WorldTracing，给Lyraheuristictrajectory，mesh/points/GScenters转pointset。ICP对齐弱化绝对metric/layout误差，outputsrepresentation与prior/data不一致；hiddengeometry独立指标未报。 消融与诊断：chunk策略用same-trainedmodel；conditioning variants same data；outdoor新增监督。支持adaptivescale/free-space的F1与generalization，但visibilityoutdoorCD稍恶化、userstudy和multisample无完整CI。",
+    "insightZh": "方法新意为perspective-aware chunk allocation和free-space-aware local2D–3D conditioning，让既有object prior处理开放scene尺度；synthetic outdoor增加场景覆盖。不是从零的新worldfoundation，也没有material、texture或physical simulator行为预测。",
+    "evidenceZh": "不同physicalscale共享canonical模型，camera/depth缩放确保projection一致。（Sec.4.1, Fig.3, PDF pp.5–6; Appendix A.1, PDF p.15）；observed surface feature与free/hiddenindicator为SS提供不同生成行为信息。（Sec.4.2 Eqs.(1)–(5), Fig.2, PDF pp.3/6–7）；更广scenegeometry有数据和conditioning两个可分收益，但visibility在outdoorCD并非最优。（Tables3–4, PDF pp.10–11）；texture/watertightness和monocular geometry误差构成输出边界。（Appendix A.3, PDF p.16）",
+    "caveatZh": "Appendix A.3 p.16输出仅geometry，继承TRELLIS2 non-watertight holes。；monocular depth/intrinsics误差影响chunkscale、placement、feature alignment；overlap latent reuse可传播早期errors。；Conclusion p.11将textures、多输入、更细geometry留后续。；几何与perceptualmetrics不能证明不可见背面真实，output为plausible scenecompletion。；所谓metric尺寸依赖depthestimator；ICP后的GT指标不能单独证明metric scale正确。；agent生成的outdoor物体/terrain可能有错误；研究评估没有实际collision/navigation或fabrication验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可将大object generativeprior用于scenegeometry与可编辑3D环境，且观测恢复/隐藏补全的明确分界有用；没有LEGO part/assembly或stitch-specific验证。"
+  }
+}

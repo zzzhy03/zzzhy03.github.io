@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.09585",
+  "slug": "procedural-generation-of-conceptual-3d-ship-internal-arrangements-for-design-space-exploration",
+  "title": "Procedural Generation of Conceptual 3D Ship Internal Arrangements for Design-Space Exploration",
+  "authors": [
+    "Kirsten Odendaal",
+    "Roy de Winter"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09585"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CE"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Procedural",
+    "Generation",
+    "Conceptual",
+    "3D",
+    "Ship",
+    "Internal",
+    "Arrangements",
+    "Design-Space",
+    "Exploration"
+  ],
+  "abstract": "Ship internal arrangement is a complex spatial design problem in which competing functions within a fixed volume affect spatial relationships, mass distribution, trim, and stability. Exploring these trade-offs requires many layouts in a common format, yet public general-arrangement drawings are scarce, inconsistent, and two-dimensional. This study develops a common framework for generating conceptual 3D internal arrangements across six vessel families: bulk carriers, tankers, container vessels, offshore support vessels, patrol vessels, and yachts. Each arrangement uses paired voxel grids and topological graphs for spatial and connectivity analysis. The framework is evaluated through three experiments: (i) comparison of 50,000 generated arrangements with 23 reconstructed real references, (ii) envelope-constrained reconstruction of one reference per family, and (iii) response of generated layouts to requested function volumes. Generated design spaces broadly align with references within each family's sampling range. Searching alternative spatial subdivisions improves reconstruction across all families, with voxel accuracy reaching 75.5%. Fuel and ballast allocations respond near-proportionally to requested volume, while other functions depend on subdivision capacity, compartment eligibility, and discrete assignment. A fixed-hull offshore support vessel application shows that the same hull and requested programme can produce different adjacency and trim outcomes, with five nondominated concepts among 119 of 500 alternatives meeting stability and programme criteria. The results support layout design-space exploration across vessel families and changing requirements, with spatial organisation remaining important beyond volume compliance. The generator and conceptual general arrangement dataset are released publicly for reproducible analysis, benchmarking, and learning-based design studies.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09585v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09585v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://doi.org/10.5281/zenodo.23196765"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09585v1 的 27 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "一种带工程规则的船舱3D procedural layout generator，用voxel/subdivision graph与functional CCGraph暴露结构、容积与质量分布。作者报告50K layouts、23 real anchors及500候选的adjacency–trim探索；可借鉴“request→effective→achieved”的设计可控性审计，但不是学习生成foundation model，也不生成船体或详细可生产CAD。",
+    "motivationZh": "早期船舶设计需要探索舱室布局，但满足船型规则、功能空间和质量分布的三维样本稀缺。问题是产生可用于设计空间探索的成组内部布置，并明确其规则可行性与真实工程验证之间的距离。",
+    "methodZh": "既有17个STL船体独立缩放并voxelize到64×32×24，按六船型规则随机细分、mandatoryplacement与greedy deficit×spatial×mass score分配功能，再repair及preserve-volume label refinement优化质量中心。QC检查规则一致性后export paired representations，externalcomparison另行检查plausibility、reconstruction和requirementsweeps。空间/eligibility限制导致若干容积请求无响应；工程mass模型以η0.5与family永久质量中心校准，仅概念级指标。本文贡献在结构化设计空间及其边界测量，适合参考而非最高优先。",
+    "methodFlow": [
+      "固定envelope与细分空间：从17template选船体缩放voxelize，采样peaks/engine/main/tier/side/superstructure zones，各zone定义eligiblefunctions和mirrorpartners。",
+      "显式容量projection：记录requested programme breq，按eligiblecapacity投影为beff；mandatory engine/steering等先放置，再按deficit、overshoot、spatial/mass偏好和seed扰动greedy赋label。",
+      "修复与constraint-preserving refinement：修void/programmeerror、enginecontiguity、symmetry/fuelseparation；coordinatedrelabelling只在preserve achievedvolumes且改善LCG/KG时接受。",
+      "输出与设计空间分析：QCaccepted输出voxel/subdivisiongraph，并derive functional-island CCGraph；固定hull对adjacency与trim做受约束nondominatedselection。"
+    ],
+    "experimentsZh": "六families50KQCaccepted/23manualrealanchors；各familyonefixedreference、100candidatefixed/varyingsubdivisionreconstruction；100subdivisions×4requestlevels的onefactorcontrols；OSV500alternatives。 以下结果为作者报告：作者报告Bestvaryingvoxelaccuracy23.0–75.5%，平均54.3%，vsBestfixed51.3；adjacencyF1平均0.724。（PDF p.13, Table4）；作者报告OSVfeasible119/500，5nondominated；trim0.01–0.79%L，说明volumecompliance外空间分布影响proxy工程结果。（PDF p.15, Figure6/§7.1） 对照范围：对比同generatorfixed/varyingsubdivision和reference-guideddiagnostic，没有其他procedural/learninggeneratorhead-to-head；reference也inform生成rules，数据空间agreement不等于realismgeneralization。 消融与诊断：需求失效按breq→beff→bach分解，variedsubdivision和targetguidance区分空间/assignment瓶颈；massvariance忽略covariance，非完整varianceattribution。",
+    "insightZh": "新意是六family统一procedural生成及paired dataset和控制边界的实证分析，非新AI架构或globaloptimizer。相同抽象representation让空间、功能和工程proxy可比较，domain-specificheuristics迁移需重新定义。",
+    "evidenceZh": "requested volume不是最终布局的独立连续坐标。（PDF pp.6–7, §4.3–4.4, Eqs.(8)–(9); pp.13–14, Figure5）；realreferences只是plausibility anchors，非独立泛化test。（PDF pp.8–9, §4.5/5.1; pp.20–22, Appendices A–C）；reconstruction峰值75.5%只是bulker一例best-of100。（PDF p.13, Table4）；工程tradeoffs可区分同functionalprogramme布局。（PDF pp.14–16, Eq.(16), Figures6–7; pp.23–24, AppendixD）",
+    "caveatZh": "23realexamples非统计fleet样本并影响generatorrules。；简化functionalclasses/voxelgraph移除room-level geometry、routing/access/irregularboundaries。；同generator/QC数据继承sampling和模型假设。；概念mass校准，未评damage stability、detailedregulations、productionconstraints，500内Pareto不是globaloptimal。；不生成hull；17template外形限制、sourceSTL不随release分发，复现需另备compatiblegeometry。；作为futurelearningdataset可能学到heuristic/QC偏差，而非expertdesign分布。；subdivisiongraph与CCGraph不同，设计距离是区域centroid/interfaceproxy，不是真实pipe/corridor path。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接是constraint-aware结构化3D设计生成与trade-spaceevaluation，可为CAD/形状可执行生成的representations和controlaudit提供参考；不是3Dfoundationarchitecture，推荐medium/skim。"
+  }
+}

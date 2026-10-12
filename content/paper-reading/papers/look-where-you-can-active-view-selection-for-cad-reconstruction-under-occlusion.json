@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.11954",
+  "slug": "look-where-you-can-active-view-selection-for-cad-reconstruction-under-occlusion",
+  "title": "Look Where You Can: Active View Selection for CAD Reconstruction under Occlusion",
+  "authors": [
+    "Kartik Bali",
+    "Mahish Guru",
+    "Yiderigun Borjigin",
+    "Alexandra Starostina",
+    "Christian J. Cyron",
+    "Roland Aydin"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11954"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Look",
+    "Where",
+    "You",
+    "Can",
+    "Active",
+    "View",
+    "Selection",
+    "CAD",
+    "Reconstruction",
+    "under",
+    "Occlusion"
+  ],
+  "abstract": "CAD reconstruction methods assume a luxury reality rarely grants: unrestricted visual access to the object, photographed from any desired angle. Real objects, however, are scene-embedded, bolted against walls, wedged into corners, resting on floors, where the scene renders much of the view sphere unreachable and the remaining views unequally informative. We introduce \\textbf{SightCAD}, a framework for parametric CAD reconstruction that treats view feasibility as a first-class constraint. In this work we consider objects from standard CAD benchmarks embedded in realistic indoor scenes with physically derived visibility constraints over a discrete view sphere. A learned view selector must choose $K$ feasible views for a vision--language model (VLM) that generates executable CadQuery code, scored by geometric fidelity of the executed solid. Because reward arrives only after discrete view selection, autoregressive generation, and CAD-kernel execution, we propose a joint training paradigm in which the view selector and the CAD-generation VLM are trained together against this reward. The learned selection policy departs sharply from random, uniform, and coverage-greedy alternatives, outperforming surface-area maximization (SA-max) by up to $6.4$ Intersection-over-Union (IoU) points across budgets $K\\in\\{1,\\dots,5\\}$. The full system surpasses strong external baselines on scene-embedded, occluded multi-view renders of DeepCAD and Fusion360 objects ($+21$ and $+17$ effective-mIoU points over the best baseline, respectively), as well as on test-time domain-canonicalized real images from the industrial T-LESS benchmark and on both synthetic and real images from the MP6D industrial metal-parts benchmark, while producing the highest rate of executable programs of any method compared (invalid-code rate ${\\leq}1.5\\%$).",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11954v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11954v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11954v1 的 38 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "为scene-embedded CAD recovery学习task-specific view subset，以executedCadQuery IoU而非surfacecoverage训练selector，再与VLMco-adapt。作者报告policy-neutral选择比SA-max+1.4–3.2pp、co-adapted+GRPO最高+6.4pp；直接值得深读可执行CAD恢复，但selector已看全部候选图像，K限制decoder输入，不证明真实相机只拍K张即可。",
+    "motivationZh": "遮挡场景中的 CAD 重建并非增加任意视角就能改善：有些相机位置看不到关键表面，甚至不可观测。问题是在有限视图预算下选择能揭示形状的视角，并使重建器适应不完整、多视角证据。",
+    "methodZh": "CADobjects嵌入七SceneNetrooms的floor/wall/corner，36calibratedviewgrid以GTsurfacevisibility生成feasibility/SA-maxteacher。DINO冻结+cross-viewtransformer各Kselector先distillSAchain；Qwen2VL2B/cadrillecheckpoint用variableKmixturewarmstart。JointphaseviewGRPO使用greedycode执行IoU，同时bestsubsetGTcodeNLL，之后freeze selector再generatorGRPO；不是两模块同时纯RL。大量4Kpolicy-neutral与coadaptedcontrols支持learnedviewlegibility优于coverage，外部benchmark各nativeinput与scale/bestrotationcanonicalscoring，realTLESSraw明显失败但domainmatch改善。",
+    "methodFlow": [
+      "构建已知candidate view lattice：objectframe36views＝3elevation×12azimuth，GT8000surfacesamplesraycast出feasibility/SAmaxchain；renderallviews供image-selector。",
+      "warm-start scorer与generator：DINOfeatures/pose+2layertransformer约2Mscorehead以SAmaxfirst5pairrank/PlackettLuce预训，VLM以random/uniform/SAmaxvariableK及GTprogramNLL。",
+      "jointselection与codeSFT：sample4subsetswithoutreplacement，greedycodekernel执行IoU/invalid−0.5给selectorgroupadvantage；highestrewardsubset监督GTcode，coveragegate0.05perview/0.3union。",
+      "固定selector再codeRL：8temperature0.9codedeCodes同selectedviews，用executedIoU+SFTrefKL；inference每K独立selectorTopK输出code。",
+      "realcapturealignment适配：alignnet从12viewring估canonicalphase，knownobjectposes分slotnearestview≤20°，blankpad/mapback与backfill选4views；TLESS另SAM/nativeplatepixelmatch。"
+    ],
+    "experimentsZh": "523KCADRecode+44KText2CAD程序的sceneembeddedrenders；4Kheldoutpolicycomparison，DeepCAD/Fusion100each、TLESS30synth/138realsets、MP6D20synth/200realsets；variableK1–5。 以下结果为作者报告：作者报告4Kpolicy-neutralK4SA46.30vsLearned47.81，coadaptedRL55.16vs60.52；learned更小coverage但更高geometryfidelity。（PDF p.8, Table1; p.38, Table8）；作者报告MP6Dreal25.58effectiveIoUvsCADCoder19.84，0.50%invalid；TLESScanon32.48vsCADCoder26.32，raw8.26。（PDF p.9, Tables3–4） 对照范围：每baseline自身nativecamerainput且occludedcamera blanked，一些singleviewstudio/mesh-lift而ours4learnedviews；公平nativeformat不等于matchedinformation/acquisitionbudget。SAheuristicGTgeometryoracle、uniform/random允许occlusion，learnedgain混含feasibility和legibility。 消融与诊断：policy-neutral/coadapted/fw-SA、K/occlusionregimepairedstats、geometry-specificpicks及meanother-viewtokenreplaceNLL；meanreplacement不保证in-distribution，interpretability限Qwen2VL。",
+    "insightZh": "newscene-feasibleCADsetting＋decoderreward-drivenviews与co-adaptation组合；不是首个task-drivenviewselection，但将execution-onlyprogramreward用于选择与generatorcredit拆解很直接。重点faithfulspecific-objectrecovery，归3d-reconstruction。",
+    "evidenceZh": "selectedviews的独立价值与co-adaptation可分开。（PDF p.8, Table1; pp.37–38, Tables7–8）；joint阶段VLM学GTcode，不是双方同时rewardRL。（PDF pp.5–7, Eqs.(4)–(7); p.37, Table6）；externalbaseline指标不保持真实scale/pose；rawrealTLESS失败被披露。（PDF pp.8–9, Tables2–4; pp.20–29, Figurecaptions）；realcaptures仍假设poseannotation/lattice，不是无需calibration的activecapture。（PDF pp.34–36, AppendixA.3）",
+    "caveatZh": "固定discretegrid，knowncamera/objectdistance/canonicalanchor只部分test补偿。；rawphotographdomain gap未解决；viewclassreadout解释依赖trainedVLM/tokenization。；K不是totalimageacquisitionbudget，完整candidateviews已获取，尚无sequentialcamera/feasiblepathrobotdeployment。；samefixedscene七rooms与curatedanchors、objectframe旋转补偿限制环境generalization。；cross-methodunitnormalization/bestfitrotation不评真实metricplacement或designintenteditableconstraints；codepublicrelease仍承诺。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接是多视图可执行parametricCADrecovery与task-specificperception，geometry/tokenparameter分析可支撑CADreconstruction研究，high/deep。"
+  }
+}

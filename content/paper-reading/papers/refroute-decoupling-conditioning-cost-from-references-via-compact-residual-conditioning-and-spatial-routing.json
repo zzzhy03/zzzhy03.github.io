@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.07720",
+  "slug": "refroute-decoupling-conditioning-cost-from-references-via-compact-residual-conditioning-and-spatial-routing",
+  "title": "RefRoute: Decoupling Conditioning Cost from References via Compact Residual Conditioning and Spatial Routing",
+  "authors": [
+    "Wanning He",
+    "Yuyao Zhang",
+    "Yu-Wing Tai"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.07720"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "RefRoute",
+    "Decoupling",
+    "Conditioning",
+    "Cost",
+    "References",
+    "Compact",
+    "Residual",
+    "Spatial",
+    "Routing"
+  ],
+  "abstract": "Multi-reference image generation requires preserving the appearance of multiple subjects while composing them into a coherent scene. However, existing diffusion transformers commonly encode references as dense visual token grids and jointly process them with global attention, making conditioning increasingly expensive as the number and resolution of references grow. We present RefRoute, a framework that addresses both reference representation cost and attention overhead through two complementary mechanisms. Compact residual conditioning combines low-resolution latent tokens with lightweight residual features extracted from full-resolution pixels, reducing reference token counts while retaining fine-grained appearance cues. Condition routing and attention routing align reference tokens with their assigned target regions and restrict cross-reference interactions, while allowing selective reference access beyond region boundaries for scene integration. We further introduce RefRoute-Data for training many-reference generation models and ManyRef100, a benchmark spanning human, object, and mixed compositions with 10-17 references. After many-reference fine-tuning, RefRoute achieves an overall Weighted-Ref-VIEScore of 36.06 on ManyRef100, compared with 8.88 for FLUX.2-Klein-9B. Separate inference-cost evaluations show substantially slower latency growth as the reference count increases: at 16 references, our 50-step and 4-step configurations achieve $18.3\\times$ and $14.2\\times$ speedups over their corresponding FLUX baselines, respectively. These results establish compact reference representations and spatially routed attention as an effective approach to scalable many-reference image generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.07720v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.07720v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.07720v1 的 19 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "RefRoute 将每张1024² reference压到256tokens，再用pixel residual补fine identity/材质，并以region routing限制reference串扰，直接适合多对象视觉设计组合。作者在10–17references的自建ManyRef100报告36.06 vs FLUX8.88与显著cost缩放改善；代价是few-reference MICo质量下降、references多由target反推/合成，公开数据/code仍承诺，不能据此保证真实独立拍摄参考的泛化。",
+    "motivationZh": "高分辨率 reference 数量增加时，编辑模型的 conditioning 成本随视觉 tokens 膨胀，而压缩又容易损失身份与材质细节。多个 references 还可能互相串扰，导致目标区域采用了错误对象的特征。",
+    "methodZh": "FLUX2-Klein9B中reference grids使joint attention随K急涨。RefRoute先low-res VAE+六stride2 conv/two-attn pixel compressor，zero-init投影补到DiT reference embeddings；独立reference/spatial LoRA和RoPE rescale绑定targetregions。Mask阻止ref-ref与ref→target直接attention，target区域内看相应reference、区域外只看top1 reference以支持shadows/contact。Stage1以reconstruction/subject generation预训练，Stage2多ref+layout训练，highK continuation另20K。完整19页及数据生成、checkpoint/cost、compressor、distillation和例图附录已读。",
+    "methodFlow": [
+      "每reference downsample至256²经VAE形成16×16tokens，同时从原pixel提同grid residual，经zero-init projection加到DiT。",
+      "Stage1联合reconstruction与subject-driven任务预训练compact representation。",
+      "reference/spatial LoRA适配并rescale RoPE coordinates，输入提供每reference目标region。",
+      "routing mask禁止direct跨reference混合；targetregion内访问对应reference，外部仅top-ranked reference全部tokens。",
+      "Stage2联合reference/layout训练并highK续训，optional TBSM蒸馏4step，生成1024²composition。"
+    ],
+    "experimentsZh": "FLUX2Klein9B、BF16、1024²；MICo897(89.2%≤5refs)，ManyRef100=30human/30object/40mixed、10–17refs且assignedregions。训练manifest20Kobject scenes/143Kinstances+1Khuman；40KStage1、40KStage2、highK续20K，LoRA128/lr1e-4；cost K1/2/4/8/12/16、median3runs、KVcache off。评价GPT5.4+Qwen3VLM权重judges，辅助ArcFace/DINO/mIoU/RRBA。 以下结果为作者报告：作者报告ManyRef Weighted-Ref-VIEScore36.06 vsFLUX2Klein8.88、Ours-MICo17.32；MICo ours52.81 vsBaseFLUX55.67。（Tables1–2, PDF pp.6–7）；作者报告K16 speedups18.3x(50step)/14.2x(4step)，fourstep7.84s vs111.10s；peakallocatedmemory随K增.12GiB vsdense9.05GiB。（Fig.4, PDF p.8; Appendix A.6, PDF p.16）；作者报告matched10KStage2 pixel→DiT Humanface cosine.300 vsconcat.264、RRBA.517 vs.390；Stage1预训练person-count MAE1.643→1.057。（Table3, PDF p.8; Table4, PDF p.9） 对照范围：FLUX checkpoints与外部reportedMICo systems；ManyRefGPTImage1。OminiControl2只同backbone未训练reference-branch cost机制，不能当完整训练system质量/速度对照。缺现实独立拍摄多ref与equal-highK-finetuning其他method对照。 消融与诊断：residual source/injection matchedbudget、Stage1 with/without以及strict mask vsdynamic同checkpointqual；支持representation+binding，top1scene interaction主要qual无corpus影子/contact定量。",
+    "insightZh": "同时解决per-reference表示冗余与reference-region交互图，使细节压缩与空间binding互补；不是简单降低输入resolution，也不是靠mask独立解决所有composition。总reference tokens仍随K增长，“decouple”主要针对resolution/dense interactions，并非reference数量完全无关的复杂度。",
+    "evidenceZh": "pixel residual与lowres VAE tokens同长度相加，而不是新增dense高分辨率token序列。（Sec.3.2 Eq.(2), Fig.2, PDF pp.4–5; Appendix A.5, PDF p.16）；显式region mask与区域外top1访问限制串扰，同时允许scene integration。（Sec.3.3 Eq.(4), PDF pp.5–6; Fig.5, PDF p.9）；many-reference收益不等同few-reference各项胜出。（Tables1–2, PDF pp.6–7）；speed curve与highK quality checkpoints/测量独立，不代表14.2x配置拥有主quality表能力。（Appendix A.3/A.6, PDF pp.15–17）",
+    "caveatZh": "PDF p.9未研究longtext+manyvisualconditions，beyond当前scope。；Conclusion p.9承认few-reference MICo质量低于对应base。；Appendix A.1 p.14说明benchmark references来自早期target或rerender，独立photographed refs泛化不在scope，human identity可能uncertain。；VLMjudge与合成benchmark可能偏向生成pipeline，100cases不足以证明任意multi-object设计稳定。；quality与cost不是同checkpoint统一operatingpoint；cost关闭reference cache，真实serving设置可能不同。；spatialregion给定使任务更受控，reference identity/布局错误需用户或上游系统解决。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对visual creation中多个身份、服饰、材质、对象与位置的组合控制有直接方法价值，可参考structured design条件的空间绑定；没有实际SVG/CAD输出或制造约束。"
+  }
+}

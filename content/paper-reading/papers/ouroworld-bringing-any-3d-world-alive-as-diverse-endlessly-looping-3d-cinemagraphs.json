@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2610.12461",
+  "slug": "ouroworld-bringing-any-3d-world-alive-as-diverse-endlessly-looping-3d-cinemagraphs",
+  "title": "OuroWorld: Bringing Any 3D World Alive as Diverse, Endlessly Looping 3D Cinemagraphs",
+  "authors": [
+    "You-Zhe Xie",
+    "Ting-Wei Chou",
+    "Yu-Hsuan Li",
+    "Kaipeng Zhang",
+    "Zhixiang Wang",
+    "Yu-Lun Liu"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12461"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "OuroWorld",
+    "Bringing",
+    "Any",
+    "3D",
+    "World",
+    "Alive",
+    "Diverse",
+    "Endlessly",
+    "Looping",
+    "Cinemagraphs"
+  ],
+  "abstract": "Recent 3D world models generate photorealistic, explorable scenes that remain frozen in time. OuroWorld is a mask-free framework that turns any static 3D Gaussian Splatting scene into a 3D cinemagraph: a dynamic scene with vivid, diverse motion looping seamlessly from any viewpoint. A vision-language model infers plausible dynamics and guides a video model to synthesize a reference video, which we lift and complete into multi-view videos. To learn from this imperfect supervision, we propose Inconsistency-Robust Periodic 4DGS: a Fourier-series deformation field guarantees looping by construction, while a Grounded Drift Field anchored at the reference view absorbs cross-view inconsistency. Unlike prior Eulerian methods limited to fluid-like motion, we capture general deformation, object motion, and illumination change. We introduce a ground-truth-free evaluation covering vividness, naturalness, loop seam coherence, and scene quality. On 39 reconstructed and generated scenes, OuroWorld outperforms all baselines and wins 70.8%-99.0% of user-study comparisons. Project page: https://ouroworld.userwei.com",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12461v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12461v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/youzhe0305/OuroWorld"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12461v1 的 28 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "把static3DGS蒸馏为周期4DGS：Fourier deformation硬保证每T回到同一状态，reference-view无drift迫使共享field保留motion，其余view-specificdrift吸收生成不一致后丢弃。适合深读有限视域中的3D动画创作；‘endless’是循环表示保证，‘any viewpoint/world’未获全域验证，实验仅±20°附近39scenes。",
+    "motivationZh": "静态三维场景难以直接变成可自由观看、长期重复播放的动态内容；单视角视频的循环接缝与多视图不一致又会在三维提升后放大。目标是同时处理跨视角运动表现和循环边界的连续性。",
+    "methodZh": "GPTmotionprompt/Seedance reference loop经VGGT-Ω static+temporalviews lift，20邻近view的incompletevideos由TrajectoryCrafter补全。CanonicalGS的position/rotation/scale/color由K4Fouriertriplane+MLP周期offset控制，另nonperiodicview-conditioneddrift在训练解释多view误差，reference不允许drift。Referencevideo及t0staticrenders用L1，其余用SDrefinedLPIPS，drift inference丢弃。39scenes和30participant强偏好支持比Eulerianfluidmethods更丰富的动画，physicalplausibility仍完全受videoprior限制。",
+    "methodFlow": [
+      "生成近似reference loop：VLM判断运动并promptvideo，首尾同staticrender条件Seedance10sloop，再filterunnaturalmotion；无需manualmotionmask，但referencepose/pivot仍人工指定。",
+      "lift与complete邻视域：21staticrenders+24temporalframes经VGGT-Ω生成dynamicpoints，aligninputGS，用±20°的20viewsrenderholes再TrajectoryCrafterinpaint。",
+      "周期共享deformation：triplane给K4Fouriercoefficients，MLP输出GSattributeoffset，所有time通过周期basis，P(t+T)=P(t)保证closure。",
+      "吸收跨viewdrift并蒸馏：reference仅G+P，其他views加time/viewembeddingdrift；L1可靠frames、SDrefine后的LPIPS其余frames，inference去drift。"
+    ],
+    "experimentsZh": "9MipNeRF360+30generatedworldscenes，39×static/orbit20s30FPSrender，共四baselines；人评156pairs×5ratings，sameGPTfilter与manualverifiedbaselineSAMmasks。 以下结果为作者报告：作者报告staticvividness0.0423vsGTL0.0374，seam0.9965低于nearstaticLoopGaussian0.9998但MALF更高0.0809vs0.0025。（PDF p.7, Table2）；作者报告naturalnessKVDorbit50.11vsGTL51.86；无groundtruthmotion，differentcamerasKVD不可互比。（PDF p.7, Table2; p.17, AppendixA.5.2） 对照范围：三Eulerian/LDI方法和非loopGTL，能力范围/period/geometryinput不同；没有concurrentAniGS或同Seedanceprior+alternativeperiodic4Dvariant全面比较，需结合owncomponentablation。 消融与诊断：removeDrift、removeGrounding、naiveL1insteadSVCO、2Tperiod；未报告repeatedseed、迭代/optimizationwallclockper-scene范围。",
+    "insightZh": "Fourier与4DGS并非首次，创新在把周期属性用于hardloopguarantee且referencegrounding区分sharedmotion/generativedrift。它不保证drift唯一分解或真实物理，effect由ablation支持。",
+    "evidenceZh": "周期性在representation层成立，与video近似periodic不同。（PDF p.5, Eq.(1)/§3.3.1; pp.9–10, periodablation）；referencegrounding避免drift吞掉motion。（PDF p.5, Eq.(2)/Figure4; p.9, Table3）；自动metric比较支持局部循环观感，不是physicalGTaccuracy。（PDF pp.6–7, Table2/§4.3–4.4; pp.16–17, AppendixA.5）；人评覆盖39scenes，偏好强但没有全空间验证。（PDF p.9, Figure6; pp.17–18, AppendixA.6; pp.11–13, AppendixA.1–A.2）",
+    "caveatZh": "videoprior不合理motion会传播，VLMfilter只能缓解。；singlereference完成wideviews会增disocclusion/inconsistency，multipleviews为futurework。；reference/pivot人工指定，Lyra输入改trajectory并per-scene重建，不是直接对所有off-the-shelfworld证明。；synthesisloops不模拟physicalinteraction或任意exploration，Fourier固定frequency限制motion表达。；生成视频filtered，reject/regeneration成本与fullper-sceneiteration未量化；没有独立物理或loop视频实测复现。；官方printed project的JS链接追溯到public repo，README/pyproject和实际CLI训练实现已保存证据；未执行官方代码或复现结果。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接将已有3Dworldasset变为可novel-view循环动画，periodicrepresentation与robustgenerative-distillation可用于3D创作系统；high/deep关注方法分解。"
+  }
+}

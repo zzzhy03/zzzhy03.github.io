@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.10342",
+  "slug": "position-forcing-self-conditioning-3d-generation",
+  "title": "Position Forcing: Self-Conditioning 3D Generation",
+  "authors": [
+    "Ziheng Ouyang",
+    "Zeqiang Lai",
+    "Jiarui Chen",
+    "Jiangshan Wang",
+    "Yuhao Wan",
+    "Jingbo Gong",
+    "Xiangyu Yue",
+    "Hengshuang Zhao",
+    "Qibin Hou",
+    "Chunchao Guo"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10342"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Position",
+    "Forcing",
+    "Self-Conditioning",
+    "3D",
+    "Generation"
+  ],
+  "abstract": "Recent single-stage 3D generative models commonly adopt VecSet representations, encoding 3D shapes as unordered sets of latent tokens. However, compared with two-stage methods that provide explicit positional guidance, these models must implicitly infer token positions throughout denoising, limiting their generation quality. We observe that, despite the absence of explicit positional conditioning, VecSet tokens retain recoverable spatial correspondences. Building on this observation, we propose Position Forcing, a position-based self-conditioning framework. During denoising, Position Forcing recovers token positions from the current clean latent estimate, quantizes them at progressively finer resolutions according to the denoising stage, and feeds the resulting positional encodings back into the diffusion Transformer. This progressively refined positional feedback provides spatial guidance at a granularity appropriate to each denoising stage, guiding shape generation along a coarse-to-fine trajectory and substantially improving generation quality without a separate position generation stage. Experiments demonstrate that Position Forcing achieves strong performance among single-stage 3D generative methods and outperforms several competitive multi-stage approaches.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10342v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10342v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10342v1 的 18 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Position Forcing从VecSet/VoxSet clean-latent estimate恢复token位置，并按noise逐步量化、通过3DRoPE反馈给单stageDiT，免独立layout生成器。作者报告jointVAE在128³grid cleancell accuracy99.9%与几何F1改善；generation embedding指标只比HY2.1小幅提高，训练用GTquery而推理用prediction，且corpus/评测N未给。值得读空间self-conditioning机制。",
+    "motivationZh": "3D latent set 在生成中逐步形成几何位置，早期 latent 与空间坐标尚未稳定对应，固定位置编码难以表达当前形状。问题是让空间关系在 denoising 过程中随几何估计更新，而不把未知位置当成已知输入。",
+    "methodZh": "复现LATTICE VoxSet VAE，先冻结几何VAE训练四层positiondecoder，再joint geometry/position/KL finetune。DiT训练VAE冻结、用GTquery positions在同noise resolution量化并随机扰动；推理从上一步velocity估cleanstate Z0=Zt−tVt，再解码positions作为下一步3DRoPE。pure-noise第一步R=1使所有token同pos，后续resolution1→128；50stepEuler/CFG5生成latents，以DMC512抽mesh。所谓single-stage只指生成trajectory，表示训练仍多stage。图表支持机制但非所有embeddingmetricsfullmodel最佳，无更精细geometry/validity统计。",
+    "methodFlow": [
+      "以point/voxel queries编码shapegeometrylatents，先学冻结VAE的位置decoder，再jointfinetunegeometry与位置恢复。",
+      "冻结PositionVAE，DINOv2-Giant编码条件image，FLUX式DiT用GTquery quantization与训练扰动学习rectifiedflow。",
+      "从noise以R1无区分位置启动，每step预测velocity并估cleanlatents。",
+      "Positiondecoder从cleanestimate恢复tokenpositions，按下一stepresolution量化并注入3DRoPE，循环coarse-to-fine。",
+      "50stepEuler/CFG5生成12288latenttokens，geometrydecoder+DMC512输出mesh。"
+    ],
+    "experimentsZh": "held-outmeshes重建与image-conditionedgeneration，ULIP/Uni3Dtext/imagesimilarity；正文未给corpus、generationevaluation样本N或CI。VAE64channeltoken，DiT12double+24singleblocks、width1536，train4096→6144tokens/image518，infer12288tokens/image1022、50Eulersteps、DMC512。 以下结果为作者报告：作者报告jointVAEcleancellaccuracy99.9%、20%noise92.5%，frozenVAE67.4%/23.0%；largestlatentCD5.39/F195.38。（Table1 PDF p.4; Table2 p.7）；作者报告fullULIP-T/I0.077/0.130与Uni3D-T/I0.257/0.321；baselineVecSet0.075/0.125/0.250/0.320。（Fig.4, PDF p.9） 对照范围：TRELLIS1/2、Direct3D-S2、Hi3DGen、CraftsMan1.5、UniLat3D、HY2.1；VAETripoSG/HY2.1。无统一runtime/参数量/训练data证明、meshmanifoldness或CADeditability/3Dpart验证。 消融与诊断：matchedseeds分别固定/noquant、noisyvscleanpositions、GTqueryvstrainingpred、StageIvsjointVAE；GTquerytrain配noisyinference严重退化，说明coupling必要。某些embeddingmetrics在替代variant更高，收益不应称一致dominance。",
+    "insightZh": "相对两stage先layout再geometry，把可解码token-query correspondence作为单trajectoryself-conditioning；cleanestimate与progressivequantization降低噪声position误导。positionVAE依赖VoxSet/LATTICE，并非证明所有unorderedVecSet天然可高精度恢复。",
+    "evidenceZh": "VAE jointfinetune让position可恢复，单独冻结VAEpositiondecoder噪声下明显失败。（Sec.3.2, Table1, PDF pp.4–5）；训练用GTqueries，推理用preceding-stepcleanestimate；progressivequantization匹配noise并首次R1。（Sec.3.3 Eqs.(10)–(14), PDF pp.6–7; Algorithm1 p.17）；作者报告generation ULIP-I0.130/Uni3D-I0.321，HY2.1为0.125/0.320；部分matchedvariantUni3D-I0.323高于full0.321。（Table3 PDF p.7; Fig.4 p.9）；作者报告largestlatent20480 VAECD5.39/F195.38，对HY2.1同token7.62/92.06。（Table2, PDF p.7）",
+    "caveatZh": "未见独立Limitations章节；Sec.3.3指出复现historyfeedback需昂贵unroll，所以改用GTquery单timestep训练（p.6）。；训练querypositions与推理预测有exposuregap；调节noisequantization与positiondecoderbias可能对thin/multipleparts敏感。；corpus、evalN/threshold单位与CI缺失，极小embedding差距无法判断统计稳定。；12288tokens、50steps与额外positiondecoder未提供speed对照，不能仅single-stage推断更快。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "3Dlatentpositionfeedback可为object/part-aware生成与结构控制提供直接思路；本文没有LEGO/CAD/fabricationconstraint证据。"
+  }
+}

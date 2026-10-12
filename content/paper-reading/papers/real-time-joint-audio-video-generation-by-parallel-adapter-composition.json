@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.10343",
+  "slug": "real-time-joint-audio-video-generation-by-parallel-adapter-composition",
+  "title": "Real-Time Joint Audio-Video Generation by Parallel Adapter Composition",
+  "authors": [
+    "Jingyu Li",
+    "Xiaoxiao Xiang",
+    "Yiwen Guo"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2610.10343"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Real-Time",
+    "Joint",
+    "Audio-Video",
+    "Generation",
+    "Parallel",
+    "Adapter",
+    "Composition"
+  ],
+  "abstract": "Deploying a joint audio-video diffusion transformer for real-time, interactive generation normally requires two essential modifications: block-autoregressive attention, so frames can be emitted before the whole clip is finished, and few-step sampling, so each block is cheap. Conventionally, the streaming video literature obtains both capabilities from a chained pipeline. It first distills a bidirectional teacher into a causal student, then into a few-step one, or proceeds in reverse order. Each stage of such a chain fine-tunes the weights the previous one produced, so a later objective can undo an earlier capability. Following the idea of model merging, we show that on a packed audio-video backbone the two capabilities can be acquired in parallel. A causal adapter is trained against the frozen backbone, and an off-the-shelf few-step adapter provides the few-step capability. As the two edit different functional axes, we predict, and then verify, that their weight-update directions are near-orthogonal, without any explicit orthogonality constraint during training. Orthogonal updates should combine without interfering, so parallel composition is a direct sum. The two adapters are simply added at inference, with no joint training, yielding few-step, streaming audio-video whose image quality tracks the bidirectional teacher. Compared to the chained baselines, the composed model matches or beats them on most metrics, making parallel composition a practical approach. The resulting streaming system generates joint audio-video in real time, $\\approx$26 fps at $480\\times832$ without quantization, and sustains 30 s of continuous generation with stable image quality. Demo Page: https://pac-demo-2027.github.io/demo/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10343v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10343v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10343v2 的 15 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "PAC 在同一frozen MiniMax-H3上独立训练causal LoRA，直接叠加现成four-step distillation LoRA，避免串行训练“un-distill”已有快采样能力。作者报告6GPU下约26fps/480×832和30s talking-head streaming；训练组合思路值得skim，不能省略4.2s首帧延迟、约3倍word errors、speaker identity drift及单backbone限制。",
+    "motivationZh": "实时 talking-head generation 要同时维持音画同步、身份、视觉质量和低延迟，离线 video diffusion 难直接满足交互。不同区域的运动尺度与依赖不同，统一采样和计算分配带来质量/吞吐/延迟冲突。",
+    "methodZh": "生成边播放需要block-causal routing和few-step denoising，论文认为分别在原frozen base训练两种小更新比让第二阶段改变第一阶段更稳。causal adapter用duplicated clean/noisy audio-video token axis和mask进行clean-context teacher forcing，使每个noisy chunk只看以前的clean chunks并用flow-matching regression训练。lightx2v Turbo LoRA保持bidirectional distillation来源，inference将其融入W再叠causal LoRA，以sliding-window KV cache输出34-frame chunks。211个held-out teacher-generated clips、3×100 real talking-head clips与40×30s rollouts支持appearance优势，但lip-sync/audio质量较teacher和部分chained baseline弱。权重Frobenius near-orthogonality是小扰动下的诊断，不是Hessian兼容性的严格证明。",
+    "methodFlow": [
+      "在frozen MiniMax-H3 FL2VA上保留现成rank128/lightx2v four-step distillation adapter，独立训练causal adapter。",
+      "将clean与noisy audio/video tokens沿time axis复制，per-chunk同步取噪声index；mask禁止noisy chunk读取自身clean副本。",
+      "仅在noisy halves施加flow-matching regression，所有历史为clean teacher forcing；不在distilled base上回归瞬时velocity。",
+      "inference离线融合distillation权重，再叠causal LoRA，以four-step denoise逐34-frame音视频chunk。",
+      "使用7chunk滑窗cache与first-frame anchor，重编码text并接受stale history cache；输出后额外forward写clean KV。"
+    ],
+    "experimentsZh": "MiniMax-H3 first-frame FL2VA；约4000个5–10s teacher-generated talking-head clips，211held-out，中英balanced、480×832/640×640；causal rank128 LoRA16GPUs训练2epochs、LR1e-4、chunk34frames，inference4steps/7chunk window。AVSpeech/HDTF/VidChatBench各100real clips；40×30s long rollouts扩展transcripts确保不以提前停止得益。 以下结果为作者报告：作者报告held-out IQA .914对ChainedDA .854/ChainedAD .877；SyncC7.443低于ChainedAD8.021，WER .127对WholeSeg4step .047、teacher .041。（Table1, PDF p.6）；作者报告30s closing5s IQA .871(+2.6%)、face identity .710(-18.3%)、SyncC5.69(-29.6%)、voice .521(-41.0%)；speech speaker保留是弱项。（Table2, PDF p.7）；作者报告3个public sets上IQA .866/.866/.892，但HDTF FVD61.4不如ChainedDA49.6；同路线并非所有metrics/sets领先。（Table4, AppendixG, PDF p.15）；作者报告6GPUs/no quantization下约26fps@480×832，time-to-first-frame4.2–4.3s；单session每chunk成本由滑窗限住。（AppendixI, PDF pp.14–15） 对照范围：同H3 base比较50stepteacher、4stepWholeSeg、Decoupled50、ChainedDA和三阶段ChainedAD，且real-source公开数据补充teacher-reference held-out。DA/AD不同order同时有不同objective，不能将差异全归因order；OmniForcing因LTX2 backbone不同未直接比较。 消融与诊断：50stepcausal是reference point而非纯step ablation；weight geometry/null、chained order、shared stream implementation与attention mask验证支持objective兼容解释。未做跨backbone、non-avatar video或self-rollout训练来检验transfer/generalization。",
+    "insightZh": "把causalization与few-step distillation视为可重用parallel task updates，并以同backbone两种chained order和weight-subspace measurements解释为何无需joint training或orthogonality regularizer。基础是task arithmetic/LoRA与teacher forcing，独立组合目前只在一个talking-head H3条件成立，不能推广为任意adapters都安全相加。",
+    "evidenceZh": "causal adapter只对原frozen W用clean-history flow regression训练，而distilled jump-field上同目标会un-distill。（Sec.3.1–3.2, Eq.(2)–(3), PDF pp.3–4）；independent updates的write interference接近随机null，但不证明Hessian正交。（Table3, PDF p.8; AppendixE, PDF pp.12–13）；composed model维持appearance但lip-sync与speech错误存在trade-off。（Table1, Sec.4.2, PDF p.6）；30s rollout的face/image稳定不意味着voice稳定。（Table2, Fig.2, PDF p.7; Fig.5, PDF p.14）；约26fps依赖six GPUs且首window需4.2–4.3s。（AppendixI, PDF pp.14–15）",
+    "caveatZh": "所有训练与评测corpora均talking-head/digital-human，sync/audio结论是domain-specific。；long sessions的speaker identity下降最严重，causal adapter未训练自身rollouts，未来可加self-rollout objective。；仅MiniMax-H3，未在LTX2/Wan验证；与OmniForcing同backbone比较仍缺。；cache history在更短context写入且text已变化，作者接受stale-cache训练/推理mismatch。；weight near-orthogonality仅Frobenius surrogate，没有测Hessian cross-term，不能作为任意adapter组合的保证。；frame throughput依赖6GPUs且首帧>4s，不宜描述为单GPU低latency实用方案。；held-out references由teacher生成且teacher看两个keyframes，stream只看first frame，质量floor与public real-source scores不可混用；数字为作者报告未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "独立训练与重用generation adapters的思路可作为visual creation系统同时加入streaming/效率功能的参考；跨一般video或3D生成尚未测试，不把talking-head结果泛化为世界生成能力。"
+  }
+}

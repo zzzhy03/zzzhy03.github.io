@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2610.12572",
+  "slug": "diffusionart-efficient-stable-and-scalable-reinforcement-of-diffusion-models",
+  "title": "DiffusionART: Efficient, Stable and Scalable Reinforcement of Diffusion Models",
+  "authors": [
+    "Zhenglin Wan",
+    "Jiayu Chen",
+    "Zhengfeiyang Zhang",
+    "Pengfei Zhou",
+    "Wangbo Zhao",
+    "Fangyuan Kong",
+    "Pengfei Wan",
+    "Kun Gai",
+    "Yang You"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12572"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "DiffusionART",
+    "Efficient",
+    "Stable",
+    "Scalable",
+    "Reinforcement",
+    "Diffusion",
+    "Models"
+  ],
+  "abstract": "Online reinforcement learning (RL) fine-tunes diffusion models with black-box rewards, but reverse-process methods such as Flow-GRPO are limited in efficiency by poor credit assignment, while forward-process methods such as DiffusionNFT are efficient yet unstable without carefully tuned exponential-moving-average (EMA) off-policy training. We show that NFT-style objectives contain a hidden forward--reverse consistency force that joint positive--negative training cancels only partially, and that EMA stabilizes training through restoration rather than off-policy rollouts. We introduce DiffusionART (Diffusion Reinforcement with Aggregation-First Reward Tilting), which aggregates each prompt's rewards into a shared reward-improving direction for reverse-process states, removing the consistency force by construction, and adds a trust-region-masked second update for drift-adaptive restoration without EMA tuning. It requires no differentiable reward model, remains effective with fewer samples per prompt, and supports pairwise reward models (DiffusionART-Pairwise). Across image and video generation, DiffusionART trains efficiently and stably without per-task tuning. In particular, on HunyuanVideo-13B with equally weighted visual and motion quality rewards, DiffusionART reaches the late-stage mean reward levels of DiffusionNFT and Flow-GRPO-Fast with 12.02 and 11.72 times fewer GPU hours, respectively, while achieving 28.8% and 53.0% higher mean training rewards.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12572v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12572v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/vanzll/DiffusionART"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12572v1 的 23 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "DiffusionART先在每prompt把reward与cleanendpoints聚成RMS-normalizedcovariance方向，再对reverseODEstates回归同一guidedvelocity；第二个disjointupdate与GaussianreferenceKLproxy mask限制drift，免调EMA。作者报告Hunyuan13B在VQ:MQ1:1下time-to-baselinereward约12×更省GPUh；这是reward优化效率，不是人类质量/物理真实性12×提高。",
+    "motivationZh": "Diffusion 的 reward finetuning 可能在旧策略约束与奖励改进之间产生相互抵消的更新，还需反复承担昂贵 rollout 成本。问题是获得更稳定、可扩展的奖励优化，并区分训练 reward 的快速上升与真实生成质量改善。",
+    "methodZh": "理论拆NFT更新为conditionalrewardguidance与未完全抵消forward/reverseconsistencyforce，解释oldpolicyanchor的restoration。ART不借forwardnoisedendpointvelocity，只缓存rolloutstates/oldpredictions并用Cov(R,x0)归一sharedguidance。两等分minibatches分别一次MSE，第二步出现localdriftrestoration；trustmask基于假想SDEGaussians评估outwardchange，不把deterministicODEKL当有限KL。pairwisewinner/loser赋1/0同pipeline，K2退化为winner-minus-loser。主结果同时涵盖SD3.5/FLUXimages、HunyuanT2V与WanI2V，评估仍依赖目标rewardmodels。",
+    "methodFlow": [
+      "从当前ODEpolicy对每prompt生成Koutputs，收cleanlatents、blackboxrewards、visitedstates与oldvelocitypredictions。",
+      "计算promptreward-endpointcovariance并RMSnormalize，令每statefrozen target=oldvelocity+sharedG。",
+      "将rolloutbatch等分为两个disjointminibatches，每份执行一次guidedMSEupdate，第二次包含对旧stateprediction的restoration。",
+      "用referenceGaussianSDEtransitionKLproxy检测excessoutwarddrift，按mask/timestepweights抑制过大第二次更新。",
+      "重复on-policyrollout；pairwisereward将每pairwinner/loser/tie替成1/0/0.5而保持同covarianceoperator。"
+    ],
+    "experimentsZh": "SD3.5M512²LoRA32/α64/10steprollout，GenEval/OCR/PickScore及四rewardjoint；FLUX12B6step。Hunyuan13B全参53frames480²8FPS/16steps，32prompts×8videos；Wan14BI2V53frames400×640/4steps。VideoReward4FPS，T2V分别7:2:1与1:1weightsets，400updates。 以下结果为作者报告：作者报告1:1最后50stepsmeantrainreward13.018vsNFT10.105/Fast8.510，达到二者late-reward时GPUh减少12.02×/11.72×。（App.A.5, PDF p.14）；作者报告FLUXheldoutGenEval0.9684vsFlowDPPO0.9183/NFT0.8490；WanI2V VQ11.196/MQ10.476vsFast5.771/4.710。（App.Tables2/4, PDF p.14） 对照范围：FlowGRPO/Fast、DanceGRPO、FlowDPPO、NFTonpolicy/EMA，另ReFLwithrewardgrad。部分large-modelNFT移用未重调参数，因此稳定性比较应限这些recipes；无独立humanpreference、differentRMheldout或安全/物理准确评测，显著rewardhacking风险未量化。 消融与诊断：positive/negative/EMAanchor、onevstwoARTupdates、trustmask、scalar/pairwiseK2/4/8、prompt-globalvslocalpair、gradient/driftdiagnostics；mask对T2I非必要且nomask可更快，对video更稳。主收益是优化目标与resource效率而非仅samples数量。",
+    "insightZh": "aggregation-before-statecredit和drift-awaretwo-update避开NFT的forwardvelocity目标，形成跨image/video的likelihood-freeRL训练方式；理论只证明tiltedendpointmean一阶方向，不保证每stateposterior或parameterstep都单调提升reward。",
+    "evidenceZh": "reward-endpointcovariance形成sharedguidedtarget，不含forwardvelocity consistencyterm。（Sec.4.1 Eq.(5), Fig.4, PDF p.6; App.B.3 p.19）；two-disjointMSEupdates引restoration，trustregion使用Gaussianreferenceproxy而非ODEtrueKL。（Sec.4.2–4.3 Eqs.(6)–(8), Algorithm1, PDF p.7; App.C.2 p.19）；作者报告T2VHunyuanVQ8.970/MQ4.224/TA2.111，对NFT6.827/2.683/2.096。（App.A.2 Table3, PDF p.14）；K2pairwise400updatesVQ12.235、260.8GPUh，对K8pairwise12.092、883.3GPUh。（Table1, PDF p.10）",
+    "caveatZh": "共享prompt方向未匹配每stateposterior，参数更新响应不同，singleupdate会deteriorate（App.B.3 p.19）。；NFTrestore梯度取消机制仍待更详细分析（p.5）。；训练及eval主要同reward模型，rawscores不是generalhumanquality或真实physicalmetrics。；time-to-selected-reward阈值和step/GPUhour指标不能当所有budget均12×speedup；无多seedCI。；RMSnormalization对lowvariance/zero/tiepairs需数值保护，smallK一般泛化未证明。；syntheticSDEtrustproxy不是deterministicODEpolicyKL，有solver-dependent参数。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "image/video黑盒rewardpost-training新方式可迁移视觉生成priors与创作control训练，尚无SVG/CAD/3D直接验证。"
+  }
+}

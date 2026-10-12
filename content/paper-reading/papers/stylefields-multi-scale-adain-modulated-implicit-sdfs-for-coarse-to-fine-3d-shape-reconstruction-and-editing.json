@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.09200",
+  "slug": "stylefields-multi-scale-adain-modulated-implicit-sdfs-for-coarse-to-fine-3d-shape-reconstruction-and-editing",
+  "title": "StyleFields: Multi-Scale AdaIN-Modulated Implicit SDFs for Coarse-to-Fine 3D Shape Reconstruction and Editing",
+  "authors": [
+    "Ehsan Garaaghaji",
+    "Nicolas Talabot",
+    "Pascal Fua",
+    "Doruk Oner"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09200"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "StyleFields",
+    "Multi-Scale",
+    "AdaIN-Modulated",
+    "Implicit",
+    "SDFs",
+    "Coarse-to-Fine",
+    "3D",
+    "Shape",
+    "Reconstruction",
+    "Editing"
+  ],
+  "abstract": "We introduce StyleFields, a DeepSDF-based architecture for high-fidelity 3D reconstruction that enables controllable geometric style mixing: the coarse structure of one object can be combined with the fine-scale details of another. The core idea is depth-aware modulation: instead of a single global code, we inject latents via multi-level Adaptive Instance Normalization at several decoder depths, and supervise matching auxiliary heads with a coarse-to-fine schedule while gradually growing network depth. This aligns early layers with global shape and later layers with high-frequency detail, achieving content-style decoupling without part labels or adversarial training. StyleFields delivers faithful reconstructions, convincing cross-instance hybrids, and consistent gains in ablations over injection depth and supervision granularity. We further demonstrate a practical application in automotive aerodynamics: a learned surrogate drag predictor serves as a differentiable objective to optimize reconstructed cars, allowing targeted edits of global form or surface details by freezing the complementary latent stream. StyleFields offers a simple, effective recipe for controllable implicit reconstruction and downstream performance-driven design.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09200v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09200v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09200v1 的 39 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "StyleFields 将 DeepSDF autodecoder 的逐层 AdaIN 条件分成多个尺度，再用平滑 SDF 辅助头逐步训练；重建后可在 W+ 混合粗细形状或冻结部分尺度优化。它提供可编辑 implicit asset 的具体控制接口，但“粗细解耦”主要是定性频率偏置，重建并非各类别领先，空气阻力改善只是 GCN surrogate 预测，适合 skim 方法而非直接采信性能宣传。",
+    "motivationZh": "隐式 SDF 的单一 latent 往往把整体轮廓和局部细节纠缠在一起，重建后难以只修改一个几何尺度。论文希望让粗形状与细结构能够分别调整或组合，减少编辑对其他尺度的干扰。",
+    "methodZh": "阅读全文和补充材料后，方法是每个训练形状学习 global latent，经 mapping network 和各深度 affine transform 得到 W+；多个 ResMLP block 以 AdaIN 调制，训练时逐渐增加深度，并用不同 Gaussian 平滑尺度的 SDF target 监督中间头。测试形状分别优化 z 或更自由的 W+，随后按 block 混合源与目标的 styles。另通过 differentiable mesh extraction 接 frozen GraphSAGE pressure predictor，在 latent 初始化与邻域 regularization 下做局部尺度 drag optimization。这里的“style”是几何尺度，不是纹理生成，模型没有单图输入 encoder。",
+    "methodFlow": [
+      "为训练 shape 采样 SDF 并形成多种 Gaussian 平滑的目标，学习每个 shape 的 global latent。",
+      "将 latent 映射到 W，再按 block affine transform 得到逐层 W+，用于各 ResMLP block 的 AdaIN scale/shift。",
+      "逐渐增加网络深度，用中间 SDF head 保持粗尺度监督，最终 head 拟合原始 SDF。",
+      "对测试 shape 优化 z 或 W+ 重建，并替换早期或后期 styles 得到 coarse/fine hybrid geometry。",
+      "可冻结部分尺度，通过 differentiable mesh 和 frozen pressure GCN 的 drag proxy 更新其余 latent，加入初值与 latent 邻域 regularization。"
+    ],
+    "experimentsZh": "Cars、chairs、airplanes 的 SDF reconstruction，分别比较 global z 和 W+ optimization；正文混合与 latent interpolation，补充提供多类别 style mixing、重建和 t-SNE 邻域图。模型4.2M参数，对 DeepSDF1.7M/Curriculum DeepSDF2.1M，不是等参数比较。空气动力学仅两个 car case，采用 frozen GraphSAGE surface-pressure prediction 与 pressure integration proxy。 以下结果为作者报告：作者报告 cars z CD1.3e-4/IoU97.36、W+1.2e-4/98.43；DeepSDF1.6e-4/97.27，PartSDF1.3e-4/98.02。（Table1, PDF p.12）；作者报告 chairs W+1.6e-4/95.31 落后 PartSDF1.3e-4/97.17；planes W+6.4e-4/93.66 的 IoU高于 VecSet92.10，但 CD差于 VecSet7.8e-5。（Table1, PDF p.12）；作者报告两辆车只优化早期 styles 的 surrogate Cd 比只优化细尺度更低，同时展示不同程度保留 silhouette；无物理真实性量化。（Table2 and Fig.7, PDF pp.13-14）；作者报告四组 styles 的 reconstruction 优于1/2/3/5组，参数量与 block configuration 同时变化。（Table3, PDF p.22） 对照范围：DeepSDF/Curriculum DeepSDF/PartSDF/3DShape2VecSet 等 reconstruction reference；ours W+ 的测试时优化自由度多于 global latent baselines，model parameters 也不同，不能把全部提升当同预算架构收益。编辑缺乏 matched alternative、部件保持数值和 human study，主要有图示。 消融与诊断：style-group数量及跨层混合可说明实际频率偏置；没有 progressive-depth、Gaussian target、AdaIN 单因素充分消融。t-SNE 根据 latent distance 选 nearest/farthest examples，不是 frequency localization 或语义可分性的量化证据。",
+    "insightZh": "实质贡献是把 StyleGAN 式逐层 conditioning 与多尺度 SDF progressive supervision 组合成 implicit geometry 的 coarse-to-fine editing interface，并展示只改部分尺度的 downstream optimization。没有证明严格空间部件独立性或 latent disentanglement；尺度偏置与参数量、W+ inversion 自由度的影响尚未完全分离。",
+    "evidenceZh": "不同深度 styles 对粗细几何有可见偏置，但不是完全独立的频率或语义部件变量。（Sec.3 and Fig.1, PDF pp.2-5; Appendix discussion, pp.19-20; Fig.18, p.37）；W+ 重建提升部分指标，但 chairs 和 airplanes 的 Chamfer distance 不领先。（Table1, PDF p.12）；逐层数量消融支持四组 styles 的局部取舍，未单独证明 smoothing 或 progressive growth 的因果贡献。（Appendix Table3, PDF p.22）；drag example 是两个 car 的 learned pressure surrogate 优化，没有真实 CFD 或风洞复验。（Sec.4.3 and Table2, PDF pp.12-14; Appendix implementation, pp.23-24）",
+    "caveatZh": "Appendix pp.19-20 承认 styles 不完全独立，后期变量仍可能影响较粗形状，dataset bias 是解释假设。；优化使用 learned aerodynamic surrogate 和 latent regularization，几何质量与设计保持仍是软限制。；AdaIN 的 normalization axes、inference query consistency、完整训练 optimizer/steps、数据 split 数量、inversion iterations 和 drag regularizer weights 未充分给出，当前复现把握有限。；SDF smoothing 的 Gaussian尺度表给了不同类别数值，但坐标/grid单位及 head training schedule 不够完整，不能直接迁移为可复现 recipe。；airplanes Chamfer 明显落后最佳 baseline；不可把 IoU单项优势写成全面 SOTA。；pressure GCN 的训练/held-out误差及 optimized shapes 的分布外可靠性未报告，pressure-only proxy 不等完整气动阻力。；混合结果是几何 coarse/fine transfer，未展示结构 CAD、可制造性、纹理或保证语义部件独立。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接提供 implicit 3D asset 的重建后 coarse/fine editing 和部分尺度优化，符合3D reconstruction及独立几何编辑方向；应用证据和可复现性不足以建议 deep，推荐 skim其控制接口。"
+  }
+}

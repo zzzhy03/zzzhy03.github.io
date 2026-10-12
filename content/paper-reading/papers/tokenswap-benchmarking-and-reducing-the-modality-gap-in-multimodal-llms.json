@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2607.28640",
+  "slug": "tokenswap-benchmarking-and-reducing-the-modality-gap-in-multimodal-llms",
+  "title": "TokenSwap: Benchmarking and Reducing the Modality Gap in Multimodal LLMs",
+  "authors": [
+    "Andong Hua",
+    "Colton Bishop",
+    "Igor Mordatch",
+    "Arian Hosseini",
+    "Jindong Gu",
+    "Aleksandra Faust",
+    "Rebecca Roelofs",
+    "Yao Qin"
+  ],
+  "publishedAt": "2026-05-20",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2607.28640"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "TokenSwap",
+    "Benchmarking",
+    "Reducing",
+    "Modality",
+    "Gap",
+    "Multimodal",
+    "LLMs"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) should exhibit cross-modal consistency, generating consistent responses given semantically equivalent inputs across modalities. However, we observe a systematic discrepancy in model predictions under such cross-modal variations. Specifically, we define the modality gap as the difference in model performance under semantically equivalent textual and multimodal inputs. We introduce TokenSwap, a method that constructs such inputs by replacing textual concepts with semantically aligned images, resulting in sequences where visual tokens are interleaved with text tokens. Based on TokenSwap, we transform existing text-based benchmarks (e.g., MMLU) into image-interleaved counterparts, resulting in TokenSwap-Bench. Across 42 MLLMs, we observe a pervasive modality gap, with performance decreasing by 4.2% to 47.4% when moving from text-only to image-interleaved inputs, averaging 19.6% +/- 3.3% across models. Notably, reasoning models exhibit consistently smaller gaps, achieving an average gap of 10.1% compared to 25.5% for non-reasoning models, suggesting greater robustness in multimodal reasoning across equivalent textual and visual representations. In contrast, neither prompting strategies nor scaling training compute alone reliably reduces the modality gap. Finally, we demonstrate that incorporating TokenSwap during training effectively mitigates this gap, improving cross-modal alignment while preserving strong text-only and vision-language model performance. The project page is available at https://dongxzz.github.io/TokenSwap/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.28640v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.28640v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/DongXzz/TokenSwap"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.28640v2 的 32 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：相对v1，v2新增GPT-5-mini filtering proxy robustness、GSM8K free-form任务、white-image和rendered-text输入长度/视觉路径控制，以及InternVL3-8B第二骨干训练验证（gap .303→.230）。核心TokenSwap和Qwen/OCR训练结果v1已有；新控制支持排除部分混杂但不是完全语义等价的因果证明。 TokenSwap 将text里的可视实体替为image并保留原answer，通过同样文本样本的对照训练检验跨模态grounding。作者报告Qwen2-VL生成图posttrain gap.268→.167，第二family也从.303→.230；这是比纯benchmark更有用的interleaved数据recipe。适合skim，但『语义等价』只由recoverability近似、gap随图片/过滤而变，reasoning/scaling结论是跨模型相关，不是因果或普遍训练law。",
+    "motivationZh": "语义近似的概念以文字或图片出现时，MLLM 的答案仍可能显著不同。现有评测还混入输入长度、OCR、图像质量与过滤模型偏好，难以定位跨模态能力差距及其训练来源。",
+    "methodZh": "构造1516MMLU问题/6946图像，Gemini提取实体、生成图与contextvalidity/conceptimportance/captionroundtrip过滤；另proxy/retrieval/white/OCRimage控制。42modeldiagnostic、116722Magpiequeryaugment与18366retrievalexamples在Qwenpre/posttraining，InternVL小规模replication；OCR需匹配域数据。",
+    "methodFlow": [
+      "提取与可视替换：选concreteentity/phrase，生成或检索对应image替文本span，保留句子上下文和原response。",
+      "过滤benchmark：checkcontextvalidity、文本答对且删概念答错、imagecaption还原能答对；training为规模移除后两filter。",
+      "paired训练：同samples生成text-only/TokenSwap，冻结visionencoder、更新projector+LLM，比较pretrain及posttrain。",
+      "测量gap与控制：比较text−interleavedaccuracy，附whiteimage+text、renderedword、image来源与domain测试。"
+    ],
+    "experimentsZh": "MMLU1516/平均4.58images，GSM8K73/6.2images；42不同模型。Qwenpretrained+LLaVA665K替代SFT，8A100oneepoch；InternVL12%数据。OCRIIIT2Ktrain/3Ktest，numbers作者报告。 以下结果为作者报告：作者报告42modelabsolutegap4.2–47.4pp，modelmean19.6±3.3pp；reasoningmean10.1 vsnon25.5，模型不是随机独立因果处理。（PDF pp.2/6 Fig.1/§4.3）；作者报告Qwenposttrain generatedgap pairedtext.268→TokenSwap.167（baseline.232）；InternVLimage.438→.518/text.741→.748。（PDF pp.9/28 Fig.6/Table8）；作者报告naturaltrainimageaccuracy.4466→.5132，OCRtrain.4393；OCRbaseline.9003→.9270匹配训练。（PDF p.32 Table10）；作者报告TextVQA62.5→61.7pretrainGen、GQA63.8→63.5；小下降存在，『no noticeable』不等于全保留。（PDF p.31 Table9） 对照范围：pairedtext、pre/posttrain、generated/retrieved、secondfamily、renderedtext/white/tokenlen、proxy替换。whiteimages位于句首而真实interleaved位置不同，length不充分控制attentionrouting。 消融与诊断：importance/caption filters、retrievalsource、proxyGPT、imagecount、CoT/fewshot、trainingdomain；no显式image-onlycaption-to-text桥接与同视觉tokenbudgetotherdata控制。",
+    "insightZh": "开放实体concept-level替换+可规模化paired训练策略，区别整句OCR图片或纯符号consistencybench。主要方法是数据recipe而非新architecture/对齐loss，训练证据限两个model和域内替换。 相对v1，v2新增GPT-5-mini filtering proxy robustness、GSM8K free-form任务、white-image和rendered-text输入长度/视觉路径控制，以及InternVL3-8B第二骨干训练验证（gap .303→.230）。核心TokenSwap和Qwen/OCR训练结果v1已有；新控制支持排除部分混杂但不是完全语义等价的因果证明。",
+    "evidenceZh": "benchmark确保的是proxy可恢复预测，而非严格语义同构。（PDF pp.4–5 §3.2–3.3; pp.15–16 A.3/A.5）；TokenSwappairedtraining减少gap，非仅诊断。（PDF pp.9–10 §5/Fig.6; pp.27–28 Table8）；gap对image来源/域有依赖。（PDF pp.8/25/31–32 §4.6/C.6 Table10）；相对v1，v2新增GPT-5-mini filtering proxy robustness、GSM8K free-form任务、white-image和rendered-text输入长度/视觉路径控制，以及InternVL3-8B第二骨干训练验证（gap .303→.230）。核心TokenSwap和Qwen/OCR训练结果v1已有；新控制支持排除部分混杂但不是完全语义等价的因果证明。（Prior 2607.28640v1 PDF p.9 §5.3; current v2 PDF p.5 §3.3, pp.24–25 Tables 4–5, p.27 C.2/Table 8）",
+    "caveatZh": "图像质量/来源影响gap，严格语义等价不可达；trainingdomain mismatch限制transfer。；FLOPs仅较旧公开nonreasoningmodels，frontier推论未实证；human验证小且distractoreasy。；benchmark依proxy原文本正确/删概念错选择，hightextscores不代表一般MMLU；modelranking稳定不能消除selectionbias。；Standardprompt任first/last有效A–D命中即算correct，CoT用不同finalregex，可影响对照。；reasoning与nonreasoningmodel不同家族/规模/训练/版本、Welcht不隔离trainingcausal效应；compute回归不是scaling实验。；pretrain去responses只看query不等同foundationpretraining大规模优势；训练validationfilter减少存在semanticdrift。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "visual/设计输入的interleaved实体grounding可参考paired数据augment与保text能力的控制；无直接spatial3D/structuredartifact编辑实验。"
+  }
+}

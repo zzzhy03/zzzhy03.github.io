@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.11721",
+  "slug": "subdguide-a-modeler-inspired-agentic-workflow-for-mesh-to-subd-reconstruction",
+  "title": "SubDGuide: A Modeler-Inspired Agentic Workflow for Mesh-to-SubD Reconstruction",
+  "authors": [
+    "Mengnan Jiang",
+    "Christian Franke",
+    "Michele Franco Adesso",
+    "Antonio Haas",
+    "Grace Li Zhang"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11721"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "SubDGuide",
+    "Modeler-Inspired",
+    "Agentic",
+    "Workflow",
+    "Mesh-to-SubD",
+    "Reconstruction"
+  ],
+  "abstract": "Subdivision surfaces represent free-form geometry through a sparse control cage, but recovering that cage from a dense mesh is not merely a fitting problem: the system must infer where control is needed, which curves encode design features, and when an initial result should be revised. We present SubDGuide, a modeler-inspired agentic workflow for this task. Stage A reads aligned multiview geometric evidence and produces a compact plan for cage resolution, feature mapping, and broad-form fitting. Stage B inspects the resulting surface, requests targeted diagnostics, and chooses repair, rollback, or stopping actions. Geometry tools execute and verify every change; the planner never generates vertices or connectivity. On a fixed evaluation cohort, SubDGuide improves all five reported metrics over automatic remeshing: median Chamfer-L1 decreases from 0.641% to 0.443% of the target bounding-box diagonal, and F-score at a 1% tolerance increases from 82.00% to 92.78%. Stateful feedback improves four of five reported median metrics over one-shot planning, while verification retains the earlier checkpoint when a proposal is unhelpful. The same interface supports six multimodal planners, showing how semantic judgment can guide a practical, inspectable mesh-to-SubD workflow.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11721v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11721v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11721v1 的 18 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SubDGuide 从densemesh恢复可检查的 Catmull–Clark cage：VLM先选resolution/feature角色，再观察CC-L3结果调用diagnostics、regionalrefit、supportloop或rollback，geometrytool负责构造与验收。作者报告20案例Chamfer0.641→0.443%D，feedback只改善6例、14例保留旧结果；值得精读可执行reconstruction agent，但不恢复唯一artisttopology，也未测真实交互编辑质量。",
+    "motivationZh": "把三角网格自动转为 SubD，既要逼近原表面，又要保留锐边和结构曲线；直接重网格和平滑常会抹掉这些特征。问题是得到预算受限、可继续编辑的 control cage，并判断局部修正何时确实改善原形状。",
+    "methodZh": "六canonicalviews的clay/silhouette/normals/dihedral/curveoverlay加normalizeddescriptors，规划低中高budget与curvecrease/smooth/boundary/noaction。QuadriFlow初始cage后真实edgegraph将目标曲线映射path，softanchors全局fit后重新map并写creaseattributes，Blender独立CC-L3重建检查。StageB有15reviews/10attempts/600s预算，选tool而不直接生成vertices/connectivity；onlyvalidscoreimprovementreplacecheckpoint。",
+    "methodFlow": [
+      "构造对齐几何证据：六视角五modalities保持curveID/colors，提供component/boundary/curvegeometricdescriptors，不暴露rawarrays。",
+      "规划cage与feature处理：选择complexity-derivedquadbudget的0.75/1/1.5tier、sharpfeaturepreset，每curve标hardline/softridge/boundary或ignore。",
+      "工具构造和curve到cage绑定：QuadriFlow建cage；mapper按distance/tangent/progress在真实edgegraph找连续path，softanchorsglobalfit后remap并creasetargethardlines。",
+      "观察结果并请求修复：读取CC-L3/residual/cage与history，可请求section/closeup、regionalfit、onefinitesupportloop、rollback或finish。",
+      "独立重建验收并留优：Blenderfreshreopen检测fold/selfintersection/degeneracy/components/apertures，结合distance/normal/featurescore，只valid且改善接纳，最后重验所有savedstates。"
+    ],
+    "experimentsZh": "固定20singlecomponentmesh（16Thingi10K/4developmentreferences），fivecontrolledconfigurations每case一次；20Karea-weightedsamples、CC-L3/L4check、%bboxdiagonalD、1%D Fscore。GPT5.6Solmain，sixplannerreplacement；M3Max64GBlocalgeometry、hostedVLM，Bbudget15reviews/10attempts/600s。 以下结果为作者报告：作者报告medianDevP95 1.242→.970%D、normalP95 36.92→29.34°、Fscore82→92.78、silhouette87.73→93.13。（PDF p.7 Table 1）；作者报告rulecontrollerDevP95.996、oneshot.975、full.970%D；feedback增益明显小于fitstep。（PDF p.7 Table 1）；作者报告sixplannersretainedgeometry几乎相同，GPTSol7.15min/case、Luna5.21min；Gemini/Kimi只15validreplycases且5failures保留priorstate。（PDF p.8 Tables 2–3）；作者单独controlledprogramswitch展示symmetricP95 7.827→2.952%D，但该例不在20cohort；Mousetrace也独立。（PDF p.4 Figure 3; pp.17–18 Table 8） 对照范围：AutomaticQuadriFlow+CC、同workspacefit/rulecontroller/oneshot为controlledreferences，缺其他state-of-artSubDfitting/retopologycommercial/humanworkflow对比；同budgetpolicy不意味着所有输出相同quadcount。 消融与诊断：preplanning与feedback、sixmodels共享evidence/tools、commitcounts/trace；无multi-runCI/artistcagerecovery/control-edit测试，不能把20cohort泛化到复杂multipart/genus变化。",
+    "insightZh": "将semanticcurveinterpretation落到真实cageedgepaths/anchors/creases，并把feedbackaction限定为可验证几何工具，构成独立Mesh-to-SubDagentworkflow。多数accuracygain来自deterministicfitting，VLM初始化和feedback的额外作用较小，但对结构化逆向工程任务有直接价值。",
+    "evidenceZh": "VLM只做boundedchoices，geometrytools控制vertices/edges与numericalfit，supportloop是当前唯一localtopologyedit。（PDF pp.4–5 §3.2–3.5; pp.17–18 Tables 6–7）；作者报告完整系统相对自动remesh显著提升，但one-shot到feedback的medianChamfer相同。（PDF p.7 Table 1）；作者报告123reviews/47repairproposals只12commits、6cases，两方向P95都改善，14casesunchanged。（PDF pp.7–8 §4.4 Figure 6）；Sourcecages不可用且未measureinteractiveediting，topology/featureflow为diagnostics而非editablequalitygroundtruth。（PDF p.8 Limitations; p.13 Appendix A.3; p.18 Scope）",
+    "caveatZh": "Genericinitialcage限制missingcomponents/edgeflow，现只regionalfit和one-looprepair。；Curated20mesh无sourcecage，测targetagreement不测uniqueartisttopology。；未测interactiveediting/professionalworkflow，各caseonce，crossmodeltokenaccounting不同。；Majoritygain属于fixedfitter，VLMfeedbackmedian额外tiny；selectedcheckpointmonotonic不证明设计判断普遍正确。；六视角加normal/dihedral从完整mesh提取，不能推广partialscan或图像输入，先决geometry很丰富。；Providerfailurefallback保持前verifiedstate，跨模型总metric部分共享旧cage，应区分成功exec和failure。；输出名为controlcage但pole/featureflow只diagnostics，缺实际editablebehavior验证。；没有确认publicimplementationURL，reproduction需要获取固定tool代码和cohortassets；mainparameterweights/score细节仍有限。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": " faithfulmesh输入恢复显式SubDcontrolrepresentation，主归3d-reconstruction；boundedagentaction和visualdiagnostics是独立visualdesignagent贡献，可直接借鉴core可编辑geometry逆向工程。"
+  }
+}

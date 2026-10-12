@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2610.13035",
+  "slug": "geogr-spatial-semantic-token-compression-and-group-routing-for-efficient-3d-vlms",
+  "title": "GeoGR: Spatial-Semantic Token Compression and Group Routing for Efficient 3D VLMs",
+  "authors": [
+    "Yongxin Zheng",
+    "Hao Wu",
+    "Fang Li",
+    "Hu Fu",
+    "Peiran Yin",
+    "Xudong Wang",
+    "Haozhe Hu",
+    "Xinghao Chen",
+    "Yunpu Ma",
+    "Wei Zhang",
+    "Xiaoyu Shen"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13035"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "GeoGR",
+    "Spatial-Semantic",
+    "Token",
+    "Compression",
+    "Group",
+    "Routing",
+    "Efficient",
+    "3D",
+    "VLMs"
+  ],
+  "abstract": "Multi-view representations enable pretrained image and video vision-language models to understand 3D scenes, but their long visual token sequences make inference costly. Redundancy arises both from repeated observations of the same scene regions across views and from processing all visual tokens at every LLM layer, regardless of their relevance to the current computation. We propose GeoGR, a two-stage framework that jointly compresses scene representations and visual computation. At the projector level, GeoSemZip consolidates cross-view observations into 3D voxel tokens and combines semantic saliency with spatial coverage to construct a compact scene representation. Unselected voxel features are aggregated into contextual anchors to retain scene information that would otherwise be discarded. At the LLM level, we identify an effective visual computation window and observe that query-conditioned token relevance remains locally stable but changes over longer layer intervals. Guided by these findings, GroupRoute combines late entry and early exit with recoverable group-wise skipping. Low-relevance tokens bypass complete LLM layers while retaining their hidden states and can rejoin the active group at subsequent anchor layers selected under a computation budget. For compression-aware post-training, we construct a compact dataset of 67K samples by retaining 30% of the original training pool. With this protocol, GeoGR retains 95.2% and 96.8% of the dense post-trained models' performance on LLaVA-OneVision-7B and Video-3D LLM-7B, respectively, while accelerating LLM prefill by $6.8\\times$ and $6.1\\times$. These results demonstrate the consistent effectiveness of GeoGR across 3D VLMs with and without explicit 3D spatial encoding, highlighting a favorable performance-efficiency trade-off. The code is available at https://github.com/EIT-NLP/GeoGR.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13035v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13035v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/EIT-NLP/GeoGR"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13035v1 的 24 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "GeoGR先把多viewfeatures按3Dvoxels去重，保semanticdominants+Mortoncoverageanchors并汇聚剩余；再让visualtokens在中层group-wise跳过、anchor层重启，避免不可逆pruning。作者报告约10%LLMvisualFLOPs下95.2/96.8%retention与6.8/6.1×prefill，但TTFT仅2.4/2.3×；参照是67kpost-traineddense，另减data也已损4.3/1.3%。",
+    "motivationZh": "多视图 3D VLM 中，大量视觉 token 重复描述同一空间区域，所有 token 在每层参与计算也带来高延迟。问题是在压缩与减少深层计算的同时，保留细小目标、空间覆盖和跨视图定位所需的信息。",
+    "methodZh": "GeoSemZip需aligneddepth/intrinsics/poses，平均samevoxelfeatures、maxsaliency，30%projectortokenbudget中85%salient+15%spatialanchors，未选features按cosine残差加到anchors。GroupRoute保持text活跃、visual在blocks8–23/24，anchors9/13全tokencompute后queryattention分半，lowgroup在中间blocks不提供KV但state保留。BARS以attentionmass/rankmigration/rankshift搜索fixedanchors；posttrain先projector+LLM，再仅LLM适配lateentry/exit，RGS推理启用。data是PRISM从223128选66940，并非新标注67k数据。",
+    "methodFlow": [
+      "将32posedRGBviews的projectorfeatures与depth反投影到worldcoordinates，按0.1voxel平均并保maxsaliency。",
+      "按30%budget选择85%semanticdominants和15%Mortoncoverageanchors，残余features通过cosinesimilarity归并为context。",
+      "两stageposttrain适配projectorcompression及visualmiddle-layerwindow，冻结visionencoder。",
+      "在blocks9/13用queryattention分高/低groups，lowtokens保存state并跳完整blocks，下anchor全量重算恢复。",
+      "只在blocks8–23/24执行visualcomputation；text全程参与，输出3DQA/grounding/caption。"
+    ],
+    "experimentsZh": "LLaVAOneVision7B/Video3DLLM7B均Qwen2-7B，32views×14²=6272tokens。ScanQA/SQA3D两QA；Video3D另Scan2Cap/ScanRefer/Multi3DRefer，全部ScanNetindoor。223128trainselected66940；每stage1epoch/globalbatch16/lr1e-5/BF16/ZeRO3，greedymax512tokens。 以下结果为作者报告：作者报告GeoGR LLaVA ScanQACIDEr88.25/EM26.20、SQAEM56.61，对selected-data dense94.84/28.09/57.06，retention95.18%。（Table2, PDF p.9）；作者报告LLaVA TTFT605.0msvs1426.7，Video3D537.4vs1257.8；SeGPruner更快548.5/479.7但retention较低。（Table3, PDF p.10） 对照范围：VisionZip/VisPruner/SeGPruner/VTC/DTC，包括原trainingfree及统一recoveryposttrain。不同backboneaverages含不同任务不可横比；provideddepth/poses的获取cost不在reportedstage；calibration/HP-selection独立split未充分说明。 消融与诊断：semantic+spatial+residual、queryvsprojector-group、recoverableskipvs永久prune、tokenbudget/voxelsize/ρ/window/anchors比例。ρ0.85、0.1voxel与window8–23根据samebenchreportedmetrics选择，需独立calibration验证；无multiseedCI/outdoors/dynamic3Dtesting。",
+    "insightZh": "空间/语义coverageaggregation与recoverableskipping联合，把temporarilylowattention与永久无用区分；新意在3Dscene-token表示与可恢复操作routing。既有PRISMdata选择不是新dataset生成，LLMFLOPs减少也不是samefactor全流程加速。",
+    "evidenceZh": "projectorvoxelconsolidation、semantic/spatialanchors和residualmerge共同保scenecontext。（Sec.4.2 Fig.3, PDF pp.5–7）；lowgroup不提供attentionKV但保hiddenstate，下一anchor恢复并rescore。（Sec.4.3, PDF pp.7–8; App.A.2 Table7 pp.15–16）；作者报告retention95.18/96.80%，prefill6.8/6.1×，TTFT2.4/2.3×。（Tables2–3, PDF pp.9–10）；作者报告30%data dense相对223kfull retention95.69/98.72，RGSvsmatchedpruning提升很小。（App.D.1 Table10 p.20; Table6 p.11）",
+    "caveatZh": "未设置独立Limitations章节；正文承认encoder/projectorcost限制全流程speedup、SeGPruner更快（p.10）。；全部实验为两ScanNetmulti-view3DVLM配置（pp.8–10、18–19）。；压缩同voxel平均和cosineresidual可能损跨surface/occlusionstate，thinobjects/动态scene未验证。；retention是跨metricratio平均，不表示每3D任务95%以上或原full-data性能。；主改进对最强compressionbaseline0.79–1.88pp且RGS独立0.15–0.45pp，需要误差统计判断稳定。；aligneddepth/poses依赖和HPcalibrationdisjointness影响实际部署收益。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "紧凑3Dscene-token与可恢复证据路由可用于多模态3Dgrounding及设计feedback模型；本工作没有visualartifact生成或通用新foundation能力。"
+  }
+}

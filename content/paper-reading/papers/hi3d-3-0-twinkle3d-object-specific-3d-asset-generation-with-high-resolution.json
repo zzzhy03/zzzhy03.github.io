@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2610.11685",
+  "slug": "hi3d-3-0-twinkle3d-object-specific-3d-asset-generation-with-high-resolution",
+  "title": "HI3D 3.0 (Twinkle3D): Object-specific 3D Asset Generation with High Resolution",
+  "authors": [
+    "Ziying Li",
+    "Shengchu Zhao",
+    "Huiang He",
+    "Yiyang Chen",
+    "Jianwen Huang",
+    "Bailin Li",
+    "Changhao Li",
+    "Jianhui Li",
+    "Jie Li",
+    "Ruiyang Liu",
+    "Yibo Luo",
+    "Tengjiao Sun",
+    "Pei Tang",
+    "Shiwen Wang",
+    "Jiaqi Wu",
+    "Kang Wu",
+    "Kaiqiao Yang",
+    "Zherui Yang",
+    "Hu Zhang",
+    "Xuezhi Zhao",
+    "Xinhe Zheng",
+    "Yukun Li",
+    "Heliang Zheng",
+    "Rongfei Jia"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11685"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "HI3D",
+    "3",
+    "0",
+    "Twinkle3D",
+    "Object-specific",
+    "3D",
+    "Asset",
+    "Generation",
+    "High",
+    "Resolution"
+  ],
+  "abstract": "Image-to-3D generation has become increasingly capable of producing objects that closely resemble the input image, and an outstanding challenge is to reproduce the depicted object itself, including the specific geometry that defines it. Inscriptions, brand marks, and repeated structures are frequently distorted or lost, despite being critical to object identity. We present Hi3D 3.0, an image-to-3D generation system targeting object-specific fidelity, with Twinkle3D as its geometry model for generating watertight triangle meshes at $2048^{3}$ resolution. Twinkle3D advances high-fidelity geometry generation along four dimensions. First, while O-Voxel/FaithC offers high representational precision, it often suffers from poor surface quality and non-watertight geometry. We address both issues while retaining its $2048^{3}$-level precision. Second, we scale diffusion generation to sequences of up to 300K geometric tokens through a redesigned DiT architecture and large-scale distributed training optimizations, reducing training time per step from approximately ten minutes to ten seconds. Third, subsequent refinement cannot fully compensate for errors introduced during initial generation; we therefore strengthen both global shape and local detail in the initial generation stage, and the resulting single-stage model surpasses prior two-stage pipelines with $512^{3}$ refinement. Finally, we introduce a fine-grained image-3D cross-modal interaction mechanism that strengthens correspondence between visual evidence and geometric tokens, improving the recovery of object-specific structures. We evaluate geometric fidelity using alignment metrics derived from silhouettes and normal fields. Hi3D 3.0 outperforms four commercial systems across all reported metrics, recovering 82.1% of inscribed characters at 98.2% precision, compared with 21.7% recall for the strongest competitor.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11685v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11685v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11685v1 的 18 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Twinkle3D 的官方report把image-to-3D质量重心移至object-specific geometry：2048³级multi-sheet surface表示、watertight extraction与single-stage细节生成，作者报告526characters OCR recall82.1%/precision98.2%。值得skim其细节评价与失败案例；DiT/representation改造只给高层描述，33inputs不足以稳健判定组内排名，代码未找到。",
+    "motivationZh": "Text-to-3D 模型常保留整体形状却丢失文字、装饰与细粒度 identity，单一视图监督也难确保多视图一致。现有评价可能只量化可见 rendered proxy，难以分清资产细节是真实恢复还是上采样外观。",
+    "methodZh": "Hi3D3.0报告希望从“看起来相似”走向输入对象特定铭文、thin repeated structures和identity细节。其几何模型Twinkle3D基于可容纳多surface sheets的O-Voxel/FaithC-style precision，声称改善surface quality与无repair watertight extraction；DiT及distributedtraining支撑up-to300K geometric tokens，增强first-stage global/local fidelity并加强fine-grained image–geometry interaction。公开18页主要是能力与evaluation报告，未给可执行architecture、loss、dataset/parameters详情。评估33production inputs、monocular-normal bandpass、526OCRchars和blind pairwise ratings；图示autoencoder和single-vs-two-stage可观察薄层区分，但训练机制不能由图片反推。",
+    "methodFlow": [
+      "以single image作为object-specific几何条件，强调inscriptions、marks与repeated structures而非只匹配silhouette。",
+      "使用multi-sheet-per-cell的高精度surface representation及改造autoencoder，报告2048³级细节与closed-mesh extraction。",
+      "以redesigned DiT生成最高300K geometric token序列，并强化image-to-geometry细粒度交互；具体attention/architecture未披露。",
+      "优先在single first stage保持global placement与local separation，避免只靠后续surface refinement修补错位。",
+      "decode并extract watertight triangle mesh；以clay/normal renders检查输入可见geometry和unseen completion。"
+    ],
+    "experimentsZh": "33来自productionrequests的single-image inputs；Hi3D3.0、Hi3D2.1、Meshy7、Tripo3.1、RodinGen2.5最高可用geometry resolution。shared35°FOV并逐method拟合pose；silhouette IoU、high-confidence subset monocular normal bandpass、VLM背面completeness与三等级Q-Judger。526中英文inscriptionchars由PaddleOCR在clay renders上align；blindpairwise人评structure/detail，但raters/judgment数未给。 以下结果为作者报告：作者报告globalalignment .9184、detail .3782、multi-viewplausibility .757、aesthetics50.91；Meshy7为.9013/.3694/.638/50.00。detail差.0088作者明确不足支持稳健组内排序。（Table1, PDF p.5; Sec.3.8, PDF p.12）；作者报告OCRrecall82.1%/precision98.2%/F189.4%，strongestpeerMeshy7为21.7%/62.0%/32.1%；Hi3Dmiss16.5%、halluc .2%。（Table2, PDF p.6）；作者报告Hi3D3.0在人评structure same-or-better78.0–89.8%、detail88.1–95.5%；这是win+tie，不是win rate或偏好概率。（Table3, PDF p.7） 对照范围：商业released systems最高resolution对比覆盖强output能力，但训练data/compute均不同，不支持architecture-only因果结论。Sparc3D/TRELLIS2.0 autoencoder与512³ refinement比较主要qualitative，未见统一训练/参数/数字组件对照。 消融与诊断：2个autoencoder重建和3个one-vs-two-stage案例支持thin-sheet与first-stage位置保留观察；没有cross-modal机制、DiTscaling或watertight算法的独立量化消融。10min→10s训练step声称未给相同batch/hardware/profile细节，不用于直接成本比较。",
+    "insightZh": "报告的贡献是object-specific fidelity能力目标、multi-sheet representation/autoencoder与大token geometry generation工程升级，并将normal-bandpass/OCR读字从appearance评价分离。具体新representation结构、DiT改造和cross-modal机制未描述到可复现程度；不应写成已理解并验证其算法实现。",
+    "evidenceZh": "四个主要技术改造在report中只有高层机制描述，未给完整方法方程/训练recipe。（Sec.1 Representation/Scaling/Single-stage/Cross-modal interaction, PDF p.3）；detail alignment对monocular normal估计和pose-fit confidence subset度量，不是GT3D误差。（Sec.3.1, PDF p.4）；normal/clay shading与OCR计数隔离纹理影响，仍有missed与malformedcharacters。（Table2/Fig.2, PDF p.6; Fig.3, PDF p.7）；表示autoencoder和first-stage比较展示thin repeated structures保留，但只少量qualitative案例。（Sec.3.5–3.6, Fig.4–5, PDF pp.7–9）",
+    "caveatZh": "Sec.3.8指出multi-viewplausibility .757，即约四分之一背面completion仍失败。；约一六分之一characters不可读，还有7个错字符；OCR能力未饱和。；33inputs足够展示两个大group差异但不足分组内排名，aesthetics约1point和Hi3D/Meshy detail .0088可能由perinputvariance造成。；topology及face-budget control在Sec.2明确不属于report scope。；high-levelrepresentation/DiT/crossmodal方法未充分披露，训练数据、规模与推理时间未给，不能据gallery推定可复现。；normalbandpass依赖monocularestimator与可靠pose筛选，需公开subsetcoverage避免选择偏差；humanwin+tie不可当独立优胜率。；watertight不保证manufacturing、metricdimensions或thinwalls工艺可行；只singleimage可见面忠实度，unseengeometry不是真实recovery。；全部数字是vendor-author报告，本项目未复现；适合追踪能力与评价思路而非立即实施核心算法。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接关注可用3D资产的细字、thinparts和重复结构，object-specific fidelity评价对LEGO/CAD/生成asset的几何正确性检查有启发；没有积木、assembly或可制造约束实验。"
+  }
+}

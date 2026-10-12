@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2608.28174",
+  "slug": "manifold4d-denoising-on-point-cloud-rendered-manifolds-for-video-re-shooting",
+  "title": "Manifold4D: Denoising on Point Cloud Rendered Manifolds for Video Re-shooting",
+  "authors": [
+    "Yongqi Mao",
+    "Zijia Dai",
+    "Zhishuo Liu",
+    "Wei Xu",
+    "Kaiwei Wang",
+    "Guotao Meng"
+  ],
+  "publishedAt": "2026-08-28",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.28174"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Manifold4D",
+    "Denoising",
+    "Point",
+    "Cloud",
+    "Rendered",
+    "Manifolds",
+    "Video",
+    "Re-shooting"
+  ],
+  "abstract": "Video re-shooting is the task of re-rendering a monocular video of a dynamic scene along a user-specified camera trajectory. A dominant paradigm explicitly provides the target geometry by lifting the source video into a 4D point cloud using per-frame depth, and rasterizing this representation along the target trajectory to obtain point-cloud renders as geometric conditions for trajectory-controlled generation. The point cloud render and source video may provide conflicting visual cues throughout denoising, as both are directly used as conditions. We refer to this conflict as a trust dilemma, which can compromise trajectory control, 3D consistency of dynamic content, and visual quality, particularly under distribution shifts. We argue that because a point-cloud render is pixel-aligned with the target view, it does not need to be continuously provided as a conditioning signal throughout denoising. We propose Manifold4D, which injects the render directly into the initial noise of flow matching, so that generation no longer departs from standard Gaussian noise but from a geometry-bearing noise distribution that we term the point cloud rendered manifold, leaving the source video as the only visual condition. The render is thus used exactly once, and the network is never asked to learn how to read it; in subsequent denoising steps the model can focus on the source video. In our experiments, Manifold4D attains the best camera-control accuracy on every metric, lowering rotation error by 25--27% and translation error by up to 32% over the strongest baseline, while matching it in video fidelity and attaining the best overall photometric quality and 3D consistency of dynamic content.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.28174v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.28174v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.28174v2 的 19 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：v2将单seed DAVIS conditioning评测改为Vista4D filtered103/quality110，扩展residual-noiseσ至1.5揭示过噪损伤，并新增相同骨干/seed/训练预算的Vista4D及GEN3C架构比较与视觉例。旧v1只有两块Table5和0–0.5σ，未有该matched-training architecture实验；属于实质经验更新，基础noise-on-render方案v1已有。 Manifold4D 将target-trajectory pointcloud render仅一次加到flow起点，以coverage在geometry-bearing noise与pureGaussian间混合，之后只保留sourcevideo视觉条件。作者报告更紧camera控制和约1.5×较Vista4D快；值得deep读geometry作为state而非第三conditionstream，但fine-tuning仍必要，Pi3复测并非所有指标最佳，不能把manifold理解为硬3D约束。",
+    "motivationZh": "给定单目视频与新 camera trajectory，video re-shooting 要保持动态主体和场景几何，同时补全新视角缺失区域。把 source video 与有孔洞的 point-cloud render 作为持续条件容易相互竞争或传播错误几何。",
+    "methodZh": "VGGT-Omega估depth/cameras，Qwen/SAM3分离dynamic subject；static points跨帧累积、dynamic按timestamp保留，再渲染用户轨迹。encodedrender+σnoise初始化coveredtokens，holes从Gaussian开始，coverage混合两者；训练flowvelocitytarget也随新endpoint改变。sourceVAEtokens与noisystatesconcat，cameraPlücker与text为非visual辅助，render不再反复供attention。Wan2.1-14B约36Kclips/30Ksteps适配，render/conditiondropout和pointcloudcorruption训练支持纠错。DAVIS24scenes×3trajectories、Vista110clips、iPhone真实multiview支持creativecamerareshooting，但估计器/Sim3alignment与过滤覆盖影响位姿结论。",
+    "methodFlow": [
+      "从sourcevideo估per-frame depth/camera并分dynamicmask，构建globalstatic与timestamped dynamic4Dpoints。",
+      "沿requestedcamera轨迹渲染points，计算pixelcoverage再pool到tokencoverageα。",
+      "将VAErenderlatents+σGaussian作为coveredtoken起点，holes纯Gaussian，α混合；flow监督改为该endpoint减target。",
+      "concat sourceVAEtokens与geometry-bearing state，WanDiT随后仅读sourcevideo作为visualcondition，保留text/cameraembeddings。",
+      "fine-tune指定selfattention/patchify/cameraprojector并训练dropout/corruptedrenders；沿newpathdenoise输出新轨迹视频。"
+    ],
+    "experimentsZh": "Wan2.1T2V14B/49frames384×672，8A100/30Ksteps/LR1e-5。约36K5sources含多camera与monoculardouble-reprojection，10%各conditiondropout/5%unconditional/pointscorruption。DAVIS-Traj72clips、VistaEval110raw/103filtered、iPhonereal同步views，camera3seedsVGGT/Pi3、imagequality、30+participants20clips多选study及samebudgetarchitecturalvariants。 以下结果为作者报告：作者报告VGGT DAVISRot1.09°/Trans .161对GEN3C1.45/.236，VistafilteredRot2.76/Trans.394对GEN3C3.77/.441、Vista3.89/.403；raw110Rot4.26对GEN3C4.31差小。（Table1, PDF p.6）；作者报告iPhonePSNR16.21/LPIPS.3582/EPE1.25，但SSIM.3847不如Trajectory.4338；不同指标并非全优。（Table2, PDF p.7）；作者报告usertrajectory/3Dconsistencyselection63.6%/62.4%，overallquality49.6%低于Vista54.7%；允许多选，不能当互斥winrates。（Table4, PDF p.8; AppendixG, PDF p.19）；作者报告相同14B/output/50steps单A10080GB，13.0min对Vista19.3min；其他backbone/nativeoutputs不同时间不可等价比较。（Table6, AppendixE.1, PDF p.15） 对照范围：ReCamMaster、TrajectoryCrafter、GEN3C、Vista相同pointcloudprojection但base/models/defaultsettings不同；samebase/seed/earlybudgetlayouts再对照有助分离injection布局。没有MoCam直接quantcomparison，文中视为contemporaneous相关方法。 消融与诊断：remove render/source的inference失败、σsweep、camera/text删除与samebudgetrenderlayout支持startingstate与appearance互补。模型训练recipe含dropout/corruption，缺完全同最终budget的single-componentcausalablation；case19views和估计筛选仍影响泛化判断。",
+    "insightZh": "将pixel-aligned geometric prior直接变成generative startingstate，减掉persistentrenderstream来避免source/renderattention竞争；不是新4Dreconstruction模型，也不是无需training的noise插件。manifold是作者对geometry-bearing prior的命名，无formalmanifoldprojection或physicalguarantee。 v2将单seed DAVIS conditioning评测改为Vista4D filtered103/quality110，扩展residual-noiseσ至1.5揭示过噪损伤，并新增相同骨干/seed/训练预算的Vista4D及GEN3C架构比较与视觉例。旧v1只有两块Table5和0–0.5σ，未有该matched-training architecture实验；属于实质经验更新，基础noise-on-render方案v1已有。",
+    "evidenceZh": "startingnoise依coverage混合render+residualnoise与Gaussian，trainingvelocitytarget随之改变。（Sec.3.3 Eq.(2), PDF p.5）；render只一次进入state，但cameraembedding/text仍存在，source是唯一持续visualcondition。（Fig.3, Sec.3.2–3.4, PDF pp.4–5）；主VGGTcamera结果领先，但Pi3复测有明确不利列。（Table1 PDF p.6; Table7 PDF p.16）；render误差纠正的robustness有qualitative测试，仍留重叠blur。（Sec.4.3, PDF p.8; AppendixF.2/Fig.8, PDF pp.17–18）；v2将单seed DAVIS conditioning评测改为Vista4D filtered103/quality110，扩展residual-noiseσ至1.5揭示过噪损伤，并新增相同骨干/seed/训练预算的Vista4D及GEN3C架构比较与视觉例。旧v1只有两块Table5和0–0.5σ，未有该matched-training architecture实验；属于实质经验更新，基础noise-on-render方案v1已有。（Prior 2608.28174v1 PDF p.9 Table 5/§4.4; current v2 PDF p.9 Table 5(a–c)/§4.4, p.18 Figure 9）",
+    "caveatZh": "原limitations仅提出更复杂noise–geometryinteractionfuturework；AppendixF2另承认corruptedpointcloud产生局部blur。；source/targetoverlap小或sourcecamera近静止导致Sim3alignment错误，原VGGT筛掉7/110、Pi3筛掉4/110。；训练monoculardouble-reprojection只保留≥45%coverage，videogeneration从depthprior得到几何而非真实隐藏状态。；几何重建与主eval同用VGGT-Omega，Pi3表不能支持所有列领先；filtered/raw和估计器需同时展示。；human可开pointcloud overlay，有geometry-prior引导且多选，不能概括为独立总体偏好胜率。；从sourcevideo重拍未见区域仍是plausiblegeneration，metricpose/physicalscene不是严格GT证明；无explicitforces或editable3D输出。；camera-control原promotionalallmetrics语句过宽，数字作者报告未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接支持3D-aware可控video创作，几何先验进入generative state的接口设计可用于视觉生成条件冲突研究；没有3D资产编辑或制造任务实证。"
+  }
+}

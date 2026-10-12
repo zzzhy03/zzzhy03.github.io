@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2512.17302",
+  "slug": "matlat-material-latent-space-for-pbr-texture-generation",
+  "title": "MatLat: Material Latent Space for PBR Texture Generation",
+  "authors": [
+    "Kyeongmin Yeo",
+    "Yunhong Min",
+    "Jaihoon Kim",
+    "Minhyuk Sung"
+  ],
+  "publishedAt": "2025-12-19",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2512.17302"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "MatLat",
+    "Material",
+    "Latent",
+    "Space",
+    "PBR",
+    "Texture",
+    "Generation"
+  ],
+  "abstract": "We propose a generative framework for producing high-quality PBR textures on a given 3D mesh. As large-scale PBR texture datasets are scarce, our approach focuses on effectively leveraging the embedding space and diffusion priors of pretrained latent image generative models while learning a material latent space, MatLat, through targeted fine-tuning. Unlike prior methods that freeze the embedding network, which leads to distribution shifts when encoding additional PBR channels and hinders subsequent diffusion training, we fine-tune the pretrained VAE so that new material channels can be incorporated with minimal latent distribution deviation. We further show that correspondence-aware attention alone is insufficient for cross-view consistency unless the latent-to-image mapping preserves locality. To enforce this locality, we introduce a regularization in the VAE fine-tuning that crops latent patches, decodes them, and aligns the corresponding image regions to maintain strong pixel-latent spatial correspondence. Ablation studies and comparison with previous baselines demonstrate that our framework improves PBR texture fidelity and that each component is critical for achieving state-of-the-art performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2512.17302v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2512.17302v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/KAIST-Visual-AI-Group/MatLat"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2512.17302v2 的 16 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：v2新增CLIP-based KID以补充混合Inception KID结果、crop-range locality消融与对5K diffusion samples的latent SWD mismatch验证，并增加relighting例。v1已有主体方法与Table1数值；此次价值是新机制支持与度量边界，而非宣称主结果新提升。c-PSNR公式补C=5归一化但原表数值不变，应视公式说明修正。 MatLat 将albedo/roughness/metallic压进一个保持SD3.5 prior的stochastic latent：冻结RGB encoder作base，学习mean/scale residual并用KL对齐；再用crop-decode locality loss使geometry-aware attention真正对应pixels。作者报告PBR fidelity与跨view c-PSNR提升，关键启发是“latent分布兼容”还不够，空间locality也必须保持；并非全部material metrics最佳。",
+    "motivationZh": "RGB-pretrained diffusion latent 并不自然容纳 albedo、roughness、metallic 等 PBR channels，多视图独立生成还会产生材质不一致。目标是在保留预训练视觉 prior 的同时，支持可重光照且跨视图一致的材质生成。",
+    "methodZh": "给定mesh与text，方法先训练MatVAE，再fine-tune多view flow model生成5channel PBR maps并投影UV。冻结RGB encoder编码albedo得到base Gaussian，residual encoder加入roughness/metallic，延伸decoder输出5channels；latent KL约束接近albedo pretrained分布并维持原latent维度。VAE阶段random crops的latent decode必须恢复对应image crops，以免CAA交换的spatial tokens在decoder中传播到无关位置。SD3.5 MMDiT原attention外加correspondence-aware LoRA branch，用mesh position/normal条件生成6canonical views；UV projection/upscale/inpainting填可见性空洞。40,723train/128held-out mesh的ablation和sharedrender评估支持方法，relighting gallery是视觉合理性，不等于材料物理测量。",
+    "methodFlow": [
+      "渲染训练mesh的albedo/roughness/metallic与normal/position maps；冻结SD3.5 RGB encoder把albedo编码为base latent Gaussian。",
+      "offset encoder从5channel输入预测latent mean/scale residual，输出single stochastic latent；KL regularizer约束其接近pretrained albedo分布。",
+      "随机crop latent、decode并对齐同位置image crop，以locality reconstruction、KL和adversarial losses训练5channel MatVAE decoder。",
+      "在MMDiT中加geometry-correspondence attention LoRA branch，结合position/normal maps以conditional flow matching fine-tune多view材质生成。",
+      "text+mesh生成6canonical material views，decode5channels、upscale并unproject到UV，再inpaint occluded UV regions输出可relight纹理。"
+    ],
+    "experimentsZh": "SD3.5-medium VAE/MMDiT；40,851 PBRObjaverse-XL meshes中40,723train/128test；26views训练随机6views，generation6canonical。MatVAE200Ksteps batch8/8RTXPro6000约60h，diffusion20K batch4约24h；test20views/mesh、相同785HDR pool采样lighting。metric含CLIP-FID、Inception/CLIP-KID、CLIPtext alignment、roughness/metal RMSE、cPSNR与runtime。 以下结果为作者报告：作者报告full shaded/albedo CLIP-FID3.083/4.599，MaterialMVP6.309/9.630、MaterialAnything6.582/12.691；runtime34s对MVP35s、Anything500s。（Table2, PDF p.8）；作者报告full cPSNR21.934对FrozenVAE19.869、w/o locality19.437、w/oCAA18.687；FrozenVAE runtime111s对34s。（Table1, PDF p.7）；作者报告prior SWD为albedo .539、zero-padded roughness/metal .897、MatVAE .560，支持缩小material latent shift；这是5Kprompt prior采样的代理距离。（Table5 and AppendixA.5, PDF pp.13–14）；作者报告Inception-KID在VAE对照中有mixed ordering，CLIP-KID改善较一致；w/oCAA shaded CLIP-KID1.424还略低于full1.496，不能称每项组件都最佳。（Table1 PDF p.7; Table3 PDF p.12） 对照范围：含from-scratch MeshGen/TexGaussian、SDS Paint-it/DreamMat/FlashTex、MV MaterialAnything/MaterialMVP。外部checkpoint training不同；image-conditioned MeshGen/MVP使用SD2-depth合成reference，不是完全等价conditioning。VAEvariants匹配overallcompute，FrozenVAE diffusion45K对others20K+VAE200K，最能支持内部组件比较。 消融与诊断：比较FrozenVAE、LayerDiffuse式identity residual、Orchid式direct+KL，另去CAA/locality并扫crop ranges；提供early reconstruction error和prior SWD支持机制。效果不只依赖更多parameters，但未见uncertainty intervals、多seed或复杂BRDF材质扩展。",
+    "insightZh": "将已有residual VAE modality adaptation与distribution KL合并用于PBR，并识别CAA依赖latent→pixel locality，从VAE训练施加crop regularizer解决。CAA和latent扩展本身已有先例；贡献是材料域的stochastic residual/对齐细节与locality-geometry交互，不是新geometry生成模型。 v2新增CLIP-based KID以补充混合Inception KID结果、crop-range locality消融与对5K diffusion samples的latent SWD mismatch验证，并增加relighting例。v1已有主体方法与Table1数值；此次价值是新机制支持与度量边界，而非宣称主结果新提升。c-PSNR公式补C=5归一化但原表数值不变，应视公式说明修正。",
+    "evidenceZh": "MatVAE保留frozen albedo base，再预测mean和scale residual并施加distribution KL。（Sec.3.1.2, Eq.(1),(5), Fig.3, PDF pp.4–5; AppendixB.1, PDF p.14）；locality crop loss使CAA的geometry correspondence在decoded pixels上成立。（Sec.3.2.1–3.2.2, Fig.4, Eq.(6)–(8), PDF pp.5–6）；CAA与locality组合提高cross-view一致性，单纯CAA可能降低指标。（Table1, PDF p.7; Table4/Fig.8, PDF p.13）；外部方法比较共享render protocol但training/checkpoint不统一，材料误差并非全项领先。（Sec.4.3 and Table2, PDF p.8）；multi-view PBR outputs还经过UV inpainting，最终不可见部位并非由直接观测保证。（AppendixB.2 Inference, PDF p.14）；v2新增CLIP-based KID以补充混合Inception KID结果、crop-range locality消融与对5K diffusion samples的latent SWD mismatch验证，并增加relighting例。v1已有主体方法与Table1数值；此次价值是新机制支持与度量边界，而非宣称主结果新提升。c-PSNR公式补C=5归一化但原表数值不变，应视公式说明修正。（Prior 2512.17302v1 PDF p.12 Appendix A; current v2 PDF pp.12–13 Tables 3–5/§A.2–A.5, p.15 Figure 9）",
+    "caveatZh": "Sec.4.3明确各baseline训练方式/数据/checkpoints不同，无法完全统一，采用official默认config与统一render评估。；AppendixA.2承认Inception-KID结果mixed，提出feature-domain解释并补CLIP-KID，不应隐藏不利指标。；inference需六canonical views、known mesh/camera geometry与UV后处理，occludedregions用inpainting填充。；PBR输出仅albedo/roughness/metallic五channels；可relight不等于任意真实复杂BRDF/透射材质的物理准确。；cPSNR检查visible surface correspondence，不能独立保证UV seams、hidden regions或fine-scale normal geometry。；RMSE对单一GT材质与text-conditioned多解生成并非完全公平；不同feature metrics不能证明真实人类材质偏好。；实验只在128heldout资产上，数值均作者报告未复现，未验证LEGO/Embroidery专域。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进可用3D资产的PBR texture生成，single latent多channel兼容与locality-preserving VAE对结构化2D/3D生成中的几何token correspondence有方法价值。"
+  }
+}

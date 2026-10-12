@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.12230",
+  "slug": "from-prompting-to-composing-a-spatial-canvas-interface-for-poster-generation",
+  "title": "From Prompting to Composing: A Spatial Canvas Interface for Poster Generation",
+  "authors": [
+    "Yitong Wang",
+    "Fangyun Wei",
+    "Jinjing Zhao",
+    "Sirui Zhang",
+    "Hongyang Zhang",
+    "Dong Chen",
+    "Bo Dai",
+    "Yan Lu"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12230"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design",
+    "image-generation"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "2d-design",
+    "Prompting",
+    "Composing",
+    "Spatial",
+    "Canvas",
+    "Interface",
+    "Poster",
+    "Generation"
+  ],
+  "abstract": "Text prompting is an indirect interface for poster generation, requiring users to encode inherently two-dimensional composition intent into a one-dimensional sequence of words. We introduce a Spatial Canvas Interface that enables users to directly compose generation intent in space through four complementary binding types: semantic, identity, text, and pixel, together with Text Specifications for individual elements and global appearance. Based on this interface, we develop Compo, a poster generation model adapted from a pretrained image editing model to understand Spatial Canvas inputs and Text Specifications. Compo supports both direct inference, where users explicitly construct the canvas, and agentic mode, where a high-level request is automatically translated into a planned Spatial Canvas. To train Compo, we develop a scalable pipeline that automatically constructs supervision data for different binding types and their combinations, enabling efficient adaptation without training a specialized poster generator from scratch. We further introduce a benchmark that evaluates adherence to individual binding types and their joint composition. Experiments show that Compo achieves stronger compositional controllability than both general-purpose image generation models and dedicated poster generation systems while maintaining high visual quality. By decoupling intent specification from visual generation, our work shifts poster generation from prompting toward composing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12230v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12230v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12230v1 的 38 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "把poster创作转为2D Spatial Canvas上的semantic/identity/text/pixel binding，再用LoRA＋binding-awareDiffusionNFT适配image-editing模型。作者报告500合成benchmark的layout/文字/identity控制显著改善；值得深读设计intent中间表示，但‘pixel’允许style/lighting变化，输出不是可编辑多层或SVG，agentmode尚无独立定量闭环评估。",
+    "motivationZh": "Poster 的元素位置、尺寸、身份与文字关系难以用一段 prompt 精确表达；全图生成也容易忽略局部布局要求。需要一种让用户明确指定空间构图、同时保留生成自由度的输入方式。",
+    "methodZh": "黑canvas把每element的bbox、placeholder、referenceimage或category显式画出，TextSpecifications提供elementactions/typography及globalbackground/style。200Ksyntheticposters用segmentation/OCR反构canvas和spec；identityreference经repose，pixelcopy，semantic仅regionlabel。FrozenVLM+VAE将canvas/spec输入既有MMDiT，rank128LoRASFT后新增rank64LoRADiffusionNFT，textaccuracy/NED、instanceCLIP/DINO和layoutIoU0.4/0.4/0.2组合。Directmode支持人规划，agentmodeGPTplanning＋referenceverification可构同input；结构化designcontrol是方法主贡献。",
+    "methodFlow": [
+      "表达typed spatial bindings：text框用txt-ID映射exactcopy，identityreference用obj-ID和action，semantic框label与description，pixelasset直接paste，globalstyle/background另spec。",
+      "反构paired设计监督：LLMplan生成1024poster，SAM3seginstance/OCRrecognition定位；以实际OCRtext为GT而非原plan，FLUXrepose/relightreferences。",
+      "适配既有editing MMDiT：frozenQwen2.5VL/VAE产生VL/canvas/noisytargettokens，image/textbranchesrank128LoRA学canvas-to-poster，无newbackbonearchitecture。",
+      "binding reward post-training：10rollouts×10denoisestepsguidance1，新增rank64LoRA用DiffusionNFT；textANDsentenceaccuracy＋NED、instanceCLIP/DINO、bboxIoU反馈。",
+      "human或planner驱动生成：人工canvas/spec或GPTextract/layout/binding，identity可Openverse检索/T2Ifallback并SAM3后验证，再Compo单poster生成。"
+    ],
+    "experimentsZh": "200Ktrain，12themes/约1000contentitems/250styles，train3–8instances；500curatedsynthetictest4–9instances，noexacttrainingoverlap；14generalediting和3postermethodnativeinputs；rank/rewardablationLongCatonly。 以下结果为作者报告：作者报告LongCatTextBindingNED0.970/sentence0.940/IoU0.944；Qwen0.940/0.868/0.934，subject/Layoutmetrics强化。（PDF p.7, Table1; p.19, Table5）；作者报告no-rewardoverallAvg0.725→full0.752，layoutrewardremoval0.750，较小marginaleffect无CI；newthemesqualitative非统计OODtest。（PDF p.9, Table2; p.22, Figure8） 对照范围：专用posterformats不支持全部fourbinding，信息保留只在nativecapability范围；通用editingmodels未为canvas界面adapt，对比包含200Kinterface训练优势；未比较同dataset不同structuredinput或text-only输入的净interfacegain。 消融与诊断：rewardcomponents、sentenceweight0–1、LoRAimage/textbranches及SFT/RL；未给repeatedseeds/userstudy、agentmodequantification或layoutcomplexity/numbindings分层结果。",
+    "insightZh": "heterogeneousbindings统一到visualcanvas及typedtextmapping，结合syntheticpaireddata与task-specificposttraining；其价值是designconditioninginterface而非新diffusionfoundationarchitecture。agent流程是辅助workflow，无独立贡献验证不单列visual-design-agents主主题。",
+    "evidenceZh": "四binding区分所需可控性而不是所有reference都exactcopy。（PDF pp.1–3, Figure1; p.17, AppendixA.1; pp.31–35, AppendixD.3）；两backbonebindingcontrol领先，但synthetic同源benchmark和rewardmetrics重合。（PDF pp.7–9, Tables1–4; pp.17–19, AppendicesA/B）；posttraining提升有实证，text/identity权重存在tradeoff。（PDF p.9, Tables2–3; p.19, Table5）；agentmode具体，但verification仅reference，不是iterativefinaldesignrepair。（PDF p.6, Figure4; p.19, AppendixB.3; pp.31–38, planning/verificationprompts）",
+    "caveatZh": "image/model/assets使用来源license；模型为pretrainededitingadaptation，文中无专节technicallimitations。；matchingIoUthreshold数值未明确、maximumIoU非说明one-to-oneassignment，同category多instance匹配可靠性待核验。；semantic/identity/pixelregion自动seg与同rewardmetric可能放大scores，缺独立human/designqualityevaluation。；训练数据OCRrecognizedtext可能改掉原intent，HorizontalEnglishshortcopy规则限制书写/复杂版式generalization。；官方repo当前README/assets展示，未确认implementation/weightsreleased；SFT/RL总steps及耗时未完整量化。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接是structured2Ddesigngeneration与用户可控composition，能迁移SVG/layout/designintent的intermediaterepresentation思路；输出当前raster，high/deep关注bindings而非夸大editableassets。"
+  }
+}

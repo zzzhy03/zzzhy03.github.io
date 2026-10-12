@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.07460",
+  "slug": "elasticfit-fit-aware-3d-object-insertion-via-vlm-reasoning-and-generative-adaptation",
+  "title": "ElasticFit: Fit-Aware 3D Object Insertion via VLM Reasoning and Generative Adaptation",
+  "authors": [
+    "Tzu-Hsin Hsieh",
+    "Ricardo Marroquim"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2610.07460"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "ElasticFit",
+    "Fit-Aware",
+    "3D",
+    "Object",
+    "Insertion",
+    "VLM",
+    "Reasoning",
+    "Generative",
+    "Adaptation"
+  ],
+  "abstract": "Inserting objects into existing 3D scenes requires more than selecting a plausible location: the inserted object must also fit local geometry while preserving semantic intent and physical plausibility. Although recent Vision-Language Models (VLMs) and generative models enable semantic reasoning and visual content creation, they offer limited 3D grounding and geometric control when an inserted object must fit into constrained local spaces. We introduce ElasticFit, a VLM-guided framework for fit-aware object insertion centered on a novel scene-grounded representation. Given a language instruction and rendered scene observations, ElasticFit infers structured fitting cues that specify where the object should be grounded, what volume it should occupy, how it should be oriented, and its adaptation mode (rigid placement, uniform scaling, or elastic fitting). These cues convert high-level VLM reasoning into explicit 3D constraints that condition object generation and guide downstream geometric fitting. ElasticFit then generates a scene-conditioned object prior, reconstructs it in 3D, and refines the mesh through mode-specific fitting while enforcing collision avoidance, contact consistency, and physical grounding. In fixed-asset baseline comparisons, ElasticFit improves spatial relation success from 50.8% to 69.7% and support success from 48.3% to 91.7% over the strongest baseline, while providing novel support for generative \"make-it-fit\" insertions in complex scenarios.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.07460v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.07460v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.07460v2 的 28 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "把VLM target pixel、support ID和ghost-box/mode转为明确3D fitting cues，按目标形状生成prior再做rigid/uniform/anisotropic fitting与PyBullet settling。适合深读语义→几何执行接口；elastic仅axis scaling，作者报告的69.7% SRS/91.7% support来自禁用生成和deformation的placement-only对比，不能当full-generative-fit整体成功率。",
+    "motivationZh": "把生成物体放入指定场景空隙时，仅改变位置或统一缩放常会导致碰撞、支撑不稳，或破坏物体的形状与类别。问题是同时满足场景的可容纳空间和目标物体的几何、语义要求。",
+    "methodZh": "用户视角RGB/SoM/XYZ/ID buffers给VLM结构化grounding，support pixel ID纠正后建立maximumfitvolume与yaw/pitch；SDXL canvas aspectratio和topologytags条件objectimage，TRELLIS liftmesh。Localpointnormalcollision/support搜索rigidpose、uniformscale优化或最大空boxaxisstretch，gravitysettling后保守supportclamp。常规60tasks对固定assetbaselines，另60fit-criticaltasks测试completepipeline；gap subset仅48.3% predicateSRS/66.7%CFR。方法无需训练，却依赖完备scenegeometry/semantic annotations以及externalmodels，建议聚焦约束接口和失败case。",
+    "methodFlow": [
+      "从视角grounding到3D cues：VLM读取clean/SoMview与metadata输出support/target/orientation/mode JSON；IDbuffer纠正target到nearestsupportpixel，XYZbackmap构建bottom-anchoredghostbox。",
+      "fit-conditioned prior生成：ghostboxwidth/height决定512–1024SDXLcanvas比例，elastic附wide/talltags；canonical isolatedfrontviewobjectimage经TRELLIS lift为mesh。",
+      "按adaptationmode实现几何fit：rigid broad/narrowpose搜索；uniformtranslation+isotropicscale优化collision/box/gravity/center/maxscale；elastic局部seedexpand最大emptybox并anisotropicscale。",
+      "settle与支持修正：croppedscene为staticconcavemesh，adaptedmesh用PyBullet rigidgravity/friction/damping短settling，从lifted安全位置初始化，最后semantic-aware supportclamp。"
+    ],
+    "experimentsZh": "ReplicaCAD/Replica matchedcommonplacement；60commontasks×adaptedLayoutGPT/Holodeck/LayoutVLM/ours，同Geminireasoner和fixedassets；60fitcritical/30gapablation，geometrymetrics与GPTCPS，无training。 以下结果为作者报告：作者报告placement-onlyReplicaCAD70.4SRS/92.7SupR与Replica69.7/91.7相近，但matchedsubset数量未独立展开。（PDF p.7, Table1）；作者报告completegapfit48.3SRS/66.7CFR/86.7SupR/CPS4.63，表13–15的failurecases说明高CPS不消除geometryfailure。（PDF pp.8–9, Table3; pp.13–15, AppendixA） 对照范围：layoutbaselines被限制singlefixedobject并使用box-levelsolver，最接近FirePlace在overlapping24commontasks也未定量比较；不存在其他fullpipelinegenerativefit对照，不能确认relativeSOTA。 消融与诊断：Stage3全移除及仅settling移除，无完整generation-conditioning/mode/category能力controlledablation；evaluation suite与method共同开发，无repeatedrunvariance。",
+    "insightZh": "核心组合是scene-grounded fittingrepresentation把high-levelreasoning连接generativeprior与mode-specificgeometry。相对FirePlace扩展make-it-fit，但closestgeometrybaseline只designcomparison，主数值对adaptedlayoutmethods；anisotropicscaling不构成物理elasticdeformation。",
+    "evidenceZh": "grounding纠正support ID不保证正确surface或orientation。（PDF p.4, §3.2/Eq.(1); pp.14–15, AppendixA.2; pp.17–18, AppendixC.1）；commonbaseline数值是placement-only，不含priorgeneration/deformation。（PDF p.7, Table2/§4.1; pp.24–26, AppendixF）；completefit-criticalpipeline成功有限，CPS不能证明shape/constraint fidelity。（PDF pp.8–9, Table3; pp.21–23, AppendixE）；几何fitting为collision改善主因，settling只小幅改善support。（PDF p.9, Table4）",
+    "caveatZh": "elastic仅anisotropicscaling，真实cloth/pillow nonrigiddeformation未实现。；support成立仍可能overhang，缺explicitcontainment。；task suite共同开发，依赖datasetsemanticinstanceannotations，预测annotation误差未测。；generation/aspectratio控制soft，category比例可能被stretch破坏；singleobjectonly。；CFR是sampledpoints相对yawboxcount，support8%coverage阈值与pointheightproxy不等同物理stablecontact保证。；SRS排除方向，CPS未human校准并忽略identity/shapequality；不能用CPS补全未满足的geometricconstraints。；官方projectpaper/code链接仍#，PDF承诺release完整prompt/code，未确认实现可获得。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接连接visualdesignreasoning与可执行3D生成、局部几何constraint及objectadaptation，对CAD/结构化资产创作可借鉴，high/deep。"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2604.13491",
+  "slug": "fire-fine-grained-multimodal-reasoning-for-enhanced-image-generation",
+  "title": "FiRe: Fine-grained Multimodal Reasoning for Enhanced Image Generation",
+  "authors": [
+    "Yongjin Kim",
+    "Yoonjin Oh",
+    "Yerin Kim",
+    "Hyomin Kim",
+    "Jeeyoung Yun",
+    "Yujung Heo",
+    "Minjun Kim",
+    "Sungwoong Kim"
+  ],
+  "publishedAt": "2026-04-15",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v4",
+  "identifiers": {
+    "arxiv": "2604.13491"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "vlm-mllm",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "FiRe",
+    "Fine-grained",
+    "Multimodal",
+    "Reasoning",
+    "Enhanced",
+    "Image",
+    "Generation"
+  ],
+  "abstract": "With the rapid progress of Multimodal Large Language Models (MLLMs), unified MLLMs that jointly perform image understanding and generation have advanced significantly. However, despite the inherent reasoning capabilities of unified MLLMs for self-reflection and self-refinement, their use in text-to-image generation remains largely underexplored. Meanwhile, existing multimodal reasoning-based image generation methods mostly rely on prompt augmentation or holistic image-text alignment judgments, without fine-grained reflection and refinement of detailed prompt attributes, leading to limited fine-grained control. To address this limitation, we propose FiRe, a Fine-grained Multimodal Reasoning method for enhanced image generation by MLLM. In specific, FiRe performs a fine-grained multi-step reasoning by first decomposing the prompt into key visual requirements and then self-judging their satisfaction in the generated image, followed by localized refinement according to self-generated precise feedback. In addition, to further strengthen the MLLM's multimodal reasoning ability, we introduce FiRe-GRPO, a reinforcement learning method tailored to FiRe. Since standard Group Relative Policy Optimization (GRPO) suffers from sparse, outcome-based rewards in multi-step reasoning, we formulate our reasoning process as a step-level decision-making problem, design step-specific rewards, and compute step-level advantages for granular credit assignment within GRPO. Extensive experiments demonstrate that FiRe consistently outperforms competitive text-to-image baselines, including existing reasoning-based methods, with particularly substantial gains on compositional text-to-image benchmarks. Our project page is available at https://ku-agi.github.io/FiRe/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2604.13491v4",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2604.13491v4"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/KU-AGI/FiRe"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2604.13491v4 的 53 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：相对v3，v4新增2500-step训练结果、独立删除tuple/VQA的消融、HPS/aesthetic与理解能力保持评测、分阶段/复杂度时延，及543失败来源、错误注入恢复、外部recheck与弱语义遗漏统计。v3已有六步方法、300-step主体结果与固定初始图控制，不能把这些写成此次新贡献。 FiRe 把统一 MLLM 的生成后自检拆成可核验 semantic tuples、逐项 VQA、具体修改反馈，再用 step-wise GRPO 学习这条闭环；作者报告 Janus-Pro-7B 的 GenEval++ 从基础模型 0.246 升至初生成 0.379、两次修正后 0.491。它适合借鉴视觉设计 agent 的可检查条件与最小编辑，但不是可靠的自动验收器：VQA 占失败来源 76.43%，所谓 localized correction 主要靠 preservation prompt，完整闭环耗时约为初生成的 4.8 倍。",
+    "motivationZh": "统一理解与生成的 MLLM 能反思生成结果，却常用整体好坏判断，漏掉具体颜色、数量、关系绑定错误。生成后多轮修正也可能损害已正确内容，且终局 reward 难以定位哪一步出错。",
+    "methodZh": "针对 holistic self-reflection 难以识别颜色、数量、关系绑定错误的问题，FiRe 用同一个 Janus-Pro 完成生成、摘要、tuple decomposition、tuple-level verification、feedback 与 image correction；训练阶段另用 Qwen 模型构造 200K 监督图文对并提供分步骤 reward。SFT 已贡献大部分基础改进，300-step FiRe-GRPO 加强复杂组合约束，2500-step 版本进一步提高，但证据限于 Janus-Pro 1B/7B 与三个组合生成 benchmark。",
+    "methodFlow": [
+      "初始生成：Janus-Pro 根据原始 prompt 自回归生成图像，作为后续视觉核验和编辑的当前状态。",
+      "压缩并拆解约束：保留具体可见对象、属性、数量、空间关系、文字，去掉弱可核验描述；将摘要转换为 schema-locked semantic tuples。",
+      "逐项视觉判断：同一 MLLM 针对每个 tuple 输出 image-grounded rationale 与 Yes/No，形成待改与待保护条件。",
+      "定向反馈与迭代修正：对 No 条件给出 actionable edit，配 preservation instruction 编辑当前图；no-edit 时提前停止，否则把修改图重新送入检查，至次数上限。",
+      "监督轨迹初始化：FocusDiff 编辑对与 Qwen 合成组合数据经独立 VQA 筛选，形成 corrective/no-edit 轨迹，对文字和图像输出一起 SFT。",
+      "分步骤强化学习：Qwen3.5 给图像 alignment、摘要、tuple、VQA、feedback 与修改 instruction-following 打分；按 rollout 的对应步骤归一化 advantage 并优化 token-level GRPO。"
+    ],
+    "experimentsZh": "Janus-Pro-7B 主模型，200K SFT，8×A100 约768 GPU hours，300-step GRPO 24×A100 约1152 GPU hours；三个组合生成 benchmark，同环境重跑 reasoning baselines。附 Janus-Pro-1B、2500-step 延长训练、相同初始图与误差注入实验。 以下结果为作者报告：作者报告基础 Janus-Pro GenEval/GenEval++/DPG 0.80/0.246/83.78，FiRe300step 两次修改后0.87/0.491/85.28；2500step 后0.90/0.686/86.01。（PDF p.6 Table 1）；作者报告 GenEval++ 三轮 SFT0.348/0.409/0.440，stepwise GRPO0.379/0.464/0.491；aggregated 和 terminal 最终约0.44。（PDF p.8 Tables 4–5）；作者报告 masked-CLIP preservation 0.9204；HPS保持但 aesthetic 5.608→5.600略降，部分理解 benchmark 也下降。（PDF p.9 Tables 6–7; p.24 Table 15）；作者报告两次修正累计30.19s，外部 recheck38.82s且+70GB；首次 GenEval++ degradation34例，对照36，第二次16对45。（PDF pp.23,26 Tables 13,20,23） 对照范围：包含 SD3.5/FLUX、BAGEL/Show-o2/Blip3o 与同骨干 Janus-Pro-R1/T2I-R1；表中最好仅限 reasoning 模型部分，不覆盖所有当前生成系统。DPGBench 修正了官方多GPU评测脚本并统一重评，分数跨论文需谨慎。 消融与诊断：同图同SFT配置 coarse-vs-fine，分别删tuple/VQA，stepwise-vs-aggregated/terminal，SFT-vs-RL与1B规模、固定初图控制；没有跨生成骨干或独立人类错误验收的全面泛化证据。",
+    "insightZh": "贡献在于把统一理解/生成模型的自修正显式组织成可核验条件，而非只增强 prompt 或自由形式反思，并将 reward/advantage 分到实际推理与修改步骤。步骤级 GRPO 本身继承已有方法，不应视为全新 RL 算法；可迁移点是条件分解、保护已正确内容和对中间验收器的误差分析。 相对v3，v4新增2500-step训练结果、独立删除tuple/VQA的消融、HPS/aesthetic与理解能力保持评测、分阶段/复杂度时延，及543失败来源、错误注入恢复、外部recheck与弱语义遗漏统计。v3已有六步方法、300-step主体结果与固定初始图控制，不能把这些写成此次新贡献。",
+    "evidenceZh": "推理时同一统一 MLLM 执行六个步骤，编辑局部性由反馈和保护指令表达。（PDF pp.3–5 §2; pp.15–16 Appendix B–C, Algorithm 1）；300-step 模型的初生成与两次修正都改善组合遵循。（PDF p.6 Table 1; p.8 Tables 2–5）；控制相同初始图后，FiRe 修正仍优于 holistic regeneration。（PDF pp.27–28 Appendix N, Tables 26–27）；细粒度检查增加时间，失败多数仍来自检查器。（PDF p.23 Table 13; pp.25–26 Tables 20–23）；弱可核验内容通常被排除而非被成功验证。（PDF p.27 Appendix M.5, Tables 24–25）；相对v3，v4新增2500-step训练结果、独立删除tuple/VQA的消融、HPS/aesthetic与理解能力保持评测、分阶段/复杂度时延，及543失败来源、错误注入恢复、外部recheck与弱语义遗漏统计。v3已有六步方法、300-step主体结果与固定初始图控制，不能把这些写成此次新贡献。（Prior 2604.13491v3 PDF p.23 Tables 15–16/Appendix L–M; current v4 PDF p.6 Table 1, p.8 Table 3, p.9 Tables 6–7, pp.23–27 Tables 13–25）",
+    "caveatZh": "依赖多轮中间推理可靠性，VQA和精确计数仍是主要瓶颈。；合成数据依赖单一生成/编辑家族，GRPO依赖单一VLM reward evaluator。；弱可验证语义不能被显式完整核验，未来需要多评审及分支探索。；localized correction 是 prompt 约束而非 mask 保证；Masked CLIP 是语义 preservation proxy，不证明像素或结构不变。；摘要/tuple保守筛选会丢掉 mood、lighting、tiny details；all-Yes 仅覆盖保留的条件。；主体公式含 KL 项但实际 hyperparameters β=0；step奖励是当下质量并不证明对最终图像的因果credit。；2500-step 分数训练预算不同；主实验没有误差条，DPG重评协议、synthetic judge和训练prompt风格可能带偏差。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可检查视觉约束→渲染观察→最小修正的闭环直接适合视觉设计agent；tuple与保护条件的组织可转用于设计artifact，但本文输出仍是raster图，没有SVG/CAD或制造验证。"
+  }
+}

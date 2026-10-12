@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.09720",
+  "slug": "dynstream-online-streaming-4d-gaussian-reconstruction-of-dynamic-worlds-from-unposed-video",
+  "title": "DynStream: Online Streaming 4D Gaussian Reconstruction of Dynamic Worlds from Unposed Video",
+  "authors": [
+    "Dingwei Xian",
+    "Xiaoyu Zhou",
+    "Yajiao Xiong",
+    "Yongtao Wang",
+    "Ming-Hsuan Yang"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09720"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "DynStream",
+    "Online",
+    "Streaming",
+    "4D",
+    "Gaussian",
+    "Reconstruction",
+    "Dynamic",
+    "Worlds",
+    "Unposed",
+    "Video"
+  ],
+  "abstract": "Online reconstruction of dynamic 4D scenes from long, unposed streaming videos requires both continuous processing and photorealistic rendering, which existing methods struggle to achieve simultaneously. Existing feed-forward Gaussian methods are restricted to offline processing, whereas online point-cloud approaches struggle to maintain dense geometry and high-fidelity rendering. We present DynStream, a framework for streaming 4D Gaussian reconstruction from long, unposed videos. Given a continuous video stream, DynStream reconstructs the scene within local temporal windows and incrementally aligns and fuses these local reconstructions into a globally consistent scene, enabling online 4D reconstruction without per-scene optimization. By jointly enforcing cross-window geometric consistency and modeling time-varying scene content, DynStream supports efficient reconstruction and photorealistic rendering over extended video streams. Experiments demonstrate that DynStream enables high-fidelity online dynamic reconstruction and rendering from long video streams, achieving state-of-the-art performance across diverse dynamic indoor and outdoor scenes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09720v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09720v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09720v1 的 17 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "DynStream在causal chunks内预测pose/depth/15维Gaussians与scale，再按relative-pose传播把static内容并入global scene、dynamic内容保留时关联，免逐scene优化。作者报告Waymo PSNR26.777与100chunks端到端315.5ms/frame。可借鉴persistent4D资产恢复，但global scene memory仍增长、pose仍drift；dynamic labels其实SAM3 foreground，SpatialVID潜在train overlap未排除。",
+    "motivationZh": "动态视频的三维重建常依赖整段序列联合处理，无法在新帧到来时及时更新；逐段处理又易出现尺度和相机位姿漂移。需要因果地维护静态与动态几何，并让长期增量重建保持一致。",
+    "methodZh": "DINOv2/VGGT初始化的alternating intra/cross-frame attention施加causal mask，当前chunk只看已有frames。Gaussian含center/quaternion/scale/opacity/RGB/dynamic probability，scale head统一metric长度；keyframe间relative transforms逐chunk累乘，static Gaussians持久累积，dynamic Gaussians附time。训练VGGT-Ω提供depth/pose伪监督，metric scale用available annotations、dynamic head用SAM3 masks，加RGB/LPIPS渲染与depth consistency。无3D/pose人工GT不等同完全self-supervised。附录明确unboundedinferencecontext不等于bounded资产内存，且训练/验证历史不完整可能有数据重叠。",
+    "methodFlow": [
+      "把unposedRGBstream划成fixed chunks，以DINOv2和causal alternating attention编码当前可见prefix。",
+      "预测keyframe-relative pose、depth、pixel-aligned15维Gaussian与positive metric scale。",
+      "按相邻keyframes relative transform传播global pose，并一致缩放translation/depth/Gaussian geometry。",
+      "按dynamic probability将static加入persistent world，dynamic保留当前time association以避免ghosting。",
+      "用RGB/LPIPS、teacherdepth/pose、metric scale及SAM3foregroundloss训练，持续渲染已维护的4D scene。"
+    ],
+    "experimentsZh": "训练SpatialVID、Waymo、PointOdyssey、DL3DV/HM3D/Replica/ETH3D/Matterport/TartanAir；2–14contextviews、高224–448。rendered dynamicbench Waymo/SpatialVID/KITTI/PointOdyssey/TartanAir，cameraKITTI11seq/23201frames。mask对照100scenes×14frames/dataset；100chunks进行end-to-endtime。 以下结果为作者报告：作者报告PointOdysseyPSNR26.787vsNeoVerse21.868，KITTI17.708vsDGGT17.010；去dynamic后Waymo26.777→23.011、SpatialVID23.994→21.161。（Table1 PDF p.7; Table3 p.9）；作者报告KITTI Sim3ATE45.627m、SE3ATE142.064m、rawATE283.220m；100chunks315.5ms/frame，2chunks753.4ms/frame。（Table2 PDF p.8; Supplement.TableIV p.16） 对照范围：AnySplat/DGGT/MVSplat/NeoVerse/STORM渲染，STream3R/StreamVGGT/VGGT-SLAM轨迹；动态对照native thresholds不同。maskruntime24–25ms排除export等，不应和315.5ms端到端混淆；缺geometry surfaces/part edit与global-memory曲线。 消融与诊断：去dynamic降渲染，去scale head显著增加SE3ATE，去relativepose加轨迹误差；主表缺完整causalattention定量。SAM3共同reference与trainlabels使maskagreement优势需限定监督条件。",
+    "insightZh": "将causal geometric inference、renderable Gaussian输出与跨chunk relative-scale对齐组合成在线dynamic reconstruction，超出纯pose tracking。没有global loop closure或dynamic物理motion模型，所谓dynamic-aware更多是防止前景跨时静态融合。",
+    "evidenceZh": "localcausalGaussian预测以relative keyframe poses及同scale变换并入world，dynamic保持temporalassociation。（Sec.3.1–3.3 Eqs.(1)–(7), Fig.2, PDF pp.4–6）；作者报告WaymoPSNR26.777/SSIM0.8675/LPIPS0.0972，对DGGT24.396/0.8125/0.1462。（Table1, PDF p.7）；dynamic mask为vehicle/person/cyclist语义foreground，且训练同源labels；SpatialVID无法排除历史预处理造成trainoverlap。（Supplement.C Reference masks/Protocol, PDF p.15）；作者明确pose/scale误差积累、Gaussianstate内存可持续增长。（Supplement.G Failure Cases and Limitations, PDF p.16）",
+    "caveatZh": "跨chunkrelativepose/scale累积drift，无bundleadjustment/loopclosure（p.16）。；foreground supervision漏movingvegetation/water并包括parkedvehicles（p.15）。；networkcontext固定但globalGaussianstate内存继续增加（p.16）。；SpatialVID无法完全排除早期预处理train-sceneoverlap（p.15）。；大范围ATE仍高，不能把globallyconsistent表述为精准metricworld。；benchmark训练源重叠需要更严格split与unseen-domain验证。；动态图元有temporal association，但未给连续物理motion或可编辑semanticassets能力。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "在线renderable4Dstate与causalasset恢复是3Drepresentation/动态scene制作可迁移的范式；不能当driving安全或general3Dsegmentation能力证据。"
+  }
+}

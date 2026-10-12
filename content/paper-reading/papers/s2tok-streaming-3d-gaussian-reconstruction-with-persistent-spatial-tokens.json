@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2610.08978",
+  "slug": "s2tok-streaming-3d-gaussian-reconstruction-with-persistent-spatial-tokens",
+  "title": "S2Tok: Streaming 3D Gaussian Reconstruction with Persistent Spatial Tokens",
+  "authors": [
+    "Fang Li",
+    "Jiraphon Yenphraphai",
+    "Quentin Herau",
+    "Depu Meng",
+    "Yihan Hu",
+    "Tianshuo Xu",
+    "Narendra Ahuja",
+    "Wei Zhan"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.08978"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "S2Tok",
+    "Streaming",
+    "3D",
+    "Gaussian",
+    "Reconstruction",
+    "Persistent",
+    "Spatial",
+    "Tokens"
+  ],
+  "abstract": "Streaming 3D reconstruction requires more than a sequence of geometric predictions: it requires a persistent scene state that can incorporate new evidence and remain renderable as observations arrive. Latent spatial tokens offer a promising representation for this purpose, but constructing them from an image collection leaves open how to maintain them online, where each observation may both revisit known regions and reveal new content. We introduce S2Tok, a feed-forward framework that maintains a size-adaptive, persistent scene state from uncalibrated image streams. Its central idea is to distinguish updates to the existing representation from selective expansion. A spatially informed transformer integrates each incoming observation with the persistent scene tokens, while a learned admission module selectively expands the representation to limit redundant storage. A hierarchical decoder and Gaussian head convert the evolving state into non-pixel-aligned 3D Gaussians, enabling novel-view rendering without caching previous frames. Experiments across four benchmarks demonstrate competitive streaming rendering quality with compact Gaussian representations. These results support latent spatial tokens as a persistent computational state for online 3D reconstruction, combining learned scene updates with explicit Gaussian rendering.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.08978v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.08978v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Applied-Intuition-Open-Source/S2Tok"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.08978v1 的 28 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "S2Tok 把静态scene维护为可增量更新/选择扩展的latent spatialtokens，每步整体decode非pixel-aligned3DGS而非累加immutableframepoints。作者报告50view DL3DV仅66KGaussians、19.11dBintermediatePSNR，但final18.00说明后续更新会忘早视角；state只增不删、colorbankwrite-once，不能当boundedmemory或monotonic3D理解。",
+    "motivationZh": "流式 3DGS 重建若不断累加每帧对应的 primitives，会产生冗余，也难以用后续视角修正早期场景解释。论文关注可持续更新的场景状态，使增量观察能够整合到同一空间表示中。",
+    "methodZh": "ZipSplatViTG14初始化，currentframe与旧scene经27blockglobal/noPE、scene3DRoPE、frame2DRoPE三attention更新。旧token3Dcoord由previousGaussiansopacity-weightedgeometricmedian，scale token稳定prefix-normalizedgauge。admissiondistillDA3depthnovelty，再SCSTrenderreward，appendnewtokens；三个layerhierarchyjointdecode每token32GS/degree1SH。完整28页含teacherfuturedepthcausality、scale、color-skip、3stage训练、4dataset协议及retention/memorylimitations已读。",
+    "methodFlow": [
+      "当前RGBencode14patchtokens，与oldscene/normalizationscale token做globalcrosscontext。",
+      "scene-local3DRoPE使用旧tokenGaussian中心geometricmedian，frame-local2DRoPE保imagegrid。",
+      "admissioncross/selfattention预测geometricnovelpatch，threshold.5选择append，同时oldtokens持续更新。",
+      "三层tokenshierarchicalselfattentiondecode每token32Gaussian；write-once128Dcolorbank提供admissiontimeappearance。",
+      "训练先oraclehardadmissions+BCE，再BernoulliSCSTreward-to-go，最后固定headdeterministicrule适配restmodel。",
+      "每arrival由currentstate重decodeaccumulatedscene，丢弃pastimages并把tokens/colorbank带到下一步。"
+    ],
+    "experimentsZh": "DL3DV/RE10K两data，teacherDA3depth+datasetcameras；13encoder+27tripleattentionD1536、32GS/token。前两stage各100epochs128A10080GB/train12-16views，最终74epochs64B200/train12-24views/fullBPTT。输入shortside252，12views小8/8/9/8scene与50heldoutsets不完全相同；heldout每相邻context间一target。 以下结果为作者报告：作者报告DL50viewFinal18.00/.42/.51与Intermediate19.11/.46/.47，66KGS；StreamSplatIntermediate17.93/.40/.45有更低LPIPS。（Table1, PDF p.9）；作者报告Scan50intermediate22.63/.76/.34 vsStreamSplat24.23/.83/.26，S2final20.54仍低于optimizationMonoGS23.90。（Table7, PDF p.26）；作者报告SCST全66KGS Final18.00/Intermediate19.11；noSCST120K18.13/19.67更好，match66K17.90/19.03才小幅优势。（Table3, PDF p.11）；作者报告A10080GB50view81ms/view+7.8GiBpeak，vsCUT41ms/4.8GiB、StreamSplat225ms/5.7GiB；小GS不等同smallwholeGPU。（Table1, PDF p.9） 对照范围：offlineZipSplat/TokenGS/GlobalSplat/Any/Depth及streamCUT/Spann/Point/StreamVGGT/StreamSplat/optimizationMonoGS。pointmethods经point-splat非原NVS目标；sensory、teacher/representation/traindata/optimization不同，只支持当前renderprotocol。同primitivebudgetZipSplat是offline参考，notstreamfairmodel。 消融与诊断：noRoPE3D/noScale/noAdmission/noSCST及matchedbudget66K。fulladmission518K intermediate20.39提升但final17.50退化；SCSTreward无显式countcost，质量/storage折衷在实测出现，不宣称全提升。12/50不同scenes不可做controlledsequence-lengthablation。",
+    "insightZh": "实质是scene-levelrecurrentreadout与update/expand分离，把ZipSplat非pixelGSdecoder接到size-adaptive3Dstate。RoPE3D/scale与learnednoveltySCST针对该state，非单SLAM速度微调；但output每token32GS且memorygrows，adaptive不等同fixedboundedcache。",
+    "evidenceZh": "oldscene能重新decode，而appearance支路write-once不随新观察直接刷新。（Sec.3.2-3.4/Fig.2, PDF pp.4-7; Appendix D.2, pp.18-19）；oraclelabels只比较prefix但depthteacher全clip可见future。（Appendix A, PDF pp.15-16）；持续stateupdates不保证保真上升，final多数据低于intermediate。（Sec.4 reconstruction updates, PDF p.10; Appendix H, pp.21-22）；componentstorage增长缓慢不等于GPU峰memory更低或长期有界。（Fig.11, PDF p.27; Table1, p.9; Appendix G-H, pp.21-22）",
+    "caveatZh": "Appendix H pp.21-22明确staticonly、训练12-24/test12/50、longretentionunestablished、无remove/compression/fixedbudget。；continueupdates会降低oldviewrenderfidelity；geometryblur/error仍在。；teacherinvaliddepthtreatedcovered避免spuriousgrowth，但可漏真正newcontent。；latentcapacity扩展/全局attention和jointdecoder随着memory成本增长；loopclosure/longvideo/scenechange未测。；强NVS未必geometricaccuracy，depthGT为DA3pseudo不是independentgeometry。；code现有4000tokencap仅拒新patch，不能当paper理论boundedmemory且可能截scene。；color-skip旧appearance冻结，对revisit纠错贡献需专门实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "3Dscene representation更新/扩容/可渲染readout新architecture直接可参考interactiveassetcapture，与几何结构/后续编辑状态相关；未提供assetediting或fabrication实验。"
+  }
+}

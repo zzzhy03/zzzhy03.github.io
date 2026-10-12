@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.10539",
+  "slug": "tetris3d-3d-scene-generation-with-objects-that-fit-together",
+  "title": "Tetris3D: 3D Scene Generation With Objects That Fit Together",
+  "authors": [
+    "Jaeyeong Kim",
+    "Jinhyuk Jang",
+    "Jongmin Lee",
+    "Kyehong Park",
+    "Seungryong Kim"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10539"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Tetris3D",
+    "3D",
+    "Scene",
+    "Generation",
+    "Objects",
+    "That",
+    "Fit",
+    "Together"
+  ],
+  "abstract": "We propose Tetris3D, a generative framework for single-image 3D scene reconstruction that recovers objects which are physically and geometrically coherent as a scene. Existing methods often generate objects independently or couple them implicitly, providing limited guidance for ensuring fine-grained spatial compatibility between neighboring objects that interact with one another. To address this, we explicitly condition the generation of each object on the geometry of surrounding objects and their physical relationships, guiding its shape and pose to remain geometrically and physically plausible within the scene. Moreover, we introduce ComOb, a physics simulation-based dataset of 1.2M scenes featuring physical interactions across diverse object categories, with per-object meshes and pairwise physical relation annotations. Comprehensive experiments on synthetic and realworld scenes show that Tetris3D recovers coherent object shapes and poses even when interacting regions are occluded, and achieves state-of-the-art performance in both generation quality and physical stability.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10539v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10539v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10539v1 的 30 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Tetris3D 把邻近mesh的UDF、surface direction/normal与stack/contain等关系直接inject每voxel，以物理依赖顺序重建可分离objectmeshes，补出更能fit的遮挡部分。作者报告Toys4K sceneCD3.68vsShapeR5.72及更低settling/penetration；最终是inputfaithfulreconstruction，非任意scene创作，1.2M训练scene为target+primitives且physics只是learnedguidance。",
+    "motivationZh": "逐个独立重建场景物体时，遮挡部分缺少观察约束，生成的 mesh 容易互相穿透，或无法满足支撑、堆叠与容纳关系。论文要恢复的是与输入场景相符、彼此能够配合的可分离物体几何。",
+    "methodZh": "Pixal3D初始化TRELLIS2 SS/SLAT；depthmaskpointcloud确定camera-spaceobjectgrid，DINOv3backprojection与surfaceoccupancy提供posealignment。nearestneighborsurfaceUDF/direction/normal加relationembedding在grid对齐后per-layer注入，V2I让potentiallyoccludedtokens读visibletokens。MoGe3/SAM3/Qweninventory+relationgraph给ARorder，cycle时confidence-weightedsubsetDP弃低confidence逆边。完整30页含data筛选、depth/VLM实验、simmetrics、全部prompt及LLMagent限制已读。",
+    "methodFlow": [
+      "MoGe3估depth/cameras、SAM3分instance，VLM将coloredmask对齐inventory并预测support/contactgraph。",
+      "以Plane为root做confidence-weightedorder，先恢复supporter，已有neighbors成为后续context。",
+      "targetmaskdepthlift到cubegrid，DINOfeaturebackprojection和observedsurfaceembedding逐voxel提供poseconditioning。",
+      "nearestneighborUDF/direction/normal与stack/lean/contain/touch/noneembedding注入SS/SLAT的同坐标tokens。",
+      "othermaskrays标potentialinvisible，以V2Icrossattention从visibletoken聚合amodalcompletion。",
+      "decodeindependenttexturedmeshes并逐object作为后续surfacecontext；用physicssettling检验scene，不进行硬constraint求解。"
+    ],
+    "experimentsZh": "ComOb1.2Mscene/3.4Msamples，SS1.83B/SLAT1.68B、200K/100Ksteps两H200batch16，作者报告7/9days；full/primitiveoccluded/syntheticoccludedcurriculum1:2:1。Toys4Kdisjointobjects同ComOb布局、MessyKitchen/Picasso实scene。sameRGB/masks/depth；真实估MoGe3/VLM，syntheticGT另estimatedablation。MuJoCostability300s/1mssampledstates。 以下结果为作者报告：作者报告Toys4KGTdepthCD-S3.68/F1-S.8407/P-FID1.599/PD.0036/Dmean38.91 vsShapeR5.72/.6480/12.45/.8862/115.1。（Table1, PDF p.6）；作者报告estimateddepthoursCD-S7.56/F1-S.6457/PD.0047；SAM3DsemanticUni3D.5981高于ours.5795，非所有指标都最好。（Table4, PDF p.22）；作者报告MessyKitchenCD-S.11/F1-S.962/PD.0011/Epeak.3347，Picasso.27/.9053/.0016/2.147，学习prior有实scenetransfer。（Table2, PDF p.6）；作者报告100KSSablation去interactionCD-S3.90到8.56/PD.0192到.4980；去V2IPD.0270，interaction是主要贡献。（Table3, PDF p.9） 对照范围：SAM3D/ShapeR/WorldSculpt/MIDI/SceneMaker/SceneGen与amodal+FoundationPose；trainingdata/prior大小/nativeposeinterfaces不同，baseline适应depth细节不完整。mainGTdepth与realestimated分开；没有jointallobjectsphysicsconstraintbaseline，样本数/重复seedCI/end-to-endruntime未详细报告。 消融与诊断：interactionallremoved、V2Iremoved/replacedAmodal3R，100KSSvsmain200K、SLATunchanged但所有ablationsamebudget。未将relationtype与neighborgeometry单独拆分。GT→VLMrelations小gap但withGTdepth；不能外推noisydepth/segmentation/graph联合robustness。LLMagent仅3qualexamples，禁止externalgenerator/assets且CPUproceduralBlender，非comprehensiveagentcomparison。",
+    "insightZh": "贡献是把neighborgeometry/physicalrelation纳入objectshape/pose生成，而不是posthoc只移pose；voxel-alignedcondition和occlusionattention由强prior恢复contactfit，有editable/compositionalassets实质价值。Pixal/Trellis/FMs与VLMgraph已有，ARorder本身不是独立agent贡献。",
+    "evidenceZh": "学到physicalguidance而非hardconstraints，错误condition可AR传播。（Sec.3.2 Eqs.(2)-(4), PDF pp.4-5; Appendix E pp.22-23）；ComOb并非1.2M任意自然多objectscene：每scene单target+fixedprimitives。（Appendix B.3, PDF pp.17-18）；主要Toys4K数字含GTdepth/relations，估depth时性能下降明显。（Table1, PDF p.6; Table4, p.22）；imagefaithful目标及完整scene/objectmetric是reconstruction分类依据。（Sec.3.1/4protocol, PDF pp.3/7; Appendix C.1, pp.19-20）",
+    "caveatZh": "Appendix E pp.22-23明确不保证physicalvalidity，depth/segmentation/relations/order错误传到context。；cond是UDF适配nonwatertight但surface/normalerror仍存在。；ComObtarget+fixedprimitive训练与真实多生成neighbor互相依赖不同。；faithfulhiddengeometry仍prior猜测，contactfit更好不等于真实hiddenmesh。；supportDP指数subset算法和AR每object生成使largecrowd成本未测；groundunknown时prompt强制lowconfidenceplaneedge会先验造support。；MuJoCo稳定取决于collisionmesh/friction/mass设定，未详尽公开collisiondecomposition与物理参数，指标不等于现实装配/制造可行。；main表Dmean/PD单位解释不充分，不擅自转换到mm；CD有明确乘100，EpeakJ/kg。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "输入图到可分离3Dobjects并用neighborcontactfit恢复assets，直接对compositional3D/partassembly的几何conditioning有方法迁移；不是提出fabricationprocess，不归fabrication。"
+  }
+}

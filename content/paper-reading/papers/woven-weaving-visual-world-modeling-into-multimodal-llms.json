@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2610.12417",
+  "slug": "woven-weaving-visual-world-modeling-into-multimodal-llms",
+  "title": "WOVEN: Weaving Visual World Modeling into Multimodal LLMs",
+  "authors": [
+    "Zheyu Fan",
+    "Yue Zhang",
+    "Mingkai Deng",
+    "Kangrui Wang",
+    "Qineng Wang",
+    "Canyu Chen",
+    "Jie Hao",
+    "Xing Fan",
+    "Chenlei Guo",
+    "Eric P. Xing",
+    "Mohit Bansal",
+    "Manling Li"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12417"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "WOVEN",
+    "Weaving",
+    "Visual",
+    "World",
+    "Modeling",
+    "into",
+    "Multimodal",
+    "LLMs"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) struggle with spatial, embodied, physical, and temporal reasoning. We hypothesize that these failures reflect a shared deficit in visual transition reasoning, and test whether this capability can serve as a shared training primitive, one that different models can learn from different supervision sources and reuse across different tasks, with a systematic training recipe. Existing benchmarks document these deficits separately but do not support controlled comparisons across scenes, actions, and reasoning operations. We therefore introduce WOVEN, a training source and benchmark for visual transition reasoning that organizes transition supervision by scene, action, and reasoning type, using diverse, realistic rollouts from video-pretrained generative models: 36,076 examples across 20 scene types, 5 action types, and 8 reasoning types. We first evaluate 38 frontier MLLMs (e.g., GPT-5.4 and Qwen3-VL-235B-A22B) and find a substantial and systematic deficit: even the strongest models fall far below humans, and the failures recur across model families and persist with scale. We then train MLLMs at multiple scales on WOVEN and find that they learn a shared capability that transfers broadly: training subsets of only about 2,000 items each collectively improve 22 of 26 external benchmarks by up to 27.3 percentage points, and WOVEN data can replace 30-50% of a task's own training data with comparable accuracy. Controlled comparisons further yield a training recipe for visual world modeling, validated prospectively on held-out benchmarks: select supervision by the reasoning operation it teaches rather than by the actions, scenes, or domains it shows, and prefer larger changes to the visual state for robustness. Our work establishes visual transition reasoning as a reusable foundation for systematic visual world-model training in MLLMs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12417v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12417v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/mll-lab-nu/WOVEN"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12417v1 的 112 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "WOVEN 把生成视频的(s,a,s′)转换为按scene/action/reasoning operation分组的训练监督，并用matched content、letter和prospective-mixture controls研究跨任务迁移。值得深读的是监督选择实验；作者报告22/26改善来自逐benchmark选最好的subset/stage，单一full-mix只有12/26，且89.3% ID训练后perturbation仍38.3%。它不是长程或物理可靠的world simulator。",
+    "motivationZh": "直接VQA监督混合了不同视觉推理operation，难以判断哪些训练内容能够跨任务迁移。WOVEN研究能否用可控生成transition构造监督，并在固定预算与内容控制下识别有效的训练组合。",
+    "methodZh": "用20scenes/5actions/8reasoning types组织Wan2.2-I2V-A14B rollout，从5秒视频11frames构造typed-distractor四选一题；physical options均经过同一editor含null pass以减少artifactshortcut。按生成sources/scenario groups分train/val/ID，另有两heldoutscenes及stateperturbation。Qwen系列LoRA SFT和terminalletter GRPO分别训练fullmix/11controlledsubsets，比较自有诊断、26externaltasks及固定budget替换实验，Gemma与heldoutrecipe进一步检查迁移。",
+    "methodFlow": [
+      "因子化scene、action和reasoning operation，生成初始image及不同actions下的Wanrollouts，抽取11frames。",
+      "按forward/inverse/counterfactual/physical/temporalquery构造四选一监督与typed distractors；physical正确选项也走null edit。",
+      "按sources/scenario分割，建立ID、两sceneOOD和objectstateperturbation；训练fullmix或约2k-item operation/action subsets。",
+      "LoRA SFT加option permutations，再以answer reward与rolling-letter KL penalty做GRPO；分别选择checkpoint。",
+      "在externaltasks、content/letter/static-optioncontrols、固定2k替换预算和prospective8seed mixtures下检查transfer及边界。"
+    ],
+    "experimentsZh": "36,076items：train22,728/val2,508/ID6,228/OOD3,496/perturb1,116。Wan5秒24FPS、11uniformframes；38MLLM诊断，human3annotators990ID+1000perturb。主Qwen2.5VL3B LoRAr16/α4/3epochs/lr1e-4/batch32，WOVEN-only四option permutations；GRPO300steps、reportedstep150、16prompts×8rollouts、answermax8、KLref.005与recent64letterdistribution penalty.1。H/I/J controls另α32/batch64等recipe须区别。 以下结果为作者报告：作者报告最佳MLLM65.8% vs有限humanbaseline92.3%；fullmixSFT ID89.3/OOD88.2/perturb38.3，几何35.0仍弱。（Tables2/3 pp.6–7; App.C p.47; Table87 p.86）；作者报告fullmix至多12/26external改善、逐taskbestsubset22/26、SAT最大+27.3pp；三GRPOseeds meanSAT+24.0，最优SFT+26.0的selection校正pHolm.002。（Tables4/5 p.8, Table112/113 p.106）；作者报告prospectiveagent-actionRecipe37.9 vsUniform36.4(+1.5pp)、Temporal34.4(+3.5)、Exogenous33.2(+4.7)；camera+.6pp及passivephysics−.5仅小差。（Table7 p.12; Tables121/122 pp.111–112）；作者报告Gemma3-4B perceptivecausal训练ID+16.5、realimageSPARviewchange+19.7、SAT+17.1，3seeds有CI；这支持有限family/realimage迁移。（Table114 p.107） 对照范围：38frontierdiagnostics、full/11subsets、matchedforward/inverse、VJEPA2/image/videopriorreadouts、permutation/mirror/AOKVQA、circularletter/statics-free、3B/7B/32B及Gemma、deletionbudget/8seedprospective。Orca比较同Qwen3.5-4B但posttrain107kQA vs125k小时midtrain、budget/objective不同，不能宣称普遍四个数量级compute优势。 消融与诊断：10representativebenchmarks的maxselectionnull/3GRPOseeds有信息，prospective不同operationmix支持recipe的部分边界；datareplacement只三bench、每p三seeds且SATseedrange大，不是equivalence/noninferiority证明。单stepMCQ、syntheticgenerator与已有video/modeltraining可能的先验限制因果解读。",
+    "insightZh": "贡献是把生成video transition作为可控监督来源，并以factorized subsets、内容/格式控制和prospective-mixture实验研究什么监督可迁移，超出单纯VQAbenchmark。共享primitive是作者的实验解释，positiveprofile correlation/PCA及替换监督不证明模型内部唯一world-model机制；也未证明syntheticrollout严格满足真实physics。全部112页主文/附录A–K已读，PDF第39页实际空白已render核验。",
+    "evidenceZh": "数据由可控transition、typed MCQ和分组splits构成；not all action×operation cells实例化。（§2 pp.4–6, Table1, Figure2 p.5, App.B.2/B.7/B.8 pp.36/41–42）；作者报告fullmix SFT ID26.4→89.3、OOD88.2，但perturbation21.1→38.3。（Table3 p.7, Tables83/85/87 pp.82/84/86）；作者22/26与+27.3pp采用每benchmark最佳subset与SFT/GRPOstage，fullmix只12/26。（Tables4/5 p.8, Table50 p.70, App.I.1/Tables112–113 pp.105–106）；matched content/letter controls支持正确transitionsemantics比训练format本身有用。（App.H pp.100–104, Tables101–109）；固定2k监督替换与prospective mixtures支持具体预算分配，但30–50%依task而定。（Figure3 p.9, Tables79/80 p.80, Table7 p.12, App.J pp.108–112）；humanbaseline及rollout审计来自有限独立样本。（App.C.2–C.3 pp.47–49, Tables16–20）",
+    "caveatZh": "仅single-step action-conditionedvisualreasoning，不覆盖long-horizonproceduralplanning、symbolicworlddynamics或latentmodels的实际downstreamcontrol。；best-per-benchmark22项覆盖不是一个模型，四static/generalvideoQA任务没有>2pp增益，不能声称全能力共享或通用world-model训练成功。；generativerollouts/editeddistractors非physicalGT，finitehumanchecks不能确认全量labels或所有backgroundconditions受控。；budget替换的『comparable』无equivalence检验，ActionEQA50%下降约9pp；prospectivetiny差无familywisecorrection。；App.B.6『scenario group为atomic split』与『train/testsourcelevelwithinremaininggroups』表述需核实实际partition，B.7则说group-level，不能自行宣称已发现或已排除泄漏。；publicrelease当前只trainingcode/train data，evaluationcode/validation/tests未release，本项目未复现；几个controls采用不同α/decoding/base分数，不可跨表随意减。；代码范围：exact PDF p.1明确Codeannotation；HTTP200 actualtraining/requirements/README，README说明Oct9释放SFT/GRPOtrainingcode，evalcode/val/testcomingsoon。源快照保存，不宣称完整benchmark复现已具备。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为VLM空间、physical和temporal推理提供可控训练数据与transfer诊断，operation-first监督选择可启发结构化视觉能力训练；直接制造/LEGO/embroidery能力未在本文验证。"
+  }
+}

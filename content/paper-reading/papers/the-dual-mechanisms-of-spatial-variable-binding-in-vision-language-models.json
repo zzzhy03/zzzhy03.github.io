@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2603.22278",
+  "slug": "the-dual-mechanisms-of-spatial-variable-binding-in-vision-language-models",
+  "title": "The Dual Mechanisms of Spatial Variable Binding in Vision-Language Models",
+  "authors": [
+    "Kelly Cui",
+    "Nikhil Prakash",
+    "Shoval Messica",
+    "Ayush Raina",
+    "David Bau",
+    "Antonio Torralba",
+    "Tamar Rott Shaham"
+  ],
+  "publishedAt": "2026-03-23",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2603.22278"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Dual",
+    "Mechanisms",
+    "Spatial",
+    "Variable",
+    "Binding",
+    "Vision-Language",
+    "Models"
+  ],
+  "abstract": "Many multimodal tasks, such as image captioning and visual question answering, require vision-language models (VLMs) to bind objects with their properties and spatial relations. Yet it remains unclear where and how such associations are computed within VLMs. In this work, we show that VLMs rely on two concurrent mechanisms to represent spatial variable binding. In the language model backbone, intermediate layers represent content-independent spatial relations on top of visual tokens corresponding to objects. However, this mechanism plays only a secondary role in shaping model predictions. Instead, the dominant source of spatial information originates in the vision encoder, whose representations encode the layout of objects and are directly exploited by the language model backbone. Notably, this spatial signal is distributed globally across visual tokens, extending beyond object regions into surrounding background areas. We validate the generalization of our findings to complex natural images from the COCO dataset, where globally amplifying the vision-derived spatial representations across all image tokens corrects spatial variable binding failures across models of various sizes. Together, our results clarify how spatial variable binding is computed within VLMs and highlight the central role of vision encoders in enabling it.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.22278v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.22278v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Nix07/spatial-variable-binding"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.22278v3 的 66 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：相对v2，v3新增/扩展五模型机制证据（含Qwen3 DeepStack与Pixtral主要LM侧的架构例外）、100-pair bootstrap统计、held-outα、跨轴/跨dataset transfer、CoT与全样本break/非空间能力损伤。这些结果实质限定了v2修复上界的实际可用性；核心双机制与主表oracle数值不是本轮首次发现。 空间 binding 不仅发生在 object tokens：Qwen/Gemma 的 vision encoder 将布局信号扩散到 background strips，LM 中间层提供另一条局部 ordering 路径。可借鉴其 counterfactual patching 诊断视觉布局错误，但作者的“修复40–55%失败”是 per-item α oracle 上界且默认保留正确项；全部样本统一α6重评仅 Qwen2-VL-2B 0.600→0.709、Gemma0.527→0.536，并有能力损失。",
+    "motivationZh": "VLM 经常把物体属性绑定到错误空间 referent，但现有分析无法区分布局信号来自 vision encoder、LM backbone 还是两者交互。只检查 object tokens 还可能遗漏散布在背景中的空间信息。",
+    "methodZh": "论文用三种受控合成图、What’sUp拼接自然图和COCO空间问答追踪视觉与语言侧的空间变量绑定。Linear probes 能从视觉嵌入读出 ordinal/absolute position；保色交换 object-only 与 object+background strips，并消融 vision-derived ordering 后逐层 activation patching，区分两条路径。机制发现对空间理解重要，但模型间并不完全统一：新增附录指出 Pixtral 主要在LM层构建 ordering。",
+    "methodFlow": [
+      "构造可控反事实：建立颜色/shape/object三物体布局与自然图composites，选择clean/counterfactual都答对的样本，改变ordering而保持颜色等内容。",
+      "追踪答案形成：patch最终prompt token各层residual，区分clean answer、clean图counterfactual位置的属性与counterfactual属性，定位ordering→attribute阶段。",
+      "读出视觉位置与交换strips：训练位置linear probes，应用到object和background；分别交换object-only与整条background strip检验哪种信号能改变最终预测。",
+      "隔离语言侧路径：用居中孤立同色物体embedding及空背景替换视觉嵌入，再patch object tokens；LM中间层仍能生成主要relative ordering。",
+      "放大自然图ordering：从baseline-correct自然图和box annotations学probe，对所有visual tokens加方向向量；比较random、fixedα、per-item oracle与held-outα以及完整样本损伤。"
+    ],
+    "experimentsZh": "五个open-weight VLM、三个synthetic settings、1074 What’sUp composites及COCO-spatial，2×80GB A100。多数causal每方向100对，bootstrap2000；Pixtral50对，消融后有低n/无valid cells。Probe90训练/30测试图；自然图问答要求两种option顺序都正确（chance25%）。 以下结果为作者报告：作者报告Qwen2-7B消融visual ordering后Squares/Shapes/Objects准确率0.60/0.62/0.43，原约1.0；Pixtral Shapes0.55→0.78是例外。（PDF p.13 Table 2; p.23 Table 6）；作者报告COCO fixedα仅重评失败的repair Qwen42.6%/Gemma26.8%，per-item54.5%/40.2%；不能直接当部署全样本准确率。（PDF p.48 Table 11）；作者报告全样本α6 Qwen.600→.709、Gemma.527→.536；CoT Qwen.752/Gemma.464，修复与损伤权衡不同。（PDF p.50 Table 15）；作者报告Qwen What’sUp→COCO probe修复48.1%（held-out46.9%），水平→垂直33.3%，为共享ordering码的转移证据。（PDF p.50 Table 14） 对照范围：Random direction、object-only/strip、vision-ablation、shifted absolute-vs-relative、CoT和non-spatial benchmark控制充分；没有其它完整空间训练/输入方法的SOTA比较，作者明确为机制检验。COCO数据集2687图，但amplification表主要440items/subsets，不是全部图统一评测。 消融与诊断：last-token、strip/object token、视觉源消融、shifted布局、diagonal、跨模型/real-background，以及αsweep/held-out选择、axis/datasettransfer；Pixtral与垂直Gemma差异不能被平均结论掩盖。",
+    "insightZh": "实质发现是空间信号的来源和分布：视觉侧跨背景的全局布局与语言侧局部补偿可通过干预区分，而不只是证明最后token存在symbolic representation。自然图amplification提供机制可转移证据；非无需监督的通用空间推理算法，probe需要带box的正确样本，模型架构差异是重要结果。 相对v2，v3新增/扩展五模型机制证据（含Qwen3 DeepStack与Pixtral主要LM侧的架构例外）、100-pair bootstrap统计、held-outα、跨轴/跨dataset transfer、CoT与全样本break/非空间能力损伤。这些结果实质限定了v2修复上界的实际可用性；核心双机制与主表oracle数值不是本轮首次发现。",
+    "evidenceZh": "Qwen object-only patch弱，加入background strips后从vision embedding层就改变对应位置的答案。（PDF pp.6–7 §5.2, Figures 4–7）；视觉ordering被移除后，LM仍有中间层局部ordering，但模型间源头不同。（PDF pp.8–9 §5.3, Figures 8–9; p.23 Appendix C.3; pp.33–35 Figures 28–31）；主表修复率是上界，统一干预全样本有损伤。（PDF pp.16–17 Appendix A.4; p.48 Table 11; p.50 Table 15）；held-outα和跨dataset方向也能修复部分失败，支持转移而非只记住测试标签。（PDF p.17 Table 5; pp.49–50 Tables 13–14）；放大强度有side effects，主设置不限空间任务。（PDF p.51 Table 16, Figure 44）；相对v2，v3新增/扩展五模型机制证据（含Qwen3 DeepStack与Pixtral主要LM侧的架构例外）、100-pair bootstrap统计、held-outα、跨轴/跨dataset transfer、CoT与全样本break/非空间能力损伤。这些结果实质限定了v2修复上界的实际可用性；核心双机制与主表oracle数值不是本轮首次发现。（Prior 2603.22278v2 PDF p.9 §5.4/Table 2; current v3 PDF p.17 Table 5, p.23 C.3, p.36 C.4, pp.48–51 Tables 11–16）",
+    "caveatZh": "严谨因果干预限于受控与composite图；自然图amplification并非同等干预设计。；只少量left/right/above/below关系，depth关系机制、between与hierarchical未解决。；部分transfer/diagonal分析单模型，closed-source和不同vision架构未研究。；Table1 oracle选α且只重评已错项，正确项保留需oracle门控；全样本损伤表是实用效果的正确边界。；不能把vision主导声称适用全部五模型；Appendix C.3 Pixtral主要LM侧，Gemma垂直信号也弱。；模型正确性筛选、少n消融和合成fixed-spacing限制因果结论外推。；对单布局probe失败并非证明仅absolute code；双布局联合probe及patching提供更强证据但仍非纯符号唯一机制。；Probe训练需要位置annotations，单seedheld-out与小subset修复率不证明实际开放世界鲁棒性。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对VLM用来理解与验收布局的失败诊断有直接参考价值，提示不能只分析object crop/token；仍没有设计artifact生成或制造证据。"
+  }
+}

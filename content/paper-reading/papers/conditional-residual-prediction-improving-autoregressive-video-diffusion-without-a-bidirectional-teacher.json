@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.11479",
+  "slug": "conditional-residual-prediction-improving-autoregressive-video-diffusion-without-a-bidirectional-teacher",
+  "title": "Conditional Residual Prediction: Improving Autoregressive Video Diffusion without a Bidirectional Teacher",
+  "authors": [
+    "Bowen Zheng",
+    "Zhiguang Liu",
+    "Jiarong Ou",
+    "Rui Chen",
+    "Tianyang Hu"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11479"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Conditional",
+    "Residual",
+    "Prediction",
+    "Improving",
+    "Autoregressive",
+    "Video",
+    "Diffusion",
+    "without",
+    "Bidirectional",
+    "Teacher"
+  ],
+  "abstract": "Causal video diffusion models generate video autoregressively, which suits streaming, interactive, and long-video generation. Under standard training, however, they often yield lower generation quality than bidirectional models of the same size. Many existing approaches address this gap by initializing from or distilling a pretrained bidirectional teacher. We instead train a causal model from an image-model initialization, with no bidirectional video model at any stage. Because this path requires neither a large bidirectional teacher nor a complex distillation pipeline, it is simpler and more scalable. On this path, we find that a causal model trained on ground-truth history becomes strongly dependent on it, so that at inference errors in its own generated history propagate forward. We hypothesize that much of this dependence is unnecessary, because the current input already determines much of what the history provides. We propose Conditional Residual Prediction (CRP), a simple recipe for reducing a model's reliance on a condition: the model first predicts the target without the condition, and the condition may only add a residual on top of this prediction. Applied to history, CRP makes the model predict each chunk from the present as far as it can and use the past only for what the present cannot supply. In controlled experiments, CRP nearly closes the 6.14-point gap to a bidirectional model trained under the same setup. Scaling this recipe, we train Optica, a 2B-parameter causal video model that autoregressively generates 5-second 480p videos and reaches 82.78 on VBench with only about 15M training videos.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11479v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11479v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11479v1 的 26 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "CRP 让共享网络先在无 history 条件下预测 x0，再用 detached features 与 history 预测剩余误差；image-mode VAE消除decoder的跨帧耦合。作者在同数据/2B模型控制下报告VBench72.41→77.09，进一步image VAE77.48，与bidirectional77.28接近。这是teacher-free causal视频训练的实质思路，但仅5秒且50步、双forward，不能写成已解决长视频或实时world model。",
+    "motivationZh": "Autoregressive video diffusion 在 teacher-forced 训练中容易过度依赖完美 history，部署时误差会随 chunk rollout 累积。现有解决方案常依赖昂贵的 bidirectional teacher，causal VAE 的跨帧耦合也妨碍从当前 noisy input 独立恢复内容。",
+    "methodZh": "本文将 exposure bias解释为teacher-forced模型过分借历史补充本来可由当前noisy input与text恢复的信息。CRP两branch同参数，conditioned branch通过残差输出与每block latent fusion使用history，无history branch不接收history输入或该分支梯度路径。用Wan VAE image mode与temporal down/up恢复DiT token预算，SANA图像初始化训练Optica；控制消融和1000clip扰动诊断比较因果/双向。",
+    "methodFlow": [
+      "无历史生成：共享DiT对当前noisy chunk/text屏蔽history，训练直接x0预测Lfree。",
+      "历史残差：第二forward看history并接每block detached free hidden states，只预测加到sg[x_free]上的residual，训练Lcond。",
+      "切断VAE耦合：Wan2.1 image mode逐帧encode/decode，输入strided temporal map每4latent合并，输出再拆开。",
+      "因果rollout：首chunk仅free，其余sum两branch，保留causal attention/conv与KV结构，以50步flow采样。"
+    ],
+    "experimentsZh": "SANA1.5图像初始化适配Wan latent，2B、内部4M控制与15M扩展，Gemma2text、H20cluster、batch128、50DPM-Solver++。扩展480×832/80frames16fps/5chunks；numbers作者报告。 以下结果为作者报告：作者报告控制causal71.14，x0 72.41，CRP77.09，imageVAE77.48 vs双向77.28。（PDF p.6 Table1）；作者报告1000clip AR-TF quality gap .138±.003→CRP .066±.003→imageVAE .039±.002；corruption degradation .089→.020→−.004。（PDF pp.4–5/8 Fig.2 §4.3–4.4）；作者报告Optica82.78/83.02/81.83 VBench total/quality/semantic；质量低于Pyramid84.74和若干蒸馏模型。（PDF pp.10–11 Table3）；作者报告image VAE paired PSNR+1.11±.04dB，encode909ms vsvideo754ms。（PDF pp.25–26 Table4） 对照范围：同数据/架构causal与bidirectional控制强于跨论文leaderboard；Table3引用来源/augmentedprompts/resolutions不同，不能宣布整体SOTA。无严格同训练预算的history-noise/rollout matched系统消融。 消融与诊断：去residual、latentfusion、stopgradient和extrafreetraining；扰动history及VAE、paired重建；缺少多seed与长horizon。",
+    "insightZh": "与history CFG只在推理混合full predictions不同，CRP把残差目标和单向latent fusion放入训练；与额外ControlNet参数不同，两个branch共享权重。信息论chain rule是motivation，不能证明优化严格分离history-exclusive信息。",
+    "evidenceZh": "条件分支只提供无条件预测之上的残差。（PDF pp.2/6 Fig.1/Definition1）；控制实验逐项分离x0、CRP与image VAE收益。（PDF pp.6–9 Tables1–2 §§4.3–4.5）；image VAE不把早latent扰动传播到后frame。（PDF pp.24–26 D.3/E/F Figs.5–6 Table4）；实证范围只有5秒，实时与I2V未达成。（PDF p.12 Limitations）",
+    "caveatZh": "仅5秒评估，未验证长rollout；不支持image-to-video。；50步双branch无实时效率证明；imageVAE放弃temporalcompression。；扩展模型质量仍低于较大训练预算/teacher模型。；内部数据和SFT不可独立复现，15M训练量不能等同与baseline等算力。；当前input低噪声时信息丰富，高noise起始时history-exclusive分离未由mutual-information实测证明。；VAE模式重建差异与temporalmap增加40M参数也是干预，CRP之外收益不能完全归decodercoupling。；Q-ReAlign是image-qualityproxy，不足验证真实物理/identity/motion长期可靠性。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对visual creation视频模型有可迁移的history依赖与latent设计，尤其未来多步编辑rollout稳定性；未验证精确3D/fabrication状态。"
+  }
+}

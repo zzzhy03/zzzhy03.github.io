@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.13316",
+  "slug": "thinkdrag-semantic-drag-based-image-editing-with-visual-reasoning",
+  "title": "ThinkDrag: Semantic Drag-Based Image Editing with Visual Reasoning",
+  "authors": [
+    "Armando Fortes",
+    "Tianyi Wei",
+    "Chindanai Trakantannarong",
+    "Shangchen Zhou",
+    "Xingang Pan"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13316"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "ThinkDrag",
+    "Semantic",
+    "Drag-Based",
+    "Image",
+    "Editing",
+    "Visual",
+    "Reasoning"
+  ],
+  "abstract": "Drag-based image editing provides an intuitive interface for spatially controlled image manipulation by allowing users to specify handle and target points. Existing methods have made substantial progress through optimization-based, one-step, and feed-forward formulations, but they often interpret drag instructions as geometric displacements. This limits their effectiveness when the desired edit depends on interpreting image content and inferring a plausible semantic transformation from sparse point constraints. We introduce ThinkDrag, a unified multimodal framework for drag-based image editing with visual reasoning. ThinkDrag is trained to associate point constraints with meaningful object- and scene-level transformations, and can optionally produce an explicit reasoning trace that interprets the intended edit before image generation. This reasoning trace improves interpretability, particularly for ambiguous drags. Drag Endpoint Markers, motivated by an analysis of cross-image attention, provide an explicit correspondence signal that grounds each drag in image space. To support this framework, we construct a supervised dataset of semantic drag transformations paired with reasoning traces and introduce DragBench++, a benchmark targeting challenging drag-based editing scenarios with reference edit solutions. Experiments show that ThinkDrag achieves state-of-the-art performance, improving generation quality and plausibility while maintaining competitive point-following precision.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13316v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13316v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13316v1 的 19 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "ThinkDrag把drag视为semantic编辑意图：BAGEL用坐标text与共享endpoint markers学source-target对应，可先生成解释再出图。作者报告DragBench++ IF*0.905、human preference79.7%，但reasoning仅0.905→0.911、51.7%样本胜direct，主收益来自semantic数据与DEM。适合视觉创作控制；无公开implementation，reasoning增至22.9s/H200。",
+    "motivationZh": "Drag editing 的像素位移指令无法充分表达用户希望保留的语义、物体结构和遮挡关系，容易产生拉伸或错误移动。问题是让编辑器理解 handle–target 对应的实际意图，而不只局部满足坐标变化。",
+    "methodZh": "约193k syntheticpairs经MLLMfilter/keypoints/DINO+人工验证剩11kpairs，双向成22k样本，Gemini traces在training时看source/target/editintent。BAGEL rank256LoRA学习ARreasoning与rectifiedflow；每drag在sourcehandle及targetVAEtokens加同orthogonal-slotmarker，并逐层注入。inputdrags是normalizedtext和markers，图中箭头仅展示。direct与reasoning可选，10%training含texteditdescription以支持消歧。新增DragBench++145参考编辑与外部DragBench205；baseline在标准pointdistance仍更精准，auto评测不完全反映多解humanintent。",
+    "methodFlow": [
+      "生成drag-compatible source/targetpairs，过滤identity/global/artifact问题并用semantickeypointmatching+verification得到drag与oracle-conditionedreasoningtraces。",
+      "在BAGELprompt写入normalizedhandle-targetcoordinates，并给每对source/targetVAEtokens注入共享dragmarker。",
+      "rank256LoRA联合ARreasoningCE与rectifiedflowimagevelocityloss，部分样本加入semantictext。",
+      "推理可直接生成或先解释intendededit，再50stepimageflow编辑；text可修正ambiguousintent。"
+    ],
+    "experimentsZh": "DragBench205、DragBench++145（2.51drags/80.7%multi/107.8pxmean displacement），train22kbidirectionalsamples。BAGELLoRA256、100ksteps/batch16/4H200约60h，λthink0.25；infer50steps，H20014.3/22.9s，35.5/35.6GB。MDDIFT与GPT5.5tracking、IFinput/reference、FID与30人20问题study。 以下结果为作者报告：作者报告DragBench++IF*0.905vsLightningDrag0.836，MDMLLM34.24vs57.28；DragBenchIF0.918/FID30.05，MD28.84劣于GeoDrag22.77。（Table1, PDF p.7）；作者报告去DEM后标准MD45.42vsfull28.84；250coordinatepointsgrounding72.8%vsBAGEL38.0%。（Table5 PDF p.9; App.A.3 Table8 p.13） 对照范围：DragDiffusion/Noise/LoRA、Fast/GeoDrag、Instant/LightningDrag，selectedcategorystrongest才评GPTtracker。++同syntheticpipeline产生但sourceimages与train分离，外部标准bench/human偏好补证；所有generalediting/domains未测试。 消融与诊断：baseBAGEL/FLUXzero-shot、w/oDEM、reasoning/referenceprompt；DEM大幅改善pointgrounding，reasoningIF*小增。attentionpeakhandle50.7%vs6.1%但只是解释性关联，不是因果proof；tracecorrectnessVLM78.6%且underconstrained意图多解。",
+    "insightZh": "将semanticdrag监督、统一understanding/generation及显式cross-imageendpointsignature组合，区别视频flow-only监督与test-time优化。新能力主要是data/grounding训练；reasoning解释提供小而非普遍的额外数值收益。",
+    "evidenceZh": "DEM在source/target端点逐层加共享signature，用于cross-imagecorrespondence；jointAR+flow训练。（Sec.3.2–3.3 Eqs.(1)–(4), Fig.4, PDF p.5）；作者报告DragBench++IF*0.905、MDMLLM34.24，reasoning0.911/33.92；标准DragBenchMD28.84不是最优。（Tables1/4, PDF pp.7、9）；作者报告30participants×20questions，overallpreference79.7%/61.0%。（Table3 Sec.UserStudy PDF p.7; App.B.3 Table11 p.17）；reasoningruntime14.3→22.9s，胜direct75/145样本；single-drag只35.7%。（App.A.2 Table6 PDF p.13; App.A.5 Table10 p.15）",
+    "caveatZh": "reasoning增加latency且benefit集中ambiguousmulti-drag（p.19）。；language-space解释未完全表达finevisualtransform；metrics只部分反映human多解意图（p.19）。；syntheticpairs/filtering可能偏向teacherFLUX能实现的edit，realworld复杂occlusion/结构破坏泛化未覆盖。；ARtraces训练知道target，不能由coherent描述推断模型真正准确预见输出。；publicrepo仅LICENSE/README/assets，没有implementation，不能提供availableCode。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "semanticspatialcontrol与coordinategrounding直接服务visualcreationworkflow，提供对图像/部件编辑意图的控制方法；无SVG/CAD/物理约束验证。"
+  }
+}

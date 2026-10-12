@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.09781",
+  "slug": "end-to-end-autonomous-generation-of-human-assembly-plans",
+  "title": "End-to-End Autonomous Generation of Human Assembly Plans",
+  "authors": [
+    "Faustin Arion von Arx",
+    "Millicent Schlafly",
+    "Mark D. Fuge"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09781"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "fabrication"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "fabrication",
+    "End-to-End",
+    "Autonomous",
+    "Generation",
+    "Human",
+    "Assembly",
+    "Plans"
+  ],
+  "abstract": "Turning a CAD design into an assembly plan is still largely done by hand, requiring engineers to reason about geometric feasibility, tool access, stability, and the ergonomics of human assembly. In this work, we encode long-established design for assembly (DfA) principles into a contained, end-to-end approach for generating assembly plans. Our approach takes only a mesh assembly and produces either a step-by-step assembly manual or a structured failure report, requiring no joint metadata, fastener annotations, or additional information. Four major components of a manufacturing plan are addressed autonomously: an assembly tool list, the assembly sequence and subassemblies, an assembly manual, and design feedback for improving assemblability. For determining the sequence plan, we systematically disassemble the object in a physics simulator and apply a cost function that encodes DfA principles. Manual generation, tool labelling, and assembly feedback rely primarily on multimodal large language models. Compared with a baseline that always removes the outermost part first from Tian et al., DfA-aware sequence planning reduces simulated assembly time, measured with a robot-arm assembly-time proxy, by 35% on 136 assemblies of 5 to 30 parts. The correct tool is selected for 88.6% of assembly steps. A vision-language model judge compares the generated manuals against ablated variants, identifying which page elements carry the information a reader needs. The presented approach and open-source code are available for use by engineers or AI agents looking to rapidly accelerate the creation of manufacturing plans for a given product design.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09781v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09781v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/IDEALLab/AssembleX"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09781v1 的 22 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "AssembleX 从meshassembly与toolcatalog产出physics-checkedsequence、subassemblies、图文manual或结构化failure。Beamsearch结合DfAcost与碰撞/工具访问/重力检查；作者报告136共同成功assemblies的timeproxy减35%，不是实测human减时。值得精读制造验收工具；toolaxis只有5/10正确、136timing实验关闭toolchecks，设计修正反馈尚未闭环执行。",
+    "motivationZh": "仅有 CAD 零件几何时，装配次序、工具可达性、临时支撑和人工操作难度并不明确。需要产生满足碰撞与重力约束的装配计划，并把可执行的顺序转成工人能理解的说明。",
+    "methodZh": "无需mates或fastenerlabels，VLM命名parts并在convextooldecomposition的候选principalaxes中选toolcontact。ASAP/RedMaxdisassembly搜索逐件remove、最多hold2parts，在三restposes测稳定，DfAweightedcost排序beam4/6000checks。Blockingmatrix由已有removalchecks积累，以connectedsubsettree和simvalidation找subassemblies。Manual从selectedtrajectory渲染motion/highlight并写instruction；geometrydefects或搜索failure转VLMdescription/recommendation，但不自动修改design。",
+    "methodFlow": [
+      "预处理mesh并识别工具：修非watertight、保留大overlap缺陷，simrelativegravitystability；VLM给names/toolneed，convexcomponents产生toolaxes和contact候选。",
+      "物理验证disassembly：每候选检查partremovalpath、toolaccess与剩余assemblygravity稳定，最多两partshold且任一stablepose通过。",
+      "以DfAcost搜索序列：Beam4保低costpartialpaths，包含reorientation/topdown/contactgraphdistance/freedom/holds；四weights在六trainingassemblies用robotarmtimeproxyTPE调优。",
+      "查找可并行subassemblies：复用underapproxblockingmatrix枚举connectedsubsets，排名后rigid6axisremoval/remainingstability复验，beneficialsplit递归depth2。",
+      "生成manual或failurefeedback：每step选择四view中motion最可见angle，render+VLMtext+tool/reorientationcallouts；失败record指出相关parts和可选geometrychange，供下游设计者。"
+    ],
+    "experimentsZh": "ASAP200testassemblies5–30parts（exclude6train），136allmethodscompleted共同比较；beam4、6000checks、12hlimit，toolchecksdisabled。Tool选四IKEA158parts/56needs两tools，fiverepeats；10GrabCADaxes10repeats。Manual11handpickedassemblies/127itemsVLMjudge；runtime295assemblies、only147complete计statistics，48coreEPYC。 以下结果为作者报告：作者报告optimizedDfA relativetime.65 CI[.61,.70]、120/136faster；untunedhandweights.76 CI[.70,.82]，hold.16vsbaseline.37/optimized.36。（PDF pp.11–12 Table 2/Figure 3）；作者报告subassembly1worker相对linear慢1.15×；2workersvsbaseline.63但vslinear.97CI[.92,1.01]不significant，非独立又快37%。（PDF pp.11–12 §4.2.1）；作者报告toolneed88.6%CI[83.9,93.0]，neededtool漏5.4%；axes/contact5/10correct，repeatconsistent不等于correct。（PDF pp.10–11 Figure 2; p.17 A.1）；作者报告fullmanual77/127items60.6%，notext34.6、nomotion29.9、noangle同60.6；briefjudge81.9。（PDF p.13 Figure 4） 对照范围：ASAPoutermostfirst与random、handweighted、TPEweights/subassembly，samebeam与feasibility；不对比全部modernsequencingRL/optimizationmethod。原manufacturermanualproxyrange例及单participant对照有限，不是humanstudy。 消融与诊断：Costweights、subassemblyworkers、beamwidth26smallassembliesglobalopt、manualelements；separatecomponents不同数据集评估，缺带toolchecks完整136assembly实验或closedloopdesigncorrection收益。",
+    "insightZh": "把DfAprinciplescost、mesh-onlytoolapplication、physicssequence和manual/failurefeedback组合，且有sequencequality/统计评估，超出普通LLM写说明。来自ASAP的feasibility与既有DfA原则非新physics；agent生成design修正仍建议，不能声称已验证完整autonomousdesignrepairloop。",
+    "evidenceZh": "35%来自与训练目标同一个robotarmmotion/base/reorientationproxy，holds不计time。（PDF p.7 §3.3.3–3.3.4; pp.11–12 Table 2/Figure 3）；序列timing只共同成功136/200，47不stable先excluded且tools disabled。（PDF p.10 §3.6; p.11 Table 2）；Toolneed选择88.6%有人工GT，但contactaxis/direction仅5/10tools正确。（PDF pp.10–11 §4.1/Figure 2; p.17 A.1）；Manualjudge测信息可见性而非真实读者执行，feedback建议未下游执行验证。（PDF p.13 §4.3–4.4/Figure 4）；Rigidparts、axisalignedsubassembly与singlepartremoval限制scope。（PDF pp.14–15 §5; p.7 §3.3.5）",
+    "caveatZh": "CPUstabilitysimcost超linear，21–25partcomplete均2560s，有接近两hourrun。；Toolaxisconvexheuristic不一定包含正确candidate，straightaccess不含hammerusevolume。；Rigidbody不支持friction/compliance/snapfits；singlepartsearch无法必需simultaneousremovals。；Proxy不含humanprecision/weight/handlability；designsuggestions下游效果留未来。；同proxy训练/测试有proxy-fitting，不能说human实际省35%；holders未计time可能忽略主human负担。；Successconditioned136cohort排除unstable/fails，runtime只完成147/295，完整部署coverage更低。；‘nofeasiblesequence’在boundedbeam/budget耗尽不证明所有orders不可行，recommendation仍hypothesis需修后重验。；Manual信息judge同GPTfamily且brief大幅改分，未量化humanreadingerror；toolcontact只有50%虽need88.6%。；Noactualmanufacturingtime/ergonomic验证和大scaleassembly，不能推广loadbearing/safetycompleteplan。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "自动assemblysequence、DfAcost与physicalconstraints直接命中fabrication，为CADgenerativeassembly提供可执行验收/失败record工具；不把普通VLMusage归通用MLLM创新。"
+  }
+}

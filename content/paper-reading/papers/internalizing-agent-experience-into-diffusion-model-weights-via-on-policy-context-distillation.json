@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.07250",
+  "slug": "internalizing-agent-experience-into-diffusion-model-weights-via-on-policy-context-distillation",
+  "title": "Internalizing Agent Experience into Diffusion Model Weights via On-Policy Context Distillation",
+  "authors": [
+    "Wenxuan Wang",
+    "Zekai Liu",
+    "Weinan Zhang",
+    "Yu Cheng",
+    "Yang Yang"
+  ],
+  "publishedAt": "2026-10-05",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.07250"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Internalizing",
+    "Agent",
+    "Experience",
+    "into",
+    "Diffusion",
+    "Model",
+    "Weights",
+    "On-Policy",
+    "Context",
+    "Distillation"
+  ],
+  "abstract": "Wrapping an image generation model in an agentic harness can effectively boost Text-to-Image task performance: the harness can leverage memory, skills, workflow orchestration, result verification, and iterative refinement to continually construct and revise prompts, thereby eliciting better images. These gains, however, remain external to the diffusion model and are realized only while the full harness runs. We propose Diffusion On-Policy Context Distillation (D-OPCD), which treats the agent-improved prompt as privileged context and distills the knowledge encoded in the agent harness into the weights of the diffusion model, so that the model retains part of the harness's benefit when conditioned on the original query alone. Using a Text-to-Image agent equipped with our proposed Auto Skill Evolver (ASE), we show that D-OPCD can internalize harness capabilities into the generator's weights, raising the average direct-generation score from 60.52 to 65.09 across four benchmarks. With this knowledge absorbed into the weights, the harness can shed its saturated skills and resume evolving: a second ASE round on the updated generator improves on a skill-free harness by additional 1.83 points, pointing toward text-to-image systems in which harness and model keep improving each other through continual co-evolution.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.07250v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.07250v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Yummytanmo/D-OPCD-CoEvolution"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.07250v1 的 27 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "D-OPCD 将agent改写prompt作为teacherprivilegedcontext，让query-only student在自身flow轨迹匹配EMAteacher速度。作者报告四benchmark各自checkpoint平均60.52到65.09，仍远低于完整harness81.83；只迁移prompt增益，不内化verifier或多次采样，仅一次modelupdate后重新evolve，适合skim接口与边界。",
+    "motivationZh": "图像生成 agents 能通过反复改写 prompt 提升结果，但这些经验留在外部工作流中，用户的原始 query 仍不能直接获得相同增益。论文关注能否将 prompt 改写带来的收益转移到 diffusion model 本身。",
+    "methodZh": "ASE以episode/insight/最多5skills积累prompt指导，由GPT5.6Terra规划/verify/refine，每task最多5generation选择最高passcount早期attempt。heldout选择frozenharness重放train取changed(q,p)，studentquery-only4pointEulerrolloutdetachstates，EMAteacher看q+p提供velocityMSE，rank64LoRAupdate。完整27页正文及allagentprompts、versioning、splits、matchedbaselines、OOD和selection/diversitydiagnostic已读。",
+    "methodFlow": [
+      "固定generator让agent按原query分解visualchecks，最多5次prompt/image迭代并保最高passattempt。",
+      "记录episode，由evidence-linkedinsights成熟后更新boundedpromptskills，heldout选择snapshot。",
+      "frozenharness在train重放并保changedquery/promptpair；image只筛记录而非D-OPCDloss。",
+      "query-onlystudent四pointEulerstatesdetach，q+matchedp的EMAteacher提供stopgradvelocitytargets。",
+      "训练LoRA并heldout选各benchmarkcheckpoint，原query直接generate；重挂空skillsagent再evolve一次。"
+    ],
+    "experimentsZh": "ZImageTurbo各benchmarkrank64/alpha128LoRA，2000steps4A10080GB、1024square、lr1e-4/seed42，每200stepheldoutselect；train4Eulerpoints0/.1/.25/.5到1、eval8stepsguidance0。train/hold/eval GenEval276/83/194、GenEval2400/120/280、WISE500/150/350、R2I480/100/200；contexts276/400/490/392。OOD2100prompts3seeds。 以下结果为作者报告：作者报告directAvg60.52到65.09，SFT63.38/DPO62.18/DOPSD62.75，同records不同privilegedsignal。（Tables1-2, PDF pp.7-8）；作者报告teacherq+p65.09 vsponly64.63/shuffled61.05；ponlyR2I47.32高于q+p46.83。（Table3, PDF p.8）；作者报告secondASEmean82.33到84.16，R2I73.68到69.45；originalskill81.83到updatedskill-free82.33。（Table1, PDF p.7）；作者报告OODGenEval2checkpoint2Dspatial32.32到37.33/color77.45到81.44；WISE3Dspatial41.27到39.74。（Table5, PDF p.9） 对照范围：SFT/DPO/imageprivilegedDOPSD同base/records/LoRAsteps、独立heldoutselection；teacherpromptlength增加。缺相同promptteacher的off-policy、fixedteacher、q-onlyteacher与普通rewrite替代ASE对照；singletrainingseed/noCI，无costbreak-even。 消融与诊断：contextmatch/shuffle、improvementfilter/diversity及OOD。filter65.14近65.09但GenEval276到43pairs，quantity/composition混合；diversity64.42下降。internalfilter不同seedimage而same-seedexternalaudit另测，不是promptcausal效应。",
+    "insightZh": "实质是agentprompt作为privilegedteachercontext的weighttransfer接口及harness/generatorcycle。OPCD/OPSD和EMAvelocitymatching已有，ASE主要memory/evidence工程组合；内化scope为prompt-mediatedgains，不是tool/verificationpolicy全部经验。",
+    "evidenceZh": "两分支在同studentstates比较velocity，无trajectorybackprop或image训练目标。（Sec.3.2 Eqs.(4)-(7), PDF pp.4-5; Appendix D.2, p.22）；技能相当性仍需运行harness，standalone仅部分收益。（Table1, PDF p.7; Appendix B, pp.13-14）；main平均涉及各source-specific训练/选checkpoint，并非同updatedweights全面泛化。（Appendix D.4/Table11, PDF p.23; Table5/E.4, pp.9/27）；第二技能round并非所有任务改善且无第二generatorupdate。（Table1, PDF p.7; Appendix B, p.13）",
+    "caveatZh": "Appendix B pp.13-14承认standalonegainmodest、onegenerator/oneupdate/onefurtherevolution，不证明长期retention。；prompt不能表达toolchoices/retrievedvisualknowledge；当前无web/referenceimagetools。；Sec.4.3.3 p.9说明易用context不等于易内化，data quantity/composition及latent原因未定。；四来源单独checkpoint平均不可误读为同model跨四任务。；clear技能但verifier和best-of5仍在，internalizationgap并非完整agent成本消除。；小heldout选择多个snapshots/checkpoints且小evalsets，无uncertainty。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "visualgeneration闭环经验如何固化到weights有具体接口，可借鉴designgenerator减少promptwrapper依赖；未验证SVG/CAD/tools，mediumskim。"
+  }
+}

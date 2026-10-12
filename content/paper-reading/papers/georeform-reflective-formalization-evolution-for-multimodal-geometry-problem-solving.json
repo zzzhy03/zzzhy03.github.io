@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.12391",
+  "slug": "georeform-reflective-formalization-evolution-for-multimodal-geometry-problem-solving",
+  "title": "GeoReform: Reflective Formalization Evolution for Multimodal Geometry Problem Solving",
+  "authors": [
+    "Jialu Wang",
+    "Ruichen Zhang",
+    "Xiaoou Liu",
+    "Hua Wei",
+    "Tianlong Chen"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12391"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "GeoReform",
+    "Reflective",
+    "Formalization",
+    "Evolution",
+    "Multimodal",
+    "Geometry",
+    "Problem",
+    "Solving"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) often struggle to identify and use geometric relations in diagrams. Recent methods address this challenge by converting geometric entities, relations, and constraints into explicit textual representations for the model to reason over. However, effective formalization is highly non-trivial: on Geometry3K, structure injection fixes 28 errors but introduces 13 new ones among 200 examples. Redundant relations can distract the model, while ambiguous references to diagram elements can lead it to apply constraints incorrectly. This suggests that the key challenge is not merely extracting more geometric facts, but organizing them into representations that support downstream reasoning. To fully exploit the power of formalization, we further propose GeoReform, a reflective formalization evolution framework that treats formalization as an optimizable policy rather than a fixed parser output. GeoReform executes the full reasoning pipeline, collects failed rollouts, diagnoses defects in the current representation, and mutates the policy to better select, ground, group, and present geometric entities, relations, constraints, and targets. On Geometry3K, GeoReform improves Qwen3VL-2B accuracy from 42.0\\% to 56.0\\%. Extensive experiments and analyses across geometry reasoning benchmarks demonstrate that effective formalization is crucial for improving multimodal geometry reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12391v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12391v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12391v1 的 15 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "GeoReform 不训练新VLM，而是用失败解题rollouts进化“如何选取、绑定并组织几何事实”的formalization prompt，再固定政策供下游solver使用。作者报告Qwen3VL-2B的Geometry3K choice从42.0%到56.0%，说明更好的中间表示比堆关系有用；但强GPT-5 extractor、单seed小validation search与仅plane geometry限制了外推，适合skim其representation feedback思路。",
+    "motivationZh": "几何图题求解常在进入 solver 之前就丢失或错误绑定关键事实，加入更多关系又可能产生冗余和冲突。论文关注中间 formalization 的组织质量，而不只是让下游模型进行更长的推理。",
+    "methodZh": "diagram/text先经GPT-5结构generator按typed literal policy提entity/relation/constraint/target，solver始终看原问题和formalization。遗传candidate pool选parent，32题训练minibatch取最多16个失败rollouts交reflection model改prompt；child先比同minibatch表现，再用固定50题validation更新best，最多20轮，test不用于search。政策可去冗余、加angle/target mapping与named-shape properties。完整15页及p.12 lineage、p.13–15初始/reflect/solver/finalprompts均已读。",
+    "methodFlow": [
+      "固定structure generator与solver，初始policy用typed geometric literals编码diagram/text。",
+      "candidate pool按best偏置或随机选parent，在32题minibatch运行完整formalize→solve。",
+      "最多16个错误包含problem、structure、reasoning、prediction/gold，用reflection改representation policy。",
+      "child在相同train batch更好才入pool，再以固定50题validation挑best，预算最多20轮。",
+      "推理固定evolved policy生成concise relation set，保持solver prompt不变。"
+    ],
+    "experimentsZh": "Geometry3K主要evolution实验，Qwen3VL2/4/8/32B与InternVL3.5 1–14B；GPT-5 generator，32train batch/最多16fail/50validation/20updates，seed42、maxgeneration4096、A6000/ProA6000。GeoQA/PGPS9K额外验证explicit structure作用，但Table3不是全套GeoReform演化结果；主test完整规模说明不足。 以下结果为作者报告：作者报告Qwen3VL2B initial→GeoReform choice42.0→56.0%、completion37.0→53.5%；8B choice74.0→79.0%。（Table1, PDF p.5）；作者报告InternVL3.5-2B choice68.0%、completion53.5%，对比initial54.0/36.0%。（Table1, PDF p.5）；作者报告GeoQA结构注入在Qwen3VL8B/32B choice反而81.0→80.0、92.0→90.0%；额外结构并非必然有益。（Table3, PDF p.6） 对照范围：同generator initial对照较清楚；InterGPS OCR和AutoGPS GPT4o/InternVL/Qwen formalization使用不同结构模型，可能包含GPT-5质量差异。未与通用GEPA/OPRO在同预算同representation接口直接比较。 消融与诊断：explicit structure在GeoQA/PGPS9K作用及selected policy lineage支持中间表示组织价值；没有reflection vs random mutation、candidatepool、budget控制的独立search消融或重复run统计。",
+    "insightZh": "把reflective prompt evolution应用到中间geometry representation而非最终reasoning prompt，是有用的接口优化；不是新visual encoder、formal theorem verifier或模型training。它继承GEPA/PromptBreeder式search，实质差别是针对关系选择、symbol binding和图形属性组织的失败反馈。",
+    "evidenceZh": "演化只改formalization policy，generator/solver/reasoning prompt冻结。（Secs.3.2–3.3, Fig.2 and Algorithm1, PDF pp.3–5）；与同generator的initial policy相比，evolved policy提高多scale下choice/completion。（Table1, PDF p.5）；最终政策主要依赖text与named-figure定义，不能据此声称视觉parser普遍变强。（Appendix A.2.4, Fig.9, PDF p.15）；plane geometry、parser错误与统计缺失是作者承认的边界。（Limitations, PDF pp.8–9）",
+    "caveatZh": "PDF pp.8–9说明仅plane geometry，solid geometry、physics、proof-oriented场景尚未测。；structure generator漏视觉marks/错entity/angle仍会误导solver，symbolic checks和theorem verification留后续。；作者未做完整重复runs statistical significance。；小固定validation minibatch可被多轮search过拟合；未报告crossdataset transfer同一evolved policy。；finalprompt偏text-grounded named-shape规则，不能把成绩提升等同于更强general visual grounding。；有GPT-5 structure generation调用成本，未给token/latency预算对照，不能称小模型独立达成上述能力。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "关系应为目标选择而非尽量穷举的原则，可参考diagram/CAD constraints的中间表示组织；这种design迁移是审阅推断，论文未生成可编辑2D/3D artifacts。"
+  }
+}

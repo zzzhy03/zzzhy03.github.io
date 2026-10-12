@@ -12,9 +12,9 @@
     "Xunliang Cai"
   ],
   "publishedAt": "2026-06-24",
-  "updatedAt": "2026-08-24",
+  "updatedAt": "2026-10-08",
   "collectedAt": "2026-08-26",
-  "venue": "arXiv v2",
+  "venue": "arXiv v3",
   "identifiers": {
     "arxiv": "2608.00013"
   },
@@ -33,20 +33,22 @@
     "vlm-mllm",
     "What",
     "Transfers",
-    "from",
     "Text",
     "Vision",
     "Capability",
     "Scaling",
-    "Laws"
+    "Laws",
+    "Transfer",
+    "Dynamics",
+    "VLMs"
   ],
   "abstract": "Choosing the right large language model (LLM) backbone is the most consequential decision when building a vision-language model (VLM), yet it remains fundamentally unprincipled: compute-based scaling laws fail to generalize across model families, and no framework exists for directly predicting VLM performance before training begins. We propose the Capability-Driven Multimodal Scaling Law, the first cross-family framework that predicts VLM benchmark accuracy from directly observable textual capability. Given a low-dimensional capability score $S$ extracted from LLM textual benchmarks via PCA, we model VLM performance as a function of $S$, with a per-backbone transfer rate and an absorption rate that quantifies data-scaling efficiency. To fit and validate the framework, we train over 150 VLMs on 34 LLMs spanning 7 model families under a strictly controlled recipe. Evaluations on more than 200 textual and 50 multimodal benchmarks show that the law accurately extrapolates transfer rate from models up to 8B parameters to 72B-scale backbones, predicts full VLM training trajectories with high fidelity, and generalizes to entirely held-out model families. Beyond the scaling law, our analysis surfaces actionable insights: certain textual benchmarks negatively correlate with multimodal performance, exposing latent benchmark-gaming behavior; base LLMs outperform instruction-tuned counterparts as VLM backbones due to higher absorption rates and lower data-scaling decay; and different model families occupy distinct positions in the transfer--absorption space. The framework turns backbone selection from costly empirical sweeps into a principled, quantitative decision. Code and data are available at https://github.com/wangq-dev/CDMScaling.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2608.00013v2",
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.00013v3",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2608.00013v2"
+      "href": "https://arxiv.org/abs/2608.00013v3"
     },
     {
       "label": "Code",
@@ -55,24 +57,23 @@
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 exact version 2608.00013v2 全文整理；本地 PDF 共 29 页，SHA-256 efe441cb3297c629d52c88cda84179aa39b11bb2449fffd675a4946c70447f32，并视觉核验第 1、9、18、22 页。",
-    "ideaZh": "论文以 34 个 LLM backbone 训练 150 余个 VLM，提出跨模型族 capability-driven scaling law；若实验控制与外推成立，将直接影响 VLM backbone 选择，；作者报告该 law 可从 <=8B backbones 外推到 72B，并在 200+ text 与 50 multimodal benchmarks 上预测完整训练 trajectory。",
+    "sourceNote": "依据 exact version 2608.00013v3 的 29 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本次 v3 有两处影响复现和证据解释的修订：归一化 capability weights 时同时重标定 transfer 与 absorption coefficient，避免改变预测；Figure3 的阴影明确为 training-residual error band，撤回95%confidence interval表述。没有新增实验，适合略读这两处 correction；原 scaling-law 仍是固定 LLaVA recipe 下的关联预测，不能推出因果 transfer tax。",
+    "motivationZh": "在固定VLM训练recipe中，怎样由语言模型的已有capabilities预测视觉任务的训练数据收益，需要可检查的拟合模型。系数归一化必须保持预测函数，误差带也需要与真正的confidence interval区分。",
+    "methodZh": "用最终40项text benchmark经训练集centering/PCA构造latent capability，再联合拟合单位方向w及 P=Ahat*S+(B0-Bm*S)*lnD+P0。Huber与nonnegative-absorption soft penalty配合 differential evolution/L-BFGS-B，预测新backbone的multimodal checkpoint trajectory。v3在Algorithm1补上 Bm乘||w||，并澄清residual-based uncertainty的含义。",
     "methodFlow": [
-      "从 LLM textual benchmarks 以 PCA 提取 capability score",
-      "在 34 个 backbones 上按统一 recipe 训练 150+ VLMs",
-      "拟合 per-backbone transfer rate",
-      "拟合 data-scaling absorption rate",
-      "外推 held-out family 与大模型 VLM trajectory"
+      "训练同一SigLIP/MLP/LLaVA-OneVision recipe 的不同LLM backbones，记录text及multimodal checkpoint scores。",
+      "只用training backbones的benchmark-wise means做centering，PCA保留≥95%variance，再以w聚合scalar capability。",
+      "联合优化transfer/absorption与w，Huber加nonnegative-absorption软约束；DE全局搜索后L-BFGS-B。",
+      "将w除以norm r，并同时将Ahat和Bm乘r以保留完整预测函数，再对held-out backbone按text scores和D外推。"
     ],
-    "whyRelevantZh": "直接对应 vlm-mllm，且全文给出方法、实验、限制与 exact-version 证据闭环。",
-    "evidenceZh": "论文方法由以下流程构成：从 LLM textual benchmarks 以 PCA 提取 capability score -> 在 34 个 backbones 上按统一 recipe 训练 150+ VLMs -> 拟合 per-backbone transfer rate -> 拟合 data-scaling absorption rate -> 外推 held-out family 与大模型 VLM trajectory。（Main method section/figure, p. 9）；作者报告该 law 可从 <=8B backbones 外推到 72B，并在 200+ text 与 50 multimodal benchmarks 上预测完整训练 trajectory。（Main experiment/table, p. 18）；能力 score 与 benchmark choice 可能携带 dataset overlap/gaming；统一 recipe 不代表所有 VLM 架构，72B 外推样本仍有限。（Limitations/discussion and scope, p. 22）",
-    "caveatZh": "能力 score 与 benchmark choice 可能携带 dataset overlap/gaming；统一 recipe 不代表所有 VLM 架构，72B 外推样本仍有限。；能力 score 与 benchmark choice 可能携带 dataset overlap/gaming；统一 recipe 不代表所有 VLM 架构，72B 外推样本仍有限。 所有实验结论均只按作者报告表述。；所有实验数字均为作者报告，本项目没有独立复现。",
-    "motivationZh": "论文以 34 个 LLM backbone 训练 150 余个 VLM，提出跨模型族 capability-driven scaling law；若实验控制与外推成立，将直接影响 VLM backbone 选择，。全文方法页给出完整数据流，主实验与讨论页支持以下边界：作者报告该 law 可从 <=8B backbones 外推到 72B，并在 200+ text 与 50 multimodal benchmarks 上预测完整训练 trajectory。 能力 score 与 benchmark choice 可能携带 dataset overlap/gaming；统一 recipe 不代表所有 VLM 架构，72B 外推样本仍有限。 所有数字均为作者报告，本项目未独立复现。",
-    "methodZh": "论文以 34 个 LLM backbone 训练 150 余个 VLM，提出跨模型族 capability-driven scaling law；若实验控制与外推成立，将直接影响 VLM backbone 选择，。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 方法流程：从 LLM textual benchmarks 以 PCA 提取 capability score -> 在 34 个 backbones 上按统一 recipe 训练 150+ VLMs -> 拟合 per-backbone transfer rate -> 拟合 data-scaling absorption rate -> 外推 held-out family 与大模型 VLM trajectory。",
-    "experimentsZh": "跨七个 model families、34 LLMs 和 150+ VLM runs 做 controlled scaling，含 held-out family、scale extrapolation 和 absorption analysis。 作者报告：作者报告该 law 可从 <=8B backbones 外推到 72B，并在 200+ text 与 50 multimodal benchmarks 上预测完整训练 trajectory。（Main experiment/table, p. 18） Baseline coverage：全文与论文选定的代表性 baselines 比较；证据边界仍受以下因素限制：能力 score 与 benchmark choice 可能携带 dataset overlap/gaming；统一 recipe 不代表所有 VLM 架构，72B 外推样本仍有限。 Ablation：全文包含关键组件、训练或超参数消融；这些结果支持作者内部归因，但不能替代跨实现复现。",
-    "insightZh": "论文以 34 个 LLM backbone 训练 150 余个 VLM，提出跨模型族 capability-driven scaling law；若实验控制与外推成立，将直接影响 VLM backbone 选择，。其可描述新意在于把该机制落实为可验证的 end-to-end 方法，而非只给概念或 benchmark。 全文证据足以支持 accept-deep；阅读建议沿用 screening 的 high/deep，并保留作者报告与 reviewer inference 的边界。",
-    "relevance": "high",
-    "readingAction": "deep",
-    "evidenceMaturity": "solid"
+    "experimentsZh": "34LLMs/7families（32fit+Qwen2.5-72B Base/Instruct holdout），作者150+VLMs；固定SigLIP约400M、two-layerMLP及LLaVA-OneVision，InfinityMM5M projector alignment+12M full-model stage，Table8 batch512/lr1e-3→1e-5。最终40text entries和35multimodal tasks，40来自200+初始subsets过滤，不照抄abstract50项。 以下结果为作者报告：作者报告capability loss-fit MAE .0087 vsparameter-based .0383，performance fit约1.287%；不是v3新增实验。（v3 §3.3–3.4 p.5, Figures1/2 p.6）；作者报告72B-Base absorption交互项MAE2.374→2.055%、Instruct .476→.394%；这些定量表v2/v3一致，v3只修正文2.375 typo。（v3 Table1 p.7; v2对应Table1）；作者leave-family-out MAE1.524–2.225%，correlated-benchmark过滤后holdout1.567%；固定recipe范围内有外推价值。（v3 Figure4 p.8; Figure9 p.26） 对照范围：parameter count/average-text-score、吸收交互项、four-family holdout、correlatedbenchmark过滤、category fits及pairedBase/Instruct；没有native early-fusion、vision encoder co-scaling或recipe外heldout，loss与accuracy拟合并非同一证据。 消融与诊断：保留40text entries后的PCA/interaction与相关性过滤很有用；held-out72B只有一个family两变体，checkpoint相关性、过滤selection与supervised-w也限制泛化。不将负系数解释为因果能力抑制。",
+    "insightZh": "与精确归档v2的完整diff相比，v3的真实增量是修正复现算法和统计边界，不是新模型或数据：Algorithm1原先只Ahat乘r，现在Ahat与Bm同时乘r；因为S缩小r倍，缺少Bm重标定会改变interaction term，属于具有实质影响的科学修订。Figure3现在明确σ为training residual标准差，不再把固定±1.96σ带当95%confidence interval。2.375→2.374%为文字纠错，其余实验与主要结论一致。",
+    "evidenceZh": "v3修正normalization，使transfer和capability-modulated absorption都保持原预测。（v2/v3 Algorithm1 p.24, Step4; v3 App.E p.25）；Figure3改为prediction error band±1.96σ，σ来自training residuals。（v2/v3 Figure3 p.7）；作者报告32training backbones的fit MAE约1.287%、72B两变体trajectory MAE正文1.225%。（v3 §3.4 pp.5–6, Figures2/3 pp.6–7）；作者报告correlation过滤后holdout MAE1.225→1.567%、40benchmark中25positive/6negative/9unstable。（v3 App.G/I pp.26–28, Figure9, Table10）；Base/instruct优势按family/budget变动，未验证所有backbones的通用base优越性。（v3 §4.2 pp.8–9, App.J/Table11 pp.28–29）",
+    "caveatZh": "统一late-fusion recipe与固定vision encoder，尚未验证native mixed-modal/early-fusion或encoder共同缩放。；新error band仍只是training-residual尺度，无heldoutcoverage/parameterCI，弱化原统计解释而非加强置信保证。；abstract200text/50multimodal与实际40/35需要分别说明；图文holdoutMAE及≤8B标签仍有歧义。；transfer tax/alignment tax为拟合关联，不能由benchmark weight直接证明gaming或因果几何容量。；单family72B与大量相关checkpoints不能视为独立大规模外推验证；未复现公开notebooks或25kH800GPUdays训练。；代码范围：exact PDF p.1打印官方repo；HTTP200实际包含3个fitting/validation notebooks、eval_results和requirements，README已归档。核实的是analysis implementation/resources，没有声称全部150+VLM训练已独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "VLM backbone/data scaling与证据边界直接影响foundation-model研究决策。本次建议关注可复现的normalization correction和uncertainty解释，避免把固定训练recipe的observational规律用于任意视觉系统。"
   }
 }

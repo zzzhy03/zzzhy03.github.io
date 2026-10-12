@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2609.26793",
+  "slug": "harmony-hierarchical-agentic-reasoning-for-monocular-image-to-scene-synthesis",
+  "title": "HARMONY: Hierarchical Agentic Reasoning for MONocular Image-to-Scene Synthesis",
+  "authors": [
+    "Shufan Sun",
+    "Chen Wang",
+    "Enxin Song",
+    "Jiatao Gu",
+    "Lingjie Liu"
+  ],
+  "publishedAt": "2026-09-22",
+  "updatedAt": "2026-10-05",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2609.26793"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "HARMONY",
+    "Hierarchical",
+    "Agentic",
+    "Reasoning",
+    "MONocular",
+    "Image-to-Scene",
+    "Synthesis"
+  ],
+  "abstract": "Compositional 3D scene reconstruction has recently been explored from two directions: agentic reasoning that provides semantic understanding of spatial relationships but lacks precise alignment with input images; and visual geometry foundation models that predict dense point maps from input images but the reconstruction quality is limited. Therefore, recovering a complete 3D scene from a single monocular image with accurate inter-object relationships and high-fidelity reconstruction quality remains challenging. In this paper, we present HARMONY, a hierarchical chain-of-thought framework that leverages both agentic reasoning and visual geometry foundation. Given an image of an indoor scene, starting from an empty 3D floorplan, HARMONY first calibrates the camera against the reference image to establish a semantically-grounded spatial frame, then uses agentic VLM reasoning to recover the 3D room layout and an initial placement order. It then places the objects in a hierarchical order, from wall-mounted elements, free-standing furniture, to dependent decorations on top of furniture. We also use depth-first traversal for furniture so each placement conditions on previously resolved structure and a reflective feedback loop to avoid error accumulation. After each object placement by VLM, we use the point cloud estimations to perform geometry-based refinement so that the rendered image aligns better with the input. HARMONY can produce 3D scenes that are semantically consistent and perceptually aligned with the reference image, extending single-image compositional reconstruction to complex indoor scene images. Experiments on synthetic and real-world images demonstrate that HARMONY outperforms the evaluated reconstruction baselines, while qualitative comparisons with GPT-6 Astra suggest more faithful object arrangements and better preservation of scene details.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2609.26793v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2609.26793v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ShufanSun/harmony-release"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2609.26793v2 的 30 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "HARMONY 将单图scene recovery分成camera/roomanchor、wallobjects、furniture、decorations与lighting，VLM规划/critique接silhouette和VGGTdepthrefinement。v2实质扩展perceptualcomparison到HARMONY300全部300scenes，作者报告NCLIP.107/PL.053最佳；旧v1只30real+100synthetic分开quant比较。值得精读hierarchicalsceneagent，但几何metric对齐会消除globalscale，物理属性来自视觉prior，机器人示范是kinematicscript。",
+    "motivationZh": "单张室内图像同时缺少遮挡部分、真实尺度和三维布局证据，分别生成物体后又容易发生碰撞或依赖关系错误。需要把不完整视觉证据组织为一致的场景，并明确几何与物理属性中仍依赖推测的部分。",
+    "methodZh": "VLM估roomdims、最深corner和visiblewall，VGGTManhattanframe角点经similarity变换固定camera。Perobjectdetection/SAM2seg、Geminiamodalcompletion与Hunyuanmesh、PCAup和VLMfrontface；按back-to-front/dependencies放wall/furniture/decorations。Silhouettebackprojection固定lateral/scale-depthratio，robustfrontsurfacedepth修Z，collisionleastmove或revisionorder；perstagecritique补missing/paired/grouporientation。Cycles以VLMmaterial/emissionrelight。",
+    "methodFlow": [
+      "恢复room与cameraanchor：VLMroomheightprior和deepestcorner，VGGTnormals拟Manhattanplanes/corners，singleSim3将VGGTcamera映至canonicalroomframe。",
+      "分层重建objects：Wall/furniture/decoration逐leveldetect/segment、amodalimagecomplete、Hunyuan3Dmesh，PCAup+frontfacecanonicalization。",
+      "按relation和occlusion顺序放置：先wall、depth-firstfurniture/ceiling再dependentdecorations，VLM定wallaffinity、support、yaw、pairs/count和粗scale。",
+      "几何refine与visualcritique：Silhouettecenter/widthbackprojection、VGGTfrontdepthMADrefineposition/scale，collisionminimaldisplacement与stagefeedback修orientation/host/missinginstances。",
+      "Relight并输出可组合scene：PerobjectPBRprior与emittingsources，Cyclesrenderfeedback调整brightness/tone；独立meshes与scene支持编辑和kinematicdemo。"
+    ],
+    "experimentsZh": "HARMONY300=100Front3DsyntheticGT+200real/otherimages，full300perceptualv2、100geometry；gpt5.5/GeminiFlash2.5/Hunyuan2/VGGT/LocateAnything/SAM2，L40每scene20–90min、3.4VLMcalls/object。16volunteers×20allmethodsrenderedsuccessscenessixwayanonforcedrank；ablation10scenes。 以下结果为作者报告：作者报告v2full300 NCLIP.107/PL.053，nextbestsemanticSAM3D.139、Gen3DSRPL.054；这与v1real30的.112/.045不能直接比增益。（PDF p.8 Table 2; v1 p.9 Table 2）；作者报告100FrontCD.049 vsCAST.052/SAM.056；F@.1 89.82、@.01 19.47、@.001 .130，geometrymain数值延续v1。（PDF p.8 Table 1; v1 p.9 Table 1）；作者报告humanTop1 67%、Top2 86%、rank1.54±.93，20successfulrendercohort；不含GPT6ranking，baselineforcednoties。（PDF p.8 Table 2; p.24 Appendix F）；作者报告10scene无calibrationNCLIP.1381vsfull.1034、无feedback.1184；无DFS.1045，DFS增益较小。（PDF p.9 Table 3） 对照范围：CASTunofficialrepo、SAM3D使用HARMONYsegmasks和background；VIGA改SAM3D/gpt5.5、3DReGen改backgroundimagegen非stock。每methodownrecoveredcamera比较RGB，有共同renderprotocol但非完全相同backbone/compute；GPT6Astraqualitative并有mainmetric行，非训练modelbenchmark。 消融与诊断：Camera、VGGTdepth、placementrefine/reasoning/order/DFS/feedback各remove10scenes，无multiseedCI或time-matchedbudget；manualdim与structuredcohort说明可复现性仍有限。",
+    "insightZh": "独立agentcontribution是hierarchicalrelation/order与geometryrefinement/critique结合，specificinputfaithfulrecovery主归reconstruction。v2方法/geometryresults基本不变，但把baselineperceptualcomparison扩展到全部300cohort并更新Table2，属于实质证据范围扩展；旧30subset与新300的数值不能作模型提升delta。",
+    "evidenceZh": "v2扩大quantperceptualbaselinecomparison到300scenes，v1仅100Front+30real分别报告；300assetlibrary在v1已存在。（v2 PDF pp.7–8 §4.1/Table 2; v1 PDF pp.7–9 §4.1/Table 2）；Metricheight是VLMsemanticprior，VGGT几何只能在该scalehypothesis下refine。（PDF pp.4–5 §3.1; p.16/p.17 supplementarylayoutprompt）；作者报告geometrybetter但strictF@.01仅19.47，evaluationrepo明确Sim3-normalized+ICP。（PDF p.8 Table 1; officialREADME Evaluation）；Robotinteraction是scriptedkinematics、physicalproperties为VLMtypicalprior，不是realtransfer/controlpolicy验证。（PDF pp.28–30 G.5.1–G.5.2/Figures19–20）",
+    "caveatZh": "Raretypesynonymslowgroundingconfidence与heavyforegroundclipping影响objectrecovery。；Objectarticulation和multiviewrecovery是future方向。；Physicsanimation/robotsequence是geometryaffordancedemo，notcontrolpolicy。；Roomsizeheight/physicalproperties来自commonsense而非测量，globalmetricframe和materialaccuracy无法从singlephoto确认。；官方geometryevaluationSim3+ICP消除scale/poseerror，Fthreshold未main文本单位澄清，应避免称精准真实尺度。；Amodalcompletion可inventhiddenparts，PCAup不一定适于非轴对称/倾斜家具；DFS ‘cleanunoccluded’并不对所有layouts保证。；Humanstudyonallmethodsrenderedsuccess的20cohort，noCI/seed；v2tableexpanded300是evidence范围扩展而非methodperformancegain。；Full20–90min与API多个foundationmodels，baselinealterations/owncameras影响fairness；scripts/sidecarphysprops与simanimation不证明真实动力学。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "Specificmonocularscene重建与objectsupport/placement/visualrepair直接命中3dreconstruction/visualdesignagent，structurededitablecompositionaloutput适用于scenecreation工具；不是新VLM能力训练。"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2610.12355",
+  "slug": "distilling-routed-3d-privilege-for-spatial-reasoning-in-vision-language-models",
+  "title": "Distilling Routed 3D Privilege for Spatial Reasoning in Vision-Language Models",
+  "authors": [
+    "Hongxing Li",
+    "Yixin Li",
+    "Dingming Li",
+    "Zixuan Wang",
+    "Yuchen Yan",
+    "Wenqi Zhang",
+    "Weiming Lu",
+    "Yongliang Shen"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12355"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Distilling",
+    "Routed",
+    "3D",
+    "Privilege",
+    "Spatial",
+    "Reasoning",
+    "Vision-Language",
+    "Models"
+  ],
+  "abstract": "Spatial reasoning remains a persistent weakness of vision-language models (VLMs), because RGB inputs do not directly provide geometric evidence. Existing remedies either inject 3D into the model at inference, paying architecture and latency costs, or train with outcome rewards that supervise only the final answer. Spatial errors originate in perception: a misjudged depth or direction can be corrected only by the scene's true geometry, which the 3D-scanned sources of spatial training corpora already provide. We propose GPD (Geometry-Privileged Distillation), which makes geometric evidence the privilege in on-policy self-distillation (OPSD). For each question, depth, semantic, and bird's-eye-view (BEV) cues are rendered as compact text and routed to the teacher alongside the reference answer; a privileged KL, applied only to incorrect trajectories, augments GRPO, and the deployed model remains RGB-only. On the 4B backbone, GPD achieves 57.1 on VSI-Bench and 37.6 average across MindCube, SPARBench, MMSI-Bench, and ViewSpatial, outperforming both GRPO and answer-privileged OPSD across spatial reasoning benchmarks. Ablations confirm the complementarity of 3D and answer privilege, the advantage of question-conditioned routing over full-context injection, and the benefit of restricting distillation to incorrect trajectories.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12355v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12355v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ZJU-REAL/GPD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12355v1 的 9 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "GPD 把 depth、object semantics 与 BEV 转成按问题路由的 teacher privilege，只在错误 student trajectories 上施加 token KL，并保留 RGB-only inference。作者报告 Qwen3-VL-4B 的五个空间 benchmark 平均比 GRPO 高1.7点；值得读的是几何证据如何纠正 perception-originated reasoning errors，增益仍较小且限于两个 Qwen 尺度。",
+    "motivationZh": "空间 VLM 的 outcome-only RL 难以定位中间推理错误来自 depth、object grounding 还是 layout，直接加入几何输入又会增加部署依赖。需要把训练时可得的 3D privilege 转移到 RGB-only reasoning，并区分几何证据与答案提示的收益。",
+    "methodZh": "空间推理RL只奖励最终答案，无法判断中间错误来自depth、方向还是layout。GPD离线从3D annotations或Depth Anything3/Grounded-SAM2生成textual geometry cues，用base VLM按question选模态，与reference answer共同组成teacher context。相同参数的RGB-only student生成rollout，再由带privilege的teacher逐token打分；GRPO与error-gated/clipped OPSD KL联合训练。作者以15K VSI/SPAR/MindCube samples训练2B/4B模型，比较受控GRPO、answer-only OPSD及跨benchmark结果；论文未证明geometry已以特定内部表示被存储，internalization来自test-time privilege依赖减小的行为证据。",
+    "methodFlow": [
+      "从3D annotations或depth/instance estimators提取带frame IDs的distance、object regions与BEV relations。",
+      "用base VLM按question离线路由可用几何模态，拼接compact scene text和reference answer作teacher privilege。",
+      "RGB+question student采样group rollouts，计算outcome reward与GRPO advantage。",
+      "同一模型在privileged context下重打student tokens，只对reward<0.5的错误轨迹累计reverse-KL estimator，microbatch scalar clip至1.5。",
+      "以GRPO+λ·privileged KL更新policy；部署仅输入RGB与question。"
+    ],
+    "experimentsZh": "Qwen3-VL-Instruct 2B/4B；10K VSI、4K SPAR、1K MindCube训练split，一epoch、LR1e-6、rollout n=8、λ=.003。五个空间benchmark含VSI视频八subtasks及MindCube/SPAR/MMSI/ViewSpatial多视图/关系任务；3D annotations来自ScanNet，MindCube用估计cue。 以下结果为作者报告：作者报告4B VSI平均57.1，对同backbone GRPO56.4为+0.7点、OPSD55.7为+1.4点；并非所有subtasks均最佳。（Table1, PDF p.5）；作者报告4B其余四benchmark平均37.6，比GRPO35.7高1.9点，比OPSD31.5高6.1点；MindCube38.0对GRPO33.0。（Table2, PDF p.5）；作者报告五benchmark ablation中routed3D+answer41.5，answer-only40.2、routed3D-only40.5、full3D+answer39.8，表明信息选择与互补性。（Fig.4, Sec.4.3, PDF p.6） 对照范围：含general VLM、3D-augmented和outcome-supervised参考结果；最可靠比较是相同data/backbone训练的GRPO与OPSD。大型闭源及不同训练来源的行不构成严格同compute因果比较，未见跨其他foundation家族验证。 消融与诊断：分离answer/geometry privilege、text/image/full/routed injection、λ及incorrect-only/all-trajectories，支持routing和error-gating；单次entropy曲线不能独立证明探测到正确3D reasoning mechanisms，未报告多seed不确定性。",
+    "insightZh": "贡献不是新3D encoder或新的大teacher，而是把question-relevant geometry作为self-distillation privilege，在学生实际错误路径上分配token监督；offline text routing和incorrect-only gate的组合将几何训练监督与RGB-only部署解耦。依赖已有GRPO/OPSD、Depth Anything3和Grounded-SAM2，不能描述为从零发明过程奖励。",
+    "evidenceZh": "离线几何cue按question选择，BEV只在camera poses/layout可靠时使用。（Sec.3.2, Eq.(1)–(2), Fig.2, PDF p.3）；privileged KL仅作用于错误轨迹并在scalar聚合后clip至1.5。（Sec.3.3, Eq.(4)–(7), PDF p.4）；受控4B五benchmark平均提升来自routed 3D+answer而非更多context。（Fig.4, Sec.4.3, PDF p.6）；test-time privilege gap缩小支持训练内化，但不是内部几何表示的直接因果证明。（Fig.7, Sec.4.4, PDF p.7）",
+    "caveatZh": "Sec.3.2 明确BEV仅在camera poses与scene-layout可靠时可提供，其余cue可由外部模型估计。；全文没有单独Limitations节；正文中distillation scalar clipping用于抑制偶发大teacher信号。；仅Qwen3-VL两个尺度与室内场景相关数据，不能外推到CAD/LEGO的part geometry和metric reasoning。；VSI总分改进较小，MMSI/ViewSpatial改善有限；没有seed/error-bar报告，作者结果未复现。；teacher同时看reference answer，token agreement并非经过标注的逐步正确性；错误geometry或routing可能形成错指导。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接涉及VLM spatial reasoning，并提供把真实3D结构作为训练监督而不增加部署输入的路径，可作为设计agent/3D几何判断训练参考；尚未实验证明在LEGO或CAD任务有效。"
+  }
+}

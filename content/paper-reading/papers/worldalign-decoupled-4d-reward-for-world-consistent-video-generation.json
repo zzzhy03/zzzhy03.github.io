@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.12382",
+  "slug": "worldalign-decoupled-4d-reward-for-world-consistent-video-generation",
+  "title": "WorldAlign: Decoupled 4D Reward for World-Consistent Video Generation",
+  "authors": [
+    "Jing He",
+    "Kaixin Ding",
+    "Xingye Tian",
+    "Guibao Shen",
+    "Wenhang Ge",
+    "Xin Tao",
+    "Pengfei Wan",
+    "Ying-Cong Chen"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12382"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "WorldAlign",
+    "Decoupled",
+    "4D",
+    "Reward",
+    "World-Consistent",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Faithful visual world simulation requires generated videos to maintain 4D world consistency, encompassing both static and dynamic consistency. Static consistency requires coherent 3D structure in static environments across viewpoints, while dynamic consistency requires plausible subject motion and consistent appearance over time. Geometry-aware post-training offers a promising way to improve world consistency. However, existing methods often rely on a static-scene assumption. Even those that accommodate dynamic scenes struggle to provide reliable static-consistency feedback, while dynamic consistency is often overlooked or inadequately assessed. To address these limitations, we introduce WorldAlign, a decoupled 4D reward framework that semantically separates static regions and dynamic subjects and provides feedback by aligning each with a world prior suited to its assumptions. For static regions, WorldAlign aligns static geometry with a geometric world prior through semantically guided masked reprojection, enabling more reliable static-consistency evaluation; an auxiliary camera-motion reward discourages nearly static solutions. For dynamic subjects, WorldAlign uses a strong vision-language model (VLM) as a dynamic world prior and constructs a VLM-as-a-judge reward based on sample-specific checklists that assess dynamicity, physical plausibility, shape, and texture consistency. This decoupled design enables more effective online post-training without requiring human preference annotations. Across two pretrained image-to-video generators, Wan2.1 and Wan2.2, WorldAlign jointly improves static and dynamic consistency over existing methods without suppressing overall or subject motion. These results support decoupled world-prior alignment for more faithful visual world simulation. Project page: https://worldalign.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12382v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12382v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12382v1 的 15 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "WorldAlign 用semantic subject masks把video reward拆成static geometry、camera motion与dynamic checklist：VGGT masked reprojection惩罚背景扭曲，VLM评subject运动/形状/纹理，GRPO逐项归一化。作者报告两种Wan模型在保留运动时提高一致性；值得deep读reward分解避免“冻住视频拿高分”的设计，4D/physics正确性仍只是估计prior与judge反馈。",
+    "motivationZh": "Image/video generation 的视觉相似 reward 难以监督动态几何一致性，静态与运动区域也需要不同约束。需要用可获得的 3D/4D proxy 信号改善生成世界的一致性，并确认这些 proxy 不被视觉外观掩盖。",
+    "methodZh": "静态几何奖励会把真实subject motion当错误，基于optical/scene flow的mask又可能放过本应惩罚的背景sliding/warping。WorldAlign从conditioning image的subject mask出发用SAM3跟踪，通过semantic identity而非motion定义dynamic区域。VGGT仅聚合背景point maps再masked reprojection，辅以camera-motion hinge防止静止捷径；Gemini生成sample-specific binary checklist，由Qwen3.6-Plus评dynamicity、physical plausibility、shape/texture。三项reward在同prompt八rollouts内各自归一化后用于Flow-GRPO LoRA。1,289train/100test条件、两Wan backbones的量化与300人评judgments支持视觉一致性改善，但没有ground-truth 4D或physics simulator证明。",
+    "methodFlow": [
+      "从COCO/DAVIS conditioning image的subject annotation初始化SAM3，跟踪生成视频中的dynamic subject；complement保留为static region。",
+      "以VGGT预测points/cameras，先去dynamic points构建shared static cloud，再仅在有效static pixels计算RGB reprojection MSE作reward。",
+      "从VGGT extrinsics算相邻translation/rotation幅度，对低于τ=.01的camera motion给hinge penalty，抑制静止解。",
+      "Gemini按image/prompt预生成subject-centric checklist；Qwen judge逐题回答YES/NO，将dynamicity/physics/shape/texture比例作reward。",
+      "对三种reward分别group-normalize并等权合成advantage，以Flow-GRPO更新rank32 video LoRA，所有reward models冻结。"
+    ],
+    "experimentsZh": "1,389conditions：1,339COCO/50DAVIS；train1,289/test100，subject masks15%–40%且motion-capable。Wan2.2-TI2V-5B和Wan2.1-I2V-14B-480P在线GRPO，16A800-80GB、rank32/scaling64、K8、81frames@480×832/20steps；每setting仅seed42训练一次。test每condition1video；masked epipolar/reprojection、SubjectDINO、checklist、VBench；另20conditions×5comparators×3raters人评。 以下结果为作者报告：作者报告5B full模型M.Epi .321对base .463、GeoFlow .367；dynamic checklist .781(.85 dynamicity)对base .697(.63)，DynamicDegree .72对.63。（Table1, PDF p.8）；作者报告14B full M.Epi .264对base .469，SubjectDINO .939对.918，checklist .856(.92)对.760(.81)，DynamicDegree .74对.62。（Table1, PDF p.8）；作者报告5B仅masked reward的DynamicDegree .42，加入camera .70，再加dynamic .72；direct reward+camera的dynamicity仅.22，说明camera运动不等于subject运动。（Table2, PDF p.9; AppendixD, PDF p.15）；作者报告300human judgments aggregate static/dynamic/overall Win71.3%/75.0%/76.0%；overall对GeoFlow65.0%、对base81.7%，为该20condition实验的作者结果。（TableS2–S3, PDF p.14） 对照范围：同data/settings分别比较base、Epipolar-DPO、VideoGPA、World-R1和GeoFlow；World-R1改版保留reconstruction/meta-view/general visual但删camera-aware noise warping与trajectory rewards，不等于原完整方法；VGGRPO因无official implementation排除。 消融与诊断：masked/direct reprojection分支各逐加camera/dynamic，清楚显示static collapse与camera-only无法解决subject freezing。没有multi-seed、tracker/VLM错误强度或mask占比外推消融；flow/semantic masking图是qualitative对比，不是annotated segmentation准确度报告。",
+    "insightZh": "核心是按world-prior假设语义分离static/dynamic，并把相反的reward failure modes通过camera与subject feedback配平。比全局static reward或flow-based dynamic filtering更直接保留异常background结构。使用既有SAM3/VGGT/VLM/GRPO，所谓4D reward是对2D video的prior consistency代理，不是新4D状态表示或真实physics验证。",
+    "evidenceZh": "semantic mask同时作用于point aggregation和reprojection comparison，保留失真的static regions。（Sec.3.1–3.2, Eq.(1)–(3), Fig.3, PDF p.5）；camera-motion与dynamic checklist消除不同的静止捷径，三reward单独归一化。（Sec.3.2–3.4, Eq.(4)–(7), PDF p.6）；full reward改进同时包括reward-independent指标与保留运动，但并非raw geometry最低。（Table1, PDF p.8）；人评支持感知优势，但300judgments来自20condition×5baselines×3raters，不能当300独立场景。（AppendixC, TableS2–S3, PDF p.14）；评估geometric与physical consistency依赖估计器，不提供真实world-state正确性保证。（AppendixE.1–E.3, PDF p.15）",
+    "caveatZh": "没有独立Limitations节；AppendixB明确每method/ablation每setting仅训练一次，evaluation也只seed42。；任务为image-to-video且依赖conditioning subject masks；text-to-video extension只在footnote描述，未实测。；World-R1 comparator省略camera轨迹相关模块，VGGRPO未纳入。；semantic subject complement不一定全部静态，多subject或非刚体background、mask漏检会污染geometry奖励。；VLM physical plausibility是知识judge意见，不能等同可执行physics/contact/metric constraint证明；reward-relatedchecklist存在judge自一致偏差。；epipolar metric按RANSAC inliers且排除匹配不足帧，必须结合coverage，否则弱纹理/失败geometry可能被选择性忽略。；训练条件只包含较大motion-capable subject和明显camera prompts，仍缺复杂长期场景与核心3D资产任务迁移；数字未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究video generation中的3D structure与dynamic consistency，reward分解对3D-guided visual creation和几何约束设计有重要方法参考；对CAD/LEGO的可制造metric结构正确性未验证。"
+  }
+}

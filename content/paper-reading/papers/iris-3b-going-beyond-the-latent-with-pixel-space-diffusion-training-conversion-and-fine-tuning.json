@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.09450",
+  "slug": "iris-3b-going-beyond-the-latent-with-pixel-space-diffusion-training-conversion-and-fine-tuning",
+  "title": "Iris-3B: Going Beyond the Latent with Pixel-Space Diffusion Training, Conversion and Fine-Tuning",
+  "authors": [
+    "Hanqiu Li Cai",
+    "Chema Garabito"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09450"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Iris-3B",
+    "Going",
+    "Beyond",
+    "Latent",
+    "Pixel-Space",
+    "Diffusion",
+    "Training",
+    "Conversion",
+    "Fine-Tuning"
+  ],
+  "abstract": "Pixel-space diffusion models avoid the lossy VAE of latent models, which suggests an advantage on downstream tasks where fine-grained detail matters. We test this claim along both routes to a pixel-space backbone. We pretrain Iris-3B, a 3B-parameter pixel-space text-to-image transformer, from scratch through a $256\\to512\\to1024$ curriculum, after first ablating the prediction target and representation alignment at $256^2$ to decide what to scale. We also convert a pretrained latent model, FLUX.2 Klein base 4B, to pixel space. We fine-tune both families for monocular depth estimation and for image restoration/super-resolution. We find no significant improvement from using a pixel-space generative prior. Fine-tuned for depth with one matched direct-regression recipe, Iris-3B is level with the latent FLUX.2 Klein and the converted pixel FLUX.2 Klein falls behind it, and on $4\\times$ DIV2K restoration neither pixel model beats a latent FLUX.2 Klein fine-tune, the converted one trailing it slightly. We document the recipes, the failure modes and the remaining confounds behind this negative result. Nevertheless, Iris-3B shows that pixel-space pretraining with the pixel-transformer (PiT) head of PixelDiT scales to 3B parameters and to text-to-image quality competitive with latent models, matching Qwen-Image on OneIG under the official evaluators at $1024^2$. We release its weights and training code in the hope that they help pave the way for further work on pixel-space generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09450v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09450v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/speridlabs/iris-3b"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09450v1 的 19 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Iris-3B给出开放3B pixel-space T2I从256→1024训练与FLUX latent→pixel转换recipe，作者报告OneIG0.540≈QwenImage0.539但GenEval0.798仍低于0.87。关键判断是负结果：去VAE未让depth/restoration prior更优，pixelpatch边界反而留grid；单run/短转换和无Iris latenttwin使结果只支持“此recipe没有优势”，不是否定pixel paradigm。",
+    "motivationZh": "高分辨率 pixel-space diffusion 训练成本高，而且既有 latent-space 模型的能力难以直接复用。需要厘清像素域的训练表示、优化方式和接口转换，才能以可控成本扩展分辨率并迁移现有生成能力。",
+    "methodZh": "Iris用16×16pixelpatch、8dual+16singleblocktrunk及四PiThead，冻结Qwen3VL4B文本features；256stage比较v/x及REPA后选择v+DINOv2，后两stage不再REPA，hybridMuon/AdamW训练并SFT。latentKlein4B转换用gainmatchedridgeinputprojection与0.12×trunkLR解决接口不匹配，30kstepPiTconversion作为downstreamparent。depth用matchedsinglepassregression、restoration用HYPIRone-stepfine-tune做pixel/latent比较，公开confounds、patchgrid和selectedqualitatives；release本体有可复核源码。",
+    "methodFlow": [
+      "在1.3B/256²matchedsteps比较predictiontarget和representationalignment，选择v-prediction+DINOv2REPA。",
+      "训练3B16×16pixeltransformer与PiThead，经256/512/1024curriculum及SFT获得1024T2Imodel。",
+      "latentKlein4B移除VAE，以gainmatchedridge初始化pixelinput并缩trunkLR，训练30kstepconvertedpixelparent。",
+      "以同depth/restorefinetuningrecipes比较convertedpixel与latenttwin，另测无latenttwinIris，记录grid/confounds。"
+    ],
+    "experimentsZh": "T2Ipretrain真实/合成/渲染text英文pairs；367k256stage/163k512/95k1024/40kSFT，累计约611.8Msampleexposures非uniqueimages。T2Iofficial1024²CFG3/100steps/4samples。depthHypersim:VKITTI9:1、10kstep32batch；Kleinrestorepaired30ksteps，Iris10kEMAdifferentbudget。 以下结果为作者报告：作者报告IrisOneIG0.540≈QwenImage0.539，GenEval0.798低于Qwen0.87，LongText0.857vs0.943。（Table2, PDF p.6）；作者报告Kleinpixel/latentDIV2KSSIM0.504/0.557、PSNR20.87/20.99、LPIPS0.274/0.275；IrisSSIM0.481、MUSIQ68.01。（Table6, PDF p.10） 对照范围：官方publishedT2IscoresFLUX/i1/ZImage/Qwen含promptrewriting差异；matchedKleinpixel-vslatent两downstream对照，Iris无latenttwin。convertedT2IGenEval/DPG/FID未测，restoration公共模型去文本条件改变releasedprotocol，不能作公平全方法排名。 消融与诊断：v/xcontrast还改变timestepsdistribution不完全隔离target；REPA/iREPA/DINOv3/SelfFlowmatchedsteps支持该256recipe。ridge/RMSscaledLR小batch8/1kprobes有效，未验证global128；架构效率changes非同消融选择。",
+    "insightZh": "主要贡献为开放3Bpixel-spacepretrainingrecipe、conversioninterfacegain/LR诊断与透明的downstreamnegativeevidence；architecture借PixelDiT/FLUX/PiT而非新fundamentalflow目标。价值是可用foundationprior与对“无VAE一定更细”的实证边界。",
+    "evidenceZh": "Iris采用16×16patchhybridtrunk+PiThead，训练256→512→1024并在256使用DINOv2REPA。（Sec.3.2–3.3 Fig.4, PDF pp.4–6）；作者报告releasedcheckpointGenEval0.798/DPG86.52/OneIG0.540，QwenImage0.87/88.3/0.539。（Table2, PDF p.6）；作者报告depthmeanAbsRelIris0.071/latentKlein0.072/converted0.081；Irispatchgridratio1.61–2.25。（Tables4–5, PDF p.9）；作者明确single-run/no significance、conversionprior较弱及Iris无latenttwin，不能隔离所有confounds。（Limitations, PDF pp.10–11）",
+    "caveatZh": "Iris没有latenttwin、convertedparent短训练、每downstreamarm单run无significancetest（pp.10–11）。；IrisrestoreEMA/batch/schedule/wavelet/tiling不与Klein匹配；pixelpatch产生边界grid（pp.9–11）。；Iris非generationrawqualitySOTA（p.11）。；核心结论不应推广为pixelspace无潜力；sameData/compute完整pixel-latentpretrainpair缺失。；611.8M是sampleexposure，未公开uniquecorpus规模/细分license边界，不能推断datasetefficiency。；illustratedrestorecrops先看outputs后选择（App.C），非随机质量证明。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "公开pixel-spacefoundationprior及detail/representationboundary能指导visualgeneration和3Dprior选择；这里restoration/depth作为paradigm检验，未添加这些为独立关注方向。"
+  }
+}

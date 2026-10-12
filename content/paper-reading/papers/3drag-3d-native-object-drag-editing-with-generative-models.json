@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.13216",
+  "slug": "3drag-3d-native-object-drag-editing-with-generative-models",
+  "title": "3DRAG: 3D-Native Object Drag Editing with Generative Models",
+  "authors": [
+    "Kuixiang Shao",
+    "Yuyang Jiao",
+    "Chenghao Zhang",
+    "Wenbo Zhao",
+    "Yinuo Bai",
+    "Jingyi Yu"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13216"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "3DRAG",
+    "3D-Native",
+    "Object",
+    "Drag",
+    "Editing",
+    "Generative",
+    "Models"
+  ],
+  "abstract": "The rapid progress of 3D generative models has made 3D asset creation increasingly accessible. However, achieving intuitive, precise, and interactive user control, such as point-based drag editing, remains challenging. Existing 3D drag methods either rely on slow 2D diffusion priors, such as Score Distillation Sampling, or directly warp geometry, often causing multi-view inconsistency and topological artifacts. In this paper, we present 3DRAG, a training-free framework that executes precise drag editing natively within the explicit 3D latent space of large-scale generative models, without SDS-based optimization or iterative point tracking. To ensure geometrically plausible deformations, 3DRAG explicitly extends the drag displacement field into 3D space, incorporating an Occupancy-Aware Winner-Takes-All (OA-WTA) strategy to robustly handle sparse geometries. Furthermore, we introduce a generative editing pipeline that explicitly transforms latent representations via the 3D displacement field. By fully leveraging the model's generative capabilities, it achieves smooth geometric deformations while maintaining the object's identity. To further transfer original geometry and texture with high fidelity, we propose Logits-Level Token Fusion, which accurately injects source information into the destination region. To evaluate 3D point-based editing, we construct a novel dataset featuring diverse 3D assets and complex multi-point drag instructions. Quantitative and qualitative experiments demonstrate that 3DRAG achieves state-of-the-art performance, surpassing existing baselines in drag accuracy, geometric fidelity, and unedited region preservation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13216v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13216v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/L-avenir/3DRAG"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13216v1 的 10 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "3DRAG 在 TRELLIS 的 sparse 3D latent 内完成点拖拽：先用 occupancy-aware displacement 搬运结构，再复制 destination attention logits 注入 source values 保住纹理。作者在100个资产上报告更好的拖拽精度与未编辑区域保留；值得精读的是空间映射与生成修补的结合，实际速度仍约228秒，且64³ voxel精度和VAE色偏限制细结构编辑。",
+    "motivationZh": "将 3D 资产投影到 2D 后做 drag editing，难以保持真正的空间对应关系，也可能连带改变未编辑几何和纹理。论文关注直接表达 3D 点位移动，同时保留源资产的外观与非目标区域。",
+    "methodZh": "问题是基于2D SDS的3D drag慢且视图不一致，直接mesh warp又难保持自然几何与纹理。3DRAG基于TRELLIS/VoxHammer，用户给handle-target pairs和editable mask；将弹性位移扩到3D，用OA-WTA防空voxel抢占实voxel，分destination/inpainting/preserved/transition四区。ST和SLAT各自反演并缓存latent/QKV，warp latent后以QKV replacement保未编辑区，用logits-level fusion把位移后的source细节送回destination；缺失区域依靠原生生成先验补全。正文、实验与局限已完整读；PDF pp.9–10为参考文献，无另外附录。",
+    "methodFlow": [
+      "把输入3D asset编码到TRELLIS 64³ sparse ST/SLAT表示，并按用户handle-target和mask计算3D elastic displacement。",
+      "用OA-WTA优先occupied source voxels，建立reverse mapping并分出destination、inpainting、preserved、transition regions。",
+      "两生成stage做RF-Solver inversion，缓存每step latent与Q/K/V；warp destination latent，未映射区域用Gaussian noise初始化。",
+      "在preserved region替换cached QKV；在destination复制对应attention logits并追加cached source values，实现coordinate-feature解耦融合。",
+      "通过ST/SLAT denoising生成修补与纹理传播，解码输出拖拽后的3D资产。"
+    ],
+    "experimentsZh": "作者从TRELLIS-500K和BlenderKit挑100个objects，每例附预设multi-point handles、targets和editable mask；在单NVIDIA H20以TRELLIS/VoxHammer、ST/SLAT各25步反演与denoising、CFG5.0运行。另有30人blind排名study，其中30%为artists/3D researchers。 以下结果为作者报告：作者报告DAI0.187、MD15.89；3DGS-Drag为0.262/18.25，Drag Your Gaussian0.223/18.45，APAP0.368/18.01。（Table1, PDF p.5）；作者报告unedited CD0.008、PSNR31.50、LPIPS0.025，优于四baseline；runtime227.74秒，对比3DGS-Drag752.70和ARAP3.32秒。（Table1, PDF p.5）；作者报告full fusion FVD42.32，对比无fusion84.09、仅ST43.49；30人Borda结果中drag/preservation/quality为4.58/4.59/4.40。（Tables2–3, PDF p.8） 对照范围：比较3DGS-Drag、Drag Your Gaussian、ARAP、APAP，使用官方default实现并适配mask/mesh handle与anchors。没有针对更高分辨率native 3D editing backbone的完整比较；Gaussian/mesh representation和asset转换可能影响公平性。 消融与诊断：OA-WTA ablation与ST-only/no/full fusion直接支持占用prior和纹理路由；多数指标无confidence intervals，100个curated资产与预设drag不代表任意复杂编辑。",
+    "insightZh": "主要新意为针对稀疏3Dvoxel的occupancy-aware collision resolution及logits-level source-value transfer，而不是声称首次latent inversion或QKV preservation。TRELLIS的absolute coordinate-feature entanglement使简单RoPE对齐不足，复制destination logits提供明确的attention路由解决办法；这是可直接迁移的3D editing机制。",
+    "evidenceZh": "OA-WTA以occupancy plus bounded距离weight确保occupied source胜过empty source。（Sec.3.2, Eqs.(4)–(5), Fig.3, PDF pp.4–5）；logits-level fusion复制destination logits并追加对应source values，不依赖source keys与destination重新匹配。（Sec.3.3, Fig.4, PDF pp.4–6）；作者报告drag精度与unedited preservation优于四个比较方法，但runtime不是所有baseline中最快。（Table1, PDF p.5; Sec.4.1–4.2, PDF pp.6–7）；ST+SLAT fusion消融支持源几何与纹理注入作用，OA-WTA收益更偏topological artifacts。（Sec.4.3, Table2 and Figs.7–8, PDF pp.7–8）；色偏和细结构precision存在明确生成backbone边界。（Limitations and Fig.9, PDF p.8）",
+    "caveatZh": "PDF p.8明确说明TRELLIS VAE会色偏：作者报告重建mean ΔE76为8.14、CIEDE2000为5.59。；PDF p.8说明64³ sparse grid限制极细结构和复杂局部detail的drag精度。；227.74秒平均时间适合离线资产修改，不能据此称实时交互。；WTA占用优先与generative prior不提供watertightness、connectivity或fabrication feasibility的形式保证。；FID/FVD与GPTEval3D衡量render/视觉偏好，未验证装配、力学或制造可用性。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中3D asset editing；OA-WTA与attention source-value搬运可参考于part-aware编辑和离散asset局部修改，但没有LEGO connectivity或fabrication-specific验证。"
+  }
+}

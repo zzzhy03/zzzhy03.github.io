@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.11019",
+  "slug": "mid-training-language-models-on-raw-video",
+  "title": "Mid-Training Language Models on Raw Video",
+  "authors": [
+    "Jaedong Hwang",
+    "Xiaoqian Shen",
+    "Ernie Chang",
+    "Changsheng Zhao",
+    "Chong Zhou",
+    "Saksham Suri",
+    "Qi Qian",
+    "Zechun Liu",
+    "Lemeng Wu",
+    "Qinsi Wang",
+    "Raghuraman Krishnamoorthi",
+    "Wei Wen"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11019"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Mid-Training",
+    "Language",
+    "Models",
+    "Raw",
+    "Video"
+  ],
+  "abstract": "Multimodal large language models learn mostly from paired image-text data or annotated video, and raw web video is rarely used to further train an existing language model. We study whether raw video, with no captions and no text loss, can serve as mid-training data for a pretrained language model. Frames are encoded into continuous visual tokens, and the language model learns to predict the next visual token. We mid-train Qwen3-1.7B on raw clips from YT-Temporal-1B and then apply the same image-text instruction tuning to it and to the model without mid-training, so that the two differ only in mid-training. The mid-trained model scores 2.9 points higher on average across four video benchmarks and 5.1 points higher across ten image benchmarks, spanning perception, document, and chart tasks. Text performance is preserved even though mid-training includes no text, with an average of 48.9 across 14 text benchmarks compared with 48.0 for the model without mid-training. Analyses across training show that the image and video gains emerge within 30% of training and plateau thereafter, varying by less than 0.5 points. Predicting captions fails to outperform next-visual-token prediction, demonstrating that video mid-training can remain purely self-supervised without the computational overhead or labeling noise of automated captioning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11019v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11019v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11019v1 的 12 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "这项Meta研究把Qwen3-1.7B直接接入continuous visual token stream，只预测next visual token，无caption和text loss，再用相同image-text SFT评测。作者报告video/image平均+2.9/+5.1点，caption监督无优势；值得读的是unannotated mid-training路径，但未做frame-shuffle对照，且“保留text能力”只相对SFT baseline，不能外推为保留原LLM的reasoning。",
+    "motivationZh": "视频 caption 压缩会丢掉细粒度时序和视觉信息，而为大量 raw videos 制作文字监督代价高。需要评估在 MLLM 中直接用 raw video 做 mid-training 是否能提高理解，以及后续监督是否掩盖其真实增益。",
+    "methodZh": "为减少web video captioning成本，论文在已有LM上进行自监督visual mid-training。SigLIP SO400M/14与MLP将16-frame clips编码为按行带newline delimiters的continuous patch tokens；causal LM和training-only预测MLP用cosine regression预测下一个stop-gradient token。6.99M clips/64.4B tokens训练一epoch后，所有variants用相同3.9M LLaVA-OneVision image-text数据instruction-tune。受控video/image benchmarks普遍提高，收益在0.3epoch后plateau；text相对同SFT无mid-training平均维持，但相对原始Qwen3的GSM8K/MATH/BBH仍明显下降。caption targets的对照和讨论限制了“时间动态学到了什么”的推断。",
+    "methodFlow": [
+      "从YT-Temporal-1B取0.2fps contiguous16-frame clips，保持时间顺序且不生成caption。",
+      "以SigLIP encoder与two-layer projector编码patch grid，在row-major sequence加入learned newline后concat所有frames。",
+      "causal Qwen3 LM处理continuous visual tokens，用training-only MLP预测next visual embedding，cosine loss的target stop-gradient。",
+      "end-to-end mid-train encoder/projector/LM/head一epoch，无text或discrete visual codebook监督。",
+      "采用与baseline相同image-text instruction tuning，再分别测video、image与text能力及caption目标对照。"
+    ],
+    "experimentsZh": "SigLIP SO400M/14@384 +Qwen3-1.7B/2048-dim projector，context16K、256clips batch、128H100，one epoch mid-training64.4B tokens。固定LLaVA-OneVision SFT后用lmms-eval测4video/10image tasks，text14任务mix likelihood/greedy/fewshot protocols。 以下结果为作者报告：作者报告video平均49.67→52.59，EgoSchema45.20→50.00；image平均48.72→53.80，ChartQA43.76→51.96。PDF两表caption中的image/video标题互换，结果以实际row names核对。（Table1 image rows and Table2 video rows, PDF p.6）；作者报告text平均48.03→48.89，但原Qwen3平均51.38；GSM8K73.41(original)→54.77(mid-trained+SFT)，不能称保留原始reasoning。（Table3, PDF p.7）；作者报告0.3epoch(19.5B tokens)后image/video已获+4.9/+3.1点，之后波动<.5点；next-caption不提升image/video且text为47.40低于48.89。（Fig.3 and Table4, PDF p.8） 对照范围：同initial LM与同SFT控制mid-training差异，比较current/next-frame captions并加0.5epoch visual预算参照；未比较frame-shuffled或等量静态image exposure，因此时间结构作用未分离。仅一个LM与vision encoder组合。 消融与诊断：目标形式与0.3/0.5/1epoch checkpoint分析支持caption-free可行性和early plateau。讨论指出同initial state的SFT runs在BBH差11.7点，大于mid-training margin5.5，reasoning gains不能当稳健因果改善。",
+    "insightZh": "贡献是continued pretraining现有LM的caption-free continuous visual next-token route；有别于从零joint multimodal pretraining或给现有VLM加task-specific future-frame heads。objective类似self-supervised feature regression，不能称为新world model或已证明temporal physics learning。",
+    "evidenceZh": "same causal LM学习continuous visual token，prediction head仅在mid-training使用。（Sec.3, Eq.(1)–(2), Fig.1, PDF pp.3–4）；数据与训练预算有明确规模，比较arms共享后续SFT。（Sec.4.1.2–4.1.4, PDF pp.4–5）；visual next-token训练优于或匹配caption目标，但不能证明改进来自时间顺序。（Table4 and Sec.5, PDF p.8）；text preservation相对multimodal-SFT baseline，原始LM仍有reasoning损失。（Table3, PDF p.7; Sec.5, PDF p.8）",
+    "caveatZh": "未做frame-shuffling实验，不能分离temporal structure与额外visual token exposure。；denser temporal sampling、longer horizons与更大LM是否增加收益仍开放。；instruction tuning后两个模型均低于原LM的GSM8K/MATH500/BBH；BBH的SFT-run波动超过改进幅度。；128H100与64.4B tokens不是小成本实验；只能说省captioning overhead，不能声称整体低成本。；只测understanding，未证明物理world modeling、visual generation或CAD/LEGO空间生成迁移。；视频采样0.2fps较稀疏，motion与细粒度时间学习能力需单独验证；数字为作者报告未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "提供与VLM foundation pretraining直接相关的无需annotation中间训练路径，空间/视觉理解任务可作为设计agent模型的训练参考；对可编辑设计和3D内容的收益尚未实证。"
+  }
+}

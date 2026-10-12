@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.12388",
+  "slug": "genia-generative-reconstruction-with-test-time-input-alignment",
+  "title": "GenIA: Generative Reconstruction with Test-Time Input Alignment",
+  "authors": [
+    "Stefano Esposito",
+    "Naama Pearl",
+    "Polina Karpikova",
+    "Samuel Rota Bulò",
+    "Lorenzo Porzi",
+    "Peter Kontschieder",
+    "Andreas Geiger",
+    "Jonathon Luiten"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12388"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "GenIA",
+    "Generative",
+    "Reconstruction",
+    "Test-Time",
+    "Input",
+    "Alignment"
+  ],
+  "abstract": "Reconstructing complete 3D object assets from monocular or sparse multi-view observations remains challenging. Generative 3D foundation models can complete object geometry beyond the observed views, but their predictions may not faithfully reproduce the observed geometry, appearance, or pose. We introduce GenIA, a framework for test-time input-aligned generation that grounds SAM3D's generative prior in geometric and photometric observations without retraining the foundation model. We improve object pose by deriving translation and scale from geometry while retaining the learned rotation prior, and align appearance through visibility-biased attention, cross-observation fusion, and differentiable rendering guidance during denoising. An optional post-denoising refinement further adapts the appearance latent, lightweight decoder adapters, and object placement to the observations. Our framework also supports externally supplied geometry; when given temporal shapes of dynamic objects, it recovers a shared, input-aligned canonical appearance and stable world-space placement. Across synthetic and real benchmarks, GenIA improves pose prediction and object reconstruction from monocular, multi-view, and dynamic inputs, outperforming recent optimization-based, per-frame image-to-3D, and video-to-4D methods. Our project page is available at https://facebookresearch.github.io/GenIA.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12388v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12388v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12388v1 的 23 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "GenIA 把 frozen SAM3D 的完整资产 prior 用 depth-grounded pose、visible-patch attention 和 rendering gradients 对齐到输入，能从单图扩展到多视图及外部动态几何。作者报告静态细节和 held-out 感知指标改善，值得细读 test-time alignment；动态几何仍来自 ActionMesh，TTR 是逐实例优化，DAVIS 没有真实 novel-view GT，不能概括为统一 4D 生成器。",
+    "motivationZh": "单图 3D generative prior 能补出完整资产，但其相机、姿态和细节未必忠实于实际输入，增加视图也不一定能直接利用这些观察。论文关注如何把完整形状 prior 与特定输入的可见几何证据对齐。",
+    "methodZh": "先由 SAM3D 预测 coarse shape，或 inverse external occupancy 到 frozen shape latent；旋转保留 prior，平移/scale由 mask-pointmap median depth及投影尺寸 fixed-point求解。每观察运行 SLAT flow，以当前形状可见性 bias 投影 DINO patches，clean-latent Gaussian rendering loss梯度在 denoising 中引导并 canonical-fuse 多观察。可选100步 TTR更新 appearance latent、rank4 decoder DoRA和pose。实际阅读完整23页正文、实现/数据/metric/ablations appendices，包括材料基线只qualitative、pseudo-track filtering与CLIP解释。",
+    "methodFlow": [
+      "由MapAnything取得depth/cameras及object mask，SAM3D生成coarse geometry；可选externaloccupancy inverse到shape tokens。",
+      "用learnedrotation先验，maskdepth与angularsize求t/scale，多观察median融合并可选ICP对齐。",
+      "按coarse形状可见性把projectedRGBpatchattention提高α5，mask/global组补偿softmaxmass。",
+      "每flowstep extrapolate cleanSLAT，render RGB/depth并以maskedgradient引导，阻止hiddenGaussian受梯度侵蚀。",
+      "把多view/frame可见voxelvelocity映射canonical并visibility-weighted融合；动态deformation由external固定拓扑提供。",
+      "可选100步TTR优化latent、decoderDoRA及pose，anchor保护未观察opacity/latent。"
+    ],
+    "experimentsZh": "GSO30objects each25views(0–9input candidates,10–24test)，CO3D10selectedsequences4input/4heldoutclusters，ActionBench6scenes16frames，DAVIS10sequences16frames无真实testview。SAM3D25steps与externalshapelatent10pose steps，TTR100steps；A10040GB，所有baselinepose可refine且shape/appearancefixed，optimizationbaselinesexempt。 以下结果为作者报告：作者报告GSO mono SAM3D15.461→GenIA+TTR24.471 trainPSNR；heldoutcoPSNR12.781仍低于TripoSplat13.564，但CLIP.884与LPIPS.379优于SAM3D.883/.411。（Table1a, PDF p.7）；作者报告5-view GSO heldout18.503coPSNR/.228LPIPS/.914CLIP，对比ReconViaGen13.977/.296/.908；Depth3DGS23.126coPSNR但.372LPIPS/.830CLIP且unseenincomplete。（Table1a, PDF p.7）；作者报告ActionBenchfullpipeline9.661coPSNR/.502LPIPS/.846CLIP，与SAM3D9.900/.504/.882相比并非全面提升；DAVISTTR3.91pxpseudo-trackerr、CLIP.899。（Table1b, PDF p.7）；作者报告dynamic runtime约13×SAM3D25s含ActionMesh；CO3Dsingleviewpeak19.7GB无TTR、31.8GB有TTR，对比SAM3D18GB。（Fig.6 and Sec.5.1, PDF p.8） 对照范围：mono SAM3D/TripoSplat/RecGen/CUPID，多view STREAM3D/MV-SAM3D/ReconViaGen/Depth3DGS，dynamicperframeSAM3D/Lift4D/HiMoR/Any4D。TRELLIS2/Pixal3D仅qualitative材料比较，不提供可比renderillumination数字。DAVIS无GTnovelview，CLIP和pseudo-track结果仅对应appearance/consistency proxy。 消融与诊断：pose四步rotationaverage→depthground→ICP，appearanceAttn→RG→TTR，softmaxcomp OFF/APPROX/EXACT。RG收益主要；ICP静态CD降约半而DAVISappearance可能退化；comp近乎同quality、EXACT1.3–1.8×overhead。GTshape/pose条件和完整mainbenchmark必须分开。",
+    "insightZh": "贡献是将generative complete-object prior与输入约束解耦到pose/appearance inference机制，尤其visibleattention、maskedrenderguidance和canonical observationfusion。基础shape/flow/SAM3D、ActionMesh与渲染loss皆非新模型；dynamicmotion不由GenIA自身恢复，softmaxmass补偿作者实验证明近乎无quality收益。",
+    "evidenceZh": "动态结果必须输入externalgeometry；test-time refinement确实逐实例更新adapter而非零优化。（Sec.4/Fig.2, PDF p.4; Sec.4.4, p.6; Appendix A.7, pp.15–16）；visibility与rendergradient使appearance受observations约束，但coarsegeometry仍prior-driven。（Sec.4.3, PDF pp.5–6; Sec.6 limitations, p.8）；静态held-out感知收益强于动态quantitative dominance。（Table1/Fig.6, PDF pp.7–8）；appearanceablation在GSO/ActionBench使用GTshape及pose，不能当成完整估计pipeline增益。（Appendix A.1/Table3, PDF pp.13–14）；DAVIStracking指标只是CoTracker一致性，不是absoluteGT；dynamic失败来自placement/deformation。（Appendix A.11–A.13/Fig.16, PDF pp.20–23）",
+    "caveatZh": "PDF p.8明确dynamicgeometry依赖externalpredictor，coarsegeometry未直接由observedsilhouette/depth对齐。；rotationprior及noise-sensitiveICP、mask/depth/camera错误可使renderingsupervision退化；大interframemotion使geometry/poseerror传播。；Appendix A.13 pp.22–23明确CLIP对pose/texture误差不敏感，DAVISsyntheticrotatedviews不是GTNVS。；30/10/6/10 selected对象/sequence规模有限，completeasset外观强不代表全场景复杂拓扑/编辑可用性。；GTgeometryappearanceablation较强而真实ActionMesh主表弱，不能把外部motion质量归因GenIA。；TTR为每instanceadapter/latent/pose优化；zero-foundation-retraining与低deploymentcost需分开。；unseencompletion只由prior合理性约束，没有truehiddenobservations保证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接连接generative3Dasset与multi-viewobservation，提供对canonicalasset appearance/pose的testtime控制机制；对reconstruction转可编辑资源有方法迁移价值，但没有assetediting或manufacturing验证。"
+  }
+}

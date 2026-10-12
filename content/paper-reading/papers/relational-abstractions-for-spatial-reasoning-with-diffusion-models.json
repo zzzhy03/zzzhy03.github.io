@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.09780",
+  "slug": "relational-abstractions-for-spatial-reasoning-with-diffusion-models",
+  "title": "Relational Abstractions for Spatial Reasoning with Diffusion Models",
+  "authors": [
+    "Ana Ezquerro",
+    "Ozan Özdenizci"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09780"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Relational",
+    "Abstractions",
+    "Spatial",
+    "Reasoning",
+    "Diffusion",
+    "Models"
+  ],
+  "abstract": "Diffusion models excel at image synthesis, but they remain limited in their ability to reliably satisfy structured spatial reasoning constraints. In conditional data distribution modeling tasks with implicit logical structure, such as puzzles defined by visible clues paired with consistent solutions, state-of-the-art generative models tend to approximate pixel-space distributions without learning the underlying logical rules required for inference. To address this limitation, we present a novel framework for spatial reasoning with diffusion models that leverages unsupervised object discovery and abstractions of object relations. We show that the relational knowledge derived from object-centric representations enriches diffusion models with structural primitives, allowing them to effectively guide the generative representation space during both training and inference, and enabling conditional image generation that satisfies reasoning constraints. Additionally, we introduce a large-scale generative spatial reasoning benchmark with four datasets inspired by human-solvable puzzles. Our results show that relational abstractions significantly improve reasoning capabilities of diffusion models on a variety of complex reasoning tasks, while enabling robust generalization in out-of-distribution settings.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09780v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09780v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/anaezquerro/rdm"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09780v1 的 29 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "RDM 将 Slot Attention 对象feature/position 经 relational Abstractor 注入 diffusion U-Net，训练可额外用正确solution的抽象并随机drop，推理只见clue。作者报告Tangram全约束ACC15.46→46.76、Akari低wall-density39.48→72.48，说明对象关系接口比纯pixel fit更能支持约束生成。适合deep借鉴layout/part组合，但不是symbolic solver或保证正确的可编辑输出，hardColdoku仍12.58%，数据与eval有限。",
+    "motivationZh": "视觉空间 puzzles 需要组合多个对象的关系与约束，单个对象特征或位置表示不足以支持系统性解题。希望学到可跨任务和规模迁移的 relational abstraction，让 diffusion reasoner 直接生成满足约束的解。",
+    "methodZh": "发现器用无objectlabel的slotautoencoder学习对象表示，feature与position分离，abstractor迭代关系attention后cross-attend到reasonerbottleneck。四种任务涵盖Akari、coloredSudoku、Tangrampiece布局与固定逻辑faceattributes。提供scalabledecoder避免per-slotfullimage成本、clue/solution/full训练设置、capacitymatchedbaseline及slot-only控制。",
+    "methodFlow": [
+      "学习对象slot：clue/solution分别经过预训练slotautoencoder，最后attention将feature/position各聚合到slots。",
+      "抽象关系：以position为value、objectfeature作Q/K，在多层cross/selfattention更新关系embedding。",
+      "辅助solution训练：部分样本额外使用solution slots，pdrop.5置空，使同reasoner学习有/无solution分布。",
+      "生成并验证：关系crossattention注入U-Netbottleneck，Eulerflow生成raster solution，推理不用solution，task-specific约束解析评估。"
+    ],
+    "experimentsZh": "每task独立discoverer/reasoner，30–175M不同sizes、fixedtrainingsteps；5000heldout/task、100steps主结果，Coldoku10steps。Akari/Coldoku1M，Tangram1013silhouettes+9200shuffles，face30K图像组合1M，numbers作者报告。 以下结果为作者报告：作者报告TangramRDM[S]fullACC46.76 vsbase15.46；shape65.12 vs57.72，clueACC34.37；未达到普遍约束正确。（PDF p.8 Table2）；作者报告Akari16slotsclueID82.06→lowdensity72.48 vsbase80.04→39.48；121slotclue低54.58。（PDF pp.7–8 Table1）；作者报告hardColdokuRDMfull12.58 vsSRMsequential20.78；tiltedmediumsolution28.40 vsbase12.48/SRM7.08。（PDF pp.7–8 Tables1/Fig.6）；作者报告MNISTSudokuhard.76 vsoriginalSRM51.6但自家100stepSRM.01，显示采样协议强烈影响比较。（PDF p.27 Table12） 对照范围：capacitymatchedU-Net与SRMparallel/sequential、slot-only、DINO/MAE；unconstrainedopenworld/强VLM/程序solver未比较。Tangramnovelsilhouette split细节不足，逻辑operator固定。 消融与诊断：clue/solution/full、slots数、small/large、10/100steps、slot-only、oracle/no-rawclue、linearvalidityprobe。probe用重复digit或shuffleinvalid可能学简单统计，非证明完整符号规则。",
+    "insightZh": "将已知slotabstractors迁入conditionalgenerative reasoning，区别纯slotcondition或只调整sampling；scalabledecoder先slot-grid混合再decode。重要点是关系控制而非benchmark规模；仍每任务独立训练，不是通用rules程序执行。",
+    "evidenceZh": "solution关系仅训练可用，推理drop，不使用CFG两分布外推。（PDF pp.3–4 Fig.1 §3.2; p.6 conditioning settings）；完整Tangram正确率和OODwall-density明显改善。（PDF pp.7–9 Tables1–2; p.24 Table7）；relational模块超过纯slotconditioning。（PDF p.26 C.2.1 Table11）；objectdisentanglement并不一一对应，face可重复训练样本。（PDF pp.19/22–23 A.4/C.1）",
+    "caveatZh": "finiteobject/scenescalability，数千实体openworld未验证。；神经eval会有误差，手工slotvisualization显示未完美disentangle；face可复制训练样本。；高slots和大model不一定更好，DiTbaseline难优化；uniformrecipe不优于所有task。；输出raster且需task特定解析器，不是editableSVG或可制造assembly约束解。；solution-guided训练可做强privilegedsupervision；oracle解读不能证明clue自身logicinference。；Tangram1013silhouette与重复face组合，heldoutinstance未必结构OOD；真正OOD主要Akariwallratio/tilt。；scalabledecoder的slot-gridmixing削弱one-object-one-slot保证；规则probe/颜色解析难区分pixelquality与reasoning。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对象/part关系condition对LEGO式组合、布局与pattern生成有明确表示迁移，尤其约束满足应独立于pixel fidelity；本文没有LEGO/embroidery实际实验，保持medium。"
+  }
+}

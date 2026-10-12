@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.09454",
+  "slug": "robotapo-adversarial-physics-preference-optimization-for-robotic-manipulation-video-generation",
+  "title": "RobotAPO: Adversarial Physics Preference Optimization for Robotic Manipulation Video Generation",
+  "authors": [
+    "Kerui Li",
+    "Zhe Jing",
+    "Chenyi Huang",
+    "Xiaofeng Wang",
+    "Zheng Zhu",
+    "Haoming Cui",
+    "Huaibo Huang"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09454"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "RobotAPO",
+    "Adversarial",
+    "Physics",
+    "Preference",
+    "Optimization",
+    "Robotic",
+    "Manipulation",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Robotic manipulation videos are increasingly used as visual plans for embodied agents, but optimizing purely for visual plausibility often fails to capture the fragile physical manifold of real-world interactions. Even minor physics-violating errors at the interaction boundary, such as interpenetration or premature object motion, can completely invalidate the inferred timing and pose needed for downstream execution. Because standard supervised fine-tuning lacks the direct pressure to penalize these localized failures, we introduce AgiBot-PhysPref. This rigorously curated 10,000-sample preference dataset isolates condition-matched physics violations, turning the generator's own failure distribution into a foundational signal for physical consistency. Building upon this, we propose RobotAPO, an adversarial physics preference optimization framework operating in the continuous flow-matching denoising space. To prevent the policy from merely memorizing static curated failures, RobotAPO employs a lightweight adversarial counterfactual proposer that learns a condition-dependent, physical-failure-biased direction in denoising space. This encourages the model to explore and better respect the physical interaction boundary, all while maintaining a pure prompt-and-reference inference interface without requiring external structural conditioning. Comprehensive evaluations demonstrate that explicitly correcting these localized physics violations improves downstream robot execution from generated videos. On held-out AgiBot conditions, RobotAPO outperforms the strongest controlled internal baseline in physical consistency by 6.8% hard score and 10.0% soft score. Crucially, in real-robot replay, it translates these physical-consistency gains into a 37.4% relative improvement in task success over the strongest controlled internal baseline.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09454v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09454v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09454v1 的 19 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "RobotAPO 在flow denoising space用同condition成功/失败偏好训练policy LoRA，再让adversarial LoRA提出failure-biased hard negatives；作者报告AnyPos回放33/51成功。可借鉴把局部contact失败用于generative alignment，但不是几何/force约束；对SFT提升有pairedCI支持，对最强preference baseline的17.6点差CI仍含0，不能宣传已显著优胜。",
+    "motivationZh": "机器人 manipulation video generation 常产生穿透、悬浮、接触错误或物体 identity 漂移，普通视觉质量 reward 难以纠正。成功/失败偏好数据又有限，需要检验 failure-focused alignment 是否能改善生成和后续回放执行。",
+    "methodZh": "AgiBot-PhysPref从40Krollouts双盲人工确认10K失败，与同条件real successful demonstrations配对，primarytaxonomy涵盖penetration/identity/contact/floating等。RobotAPO对frozenSFT的flow-matching denoising energy作相对reward，用curatedfailure及在positive noisy latent上混合policy/adversary velocity的counterfactual训练DPO-style preference；anchor与LoRA norm控制drift。adversary反向偏好失败并提高policyhard-negative loss，warmup后交替更新，inference只留policy。两backbones、G+Gsource control、equal-norm noise对照和limited-dataAgileX适配有实证，但任务主要robot pick-place，真实source优势、Hyperparameter披露和统计一致性仍有限。",
+    "methodFlow": [
+      "同task/reference条件采样SFTrollouts，VLMrank后双盲human筛出10K有明显physicalfailure的视频，与real成功视频配对。",
+      "将success/failure转成同步noise level的flow targets，计算policy denoising error相对frozenSFT的reward。",
+      "在success noisy latent上小比例混合policy/adversary velocity形成hardtarget，policy同时偏好success胜过curated与hardnegatives。",
+      "adversary反向学习失败方向并增大policyhardloss；policy加success-anchor/norm正则，warmup后两LoRA交替更新。",
+      "仅部署policy LoRA作prompt+referencevideo生成；robot研究再用matched400AgileXvideos适配，并经frozenAnyPos/controller回放。"
+    ],
+    "experimentsZh": "Wan2.2TI2V5B SFT/10Kpref，200heldoutconditions×5videos/method，VideoScore2 hard/soft1–5；CogVideoX5B复测相同split/budget。AgileX每method400videos相同adaptation后51matchedtrials、frozenAnyPos无过滤；sourceG+G control及64pairedadversarial/noise诊断。main8RTXPro6000约200h，1600GPUh；具体γ/λrange等数值正文说config记录但未列出完整值。 以下结果为作者报告：作者主表PhysH3.473/PhysS3.489，对DiffusionDPO3.253/3.172、SFT3.193/3.041；这是VideoScore2评分而非实际力学保证。（Table2, PDF p.8）；作者报告RobotAPO33/51=64.7% tasksuccess[51.0,76.4]，SFT33.3%、RealDPO47.1%；与RealDPO/LVP pairedCI均含0，仅SFT比较CI排除0。（Table3 PDF p.9; AppendixA.4 PDF p.15）；作者报告CogVideoX PhysS2.968对DPO2.824，pairedgain+.144[.058,.245]，VisualS3.008未超过SFT3.039，迁移非每项指标改善。（Table8, PDF p.15） 对照范围：内部SFT/DiffusionDPO/RealDPO同backbone/data/init/interfaces；14BLVP是未matched的out-of-box参考。robot结果还含400video平台适配与AnyPos，所以不是zero-shot跨embodiment或裸generator比较。 消融与诊断：去adversarytask64.7→49.0，去anchor/norm→35.3；λadv .05最佳局部setting。G+G和noisecontrols有CI；AppendixA.4 WanPhysS pointgains(.336/.243等)与Table2差(.448/.317等)不一致，未解释同一集为何不同，不能混引用其点估计与区间。",
+    "insightZh": "在已有diffusion-DPO/flow目标中加入failure-specific curated data与generator-side adversarial target，将物理边界探索内化为velocityperturbation；没有physics simulator/显式localization。source-matched与equal-norm controls比仅数值benchmarks更能支持mechanism，广域visualcreation迁移仍未测。",
+    "evidenceZh": "policy和adversary共用SFT-centered denoising reward，hardtarget由positive noisy latent的velocity blend构造。（Sec.3.3–3.4, Eq.(1)–(11), PDF pp.5–7）；source-matched G+G与equal-normGaussian对照部分排除source身份与generic corruption解释。（AppendixA.1–A.2, Tables6–7, PDF pp.14–15）；robot replay是limited-data平台适配后pipeline结果，对最强内baseline差不显著。（Sec.4.3, Table3, PDF pp.8–9; AppendixA.4, PDF p.15）",
+    "caveatZh": "无显式3Dgeometry/force/simulation priors，多object、严重occlusion、deformable与closed-loopexecution在scope外。；originalreal-success/generated-failure源不对称，G+Gcontrol不能改变原datasetconstruction。；只两video backbones、AgiBotheldouts与limited-dataAgileX适配，不是任意embodimentzero-shot。；51trials较小，最强preferencebaseline优势CI含0；physmetric是VLM/common-sense代理，需区别统计和physicalvalidation。；AppendixA.4与主表PhysS差值不一致，完整reproconfigs/manifest未public，mechanism与reportedCI需核对。；narrowrobotinteraction方法向一般visualdesign/3Dcreation仍是迁移思路；数字均作者报告未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "failure-biased generative preference alignment对contact-sensitive视觉场景生成有可迁移方法价值；未涉及可编辑asset geometry或制造约束，按外围video方法参考。"
+  }
+}

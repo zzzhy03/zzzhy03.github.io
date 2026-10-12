@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.08179",
+  "slug": "view-matters-keyframe-guided-text-driven-3d-gaussian-editing",
+  "title": "View Matters: Keyframe-Guided Text-Driven 3D Gaussian Editing",
+  "authors": [
+    "Kaizhe Zhang",
+    "Yijie Zhou",
+    "Weizhan Zhang",
+    "Xuanyu Wang",
+    "Feng Lei",
+    "Sha Gong"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.08179"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "View",
+    "Matters",
+    "Keyframe-Guided",
+    "Text-Driven",
+    "3D",
+    "Gaussian",
+    "Editing"
+  ],
+  "abstract": "Text-driven 3D Gaussian editing commonly does not distinguish the editing reliability of rendered views, although different viewpoints provide supervision of substantially different quality. Views that clearly show the scene and match the edit instruction provide reliable guidance, while less informative views may weaken the edit when all views are treated equally. We present View Matters, a view-importance-aware framework that conducts editing around reliable keyframes. Keyframe Importance Estimation (KIE) identifies reliable views using geometric visibility, semantic distinctiveness, and edit relevance. Keyframe-Guided Editing (KGE) then propagates their editing signals asymmetrically to non-keyframes without noisy reverse influence, while Importance-Aware Optimization (IAO) preserves this reliability preference during 3DGS optimization. Across 23 scene-prompt pairs, View Matters achieves the highest average CLIP text-image similarity of 0.2822 and directional similarity of 0.2564 among the evaluated methods, with a four-minute editing time. Additional adjacent-view analysis indicates that the fidelity-oriented editing process maintains cross-view coherence.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.08179v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.08179v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.08179v1 的 14 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "View Matters 用visibility、CLIP distinctiveness与edit relevance选关键视角，让可靠keyframes单向指导其余IP2P views，再在3DGS优化中提高同一keyframe loss权重。作者报告23个scene–prompt pairs上CLIP directional .2564和4分钟编辑；可借鉴多视角监督可信度，但一致性只有两个case、几何大改仍受冻结2D editor限制。",
+    "motivationZh": "Text-driven 3DGS editing 通常把不同渲染视角当作同等可靠的监督，但遮挡或语义不清的 views 会污染原本正确的编辑。需要决定哪些 keyframes 应主导多视角编辑，并在优化时保留这种可信度差别。",
+    "methodZh": "传统render–edit–optimize把所有视角视为同等可靠，遮挡/语义不清的views会反向污染更好的编辑。KIE将Gaussian可见比例、CLIP image deviation和image–prompt similarity归一化，以(.6,.2,.2)融合，沿trajectory分group每组取最高分。KGE修改frozen IP2P attention：keyframes全局共享context，non-keyframes只看其group keyframe及previous view，禁止reverse contamination。IAO保留image reconstruction objective但给keyframes1.6倍权重，再优化3DGS。实验在8scene/23prompts上支持instruction fidelity；appendices给keyframe数/weight、visuals和限制，不能把相邻view CLIP当完整3D结构稳定性证明。",
+    "methodFlow": [
+      "渲染candidate3DGS views，计算visible Gaussian fraction、CLIP semantic distinctiveness及edit-prompt similarity。",
+      "min–max归一化并以geometry/semantic/edit=.6/.2/.2融合，按trajectory分groups选择4个representative keyframes。",
+      "在冻结IP2P中keyframes全局attention，non-keyframes只向group keyframe和previous view读取编辑context。",
+      "缓存edited views，以L1+perceptual reconstruction优化3DGS，对keyframe supervision施加1.6权重。",
+      "输出可再次渲染的edited3DGS；保持原场景结构的能力限于原始表示与2D editor可处理的编辑。"
+    ],
+    "experimentsZh": "Mip-NeRF360与IN2N subset，共8scenes/23scene–prompt pairs涵盖human/nonhuman/local/global editing。frozen IP2P；20views含4keyframes/16nonkeyframes，views每500iterations更新，guidance text7.5/image1.5，λk1.6。正文Sec.3.5说batch1，AppendixA说optimization batch5，记录为implementation描述不一致。 以下结果为作者报告：作者报告平均T-I .2822、CLIP Direction .2564，GaussianEditor .2769/.2227，DGE .2753/.2179；编辑时间4min对DGE5min、GaussianEditor8min。（Table1, PDF p.6）；作者报告per-view baseline .2702/.2229，加入KGE .2754/.2464，再加KIE .2761/.2486，完整IAO后.2822/.2564。（Table2, PDF p.7）；作者报告4keyframes配置T-I .2793/Dir.2840、266.04s、max allocated17.78GB；10keyframes324.58s/24.54GB而scores不更好。该表为hyperparameter setting实验，不混同主表平均。（AppendixB.1, Table3, PDF p.10） 对照范围：同场景/prompts/初始化比较IN2N、VICA、GaussianEditor、GaussCtrl、DGE、EditSplat。C3Editor与3D-consistent只取原论文images进行非严格qualitative对照，不能当受控quantitative baseline。 消融与诊断：progressiveKGE/KIE/IAO、cue删减、keyframe数与λk sweep支持组合及moderate keyframe优点；geometry-only不足，强loss权重有T-I/Direction权衡。未见多seed/intervals或独立客观局部geometry fidelity评估。",
+    "insightZh": "方法把view reliability贯穿view selection、attention传播与3D loss，而不是单纯随机anchor或一致性对齐。实现依赖已有CLIP/IP2P/3DGS，三个评分是heuristics，尚无learned uncertainty或可靠度校准；贡献是直接可用的view-priority editing framework。",
+    "evidenceZh": "三个view cues分别来自显式可见性、CLIP距均值差与CLIP prompt相似度，并进行group-wise选取。（Sec.3.3, Eq.(2)–(10), PDF pp.3–4）；non-keyframe attention是单向读取keyframe+previous view，IP2P weights不训练。（Sec.3.4, Fig.2, Eq.(11)–(16), PDF pp.4–5）；主表在23pairs支持更高instruction alignment和较短编辑时间。（Table1, Sec.4.1–4.2, PDF p.6; Table4, PDF p.14）；cross-view consistency只测两个代表案例，不能推广为aggregate benchmark领先。（Sec.4.6, Fig.6, PDF p.8）",
+    "caveatZh": "冻结2D editor限制substantial geometric changes和fine-grained local structures。；candidate views若同样清楚，unequal-view建模收益小；若无view观察target region，selection无法创造可靠anchor。；appendix要求未来更极端visibility条件评估；两个adjacent-view cases不构成完整consistency benchmark。；CLIP view distinctiveness或prompt similarity不等于edit correctness，semantic outlier也可能是差视角。；所报告CLIP metrics与KIE的CLIP选择共享representation，可能favor CLIP-score改善而非human/geometry fidelity。；batch1与batch5描述不一致，完整代码未在PDF提供，4min硬件描述不能无条件外推；数值为作者报告未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进3DGS editing；可借鉴为生成/设计assets的multi-view feedback选择机制，避免低置信视角污染高置信render监督。没有LEGO或fabrication的直接实验。"
+  }
+}

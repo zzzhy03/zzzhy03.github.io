@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.13174",
+  "slug": "precog-preview-edit-for-efficient-video-correction-in-generation-time",
+  "title": "PreCoG: Preview-Edit for Efficient Video Correction in Generation-Time",
+  "authors": [
+    "Yilai Liu",
+    "Wenqi Pei",
+    "Zhifeng Lu",
+    "Shiyuan Zhang",
+    "Zongxi Liu",
+    "Hongyang Du"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13174"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "video-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "PreCoG",
+    "Preview-Edit",
+    "Efficient",
+    "Video",
+    "Correction",
+    "Generation-Time"
+  ],
+  "abstract": "Iterative text-to-video generation relies on feedback to correct compositional and temporal failures. However, existing methods typically require another full generation run for each correction, repeating computation and potentially disrupting already correct content. We introduce PreCoG, an iterative framework for correcting semantic failures during video generation. PreQA diagnoses failures from low-cost previews and constructs corrective conditions, while PreEdit edits cached generation trajectories under these conditions, attenuating orthogonal changes to limit disruption of already correct content. PreCoG completes generation only for the selected candidate, reusing its cached trajectory to reduce redundant computation and help preserve semantic consistency between the preview and the final video. Experiments show that PreCoG achieves the highest VBench and T2V-CompBench scores and approaches VSR's leading VS2 score at $0.56\\times$ its inference time. It also outperforms GENMAC on all three quality and alignment metrics at $0.86\\times$ its inference time.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13174v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13174v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13174v1 的 19 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "PreCoG 用共享原生轨迹的低成本 preview 判断失败，再按 target/counterfactual contrast 对缓存轨迹做 blockwise soft projection 纠正，最后只继续渲染选中版本。作者报告 Wan2.2 的 compositional score55.27→62.28、用时是VSR的0.56×，但仍是单次生成2.26×。适合精读可缓存的视觉设计闭环；preview可靠性只在初始候选验证，质量/耗时cohorts并非完全一致。",
+    "motivationZh": "视频生成通常到完整采样结束后才暴露 prompt 遗漏或动作错误，反复完整重生成代价高。问题是在生成早期判断哪些要求会失败，并让廉价预览支持局部修正而不破坏原来正确的内容。",
+    "methodZh": "PreQA复用GENMAC初始layoutplanning，固定原promptatomicrequirements，由EvaluationAgent诊断preview、RefinementAgent从失败构造matchedtarget/counterfactual。PreEdit存source states/velocities/solver，早期按contrast抑制orthogonalupdates，余下regularsource-relativeediting；接着fewstepcompletion生成preview。最多初始+4纠正，选firstallpass或highestcoverage并续原生denoising，保留当前最佳以避免prompt目标放宽。",
+    "methodFlow": [
+      "固定要求并缓存初始轨迹：初始GENMAC式layoutguidance与atomicrequirements；Wan40steps中的前14stepscache，2bridge+2clean生成preview。",
+      "从preview构造纠正条件：读取81frames，逐requirement判定并记录观察事实；target修正失败，counterfactual仅把指定attributes换成观察到的错误。",
+      "编辑cached source-relative轨迹：d=targetvelocity−cachedsourcevelocity，a=target−counterfactual；3×30×52latentblocks做boundedpositiveprojection，再以β0.75混合。",
+      "重复判断并只完成最佳分支：最多4editingrounds；最高requirementcoverage作下一source，firstpass或budget后最佳分支恢复cache完成40stepnativecontinuation。"
+    ],
+    "experimentsZh": "主Wan2.2T2VA14B、81frames832×480、40steps，Qwen3.8-27B反馈；T2VCompBench prompts，6项自定义VBench均值、7类compositional均值、VS2softalignment。附加四T2V两I2Vbackbone/tasks、多个VLM；human96distinctvideos四ratersblindbalancedpairs。 以下结果为作者报告：作者报告6项VBench mean82.06→83.49，T2VComp55.27→62.28，VS2 3.708→3.854；VSR VS2更高3.973。（PDF p.6 Table 1）；作者报告去counterfactualprojection时compositional56.80，完整62.28；fullvideofeedback用时2809.8s vs preview2022.9s。（PDF p.8 Table 2）；作者报告human对VSR的视觉质量58.1%ties、alignment69.4%ties；对GENMACalignment43.8%wins/37.5%losses。（PDF p.15 Figure 7）；作者报告QwenVL3 4B feedback会使三项metrics都低于direct，方法需足够capableverifier。（PDF p.19 Table 5） 对照范围：Wan适配版VQQA/VSR/GENMAC/CachedSearch，预算不同且停止/selection规则不同；CachedSearch8探索后re-render，VSR最终输出而非best；本文不是统一总budget条件下所有baselines的定论。 消融与诊断：FullvsPreview、planning/targetrefinement、regenerationvsedit、projection，多个feedbackmodels/backbones；未给完整promptcount/filteredcoverage/hardware/multiseedCI，VS2soft为argmaxrating×归一化prob，非expectedrating。",
+    "insightZh": "方法把previewfeedback与实际cachetrajectoryediting连接，区别于只改prompt重生成；提出failurematchedcontrast和softprojection控制未请求变化。共享原生前缀与继续渲染有实质工程价值，但projection几何bound仅对假设contrastsegment成立，不保证semanticedit或已满足元素保存。",
+    "evidenceZh": "缓存真实source states/velocity和solver，修改在前14steps内，projection仅早期steps2–5。（PDF pp.5–6 Eqs.(2)–(5); pp.16–17 Appendix E.2）；作者报告preview/fulldecision agreement98.24%，但固定seed初始candidate，1.76%preview通过而full失败。（PDF pp.5/7 Figure 3 §4.2）；作者报告quality较direct提高、反馈方法中较快，但time是direct2.26×。（PDF p.6 Table 1; p.18 Appendix F）；作者明确bound不保证semanticalignment，counterfactual准确性为条件。（PDF pp.16–17 Eq.(6) Appendix E.2）",
+    "caveatZh": "Projectionbound只约束contrastsegment，contrast不准确时不能保证semanticalignment。；Preview/full示例fine detail与poses存在差异，一致性诊断限定初始candidate固定seed。；小VLM反馈会降低表现，需sufficientlycapablemodel。；没有对编辑后preview/full做同规模agreement诊断；终图不再在线feedback可能仍违约。；Quality排除missingoutputs，未明确分母；timing用各methodavailablecohort，存在selection/matchedcost边界。；6dimensionVBench是定制平均，不能称官方total；mainmetrics无seedCI，human样本小且对强baseline多数tie。；Baseline各预算/stop/bestselection不同；case图仅三frames不能证明完整eventphysicalcorrectness。；整套仍慢于direct2.26×，缓存memory与时长/分辨率scaling未报告，未确认officialpubliccode。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可把generationtimecache作为agent观察/修改的可复用工具，连接planning、visualevaluation和iterativerepair，直接命中visualdesignagent；与video生成相交但未推进核心3D或fabrication。"
+  }
+}

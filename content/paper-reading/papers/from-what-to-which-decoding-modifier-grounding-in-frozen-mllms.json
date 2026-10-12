@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.12305",
+  "slug": "from-what-to-which-decoding-modifier-grounding-in-frozen-mllms",
+  "title": "From What to Which: Decoding Modifier Grounding in Frozen MLLMs",
+  "authors": [
+    "Barbara Toniella Corradini",
+    "Caterina Gallegati",
+    "Ludovica Genovese",
+    "Vittorio Murino"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12305"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "What",
+    "Which",
+    "Decoding",
+    "Modifier",
+    "Grounding",
+    "Frozen",
+    "MLLMs"
+  ],
+  "abstract": "As Multimodal Large Language Models (MLLMs) can describe increasingly complex visual scenes, token-level grounding becomes crucial. Yet, when an MLLM generates \"the yellow banana on the left\", established grounding approaches focus on what is in the image (\"banana\"), overlooking tokens that help describe which instance is meant (\"yellow\", \"left\"). In this work, we ask whether frozen MLLM representations contain decodable grounding information about the referred instance across generated tokens, extending to modifiers such as attributes, spatial expressions, and relational/action terms. To address this question, we introduce OTTER, a lightweight supervised probe over frozen MLLM representations that uses Optimal Transport (OT) to align generated tokens with visual regions and produce compact grounding maps. Our results show that (i) instance-discriminative visual information can be decoded from modifier tokens, with the clearest evidence for spatial terms, but (ii) is not confined to them, as contextualized object nouns also carry referential information; (iii) the recovered grounding remains informative under context perturbations, while selected regions remain relevant to generation; and (iv) the learned OT-based grounding extends beyond the controlled setting to free generation and cross-dataset transfer.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12305v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12305v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12305v1 的 15 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "OTTER 用约550K参数的RIS-supervised probe，在冻结MLLM的token/patch states之间学习含dustbin的optimal-transport匹配，解出“哪一个实例”的modifier grounding。最有用的判断是referent信息分布在noun和spatial modifiers中，而非独属某个词；图更集中也不等于完整因果解释，跨非Qwen骨干效果弱，适合skim其受控counterfactual与probe边界。",
+    "motivationZh": "Frozen MLLMs 可能识别出物体类别，却仍难以把颜色、位置等 modifiers 对应到正确实例。论文关注这些指代信息是否已存在于内部表示，以及如何读出“哪一个物体”而不只判断“是什么”。",
+    "methodZh": "研究目标是将category-level“what”与instance-level“which”区分。Frozen Qwen中层hidden/visual states经normed projections构semantic、attention和spatial成本，学习token/visual mass及dustbins，用80次log-domain Sinkhorn(ε0.05)求plan，再aggregate成patch evidence；Dice+focalBCE+TV用RefCOCO masks监督。评价包括phrase/noun对照、same-category counterfactual、correct/blank/wrong image与scrambled/isolated context、matched projections、gray deletion、free-caption与RefCOCOg迁移。完整15页、所有architecture/layer/operator附录已读。",
+    "methodFlow": [
+      "从冻结MLLM generated tokens提中层context states与visual patch states。",
+      "轻量normed projections学习token–patch semantic成本，并可加入token-gated attention和spatial成本。",
+      "学习两端marginal masses及dustbin，80-step Sinkhorn求带abstention的global transport plan。",
+      "以transported patch mass生成grounding maps，optional semantic residual补coverage并作morphological refinement。",
+      "用RIS masks训练probe，按token类型及counterfactual/image-context干预验证instance grounding。"
+    ],
+    "experimentsZh": "主要Qwen2.5-VL-3B layer27、2,500 RefCOCO train images与300 calibration；validation10k左右expressions，MOD含5,021 spatial/2,722 attribute/516 relation-action tokens。2,971 natural same-category pairs/217 strictLR；1,000 paired bootstrap。free COCO5k/OpenPSG3176，RefCOCOg不retrain但换fixed-OT checkpoint；附录screen三其他骨干。 以下结果为作者报告：作者报告RefCOCO-MOD spatial Soft-IoU0.304 vs TAM0.061；noun0.310 vs0.106，表明noun也保留instance grounding。（Table2, PDF p.7）；作者报告learned projection calibrated mIoU0.458，而raw cosine0.130/shuffled0.135；需要learned mapping才能读出。（Table5, PDF p.8）；作者报告RefCOCOg phrase mIoU0.372/spatial0.328，对比TAM0.171/0.053；Qwen3 mini token平均32.66%，InternVL/Gemma仅11.88%/10.74%。（Table7, PDF p.9; Table9, PDF p.14） 对照范围：含TAM、attention、semantic、center/random maps以及matched projection、softmax heads。Main TAM对照不匹配RIS监督；主要结论建立Qwen，其他backbone仅mini screening而非完整protocol。 消融与诊断：layer sweeps、50–2500image训练scale和headcost组合支持中层与OT；matched raw/shuffled排除简单cosine。附录承认OT+learned dustbin与softmax无dustbin并非严格单因素operator隔离。",
+    "insightZh": "对modifier/noun分布式referent信息做逐token的受控研究较有价值；OT提供集中map与dustbin abstention，但supervised projection重塑mapping，所以不能说完全现成的intrinsic grounding geometry。TAM是zero-shot而OTTER使用RIS监督，直接scores对照不是公平的内在attribution排名。",
+    "evidenceZh": "probe训练冻结backbone，OT计划从learned projections/costs与RIS masks解出grounding。（Secs.4.2–4.4, Eqs.(4)–(13), Fig.1, PDF pp.4–6）；noun同样含强instance identity，spatial modifier并非唯一referent信息来源。（Sec.6.2, Table3, PDF p.8）；OT map相关区域影响generation，但deletion效果与learned semantic branch接近，不能当完整因果机制。（Secs.6.4–6.5, Table4, PDF pp.8–9）；operator消融将transport与dustbin bundled，且更集中map可伴更低target-distractor gap。（Appendix A.2, Table11, PDF p.15）",
+    "caveatZh": "PDF p.10承认只覆盖有限backbones/datasets/grounding settings。；PDF pp.8–9明确不把supervised projection证据解释为fully pre-existing grounding geometry；deletion不是complete causal account。；Appendix p.15承认dustbin与transport一起构成operator comparison，且gap可能不如softmax。；新probe decode不等于提升原模型reasoning或editing行为，实际design target selection迁移尚无实验。；supervised RefCOCO与region postprocessing可能引入task-specific prior，non-Qwen低成绩限制architecture普适性。；Method p.5仍有未解析Appendix ?? cross-reference，refinement配置审计不完整。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对视觉design instructions中“左边/黄色/靠上那个对象”的instance disambiguation有潜在方法价值；该迁移是审阅推断，论文没有设计编辑agent实证。"
+  }
+}

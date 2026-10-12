@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2603.15614",
+  "slug": "tri-prompting-video-diffusion-with-unified-control-over-scene-subject-and-motion",
+  "title": "Tri-Prompting: Video Diffusion with Unified Control over Scene, Subject, and Motion",
+  "authors": [
+    "Zhenghong Zhou",
+    "Xiaohang Zhan",
+    "Zhiqin Chen",
+    "Soo Ye Kim",
+    "Nanxuan Zhao",
+    "Haitian Zheng",
+    "Qing Liu",
+    "He Zhang",
+    "Zhe Lin",
+    "Yuqian Zhou",
+    "Jiebo Luo"
+  ],
+  "publishedAt": "2026-03-16",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.15614"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Tri-Prompting",
+    "Video",
+    "Diffusion",
+    "Unified",
+    "Control",
+    "over",
+    "Scene",
+    "Subject",
+    "Motion"
+  ],
+  "abstract": "Recent video diffusion models achieve strong visual quality and temporal coherence, but still lack coordinated control over scene layout, customized subject identity, and camera/subject motion. We study controllable video generation from three prompts: a first-frame scene image, 3D-aware multi-view subject references, and a motion-driving signal. This setting is challenging because background regions are often trackable under camera motion, while foreground subjects can rotate, self-occlude, and reveal new regions that require identity-consistent appearance. We introduce Tri-Prompting, a video diffusion framework that combines multi-view subject conditioning with dual-conditioned motion control. Tri-Prompting uses XYZ tracking points for visible background motion and low-resolution RGB proxies for foreground subject pose, allowing the model to recover fine appearance from multi-view references while retaining flexibility for plausible subject-scene interactions. An inference-time ControlNet scale schedule further balances motion controllability and visual realism. We evaluate Tri-Prompting against specialized baselines: DaS for motion reconstruction and Phantom for subject-driven generation. Tri-Prompting achieves competitive or improved reconstruction quality, stronger multi-view identity preservation, and better 3D consistency, while enabling 3D-aware subject insertion and in-scene manipulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.15614v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.15614v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.15614v2 的 21 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：核心RGB/XYZ双motion anchors与两阶段训练v1已有；v2增加OmniVCus、3DTrajMaster和MotionBooth比较、公开360Motion held-out35case泛化、IoU与identity的scale-decay权衡、完整推理成本及共同成功重建子集协议。新经验评测而非版式变化。 Tri-Prompting 将first-frame scene、最多3views subject与motion anchor接入Phantom14B：background用XYZtracks，foreground用70²RGBproxy，分两阶段学appearance与ControlNetmotion。作者报告更好的subject identity/motion对照，但ControlNetscale下降会用较低IoU换更自然运动，8A100上49frames仍约3.85min；值得deep读3D-aware创作控制接口而非实时worldmodel宣传。",
+    "motivationZh": "视频创作需同时指定场景、主体身份与 motion，单独控制这些维度的模型难以组合。主体旋转会让 tracking points 消失、露出未观测表面，使 motion adherence 与多视图 identity 保持互相冲突。",
+    "methodZh": "单一firstframe不足以约束subject背面，XYZvisibletracks在rotation/selfocclusion失效。StageI用scene/refimages VAE tokens与noisyvideo concat，以LoRA训练多viewidentity；StageII冻结base并复制18blocks为ControlNet，将spatialexclusive backgroundXYZpseudoRGB与lowresforegroundRGB编码作motionanchor。offlinekeyboard界面可变camera与reconstructed3Dsubjectrigidtransforms，初frame先用imageedit harmonize，references补细appearance。inferencescale1→.005前10/50steps释放对粗proxy的僵硬约束，带来motion/identitytradeoff。11Ktuples和DAVIS/106customcases/35public360Motion证明能力；并不输出可编辑4Dgeometry，也非autonomousdesignagent。",
+    "methodFlow": [
+      "以scene初frame和最多3个subjectview经PhantomVAE编码，concat[firstframe,noisyvideo,refs]，StageILoRA训练scene与multi-viewidentity。",
+      "从video或3Dassettransforms构造backgroundXYZ trackingpseudoRGB与foreground70×70RGBproxy，按mask合成一个motionanchor。",
+      "StageII复制前18DiTblocks加zero-initControlNet，只训练controlmodule，将anchor/scene/refcontext注入basevideolatents。",
+      "offlineworkflow用TRELLIS/SAM3D重建subject、DepthPro构background，并可先image-edit融合初frame，keyboard指定subject/camera运动。",
+      "50stepdenoise可前10steps将controlscale1退至.005，使motionconstraint与appearance/自然micromotion折中；输出RGBvideo。"
+    ],
+    "experimentsZh": "PhantomS2V14B；9.7KOmniWorldGame+1.3KCO3D(<7h)，49frames832×480。StageIrank64LoRA2500steps/8A10020h；StageII18blockControlNet2074steps/batch32/32A10028h。DAVIS50reconstruction、106scene-subject-motioncases×3seeds、35heldout360MotionC12×3；DINO/CLIPidentity、mask/boxIoU、VBench、π3alignment。 以下结果为作者报告：作者报告samePhantom XYZ-onlyPSNR15.9306/LPIPS.2786，dualRGB+XYZ16.5130/.2395；DaSCogVideo5B16.4916/.2725且SSIM.4123仍高于ours.4017。（Table2a, PDF p.7）；作者报告3-viewstageII DINO .746/CLIP .862/Ealign .025，对Phantom .723/.855/.034；geom为84commonreconstructions，其余non-rigidallsubject230subset .057对Phantom .062。（Table2b PDF p.7; Table8 PDF p.18）；作者报告public360MotionconstantboxIoU .632/mask.510对3DTraj .590/.435；decay后.535/.411而DINO .654高于constant.627，存在明确tradeoff。（Table3, PDF p.10）；作者报告same3cases/8A10080GB full231.235s，Phantom147.122s；fullpeak52.616GiB allocated/GPU，模型加载excluded。（Table5, PDF p.16） 对照范围：DaS、Phantom、OmniVCus、3DTrajMaster/MotionBooth具有不同conditioning/motion/backbones，ours额外RGB/refanchors；跨法quality数字不全是同informationbudget。samePhantomXYZ/dualRGB与constant/decayschedule最能支持内部设计。 消融与诊断：StageI/II、1/2/3referenceviews、samebaseRGBvsXYZ和scale/resolution展示multi-view/pose与flexibility作用。geom共成功subset可能选择bias；rigidD1报告18cases×6outputs与global106×3seeds的对应未解释，需保留protocol数而不混作全318测量。",
+    "insightZh": "分离background可track几何与foregroundpose/appearance不确定性，用lowresproxy留给multi-viewreference/genprior补细节；控制interface统一scene/subject/motion而非新video foundationmodel。tokenconcat、LoRA/ControlNet各已有先例，新价值在representation任务分配与3D-awareworkflow能力。 核心RGB/XYZ双motion anchors与两阶段训练v1已有；v2增加OmniVCus、3DTrajMaster和MotionBooth比较、公开360Motion held-out35case泛化、IoU与identity的scale-decay权衡、完整推理成本及共同成功重建子集协议。新经验评测而非版式变化。",
+    "evidenceZh": "多viewreferences与sceneimage在StageI concat视觉latent，StageII仅controlmodule学习dualmotionproxy。（Sec.3.2–3.3, Eq.(1)–(2), Fig.2, PDF pp.4–5）；ControlNetscaleanneal改善identity但损失motionadherence，而非双目标全面改进。（Sec.4.5–4.6, Table3, PDF pp.9–10）；3Dmetric仅在成功重建的common subset测量，最终不是完整真实geometry比较。（Table2b PDF p.7; AppendixD.1/E, PDF pp.16,18）；作者明确offline成本与single-primary-subject/symmetricreferencefailure。（Sec.4.7 PDF p.10; Fig.8/Table5, PDF pp.16,18）；核心RGB/XYZ双motion anchors与两阶段训练v1已有；v2增加OmniVCus、3DTrajMaster和MotionBooth比较、公开360Motion held-out35case泛化、IoU与identity的scale-decay权衡、完整推理成本及共同成功重建子集协议。新经验评测而非版式变化。（Prior 2603.15614v1 PDF p.11 §4.3/Fig.3; current v2 PDF pp.9–10 §4.6/Table 3, pp.16–17 Tables 5–8）",
+    "caveatZh": "高度对称front/backreferences会短暂identityorientationflip，强motion或更distinctiveviews可缓解。；依赖externalmask/reconstruction/viewgeneration，错误会传播；大camera转角使初frameXYZpoints离开view削弱backgroundcontrol。；offline14B、3.85min/8A100，单primarysubject，不支持复杂multi-subjectcontrol。；proxy3Dpose/scale与visualrefs不保证contact、forces或真实metricgeometry，ControlNetdecay刻意放松motion。；评价motionanchor部分来自GTvideos，generationworkflow重建/renderedcontrols更粗，需区别reconstructionsetting与创作应用。；Geom重建成功筛选且额外anchorcondition影响comparators，未知长期视频或复杂occlusiongeneralization；数字未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接服务3D-awarevideo创作，multi-viewidentity+粗3Dmotionproxy为资产动画/visualdesign控制提供技术接口参考；不涉及LEGO或制造方法实证。"
+  }
+}

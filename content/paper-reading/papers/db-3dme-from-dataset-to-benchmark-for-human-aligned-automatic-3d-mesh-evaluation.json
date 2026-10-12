@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2606.10142",
+  "slug": "db-3dme-from-dataset-to-benchmark-for-human-aligned-automatic-3d-mesh-evaluation",
+  "title": "DB-3DME: From Dataset to Benchmark for Human-aligned Automatic 3D Mesh Evaluation",
+  "authors": [
+    "Nanshan Jia",
+    "Zhenyu Zhao",
+    "Junbo Peng",
+    "Sui Huang",
+    "Jingshen Wang",
+    "Zeyu Zheng"
+  ],
+  "publishedAt": "2026-06-08",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2606.10142"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "DB-3DME",
+    "Dataset",
+    "Benchmark",
+    "Human-aligned",
+    "Automatic",
+    "3D",
+    "Mesh",
+    "Evaluation"
+  ],
+  "abstract": "Recent advances in 3D generation have led to substantial improvements in realism, controllability, and efficiency, yet the evaluation of 3D assets remains underexplored. Existing evaluation paradigms, including human evaluation, learned metrics, and vision-language models (VLMs) as judges, suffer from limitations in cost, scalability, resolution handling, or task-specific alignment. In this work, we focus on 3D mesh evaluation and introduce DB-3DME, the Dataset and Benchmark for 3D Mesh Evaluation. DB-3DME contains 2,619 synthetic 3D meshes paired with human ratings on Geometry and Prompt Adherence. Using this dataset, we systematically benchmark state-of-the-art VLMs and identify visual encoding of 3D representations as a key factor for human-aligned evaluation performance. Motivated by this finding, we fine-tune an open-weight VLM, Qwen-2.5-VL-7B, for 3D mesh evaluation by adapting the visual encoder while freezing the language model. The fine-tuned model substantially outperforms existing pre-trained VLMs across multiple evaluation dimensions, establishing a new benchmark for automatic 3D mesh evaluation. We publicly release the benchmark dataset on GitHub and Hugging Face to facilitate future research.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.10142v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.10142v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.10142v2 的 11 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "DB-3DME 用2,619个同一生成pipeline的mesh turntable与三档人评分训练3D asset judge，发现vision encoder比更长reasoning更关键；v2进一步表明，纯Geometry评分可直接从vision features读出，经过frozen LM反而变差。适合借鉴3D设计验收的训练与消融思路，但只有GIF而非原mesh、没有跨generator验证，不能把“human-aligned”外推为制造或几何有效性。",
+    "motivationZh": "3D 生成资产的 Geometry 与 Prompt Adherence 难以由通用 image–text similarity 或现成 VLM 稳定评判，人工打分则昂贵。论文关注与人类评分对齐的资产验收，并区分视觉编码、语言处理和指令对 Geometry 判断的实际作用。",
+    "methodZh": "将22类真实平台prompt生成的3D meshes渲染成24帧GIF，对Geometry和Prompt Adherence标1/2/3。基线把GIF排成grid交给VLM，V1直接评分、V2附理由；适配Qwen2.5-VL-7B时仅vision LoRA加scalar head，冻结LM，用MSE或距三rating的logit CE训练。主实验8:2随机split，输入12帧256²的3×4 grid。Sec.6.5用四Qwen族和200-trial paired cross-validation，分离vision-only、vision→LM及额外固定instruction。全文11页及官方Released rubrics两页均已读；末页为参考文献，PDF没有另外实验附录。",
+    "methodFlow": [
+      "从平台prompt覆盖22类并用内部3D checkpoints生成2,619资产，渲染24帧turntable而非直接mesh输入。",
+      "按Geometry/Prompt Adherence rubrics做人类三档评分；从GIF取12帧组成768×1024 grid。",
+      "冻结Qwen2.5-VL语言组件，仅对vision encoder加LoRA，末token hidden state接linear scalar score head。",
+      "用MSE或三rating distance logits构造CE训练，按1.5/2.5阈值离散评分。",
+      "以human exact-match/Pearson比较judge，并用vision-only vs LM/readout消融检验Geometry评分所需信息路径。"
+    ],
+    "experimentsZh": "2,619个样本，22类别，单internal mesh generation pipeline；8:2 fixed-seed42 split，524 test项中393 short/131 detailed prompts。预训练GPT4o/4.1/5各effort、Gemini2.5Pro、Qwen2.5VL及CLIP对照；Sec.6.5为四Qwen-VL、200随机80/20 split，linearhead AdamW lr1e-3/weight decay1e-4、1000 full-batch epochs。 以下结果为作者报告：作者报告Geometry exact-match0.618±0.042、Pearson0.594；Qwen2.5VL baseline为0.439±0.042/0.253。（Table3, PDF p.7）；作者报告Prompt Adherence0.695±0.039/Pearson0.583，对比GPT5-high0.679±0.040/0.542，优势小于Geometry。（Table4, PDF p.7）；作者报告Qwen2.5VL-7B vision-only Geometry exact-match0.557/Pearson0.471，加入frozen LM降为0.492/0.337；固定instruction再加后0.499/0.345且增益不显著。（Tables7–8, PDF p.9） 对照范围：主表比较多闭源/开源VLM与CLIP correlation；未直接测Eval3D/Hi3DEval/3DGenBench，作者理由为这些主要给continuous/model-level scores。缺跨generator/style外部测试和reward优化的真实下游收益。 消融与诊断：scorehead-only、vision LoRA、LM LoRA、联合LoRA显示视觉更新最有用；Sec.6.5严格拆路径，但其head-training/CV protocol与主fine-tuning不同，不能直接比较两个表的数值。",
+    "insightZh": "价值主要在可公开复用的人类标注mesh-render评价集，以及“评分不一定需要LM”的受控readout分析；LoRA加scalar head本身常规，不能称通用VLM reasoning或原生3D encoder范式。对3D generation具有直接judge迁移价值，宜skim数据与Sec.6.5。",
+    "evidenceZh": "公开输入是24帧GIF及human ratings，mesh本身不在dataset release。（Sec.3.1–3.2, PDF p.3）；视觉LoRA+score head在人类三档评分对齐上优于未训练模型，Geometry提升更明显。（Secs.5–6.2, Tables3–4, PDF pp.6–7）；frozen vision-only readout优于经过LM，固定instruction增益不显著。（Sec.6.5, Tables7–10, PDF pp.8–9）；Geometry rubric并非纯数学mesh指标，包含game-ready/silhouette等视觉标准且略考虑prompt。（Official Released rubrics.pdf, pp.1–2; main PDF p.9）",
+    "caveatZh": "PDF p.9明确限制为单generation pipeline的2,619项，需更多generators/artistic styles。；三档rating粒度有限；native3D输入、更大open VLM与Prompt Adherence的fusion分析留后续。；GIF-only视图覆盖无法确认hidden topology、watertightness、physical连接或制造可行性。；randomsplit与单pipeline可能高估泛化，未展示用该judge训练3Dgenerator的真实改善。；human rubric本身含视觉主观与prompt细项，vision-only结果并不证明所有Geometry评价都不需文本。；v2 A用mean-pooledvisionfeatures而B用LMfinaltokenreadout，差异含pooling/readout位置，不能认定LM普遍破坏3D几何表征；crossgenerator、native3Dmesh完整性和奖励驱动实际改进尚未验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "保留vlm-mllm mediumskim有明确policyexception依据：设计对象为generated3Dmeshes的人评分Geometry/PromptAdherence，encoder适配和critic消融可直接用于3D生成资产验收/agentcritique。它不是新foundation能力，也不是“用了VLM就收录”；Dataset-only不够，但有visionLoRA训练策略、组件消融和新LMbypass实证，且显著版本delta。primary不改3d-generation，因为没有生成新asset方法；不外推fabrication。"
+  }
+}

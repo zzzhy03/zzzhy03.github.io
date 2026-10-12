@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.10524",
+  "slug": "grace-generation-aware-latent-compression-for-efficient-video-generation",
+  "title": "GRACE: Generation-aware latent compression for efficient video generation",
+  "authors": [
+    "Jiyoung Kim",
+    "Paul Hyunbin Cho",
+    "Jisu Nam",
+    "Donghoon Lee",
+    "Hyunsung Go",
+    "Yeonkyeong Lee",
+    "Hansaem Kim",
+    "Seungryong Kim"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10524"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "GRACE",
+    "Generation-aware",
+    "latent",
+    "compression",
+    "efficient",
+    "video",
+    "generation"
+  ],
+  "abstract": "Highly compressed video autoencoders offer an effective way to accelerate video diffusion models, as the Diffusion Transformer (DiT) operates on far fewer tokens. However, such autoencoders are challenging to train, since a higher compression ratio degrades reconstruction quality and recovering it requires more channels, which is known to slow the convergence of the DiT. The compressed latent also differs from the one the DiT was trained on, so the pretrained DiT must be either retrained from scratch or adapted at considerable cost. Compressing the autoencoder the DiT was trained with appears to preserve compatibility, yet optimizing it for reconstruction alone still shifts the latent away from the distribution the DiT has learned. To address this, we propose Generation-Aware Latent Compression for Efficient Video Generation (GRACE), a two-stage framework that compresses a pretrained video autoencoder while keeping it compatible with the pretrained DiT. Specifically, we keep a frozen base latent from the pretrained encoder and learn a residual latent for the information lost under stronger compression, while aligning the compressed latent with the pretrained latent in the feature space of the frozen DiT so that the autoencoder is optimized for generation. We then adapt the DiT with lightweight fine-tuning and asymmetric denoising, where the base is denoised ahead of the residual. GRACE reduces the token count of Wan2.1-I2V-14B by 8x and its latency by 11.1x at 480x832x81, while matching the generation quality of the pretrained pipeline before compression on VBench.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10524v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10524v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/cvlab-kaist/GRACE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10524v1 的 43 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "GRACE 保留低分辨率视频经 frozen Wan encoder 得到的 base latent，另学 residual，并在 frozen DiT features 中对齐压缩表征；随后两路同一次 forward、base 提前去噪。作者报告约8倍少tokens、480p I2V 11.1倍加速，值得深入读 pretrained latent compatibility；I2V human study仍偏好原 Wan，不能把相近 VBench 总分写成无损质量。",
+    "motivationZh": "更强的视频 latent 压缩能减少 DiT 的计算，但重建质量好的新 latent 未必适合已经训练好的生成器，常需要昂贵的重新适配。论文关注如何在降低 token 数量时保留 pretrained autoencoder–DiT 的兼容性。",
+    "methodZh": "正文、训练/评估配置、逐项 VBench、human study、latent分析和限制已完整阅读，并检查13张实际PDF渲染页。第一阶段以空间bilinear降2倍/时间subsample2倍经frozen encoder保base；fullresolution residual encoder加spacetime-to-channel shortcut，decoder两路合并，并为I2V加入first-frame cross-attention。AE不仅reconstruction loss，还用原DiT前10层对compressed/fullresolution noised latent做featurecosinealignment与gradientnorm自适应权重。第二阶段freezeAE，扩宽projections、high-rankLoRA及modulation/norm适配，训练不同noiselevel的base/residual。推理固定offset.15，单forward输出两路velocity，不增加采样NFE。",
+    "methodFlow": [
+      "原encoder冻结，将空间/时间降采样的视频编码为base；fullresolution残差encoder用额外causaldownsample与foldedshortcut编码16个residualchannels。",
+      "concat base/residual为f16t8c32p2，联合decoder重建；I2V用firstframefeatures gatedcross-attention恢复细节。",
+      "两个latent branch通过同一个frozenDiT，把compressed features trilinearupsample加residualprojection，与原fullresolution features做前10层cosinealignment。",
+      "AE固定后扩宽DiTinput/output、scaleRoPEspacing，trainrank512LoRA及projections/modulation/norm，使base与residual各有时间conditioning。",
+      "采样baseaheadoffset训练，inference固定.15；两路同forward、base先清晰后固定、residual继续恢复motion/detail。"
+    ],
+    "experimentsZh": "Wan2.1-I2V/T2V-14B分别适配，Panda70M训练、81frames；AE256与512两阶段8.5H200GPUdays，DiT480×832/30H200days，每task38.5GPUdays。compressedf16t8c32p2 vsorigf8t4c16p2，4.3K vs32.8Ktokens；高res10.1K vs77.3K。AEPSNR/SSIM/LPIPS/rFVD，fullVBenchonevideoperprompt，A10080GBlatency；blindstudy40prompts/setting、39raters、156votes/settingbaselinecriterion。 以下结果为作者报告：作者报告480pI2V863.2→77.7s（11.1倍），VBench87.92→87.90；T2V851.5→75.8s、83.93→85.81，gain主要semantic78.70→84.98。（Table2, PDF p.9）；作者报告736pI2V3396.8→218.8s（15.5倍），87.88→87.84；LTXI2V88.75更高且274.6s更慢，GRACE不是全部qualitybest。（Table3, PDF p.10）；作者报告same4.3KtokenssinglelatentT2V82.12→dual83.55→align84.68→asymmetric85.81，I2V86.44→86.64→87.51→87.90。（Table4, PDF p.11）；作者报告I2Vhuman更偏原Wan，visualours23.7%vs43.6%、temporal29.5%vs44.9%；T2Vvisual49.4%vs35.3%，各含ties且无显著性/CI。（TableD.3, PDF p.25）；作者报告736pI2Vdynamicdegree30.89低于原Wan41.87/LTX49.59，480p则38.62高于原Wan25.20，不能笼统说运动更多。（TablesD.1b/D.2b, PDF pp.23-24） 对照范围：主比较原Wan、matchedsinglelatent、DCGen同Wanbackbone，以及OpenSora/LTX不同backbone/data/guidance。AEtransfer总budget38.5H200days相同但用DCGen三阶段recipe，oursbaseanchor其他AE不可得；是实际pipelinecomparison不是纯encoder能力控制。各模型promptenhancer不完全same，LTX单50steppass关闭原multiscale/upscaler，且第三guidancepass；跨model速度和alignment不能仅归因compression。 消融与诊断：dual/align/asymmetric逐项，DiTfromscratch同steps、VJEPA vsDiTtarget、reverseoffset、firstframeconditioning、10vs40alignmentlayers，latentnoiseperturbation/PCA和twotSNEseeds。tSNEuniformity不是原highdimdistribution均匀的证明；PCAcolors每clip/panel不可直接比较。singlelatentprojectionrandominit vsourszero/init anchor，不能把所有gain只归asymmetricdenoising。",
+    "insightZh": "贡献是面向已训练DiT的generation-aware compression：固定baseanchor、可学习residual、DiTfeaturesupervision及asymmetricdenoising共同解决latentdistributionmismatch。双latent/LoRA/featurealignment单项并非全新，但matchedtokenbaseline与组件消融支持组合。核心不是新videoresolution或少步distillation，也不是通用零训练plug-inVAE。",
+    "evidenceZh": "压缩latent以frozenbase与learnedresidual分工，alignment目标来自原DiT而非外部semanticencoder。（Fig.2 and Eqs.(4)-(10), PDF pp.5-7; Appendix A pp.18-19）；baseahead在训练和推理均实施，两路同一次DiTforward所以NFE不增加。（Eqs.(11)-(14), PDF pp.7-8; Appendix B p.20; Table6 p.12）；VBench质量总分接近原Wan但reconstruction变差，说明优化目标确有取舍。（Tables1-2, PDF pp.8-9; Appendix J p.43）；I2V human preferences与“matchingquality”总分说法存在明确边界。（TableD.3, PDF p.25）；reportedlatency含conditioningencode、denoise、decode，但不含加载、textencoding和MP4写出。（Appendix C.2, PDF p.21; TableG.1 p.30）",
+    "caveatZh": "AppendixJ p.43：distantfaces、signtext、thinstructures常丢失/破损，highres较弱但没有解决；AE以reconstruction换generation。；新pretrainedpipeline需新的baseencoder与DiTalignment训练，至少另一次8.5H200GPUdaysStage1，不是freeplug-in。；更多residualchannels可能恢复细节但再次增加DiTadaptation难度。；VBench总分matching不等原质量无损；humanI2V更偏Wan，详细I2Vsubjectfidelity/imagingquality亦下降。；只Wan14B验证，I2V/T2V各自AE，81frames和filterexcessivemotion限制长度与高运动分布外可靠性。；所谓lightweight包括rank512LoRA与全projection/modulation/norm训练，不能与小rankparameter-efficientadaptation成本混同。；跨modelpromptpipeline与NFE不同，latency排除textencoding/loading；不外推所有用户完整wallclock。；单benchmark生成seed/无scoreCI，human多票共享prompt/raters，未提供统计显著性，0.02/0.04差异不证明equivalence。；officialproject部分数值与exactv1PDF可能不同，本文summary严格使用v1Table数值，未用liveproject覆盖本版证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接改变video generator的latent representation与pretrainedmodel适配范式，兼顾generationquality/efficiency；matchedbudget和消融足够形成方法参考，值得deepread其compatibility设计与真实qualitytradeoff。"
+  }
+}

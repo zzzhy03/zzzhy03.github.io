@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.11198",
+  "slug": "3dtexmor-3d-gaussian-multi-object-removal-via-texture-space-inpainting",
+  "title": "3DTexMOR: 3D Gaussian Multi-Object Removal via Texture-Space Inpainting",
+  "authors": [
+    "Kunxin Guang",
+    "Yonghao Zhao",
+    "Jian Yang",
+    "Beibei Wang"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11198"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "3DTexMOR",
+    "3D",
+    "Gaussian",
+    "Multi-Object",
+    "Removal",
+    "Texture-Space",
+    "Inpainting"
+  ],
+  "abstract": "3D object removal aims to remove target objects from reconstructed scenes and complete the geometry and appearance of occluded regions. Existing NeRF- and 3DGS-based methods typically inpaint 2D images to guide 3D completion. However, complex multi-object layouts limit the surrounding context visible in each view, making 2D inpainting prone to artifacts. Inconsistent completions across views also introduce conflicting supervision and blurry reconstructions. We propose 3D Gaussian Multi-Object Removal via Texture-Space Inpainting (3DTexMOR). Our key idea is to perform inpainting in a unified texture space shared by all views. By combining complementary observations, this space provides richer context for recovering missing regions and promotes cross-view appearance consistency. We aggregate multi-view observations into texture maps, inpaint the missing regions, and reproject the completed maps into camera views to supervise Gaussian scene completion. To avoid the influence of view-dependent highlights and reflections, we decompose appearance and aggregate view-independent intrinsic attributes instead of RGB colors. We further introduce geometrically regularized Gaussian completion to constrain the geometry of the completed regions. Extensive experiments demonstrate visually plausible completions and state-of-the-art multi-object removal performance, improving PSNR by 5.8 dB and reducing LPIPS by at least 22% compared with existing methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11198v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11198v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11198v1 的 17 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "3DTexMOR把多view的diffuse/Fresnel/roughness聚到同一支撑平面的texture atlas，用LaMa补一次再统一回投，并只优化新Gaussians以补多对象删除后的孔洞。作者报告Syn-Diffuse PSNR30.85 vsGOR-IS25.04、LPIPS0.181vs0.232；价值在共享监督消除view冲突，但明显依赖平面，反射sceneLPIPS并非最优，也无真实scene定量GT。",
+    "motivationZh": "从 3DGS 场景删除多个物体后，原来被遮挡的表面没有纹理证据，相关反射也不会随删除自动消失。问题是补全一致的背景材质与外观，并处理移除操作对光照表现的影响。",
+    "methodZh": "先30k迭代重建有objectIDs/intrinsicattributes的3DGS，删除目标IDs并冻结保留Gaussians。背景centers最小二乘拟合plane，以camera-ray交点、bilinear/view-angleweights聚合intrinsictexture；用目标objectfootprintunion作为mask，LaMa分别补diffuse radiance/Fresnel/roughness。重投生成共同targets，在mask中初始化plane-alignedGaussians，4000steps以intrinsicL1和normal-distance/tangent-anchor/scale软约束优化。反射renderer重新查询editedscene及environmentmap，反射变化可越过footprint；diffuseradiance包含capturelighting，不能误称unlit albedo。",
+    "methodFlow": [
+      "重建带objectIDs与diffuse/Fresnel/roughness的3DGS，删除目标objects并冻结其余scene。",
+      "拟合背景supportplane，以各viewray与plane交点建atlas，bilinear/frontalityweighted聚合可见intrinsicobservations。",
+      "将多个removedobjectfootprints取union，用LaMa分别补三种intrinsictextures并统一回投camera targets。",
+      "在footprint区域从atlas采样初始化planeGaussians，以intrinsicL1及surface/anchor/scale损失只优化completionpoints。",
+      "合并原scene与completionGaussians，重新计算glossyreflection得到一致可编辑场景。"
+    ],
+    "experimentsZh": "Syn-Diffuse3Blenderscenes、Syn-Reflective3GOR-ISscenes、Real-Single3与Real-Multiple4publicscenes。SAM2多viewmasks，初始3DGS30ksteps（约40min/含intrinsic约2h）、seg10min、atlasinpaint30s、completion4min；RTX4090D。synthetic有removedGT，real仅qualitative。 以下结果为作者报告：作者报告Syn-Diffuse全图/maskPSNR30.85/28.02，对GOR-IS25.04/20.94；Reflective29.58/29.08vs28.90/26.81。（Table1, PDF p.7）；作者报告保持其余components，将image-space换texture-space后synthetic平均PSNR23.49→30.22、mPSNR19.17→28.56。（Table2, PDF p.8） 对照范围：3DGIC、AuraFusion360、Inpaint360GS、GPGS、GOR-IS统一input/splits；single-object对手改为iterativeremoval可能不如jointmethod天然。缺大规模真实cleanbackgroundGT、geometryerror与复杂curve测试，FID在少scene renderedviews下也应谨慎。 消融与诊断：共享atlas对独立LaMaimageinpaint的matchedcomparison提升；progressiveintrinsic/anchor/surface消融改善maskappearance与normals。未单独量化scale-loss或plane-fittingrobustness；附录解释retainedgeometry冻结及反射重新计算。",
+    "insightZh": "相对独立viewinpainting或少reference传播，将互补信息先置于一个共享texture-domain再补，全views监督来自同一结果；借GOR-ISintrinsic分解抑制glossyRGB聚合冲突，并加入plane-basedGaussian几何参考。新意是统一3D编辑监督，不是新2Dinpainting模型。",
+    "evidenceZh": "共享texture由同plane交点及weighted intrinsicobservations生成，目标objectfootprints取union。（Sec.3.3, Fig.2–3, PDF pp.4–5; App.A.2 pp.13–15）；只优化completionGaussians，保留原scene，surface/anchor/scale约束可分normal/tangent/size自由度。（Sec.3.4–3.5 Eqs.(2)–(4), PDF pp.5–6; App.A.3 p.16）；作者报告Syn-DiffusePSNR30.85vsGOR-IS25.04、LPIPS0.181vs0.232；ReflectiveLPIPS0.121略劣于GOR-IS0.118。（Table1, PDF p.7）；曲面、deformable及irregularsurfaces违反commonplane假设。（Sec.5 Limitations and future work, PDF p.9）",
+    "caveatZh": "completion区域需要同一commonplane近似；曲面/可变形/不规则surface会投影错位（p.9）。；真实scene没有cleanGT，只有visualcomparison（pp.6–7）。；近平面强prior可能把真实细小relief抹平，softconstraints不是精确surface恢复。；独立inpaint的intrinsicchannels没有显式material一致性约束。；fullpipeline并非即时交互，intrinsic重建可需约2h，synthetic仅六scenes。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "多对象3Dscene编辑与跨viewsharedrepresentation直接服务3Dgeneration/editing，可借鉴assetcleanup与背景补全；不属于恢复真实不可见geometry的证据。"
+  }
+}

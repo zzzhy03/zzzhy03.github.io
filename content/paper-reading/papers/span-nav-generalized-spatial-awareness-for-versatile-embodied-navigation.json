@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2603.09163",
+  "slug": "span-nav-generalized-spatial-awareness-for-versatile-embodied-navigation",
+  "title": "SPAN-Nav: Generalized Spatial Awareness for Versatile Embodied Navigation",
+  "authors": [
+    "Jiahang Liu",
+    "Tianyu Xu",
+    "Jiawei Chen",
+    "Lu Yue",
+    "Jiazhao Zhang",
+    "Zhiyong Wang",
+    "Minghan Li",
+    "Qisheng Zhao",
+    "Anqi Li",
+    "Qi Su",
+    "Zhizheng Zhang",
+    "He Wang"
+  ],
+  "publishedAt": "2026-03-10",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.09163"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "SPAN-Nav",
+    "Generalized",
+    "Spatial",
+    "Awareness",
+    "Versatile",
+    "Embodied",
+    "Navigation"
+  ],
+  "abstract": "Recent embodied navigation approaches leveraging Vision-Language Models (VLMs) demonstrate strong generalization in versatile Vision-Language Navigation (VLN). However, reliable path planning in complex environments remains challenging due to insufficient spatial awareness. In this work, we introduce SPAN-Nav, an end-to-end foundation model designed to infuse embodied navigation with universal 3D spatial awareness using RGB video streams. SPAN-Nav extracts spatial priors across diverse scenes through an occupancy prediction task on extensive indoor and outdoor environments. To mitigate the computational burden, we introduce a compact representation for spatial priors, finding that a single token is sufficient to encapsulate the coarse-grained cues essential for navigation tasks. Furthermore, inspired by the Chain-of-Thought (CoT) mechanism, SPAN-Nav utilizes this single spatial token to explicitly inject spatial cues into action reasoning through an end-to end framework. Leveraging multi-task co-training, SPAN-Nav captures task-adaptive cues from generalized spatial priors, enabling robust spatial awareness to generalize even to the task lacking explicit spatial supervision. To support comprehensive spatial learning, we present a massive dataset of 4.2 million occupancy annotations that covers both indoor and outdoor scenes across multi-type navigation tasks. SPAN-Nav achieves state-of-the-art performance across three benchmarks spanning diverse scenarios and varied navigation tasks. Finally, real-world experiments validate the robust generalization and practical reliability of our approach across complex physical scenarios.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.09163v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.09163v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.09163v2 的 24 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SPAN-Nav把occupancy压成连续spatialtoken，以GT→self-predicted两阶段对齐action。v2新增Orin实机1–2/10与remote7/10结果，并修正MM-Nav强baseline，收窄领先幅度；singledecodablespatialbottleneck有architecture参考价值，但可靠泛化仍限navigation，推荐skim。",
+    "motivationZh": "RGB 导航的可见表面不足以描述遮挡后的障碍和可通行空间，单纯将视觉输入映射到动作容易产生碰撞或错误路线。论文关注怎样让导航模型拥有可解码的空间状态，并让动作使用与部署时一致的空间证据。",
+    "methodZh": "51.33M VQ-VAE在6.22M occupancy-only样本pretrain，导航期间弃量化并trainable，120×80×20 egocentricgrid→15×10×128latent→singlehidden。Qwen3VL RGB/history一次prefill，共享KV的两个decodingsteps先预测latent，再回注spatialtoken使MLP产trajectory。stageI用GTlatents并监督occupancy/latent/action/QA，stageII改用自预测并保occupancy/action/QA。完整24页正文与全部非bibliographyappendix已读，含privilegedA*+VO示范、realDA3annotation、heatmapperturbation和realdeployment边界。",
+    "methodFlow": [
+      "用simulationoccupancy与DA3realpointcloud标注局部120×80×20grid，pretrainVQVAEencoder/decoder。",
+      "RGBhistory沿NavFoM压缩，Qwen3VL输出spatialhidden，H2Oprojector映射continuousoccupancylatent。",
+      "stageI把GTencodedlatent经O2H压成single spatialtoken，联合occ/latent/action/QA监督。",
+      "stageII使用model自预测latent回注，移除latent一致性loss并支持无occlabel样本。",
+      "推理一次prefill、两decodingsteps共享KV，actionhead输出ego(x,y,θ)trajectory，无需decodeoccupancygrid。"
+    ],
+    "experimentsZh": "7.08Mpolicy数据=5.08Mtrajectory+.93MimageQA+1.07MvideoQA，4.2Moccannotated；encoder另6.22Mpretrain。stageI2Mtraj+.5MQA、stageII全量，各1epoch32H10012h，VQ另4090×20h。R2R/RxRvalunseen、MetaUrban1000test+100unseen、InternScenes40same100pairs。 以下结果为作者报告：作者报告RGBR2R/RxRSR66.3/69.7 vsNavFoM61.7/64.4，occ-free63.3/66.5；nDTW67.9低于DualVLN70.0。（Table1, PDF p.6）；作者报告UrbanPointNavtestCost.22vsUrbanVLA.94、SR同94；unseenSR92vs97，不能称每项都最好。（Table2, PDF p.7）；作者报告single tokenIoU58.11/SR90.9/FPS6.78 vs150tokens59.26/89.7/5.39；推理FPS约+26%。（Fig.7, PDF p.9）；作者报告remote4090E2E349.9ms与7/10成功，OrinFP16957.6ms2/10/INT8889.1ms1/10；Thor147.8ms仅inference。（Table3, PDF p.8）；作者v2将MM-Nav更新为single/multi，HomeSR79.9/86.3、Commercial86.7/89.9；ours90.9/91.0不变，不能沿用v1弱baseline32.2/61.1比较。（v1 TableIII PDF p.8 vs v2 Table4 p.8） 对照范围：NavFoM/多个RGB或RGBDVLN、UrbanRL/LiDAR与UrbanVLA、PointGoalInternVLA/MMNav，sensory及trainingdata不同；没有同data/compute全模型比较或non-navigation空间benchmark。报告occupancybinarymeanIoU非detailedsemantic3D。 消融与诊断：作者称single-factor同data/steps，但discretevariant150positionsCE vs1continuoustokenloss，量化效果与representation/objective/budget混合；独立continuoustokennumberexperiment较可靠。无occupancy/无actionreasoning/无init/无stageI/II及perturbationheatmaps支持机制。",
+    "insightZh": "实质模型贡献是decodablecontinuousgeometricbottleneck及two-stageperception-to-actioncurriculum。显式occupancy、NavFoM压缩、VQVAE和A*VO皆已有；cross-tasknavtransfer与tokenablation支持空间action机制，但未验证通用VQA/assetcreation/跨embodiment。",
+    "evidenceZh": "训练与推理仅两个共享KVdecodingsteps，denseoccupancydecoder非推理必需。（Sec.4.2–4.4/Fig.2, PDF pp.3–5）；GT-to-self阶段主要改善policy mismatch而非IoU。（Table5, PDF p.8; Appendix G.4, p.22）；cross-task transfer已测，但allSOTA措辞需避开未领先子列。（Tables1–2, PDF pp.6–7）；Thor没有机器人成功率，Orin高latency失败且单taskcounts不是66trialaggregate。（Table3, PDF p.8; Appendix F, p.19）",
+    "caveatZh": "Sec.7 p.9承认largeoccsupervision及realreconstructionlabelcost/error、limitedcamera/embodiment、networklatency。；Appendix G.4 p.22明确导航把chair/shelf粗化obstacle以牺牲finegeometry；Appendix F p.19largerrobottransfer仅proposal。；realocc用t+1sframe辅助标注、示范plannerprivilegedsimstates，只能称traininglabels优先信息，inferenceRGBonly。；3navtasks并不自动证明通用spatialreasoning或editable3Dasset能力。；heatmap noisy-latentperturbation+decoder响应是attributionproxy，不能当attention或causalgroundtruth。；无完整66trial成功率与uncertainty，硬件单task10trials有限。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "singledecodablespatialbottleneck与GT-to-self训练对MLLM空间表征有具体参考，满足architecture/空间能力贡献条件；实际任务仍导航，与设计/3Dcreation迁移没有实验，只给medium。"
+  }
+}

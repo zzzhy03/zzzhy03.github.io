@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.10497",
+  "slug": "quadtok-quadtree-visual-tokenizer-for-autoregressive-image-generation",
+  "title": "QuadTok: Quadtree Visual Tokenizer for Autoregressive Image Generation",
+  "authors": [
+    "Yucheng Mao",
+    "Zeyuan Chen",
+    "Xiaojun Shan",
+    "Xiang Zhang",
+    "Divyansh Srivastava",
+    "Bingnan Li",
+    "Zhuowen Tu"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10497"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "QuadTok",
+    "Quadtree",
+    "Visual",
+    "Tokenizer",
+    "Autoregressive",
+    "Image",
+    "Generation"
+  ],
+  "abstract": "We introduce QuadTok, a novel framework for visual tokenization and autoregressive image generation. Compared to traditional approaches using 2D grids or 1D token sequences, we propose a hierarchical quadtree structure, bridging the gap between 2D spatial binding and 1D sequence-level flexibility. The QuadTok tokenizer dynamically allocates representational capacity to visually intricate areas while leaving homogeneous regions at a coarse resolution. Compared with a fixed 256-token grid, our ImageNet-trained tokenizer saves approximately 10% of tokens on ImageNet and 9% when transferred zero-shot to the COCO dataset, while maintaining comparable reconstruction fidelity. Furthermore, the natural causality introduced by the tree structure seamlessly enables autoregressive image generation. Conditioned on a quadtree topology supplied before generation, our 947M GPT-style generative model achieves a 2.08 gFID on the ImageNet $256 \\times 256$ benchmark. Additionally, leveraging the strong spatial correlation preserved by the quadtree structure, the QuadTok generator enables zero-shot spatially controlled image generation capabilities. Code: https://github.com/myc634/QuadTok.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10497v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10497v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/myc634/QuadTok"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10497v1 的 19 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "QuadTok 以quadtree nodes做视觉codes，kinship mask保coarse→fine层次，通过两次互补重建探测将细tokens分给复杂区域。可迁移价值是token–region对应让冻结ImageNet generator可被指定tree轻度引导位置；控制证据仅四half-planes，box hit约增4–7点，且生成前必须给topology，不能称模型自主生成layout或复杂多对象设计。",
+    "motivationZh": "固定分辨率的视觉 token 网格会把相同预算花在平滑区域和复杂细节上，也缺少清楚的局部层级结构。论文关注可按区域复杂度分配细粒度 tokens 的表示，并让生成过程利用明确的空间层级。",
+    "methodZh": "ViT dense features和带level/region信息的instruction tokens经aggregator转VQ nodes，BFS序列供AR；decoder按level-unpatch+upsample残差重建。Tokenizer kinship mask允许coarse间bidirectional、child看coarser与siblings但禁止reverse finer信息，generator则standard causal BFS mask。自适应tokenization根据complementary probing trees的LPIPS改善阈值选refinement；generation树预先随机或用户指定。完整19页及B–H训练、512²、speed/pretok、layoutprotocol和limitations已读。",
+    "methodFlow": [
+      "输入image经ViT形成global features，region/level instruction nodes聚合为quadtree feature tokens。",
+      "kinship mask限制tokenizer层次交流，VQ共享16Kcodebook量化；decoder逐level恢复局部residual canvas。",
+      "两complementary trees分别重建，计算region LPIPS benefit并按τ.05决定哪些coarse cells展开。",
+      "生成时预先给random或layout-derived tree，Llama-styleAR在BFS次序条件class与当前/过去nodeinstructions预测codes。",
+      "冻结tokenizer解码image；多token预算与half-plane结构用于质量/速度/位置控制评价。"
+    ],
+    "experimentsZh": "ImageNet256²训练tokenizer约120M、16,384codebook/8D，twolevel8×8→16×16；gen111M/343M/697M/947M，300epochs，randomtree独立采样。ImageNet/COCO reconstruction，50Kclass-gen；512²另344M。layout fourhalfplanes×1000image(50classes)，192tokens matchedrandom。A10080GB timing，LlamaGen随机初始化architecture-only baseline，质量另测。 以下结果为作者报告：作者报告ImageNet230tokens rFID1.46/PSNR20.37，对比LlamaGen256tokens2.19/20.79；COCO232tokens7.88/19.30，PSNR低于grid20.42。（Table1, PDF p.7）；作者报告947M genFID2.08；697M无kinship mask3.17→有mask2.23；它不是所有systems最好，xARH1.24/FlowARH1.65。（Tables2/4, PDF pp.8–9）；作者报告left boxhit47.5→51.8%、mask51.1→59.0；right box51.0→58.1%；adaptivepretokenization batch128为6.186ms vsLlamaGen2.885ms/image。（Table3, PDF p.9; Table10, PDF p.18） 对照范围：grid/1Dtokenizers与AR/flow generators跨setting比较，公平设计由mask/guidance内部ablation支持。timing随机LlamaGen权重及775Mtiming-onlyQuadTok，不可同2.08FIDclaim绑定；512²若引用LlamaGen，其evaluationresize256需区分。 消融与诊断：mask显著改善generation及spatial perturblocality，guidance以230tokens接近Full320rFID/PSNR；threshold/LPIPS vsMSE。layout用matchedtoken tree控制，但没有复杂bbox、多entityrelation或开放text实证。",
+    "insightZh": "hierarchical adaptive region representation、kinship mask与reconstruction-benefit tree selection互补，兼顾spatial binding和variable token count。新增的是token表示而非重要foundation模型；生成过程不学习何处expand，预定tree和图像自适应encoding必须分开。",
+    "evidenceZh": "tokenizer kinship mask与generator causal mask不同，region显式对应并非所有token生成都bidirectional。（Secs.3.1–3.4, Fig.2, PDF pp.3–6）；half-plane layout确有matchedtoken随机baseline，但实用box/mask增益小于GradCAM增益。（Sec.4.3, Table3, PDF pp.8–9; Appendix F, PDF p.18）；content-adaptive pretokenization额外探测开销大于fixed encoder，生成速度计时不是其总开销。（Appendix E Tables8–10, PDF pp.17–18）；多对象/open-vocabulary与T2I未验证。（Appendix H, PDF pp.18–19）",
+    "caveatZh": "Appendix H pp.18–19未scale open-domain/T2I，classconditional范围和ImageNet单subjectbias限制multi-object relational layouts。；Appendix E p.18承认adaptive dataencoding较慢，cache amortization只对datasetprep成立。；预定topology不是autonomous layout prediction；shapehalfplane指标不代表精确可编辑结构控制。；denseViT featuresglobal contextualization不保证每node仅含当地信息，局部perturbation不是strictpixelisolation证明。；官方release只256²twoleveltokenizer；ARgeneration/512model不在release，未复现主generation表。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "tree作为explicit spatial conditioning为visualdesign token representation提供潜在迁移，尤其局部容量与patch可控生成；输出仍raster而非SVG、stitch或CAD。"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.13832",
+  "slug": "spatialasm-internalizing-active-mentalization-for-spatial-reasoning",
+  "title": "SpatialASM: Internalizing Active Mentalization for Spatial Reasoning",
+  "authors": [
+    "Yuhong Liu",
+    "Shenxi Wu",
+    "Junyi Chi",
+    "Beichen Zhang",
+    "Xuanlang Dai",
+    "Jiaqi Wang",
+    "Yuhang Zang",
+    "Dahua Lin"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13832"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "SpatialASM",
+    "Internalizing",
+    "Active",
+    "Mentalization",
+    "Spatial",
+    "Reasoning"
+  ],
+  "abstract": "When solving complex spatial reasoning tasks, ordinary humans naturally revisit the scenes from task-relevant viewpoints and mentally reconstruct the spatial layouts from those viewpoints. But can Large Vision-Language Models (LVLMs) proactively think in the same way? We term this ability Active Spatial Mentalization (ASM), an intrinsic component of visual intelligence that remains substantially underdeveloped in current LVLMs. To bridge this gap, we introduce SpatialASM, a scalable framework to internalize ASM into LVLMs through training-time spatial simulation. SpatialASM employs an allocentric novel-view generator to ground hypothetical viewpoints in visual evidence and produces two complementary forms of supervision: i) explicit ASM trajectories that teach LVLMs when and how to adaptively invoke view planning and imagination during spatial reasoning, and ii) automatically-constructed perspective-taking tasks that further strengthens viewpoint-conditioned scene imagination. On seven benchmarks spanning relatively perception-oriented spatial understanding to more challenging tasks requiring multi-image, cross-view and viewpoint-transformation reasoning, SpatialASM yields performance gain on LVLMs of four LVLM backbones in spatial reasoning while retaining their original general vision capabilities. The experimental results demonstrate that our approach improves average accuracy across the seven spatial benchmarks. And the synthesis of ASM trajectories provides a scalable pathway to alleviate the scarcity of spatial Chain-of-Thought (CoT) supervision for eliciting active viewpoint exploration and mental scene simulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13832v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13832v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/InternLM/SpatialASM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13832v1 的 32 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SpatialASM 把question-conditioned相机计划→FLUX novel-view→layoutcaption→reasoning蒸馏进VLM，测试时只用原图与文本想象，并以view选择/定位RL补充。作者报告四backbone七spatial集平均+1.2–3.5pp，8B Spatial457-6d+8.7；值得deep作为工具训练到内部空间推理的数据引擎。但GeoP是MapAnything重建变化proxy，低值不保证真geometry，captioned hallucination不是实际新增观测或可执行空间模型。",
+    "motivationZh": "单张图中的相对方位问答经常受当前视角限制，直接推理难以选择真正有助于回答的观察角度。需要把问题相关的 viewpoint selection 与新视图生成、空间对应关系学习连起来。",
+    "methodZh": "allocentric接口用anchor图pixelmarker与forward/left/back/right指定目标view，FLUX2klein9B LoRA经140KposedDL3DV训练。QA错→加render答对且GeoP低的trajectory留下，render转textcaptionSFT66K，RL58K两任务GRPO。不改变VLMarchitecture，适用于多backbone；最终ESI用passivesingle而非embodiedactive操作。",
+    "methodFlow": [
+      "训练novel-viewgenerator：从posedDL3DV导camera位置在anchor投影和四directionmarker，与实际另view做LoRA MSE训练。",
+      "计划与过滤trajectory：Qwen3.6规划view、NVGrender，再reason；仅原QA错/aug答对和MapAnythingpointcloudCD低的samples保留。",
+      "caption替换视图：Qwen3.6-27B将render对象布局描述，最终SFT保留originalimages与plan-imagine-reasontext，没有新增图片。",
+      "view-associationRL：造4marker观测定位/四candidateview选择，过滤正确candidateGeoP后GRPOaccuracy/formatreward，部署无需NVG。"
+    ],
+    "experimentsZh": "edit139730、trajectory128354但实际SFT66KHoliSpatial、10epochs；RL58346/300steps、GRPO5responses.9acc/.1format、Qwen3VL4/8Bfull30BA3B/Qwen3.5-9BLoRA32。7spatial/3general，numbers作者报告。 以下结果为作者报告：作者报告4Bspatial43.8→47.3、8B46.2→49.1、30BA3B44.7→47.2、9B51.1→52.3；8B6d34.8→43.5。（PDF p.8 Table1）；作者报告4Bmatched四集avg46.5→filteredSFT49.9、filteredRL48.8、both50.6；不过SFT无filter同时取消answer与GeoP，非纯GeoP隔离。（PDF p.10 Table4; p.26 C.5）；作者报告8BAmongreasoningtime12.6→18.6s而Around7.5→7.2，外部NVG另57秒上下；不能称所有internal时间不增。（PDF p.9 Table2） 对照范围：同backbonebeforeafter、spatialmodels及externalNVG alternatives；缺matchedSFT genericspatialCoT/answer-only数据与equaltoken/computecontrols，prior模型prompts不同。 消融与诊断：SFT/RL、combined、filter/no-filter、differentNVG、external/internal；缺faithfulcaption/sceneverification、reasoningtracecausalablation、独立多seedCI。",
+    "insightZh": "新颖性在question-conditionedallocentricplanning+caption想象的toolinternalization数据接口；已有worldmodeldistillation上明确计划何时/何处imagining，而非保证形成metricworldrepresentation。",
+    "evidenceZh": "finalSFT保留textcaptions、不保留generatedimages。（PDF p.6 §3.2 Eqs.(4)–(8); pp.22–23 B.2）；GeoP用重建变化距离，作者明确为modelproxy。（PDF p.5 Eqs.(2)–(3); pp.23–24 B.3/C.1）；四backbone多数spatial集改善，但最高增益局部。（PDF p.8 Table1; p.25 Table7）；外部render与internalizedreasoning可互补，外部不总有用。（PDF p.9 Table2; p.10 Tables3–4）",
+    "caveatZh": "GeoP不是GTgeometry，受重建模型影响；backview新增未观测内容使其更高。；NVG可想象plausibleunseenobjects；现阶段dynamic/embodied/longhorizon为future。；大多数testcases不显式ASM，qualitative不能把reasoninggain全部归显式mentalization。；anchor2Dpixel不唯一确定3Dcamera位置/depth；四方向量化削弱metricprecision。；GeoP小可能偏好copyanchor或遗漏新增geometry，且independentreconstruction的scale/gauge可变；没有normalize/registration证明。；RL只有target候选被低GeoP筛，其余可能artifacts，容易学generatedpattern；reward验证index不验证renderer真pose。；最终caption/正确answerfilter不保证每intermediate布局为真；不支持将internalimaginedscene当designgeometry证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "明确空间planning/mentalview与工具internalization可启发3Ddesignreasoningagent，按任务选择视点而不是每次依赖重型render；precisegeometry与真实artifactfeedback仍须外部验。"
+  }
+}

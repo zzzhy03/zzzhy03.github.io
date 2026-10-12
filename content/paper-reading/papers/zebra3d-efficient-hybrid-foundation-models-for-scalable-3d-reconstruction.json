@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.12727",
+  "slug": "zebra3d-efficient-hybrid-foundation-models-for-scalable-3d-reconstruction",
+  "title": "Zebra3D: Efficient Hybrid Foundation Models For Scalable 3D Reconstruction",
+  "authors": [
+    "Utkarsh Saxena",
+    "Ruijing Yang",
+    "Mehdi Rezagholizadeh",
+    "Akash Haridas",
+    "Vikram Appia",
+    "Emad Barsoum"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12727"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Zebra3D",
+    "Efficient",
+    "Hybrid",
+    "Foundation",
+    "Models",
+    "Scalable",
+    "3D",
+    "Reconstruction"
+  ],
+  "abstract": "Feed-forward 3D foundation models reconstruct scenes from unposed images, but the quadratic cost of global attention limits their scalability to large view sets. We present Zebra3D, a layerwise sparse-linear hybrid attention framework that improves the efficiency of pretrained 3D foundation models without training from scratch. Across VGGT, HunyuanWorld-Mirror, and $π^3$, we observe a broadly consistent depth-wise pattern: early stages are relatively tolerant to linear replacement, while sensitive middle-to-late stages tend to exhibit more concentrated attention. Zebra3D exploits this structure by assigning linear-centered attention to tolerant stages and tile-sparse attention to sensitive stages, using landmark summaries to preserve unselected context. Closed-form affine fitting enables training-free conversion, while optional post-conversion training combines task supervision with output and relational feature distillation. Across all three backbones, Zebra3D achieves strong reconstruction and camera-pose accuracy at high attention sparsity, with training-free variants remaining close to their dense counterparts. End-to-end speedups increase with input view count, reaching up to $7.1\\times$ at 1,024 views. After post-conversion training, Zebra3D-VGGT reaches 80.5\\% RealEstate10K AUC@30 at 94\\% mean attention sparsity, within 1.1 percentage points of dense VGGT fine-tuned on the same data and schedule.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12727v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12727v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12727v1 的 37 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Zebra3D 先测每层linearreplacement敏感度，再把tolerant层换value-centeredlinear、敏感层留tile-softmax加landmarktail。作者报告三backbone1024views5.5-7.1倍model-forward提速，conservativepose几乎保留；这是可扩展3D架构转换而非新geometryfoundation，speed-firstPi3widebaseline明显变差，AMD单硬件/非含GSrendering成本，适合skim。",
+    "motivationZh": "Feed-forward 3D reconstruction 模型的 dense cross-view attention 随视图数迅速增加成本，限制长序列和大场景输入。直接替换 attention 又可能损伤几何与相机估计，因此问题是如何复用已有模型并找到可靠的速度与精度取舍。",
+    "methodZh": "13calibrationscene继承QKV/pos/norm/head，一层一层替换后以point/depth/pose误差rank分linearfraction。linear用channelsoftmaxfeaturemap及meanV-centeredaffinefloat64ridgefit；sparse以8×8spatialtile均QKscore选toptiles，unselectedmeanKV+logoccupancy与exactkeys共softmax，specialquerydense。可选3000step所有studentparamsGT+output/intermediate/crossviewrelationalKD。完整37页包括Tritionpackedkernel、自key重复tail、全部alignment/runtime/sparsity、densecontrol及widebaseline/limits已读。",
+    "methodFlow": [
+      "固定teacher对single-stagelinearconversion测多output误差rank，lowesterror层assignlinear、其余tile-sparse。",
+      "每linearstage用13scenesclosed-formaffinefit校正Olinear减meanV的residual。",
+      "sparseglobalstage把patchgridpack成64tokentiles，以meanQK选择exacttokenKV。",
+      "unselectedtiles保meanKVlandmark和logcount共同softmax，特殊tokens及selfkey保护。",
+      "可选3000stepsGT+teacheroutput/features/crossviewcosine关系distill，保相同convertedarchitecture。",
+      "全views一次model-forward输出point/depth/cameras，无历史streamstate或新assetgenerationhead。"
+    ],
+    "experimentsZh": "VGGT1B/HYWM/Pi3，13examplecalibrations不入reportedmetrics，训练HYWM12datasetmixture20%/3000steps8MI355X最多16viewmicrobatch/seed42。7Scenes18/NRGBD9seq、RE10K1719×10、CO3D41categories，ScanNet50×100-1000views，T&T/ETH/DTU8/16/32/64。Sim3+ICP或normalization评geometry，runtimeMI355XcompiledBF16excludeIO/preproc/HYWMGShead。 以下结果为作者报告：作者报告79%meanattention配置RE10KAUC30 VGGT.737vsdense.744/HYWM.856vs.860/Pi3.871vs.877，near-dense不是更强base能力。（Table1, PDF p.7）；作者报告VGGTKD94%RE10K.805，dense同GTFT.816；CO3D.872低于denseoriginal.900，训练transfer非全提升。（Table1, PDF p.7）；作者报告1024view model-forward提速6.2/5.5/7.1倍(VGGT/HYWM/Pi3)，ScanNet1000KDspeedfirst5.60倍/CD.460vsdense.466。（Fig.5/Table2, PDF p.8）；作者报告widePi3.7L/.8S T&TNC.6551vs.7311、DTUacc2.0262vs1.0550mm；.5L较可靠，HYWM.5LT&Tcompleteness.9749vsdense.4437m仍损。（Table22, PDF p.35） 对照范围：dense+VGGTmatchedGTFT、FastVGGT/SAF/Regime/Lite及A3D/blockSparse自重实现跨backboneport。denseGTFT未KD，因此supervisionobjective非完全same；timing各modelhead共设但GS输出关闭。强GPU/Vview数量很大，8-16view增益小，非consumerhardware/CDN/inferencewholepipeline速度。 消融与诊断：no/uncentered/centeredfit、tile/block+landmarks、random/front/back/reversesensitivity固定预算、KD组成和fivecalibrationrank稳定。RelKD优VGGT局部，但多modelKD非统一gain；不能把GTFT引起regression全部排除conversion因素，mixedobjective有交互。tablesnoCI/trainingseed方差。",
+    "insightZh": "实质conversion范式为backbone-measuredlayerroles及省全权重再训练的closed-formfitting，在三模型1000view验证比单GPUkernel优化广。linear/sparse/landmarks/KD本身已有，提升主要efficientattention保近densegeometry，非新reconstructionobjective或worldmodel能力。",
+    "evidenceZh": "选择linear基于单层敏感度，不考虑同时替换交互；oracleattentionmass仅动机非实际selector。（Sec.3.1, PDF p.3; Appendix F.2 p.37）；landmark保tail但不是exactmissingcontext，selfkey已保仍留未减meanlandmark。（Eq.(6), PDF p.5; Appendix B.4 p.18）；79/94%meanattention“sparsity”不等百分比FLOPs/memory缩减。（Appendix B.11, PDF pp.22-23）；最大speedbackbone与setting不保证wide-baselineaccuracy，KD也可能退化。（Table1, PDF p.7; Table22, p.35; F.2 p.37）",
+    "caveatZh": "F.2 p.37明确shortviews小收益、encoder/headbound、固定single-stagemarginalallocation忽略交互/input，AMDMI355X/Tritonportability未验证。；widebaselineAppendix E.3 pp.27-29称.7Lspeed-first主要video-likevalidated，.5L更可靠。；postconversion训练可损部分dataset；额外teacher训练成本仍存在。；geometrymain经Sim3ICP/ScanNetCDnormalized/clipped，保metric不等真实可编辑mesh/sceneobject质量。；speedup测518×378、ScanNetquality518×392，展示ratio非scene-specificrecordtimings，同配置KD/noKD复用测量。；longseqnon-stream仍sparsestageρN2加landmarkN2/B；不是线性total规模或boundedmemory。；没有assetcreation/segmentation/CAD downstream，推荐限foundationconversion技术参考。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "超过单metricpose改进，给三feedforward3Dbackbones的可扩展architectureconversion与1000view/widebaseline完整实证，达到方法参考skim；未证明editableasset迁移，因此medium。"
+  }
+}

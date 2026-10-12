@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2607.00148",
+  "slug": "3d-point-world-models-point-completion-enables-more-accurate-dynamics-learning",
+  "title": "3D Point World Models: Point Completion Enables More Accurate Dynamics Learning",
+  "authors": [
+    "Skand Peri",
+    "Hung Nguyen",
+    "Chanho Kim",
+    "Li Fuxin",
+    "Stefan Lee"
+  ],
+  "publishedAt": "2026-06-30",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2607.00148"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "3D",
+    "Point",
+    "World",
+    "Models",
+    "Completion",
+    "Enables",
+    "More",
+    "Accurate",
+    "Dynamics",
+    "Learning"
+  ],
+  "abstract": "Learning predictive models of the world enables robotic control through planning, potentially allowing robots to improvise solutions on new tasks. However, large video-based dynamics models lack explicit 3D spatial structure and suffer from geometrically inconsistent long-term rollouts with compounding errors. Emerging 3D dynamics models based on partial point clouds improve geometric consistency but remain sensitive to occlusions and accumulated prediction drift. To address these challenges, we present 3D Point World Models (3DPWM) - a task-agnostic world model that operates entirely in 3D space by first completing partial point clouds and then learning action-conditioned dynamics in this completed 3D scene. By operating on completed geometry, 3DPWM enables reliable long-horizon rollouts and more accurate cost evaluation for model-based planning while supporting adaptation to new tasks. Experiments across different robotic embodiments and tabletop manipulation benchmarks demonstrate that 3DPWM achieves significantly more reliable long-horizon rollouts (100-300+ steps), supports both open-loop and closed-loop planning, and enables successful sim-to-real transfer.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.00148v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.00148v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.00148v2 的 16 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "3DPWM v2 新增 PointWorld rollout 与 analytic FK planning baseline、模拟planning20→100runs及VLM生成cost。作者报告简单Pick/Stack的FK+completion已较强，复杂PickYCB才更体现 learned dynamics价值；长期MugCleanup336step Chamfer.022vsPointWorld.174。值得精读完整geometry状态预测，也须保留机器人rigid/tabletop和quasi-static边界。",
+    "motivationZh": "机器人从单张 RGB-D 只能看到物体的一部分表面，直接预测可见点运动容易遗漏接触几何并误判未来状态。问题是检验完整表面几何是否能改善多物体 dynamics 与规划，并排除机器人几何缺失等混杂因素。",
+    "methodZh": "single RGB-D经SAM3分object并用ShapeNet预训练、YCB微调的instance completion模型生成完整surface；robot end-effector由URDF/FK取points。每point输入xyz/current+previous velocity，PTV3编码到action/register cross-attention与self-attention，再decoder预测next velocity，递归形成未来点云。simulation以canonical points随rigid poses变换提供一一correspondence，训练15step velocity Huber；MPPI在完整几何上用VLM/手工cost规划。真实实验仅simtrained PickYCB模型和少量Frankatrials，约1.07s/action偏quasi-static。论文v2增加PointWorld/FK及100run评估，candidate为new而非已canonical更新。",
+    "methodFlow": [
+      "从single-viewRGB-D分出object point clouds，旋转增强/jitter的completion网络补全；URDF/FK采robot end-effector points。",
+      "合并完整scene points，为每点构造xyz、当前及上一step velocities，经PTV3编码。",
+      "以action embedding和一个register token作cross-attention keys/values，再self-attention传播interaction。",
+      "PTV3 decoder+MLP预测per-point velocity，15step递归Huber训练并逐点更新未来geometry。",
+      "MPPI采样action sequences，用完整predicted geometry上的task cost排序，分chunk执行open/closed-loop plan。"
+    ],
+    "experimentsZh": "ManiSkill PickCube/StackCube/PickYCB、MimicGen MugCleanup/Coffee、DexMimicGen双手Box/Drawer；Franka和GT-1hand。rollout开始给前三point clouds，之后GTactions；mainplanning100runs，200MPPI candidates/horizon10。真实Franka D455每method/task10trials，额外view/light/clutter各20。 以下结果为作者报告：作者报告PickYCB143step Chamfer0.028 vsPointWorld0.064，reward correlation0.85 vs0.68；Drawer274step0.058/0.77 vs0.351/0.04。（TableI, PDF p.6）；作者报告GTcompletion closed-loop PickCube88%、StackCube78%、PickYCB60%，learned completion在较难任务降2–10pp；CoffeePreparation新组合task45%。（Sec.IV-B–C and Fig.4–5, PDF p.6） 对照范围：PointWorld按IK转换为action flow；ParticleFormer+同PTV3尺寸、原3layer版本及partial variant；analytic FK+completion、GTvslearned completion、GNN动态对手。训练complete state与correspondence监督比partial Chamfer/hybrid更强，优势不能只归因新architecture。 消融与诊断：register0→1显著降drift、1→2收益小；H3/5/10/15逐步提升；random mid-trajectory动作20%augmentation提高planning。附录GNN/原ParticleFormer、clutter、view/light、completion失败及SAM3D/depth未成功替代。",
+    "insightZh": "将instance completion和explicit point dynamics整合，使world model在training/deployment都使用完整几何；采用对应点速度监督、多step rollouts和dummy register降低occlusion/drift。completion主体来自既有方法，新的动态表示虽可借鉴3D内容模拟但没有texture/rendering生成。",
+    "evidenceZh": "完整object completion加FKrobot points输入PTV3 action-conditioned velocity model。（Sec.III PDF p.3; Fig.2 p.4）；作者报告MugCleanup平均336step Chamfer0.022和reward corr0.79，对PointWorld0.174/0.35。（TableI, PDF p.6）；一个register及15step training减少Chamfer；planning仍约1.07s/action。（TableII, Sec.V, PDF p.7）；grasp用2.5cm距离heuristic假定成功；completion训练没有其他object occlusion。（App.X-C–D, PDF p.14）；ExactJul1v1无PointWorld/FK主对照，simMPPI20runs；v2新增两对照、100runs重评并以Gemini生成cost替代手工cost，主结果planning88/78/60与旧90/75/65不可当纯modelgain。新evidence界定kinematicbaseline能解决简单task、learneddynamics主要复杂交互收益，属于scientificevent。（previous v1 PDF pp.5–7 Table 1/Figure 4 vs current v2 PDF pp.5–8 Table I/Figure 4/Change Log）",
+    "caveatZh": "SAM3对occluded/gripper-held objects会失败，completion需更多scene-level多样data（Sec.VI p.7）。；sequential rollouts有latency，偏quasi-static任务（p.7）。；completion训练未包含other-object遮挡，边界noise和质心偏差可致失败（App.X-D p.14）。；完整点云的中心均值不是真实质量中心，隐藏material/force不可从geometry确定。；contact/grasp由距离heuristic假定，尚无explicit contact dynamics保证。；没有渲染/appearance或general dynamic3D创作评测；真实10trials误差很大。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "明确的3D未来geometry生成与completion representation可迁移到动态资产/scene模拟；不能扩称视觉设计agent、fabrication或一般对象生成foundation。"
+  }
+}

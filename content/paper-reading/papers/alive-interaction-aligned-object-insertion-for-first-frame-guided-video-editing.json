@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.08779",
+  "slug": "alive-interaction-aligned-object-insertion-for-first-frame-guided-video-editing",
+  "title": "ALIVE: Interaction-Aligned Object Insertion for First-Frame-Guided Video Editing",
+  "authors": [
+    "Zhenghong Zhou",
+    "Zhe Lin",
+    "Jiebo Luo",
+    "Yuqian Zhou"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.08779"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "ALIVE",
+    "Interaction-Aligned",
+    "Object",
+    "Insertion",
+    "First-Frame-Guided",
+    "Video",
+    "Editing"
+  ],
+  "abstract": "Current video editors can insert objects but often struggle to make them participate in interactions such as being picked up or manipulated. We introduce ALIVE, a framework that makes inserted objects \"alive\" through coherent interactions with the source video's contents, using an edited first frame and an instruction naming only the added object. We curate 35,800 editing pairs combining 3D-rendered, model-generated, and real-world videos with general editing pairs from ROSE. Each pair differs in the target object's presence while preserving the surrounding action, teaching editors coordinated object behavior and source preservation. We further train a vision-language model (VLM) to predict interaction guidance from the same inputs. We introduce the ALIVE-interaction benchmark to assess interaction fidelity, source preservation, and visual coherence using a unified VLM-based protocol, and evaluate on the general video object insertion benchmark. Without VLM guidance, ALIVE improves Overall over the strongest evaluated baseline by 43.9% and 4.4% on the two benchmarks, respectively. VLM-predicted guidance further improves the ALIVE-interaction score by 0.95 points without additional user inputs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.08779v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.08779v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.08779v1 的 17 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "ALIVE 从35,800对交互编辑数据训练first-frame-guided editor，再让VLM从source/E0/对象名预测分时段P4 prompts，用time-local cross-attention使新增物体响应抓握、搬运等原动作。作者报告交互VLM Overall86.71对60.24；主要提升来自editor/data，VLM仅再加.95点且general insertion略降，不能把“活起来”理解为物理模拟。",
+    "motivationZh": "First-frame-guided video insertion 已给定物体初始外观和位置，却没有规定它如何响应源视频中的抓握、搬运等动作。模型容易把新增物体当静态贴图，无法保持合理的 interaction 与时间变化。",
+    "methodZh": "source video+edited first frame确定动作、初始物体appearance/placement，但不直接给其后运动。ALIVE以3Drendered、generated、real HOI removal及ROSE reverse pairs训练同一LTX2.5 editor，source/target latent channelconcat而E0 tokens保持clean；P0–P4混合flow loss适配LoRA。另训练Qwen3.6-27B预测P4 descriptions与intervals，把每段独立text context按video token的time overlap及context length校准cross-attention，所有video chunks仍joint denoise，非streaming。128interaction+103general cases的single VLM judge、automatic metrics与data/prompt/backbone ablations支持新interaction-editing能力，但geometry/contact/forces未作为输入，存在多种合理响应。",
+    "methodFlow": [
+      "从3D共同render、Wan-generated、realHOI+UnderEraser与ROSE removal-reverse构造object-absent/present pairs，质量筛选并标注P1–P4交互语义。",
+      "将clean source latents与noisy target latents按channel concat，固定edited-first-frame tokens，mixed P0–P4 flow loss训练LTX2.5 rank128 LoRA。",
+      "从21sampled source frames、E0和对象名P1，fine-tuned Qwen predictor输出P4 object-action descriptions及time intervals。",
+      "各P4描述独立encode；按video token与interval overlap加log(wik/Lk)到text-attention logits，零overlap屏蔽该context。",
+      "jointly denoise完整81frame edit，生成物体随原source actions的可合理interaction，保存非target scene content。"
+    ],
+    "experimentsZh": "mainLTX2.5-22B rank128LoRA，35,800pairs/20Kupdates/batch16/16GPUs；mixedP0–P4。Qwen3.6-27B rank64，predictors各2048updates、21sourceframes；81frame output@768×512/30steps。128interaction cases含71in-source heldouts、31HOIGen/26RealShotOOD，103general ROSE/EffectErase。reference-awareGPT judge+PickScore/CLIP/ViCLIP/temporal metrics；data-source5k等budget、P1/P4同editor/seed、Wan/LTX backbone对照。 以下结果为作者报告：作者主表interaction Overall：ALIVE86.71、ALIVE+VLM87.66、Señorita60.24；motion/propagation86.13对36.52，新增.95点来自predictedP4。（Table1, PDF p.7）；主表general Overall ALIVE92.28、+VLM91.71、Señorita88.83。正文使用88.39和3.89points，似混用了Señorita Task列；应按table实际Overall报告差3.45points，不照搬abstract4.4%说法。（Table1 and Sec.5.2, PDF p.7）；作者报告5k同budget mixture交互82.35/general86.93；ROSEonly60.12/84.36，generatedonly82.81/79.32，支持交互与general数据互补。（Table2, PDF p.8）；作者报告A10080GB上LTXP1平均154.16s，predictedP4 editor184.50s+VLM22.75s≈207.25s（不含switch overhead）；不是real-time编辑。（Table4, AppendixA.2, PDF p.14） 对照范围：AnyV2V/PropFly按官方接口给予额外P2描述，Señorita用P1、Nova/I2VEditP0；不完全相同模型/输出长度，作者按generator native crop/time对齐judge。mask-guided和instruction-only方法因信息预算不同排除；maingeneration能力与data/backbone差异可能耦合。 消融与诊断：source混合、P0–P4与predicted variants、5k/20k和3backbones揭示data/training主贡献；Wan14B5k评分89.82高于LTX22B82.35但训练更贵。未见多judge/human验证或bootstrap intervals，automatic相邻相似不可替代interaction质量。",
+    "insightZh": "将object insertion目标从appearance传播扩展到参与source动作，主要创新是interaction-focused paired数据与不增加user inputs的temporal prompt inference/routing。数据与editor适配贡献大于VLM guidance边际贡献；VLM是once-pass planner，没有render critique迭代，不归visual design agents。",
+    "evidenceZh": "四source35,800pairs只改变target object presence并保持source action，来源有互补作用。（Sec.3.1, Fig.2, PDF pp.3–4; Table2, PDF p.8）；time-local cross-attention对P4按interval overlap与text length归一化，video仍joint denoise。（Sec.4.2, Eq.(2)–(4), Fig.3, PDF pp.5–6）；P1 editor已具大部分interaction增益，predictedP4仅提供小幅额外提升。（Table1, PDF p.7; Table3, PDF p.9）；Overall是reference-aware single VLM对16sampled frames的weighted rubric，不是人评成功率。（Sec.5.1, PDF p.6; AppendixA.4, Tables7–8, PDF pp.15–17）；source/E0不足以确定真实geometry/forces，作者明确允许多个合理物体响应。（Limitations and future work, PDF p.9）",
+    "caveatZh": "source与E0不完全确定geometry、contact和forces，同动作可有多个物理响应。；VLM错误guidance会造成错误behavior；complex cloth deformations和rapid large-angle rotations仍困难。；real-time streaming为future与SelfForcing/EditStream结合方向，当前jointgeneration不具该能力。；只用16uniformframes与一个VLMjudge，快速contact穿透/短暂丢失可能被漏评；没有独立physical simulator或human preference验证。；real/generated pairs经object removal可能遗留artifacts，模型可学习数据construction的shortcut；对真实视频任意新对象的OOD范围有限。；主表general Overall与正文基准值不一致，应仅引用准确table列而不放大relative improvements；作者结果未复现。；公开code仍仅README/assets，rendered数据release等待permission，影响完全复现实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "把视觉编辑扩展到object-action coordination，直接服务visual creation与physical3D场景编辑的学习数据/temporal constraint思路；未将3Dmetric约束或制造接触作为真实输入。"
+  }
+}

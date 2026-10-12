@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.11756",
+  "slug": "memory-forcing-attendable-mid-horizon-history-for-streaming-video-generation",
+  "title": "Memory Forcing: Attendable Mid-Horizon History for Streaming Video Generation",
+  "authors": [
+    "Jiaming Zhang",
+    "Xinyu Wang",
+    "Huafeng Shi",
+    "Gangshan Wu",
+    "Limin Wang"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11756"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Memory",
+    "Forcing",
+    "Attendable",
+    "Mid-Horizon",
+    "History",
+    "Streaming",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Autoregressive video diffusion enables causal video streaming without a bidirectional pass over the full clip, but existing few-step systems usually retain only the opening and most recent frames in a fixed-size KV cache. Once an event leaves this window, later frames can no longer attend to it, a failure we term mid-horizon forgetting. We present Memory Forcing, a few-step streaming method that preserves this missing history without increasing the cache size. Its Archive \\& Working Banks partition the cache into sink, archive, and working regions, retaining diverse intermediate events alongside recent motion under fixed memory. Because absolute temporal indices drift outside the training range, Bank-aware RoPE reassigns indices at attention time so each bank remains distinguishable. At 1.3B, Memory Forcing leads on longer clips, shows the smallest drop from 5s to 60s among methods reporting all four lengths, and preserves subjects and scenes through leave-and-return. The same design scales to Wan2.2 5B, producing more physically plausible, realistic, and dynamic videos and, to our knowledge, the first public 5B model on this forcing line.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11756v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11756v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11756v1 的 13 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Memory Forcing在固定KV budget里分sink/archive/working，把least-similar近期chunk存为中期记忆，并每次attention重新分配RoPE；作者报告1.3B VBench总分5s83.88→60s83.20，减少leave-return漂移。值得借鉴有限记忆的生成一致性，但60s证据不足以支持无限视频，5B也未在量化表全面胜过1.3B。",
+    "motivationZh": "Streaming video generation 的局部窗口会遗忘中期出现的人物、场景与事件，单纯保留开头帧不能解决再次出现时的身份漂移。问题是在有限 attention 历史中同时保存近期动作与中期互补信息。",
+    "methodZh": "继承Rolling Forcing的rolling joint denoising与DMD，只改history cache及temporal indexing：opening sink固定，working更新局部动作，archive保存与新chunk最不相似的working chunk，archive满时FIFO淘汰。全window存raw keys，在attention-time使用interpolated temporal bands以区分历史角色；aligned insertion在与denoise相同context下形成新KV。训练各半混合rolling与self-forcing窗口，推理仅rolling。5B先经causal teacher/ODE转换再用同bank训练。证据主要是自动VBench指标、50个hard prompts与定性frames；未独立测archive retrieval的精确因果记忆能力。",
+    "methodFlow": [
+      "从CausalForcing初始化的Wan causal few-step student出发，按四noise levels滚动joint-denoise窗口。",
+      "将opening chunk固定在sink；新clean chunks进入working bank以维持近期motion。",
+      "working满时把与incoming chunk最不相似的历史chunk移入archive，archive满时FIFO删除最旧。",
+      "存raw keys并在每次attention用interpolated bank-aware RoPE重置时间索引，archive置于sink/working之间。",
+      "以相同context执行aligned KV insertion，用rolling/self-forcing混合rollouts的DMD训练，推理输出持续视频。"
+    ],
+    "experimentsZh": "Wan2.1-T2V1.3B/Wan2.2-TI2V5B；832×480、16FPS、5/15/30/60s。训练1000steps、batch32、32A800，33latent-frame window，sink/archive/working=3/6/12；VidProM prompts，5B转换使用quality-filtered Koala36M clips（280k AR、36k ODE）。official VBench、MovieGen及20+30个hard prompts。 以下结果为作者报告：作者报告60s VBench Total1.3B83.20，对RollingForcing SF-ODE81.64、LongLive82.21；5B81.93低于自身1.3B。（Table1, PDF p.8）；作者报告30s archive+working Total83.58 vsworking-only82.41；interpolated RoPE83.58 vscontiguous81.31；Similarity与FIFO60s83.20 vs82.96。（Table2a–c, PDF p.8） 对照范围：CausVid、NOVA、SkyReelsV2、SelfForcing、LongLive、SANA-Video、RollingForcing、InfinityStar/RoPE、Reward/Deep/Causal/AnchorForcing；部分只报告短视频。未提供按horizon归一的latency/memory实测、human evaluation或专门leave-return定量。 消融与诊断：固定1.3B比较bank、四RoPE mappings及Similarity vsFIFO；Similarity收益小于bank设计。5B未做同样component ablation，motion4:3:3训练mix缺独立对照。",
+    "insightZh": "贡献是固定cache中可直接attention的mid-horizon archive与其role-aware RoPE组合，而非新diffusion目标或新backbone。相对扩大sink/最近FIFO的路线，保留中间distinct event并让它在训练范围内有可辨时间位置。",
+    "evidenceZh": "Similarity从working选择least-similar chunk晋升archive，缓存容量固定。（Sec.3.3, Algorithm1, Eq.(5), Fig.2, PDF pp.4–5）；raw keys在attention-time重新赋bank索引，default为interpolated archive band。（Sec.3.4, Fig.3, Eqs.(6)–(9), PDF pp.5–6）；作者报告1.3B VBench Total在5/15/30/60s为83.88/83.51/83.58/83.20。（Table1, PDF p.8）；代码与model weights仍计划在accepted之后发布。（Reproducibility Statement, PDF p.10）",
+    "caveatZh": "未设置专门Limitations章节；训练/评测范围在Sec.4.1限定到60s与固定resolution（p.8）。；代码/weights为未来发布计划（p.10）。；固定archive最终FIFO遗忘，无法由60s自动指标支持无限时长或任意event记忆。；5B的VBench60s总分低于1.3B，视觉样例的更physical不能转成全任务定量结论。；MovieGen5→60s降1.62，并非所有complete baseline中最小；Gen-Complex60s也非表中最高。；缺leave-return专门定量和不同bank预算/长context复杂度实测。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "有限生成记忆与历史位置编码可借鉴到长视觉创作一致性；目前不支持动态3D representation或核心fabrication结论。"
+  }
+}

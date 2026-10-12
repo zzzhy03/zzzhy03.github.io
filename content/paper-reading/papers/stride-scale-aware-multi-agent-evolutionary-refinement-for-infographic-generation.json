@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.13502",
+  "slug": "stride-scale-aware-multi-agent-evolutionary-refinement-for-infographic-generation",
+  "title": "Stride: Scale-Aware Multi-Agent Evolutionary Refinement for Infographic Generation",
+  "authors": [
+    "Yan Zhou",
+    "Yang Yang"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13502"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "Stride",
+    "Scale-Aware",
+    "Multi-Agent",
+    "Evolutionary",
+    "Refinement",
+    "Infographic",
+    "Generation"
+  ],
+  "abstract": "Infographic generation challenges text-to-image models because a single image must satisfy numerous visual, textual, and semantic constraints. Iterative agentic refinement with a multimodal verifier is a natural remedy, but existing methods face a scale mismatch: local edits cannot correct global composition errors, while full regeneration may destroy already-correct regions. We introduce Stride, a constraint-grounded multi-agent framework that treats refinement over any frozen generator as a history-aware evolution strategy. Stride separates constraint evaluation - whether each requirement is satisfied - from visual grounding - where and how it is violated. It then routes global revisions to a composer subagent and local corrections to a retoucher subagent. Each subagent conducts internal planning and generates multiple candidates, while Stride accepts a candidate only when it improves the verifier score, reducing regression across iterations. Because stochastic generators and imperfect verifiers make any single step unreliable, it is this combination of scale-aware routing, per-step redundancy, and monotonic acceptance that yields stable improvement across iterations. With fully open-weight generator-verifier systems, Stride outperforms proprietary systems including Nano-Banana-2.0 and Seedream-5.0-Pro on BizGenEval, matches GPT-Image-2.0 and surpasses Seedream-5.0-Pro on IGenBench, and achieves a new state-of-the-art score on WISE, while substantially outperforming existing agentic methods across all evaluated benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13502v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13502v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13502v1 的 36 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Stride 把 infographic refinement 变成带 history 的 (1+λ) 搜索：verifier 判断 rubric，perceptor 定位文字，lead editor 在 global redraw 与局部 text/formula repaint 间选择，只有内部 score 更优才替换 champion。作者报告 Infographic-V2 的 BizGenEval hard score41.1→69.5、IGenBench I-ACC0.17→0.38；适合精读闭环设计，但不是任意局部几何编辑，内部单调也不保证独立质量单调。",
+    "motivationZh": "Infographic 同时包含全局构图和精细文字错误：全图重绘会破坏已正确区域，局部文字修改又无法解决布局问题。需要判断每次修正应作用于哪个尺度，并在多轮候选比较中保留已经满足的要求。",
+    "methodZh": "针对全图重绘破坏正确区域、局部文字工具又无法修复布局的问题，系统保留当前图、rubric判定、OCR grounding及历史。初始best-of6，最多3轮，每轮4个composer或retoucher候选；composer追加失败约束并在confidence不足时web search，retoucher把一个文字box遮盖后按字体/背景重绘PNG。Qwen负责验证，Kimi负责controller和grounding，生成器冻结。",
+    "methodFlow": [
+      "建立约束与 champion：从已发布checklists或prompt parser取得rubrics，将hard/easy优先级作lexicographic score；初始6图择优。",
+      "分离判定和空间 grounding：Verifier逐rubric给binary判定；perceptor转录text/box/garbled标记，写入当前championstate。",
+      "依据历史选择编辑尺度：Lead editor结合failure、boxcoverage/overlap和已拒绝修改，选择composer全图重绘或retoucher局部修复。",
+      "产生多候选：Composer追加失败约束，可搜索不确定事实；retoucher独立OCRbranches定位并按confidence过滤重复修改，用遮盖和transparentPNG替换文字或公式。",
+      "严格接纳优于当前图的候选：每轮4候选择内部score最高者，仅严格改善时更新；ties和rejected都保留原图，最多3轮或满足rubrics停止。"
+    ],
+    "experimentsZh": "BizGenEval400prompts/8000questions、IGenBench600cases/5259questions、WISE1000prompts；ERNIE-Image/Infographic-V2/QwenImage2512冻结生成器，Kimi-K3 agent/perceptor、Qwen3.5-397B-A17B verifier。初始6候选+最多3×4候选。最终采用官方Gemini/GPT evaluator；human100pairs/200images。 以下结果为作者报告：作者报告 Infographic-V2 BizGenEval hard score41.1→69.5；该error score与question accuracy不同，easy84.2低于NanoBanana2.0的92.5。（PDF p.7 Table 1; pp.15/17 Table 8）；作者报告 IGenBench Q-ACC0.72→0.84，I-ACC0.17→0.38；I-ACC匹配所列GPTImage2.0，但Q-ACC0.84低于0.88。（PDF p.7 Table 2）；作者报告 ERNIE-Image bestof1 28.0，bestof6 34.7，retoucher-only50.2，完整51.1；组合改善幅度比单独局部修复小。（PDF p.8 Table 3）；作者报告human BizGenEval hard gains+20.3/+29.8；human–official相关0.732–0.847，Qwen相关0.650–0.785。（PDF p.9 Table 5） 对照范围：多种prompt增强/search方法与冻生成器；proprietary数值沿用官方榜单而非等预算重跑，完整agenticstack需大模型与搜索，不能用basegenerator8B参数栏当整套成本。 消融与诊断：bestof6、composer/retoucher/grounding、1/2/3轮、forcedreplacement与retention、oracleselection/admission、perceptor20图proxyagreement；缺完整墙钟/API费用、multi-seedCI及全部最强设计agent等预算实证。",
+    "insightZh": "Contribution 是以约束判定/grounding分离、尺度路由和history/champion admission组成可执行视觉设计闭环；多轮多候选的基础策略本身不是新优化理论。主retoucher明确限制在text/formula，chart geometry和relations仍靠redraw。",
+    "evidenceZh": "本地 retouch 实际是 fixedbox文字/公式replacement，不是通用图像编辑。（PDF pp.5–6 §3.5; p.31 Appendix I; p.33 Lead Editor prompt）；作者报告 independent official和human rubric评价均保留改善。（PDF p.7 Tables 1–2; p.9 Table 5; p.21 Table 14）；内部 verifier 的selection偏差仍很大，monotonic guarantee限于其score。（PDF p.22 Table 15; pp.24–25 Table 17; p.31 Appendix I）；Retention 在相同候选数量下改善表现，不能全部解释为best-of更多采样。（PDF p.9 Table 4; p.24 Table 17）",
+    "caveatZh": "依赖verifier/grounding可靠性，monotonic只适用于内部score，不保证独立evaluation。；Retoucher只修text/formula；chartgeometry、relations靠全图regeneration。；需要公开benchmarkchecklists，部署到自建rubrics时parser可能遗漏或错误；WISE checklist是模型推断。；Bestof6+3轮4候选、4–10perception samples/round和397B verifier的费用/延迟未完整报告，胜过单次proprietary不等于算力效率更高。；Human子集25pairs/配置，未详细给blinding/annotator数/一致性，主表无置信区间；官网oracle evaluator同时用于search不是独立验收。；只替换文字可导致标签与chartmark不一致；局部遮盖可破坏背景，内部分数提升不能保证视觉层级/设计质量。；PDF声称codeavailable，但核实officialGitHub根目录只有LICENSE和114字README，无publicimplementation。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接涉及规划、视觉观察、工具生成、验证、迭代修正的2D设计产物，可迁移其constraint/grounding/admission分工到核心设计工具；不是CAD几何方法。"
+  }
+}

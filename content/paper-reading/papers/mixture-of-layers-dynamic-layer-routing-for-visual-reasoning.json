@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.09440",
+  "slug": "mixture-of-layers-dynamic-layer-routing-for-visual-reasoning",
+  "title": "Mixture of Layers: Dynamic Layer Routing for Visual Reasoning",
+  "authors": [
+    "Jeonghwan Kim",
+    "Sofia Stoica",
+    "Jiwan Chung",
+    "Ansel Blume",
+    "Hyeonjeong Ha",
+    "Zhenhailong Wang",
+    "Xin Luna Dong",
+    "Heng Ji"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09440"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Mixture",
+    "Layers",
+    "Dynamic",
+    "Layer",
+    "Routing",
+    "Visual",
+    "Reasoning"
+  ],
+  "abstract": "Pre-trained vision encoders contain layer-wise visual representations that differ in spatial granularity, semantic abstraction, and sensitivity to local details. However, most Multimodal Large Language Models (MLLMs) rely on only the final or penultimate vision encoder representations or fixed aggregation rules, making visual abstraction largely query-agnostic and limiting access to fine-grained cues such as small objects, spatial details, text, and subtle visual attributes. In this work, we propose Mixture of Layers (MoL), an instruction-conditioned layer routing approach at the visual patch level that dynamically aggregates query-relevant latent representations from intermediate vision encoder layers. Given a text query, MoL predicts routing probabilities over vision encoder layers and performs a top-k sparse aggregation over selected hidden states at either the image level, patch level, or through a hybrid routing mechanism. In doing so, MoL enables query-adaptive access to layer-specific visual features for fine-grained visual reasoning. Our experiments across 7 fine-grained visual reasoning tasks demonstrate substantial performance improvements, especially across fine-grained visual grounding and understanding tasks such as +18.9% improvement on V* in overall accuracy, +4.5% on HRBench4K, and +16.3% on CharXiv compared to the baseline MLLMs, without resorting to multi-resolution inputs, simple interleaving of multiple vision encoders, or increasing the number of patch tokens. We study vision encoders' receptive field scales across different layers and their sampling behaviors to provide an in-depth analysis of why layer-wise sampling is helpful, demonstrating that conditional visual representations are a key step towards better visual perception and reasoning in MLLMs. Our project page is available at https://wjdghks950.github.io/mol.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09440v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09440v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09440v1 的 25 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "MoL 将 query-conditioned 稀疏 top-k routing 放在 vision encoder 的不同层之间，patch 数保持不变；hybrid 用 global/local disagreement 决定回退至倒数第二层。作者报告 LLaVA-1.5-13B V* 71.43→84.87，说明细节可从中间层找回。但效果与 checkpoint/k 强相关、部分任务下降，正文与附表有数值矛盾，适合作为视觉接口设计思路 skim，不能把少参数或 token 不变等同整体低成本。",
+    "motivationZh": "VLM 通常从 vision encoder 固定一层取特征，但不同问题需要不同层级的语义与细节。固定特征层可能既限制视觉问答能力，又忽略能按 query 动态选择的中间层信息。",
+    "methodZh": "本文针对固定末层表示丢失 OCR、小对象和空间细节，提出 image-level、patch-level 和 hybrid 三种 instruction-conditioned 层选择。视觉与其 aligned text tower 提供匹配评分，融合中间层后接原 projector/LLM；两阶段训练增加 load balancing。实验用 CLIP、SigLIP、DINOv2 w/ Txt 和 Vicuna/Llama/Phi，广泛细粒度测试与 reserve/k/image-only 消融。",
+    "methodFlow": [
+      "取得层与查询特征：保留 vision tower 全部 hidden states，aligned text encoder pooled query 与每层/每 patch key 做兼容性打分。",
+      "稀疏选择层：softmax 后 top-k、重归一化，将所选 layer hidden states加权形成原数量的 patch tokens。",
+      "hybrid 与保留层：query预测 global/local 混合系数，以 product-of-experts融合；KL disagreement 经 sigmoid控制 reserve penultimate layer 权重。",
+      "训练与输入 LLM：路由输出投影到 LLM，标准语言损失加 load-balancing；可在双 encoder 分别路由再 bilinear grid对齐和 channel投影。"
+    ],
+    "experimentsZh": "LLaVA558K/665K 或 Bunny2M/695K 同类训练配方；四 H100NVL、bf16/ZeRO；主比较 7类细粒度测试，附加粗粒度 VQA。 以下结果为作者报告：作者报告 CLIP+Vicuna13B V*71.43→MoLpatch84.87，DINOv2+Vicuna65.55→hybrid84.45；这些为百分点而非普遍相对百分比。（PDF p.6 Table1）；作者报告 dual encoderV*90.34 vsInterleaved82.35，但HR4K43.50 vs44.12、RealWorldQA52.55 vs57.77；是不同fusion系统比较。（PDF pp.6/8 Table3/§4.2）；作者报告去reserve令HR4K43.88→38.75；hybridV*随k从1的84.03降到4的67.65。（PDF p.9 Table6） 对照范围：Dense Connector、TGIF、MLVF、DeepStack等公开LLaVAcheckpoint；未覆盖当前更强native-resolution主流backbone，双encoder非严格routing-only控制。 消融与诊断：image-only、reserve、k1/2/4、global/patch/hybrid；附表明确采用method family内per-metric best，结果不是统一checkpoint泛化保证。",
+    "insightZh": "相对 dense TGIF 与固定 layer fusion，创新是 image/patch证据共同决定 sparse层选择和 uncertainty reserve；不是跳过执行 vision layers 的动态深度模型。",
+    "evidenceZh": "routing 在视觉层间选择，输出 token数不增加。（PDF pp.3–6 §3, Eqs.(3)–(10), Fig.1）；细粒度收益跨若干 backbone，但并非全任务提高。（PDF p.6 Tables1–3; pp.17–18 Tables7–11）；reserve layer 与 text conditioning 有用，但正文 image-only文字错误。（PDF p.9 Tables5–6; p.10 §4.4）",
+    "caveatZh": "需要全部层 hidden state与aligned text encoder，encoder-free或仅末层接口不适用。；多数训练单run，无统计误差；新encoder/resolution需调k与reserve。；attention/RF分析不构成完整causal explanation；粗粒度任务收益小或中性。；正文Table5与§4.4image-only趋势矛盾，主表/附表CharXiv与reserve/V*数值亦不同，复现需追踪准确checkpoint配置。；只保留token数和<0.02%router参数，不足证明实际端到端速度/内存节约。；所述per-metric best容易高估单checkpoint可靠性；无paired显著性。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "视觉design/空间 agent可参考按query选择细节层，避免只扩大图像token；暂无结构化生成或3D asset编辑直接证据。"
+  }
+}

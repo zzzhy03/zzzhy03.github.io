@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.10984",
+  "slug": "fluid-gen-zero-grounding-pretrained-video-generators-in-physics-without-training",
+  "title": "Fluid-Gen-Zero: Grounding Pretrained Video Generators in Physics without Training",
+  "authors": [
+    "Hong Huang",
+    "Yuqiu Liu",
+    "Chenyu You",
+    "Daniel Martin",
+    "Chuhang Zou",
+    "Wuyang Chen"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10984"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Fluid-Gen-Zero",
+    "Grounding",
+    "Pretrained",
+    "Video",
+    "Generators",
+    "Physics",
+    "without",
+    "Training"
+  ],
+  "abstract": "We present Fluid-Gen-Zero, a training-free framework for physics-aware fluid-object interaction video generation that decouples physical reasoning from appearance synthesis. Our key insight is to delegate motion dynamics to a physics simulator while preserving the appearance modeling capacity of pretrained video generators. We bridge these two domains through a two-level agentic workflow: generation-time planning, where a vision-language model (VLM) agent interprets intent and the simulation rollout to organize generation clips, and latent-space guidance, which injects simulation signals into denoising through region-aware latent wrapping. This plug-and-play design is compatible with current video foundation models. We further introduce a benchmark for fluid-object interaction video generation. Across Tora (CogVideoX-based), VACE and WanMove (Wan-based), Fluid-Gen-Zero consistently improves simulation alignment, reducing object trajectory error by 26.7%-81.5% and fluid fEPE (fluid flow endpoint error) by 67.9%-84.0%, while largely preserving perceptual quality. In a human preference study, raters favor Fluid-Gen-Zero in 55.1%-74.4% of same-backbone comparisons across three backbones, and in 90.4%-94.2% of comparisons against simulation-based methods. Code and data will be released upon acceptance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10984v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10984v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10984v1 的 22 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Fluid-Gen-Zero 用单图重建+Genesis MPM确定object/fluid motion，再以event-aware clip planning和不同object/fluid latent wrapping把simulation接到冻结video generators。三backbone的trajectory/flow alignment改善清楚，适合skim其可迁移physics-control接口；benchmark仅43curated cases，人评8例，效果遵循所构造simulation而非保证自然物理真实，WanMove视觉质量与PhysR还小幅下降。",
+    "motivationZh": "Pretrained video generators 能画出流体，却不一定遵循指定的流动轨迹及其与物体的相互作用。重新训练物理生成器成本高，论文关注在冻结模型上实现更明确的流体运动控制。",
+    "methodZh": "rule parser给density/viscosity/force，VLM解析identity/context/events；GroundingDINO/SAM、MoGe2和SAM3D构造waterline-aligned mesh/particles。Genesis liquidMPM与rigid或elasticobject rollout401frames，生成masks/flow及appearance-preserving warped reference。由physical/visual/semantic complexity和no-cut set选13/41/81framesclips，局部prompt与last-frameanchors维持事件连续。Latent从partially noised reference开始，object早期hardwrap、fluidsoftdecay；nativeconditions依backbone转denseflow或sparse trajectories。完整22页，包括11页sup全部signal公式、sim设置、independentablation、failure和userstudy已读。",
+    "methodFlow": [
+      "解析appearance/dynamics/events，segment并lift单图，waterline-refine objectmesh/scene scale。",
+      "Genesis以liquidMPM和rigid/elasticobject模拟，投影401frameparticlemotion为masks/flow，构warpedreferencevideo。",
+      "physical/visual/VLMevent风险曲线与no-cutintervals做greedy clipboundary规划，局部prompts保globalappearance。",
+      "partial-noise reference latent初始化sampling，早期objectbinarywrap与fluidsoftlineardecay注入simcontrol。",
+      "冻结Tora/VACE/WanMove nativebackend生成clips，lastgeneratedframe作为后clipanchor并去重stitch。"
+    ],
+    "experimentsZh": "43curatedfluid-object samples、401simframes、10primaryfluidcategories；Tora5B/VACE1.3B/WanMove14B及PhysGen3D/WonderPlay/MotionCraft。Genesis dt1e-3/30substeps/g9.8，materialrulepriors；gpt5.4mini3agentcalls、gpt5.5judge。sharedwrappingsettingsk0=8,kobj11,kfl10,fluidβ.8；humanstudy8samples13people，每人34trials。 以下结果为作者报告：作者报告Toraobjecttrajectoryerror133.20→24.61、fluidfEPE3.950→.843；WanMove92.93→23.08、5.180→.827。（Table1, PDF p.7）；作者报告VACE56.02→41.06、fluid6.445→2.070；WanMoveaesthetic.528→.500、image.677→.665、PhysR.518→.486存在tradeoff。（Table1, PDF p.7）；作者报告same-backbone overallpreference55.1%(WanMove)、74.4%(Tora)、69.2%(VACE)；latentguidance单独TorafEPE.812 vsfull.843。（Table2, PDF p.8; Supplement Table7, PDF p.20） 对照范围：samebackbonecomparison对guidance有用；PhysGen3D/WonderPlay目标fluidcapacity不同，trajectory/flow表空值不能宣称全面定量超过。无sim-in-loop新物理generator同budget全面对照或end-to-endsetup/runtime成本。 消融与诊断：planneronly和guidanceonly拆出来源，Tora同/不同wrap与no-fluidwrap；planner变化含clipprompts/length，不单独隔离VLM vsmetricsplanner。只43cases+小humanstudy，semantic/physicsjudge不替代physical验证。",
+    "insightZh": "training-free sim→timeline/latent双接口，特别region-asymmetricwrap和protected-event cuts，有视觉生成control迁移；geometryreconstruction、MPM、SDpartial-noising与nativebackbonecontrol均复用，非新的physicalfoundation或新fluid solver。多数alignment收益来自latentguidance，agentplanner收益较小。",
+    "evidenceZh": "同simrollout向planner和generator提供独立temporal与latentcontrol，不更新generator参数。（Secs.3.1–3.4, Figs.2–4, PDF pp.3–5）；latentguidance承担主要motiongain，planning单独只较小改进。（Supplement Secs.6.1–6.2, Tables6–7, PDF p.20 (supp p.9)）；simulation alignment改善但perceptual/physicsjudges并非所有维度改善。（Table1 and discussion, PDF pp.7–8）；reconstruction/sim misalignment会把错误布局/contact传到输出，人研究样本很小。（Limitations PDF p.8; Supplement failure/userstudy PDF pp.20–22）",
+    "caveatZh": "PDF p.8承认reconstruction/simulationaccuracy依赖，2Dmasks/flow不足以表达finefluid-solidcoupling，longclips有appearance/cameradrift。；Supplement pp.20–22展示segmentation/depth/pose/scale错误导致layout/contactartifacts。；PDF p.8承认WanMovequality/PhysR小幅退化。；simulationparameter由heuristicmaterial词与VLMsize决定，并非测得的真实physics；alignedmotion不保证mass/contact/energy守恒。；warpedreference主要平移原objectlayer，orientation/shape变化与fluid细节生成可脱离sim3D状态。；55.1%preference未有participant/scenecorrectedCI，少量重复trials不足以证明广泛优势。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "3Dsim→video的training-freephysicalcontrol对visualcreation/4Dworkflow有迁移价值；没有新可编辑3D output、fabrication或LEGO验证。"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.12307",
+  "slug": "budgetpix-compute-adaptive-tokenization-for-pixel-space-image-diffusion",
+  "title": "BudgetPix: Compute-Adaptive Tokenization for Pixel-Space Image Diffusion",
+  "authors": [
+    "Ozgur Kara",
+    "Yujia Chen",
+    "Daniel Watson",
+    "David Forsyth",
+    "James Matthew Rehg",
+    "Wen-Sheng Chu",
+    "Du Tran"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12307"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "BudgetPix",
+    "Compute-Adaptive",
+    "Tokenization",
+    "Pixel-Space",
+    "Image",
+    "Diffusion"
+  ],
+  "abstract": "Most image generation models rely on uniform tokenization, allocating the exact same computational budget to equally-sized image patches. This static paradigm cannot adapt to different resource constraints at inference time, and yields suboptimal quality-cost tradeoff by devoting the same effort to both plain backgrounds and intricate details. We propose BudgetPix, an adaptive tokenization framework that dynamically allocates compute based on visual complexity and spatial layout, enabling flexible computational budgeting at inference time. BudgetPix comprises three key components: (1) an adaptive encoder that maps a fixed-size image to a variable-length token sequence using an entropy-guided quadtree alongside a multi-scale patch embedder; (2) a scale-aware decoder reconstructs fixed-resolution images from multi-scale token sets; and (3) a flexible training and sampling schedule that enables pixel-space denoisers to operate across variable token counts. BudgetPix seamlessly integrates with existing pixel-space diffusion architectures, enabling a single checkpoint to be operated at a wide range of compute budgets. Evaluated on text-to-image generation, BudgetPix matches the fidelity of MiniT2I-L at $512^2$ and PixelDiT at $1024^2$ using just 25% of the original compute budget. In class-conditional generation using a MeanFlow backbone, BudgetPix requires merely 60% of the full compute budget to produce images with near-zero quality degradation, observing a marginal 0.8-point increase in FID. Comprehensive assessments by human and VLM judges confirm that BudgetPix establishes a significantly improved quality-efficiency tradeoff over prior budget-adaptive baselines. More details are available at our project page: https://karaozgur.com/BudgetPix",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12307v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12307v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12307v1 的 56 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "BudgetPix 把 pixel-space diffusion 的固定网格改为 entropy quadtree，并联合训练多尺度 encoder、decoder 和原骨干，使同一 checkpoint 支持不同 token budgets。作者报告 MiniT2I-L 在 25% tokens 时 GenEval 0.874（原模型全预算 0.882）、特定 H100 批量计时加速 3.59×；PixelDiT 对应只有 1.95×。这是生成表示接口的实质改造，值得 skim；不能把 25% tokens 等同于 25% 总计算，也不能宣称任意图片无损。",
+    "motivationZh": "Pixel-space diffusion 用固定密度的 patch token 覆盖整幅图像，平坦背景与细密纹理消耗相同的计算。待解决的问题是按局部信息量分配 token，同时保留完整空间覆盖和细节生成能力。",
+    "methodZh": "目标是让像素域生成器把精细 token 留给复杂区域，合并平坦区域而维持完整图像覆盖。训练使用 clean-image entropy layout，推理由 dense warm-up 的 clean estimate 构造 quadtree；coarse patch 的聚合器保存区域信息，局部 refiner 恢复高频细节。全量微调原模型和新增模块，混合 dense、random 和 content-aware layouts。一套 checkpoint 覆盖 JiT、MiniT2I、PixelDiT，另扩展到 one-step pMF。",
+    "methodFlow": [
+      "构造预算化 quadtree：以 luma histogram entropy 判断 p、2p、4p patch；二分全局 offset，使每图 token 数不超过指定预算，保持空间完整覆盖。",
+      "聚合与解码多尺度 token：细 patch 使用原 embedding/head；coarse token 经 scale mixer 聚合，再用双路径 upsampling 与轻量 refiner 重建细节，PixelDiT 改为 cell conditioning correction。",
+      "训练预算鲁棒性：保留原 flow matching 或 MeanFlow loss，全量微调骨干；使用 dense、random entropy、clean-image layout 混合训练，一份权重服务多个预算。",
+      "从早期预测分配推理预算：先运行若干 dense steps，再由 clean estimate 构造 layout，可周期重建；one-step pMF 无轨迹，使用同类训练图片的 layout。"
+    ],
+    "experimentsZh": "七个多步 pixel diffusion parents，另有 one-step pMF；ImageNet FID-50k/IS，GenEval 553 prompts×4、DPG 1065×4，PartiPrompts 1632×1；配对 dense fidelity、20-prompt human study 与100-prompt VLM judge。H100 批量 wall-clock timing 的具体设置见 Table 21。 以下结果为作者报告：作者报告 JiT-L/32 在 100%/50%/25% tokens 的 FID 为 2.71/5.57/11.54；降低预算仍明显损失质量。（PDF p.34 Table 3）；作者报告 MiniT2I-L 25% tokens GenEval 0.874、DPG 84.3、计时 1.376s/image 与 3.59× 加速；原全预算 GenEval 0.882。（PDF p.36 Table 5; p.39 Table 7）；作者报告 one-step pMF 60% tokens FID 3.46 vs 本方法全预算 2.65、原发布权重 2.54；one-step layout 不从待生成图推断。（PDF p.42 Appendix B.6 Table 15） 对照范围：Base model、ToMe、FeatSim 使用发布模型；MiniT2I 另比较 RTI 发布 adapter；PixelDiT 只比较 base。共享 prompts/noise/solver/guidance，但训练预算和可训练参数不完全对齐。 消融与诊断：Aggregator/refiner 的组件 ablation；JiT-B layout、dense warm-up、re-layout、steps、guidance、entropy thresholds、pooled budget；FID-10k 与主 FID-50k 不可直接相减。",
+    "insightZh": "相对纯 inference token merging，贡献在于从输入起改变非均匀生成 token 接口，并联合学习 coarse encoder/decoder 和预算混合训练；多类 pixel backbone 验证使其可作为生成器设计参考。Entropy quadtree 延续 APT，不能将其单独说成新理论；基线多使用固定发布权重，收益同时包含全量 fine-tuning。",
+    "evidenceZh": "新增 coarse paths 从零初始化，全量训练原模型；不是无需训练的 pruning。（PDF pp.43–47, Appendix C.1–C.4, Tables 16–19）；作者报告低 token budget 下仍维持较强 compositional generation，收益与数据/骨干相关。（PDF p.8 Table 1; p.36 Table 5）；实际 speed-up 并非 token 预算倒数，计时采用预编码文本、批量采样、固定 layout 与 CUDA graphs。（PDF pp.38–40 Tables 6–13; p.52 Appendix C.7 Table 21）；作者报告用户能容忍更大 token 削减，但该指标以各方法自己的 dense image 为参考。（PDF pp.49–51 Appendix C.6, Table 20）",
+    "caveatZh": "推理 layout 来自早期 clean estimate，可能漏掉尚未生成的细节。；PixelDiT 的 dense pixel stage 构成成本下限；更好的学习式 allocation 留待未来。；Wall-clock 固定 layout、预编码文本且 batch 8–50，不代表单图端到端 latency；主要质量采样会每5步重建，计时条件有差别。；全量微调与冻结 merging baselines 的训练成本不同；各方法 own-dense fidelity 不能排除 full-budget 内容变化。；极低预算 FID 明显变差，pMF 使用同类训练图 layout，不证明一跳生成的内容自适应 allocation。；FID 主实验单 run，human 只有20 prompts；不宜推广为任意设计产物的无损加速。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为 image-generation 的 foundational representation 和可控预算接口提供跨骨干实证，适合对照 pixel-space 模型的生成质量与部署成本；未直接验证 CAD/LEGO 等核心任务。"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.13272",
+  "slug": "owlet-on-policy-weighted-learning-via-evidence-transfer-for-video-large-language-model-post-training",
+  "title": "OWLET: On-Policy Weighted Learning via Evidence Transfer for Video Large Language Model Post-Training",
+  "authors": [
+    "Qitan Lv",
+    "Ke Fan",
+    "Hong Wang",
+    "Wen Wu",
+    "Yilin Wang",
+    "Bowen Zhou",
+    "Feng Wu",
+    "Chao Zhang"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13272"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "OWLET",
+    "On-Policy",
+    "Weighted",
+    "Learning",
+    "Evidence",
+    "Transfer",
+    "Video",
+    "Large",
+    "Language",
+    "Model",
+    "Post-Training"
+  ],
+  "abstract": "Post-training has become a key stage for eliciting reasoning capabilities in Video Large Language Models (Video-LLMs). Existing post-training methods mainly follow two paradigms: reinforcement learning (RL) and on-policy distillation (OPD). However, they do not fully exploit visual evidence for effective training. RL supervises the policy with a single trajectory-level reward, which is too coarse-grained for video reasoning: the same response-level advantage is applied to every generated token, disregarding that the tokens of a video response are grounded in the visual stream to very different degrees. OPD provides token-level supervision through output-distribution matching, but lacks direct supervision of the spatiotemporal representations that produce those outputs. We observe across extensive experiments that the same model reasons more accurately when its video view combines global temporal context with question-relevant details. Comparing the same student-generated response under this view and uniform sampling reveals changes in token likelihoods and internal representations, providing a training signal for evidence use. Building on this observation, we propose OWLET, an evidence-privileged RL method that derives training signals from a richer teacher view. This view couples uniform global context with question-conditioned local windows, providing visual evidence without requiring a larger model. To better exploit this privileged visual evidence, OWLET introduces (i) \\textbf{evidence-aware credit redistribution}, which compares token likelihoods across the two views and redistributes positive response-level advantages according to their relative evidence support; and (ii) \\textbf{spatiotemporal state alignment}, which aligns the two views' hidden states on verifier-accepted responses.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13272v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13272v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13272v1 的 57 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "OWLET 用同规模 frozen teacher 的 global-plus-local video view 给 uniform-frame student 提供训练信号：positive advantage 按两视图 token likelihood contrast 加权，并对正确回答的 response-end hidden states 做 cosine alignment。作者报告 Qwen3.5-9B 的五项平均 54.4→59.8，GRPO 为55.5；两类 Qwen、多个预算均提升。适合精读 evidence-guided post-training，但 likelihood contrast 后期含参数差异，hidden alignment 也不是时空因果证据。",
+    "motivationZh": "Video VLM 的 RL 回答可能在稀疏、均匀采样的帧中缺少关键视觉证据；只奖励最终选项，也难以区分有证据的正确推理与偶然答对。问题是在相同帧数预算下，把 teacher 对关键时段的观察和回答证据传给 student。",
+    "methodZh": "数据将问题相关 frame relevance ranking 与均匀全局覆盖组合，teacher 和 student 的 frame 数相同。Student on-policy 产生8个回答并按选项字母计算 binary verifier reward；仅 positive group advantage 被 ECR 的 clipped、centered exponential contrast 改写，negative 保持普通 RL。SSA 对 verifier-accepted 回答在 decoder 各层对齐末尾 hidden state。推理不调用 teacher 或 evidence selector，仍均匀采帧。",
+    "methodFlow": [
+      "建立问题条件 evidence views：从四个视频 QA 来源保留95,705训练记录；frame relevance 从最多512候选中选出窗口，teacher 用 N/2 全局帧加 N/8 个4-frame windows，student 用 N 个均匀帧。",
+      "以 student rollouts 保留 outcome 方向：每题8个回答，选项字母 verifier 给 binary reward，组内标准化 advantage；teacher 从共同初始 checkpoint 冻结。",
+      "重加权 positive token credit：同一回答在teacher-rich和student-uniform视图重评分；contrast clip到±log5，减响应均值后取exp，只乘 positive advantage，negative 不变。",
+      "对齐被验证回答的 states：对正确回答各 decoder 层的末尾 state 做 paired cosine loss，默认权重0.05；teacher stop-gradient，只更新student。",
+      "保持普通推理接口：训练后 N=16/32/64 uniform frames 单次生成答案，不需额外 evidence annotation、teacher 或搜索。"
+    ],
+    "experimentsZh": "Qwen3.5 0.8B/4B/9B/27B、Qwen3-VL 2B/4B/8B thinking和non-thinking；16/32/64frames，五个multiple-choice视频benchmark，1000updates、16prompts×8rollouts、八H200。构造95,705训练记录/21,832视频，1000诊断held-out记录，声明排除了benchmark视频overlap；人工audit300条的evidence可接受率91.67%。 以下结果为作者报告：作者报告 Qwen3.5-9B 64frames宏平均由 vanilla54.4至59.8，GRPO和OPSD55.5；MLVU由52.7至61.6。（PDF p.7 Table 1）；作者报告 SSA 权重0时58.7，默认0.05时59.8；fixed teacher59.8，EMA0.99为58.6。（PDF p.49 Table 28; p.51 Table 31）；作者报告 held-out global-temporal accuracy 58.6 vs GRPO53.4，但 key-window输入的 local-evidence65.4高于OWLET59.8。（PDF pp.55–56 Table 34）；作者报告 positive advantage fraction随训练28.5%→4.7%，最后93.1%为zero；正确但zeroadvantage样本仍能产生SSA。（PDF p.49 Table 29） 对照范围：相同数据/rollouts/updates的GRPO、OPSD，以及大模型生成trace的SFT；附加JSD、OPSD+GRPO、anneal；没有完整覆盖所有video-specificRL/KTR/APPO实现对照。所有结果为作者报告，未本地复现。 消融与诊断：去ECR、去SSA、去global track，多个模型与budgets；SSA λ、fixedvsEMA、训练延长1000→3000steps。未提供学习率/总正credit幅度匹配控制来完全分离exp加权的作用；主表未报多seedCI。",
+    "insightZh": "将问题相关 temporal evidence 的 privileged view、reward-preserving token weighting 和 on-policy representation transfer 结合；贡献在视觉监督进入训练的两级接口，而不是扩大teacher。具有跨规模、thinking/non-thinking、训练成本和组件对照，超过单一 benchmark 上的小改动。‘redistribution’未显式归一化 exp 权重，不能声称严格保持响应正优势总量。",
+    "evidenceZh": "Teacher 冻结在初始 checkpoint，same-view数量、different-frame-content；student 只接收 uniform sampling。（PDF pp.19–20 Algorithm 1; pp.23–24 Table 3; p.32 Table 7）；作者报告两类 Qwen 的多个 frame budgets 上均超过 SFT、GRPO、OPSD。（PDF p.7 Table 1; p.8 Table 2; pp.37–41 Tables 15–23）；作者明确 likelihood contrast 不是 causal attribution，且后期包含 visual 和 parameter differences。（PDF pp.18–19 Appendix A; p.48 Appendix F.2）；作者报告训练只比 GRPO 多3.7% step time，但绝对成本很高。（PDF pp.53–54 Appendix F.6 Table 32）；SSA 与 output KL 用不同度量，representation 差异不能直接证明 temporal structure 被理解。（PDF pp.27–28 Appendix D.6; p.6 Eq.(6)）",
+    "caveatZh": "自动 evidence relevance 可能误定位；需要confidence-aware或联合选择。；依赖binary outcome verifier，主要测试multiple-choice，对开放答案/主观问题需其他验证。；训练增加teacherforward，非Qwen、更多frames和更长视频尚未研究。；Likelihood contrast 是间接support signal，不能显式因果归因视觉cue。；Frozen teacher对 evolving student的contrast混合参数和输入差异；初始化diagnostic不能证明整个训练中都是纯evidence增益。；末尾states同时携带回答文本，SSA降低CKA差异不等于可解释时空representation；CKA与KL单位不同。；exp(z−mean z)没有算术均值归一化，positive credit总量可增加，需额外控制才能归因于仅redistribution。；评测和ablation主结果无seed置信区间；response length末期9B大量变成Answer-only，改善的是MC回答准确率，不是保证长chain-of-thought可靠。；Dataset held-out以records划分，21.04%global训练vs50%diagnostics；benchmark无videooverlap是作者声明，尚无发布资源独立核实。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为 VLM/MLLM 多模态训练、visual evidence 利用和on-policy representation learning提供具体方法与广泛对照，可用于理解视觉反馈如何进入学习；没有直接验证核心设计生成任务。"
+  }
+}

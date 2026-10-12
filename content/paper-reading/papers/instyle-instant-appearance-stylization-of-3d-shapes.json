@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2512.03683",
+  "slug": "instyle-instant-appearance-stylization-of-3d-shapes",
+  "title": "InStyle: Instant Appearance Stylization of 3D Shapes",
+  "authors": [
+    "Melis Ocal",
+    "Xiaoyan Xing",
+    "Yue Li",
+    "Ngo Anh Vien",
+    "Sezer Karaoglu",
+    "Theo Gevers"
+  ],
+  "publishedAt": "2025-12-03",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2512.03683"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "InStyle",
+    "Instant",
+    "Appearance",
+    "Stylization",
+    "3D",
+    "Shapes"
+  ],
+  "abstract": "3D stylization is central to game development, virtual reality, and digital arts, where the demand for diverse assets calls for scalable methods that support fast, high-fidelity manipulation. Existing text-to-3D stylization methods typically distill from 2D image editors, requiring time-intensive per-asset optimization and exhibiting multi-view inconsistency due to the limitations of current text-to-image models, which makes them impractical for large-scale production. In this paper, we introduce GaussianBlender, a pioneering feed-forward framework for text-driven 3D stylization that performs edits instantly at inference. Our method learns structured, disentangled latent spaces with controlled information sharing for geometry and appearance from spatially-grouped 3D Gaussians. A latent diffusion model then applies text-conditioned edits on these learned representations. Comprehensive evaluations show that GaussianBlender not only delivers instant, high-fidelity, geometry-preserving, multi-view consistent stylization, but also surpasses methods that require per-instance test-time optimization - unlocking practical, democratized 3D stylization at scale.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2512.03683v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2512.03683v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2512.03683v2 的 31 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本轮版本更新：v1名称GaussianBlender且Stage3仅用Ledit teacher图像监督；v2 InStyle引入SD latent-space DMD/auxiliary fake denoiser、teacher-image anchoring与color-variance稳定项，并有DMD-vs-MV-L1消融、style catalog1–30与SceneSplat真实场景extract-edit-reinsert。方法及经验范围均实质更新，不是只有改名/日期。 InStyle 将 spatially-grouped 3DGS 分成geometry与color/opacity双latent，在geometry锚定下用multi-view DMD把IP2P样式蒸馏成单forward编辑器。作者报告约.26秒、structure distance.0050，适合大批量3Dasset appearance variants。值得deep学习因素分离与3D-native蒸馏；但编辑主要是训练过的1–30个stylecatalog，geometry仍经过可共享/再训练decoder，不能称任意prompt或严格坐标不变，PBR材料亦未输出。",
+    "motivationZh": "现有 text-guided 3D stylization 多需逐资产优化，速度慢且容易改变原本 geometry 或造成多视图不一致。现成 3DGS asset 的外观编辑还需从独立物体迁移到真实重建场景中的局部对象。",
+    "methodZh": "123KObjaverse-derivedGS资产经FPS/KNN分1024groups，16384Gaussians输入双branchVAE，render/parameter/KL与pooledcosine dissimilarity训练；ShapE架构appearance denoiser预训后以6viewgrid的IP2P real/fake DMD加teacherimageanchor/colorvariance学习edit。测试unseenassets、latent swaps、OmniObject及annotatedrealcaptures。",
+    "methodFlow": [
+      "分组与因素编码：16384inputGS做FPS/KNN，geometry为position/scale/quaternion，appearance为RGB/opacity，两branchgroup-tokenVAE。",
+      "受控sharing：dualdecoders的4headcrossattention与残差融合提供geometrycontext，pooledlatentcosine与重建/render/KL联合学习。",
+      "学习appearanceprior：geometrylatent保留，ShapE初始化denoiser恢复appearance noisy latent与CLIPtextcondition。",
+      "多视图DMD编辑：render6views拼grid，SDVAE编码，frozenIP2Preal与trainedauxiliaryfake给DMDgradient，加稀疏MVL1和variance，部署单forwardappearance编辑并decodeGS。"
+    ],
+    "experimentsZh": "120Ktrain/3KheldoutGS，LightGaussian50K→16384、72views400²，4H100；optimizationbaseline30assets/10styles，ShapEditor单独2000pairs/4checkpoints；50participant8tasks，numbers作者报告。 以下结果为作者报告：作者报告CLIPsim.260/CLIPdir.223/StructureDist.0050、latency.26s；GaussianEditor.246/.189/.0412/7min，ShapEditor.238/.128/.0457/1s但不同prompt/asset集。（PDF p.11 Table1）；作者报告50人偏好text33.69%、structure42.05%、quality34.60%，是五系统选项plurality不是多数。（PDF p.12 Table2）；作者报告DMD+anchor .260/.223/.0050 vsanchoronly.251/.210/.0064；latentappearance swap silhouetteIoU.985。（PDF pp.27–28 Table7/Fig.13）；作者报告input subsamplePSNR32.7136→VAE34.3299，original35.2117；fullscene16384GS有blurfailure。（PDF pp.13/31 Table3/Fig.14） 对照范围：NeRF/GSoptimization及ShapEditor；metriccolumn混合不同protocol，strongscene/newopenpromptquantitativeOOD缺乏。StructureDistance是imagefeature而非meshmetric。 消融与诊断：dualvsjoint、latentdissimilarity、crosssharing、DMDvsMVL1、catalog1–30、higherCFG、factorperturb/swap。没有精确parametergeometryinvariance或relighting/PBR检验。",
+    "insightZh": "贡献是amortizedGSappearanceeditor的factorizedgroupedlatent与multi-viewDMD，区别perassetoptimization或sharedgeometry编辑；pooledlatentorthogonality与fixedgeometrycode是empirical控制，不保证完全statisticaldisentanglement或参数恒定。 v1名称GaussianBlender且Stage3仅用Ledit teacher图像监督；v2 InStyle引入SD latent-space DMD/auxiliary fake denoiser、teacher-image anchoring与color-variance稳定项，并有DMD-vs-MV-L1消融、style catalog1–30与SceneSplat真实场景extract-edit-reinsert。方法及经验范围均实质更新，不是只有改名/日期。",
+    "evidenceZh": "geometry/appearance双latent与bidirectionalcross-branchsharing。（PDF pp.6–8 §3.1 Eqs.(1)–(8); p.23 C.1/C.2）；styling训练是multi-viewDMD+IP2Panchor，测试无需iterativeoptimization。（PDF p.8 §3.3 Eqs.(10)–(11); pp.24–25 C.2）；stylecatalog是主要适用范围。（PDF pp.14/22 Limitations/Table5; p.27 Fig.9）；geometrypreservation为统计/图像metric且强guidance恶化。（PDF pp.11/28/30 Tables1/8 Fig.13）；v1名称GaussianBlender且Stage3仅用Ledit teacher图像监督；v2 InStyle引入SD latent-space DMD/auxiliary fake denoiser、teacher-image anchoring与color-variance稳定项，并有DMD-vs-MV-L1消融、style catalog1–30与SceneSplat真实场景extract-edit-reinsert。方法及经验范围均实质更新，不是只有改名/日期。（Prior 2512.03683v1 PDF p.5 §3.3 (trained using only Ledit); current v2 PDF p.8 §3.3/Eq.10, pp.11–14 Figs.5,7, pp.24–25 C.2, p.29 Table 7）",
+    "caveatZh": "依赖IP2P/pretrain，curatedstylecatalog；open-endedprompt需更大训练。；16384GS不足复杂fullscene，会模糊重建/编辑。；real-scene先借datasetsegmentation/3Dbbox提object再reinsert，非自动localizededitor。；appearance包含opacity，crosssharing及再训练decoder允许geometry/visibility变化；不宜称严格保geometry。；大latent1024²、训练400epochs+10editstage成本与资产preprocessing不包含在编辑latency。；OOD基本qualitative，30assetoptimizationcomparison小、userstudy未含feedforwardShapEditor且无CI。；RGBstylization不是物理材质/PBRmap，不可自动给制造/材质真实性结论。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接可编辑3D资产appearance库与因素分离接口命中3DGeneration主要方向，可借鉴identityanchor与styletransfer；精确assembly/制造geometry仍需原参数保留或另验。"
+  }
+}

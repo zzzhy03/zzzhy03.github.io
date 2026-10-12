@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2610.12399",
+  "slug": "spaceflow-locally-controllable-3d-generation",
+  "title": "SpaceFlow: Locally Controllable 3D Generation",
+  "authors": [
+    "Neil De La Fuente",
+    "Joan Lafuente",
+    "Mukhammadali Sayfiddinov",
+    "Felicia Scharitzer",
+    "Marc Pollefeys",
+    "Ata Celen",
+    "Sayan Deb Sarkar",
+    "Elisabetta Fedele"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.12399"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "SpaceFlow",
+    "Locally",
+    "Controllable",
+    "3D",
+    "Generation"
+  ],
+  "abstract": "Current 3D generation methods lack explicit local control: geometric adherence is often defined by a global control strength, and appearance cannot be specified locally. We present SpaceFlow, a training-free pipeline for locally controllable 3D generation from text descriptions and a collection of geometric primitives. Each primitive serves as a proxy for an object part and is assigned a local control level, enabling users to specify whether regions should strictly follow the input shape or allow generative completion. During structure generation, we enforce these spatial constraints within the generative flow process. For appearance synthesis, the generated structure is segmented and matched to the primitives. Each generated part is conditioned only on its assigned text or image cue, thereby limiting cross-part leakage. Regional geometry metrics demonstrate that SpaceFlow preserves the specified geometry in high-control regions and enables plausible shape variation in low-control areas. A user study further indicates that the resulting balance between geometric fidelity and generative freedom remains competitive in overall quality. When evaluating appearance on fixed geometry, text-conditioned routing achieves state-of-the-art prompt faithfulness and color/material accuracy. Qualitative results additionally show localized routing of image cues. The project page is available at SpaceFlow3D.github.io.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12399v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.12399v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/SpaceFlow3D/spaceflow"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.12399v1 的 36 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SpaceFlow 以per-primitive高/低geometrycontrol保护设计结构，PartField把生成parts绑定各text/imageappearancecue，可一边保chairlegs一边补slatback。作者报告high-regionCD3.65比globalweak15.99好、localtexturePF7.07；不是硬精确或零泄漏，globalstrongCD.94仍更准且texture细节较差，300steptesttimeoptimization成本未量化，值得deep看设计控制接口。",
+    "motivationZh": "3D 生成时，设计者常只想精确保留某些结构，让其他区域自由补全；统一的全局约束难以表达这种不同区域的自由度。局部外观要求还可能互相串扰，难以把颜色或材质指令稳定绑定到目标部件。",
+    "methodZh": "TRELLISXL frozen，全部/高controlprimitives各VAEencode；从lowcontrolpartiallynoisedlatent开始，以singlelowboundingboxmask外注highcleanlatentα.18、区间每stepRePaint-style10resample。生成structuremesh提PartField448D/30Kmeansclusters，以clusterrepresentative nearestprimitive赋appearancecue。SLATcrossattention每voxel只读该cue，samecue selfattentionboost2.5但跨part仍通；每300appearanceflowstep做AdamWlatentcontrastiveupdate，选lowestlossstate。完整36页含全部参数、assignmentfallback、regionalmetric、user/judgeprotocol、continuum与failure已读。",
+    "methodFlow": [
+      "用户给2-18editableSQparts、high/lowgeometrycontrol及每parttext/referenceappearance。",
+      "all/highsubset分别VAEencode，以lowstrengthnoisylatent启动structuregeneration。",
+      "lowboundingboxmask外反复blendhighcleanlatent，12stepflow中区间10re-noise/denoise融合边界。",
+      "生成mesh提PartField30clusters，clusterrepresentative nearestSQ分配cue，下采32cube并修thinpart不足support。",
+      "crossattention只routeassignedcue，samecueboostselfattention仍保globalcontext。",
+      "300stepappearanceflow与latentAdamWpartcontrastiveguidance，选lowestlossdecodeasset。"
+    ],
+    "experimentsZh": "83selfcuratedassets/7categories/2-18SQparts，含LLM候选+humanrefine，excludeconflicting/nestedcontrolambiguity。sameprompt/scaffoldSpaceControlglobal3/10；appearanceallmethodsfixedSpaceFlowgeometry。GPT5.6Soltwofixedviews/~210degree，3randomizedpassesmajority，29human337interactive3Dtrials。RTX5060Ti；12structuresteps×intervalresample10、300appearanceoptimizersteps。 以下结果为作者报告：作者报告CDhigh3.65 vsglobalweak15.99/strong.94，ΔCD6.05vsglobal-.14/.11，CLIP.233vs.232/.226。（Table2, PDF p.8）；作者报告geometricVLMoverall75.9%vsweak、68.7%vsstrong；humanoverallweak48win/13tie/39loss，strong71/10/19，非同数字。（Table1/Fig.6, PDF pp.7/9）；作者报告textappearancePF7.07/CM6.43/TD6.49 vsTRELLIS6.13/5.79/6.87与Guide6.40/5.96/6.76，texturequality下降。（Table4, PDF p.11）；作者报告imageappearance standalone routing7.07/style6.53/overall6.73，无per-partimagebaseline；非comparativeimageSOTA。（Sec.4.2, PDF p.11） 对照范围：主要globalSpaceControl和samegeometryTRELLIS/GuideFlow；没有其他part-awaregenerator/maskedattentioncontrolmatchedcost。单backbone/83专门configs、nohumanappearancecompare、noend-to-endlatency/seedvariance。judge验证只identicalpairs和mismatchedcontrols，非independenthumanagreement；所谓3passes消stochasticnoise并不能完全消bias。 消融与诊断：lowstrength1/3/5/7/9保持high10，regionalCD趋势支持continuouscontrol但globalcoupling也改highregion；assignment可视化/thinprimitivegeometricfallback。未将routedcrossattention、selfbias、contrastiveguidance独立数字拆分。图像localcue定量只有standalonejudge，文字geometry/appearanceisolatednotjointcontrolquant保证。",
+    "insightZh": "局部geometrycontrolstrength与appearancecue的统一design接口具实质方法价值；SpaceControlVAEprojection/RePaint、GuideFlowcontrastive、PartField已有，创新为regional组合与routing而非newgenerator。输入分parts不保证outputmesh分parts，也非shapeexactconstraints。",
+    "evidenceZh": "geometrymask实际上singleboundingbox围所有lowparts，16cube latent保护有限。（Sec.3.4 Eq.(2), PDF p.5; Supplement S1, p.16）；appearancecrossattentionhardroute并不消除selfattention及partboundaryleak。（Sec.3.5, PDF pp.6-7; S8/Fig.S11, pp.27-28）；高control更faithful但仍低于uniformstrong，低controldeviation只是变化不自动quality。（Table2, PDF p.8; S7, pp.24-26）；appearancefidelity提升与texturequality损失同时存在，pairwiseoverall不显著。（Table3/4, PDF pp.9/11）",
+    "caveatZh": "S8 pp.26-28 semantic/geometricconflict会扭曲，base无jointprior。；PartFieldcluster单cue/32cube边界与material边界不符导致woodrim/cushionappearanceleak。；S7p26 regionalnearestprimitiveboundaries会把newparts算入high造成metricbias；lowregion改形可拖动high。；highgeometry只softlatentblend不是精确CADconstraint，细结构/holes/materialboundary有限。；300stepcontrastive+10resample增加interactive等待成本，no runtime实测。；83curatedbenchmark/geometry来源本方法/生成前humanrefinement限制外推，deltas不能证明有效assembly或fabrication。；highestpartseparation可能促textureuniform但损真实细节；lowestlossstate选择不直接优化photorealism。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "明确3Dassetlocalgeometry+appearancecreationcontrol，保用户部分设计决定且为开放区域补全，比globalprompt直接更适合part-aware3D设计，highdeep；使用PartField不构成新的3Dsegmentation贡献。"
+  }
+}

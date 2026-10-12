@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2610.09127",
+  "slug": "cadfather-autonomous-cad-reconstruction-through-coordinated-tool-use",
+  "title": "CADFather: Autonomous CAD Reconstruction through Coordinated Tool Use",
+  "authors": [
+    "Gennadiy Savrasov",
+    "Maksim Elistratov",
+    "Nikita Gavrilov",
+    "Albert Garifullin",
+    "Oleg Pavlov",
+    "Soslan Kabisov",
+    "Vladimir Frolov",
+    "Anton Konushin",
+    "Andrey Kuznetsov",
+    "Dmitrii Zhemchuzhnikov"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09127"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "CADFather",
+    "Autonomous",
+    "CAD",
+    "Reconstruction",
+    "through",
+    "Coordinated",
+    "Tool",
+    "Use"
+  ],
+  "abstract": "Reconstructing an editable CAD model from a 3D shape remains a challenging engineering task. Existing methods can propose CAD operations, but no single source of proposals works equally well across different part geometries and stages of reconstruction. We introduce CADFather, an autonomous agentic system that coordinates complementary tools to recover parametric CAD programs from 3D meshes. A vision-language assistant inspects renders of the target and intermediate reconstructions, then decides which candidate CAD programs to extend, which tools to invoke, how many proposals to generate, and when to finish. Learned and algorithmic tools propose CAD operations, while numerical optimization refines the parameters of existing programs. Proposed or refined programs are executed and evaluated to provide feedback for subsequent decisions. The agent maintains alternative candidate programs for each target part and preserves the best valid result throughout reconstruction. CADFather uses pretrained generation and assistant models without additional training. We evaluate reconstruction quality and execution validity on the full DeepCAD, Fusion360, and MCB test sets, as well as on CADENA-Bench, CADBench, and BenchCAD. We additionally analyze computational cost and the trade-off between cost and reconstruction quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09127v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09127v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kulibinai/CADFather"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09127v1 的 17 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "CADFather 让Qwen assistant在persistentcandidatepool上选择 learnedCADENA操作、geometryderivedextrude/revolve和参数优化，用执行+render+IoU/GMS反馈留优。作者报告fullDeepCAD/Fusion/MCB IoU .987/.976/.913，比CADENAsampling高约.02，较严格validity下全部输出closedsolid。值得精读toolorchestration；增益主要由algorithmicvalidstart贡献，未隔离assistant策略，也不证明恢复原设计意图或编辑稳定性。",
+    "motivationZh": "单一 learned CAD 生成器可能从错误初始形状继续累积不可执行或局部欠拟合的操作，单靠几何优化也难修复结构错误。问题是协调不同工具修正 mesh-to-CAD 的失败，并在探索新程序时保留已找到的可靠重建。",
+    "methodZh": "每targetmesh维护root与程序lineages，top12scorecandidates加protectedbest/root供assistantinspecttarget/currentrenders/history。每步最多4calls，learned工具采n个nextoperations、algorithmic工具从target截面/缺失或多余material产add/cut，每次4alternatives；numericalSDFfit只改sketch/radius/depth。技术validity后assistantvisualaccept入pool，host按IoU/GMSmean保最佳；fixed预算、invalidretry/cheapfallback保证terminate。",
+    "methodFlow": [
+      "维护共享CadQuery候选表示：所有tools输出CADENA DSL程序，记录parent/ops/tool/geometry/validity与scores；旧候选不可覆写，textdedup而非geometricdedup。",
+      "视觉assistant选择候选与tool：Top12+best/root table、target与best/new renders、executedhistory，选择branch、tool、learnedsamplesn或finish。",
+      "扩展或拟合程序：CADENA-RL采nextoperation；algorithm截面/差异material产extrude/revolve/cut；SDFnumericgradientfitcoordinates/radii/depth但fixedoperationstructure。",
+      "执行并视觉验收：程序build、wholewatertightsolidpositivevolume、30s限；共同targetframe度量IoU/GMS，再assistantreviewnewrenders决定pooladmission。",
+      "保护最佳并终止：Valid优先invalid，host留IoU/GMSmean最优，与agent当前branch无关；24steps/80samples/120executions/1000s上限或shape/stalled结束。"
+    ],
+    "experimentsZh": "FullDeepCAD8046/Fusion1725/MCB5000、CADENA3396、CADBench18000/BenchCAD17900；sixdatasetmain单run，ablation各1000partspairedbootstrap。CADENARLbfloat16、Qwen3.8-27BFP8assistantnotthinking冻结；24steps/12ops/1000s、80gensamples/6algorithmcalls/10optim/120exec，单buildmetric30s。 以下结果为作者报告：作者报告mainIoU .987/.976/.913 vsCADENAsampling .966/.952/.895、IR0；GMS .983/.960/.766，表面一致性与volume仍有差。（PDF p.8 Table 1）；作者报告CADENAbenchIoU.909（2240/3396有定义）/GMS.721，MCB仅58%target有IoU，机械shape主要需GMS。（PDF p.9 Table 2/§4.4）；作者报告CADBenchofficialmedianIoU.930/SIoU.787/CD.029，VSR.968vsCADFit.981；该protocol与internalmeanIoU.904不同。（PDF p.10 Tables 3–4）；作者报告DeepCAD82.6s/Fusion119.9s/MCB245.6s/CADENA306.7s每part；MCB37.3%和CADENA25%由assistant提前结束，余受limits。（PDF p.12 Table 7） 对照范围：主要baselinepublishedresults，validity/input/normalization/compute不同；同CADENAcheckpoint所以非strongergenerator。BenchCADfrontiersselfreported1000image+tools vsoursmesh1000subset，非公平directranking。CADAssistant/IterCADadaptedcomparison留future。 消融与诊断：Learned-only/noalgorithm/nooptimizer同configuredbudgets，不匹配consumedcompute，partbootstrapCI不代表multiseedagentvariability；没有removeassistant/fixedscheduler/score-onlypolicy对照。",
+    "insightZh": "独立贡献是target-conditioned候选branch与互补CADtools协调，sharedrepresentation和protectedbest支持跨tool续建。新optimizer不在claim；hostbestof使用同reportedmetrics，tooldiversity有ablation但assistantselectionpolicy未严格isolated。",
+    "evidenceZh": "Technicalvalidity是整个outputwatertightsolid，比CADENAanyclosedcomponent严格，baselineIR不能直接相减。（PDF p.6 §3.5; p.8 Table 1 caption）；算法proposal为closedsolid初始base带来多数MCB增益，optimizer额外很小。（PDF pp.11–12 Table 6/§4.6）；Best-of选择基于targetinputmetric并用于最终报告，合乎重建设置但不等于semantic/engineeringsuccess。（PDF p.7 Eq.(2); p.14 Limitations）；作者报告跨六datasets并使用CADBench官方protocol，有不同failurecount和metricaggregations。（PDF pp.8–10 Tables 1–4; p.10 §4.5）；APIcost曲线仅tokens、inputs/subsets各异，不能当100×总算力或latency胜率。（PDF p.11 Figure 4/Table 5; p.12 Table 7）",
+    "caveatZh": "受DSLoperations/proposals限制，错误initialtopology不能仅parameters修复，有用branch未生成就无法恢复。；Assistantincompleteviews/numerics与prompt依赖，不保证最优。；评geometry/validity而非history/intent/constraints，singleparts不含assembly/tolerances/simulationvalidateddesign。；planning/inspection/exec成本与limits，directCADagentcomparison未来。；高volumeIoU可遗漏表面features，surfaceGMS和qualfailure应同时看，IR0不等于faithful或manufacturable。；恢复可执行parameters不证明editability/constraintpreservation，未做直接edit任务。；Algorithmicstart能挽救invalid并占主要gain，不宜将收益全归agentreasoning。；Publishedbaselines有validonly不同cohorts和strictvalidity差异，main单run未测agentseed波动。；APIpricedtokens不包含多GPU/CPUgeometryprocess，frontierinputs/subsets不一致，不能说100×端到端便宜。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "specificmesh恢复parametricexecutableCAD，主3d-reconstruction；poolsearch/toolcoordination有独立visualdesignagent贡献，可直接用于可编辑CAD逆向工程研究。"
+  }
+}

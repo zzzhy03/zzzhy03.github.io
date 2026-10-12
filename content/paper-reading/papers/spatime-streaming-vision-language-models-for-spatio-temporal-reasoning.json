@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.08713",
+  "slug": "spatime-streaming-vision-language-models-for-spatio-temporal-reasoning",
+  "title": "SpaTime: Streaming Vision-Language Models for Spatio-temporal Reasoning",
+  "authors": [
+    "Hairong Yin",
+    "Huangying Zhan",
+    "Shin-Fang Chng",
+    "Yi Xu",
+    "Raymond A. Yeh"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.08713"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "SpaTime",
+    "Streaming",
+    "Vision-Language",
+    "Models",
+    "Spatio-temporal",
+    "Reasoning"
+  ],
+  "abstract": "Embodied agents must reason about 3D space while the video is still arriving, answering questions as soon as they have observed enough of the scene. VLMs that incorporate 3D geometric priors achieve strong spatial reasoning, but they operate offline, i.e., the full video must be available before they produce an answer. Streaming VLMs process frames causally and decide for themselves when to respond, yet they lack explicit 3D representations. We present SpaTime, a streaming VLM that fuses causal geometry tokens into the language model at every frame, using only the frames observed so far. To supervise when the model answers, we propose a response-time loss that maps per-frame response probabilities to a differentiable expected response time and penalizes the distance from the ground-truth frame. For evaluation, we construct StreamVSTI-Bench and StreamVSI-Bench, streaming adaptations of VSTI-Bench and VSI-Bench. On StreamVSTI-Bench, SpaTime reaches 49.2% overall accuracy and reduces the mean response-time error by 66% relative to the strongest streaming baseline.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.08713v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.08713v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.08713v1 的 14 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SpaTime 在每个到来的video frame融合冻结StreamVGGT几何tokens与视觉tokens，用three-state dialogue和first-response期望时间loss训练“何时回答”。作者在StreamingVSTI报告49.2% charitable/48.8% strict准确率及0.12秒视频时间轴误差；这支持流式3D证据与响应训练，但不是0.12秒计算延迟，OOD的room/object-size近乎失败，精读时应区分streaming protocol与真正实时部署。",
+    "motivationZh": "流式视频推理只能使用当前及过去的帧，既要判断空间关系，也要决定证据何时足够回答。离线 VLM 的整段视频设定不能直接解决过早回答、持续等待及缺少 3D 时空证据的问题。",
+    "methodZh": "将Qwen2.5-VL-7B与causal StreamVGGT并行编码，在2×2merge+MLP后把geometry逐frame加到visual token；冻结encoders，训练LoRA、projector、state embeddings及lm_head。沿用Silence/Standby/Response协议，新增hazard-style first-response probability p_kΠ(1−p_j)，用normalized expected time与GT的Huber loss补focal state loss，仅future样本加权。通过geometry visibility、Qwen recognizability与question-type规则把VSTI/VSI转为streaming data。全文14页及B–D训练、visibility、时间模板/trace附录均已读。",
+    "methodFlow": [
+      "每frame由冻结visual encoder与带历史KV的causal StreamVGGT分别提视觉和几何tokens。",
+      "2×2merge几何grid，经RMSNorm/MLP投影到visual token维度并逐位置相加。",
+      "LoRA Qwen按causal multi-turn frame/timestamp/query预测Silence、Standby或Response及答案。",
+      "从state logits形成first-response分布，计算expected response frame并用length-normalized Huber监督future questions。",
+      "通过人核验的geometry+VLM visibility规则生成streaming QA，并以strict首response准确率和时间轴误差评价。"
+    ],
+    "experimentsZh": "132,568 train/6,042 test StreamingVSTI，disjoint ScanNet scenes；4,726 OOD StreamingVSI来自288个视频。1fps、平均71.6frame；4GH200训练、A6000评估，LoRA rank128/alpha256，trainable1,461.2M(15%)，maxseq20,480；visibility500pairs人核验agreement84.4%。 以下结果为作者报告：作者报告VSTI charitable49.20、strict48.80、Δt0.12s；最佳charitable baseline VideoLLM-online48.40，最快timing baseline Streamo0.35s，不能将5.1点与同一“strongest”混称。（Tables1/4, PDF pp.6–7）；作者报告累计消融strict43.99→47.93→48.80、time error0.35→0.18→0.12；future-only time error0.52→0.35s。（Tables3/5, PDF pp.6–7）；作者报告OOD VSI charitable29.83、strict29.44，object size3.49、room size0.00；offline VLM-3R参考overall60.9。（Tables2/4 and Sec.6.2, PDF pp.6–7） 对照范围：streaming三baselines都在同一train数据fine-tune；offline reference数来自先前paper且见完整video，不能同protocol当部署对照。concurrent Stream3D-VLM只有文字比较，无直接实测；没有compute latency/throughput/long-history memory曲线。 消融与诊断：geometry tokens与response loss累计消融，以及future-only timing拆分支持组件；数据timing rules、显式target timestamp和GT visibility质量仍可能影响收益，未独立排除deadline cue。",
+    "insightZh": "新增贡献是无需未来帧的逐frame几何融合及与first-response metric一致的time loss；geometry encoder与additive merge来自StreamVGGT/VG-LLM，three-state/focal来自Streamo。与concurrent Stream3D-VLM的区别是additive alignment和expected-time supervision，不能称全新causal geometry backbone。",
+    "evidenceZh": "causal geometry与visual同frame相加，不需future-frame融合。（Sec.4.1 Eq.(5), Fig.2, PDF pp.3–4）；response loss建模第一次Response概率，只对future samples施加time penalty。（Sec.4.2 Eqs.(6)–(12), PDF pp.4–5; Appendix B, PDF p.10）；多数timing gain与geometry和loss都有关，但OOD绝对尺寸能力仍弱。（Tables1–5, PDF pp.6–7）；当前/past任务GT即时可答，future question模板常含target时间，因此timing不完全等同视觉证据足够判断。（Appendix C–D, TableA3 and Fig.A3, PDF pp.11–13）",
+    "caveatZh": "Sec.6.2 PDF p.7承认OOD room-size0/object-size3.5，解释为training question coverage不足。；Appendix D PDF pp.11–12显示future MC/numeric exact-response仅60.4%/74.3%，错误偏早答。；Δt是视频时间轴round error而非wall-clock model latency，实时系统性能尚无充分测量。；1fps室内静态scan与明确时间模板不足以代表任意动态scene、自然开放提问和高帧率AR。；GT visibility仅84.4%人一致且仅抽visible pairs，未核查全部false-negative/ungrounded cases；timing supervision可能受噪声影响。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "流式空间memory与判断何时取证/回答可借鉴设计agent的online观察，但论文验证为video QA而非直接生成或修正2D/3D artifact。"
+  }
+}

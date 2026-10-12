@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.09723",
+  "slug": "meshcarve-artisan-mesh-generation-with-flow-matching-in-compact-latent-spaces",
+  "title": "MeshCarve: Artisan Mesh Generation with Flow Matching in Compact Latent Spaces",
+  "authors": [
+    "Xiyu Wang",
+    "Ruocheng Wu",
+    "Yufei Wang",
+    "Zhihao Li",
+    "Lanqing Guo",
+    "Bihan Wen"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09723"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "MeshCarve",
+    "Artisan",
+    "Mesh",
+    "Generation",
+    "Flow",
+    "Matching",
+    "Compact",
+    "Latent",
+    "Spaces"
+  ],
+  "abstract": "Prior artisan mesh generation works largely predict face tokens autoregressively, which makes inference slow. Recent methods instead flow match continuous latents built by Variational AutoEncoders (VAEs), but reconstruction quality drops significantly when geometry and topology are jointly encoded, and further when the latent space is compressed. We present MeshCarve, a flow matching method that generates entirely in compact latent spaces, generating vertex positions and edge connections separately and sidestepping the difficulty of a joint compact latent. To shorten the token sequence, we propose a hierarchical sparse transformer backbone, instantiated as VertexVAE and EdgeVAE. Instead of encoding fields over the surface voxels, both VAEs anchor on discrete vertices in their latent spaces, which drastically reduces the token sequence length, and our spatial-aware compression shortens it further without costing reconstruction. VertexVAE directly encodes vertex occupancy. For connectivity, we propose vertex-link encoding, which turns arbitrary connectivity between vertices into fixed-length continuous per-vertex embeddings and recovers complex artistic topology faithfully. MeshCarve combines these VAEs with an anchor generator and flow matches on the shortened token sequences. It shows advantages over state-of-the-art autoregressive and flow matching methods on Objaverse and generalizes to Toys4K. To the best of our knowledge, it is among the first artisan mesh generation methods whose every generative stage runs in a spatially compressed latent, with a token sequence only a fraction of the most compressed previous autoregressive and flow matching works.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09723v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09723v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09723v1 的 18 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "MeshCarve 分别把vertex occupancy与edge connectivity压进64³ sparse latents，order-free vertex-link Fourier encoding让topology也可空间压缩，再用两次flow生成artist mesh。作者报告0.13tokens/face与约11.4秒生成，机制值得精读；但主附录显示end-to-end non-manifold edges仍达27.7%(Objaverse)/17.5%(Toys4K)，因此“artisan”指目标拓扑风格，不代表输出即可靠可变形或可制造资产。",
+    "motivationZh": "许多 3D generators 输出密集三角 mesh，而不是建模者希望的简洁、结构化拓扑；显式顶点与连接关系又难以压成适合高效生成的表示。论文关注紧凑地表示并生成目标 mesh 拓扑。",
+    "methodZh": "dense point cloud及用户vertex budget先经anchor VAE给coarse vertex occupancy；VertexVAE/EdgeVAE共享hierarchical sparse transformer设计而分别训练，以八octant learnable projection从512³压到64³。Vertex decoder分层subdivide/prune，Edge encoder将neighbors相对位移的128D RFF求和，decoder分类all-pair edges并枚举3-cycles成triangle faces。1.27B vertex flow和2.37B edge flow串联，edge额外条件vertex latent。完整18页及A–J目标、训练、公平subset、graph defects、tokenscaling、runtime和posterior-sample附录已读。",
+    "methodFlow": [
+      "从dense point cloud/coarse surface与vertex budget，用anchor sparse VAE一forward生成64³ latent voxel positions。",
+      "hierarchical VertexVAE和EdgeVAE分别学习geometry/topology，以octant-aware down/up projections压缩vertex-anchored tokens。",
+      "50-step vertex flow在anchor上生成latent，VertexVAE解码512³ occupied vertex voxels。",
+      "12-step edge flow在同anchor上条件pointcloud与generated vertex latent，解码order-free RFF link features。",
+      "connection head分类all vertex pairs，枚举predicted graph全部3-cycles成三角面，无manifold constraint。"
+    ],
+    "experimentsZh": "558KObjaverse meshes，max20Kvertexvoxels；185Objaverse test、500Toys4K、5000VAE validation；condition reference vertex budget。Flow1.27B/2.37B，50/12steps，VAE429M/483M，anchor613M。AR按face caps做subset matching，edge-only共147Obj/465Toys参考vertices；每mesh50Ksurfacepoint归一box。runtime24Obj、单RTXPRO6000BlackwellMaxQ暖机第二pass。 以下结果为作者报告：作者报告mean token budget0.13/face；Obj CDl2 .00649/NC .8529 vs LATO.2 .00693/.8238，Toys .00560/.9069 vs .00562/.8855；HD未最佳。（Tables1–2, PDF pp.3/7）；作者报告end-to-end non-manifold edge share27.7%Obj/17.5%Toys；given-GT vertices降至14.9%/11.7%，仍非manifold保证。（Appendix D Table6, PDF p.14）；作者报告总11.4秒，vertexstage9.45秒、edgestage1.79、all-pair head.09、face enumeration<.01；只测500–4600reference vertices。（Appendix I Table8, PDF p.16） 对照范围：MeshAnything/V2/TreeMeshGPT/BPT/DeepMesh/FastMesh/MeshFlow/LATO.2，subset/cap与count控制在appendix说明。flows比LATO.2大数倍，未equal-parameter/compute对照；VAE比较posterior sampling/quantization不同，不能简单当strict无损率排名。 消融与诊断：mean pooling、link removal、neighbor slots、RoPE与joint latent，以及anchorflow vsVAE；slot/link及joint/anchor从scratch，另些25Kfinetune。支持压缩结构与分解，但质量由多个modules/conditioning共同决定。",
+    "insightZh": "关键是把geometry/topology factorization与spatial-aware vertex latent compression结合，vertex-link RFF sum避邻居顺序与fixed-valence slots。拆geometry/topology已有LATO.2/Nexus，3-cycle faces也非新的有效mesh保证；压缩使更大flows可负担，较少token与更多model parameters共同影响质量。",
+    "evidenceZh": "两个VAE以vertex voxels为anchor，空间learned projection压到64³，比surface/每vertex未压缩tokens更短。（Secs.3.1–3.2 Eq.(1), Fig.2, PDF pp.4–5）；vertex-link encoding以固定RFF求neighbor-offset sum，order-free但finite-width，decode仍是all-pair分类。（Sec.3.3 Eq.(2), PDF pp.5–6; Appendix B, PDF p.12）；surface形状质量改善不能消除non-manifold connectivity。（Table2, PDF p.7; Appendix D Table6, PDF p.14）；真实runtime约11秒仅在24例500–4600vertices暖机设置，且connection head仍quadratic。（Appendix I Table8, PDF p.16）",
+    "caveatZh": "主p.9/Appendix H p.16说明>10Kvertices受512³量化影响，VAE reconstruction ceiling限制下游。；edge flow训练GT vertices/latent，推理generated inputs存在teacher-forcing domain gap。；Appendix D p.14承认classification-based connections over-connect并产生non-manifold edges。；all3-cycles成face无face classifier/manifoldconstraint，输出不能直接当animation、UV或fabrication-ready mesh。；reference vertex count作为condition提供oracle complexity信息，实际用户budget失配与越20K规模未验证。；finite128D RFF与pair classification不是任意高valence拓扑无损保证；拓扑metric比surface CD更关键。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接针对可编辑3D mesh的geometry/topology表示与生成，compact topology latent可参考part/asset构造；未验证LEGO connectivity或manufacturing。"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2610.13527",
+  "slug": "s-space-exploring-spatial-workspace-in-multimodal-language-models",
+  "title": "S-Space: Exploring Spatial Workspace in Multimodal Language Models",
+  "authors": [
+    "Zhiyuan Shi",
+    "Xiang Li",
+    "Xingzhuo Guo",
+    "Shangchen Miao",
+    "Weiliang Chen",
+    "Qiyu Dai",
+    "Jinshan Ren",
+    "Jiangran Lyu",
+    "Fangfu Liu",
+    "Mingsheng Long",
+    "Jialong Wu"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13527"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "S-Space",
+    "Exploring",
+    "Spatial",
+    "Workspace",
+    "Multimodal",
+    "Language",
+    "Models"
+  ],
+  "abstract": "Multimodal language models (MLLMs) exhibit promising spatial reasoning capabilities, yet the internal mechanisms supporting them remain poorly understood. We uncover S-Space, a linear representation subspace in which object-token representations encode continuous coordinates along horizontal, vertical, and distance axes. Although we identify these axes by differentiating spatial-answer scores with respect to object-token activations, S-Space is intrinsic rather than induced by specific data or prompts, remaining readable under non-spatial questions. We show that S-Space functions as an internal spatial workspace of MLLMs. Perception encodes object locations into it, forming spatial representations that can be directly read out to support accurate spatial judgments. Internal reasoning transforms it for changing viewpoints. Verbal responses selectively access it, evidenced by causal interventions that alter spatial judgments while largely preserving non-spatial responses. Case studies further show that S-Space assigns locations to unseen entities and the observer, and connects physical directions with abstract linguistic meanings, suggesting both the capabilities and limitations of large-scale language training. Finally, we use S-Space as a diagnostic tool for spatial reasoning failures. Direction-word readouts reveal systematic coupling between cardinal and image-relative reference frames. More importantly, a perception-computation decomposition exposes a key bottleneck: MLLMs can form capable spatial representations, yet fall short in the spatial transformations required to reason reliably across viewpoint changes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13527v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13527v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/mirros-lab/s-space"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13527v1 的 24 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "S-Space 用对象名称 token 的梯度差识别 horizontal、vertical、distance 三个线性方向，再将读出的坐标显式旋转，诊断 VLM 跨视点错误主要来自计算而非完全缺乏空间信息。作者报告 SpinBench 无 premise 下 Qwen3.6-27B 从直接回答 60.96% 到外部旋转 95.21%；这提供可操作的空间 reasoning 接口，但坐标是 image-plane 与相对深度，controlled CoT 还注入正确关系，不能视为模型自行构造可靠 metric 3D world。",
+    "motivationZh": "VLM 对空间关系的可读出表示和可操作机制仍不清楚，正确回答也不证明它掌握可变换的内部空间坐标。需要检验内部关系轴能否支持 causal spatial edits，以及这些轴的参考系和独立性边界。",
+    "methodZh": "问题是把视觉空间感知和后续变换错误分离。方法以左右、上下、远近答案 logit 差对 query/reference 名称末 token 求梯度，反对称化并跨模板/实例平均得到模型与层专属轴；投影可读坐标，伪逆写回可实施因果干预，预定义旋转矩阵可处理有限视点。正文及附录检验五个相关模型、三个空间 QA 集、SpinBench、跨 prompt、动作微调与多视点选择，并讨论方向词与语言隐喻耦合。",
+    "methodFlow": [
+      "识别空间轴：在 6000 个 COCO 图像的相对关系提示中求答案 contrast 对两个对象 token 的梯度差，并平均模板与对象顺序。",
+      "选择层并读坐标：用不重叠 1800 图像选层，将隐藏状态投影到三轴；以 query-reference 坐标差符号回答空间 QA。",
+      "编辑内部表示：通过 V(VᵀV)⁻¹ 写回目标坐标差，保持正交补不变，测试平移、交换和等范数随机编辑。",
+      "分离感知与变换：从对象 token 读坐标，显式执行左、右、背面的矩阵旋转，再按坐标符号决定目标视点答案。"
+    ],
+    "experimentsZh": "轴/层选择使用不重叠 COCO；相对深度 GT 为 Depth Anything V2-Small 的 mask 平均 inverse depth。空间 QA 覆盖 CV-Bench1250、EmbSpatial1200、SpatialTunnel1200；SpinBench146/144，Qwen reasoning token cap32768。 以下结果为作者报告：作者报告 Qwen3.5-4B CV-Bench 直接73.60%→S-Space89.36%，但 Molmo2-ER94.40%→91.92%、Qwen3.6-27B93.76%→91.84%；读出并非普遍优于直接回答。（PDF p.17 Table3）；作者报告 Qwen3.6-27B SpinBench无 premise direct60.96%、reasoning83.56%、readout+rotation95.21%；带 premise72.92%、91.67%、99.31%。（PDF pp.8/23 Tables1/10）；作者报告 Molmo2-ER L21 绝对坐标 Spearman H .789/V .774/D .521，pair差 .871/.872/.688。（PDF p.5 Fig.3(a–b)） 对照范围：同模型 direct/CoT与三轴确定性规则比较；没有统一成本匹配的通用空间工具或完整 metric重建 baseline。 消融与诊断：层扫描、平移/交换/随机等范数干预、spatial/nonspatial prompts、已知 premise、VLA阶段和多视点 prompt steering；强因果干预主要只在 Molmo2-ER 验证。",
+    "insightZh": "相对既有线性空间 binding/Jacobian lens，贡献是把实图中的连续三轴 readout、受控干预与外部变换统一成诊断接口；理论充分条件本身假设非空间/上下文梯度能够消去，未证明真实模型满足。",
+    "evidenceZh": "三轴估计来自对象 token 的 role-antisymmetric 梯度均值。（PDF pp.3–4, §2.2, Eqs.(1)–(4); pp.14–16, C.1）；对空间坐标干预影响空间答案明显强于等范数随机编辑，但也影响颜色。（PDF p.5 Fig.4; pp.18–20 C.3, Eq.(11), Tables7–9）；外部旋转读出显著改善有限 SpinBench 视点判断。（PDF p.8 Table1; pp.22–23 C.5, Table10）；controlled CoT 的两端正确关系来自 benchmark label。（PDF pp.22–23, C.5 Controlled CoT template）",
+    "caveatZh": "水平与垂直采用 image-plane 坐标，不显式分离 depth-dependent perspective effects；distance表示相对远近。；空间词与政治/方位隐喻共享结构，可能继承语言训练偏差；训练来源解释为 hypothesis。；模型对跨视点变换仍不可靠，原生空间计算没有被完全解决。；SpinBench 的三个预定义视点及少量样本不能证明任意旋转/尺度的 3D world reasoning。；深度 GT 由单目估计器产生，坐标轴尺度不等，线性旋转的有效性需更广泛度量检验。；controlled CoT 使用正确关系 labels，有 oracle 信息；自然生成 CoT 的可靠性需独立测量。；大尺度干预颜色 retention降至78.13%，因果选择性有限；模型 family 与 intervention覆盖有限。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可借鉴为视觉/3D design agent 的内部空间诊断与显式工具接口：先识别是否已有位置证据，再决定引入旋转/几何工具；当前证据不支持直接用于精确设计制造坐标。"
+  }
+}

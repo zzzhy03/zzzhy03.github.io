@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.11366",
+  "slug": "spatialopsd-self-distilling-spatial-intelligence-from-verified-coding-agent-traces",
+  "title": "SpatialOPSD: Self-Distilling Spatial Intelligence from Verified Coding Agent Traces",
+  "authors": [
+    "Rongxue Li",
+    "Meng Yang",
+    "Yiru Mao",
+    "Yongliang Tao",
+    "Lulu Hu",
+    "Bin Yang",
+    "Zhao Xu",
+    "Weihua Luo",
+    "Bowen Xu"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11366"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "SpatialOPSD",
+    "Self-Distilling",
+    "Spatial",
+    "Intelligence",
+    "Verified",
+    "Coding",
+    "Agent",
+    "Traces"
+  ],
+  "abstract": "Spatial coding agents significantly improve spatial reasoning in Multimodal Large Language Models (MLLMs) by using external tools to generate verified execution traces. However, this paradigm inherently suffers from prohibitive inference-time overhead and external dependencies. In this paper, we explore whether an MLLM can internalize this agentic capability to operate entirely tool-free. We begin with a simple observation: prompting an MLLM with summarized execution traces of a spatial coding agent naturally unlocks the model's internal spatial Chain-of-Thought (CoT). Motivated by this, we introduce SpatialOPSD, an on-policy self-distillation framework that internalizes spatial reasoning into a standalone MLLM by formulating verified agent traces as privileged information. To mitigate privileged-information leakage during distillation, we introduce Repetition-Aware Distillation, which combines repetition masking with unlikelihood regularization. Experiments across multiple benchmarks demonstrate that self-distilling SpatialOPSD achieves higher average accuracy than SFT and GRPO on both spatial and OOD datasets, exhibiting superior performance and generalization.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11366v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11366v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11366v1 的 35 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "SpatialOPSD 用spatialcodingagent的正确answertraces+derivedviews作teacherprivilege，在student自身CoT上reverseKL训练，并对长spancopy/repetitionmask+unlikelihood。作者报告9Bspatialmean45.9到51.9，OOD64.4到64.7仅保留；“PIleak82.7到9.1%”只是agent/trace/tool关键词率，不能当几何理解或语义泄漏消除的证明，适合skim。",
+    "motivationZh": "空间 coding agents 可以借助几何计算和额外视图得到答案，但普通 VLM 本身仍常缺乏这些空间判断能力。论文关注这些昂贵外部推理经验能否转成模型自身的推理能力，而不是让模型机械复述工具轨迹。",
+    "methodZh": "SpatialClawQwen9B在MindCube10000中选5008answercorrecttraces，同model摘要去answer声明但保toolmetricreadouts和citedBEV等privilegedimages；frozeninitialteacher看I+原输入，student只rawinputs。每问题onpolicy1rollout top100+tail reverseKL，4gramflagstudent重复或I-exclusive32tokenspan，maskKL并ULpenalty.1；不调用tools的testCoT。完整35页正文与全部privilegeconstructorprompts/示例、trainingbaseline、lexicalmetric代码及分析appendix已读。",
+    "methodFlow": [
+      "codingagent在trainingquestion执行depth/seg/camera等工具，保finalanswer通过GTcheck的完整session。",
+      "同9B把成功trace压为summary，去explicitanswer但保measurements/derivedvisuals作为teacher-only输入。",
+      "student在原image/question下采样CoT，frozeninitialteacher在同prefix加privilege给denseKLtarget。",
+      "4gram检测selfrepetition/privilege-onlycopy，连续32+tokenflag使KLmask并加入sampledtokenunlikelihood。",
+      "一epochonpolicy更新student，test只原views与CoT，不执行tools或读取训练trace。"
+    ],
+    "experimentsZh": "MindCube10000train5008agentcorrect，allinputsmax2048px/最多12frames，Qwen9Bfull1epoch156stepsbatch32/lr1e-6/8GPU，frozeninitialteacher top100+tailreverseKL。GRPOsamequestions/G8/4096cap/1epoch，SFT4459/G1/lr1e-5。MindCube1040Tiny/ViewSpatialspatial，Omni/BLINK/MMStar/VideoMME OOD。2B/4B用9Btrace，27B自己agenttrace。 以下结果为作者报告：作者报告9Bspatialavg45.9到51.9，MindCube48.3到56.9/View43.4到46.8，agent57.3总体仍更强；“91%”是accuracy比值非91%能力。（Table1, PDF p.6）；作者报告OODavg64.7 vsbase64.4/GRPO63.4/SFT38.4，MMStar66.9低于base67.5与GRPO68.1；general gain很小。（Table2, PDF p.7）；作者报告maskonlymean53.0/leak73.6、ULonly51.5/6.7、combined51.9/9.1；combined不是accuracy/leak均最佳。（Table3, PDF p.7）；作者报告2B/4B/27Bspatialmean+2.2/+3.8/+3.6pp，pySpatial52.0与SpatialClaw51.9接近，verify5008mean51.9 vsunfiltered10000mean49.2。（Tables5/7/8, PDF p.8） 对照范围：sharedinputs/evalformat但SFTdata、lr/schedule与GRPOrolloutlength/group不同，未给walltime/token-normalizedcompute、training-seedCI。proprietary对比只相同benchpoints不广泛能力比较。工具减少不等单MLLMforward(仍autoregressiveCoT)，testlatency不量化。 消融与诊断：Mask/UL、Lmin/λ、PItypes、verification/agents/scales。verify改quantity与composition，未匹配equalcountunverified；FACT/full包含answer而Summary不含且extraimages数量不同，不能将entropy效果唯一归summarystyle。lexicalmarker+thinkingdensity只style频率，作者A.4明确非causalreasoning证据。",
+    "insightZh": "特定geometryagentprivilege+anti-copy蒸馏是模型训练贡献，非普通toolwrapper或promptVQA。OPSD/UL已有；中间trace正确性并未verified到几何groundtruth，summaryextraimages/metrics形成多模态privilege而非纯CoTtransfer。",
+    "evidenceZh": "verification只检查finalmultiple-choiceanswer，并非每个工具测量/推理step。（Sec.3.2, PDF p.4; Appendix A.1 stage1, p.14）；Summaryteacher还有额外derivedimages及原frame重复thumb，非纯摘要text条件。（Table9/Appendix A.1, PDF pp.14-15; example p.23）；PIleak率为三个关键词存在规则，非真正privilegedcontentcopy检测。（Appendix A.3, PDF pp.32-33）；SFT非same5008samples，GRPOrolloutbudget/cap也不同。（Sec.4.1, PDF pp.5-6; Appendix A.2, pp.31-32）",
+    "caveatZh": "无独立limitations节；A.3 p.32明确looselexicalPI规则不推semanticintent，并举falsepositive。；A.2 pp.31-32明确SFTdatasets非samplematched及OPSD/GRPOrollout区别。；A.4 pp.33-34明确marker频率不证明intrinsic/causalreasoning。；answer-correcttracefilter不验证3Dmetric/camera estimates，toolgrounding并非客观geometry真值。；summaryanswerline scrub仍可保方向结论/含答案决定性事实，anti-copy改变表面语言不能证明避免shortcut。；trainingdataset单MindCube/crossdatasetViewgain3.4，中间思考可信/复杂multi-step spatialgeneralization缺证据。；λ/Lmin在reportedbenchmark反复ablation选择、无独立validation描述或CI，smallOODgain不宜宣传提升。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "从外部geometrytoolreasoning迁移MLLM内部spatial能力有具体训练接口，可参考designagent基础视觉能力；非直接设计生成或CAD，mediumskim。"
+  }
+}

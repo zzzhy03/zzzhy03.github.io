@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2610.10479",
+  "slug": "agentic-rsr-real-to-sim-to-real-through-scene-reconstruction-and-execution-grounded-robot-policies",
+  "title": "Agentic RSR: Real-to-Sim-to-Real through Scene Reconstruction and Execution-Grounded Robot Policies",
+  "authors": [
+    "Yihan Li",
+    "Yating Feng",
+    "Shengjiu Sun",
+    "Jianing Chen",
+    "Hao Ren",
+    "Bowen Yang",
+    "Weisheng Xu",
+    "Qiwei Wu",
+    "Hui Cheng",
+    "Renjing Xu"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.10479"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Agentic",
+    "RSR",
+    "Real-to-Sim-to-Real",
+    "through",
+    "Scene",
+    "Reconstruction",
+    "Execution-Grounded",
+    "Robot",
+    "Policies"
+  ],
+  "abstract": "A simulation of a real robot workspace must preserve task-relevant interactions, while policies developed in it must operate on observations available to the real robot. Yet scene reconstruction and policy development are often treated separately. We present Agentic Real-to-Sim-to-Real (Agentic RSR), a framework that links scene reconstruction, policy development, and real-robot execution through the same manipulation task. Given a workspace video, a task description, and a known robot model, an agent recovers metric scale, iteratively refines the scene using visual feedback, and checks task-relevant interactions in MuJoCo. A coding agent then develops an executable policy, progressing from privileged object poses to visual observations and randomized simulation. The policy can interleave multiple observations and actions within one invocation, while the agent uses execution feedback to continue, retry, or revise its approach. A shared task-level interface carries the policy and accumulated experience to the real robot, where fresh observations and safety checks guide execution. Across 18 reconstructed scenes involving two robots, the mean four-view Depth MAE against reference depth estimates is 0.1057 m, the mean Lab $ΔE_{76}$ is 11.04, and the mean grayscale SSIM is 0.6990. In real-robot experiments, the aggregate task success rate reaches 80% of the simulation task success rate, indicating substantial retention of simulated performance on hardware. Code and reconstructed scene data will be made publicly available.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10479v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10479v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10479v1 的 25 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "Agentic RSR 用已知robotURDF标定 video scene metric scale，agent在固定camera/robot下迭代Blender场景，以depth/color反馈和MuJoCo probes验收，再开发visual programmatic policy并转真实robot。作者报告18scene depthMAE .1057m，真实task8/18成功；80%是sim-success子集8/10的pairedtransfer。适合研究任务约束scene reconstruction，不能把视频估计深度/模拟sanity当独立真值物理重建。",
+    "motivationZh": "视觉上相似的 real-to-sim 场景仍可能具有错误尺度、碰撞几何或接触关系，导致机器人动作在模拟与真实环境中失配。问题是让场景重建接受实际执行相关的检查，而不只优化渲染相似度。",
+    "methodZh": "VGGTΩ+SAM3 robotmask点云与meterURDF做Sim3ICP/pose-scale refinement。Separateplanning/refinementagent构建taskobjects/materials/light，runner冻结robot/camera，scalarD/Lab与coverage共同判定。Physicsroleclassifier与checks测试settling/proxygrasp/articulation并可修collision/mass/pose。Policy先privilegedposes、再visualnominal、再randomized；最终policylocked，但outeragent仍据executioncheckpoint选择continue/retry/steps，memory转硬件后重新观察。",
+    "methodFlow": [
+      "以robot几何回收metricframe：32framesVGGTdepth/cameras和SAM3robotmask，knownURDFsurface与observedpointsSim3registration，再按maskfit/depth/coverage排名refine。",
+      "固定视角迭代场景：四RGBreferenceplanning、Blendercandidateedits与runnerfreshrender；不允许移动robot/cameras，整体和perviewdepth/Lab/coveragegates。",
+      "检验模拟interaction假设：分类visual/static/dynamic/operable/compound，geometrycolliders与physicalpriors，matchedsettling/proxygrasp或jointforceprobes后候选修正。",
+      "开发execution-groundedpolicy：从privileged到visualnominal/randomized接口，code可多次observe/actions，outeragent在checkpoint继续、reset或developmentrepair。",
+      "转移task接口与memory：Hardwarefreshlocalization、workspace/actiongates，锁定programbundle而由agent选择有效steps和retry，用realfeedback判断完成。"
+    ],
+    "experimentsZh": "18taskworkspacecaptures、FR3/Piper各9，32frames/四referenceviews，GPT6Astrahighagents，最大10refinementround。Scene-equalmetrics与42measuredobjects；policy18taskbinarycompletion，noexactmultitrialcounts/randomranges完整说明。CaPnativeformat采用task-equalattemptaverage，Instruct2Act/ours按task，noone-to-onehardwareCaP。 以下结果为作者报告：作者报告meanDepth.9036→.1057m、Lab24.84→11.04、SSIM.699；42objectscene-equalCD.0303m、F1@1cm.3655、centererror.0869m。（PDF p.7 Table 2/§4.2）；作者报告Sim10/18、Real8/18，sim成功任务中8/10hardware成功；Instruct2Actsim7/18/real5/18，baselineconversion非同定义paired率。（PDF pp.7–8 Table 3）；作者报告Full18/18visualgates vsSol10/18、noMetrics6/18、noCalibration3/18；nonpassed输出按lastvalid或round0保留而非删掉。（PDF p.9 Table 4; pp.15–16 Table 9） 对照范围：Re3Sim/RLGSBridge/RoboSimGS/SimFoundryinputs按nativeframes且输出兼容不同，缺depth不意味着方法无法depthrender。CodeasPolicies硬件scenarios不完全匹配，comparison为descriptive。缺新近CaPX/real2sim完整quantitative对照和repeatsearchvariance。 消融与诊断：Modelchoice、scalarfeedback、initialcalibration；没有单独physicalproberepair、policy三stage、memory/agentrecovery/numberretry等对照，不能把全pipelinegain分给每模块。",
+    "insightZh": "将specificcapturedscene的metricregistration/agentfeedback与同taskprogrammaticpolicy/硬件observations连接，有实际reconstructiontoolloop和下游实验证据。不是新VLM或VLA，主要新意为系统耦合与task-relevantreconstruction，physicalparameters未identified。",
+    "evidenceZh": "Depthreference来自VGGTvideoestimate，MAE只表示与该reference一致，不是独立GTgeometry。（PDF p.4 §3.1; p.7 Table 2）；完整acceptance同时检查depth、Lab和perviewcoverage，单meanDepth不能算passed。（PDF p.4 §3.1; pp.8–9 Table 4; pp.15–16 Table 9）；80%是paired8/10sim-successfultasks，全18taskreal8/18。（PDF pp.7–8 §4.3/Table 3）；模拟proxygrasp与mass/frictionprior不能验证realphysicalproperties，作者prompt强制provisional/real_world_verifiedfalse。（PDF pp.20–22 Stage3physicalprobeinstructions）",
+    "caveatZh": "Closedservicemodel不同device/interface/time行为不稳定，观察未controlledmeasure，reproducibility有限。；Model-calllatency/checkpointcontrol限制rapidcontactresponse，需高速lowlevelvisuomotorcontrol结合。；Physicalrole/forcepriors是uncertainhypotheses，simulation不能证realmass/friction。；Depth评估同VGGTreference并冻结其camera，4viewsvisualgates可能优化一致性而非真实metricgeometry。；Taskphysicalchecks是simplifiedproxy，hollowcontainerboxwalls近似，缺实测mass/contactparameter验证。；18tasks原始real成功8，无CI/完整每tasktrial、evaluationbudget/randomization幅度，80%易误读。；CaP/Instructbaselineconversion分母不同且CaPhardware不paired，不能作80vs51的严格transfer比较。；Policylocked但outeragent执行恢复仍有adaptation，不是静态零shotpolicytransfer；完整API/scene未公开只promised。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体场景的faithful重建与可执行视觉修复、physicalinteractionchecks相连，主归3dreconstruction；agent代码工具与视觉/metric反馈有独立设计流程贡献，对task-orientedscene/CAD验收有迁移价值。"
+  }
+}

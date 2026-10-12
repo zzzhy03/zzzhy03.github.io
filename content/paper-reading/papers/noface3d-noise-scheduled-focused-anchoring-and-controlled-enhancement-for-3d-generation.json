@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.13050",
+  "slug": "noface3d-noise-scheduled-focused-anchoring-and-controlled-enhancement-for-3d-generation",
+  "title": "NOFACE3D: NOise-scheduled Focused Anchoring and Controlled Enhancement for 3D Generation",
+  "authors": [
+    "James Rose",
+    "Jingwen Liang",
+    "Wenchao Ma",
+    "Oren Jacob",
+    "Haomiao Jiang"
+  ],
+  "publishedAt": "2026-10-09",
+  "updatedAt": "2026-10-09",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.13050"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "NOFACE3D",
+    "NOise-scheduled",
+    "Focused",
+    "Anchoring",
+    "Controlled",
+    "Enhancement",
+    "3D",
+    "Generation"
+  ],
+  "abstract": "Recent image-to-3D models generate complete, high-quality assets from a single image, with global shape and appearance that are already convincing; what remains is the fine scale, where small, thin, elongated, or detail-rich regions are reconstructed softly and under-resolved. This gap can arise in generators with fixed-resolution spatial grids: the same spatial sampling density is used for a large, smooth, low-curvature surface and for a thin, high-curvature structure that carries most of the perceived detail. To this end, we introduce NOFACE3D, a training-free framework that refines these detail-critical regions while preserving the rest of the asset. Given a generated mesh, its input image, and a refinement box, NOFACE3D extracts the selected submesh, scales it up to fill the generator's input volume, and re-encodes it into the full-resolution latent grid. Conditioned on the image crop, it refines the region through flow-based sampling with a spatially varying noise schedule that anchors boundary latents. The refined region is then integrated back into the original asset, preserving the surrounding geometry and appearance. We implement NOFACE3D on TRELLIS.2 and its sparse voxel representation; all of it operates purely at inference time on the frozen pretrained generator. We evaluate NOFACE3D on PAniC-3D, TexVerse and BigDetail, a new benchmark of 339 assets with annotated detail-critical regions. On all three, it generates sharper geometry and finer texture detail than the baselines. Project page: https://idkcouscous.github.io/NoFACE3D/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.13050v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.13050v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.13050v1 的 19 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "NOFACE3D把box-selected子mesh放大到冻结TRELLIS.2的整个latent cube，再按离attachment boundary距离渐进释放noise/flow，用局部预算重生成细节并接回parent。作者报告更好appearance/偏好，但large-setChamfer几乎不变且略差；值得deep读region capacity与anchoring，preserved latent不是watertight stitching，印字仍受base prior限制。",
+    "motivationZh": "3D 生成资产中的薄结构和高细节区域常分到不足的 latent tokens，提升全局分辨率又很昂贵。局部放大重生成容易破坏接缝和未改区域，需要在增加细节时保留已有结构与 texture 对应。",
+    "methodZh": "方法面向生成资产局部thin/high-detail区域的空间采样不足，不重训模型。标记2D/3Dbox后抽submesh、normalize并re-encodeSS/shape/texture latents，每token由attachment距离的smoothstep得到releaseτ；在Eulerflow每step对未release tokens重置为same-noise base状态，never-released末尾精确restore。shape与textureanchorband嵌套保证已有texture坐标，局部decode后inverse transform接回retainedparentfaces，最后globalrevoxel/remeshexport。PAnic/TexVerse artistGT与339image-generatedBIGDETAIL、human/GPTjudging及editingexamples支持局部generation；整体geometry metric不是其强优势，新增细节是符合prior的合理生成而非隐藏真实结构恢复。",
+    "methodFlow": [
+      "输入generated mesh/image与对应2D/3Dbox，抽取region并rescale占满TRELLIS.2cube，再re-encodefull-resolutionSS/shape/texture latents。",
+      "从至少一个mesh跨越box面的attachment boundary计算距离场，设anchoredbandτ0、transitionband smoothstep及far-regionτmax。",
+      "四stageEulerflow按各tokenτ初始加noise/release；每步重anchor未释放tokens到base noisy latent，末步restore固定rows/occupancy。",
+      "geometry后在refinedshape坐标生成texture，嵌套anchorbands保留边界material；不将decodedmesh再encode作texture参考。",
+      "inverse transform局部mesh，以face-centroid boxcut替换parent内部面，直接concat后global1024³revoxel/remeshexport，无Boolean/welding/stitching。"
+    ],
+    "experimentsZh": "releasedTRELLIS.2-4B1024cascade，12-stepEuler、3Dbox/croppedimage条件。PAnic329all-baseline-completedsubset与4,892all-evaluator-completedlarge-set、TexVerse151、BIGDETAIL339generatedimageassets无artistGT。CD/Fscore/IoU128³/SNE及4RGBviewsappearance；GPT4o/5.6pairwise/monadic和16reviewers200assets，裁剪/flowbandrecipe附录给出。 以下结果为作者报告：作者报告PAnic329 PSNR15.80→16.78、FID43.17→33.02、DINO .792→.812，而CD2.938→2.939几乎不变；TexVersePSNR18.02→19.57、CD7.27→7.22。（Table1, PDF p.6）；作者报告4,892large-setFID13.97→7.43、DINO .812→.830、fineFscore .141→.144、CD3.359→3.370略差，说明整体geometry变化小。（Table4, PDF p.17）；作者报告human83.3%judgedratings/73.3%allresponses偏好NOFACE，mean+1.83[-4,4]、reviewercluster95%CI[1.52,2.11]，Krippendorffα≈.44。（Table2 PDF p.7; AppendixB PDF p.16）；作者报告BIGDETAILGPT5.6overall head-to-head5.74vs4.26，属于无GT资产的judgedpreference，不是geometryerror验证。（Table3 PDF p.7; Table10 PDF p.19） 对照范围：相同原TRELLISasset/input与registeredartistGT比较Easy3E/Elevate3D/DetailGen3D；DetailGenuntextured不报告appearance。329subset仅所有baselines成功完成人，baselinefailures被排除需保留；VoxHammer未比因native-resolution但editing功能并非完全无关。 消融与诊断：去boundaryanchoring/noise schedule的Fig5支持interfacequality，但为qualitative而非独立band/τ量化sweep。largeGTset、人评以及双顺序/monadicjudge控制减小单judge位置偏差；GPTEval可偏好超GT的density，不能当物理truth。",
+    "insightZh": "把固定generative latentcapacity在inference重新分配到局部空间，结合gradedboundaryrelease跨SS/shape/texture stages兼顾可变shape和interfacepreservation。基于SDEdit/RePaint式known-region replacement，但加入局部rescaling/re-encoding和nestedstageanchor，不是一般mesh smoothing或新basegenerator。",
+    "evidenceZh": "boundaryτ既控制初noise也控制release，neverreleasedlatents最终精确restore。（Sec.3.3–3.4, Eq.(2)–(4), PDF pp.4–5）；rejoin只是meshconcat，globalexport仍有再voxel化，非保证watertight的几何stitch算法。（Sec.3.6 Eq.(5), PDF p.5; AppendixA, PDF pp.14–15）；appearance与preference改善明显但pointwisegeometry基本保持，不等于准确增加真实细节。（Table1 PDF p.6; Table4 PDF p.17）；83.3%humanpreference只对剔除neither的judgedratings，全responses为73.3%。（Table2, PDF p.7; AppendixB, PDF p.16）",
+    "caveatZh": "冻结TRELLIS.2 prior仍限制能生成的内容，printedlabels/lettering经refinement仍常错。；至少需一个attachment boundary，必须给regionbox；singleimage不能约束depth，实验用imageboxside-length作为cropdepth。；BIGDETAIL来自NanoBananaimage、没有artist3DGT，只评pairwisepreference。；partiallatent精确anchor不等于最终parent几何完全不变，binarycut/concat和globalremesh可能有seams/topology/分辨率影响，未验证manufacturability。；localizedregeneration会补出plausibledetails，不能保证object-specific隐藏几何/尺寸准确。；作者引用TRELLIS约17sbaseline来估cost，没有本方法独立end-to-endtiming，不能直接报告17s含所有encoding/export。；publicrepo是project/gallerysource，methodcode/fullBIGDETAIL尚planned，数字未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接支持3D资产局部细节生成和sequentiallocalizedediting，inference预算再分配与boundaryanchoring可为part-aware/editable模型研究参考；未测试LEGO连接或制造精度。"
+  }
+}

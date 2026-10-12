@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.11037",
+  "slug": "transforming-image-editors-into-video-editors",
+  "title": "Transforming Image Editors into Video Editors",
+  "authors": [
+    "Feng Wang",
+    "Zijie Li",
+    "Ceyuan Yang",
+    "Alan Yuille",
+    "Peng Wang"
+  ],
+  "publishedAt": "2026-10-08",
+  "updatedAt": "2026-10-08",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.11037"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "image-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Transforming",
+    "Image",
+    "Editors",
+    "into",
+    "Video"
+  ],
+  "abstract": "Recent image editing systems have achieved impressive semantic understanding, visual fidelity, and instruction-following ability, while video editing remains substantially more difficult and costly. In this paper, we present a simple alternative to end-to-end video editing: instead of training a monolithic video editor, we transform a strong image editor into a video editor through anchor-based generation. Our key insight is that video editing can be decomposed into two subproblems: editing a sparse set of keyframes and propagating those edits across time. Based on this observation, we propose Anchor-based Video Editing (AVE), a two-stage framework in which a powerful image editor first performs composed editing on selected keyframes, and a motion-guided image-to-video diffusion model then generates the final video by treating the edited keyframes as fixed anchors. This design directly inherits the strengths of modern image editors while avoiding expensive end-to-end video editing training. Experiments on IVEBench and VIE-Bench show that AVE achieves strong performance in instruction following, temporal consistency, and content fidelity. Further ablations reveal that final video editing quality is strongly correlated with the quality of the image editor, suggesting that future progress in video editing may come from stronger image editing foundations and lightweight transfer to video. Code is available at https://github.com/wangf3014/AVE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.11037v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.11037v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/wangf3014/AVE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.11037v1 的 13 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "AVE 把视频编辑拆成“联合编辑稀疏keyframes→固定anchor的motion-guided插值”，把语义编辑交给强image editor，Wan2.2仅负责时序传播。两benchmark与image-editor/anchor消融支持这种模块化转移，但默认依赖Nano Banana API，论文还训练710M motion/control参数和500K私有video pairs；公开代码仅zero-shot替代版，不能直接复现主表。",
+    "motivationZh": "强 image editors 能执行复杂语义修改，但逐帧用于视频会导致内容和运动不一致；训练完整 video editor 又需要大量视频编辑数据。论文关注如何将图像编辑能力可靠地延伸到连续视频。",
+    "methodZh": "给定source video与instruction，先scene-first加largest-gap选约T/24个anchors，在一次multi-turn image editing对话中保持keyframe consistency；可替换的Stage1也有基于1.5M私有aligned keyframe tuples微调BAGEL版本。Stage2用冻结Wan2.2-I2V-A14B，6层factorized spatial/temporal motion encoder和ControlNet residual从source video提取运动，clean anchor latents每一步重clamp，non-anchor位置denoise。完整13页及p.13运动编码/训练公式附录已读；没有单独limitations节，p.9讨论too-few/too-many anchors边界。",
+    "methodFlow": [
+      "用PySceneDetect选scene-first与lastframe，再largest-gap补齐约T/24个稀疏anchors。",
+      "同一multi-turn image-editor session联合完成keyframe语义编辑，或用fine-tuned multi-image BAGEL。",
+      "source video经Wan3D VAE与6-layer factorized motion encoder，ControlNet residual送入冻结DiT。",
+      "clean edited anchors初始化固定latent；每个diffusion step重新clamp anchors，仅生成中间frames。",
+      "Wan3D VAE解码完整video，保留edited content并传播source motion。"
+    ],
+    "experimentsZh": "Wan2.2-I2V-A14B冻结VAE/DiT，训练710M motion/control参数约5%；500K private video-edit samples，64A100、AdamW lr1e-4/weight decay0.05、cosine warmup、mixed precision。open Stage1另有1.5M tuples；默认NanoBanana2 API。IVEBench short/long与VIE-Bench用官方协议；ablation三runs，作者称std<0.1%。 以下结果为作者报告：作者报告IVEBench total short70.58、long68.75，对比previous best66.75/65.93；motion89.26/88.95。（Tables2–3, PDF p.6）；作者报告VIE instruction following9.539、preservation9.425；quality8.630低于Kling-Omni8.751，style9.203低于Kling9.341。（Table4, PDF p.7）；作者报告换Stage1为BAGEL-base/tuned、NanoBanana时IVE-long total58.54/66.07/68.75；uniform T/24为68.21，scene-first T/24为68.75。（Tables5–6, PDF p.9） 对照范围：IVE比较Ditto/InsV2V/Lucy/VACE/ICVE/OmniVideo/AnyV2V/StableV2V；VIE含commercial及InstructX/SAMA。公开训练资料不足，API版本和计算预算差异无法完全控制；未给end-to-end cost/latency对照。 消融与诊断：固定Stage2换image editor证明anchor质量重要；uniform与scene-first及2/T48/T24/T12预算支持适度anchors。缺motion encoder大小/controlbranch/clamping独立消融，不能证明710M是最低必要成本。",
+    "insightZh": "可迁移点是image editor和video propagation完全以edited frames为接口解耦，并以clean anchor clamping训练插值器；不是首次image/video组合或首创ControlNet。强API image editor对主表效果贡献显著，不能把全部增益归给motion encoder。",
+    "evidenceZh": "两stage唯一接口为edited keyframes，source motion通过单独训练branch进入冻结video model。（Secs.3.1–3.3, Figs.1–2, PDF pp.3–5）；每step fixed anchor clamping与仅non-anchor训练loss是方法的时序传播约束。（Sec.3.3 Eqs.(2)–(8), PDF p.5; Appendix Eqs.(13)–(17), PDF p.13）；作者报告两benchmark总体/指令表现较强，但IVE fidelity不是所有方法中最佳。（Tables2–4, PDF pp.6–7）；固定Stage2时Stage1强弱显著影响成绩，过多anchors也有小幅退化。（Tables5–6 and Effect of keyframe selection, PDF p.9）",
+    "caveatZh": "PDF p.9说明太少anchors弱化指令与保真，太多anchors会缩小WanVAE4×temporal下采样下的插值空间。；默认闭源API与私有500K/1.5M数据，不能把lightweight transfer理解为小算力或完全开源复现。；公开README明确trained motion encoder/control branch及BAGEL weights不发布，zero-shot代码用text motion description替代；主表没有证明其成绩相同。；source motion保留和修改motion之间的边界主要来自selected qualitative examples，复杂几何视点改变与长时loop仍需验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对visual creation workflow的直接价值是让image editor进步可转移到video edits；可参考多stage设计agent，但本论文未验证3D representation或fabrication。"
+  }
+}

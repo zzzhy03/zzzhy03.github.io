@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.09313",
+  "slug": "why-vlms-miss-small-objects-and-when-zooming-in-is-safe",
+  "title": "Why VLMs Miss Small Objects, and When Zooming In Is Safe",
+  "authors": [
+    "Junzhe Shi",
+    "Yuan Gan",
+    "Shida Jiang"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09313"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Why",
+    "VLMs",
+    "Miss",
+    "Small",
+    "Objects",
+    "When",
+    "Zooming",
+    "Is",
+    "Safe"
+  ],
+  "abstract": "Vision-language models (VLMs) often miss small objects in large images. We ask three questions: what limits them, which of these limits better models can remove, and whether the classical way of handling large images, local decomposition, still has a future. We answer them with a theory built on two quantities of the image interface: S, the number of visual tokens across an object's side, and L, the content a call must cover. The limits: a W x H image sent whole within N tokens gives an object of side m at most m*sqrt(N/(WH)) tokens per side. Doubling the token budget N therefore raises the largest S a whole image can reach by only 41%, and seeing an image at the S an object needs costs at least order S^2 tokens whatever the model. If recognition improves gradually with S, any search strategy, zoom agents included, obeys a recall-cost frontier. What better models can change: the S an object needs and how much one call can carry, measured in bits per object found; the coverage cost remains. Decomposition: yes. Assuming only that more tokens per object and less content per call do not hurt on average, splitting an image cannot lower recall if no view zooms out relative to the whole image and views overlap by one object. Neither part of this condition can be dropped; we bound the cost of every such decomposition, and a simple rule approaches the bound as the image grows. We test the theory in about 177,000 requests on 797 images. On controlled images, none of 40 orderings predicted for 8 VLMs is violated. Checked after the fact on drawings, floor plans, natural and synthetic images, 61 of 89 implied orderings hold significantly and 4 fail, all for OpenAI models given more pixels than their default path. On construction drawings the rule never significantly lowered recall relative to the whole image and raised it by up to 0.28. Code and data: https://github.com/shijunzhe/vlm-small-objects",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09313v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09313v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/shijunzhe/vlm-small-objects"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09313v1 的 44 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "本文用 S=每对象边长所占visualtokens 与 L=单call覆盖内容拆解small-object失败，给出满足crop/scale平均单调性时的保recall分块条件：不降S、以对象尺度overlap，并给成本下界与近界planner。作者177K请求中controlled40排序无显著违例，但真实数据89排序4违例；值得deep指导设计图/小part观察。『safe』是条件性expected recall，不保证每图、F1、定位merge或当前所有API模式。",
+    "motivationZh": "VLM 对小物体的识别与计数随 token 分辨率显著变化，盲目 zoom-in 又可能裁掉相关上下文或减少目标有效 token。需要区分何时增大视图真能提升召回、何时会带来新的失败。",
+    "methodZh": "区分interface几何/信息限制与可训练recognition、enumerationcapacity、coordinateinterface。论证wholeimageS至多m√(N/WH)、覆盖成本∝S²，以及有限objectoverlap保证；bits/gradedrecognitionfrontier扩至adaptivezoom。新drawingbench与FloorPlan/natural/synthetic实验、native-vsupsampledzoom、coordinateframe/JSON解析audit显示理论依赖条件和真实failure。",
+    "methodFlow": [
+      "测量输入接口：用billedtoken/blankimage与one-dotprobe校准effectivepixel/patchbudget、frame/scale/format，并在目标任务测crop/refinement单调性。",
+      "选择不降尺度：计算wholeSw，设S=max(targetS*,Sw)，tile尺寸服从vendorbudget且无二次resize。",
+      "对象尺度覆盖：nativeview按对象w/h与匹配τ形成overlap，确保wholeinteriortarget在至少一crop的interior。",
+      "定位与合并验收：模型返centres，只保core、工具转换native坐标并merge duplicates；hitrecall与FP/F1分开衡量。"
+    ],
+    "experimentsZh": "REDPX40 6tune/34test660instances，REDP10未release，FPC339items/60nested3areas、FSC150、controlled156+12battery；11models≈177Krequests277Minputtokens。pairedbootstrap4K，部分Holm其余unadjusted；numbers作者报告。 以下结果为作者报告：作者报告controlled8models×5orderings无40显著违例24显著支持；posthoc89orderings61支持/24不明确/4反向，皆特定高pixel路径。（PDF pp.14–16 Table2/Fig.2）；作者报告REDPX40Gemini3.8rule recall.62→.90(+.28 [.15,.41])；FPCGPT6.1 .63→.61 (−.02 [−.07,.03])，不等逐图无损。（PDF p.20 Table3）；作者报告same-reasoningfullsheetGPT5.6agentF1.97 vstil es.91，+ .06 [.02,.12] Holm .013；Claude+.05不显著。（PDF pp.19–20 Fig.6）；作者报告highresGPT5.6reasoningfullsheetF1 .89→.33；simple44pxrecipe降S的19/21cell负、12显著。（PDF pp.14/16/22 §5.1） 对照范围：whole/default/highres、tiling/planner、matchedreasoningtoolablation、templateproposalverify、learnedCountGD/GeCo2/OWLv2。drawing例有cleanlegend/dedicatedtokengeometry，泛复杂任务不自动适用。 消融与诊断：固定pixels改budget、固定S改count/content、native/overview/enlarged、packedtiles、coordinateparsing、tolerances、newversions；记录failedregisteredhypotheses与posthocchangedanalysis。未训练newmodel。",
+    "insightZh": "理论与可实现safe-decompositionplanner统一cropping/tiling/zoomagents的条件/成本，超单benchscore；几何bound不要求对象必整token或token内不能定位，作者反证quantizedobserver只reference。",
+    "evidenceZh": "recall安全需要有效scale不降与interiorcoverage及模型单调性。（PDF pp.5–8 Assumption1/Theorems1–3/Corollary1; pp.28–31 proofs）；S²覆盖成本限制可延伸adaptivepolicy但需recognition假设。（PDF pp.4/10–11 Propositions2/8–9; pp.31–33 proofs）；interface模型/模式改变可违反morepixelshelp。（PDF pp.16/21/25 §5.1/5.5/Limitations）；safe rule不是maxrecall方法，F1还受FP和merge影响。（PDF pp.8/19–20 Proposition6/Table3; p.38 AppendixK）",
+    "caveatZh": "assumptionsdistribution-specific，真实mode违例；guarantee仅expected recall，FP不单调故无F1保证。；hardthreshold/quantizedtoken假设现实弱或失败，gradedfrontiercalibration非认证。；只resizebudget/globalattention/textoutput接口，localnative/densehead可不同；commercialversions会变。；coordinateframe/normalization/format分析有posthocreaderchoice，REDP10labels同作者。；只12parentcontrolledimages与34drawings，177Krequests不等大量独立场景；89posthoc部分unadjusted存在多重检验。；tiletarget尺寸来自已知exemplar；未知大小/需globalcontext关系任务不满足localsupport假设，不能直接套设计语义推理。；overlap可增FP，merge丢hits与cropedge对象context缺失会破条件；不能输出『安全无损zoom』无假设。；specificcommercialmodeltoken预算/结论不能当永久产品事实，使用时重新校准；不等当前平台功能认证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "工程/设计图小symbol、LEGOpart与embroidery细结构的visualinspection可借鉴effectiveS、nativecrop、坐标工具转换与逐item验收；不把countlocalguarantee扩成全design正确性。"
+  }
+}

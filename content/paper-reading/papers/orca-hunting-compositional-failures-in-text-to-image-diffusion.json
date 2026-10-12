@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.09841",
+  "slug": "orca-hunting-compositional-failures-in-text-to-image-diffusion",
+  "title": "ORCA: Hunting Compositional Failures in Text-to-Image Diffusion",
+  "authors": [
+    "Arshia Hemmat",
+    "Amirhossein Vahidi",
+    "Amitis Shidani",
+    "Mohammad Vali Sanian",
+    "Hesam Asadollahzadeh",
+    "Aryan Yazdan Parast",
+    "Mohammad Lotfollahi"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-07",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.09841"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "ORCA",
+    "Hunting",
+    "Compositional",
+    "Failures",
+    "Text-to-Image",
+    "Diffusion"
+  ],
+  "abstract": "Text-to-image diffusion models fail predictably on compositional prompts: attributes bind to the wrong objects, spatial relations invert, and multi-object scenes lose count. Recent architectures already augment CLIP with a T5 encoder precisely because CLIP's contrastive embedding loses compositional structure, yet these failures persist. We argue the binding problem is therefore not one of missing information but of misaligned information: a text encoder preserves compositional structure, but in a representation space shaped by language modelling rather than vision, and the denoising objective does not directly reward aligning the two. We show this correspondence can be supplied as an explicit training signal, that the relevant cross-modal information is concentrated in a low-rank subspace of self-supervised visual features, and that supplying it can be folded into diffusion training as a single auxiliary loss. Our method, ORCA (Orthogonal Residual Compositional Alignment), aligns the latent of a diffusion transformer with a low-rank target derived from a frozen visual encoder, through a predictor whose orthogonal basis is parameterised by a learned residual between T5 and CLIP embeddings, which provides a prompt-dependent signal for selecting the visual readout subspace. We prove that the cross-modal information recoverable at a given rank is bounded by the spectral mass of the visual encoder's covariance in the top components. Across three diffusion-transformer backbones (DiT-B/2, DiT-L/2, U-ViT-L), ORCA improves FID and GenEval over both vanilla and REPA baselines at zero inference-time cost; on DiT-L/2 it reaches FID 16.65 and GenEval 0.291 at 200K steps, exceeding the strongest 400K baseline at half the training cost, with the largest gains concentrated on attribute binding, spatial relations, and multi-object prompts.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.09841v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.09841v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.09841v1 的 26 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "ORCA 把 T5→CLIP 的 learned difference 用作 QR readout basis 条件，在 diffusion 中间层对齐冻结 DINO PCA target，仅训练时添加损失。作者报告 DiT-L/2 COCO256 的200K步 FID16.65/GenEval.291，优于400K REPA20.05/.275；值得借鉴 compositional conditioning 的监督接口，但整体binding仍弱，learned difference不是正交残差，谱界也不是组合语义保证。",
+    "motivationZh": "Text-to-image diffusion 能生成常见物体，却经常在多对象属性与关系组合上失败。语言条件中已存在的结构信息未被充分映射到生成模型的视觉表示，需要检验更直接的 image-grounded alignment 能否改善 composition。",
+    "methodZh": "方法针对语言结构存在但视觉生成未对齐的假设，以prompt-dependent正交projection连接diffusion latent与低秩DINO目标，固定视觉target防collapse。三种小中型backbone比较REPA/REG，附录覆盖rank、layer、loss coefficient、target及sampling bootstrap；没有web-scale强模型验证，也未实际推广至视频/3D。",
+    "methodFlow": [
+      "构造差异信号：学习W将T5 embedding映到CLIP维度，计算WzT−zC；这是未加orthogonality约束的learned difference。",
+      "固定视觉目标：用5000训练图像估计DINOv2 patch PCA与均值，冻结rank64投影目标。",
+      "生成readout basis：difference经MLP输出矩阵，列normalize、微小noise和fp32QR形成正交列K，读取Kᵀh。",
+      "辅助对齐并丢弃：中间block8加入target MSE与diffusion损失；部署删去W/MLP/QR/target，采样backbone不改。"
+    ],
+    "experimentsZh": "COCO256、SD1.5VAE、CLIP/T5 frozen；DiT-B/2、DiT-L/2、U-ViT-L。4A100、globalbatch256；FID30K、GenEval553×4、50DDIM/CFG1.5，所有数字作者报告。 以下结果为作者报告：作者报告 DiT-L/2 ORCA200K FID16.65/GenEval.291，REG200K18.57/.258，REPA400K20.05/.275。（PDF p.7 Table1）；作者报告150K ORCA rank64 Position.073、color attribution.068，相对vanilla.025/.023；绝对组合能力仍低。（PDF p.8 Table2）；作者报告额外每步wall time<7%；bootstrap SD FID16.65±.11/GenEval.291±.010仅反映cached样本不含训练seed。（PDF pp.15/18–19 C.4/E Table11） 对照范围：vanilla/REPA/REG同backbone训练设定；无FLUX/SD3等高分辨率成熟模型，也没有充分difference-vs单T5/CLIP readout matched ablation。 消融与诊断：rank16–128、block1/8/16/24、λ.1–5、learned target/VICReg/frozenPCA MSE/NLL；最终blockcollapse；GenEval最优rank128与FID最优64不同。",
+    "insightZh": "贡献是text-conditioned受限readout与冻结PCA target结合；相对REPA提供prompt-dependent对齐。谱定理是重建误差的PCA上界，未证明跨模态语义或组合binding必然落在top components。",
+    "evidenceZh": "difference不是CLIP的正交补，K的正交性才由QR保证。（PDF p.4 §§3.1–3.3 Eqs.(4)–(7)）；相同backbone在若干训练预算下提升FID和GenEval。（PDF pp.7–8 Tables1–2）；orthogonal complement cosine为零是构造恒等式。（PDF pp.5/18 Eqs.(8)–(11), D.7 Fig.4）；bound刻画冻结target能量上限。（PDF pp.6/12–13 Theorem1, B.1–B.3）",
+    "caveatZh": "GPU约束仅COCO256，web-scale、视频与3D为未来工作。；多数训练单seed，bootstrap为sampling uncertainty；其他backbone误差估计待补。；orthogonal complement的target-orthogonality不是视觉信息缺失证据。；谱能量界没有提供binding因果来源，单目DINO主成分可丢稀有布局。；learnedW未约束，『T5−CLIP isolate missing composition』是假设，缺少matched conditioning ablation。；Table3 hg=dC与Table4 hg1024/dC768不一致；CLIP encoder额外配置复用主结果值，精确实现需澄清。；GenEval使用per-image bootstrap忽略同prompt相关性；速度按迭代比较不能直接当等walltime。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "属性与相对布局控制对visual creation有迁移意义，可参考训练时structured alignment；不构成可编辑SVG或可制造3D生成。"
+  }
+}

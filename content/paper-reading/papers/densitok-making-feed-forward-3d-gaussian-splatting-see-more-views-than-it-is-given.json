@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.07958",
+  "slug": "densitok-making-feed-forward-3d-gaussian-splatting-see-more-views-than-it-is-given",
+  "title": "DensiTok: Making Feed-Forward 3D Gaussian Splatting See More Views Than It Is Given",
+  "authors": [
+    "Minhyeok Lee",
+    "Jungho Lee",
+    "Minseok Kang",
+    "Heeseung Choi",
+    "Ig-Jae Kim",
+    "Sangyoun Lee"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.07958"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "DensiTok",
+    "Making",
+    "Feed-Forward",
+    "3D",
+    "Gaussian",
+    "Splatting",
+    "See",
+    "More",
+    "Views",
+    "Than",
+    "It",
+    "Is",
+    "Given"
+  ],
+  "abstract": "Feed-forward 3D Gaussian Splatting (3DGS) reconstructs a scene in a single forward pass, replacing per-scene optimization with a network trained across many scenes. Its quality, however, degrades sharply as the number of input images drops. The bottleneck is upstream of the reconstruction heads: from a few unposed views, the internal representation they read carries no evidence for unobserved regions, leaving holes, floaters, and blur. The common remedy supplies that evidence as pixels, synthesizing extra views with an image or video generator and re-encoding them, which is costly and not 3D-consistent by construction. We instead densify the evidence itself. We present DensiTok, a plug-in module for pretrained feed-forward 3DGS models that densifies their internal geometry tokens directly, making a frozen backbone behave as though it had observed many more views than it was given. DensiTok compresses those tokens into a compact latent space, completes the latents of the unobserved viewpoints in a single flow-matching step conditioned on camera geometry, and decodes them back into tokens that the original reconstruction heads. The same module design can be integrated into different pretrained predictors while keeping each backbone and its reconstruction heads frozen. Completion in a low-dimensional latent space requires no image synthesis or additional encoder passes. Across three pretrained backbones and two benchmarks, DensiTok consistently improves sparse-view reconstruction and recovers much of the gap to dense-view reconstruction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.07958v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.07958v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.07958v1 的 28 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "DensiTok 用四channel LAM-VAE压缩多层geometry tokens，再用camera-conditioned单步DiT补齐沿已观察相机轨迹的缺失view tokens，直接送回3DGS/camera/depth heads。作者报告AnySplat三输入RE10K PSNR22.47→24.28并超16输入24.04，且ScanNet等未见集camera/depth也改善；可借鉴geometry-space completion。但这是faithful插值重建，非可编辑3D生成，实际AnySplat appearance层有微调，完整几何外推未证明。",
+    "motivationZh": "Sparse-view reconstruction 的视觉 tokens 缺少未观测视角的 geometry 信息，导致前馈重建在视角和场景变化下不稳定。需要把 token-level 几何补全用于一致的相机、深度与 3D 表达。",
+    "methodZh": "方法避免额外RGB生成/encoderpass，学习multi-leveltoken→latent→alllevels的VAE。observedlatent保持clean，unobservedlatent以noise/time/mask和Plückerrays条件完成，使用fullviewgeometry teacher与rendering监督。训练各backbone/数据分开，最后固定t1单步回归；补色通过observedRGBwarp和missingembedding而非新RGBinput。",
+    "methodFlow": [
+      "压缩几何层：level-specificLN、gatinggain融合四层token，加level-wiseposteriorresidual，VAE四channel latent。",
+      "补齐camera条件：observedcamera由backbone预测；训练GTcamera尺度对齐，推理以cubiccenter/sphericalrotation插值virtualcamera。",
+      "生成缺失viewtoken：DiT交替frame/globalattention，mask/time/PlückerAdaLN，singleEulerstep补缺失latent并锁定observed。",
+      "重建输出：VAEdecode全部层，原head输出GS/camera/depth；AnySplat以depth/camerawarpobservedRGB作colorprior，微调imageembedding。"
+    ],
+    "experimentsZh": "AnySplat/WorldMirror/DA3各自训练；RE10K/DL3DV16view，n2/3/5/7、80seq×4testviews；主294×518，附256/512res重采样。200K VAE+200KDiT+20Kone-step、4RTX6000Ada；numbers作者报告。 以下结果为作者报告：作者报告AnySplatRE10K n3 PSNR22.47→24.28/SSIM.748→.813/LPIPS.215→.184，16viewbase24.04/.792/.189；runtime.117→.267s，16base.434s。（PDF p.7 Table1）；作者报告ScanNet n2 PSNR19.60→22.51、AbsRel.070→.052；ETH3D15.99→17.01；Mip360n3 LPIPS.383→.400虽PSNR改善。（PDF p.25 Table9）；作者报告n2总views2→16runtime.109→.258s、memory5.527→9.471GB；N12后收益趋缓。（PDF p.9 Table3）；作者报告one-step22.56dB vs50step22.86，runtime.258 vs4.848s；samecostscratch21.67。（PDF p.26 Table10） 对照范围：三backbone、pose/no-posefeedforward与diffusionNVS。diffusion对比使用更近/有重叠input，不能把百倍speed普遍推广到large-baseline/unseen-region生成。 消融与诊断：LAMfusion/residual、totalviews、flowpretrain/one-step、latent4vs16、appearanceheadfreeze/input/full、跨dataset。多数没有多seed/CI，主depthMoGe2pseudo。",
+    "insightZh": "相对GLD高维多步features，贡献是统一多层低维几何completion+one-step训练；已有NVS范式的表示接口推进，重要性来自跨backbone与未见数据geometry收益，不能把unobservedviewtoken当真实观测证据。",
+    "evidenceZh": "single-step完成是t1固定目标回归，不约束多步ODE一致性。（PDF pp.16–17 AppendixB Eqs.(10)–(13)）；只有观察相机区间内插值，且appearancehead并非完全冻结。（PDF pp.7/9 §3.4/§5; pp.14–16 AppendixA.2/B）；稀疏重建收益同时涉及camera/depth，并扩展到未见dataset。（PDF pp.7/25 Tables1/9; p.26 D.1）",
+    "caveatZh": "不外推observedcamera区间，novelvieweval亦仅插值。；N增加runtime/memory；somebackbone需appearance adaptation。；新backbone独立训练，更多latentchannel改善不均匀。；生成token是learnedprior不是真新证据，full3Dtopology/semanticpart/asseteditability没有验证。；训练GTalignedcamera与inferenceinterpolated预测camera有残余domain差。；80seq主eval与ETH/Mip样本少，未提供uncertainty；depthpseudo可能偏好teacherfamily。；适用selective理由是未见数据geometrygeneralization，不能改归3Dgeneration或宣称制造适配。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "geometrylatentcompletion接口有潜在3D资产恢复/生成表示迁移，现有强证据限camera/depth/GSfaithfulreconstruction。三个未见dataset的geometry收益满足selectivegeneralization门槛，推荐skim。"
+  }
+}

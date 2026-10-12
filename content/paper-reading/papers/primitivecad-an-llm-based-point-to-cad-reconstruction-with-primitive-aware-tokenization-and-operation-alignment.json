@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.08698",
+  "slug": "primitivecad-an-llm-based-point-to-cad-reconstruction-with-primitive-aware-tokenization-and-operation-alignment",
+  "title": "PrimitiveCAD: An LLM-Based Point-to-CAD Reconstruction with Primitive-Aware Tokenization and Operation Alignment",
+  "authors": [
+    "Jian Gao",
+    "Kailin Bi",
+    "Jiamin Xu",
+    "Jinlan Xu",
+    "Gang Xu"
+  ],
+  "publishedAt": "2026-10-06",
+  "updatedAt": "2026-10-06",
+  "collectedAt": "2026-10-12",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.08698"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "PrimitiveCAD",
+    "LLM-Based",
+    "Point-to-CAD",
+    "Reconstruction",
+    "Primitive-Aware",
+    "Tokenization",
+    "Operation",
+    "Alignment"
+  ],
+  "abstract": "Large-model-based point-to-CAD generation holds immense potential for advancing industrial design and enhancing 3D modeling efficiency. However, most existing methods approach the problem as a general point-cloud encoding and token prediction task, neglecting the tokenization and supervision specifically for CAD-related primitives. As a result, these methods often struggle to accurately reconstruct the intricate primitive structures. To address this limitation, we propose PrimitiveCAD, a novel multi-stage paradigm for point-to-CAD reconstruction that enhances the geometric accuracy of generated CAD models while better preserving critical geometric features. First, we introduce a primitive-aware point cloud tokenization model, enabling the system to learn more robust geometric representations from CAD point clouds. Next, we perform supervised finetuning on a large language model (LLM) and introduce an operation alignment loss to align key CAD operation frequencies, thereby improving the preservation of global shape features. Finally, we incorporate reinforcement learning (RL) and introduce a feature-line alignment reward to further reduce stochasticity and enhance the fine-grained preservation of geometric features. Experiments on the DeepCAD and Fusion360 datasets show that our method achieves state-of-the-art performance in code validity, geometric accuracy, and geometric feature preservation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.08698v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.08698v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.08698v1 的 9 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
+    "ideaZh": "PrimitiveCAD把CAD primitive约束贯穿tokenizer、SFT及GRPO：先学normal/primitive实例，再用operator soft-count loss和feature-line matching保住孔、直角与细结构。作者报告Fusion360单pass IoU由Cadrille-RL的84.8升至86.6、invalidity降至0.06%；值得借鉴几何奖励设计，但只验证component，尚不支持复杂assembly。",
+    "motivationZh": "点云到 CAD 不只要重建表面，还需恢复能执行的建模程序与合适的操作组合。问题是让点云表示暴露 primitive 结构，并减少几何上似是而非、操作序列却不匹配的输出。",
+    "methodZh": "任务是从点云忠实恢复可执行CadQuery Python及parametric B-Rep。PTv3用normal与32个primitive-instance槽监督，Hungarian匹配消除实例索引置换，FPS取256点并融合Fourier坐标。SFT在Qwen2的256-token占位区注入几何tokens，用cross-entropy与CAD operation频率的differentiable relaxed IoU同时约束局部语法/整体构造。GRPO执行候选program，奖励0.6 volumetric IoU+0.4 feature-line similarity，执行失败−10；线、圆弧和圆的Hungarian matching补上volume IoU遗漏的细节。证据来自DeepCAD/CAD-Recode训练和Fusion360评测；本9页PDF未附正文所引用的supplement，真实scan鲁棒性和复杂操作扩展不能在这里核实。",
+    "methodFlow": [
+      "从带CAD构造记录的模型采样点云，解析sketch/extrude/cylinder/box primitive标签和normal。",
+      "以Hungarian匹配+normal一致性训练PTv3，FPS采256点并将64维特征与Fourier坐标投影为几何tokens。",
+      "将256个几何tokens注入Qwen2输入，联合code cross-entropy与operator soft-count relaxed-IoU loss进行SFT。",
+      "执行GRPO候选CadQuery，按volume IoU和line/arc/circle最优匹配计算reward，失败program受−10惩罚。",
+      "从点云一次生成Python脚本，执行得到可编辑B-Rep并评估几何精度/validity。"
+    ],
+    "experimentsZh": "SFT使用约16k DeepCAD及约1M CAD-Recode（各训练配置分开列）；RL用Fusion360。评测DeepCAD/Fusion360的IoU、invalidity和8192采样点Chamfer（CD×10³）。主要表为单pass，Fig.7定性为best-of-10，Table5则best/worst-of-10。 以下结果为作者报告：作者报告DCAD+CADR训练、无RL/无test-time sampling时DeepCAD IoU90.9%、Fusion36084.9%；Cadrille同训练集分别86.6%、76.5%。（Table1, PDF p.7）；作者报告加入RL后Fusion360 mean CD0.45、IoU86.6%、IR0.06%；SFT-only分别0.65、84.9%、0.35%。（Table2, PDF p.8） 对照范围：包括DeepCAD、Point2Cyl、HNC-CAD、MultiCAD、TransCAD、CAD-Diffuser、CAD-SIGNet、CAD-Recode与Cadrille，表区分training corpus；未见复杂assembly或大规模真实scan统计。 消融与诊断：Table3去PTv3 finetune或Lop均降IoU（82.4/83.4 vs84.9）；Table4显示1024点后边际收益有限；Table5去feature-line reward后worst-of-10 IoU81.5 vs82.3，并比较Dr.CPPO。只能支持该组合在CAD benchmarks内有效。",
+    "insightZh": "相对CAD-Recode/Cadrille的通用point feature、token CE与volume reward，增量是CAD-specific primitive监督、可微operation统计约束和feature-line局部几何reward的协同；不是新的LLM架构，也不应把内部primitive分割自动扩称一般3D segmentation模型。",
+    "evidenceZh": "几何tokenizer由normal与primitive-instance监督训练，256 FPS点融合Fourier坐标。（Sec.3.2, Eqs.(1)–(7), PDF pp.3–4; Fig.2 p.3）；operator soft counts使CAD构造频率可被SFT differentiably监督。（Sec.3.3.1, Eqs.(8)–(10), Fig.5, PDF p.5）；作者报告Fusion360 RL结果IoU86.6、IR0.06%，对比Cadrille-RL84.8与0.46%。（Table2, PDF p.8）；作者明确目前不支持复杂multi-module assembly。（Sec.5, Limitation, PDF p.8）",
+    "caveatZh": "目前主要针对component-level，不支持复杂multi-module assembly（PDF p.8）。；primitive supervision依赖CAD构造labels；四类×八实例设计的更复杂construct泛化未有正文证据。；Fig.7为best-of-10，不能用它代表single-pass可靠性。；实现细节、mesh feature-line提取和复杂CADEvolve结果指向未随本PDF附上的supplement；未核实真实扫描噪声/occlusion或制造可行性。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可编辑CAD恢复直接服务3D资产与制造设计；operator统计与line/arc/circle匹配尤其可借鉴到结构化program生成的细节保留。"
+  }
+}
