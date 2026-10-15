@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.14698",
+  "slug": "pure-refining-feed-forward-3d-reconstruction-with-unlabeled-post-training-2610-14698",
+  "title": "PURE: Refining Feed-forward 3D Reconstruction with Unlabeled Post-training",
+  "authors": [
+    "Yaolong Zhu",
+    "Peng Li",
+    "Jiahao Lu",
+    "Chengfeng Zhao",
+    "Mengfei Li",
+    "Chao Wang",
+    "Wenyue Chen",
+    "Zekai Gu",
+    "Chengwei Ren",
+    "Ronggang Wang",
+    "Yuan Liu"
+  ],
+  "publishedAt": "2026-10-10",
+  "updatedAt": "2026-10-10",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.14698"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "PURE",
+    "Refining",
+    "Feed-forward",
+    "Reconstruction",
+    "with",
+    "Unlabeled",
+    "Post-training"
+  ],
+  "abstract": "Feed-forward 3D reconstruction models have achieved remarkable progress through large-scale training and strong learned priors. However, they remain fragile when applied to dynamic in-the-wild videos, where non-rigid motion, occlusions, and illumination changes are prevalent. A key limitation lies in their reliance on expensive depth and camera pose annotations, which hinders scaling to diverse real-world dynamic data and restricts generalization. To address this issue, we propose \\textbf{PURE}, an unlabeled post-training refinement framework that improves depth and camera estimation without requiring ground-truth supervision. Instead of relying on annotations, PURE elegantly distills robust structural knowledge from state-of-the-art 2D priors into 4D feed-forward architectures. PURE leverages relative depth constraints, affine-invariant geometry distillation, and pose refinement based on feature correspondences to stabilize geometric predictions under challenging dynamic conditions. Extensive experiments on both synthetic and real-world dynamic benchmarks demonstrate that PURE delivers consistent improvements across multiple state-of-the-art architectures. Furthermore, our data-efficient paradigm effectively mitigates domain shifts, successfully unlocking the architectural limits of these base models in challenging, in-the-wild dynamic scenes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.14698v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.14698v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.14698v1 的 10 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "PURE把MoGe的relative/local geometry和GIM matches蒸馏进VGGT/Pi3/DA3，在dataset-level post-training中适配动态野外视频，推理时不用逐场景优化。作者报告VGGT DyCheck scale+shift AbsRel0.113→0.055；值得skim无标注real-video adaptation。训练仍混合有标注/合成replay，Pi3需换head，另有test-set adaptation实验，不能把所有数字都当zero-shot或全流程无监督。",
+    "motivationZh": "feed-forward 3D foundation models在动态野外视频中受到GT depth/pose数据稀缺和2D teacher尺度漂移限制，需要低成本的dataset-level adaptation。",
+    "methodZh": "新real videos由MoGe、Grounded SAM2和GIM提供伪几何、dynamic/sky mask及matches。ordinal depth避免把teacher绝对尺度漂移直接传给3D模型；保留base intrinsic ray并结合mono depth构造pseudo points，以局部scale/shift-invariant distillation保留结构。correspondences做dynamic/confidence/cycle过滤与inverse-density采样以约束pose。更新中间global layers；Pi3另换multi-level conv point head。",
+    "methodFlow": [
+      "准备real-video伪监督：MoGe相对深度、Grounded SAM2动态区域与GIM匹配；并混合GT/合成数据防遗忘。",
+      "分离geometry与intrinsics：沿base model的camera rays组合mono depth，避免teacher ray方向不一致。",
+      "联合post-training：ordinal depth、local affine-invariant geometry与过滤后的multi-view correspondence共同细化几何/pose。",
+      "直接推理：更新后的feed-forward backbone输出depth/pointmaps与camera；VGGT/DA3无额外test-time优化，Pi3采用更换后的head。"
+    ],
+    "experimentsZh": "VGGT/Pi3/DA3，4×H800，1–24 views与160K–250K image pixels；VGGT约20h、DA3约8h、Pi3 head初始化12h+posttrain8h。real SpatialVID882K/Sekai3.6M图像加synthetic/Waymo；Sintel/Bonn/KITTI/DyCheck depth按scale或scale+shift对齐、poses按Sim(3)。 以下结果为作者报告：作者报告VGGT DyCheck scale+shift AbsRel0.113→0.055、delta0.852→0.976；Sintel0.215→0.178。（PDF p.7 Table2）；作者报告VGGT Sintel ATE0.148→0.061、DyCheck0.022→0.015；DA3 Bonn ATE0.008→0.009，非所有cell改善。（PDF p.7 Table3）；作者报告平均relative AbsRel在0.2M/1M/5M数据为0.8452/0.7461/0.7229，边际收益趋缓。（PDF p.9 Fig.5） 对照范围：主要before/after比较同三base architectures和loss/data消融，没有同预算替代post-training方案、paired多seed或对teacher不同质量的完整控制。Pi3结构变化并非纯loss比较。 消融与诊断：DyCheck VGGT去all/unlabeled、ordinal或local loss分别更差；但未单独隔离全部pose filtering/IDS与head replacement。Table4是在test-set图像上适配，选Sintel中有足够static区域的subset。",
+    "insightZh": "以规模化无标注real-video在dataset层做后训练、保留base模型尺度/射线同时吸收2D teacher局部结构，区别于photometric自监督和每scene test-time优化；基础loss与teacher由已有工作组成，贡献在稳健组合与跨backbone adaptation。",
+    "evidenceZh": "沿base intrinsic rays组合mono depth，再做局部affine-invariant和ordinal监督。（PDF p.4 §3.1, Eqs.(1)–(4)）；dynamic/confidence/cycle过滤与inverse density sampling约束可靠correspondences。（PDF p.4 §3.2）；训练mix包含unlabeled SpatialVID/Sekai及合成/Waymo replay，Pi3更换point head。（PDF p.5 §3.3, Table1, Fig.3）；作者报告多个depth/pose评测改善，但Pi3和DA3存在局部下降。（PDF p.7 Tables2–3）；test-set post-training是单独transductive设置，不能并入zero-shot主结果。（PDF p.6 §4.4 / p.7 Table4）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "规模化动态视频的relative geometry supervision可参考到生成数据准备或4D reconstruction backbone adaptation；主要价值是无需为新real视频逐帧标注，不直接证明可编辑mesh质量。",
+    "caveatZh": "固定模型capacity下增加post-training数据收益逐渐饱和。；Pi3原pixel-shuffle head在该训练下不稳定，因此需更换head。；annotation-free针对新real视频，不是完全不用GT；§4.5明确w/o all使用带GT数据。；Table4为test-set adaptation且Sintel subset被过滤，不能声称未见样本泛化。；Pi3 Table2参数959M→989M，与§4.2文字fewer parameters矛盾；不能直接认定所有backbone架构/推理成本不变。；完整pose correspondence loss、mask thresholds、teacher成本与多seed不详；高动态缺少static matches的边界未充分验证。；没有找到公开Code URL或release，未独立复现。"
+  }
+}

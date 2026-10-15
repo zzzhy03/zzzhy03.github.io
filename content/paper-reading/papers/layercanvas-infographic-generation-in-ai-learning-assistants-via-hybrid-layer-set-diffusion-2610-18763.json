@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.18763",
+  "slug": "layercanvas-infographic-generation-in-ai-learning-assistants-via-hybrid-layer-set-diffusion-2610-18763",
+  "title": "LayerCanvas: Infographic Generation in AI Learning Assistants via Hybrid Layer-Set Diffusion",
+  "authors": [
+    "Keshav Gupta",
+    "Jeremy Owen",
+    "Christopher Lloyd",
+    "Shaunak Mishra",
+    "Manav Sharma"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18763"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "2d-design",
+    "LayerCanvas",
+    "Infographic",
+    "Generation",
+    "in",
+    "AI",
+    "Learning",
+    "Assistants",
+    "via",
+    "Hybrid"
+  ],
+  "abstract": "Online learning platforms are increasingly deploying AI assistants to provide personalized, on-demand tutoring. These can leverage infographics to communicate complex information and improve the learning experience. However, automating effective infographic generation remains a challenging task, requiring a combination of visual richness with precise typography, structured layouts, and continued editability. Existing representation methods satisfy these goals only in part: Scalable Vector Graphics (SVG) representations preserve geometry, hierarchy, and text but provide limited aesthetic flexibility, while raster diffusion models produce richer appearances by flattening content and layout into a single image. Conditioning a diffusion model on a rasterized SVG does not resolve this conflict because the raster preserves approximate placement but discards element ownership, occlusion relationships, and the structure needed to modify and recompose the result. We introduce LayerCanvas, a hybrid approach that retains SVG as the semantic, structural, and typographic program while using diffusion to aestheticize non-text content. Rather than generating one flattened raster, LayerCanvas partitions SVG elements into z-ordered sets of mutually non-overlapping elements and processes them through communicating parallel RGB generation streams. The resulting layers are independently editable and deterministically recomposed, while text is rendered from preserved vector metadata. Our approach combines rich visual synthesis with accurate typography and localized editing. LayerCanvas substantially improves text fidelity over state-of-the-art raster image generators while achieving the highest overall aesthetic quality. We further demonstrate non-destructive content editing, localization, asset reuse, and animation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18763v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18763v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18763v1 的 30 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "LayerCanvas 保留 SVG 的 geometry、ownership、paint order 与文字，仅用并行 layer-set diffusion 美化非文字内容；overlap/parent-child communication 协调风格与边界，最后回填精确 vector text。作者展示局部编辑、重排和资产复用，是结构化 2D generation 的直接贡献；输入 SVG 正确性与改动遮挡后的稳定性仍是边界。",
+    "motivationZh": "SVG 保留精确结构与文字却视觉表现有限，raster diffusion 又丢失 layer ownership、遮挡关系与后续可编辑性。",
+    "methodZh": "LayerCanvas 保留 SVG 的 geometry、ownership、paint order 与文字，仅用并行 layer-set diffusion 美化非文字内容；overlap/parent-child communication 协调风格与边界，最后回填精确 vector text。作者展示局部编辑、重排和资产复用，是结构化 2D generation 的直接贡献；输入 SVG 正确性与改动遮挡后的稳定性仍是边界。",
+    "methodFlow": [
+      "解析 SVG 元素、amodal/visible masks 与 paint order",
+      "将互不重叠元素分到有序 layer sets",
+      "共享/私有噪声经 frozen MMDiT 与 layer-control adapter 并行生成",
+      "graph-biased layer communication 注入 style/boundary residuals",
+      "按 paint order alpha compose 并回填 vector text"
+    ],
+    "experimentsZh": "合成 SVG/renderer-derived layer training records；比较 fixed-prompt generation 与 strict 768×512 OCR；三种 VLM judge 鲁棒性及应用实例。 以下结果为作者报告：作者报告 test-set placement-exact OCR character accuracy 0.822、word recall 0.942；VLM Avg 为 3.85，Ideogram-4 为 3.03，SVG reference 为 3.76。（Table 1, p. 6） 对照范围：比较 prompt-only Qwen-Image-2512、Ideogram-4 和 SVG reference；LayerCanvas 有额外 structure input，文字优势是 deterministic typesetting 的表示优势，不是 raster text learning 提升。 消融与诊断：Table 2 用同 image backbone 的 single-raster conditioning 测 representation；缺少 layer communication 各细项完整独立消融，局部稳定性多为实例。",
+    "insightZh": "输出是保留语义结构与可编辑 raster layers 的 hybrid artifact；与单张 raster conditioning 相比明确保留 ownership/occlusion。",
+    "evidenceZh": "分组要求同组 full masks 不重叠，跨组保持遮挡 paint order。（Sec. 3.3, pp. 4-5）；layer summary attention 使用 directed overlap 与 parent-child graph，分 style/boundary paths 返回 frozen backbone。（Sec. 3.4, Fig. 2, pp. 5-6）；作者报告 test-set placement-exact OCR character accuracy 0.822、word recall 0.942；VLM Avg 为 3.85，Ideogram-4 为 3.03，SVG reference 为 3.76。（Table 1, p. 6）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "显式 structured/editable 2D output、layer generation 与 generalizable SVG control 直接命中主要方向。",
+    "caveatZh": "需要 valid source SVG；继承上游 content/layout errors；occlusion/z-order 改动可能影响未选区域。；精确文字不保证 factuality、accessibility 或 localization 语义。；主质量依赖 VLM judge；文字 OCR error 不应解释为实际字符串错误。；缺少真实设计任务用户质量与长链编辑稳定性验证。"
+  }
+}

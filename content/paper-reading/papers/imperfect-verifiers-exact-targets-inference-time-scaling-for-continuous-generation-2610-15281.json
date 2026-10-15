@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.15281",
+  "slug": "imperfect-verifiers-exact-targets-inference-time-scaling-for-continuous-generation-2610-15281",
+  "title": "Imperfect Verifiers, Exact Targets: Inference-Time Scaling for Continuous Generation",
+  "authors": [
+    "Kijung Jeon",
+    "Molei Tao"
+  ],
+  "publishedAt": "2026-10-11",
+  "updatedAt": "2026-10-11",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.15281"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG",
+    "stat.CO",
+    "stat.ML"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Imperfect",
+    "Verifiers",
+    "Exact",
+    "Targets",
+    "Inference-Time",
+    "Scaling",
+    "for",
+    "Continuous",
+    "Generation"
+  ],
+  "abstract": "Verifier-guided inference-time scaling uses additional computation to score intermediate states and steer generation toward better outputs. However, imperfect intermediate verifiers can distort sampling, and repeated refinement alone does not ensure recovery of the desired reward-tilted distribution. We introduce Continuous-State Verifier-Guided Backtracking (CS-VGB), an inference-time scaling method for sampling from reward-tilted distributions with continuous generative models through repeated denoising and renoising. With correctly paired denoising and renoising transitions, the stationary distribution of CS-VGB at the clean checkpoint equals the desired reward-tilted target, even when intermediate verifiers are inaccurate. Under stated regularity conditions, CS-VGB converges exponentially to the target despite verifier error, and the expected number of updates needed to reach a clean sample grows only linearly with the number of checkpoints. In analytically tractable settings, we empirically demonstrate that CS-VGB recovers the desired reward-tilted distribution despite verifier error, whereas the compared verifier-based sampling methods fail to recover the target under the same verifier errors. We also instantiate the framework with diffusion models and one-step stochastic posterior maps. Across prompt-guided ImageNet generation, facial-attribute generation on CelebA, and multi-robot planning, recurrent CS-VGB search improves reward and task success as inference budgets grow, with image-generation rewards continuing beyond the observed plateaus of denoising-only baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.15281v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.15281v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/KraitGit/CS_VGB"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.15281v1 的 74 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "CS-VGB 把连续生成的一次 denoising 改为可反复 denoise/renoise 的 MCMC：process verifier 负责探索，精确 terminal reward 锚定目标分布，reverse insertion 避免有限候选池引入偏差。作者给出有条件的采样保证并报告图像/规划的高预算收益；实践 search heuristic 不继承该保证，低预算也未必划算。",
+    "motivationZh": "不准确的 process verifiers 与单向 denoising 使 inference-time guidance 偏离目标，且难以回访早期生成决定。",
+    "methodZh": "CS-VGB 把连续生成的一次 denoising 改为可反复 denoise/renoise 的 MCMC：process verifier 负责探索，精确 terminal reward 锚定目标分布，reverse insertion 避免有限候选池引入偏差。作者给出有条件的采样保证并报告图像/规划的高预算收益；实践 search heuristic 不继承该保证，低预算也未必划算。",
+    "methodFlow": [
+      "预训练生成器定义 checkpoint denoising/renoising kernels",
+      "用共享 edge conductance 构造双向 verifier-guided moves",
+      "保留方向并在有限候选池中 reverse-insert 前状态",
+      "lazy evaluation 控制 verifier 调用",
+      "重复返回 clean checkpoint，采样或启发式选择高 reward 输出"
+    ],
+    "experimentsZh": "2D Gaussian mixture 检验 target recovery；ImageNet prompt pairs、CelebA attribute conditions 各 100，及四种 multi-robot tasks；budget 计算 generator forward 与 VJP。 以下结果为作者报告：作者报告 ImageNet MFM 的 CS-VGB-G 在 4,104 NFE 达到 HPSv2 45.46，而 MFM-G 在 23,959 NFE 为 44.94；规划最大预算联合成功率 84.8%，ABCD-G 为 71.2%。（Fig. 5, p. 8; Fig. 6, p. 9） 对照范围：比较 BoN、SMC、RERD、MFM/PDM search/guidance 与 recurrent planning baselines；有 held-out VQAScore。NFE 不含所有系统开销。 消融与诊断：Fig. 4 reverse-insertion removal；Table 2 restart vs recurrence，forward vs bidirectional guidance 及 lazy-pool/persistence 附录分析。",
+    "insightZh": "把离散 VGB 的 robust-verifier sampling 原理扩展到 continuous-state models；理论区分 process-verifier error 与 transition-pair mismatch。",
+    "evidenceZh": "clean edge 仅用 terminal reward，stationary clean law 在 paired-transition 条件下不依赖 process verifier 的精度。（Theorem 2.1; Sec. 2.1, pp. 3-5）；reverse insertion 和 lazy finite pools 保持采样目标；multi-chain practical search 另被明确标为 heuristic。（Sec. 2.1-2.3, pp. 4-6）；作者报告 ImageNet MFM 的 CS-VGB-G 在 4,104 NFE 达到 HPSv2 45.46，而 MFM-G 在 23,959 NFE 为 44.94；规划最大预算联合成功率 84.8%，ABCD-G 为 71.2%。（Fig. 5, p. 8; Fig. 6, p. 9）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "连续空间 recurrent sampling 是可复用于 reward-constrained visual synthesis 的 inference-time 原理，与只增加 diffusion steps 有实质区别。",
+    "caveatZh": "verifier error 可拖慢 mixing；verifier evaluation 可能抵消低预算收益。；transition mismatch 产生 stationary bias；search heuristics 不自动继承 sampling guarantees。；严格证明未在本项目逐步形式化复核；实际图像实验仍是相对小规模模型和条件。；用于 structured design 时还需定义可靠 terminal reward，本文未验证制造约束。"
+  }
+}

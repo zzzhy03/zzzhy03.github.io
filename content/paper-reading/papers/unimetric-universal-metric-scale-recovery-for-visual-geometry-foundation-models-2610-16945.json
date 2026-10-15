@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2610.16945",
+  "slug": "unimetric-universal-metric-scale-recovery-for-visual-geometry-foundation-models-2610-16945",
+  "title": "UniMetric: Universal Metric Scale Recovery for Visual Geometry Foundation Models",
+  "authors": [
+    "Lei Yang",
+    "Yuner Zhang",
+    "Ziyang Liu",
+    "Ziying Song",
+    "Kai WU",
+    "Yiyang Gao",
+    "Jiangtao Su",
+    "Yiming Li"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16945"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "UniMetric",
+    "Universal",
+    "Metric",
+    "Scale",
+    "Recovery",
+    "for",
+    "Visual",
+    "Geometry",
+    "Foundation"
+  ],
+  "abstract": "Recent advances in multimodal foundation models, exemplified by GPT-6 Astra, raise the prospect of general-purpose embodied reasoning and planning. Using Internet videos for embodied pretraining calls for reliable physical-scale annotations. Yet visual geometry foundation models often recover scene structure and camera motion without reliable metric scale. We show that uncertain size priors of familiar objects can jointly constrain a reconstruction's shared scale. Building on this insight, we present UniMetric, a universal and training-free metric scale recovery framework for geometry foundation models, without additional sensors or task-specific metric supervision. Specifically, Metric Prior Acquisition elicits object height intervals from a vision-language model. Semantic-Geometric Alignment measures reconstructed object heights along the estimated support-surface normal in each frame and converts the priors into scale intervals. Global Scale Recovery reconciles these intervals through a convex objective, yielding a jointly feasible scale when they overlap and a unique compromise otherwise. The estimated sequence-level scale is applied uniformly to reconstructed points and camera translations. Controlled experiments with real VLM priors show that combining observations improves scale accuracy with exact relative object heights. To evaluate metric accuracy on GFM reconstructions without ground-truth scale alignment, we introduce MetricBench, covering twelve embodied, driving, and roadside subsets with sensor-derived ground truth. Across nine geometry foundation models, UniMetric reduces mean depth Abs Rel, reconstruction Chamfer distance, and trajectory error by 54.2%, 83.8%, and 65.6%, respectively, improving every model on all three tasks at the suite level. We release the UniMetric code and MetricBench data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16945v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16945v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yanglei18/UniMetric"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16945v1 的 39 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "UniMetric用VLM familiarobject高度区间与SAM mask，在GFM中沿supportnormal测高度，将所有frame-object转为共同scale区间，凸一维目标求统一尺度后同时校正points与camera translations。作者报告9GFM×12subset depthmeanAbsRel下降54.2%，但只修全局尺度；重见同物体、dataset-specificsize表及anchor几何错误限制理论一致性和精确制造用途。",
+    "motivationZh": "relativegeometryfoundationmodel给出正确形状却无可靠米制尺度，Sim3groundtruthalignment通常把这一问题隐藏。",
+    "methodZh": "Seed1.8选择upright/fullheightanchors与supportsurface，SAM2.1boxmask映射GFMpointmaps，拟合每帧supportplane。按confidence/category可靠度权重最小化到scaleinterval的平方距离；交集非空时任一交集值最优，否则唯一折衷。MetricBench使用sensorGT，maineval不fitGTscale。",
+    "methodFlow": [
+      "VLM从RGB识别可测高度anchor并估physicalheightinterval",
+      "SAM2.1获取object/supportmask并映射GFMpoints",
+      "拟合supportnormal，测每anchor点的normal方向span",
+      "高度prior除以relativeheight转sharedscaleinterval",
+      "加权凸intervaldistance目标求scale",
+      "统一scale points/depth/camera translations，保留rotations与relativegeometry"
+    ],
+    "experimentsZh": "694sequences/51339frames、十二固定subset，9GFMsweights冻结；两suiteequal-subsetmean，GTsensor/poses仅评估，SE3rigid允许、GTscale不fit。 以下结果为作者报告：作者报告套件平均depthAbsRel下降54.2%、CD83.8%、ATE65.6%；每model suite平均改善并非每subset都改善。（PDF pp9–11 Tables4–6）；作者报告VGGTΩnuScenesAbsRel0.979→0.152、FusionPortable0.885→0.331，优于四metricdepthcalibrationbaseline。（PDF p11 Table7） 对照范围：同GFMoutputs的None、metricdepthratio同sequencefactor；metricdepthbaselines只两个subsets；singleanchor消融刻意lowestweight非best/randomanchor。 消融与诊断：intervalmidpoint、uniformweight、lowestweightanchor；controlledKbudget与bootstrap，但未变VLM、完整prompt/tables/filter/noanchor统计。",
+    "insightZh": "把不确定semantic尺度约束联合用于既有GFM，并同时传至depth/reconstruction/trajectory，有实质通用校准价值；object-size scale思路已有先例，创新在open-vocabularyinterval接口与统一metric协议。",
+    "evidenceZh": "heightinterval与supportnormal-derivedreconstructedspan形成共享scale约束。（PDF pp5–7 Figure3/Eqs3–12）；weightedintervaldistance目标在交集非空时无唯一scale，空交集才unique。（PDF p6 Eq11; p17 Proposition2）；作者报告108/108depth、107/108CD、81/90ATEpairs下降。（PDF pp8–11 Tables3–6）；controlledscale study使用GT-derivedexactrelativeheights，不是GFM1–2%实际精度。（PDF pp4–5 Table1; pp18–19 AppendixB）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对通用3D资产/场景恢复补充absoluteunits与诚实metricvalidation可迁移，属于selective通用reconstruction校准；不是SLAMmapping单metric改进，也不保证fabrication精度。",
+    "caveatZh": "依赖语义priors、可测anchors与objectgeometry；sharedscale无法localdistortion/trajectorydrift。；CEAR/FusionPortable额外category-size表，3EEDVGGTΩ使用datasetintrinsics，不能称完全同一通用无配置协议。；observations包括同object多frame，correlated/biasprior不能自动满足均值一致性定理；intervalwidth/confidence非校准uncertainty。；anchorpoints只visibleextent、supportnormal错会系统性偏scale；缺anchor/failurefallback未量化。；无训练不等无成本，VLM+SAMperframe延迟/APIcost未报告；不保证精密制造或真实物体dimensions。"
+  }
+}

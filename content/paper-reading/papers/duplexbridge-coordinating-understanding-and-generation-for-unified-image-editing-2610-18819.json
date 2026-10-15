@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.18819",
+  "slug": "duplexbridge-coordinating-understanding-and-generation-for-unified-image-editing-2610-18819",
+  "title": "DuplexBridge: Coordinating Understanding and Generation for Unified Image Editing",
+  "authors": [
+    "Yidi Liu",
+    "Jie Xiao",
+    "Chaojie Mao",
+    "Jingfeng Zhang",
+    "Xueyang Fu"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18819"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "vlm-mllm",
+    "DuplexBridge",
+    "Coordinating",
+    "Understanding",
+    "and",
+    "Generation",
+    "for",
+    "Unified",
+    "Image",
+    "Editing"
+  ],
+  "abstract": "Complex image editing requires faithful task interpretation and accurate execution, but a failed edit does not reveal which responsibility failed. We present DuplexBridge, which uses a unified model's own understanding capability to enhance prompts for its own generation capability, without an external understanding module. A source-grounded bridge specifies targets, final-state changes, and preservation constraints. Understanding is supervised on fidelity to the original request without observing the generated image; generation is supervised on execution of the condition it actually receives. Reciprocal trust checks selectively admit global task feedback to each role while retaining independently valid local supervision. We introduce CE-Bench, a 1,200-task benchmark measuring joint satisfaction of task-derived change and preservation requirements. Across three model configurations, the full system improves complete compliance over direct editors by 21.75-25.75 percentage points, with gains also observed on KRIS-Bench, RISEBench, ImgEdit, and GEdit-Bench. From a common supervised Wan-Image initialization, gated joint training reaches 77.08% complete compliance, compared with 70.92% without gates and 75.00% when generation-local supervision instead checks the original task with both gates retained. These results support distinct local responsibilities and selective shared feedback for joint understanding-generation adaptation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18819v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18819v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18819v1 的 25 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "DuplexBridge 将统一编辑模型的理解角色与生成角色通过 source-bound JSON bridge 协作：U按原任务学忠实表达，G按实际收到的condition学执行，partner trust只筛选额外global reward。其matched controls比总榜更有价值；gates是选择性训练而非因果credit assignment，human evidence支持指令提升但未证明视觉质量不劣。",
+    "motivationZh": "编辑失败时分清任务理解错误与执行错误，避免同一全局reward错误监督两个角色。",
+    "methodZh": "native U给出goal/scope/ops/preserve/avoid，G在fresh context只看source与bridge。独立prompt audit、received-condition execution和task-global RM提供四项loss，prompt trust gates G-global，execution trust gates U-global，valid local losses保留；soft judgment KD压缩global scorer。",
+    "methodFlow": [
+      "U解析source、目标和终态并输出structured bridge",
+      "G仅依bridge与source生成edit",
+      "分开检查原任务忠实度、收到condition的执行与最终task结果",
+      "partner trust选择global loss，local loss保留自身validity mask",
+      "交替更新U/G，frozen RM提供pairwise反馈"
+    ],
+    "experimentsZh": "BAGEL、Qwen-2511、Wan-Image，1200任务CE-Bench，KRIS/RISE/ImgEdit/GEdit；Wan控制SFT、bridge结构、gates、RM、checkpoint cross-pair及200任务human评价。 以下结果为作者报告：作者报告Qwen full CCR 79.00对direct57.25；Wan full77.08对direct53.83，其中包含SFT与RL。（Table 2, p.11）；matched SFT起点Wan full较ungated高6.17点CCR。（Table 14, p.16） 对照范围：DARS/UT-style机制移植与同预算gates较有解释力；完整系统比较含PE/SFT/RL复合变化。 消融与诊断：结构与gating、local reference、random gates、RM及cross-pair均有控制；random selection不能唯一分离质量与optimizer exposure。",
+    "insightZh": "将不同监督reference与global-feedback eligibility显式区分，避免把计划错与执行错混成单一reward；不声称counterfactual causal credit。",
+    "evidenceZh": "U-local看原任务，G-local看received bridge，双方trust gates仅控制global feedback。（Sec.3–4, pp.4–8; Fig.3, p.7）；作者同SFT起点Wan ungated CCR 70.92，full 77.08，group-matched random 72.25。（Tables 8–10, pp.13–14）；194个human共同可判断任务CCR 69.07到75.77，preservation/quality偏好区间跨零。（Sec.6.9, pp.18–19）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "统一理解生成模型的结构化中间表示、局部责任与可信feedback对复杂design editing有直接启发。",
+    "caveatZh": "semantic binding/judge仍会错，mean execution gate可放过critical failure。；gates估计conditional accepted return，不是unbiased unconditional gradient；高load有局部退化。；human quality/preservation对ungated不显著，未覆盖video，bootstrap不代表training-seed变异。；schema/check compiler与judge成本较高；未确认公开实现。；text-to-image是重新训练接口，不能称edit checkpoint zero-shot transfer。"
+  }
+}

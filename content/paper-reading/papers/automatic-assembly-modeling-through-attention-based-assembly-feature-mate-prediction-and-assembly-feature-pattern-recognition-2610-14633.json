@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.14633",
+  "slug": "automatic-assembly-modeling-through-attention-based-assembly-feature-mate-prediction-and-assembly-feature-pattern-recognition-2610-14633",
+  "title": "Automatic assembly modeling through attention-based assembly feature mate prediction and assembly feature pattern recognition",
+  "authors": [
+    "Ziheng Dai",
+    "Wanbin Pan",
+    "Zhihong Tang",
+    "Shuming Gao"
+  ],
+  "publishedAt": "2026-10-10",
+  "updatedAt": "2026-10-10",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.14633"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CE",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "fabrication",
+    "3d-generation"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "fabrication",
+    "3d-generation",
+    "Automatic",
+    "assembly",
+    "modeling",
+    "through",
+    "attention-based",
+    "feature",
+    "mate",
+    "prediction"
+  ],
+  "abstract": "Assembly modeling plays an important role in constructing product models, yet it is still mainly performed via interactive operations that are experience-dependent and labor-intensive. Data-driven strategies hold promise for automating this process; however, existing approaches either predict poses that cannot directly generate editable B-Rep assembly constraints or require prescribed part pairs or predefined assembly faces. To reduce the large candidate space of constraint prediction without predefined assembly faces, we propose a data-driven framework based on assembly feature mate prediction. The framework performs automatic assembly modeling from unassembled B-Rep parts, using assembly features to group the geometric entities of local mating interfaces and restrict candidate formation. Given the lack of suitable assembly feature annotations in existing datasets, we construct a large-scale dataset through an automatic annotation pipeline. Using the annotated dataset, we train an attention-based network to predict assembly feature mates, with Engineering Compatibility Fusion (ECF) incorporating explicit engineering compatibility into learned matching scores. To improve the accuracy of automatic assembly modeling, we use assembly feature patterns (AFPs) to guide the matching process. Finally, a post-processing search selects assembly feature mate and AFP mate candidates, whose associated constraints are generated and solved to complete assembly modeling. Experimental results show that the framework achieves assembly constraint accuracies of 74.79% on the six-assembly comparison set and 64.09% on the extended test set of 16 assemblies, which includes the comparison set. With ground-truth face labels supplied as additional input, the corresponding accuracies increase to 81.78% and 80.93%, respectively.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.14633v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.14633v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.14633v1 的 28 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "这项 automatic assembly 把互补 coaxial/plane constraints 合成具有工程含义的 feature mates，并以 parent-part attention、显式尺寸兼容与 assembly feature patterns 联合搜索，直接生成可由 CAD solver 求解的装配约束。作者报告无需预标 assembly faces 也能完成多件装配；当前限 hole/shaft 类接口、对称歧义和小规模完整装配验证。",
+    "motivationZh": "从未装配 B-Rep parts 自动预测独立面约束会产生庞大且语义歧义的候选空间，常需人工预标 assembly faces。",
+    "methodZh": "这项 automatic assembly 把互补 coaxial/plane constraints 合成具有工程含义的 feature mates，并以 parent-part attention、显式尺寸兼容与 assembly feature patterns 联合搜索，直接生成可由 CAD solver 求解的装配约束。作者报告无需预标 assembly faces 也能完成多件装配；当前限 hole/shaft 类接口、对称歧义和小规模完整装配验证。",
+    "methodFlow": [
+      "从 B-Rep 提取 hole/shaft features 并修复标准化 assembly annotations",
+      "UV-Net part-mate pretraining 编码 parent-part context",
+      "attention 对 feature candidates 匹配并乘 engineering compatibility",
+      "识别 rectangular/circular patterns 并保留合法对应",
+      "best-first neighborhood search 经 interference checks 输出 constraints 给 CAD solver"
+    ],
+    "experimentsZh": "529 unique assemblies、43,646 parts；feature network sample split80/10/10；16 个完整 assemblies 排除训练；SolidWorks API 求解。 以下结果为作者报告：作者报告六 assembly comparison set 的完整自动流程 ACCc74.79%、ACCv92.86%；16-assembly extended set ACCc64.09%，有 GT face labels 时 80.93%。（Tables 2-3, p. 20） 对照范围：JoinABLe 与 Vergez baselines 数值来自既有报告；原修改版模型不可得，本文用对应原版并修复 geometry，不能视为完全 matched comparison。 消融与诊断：去 patterns 后 6 例 ACCc 降至 38.93%、16 例 31.77%；ECF feature accuracy 从 55.79%到 76.27%；候选空间缩减不等于 runtime 同比改善。",
+    "insightZh": "关键在预测对象从孤立面约束提升为互补 feature mate 与 pattern group，显式缩减候选空间，并将工程规则进入评分和求解。",
+    "evidenceZh": "feature mate 将 cylindrical/planar faces 的 complementary constraints 联合表示。（Secs. 3.1.1-3.1.2, pp. 5-6）；cross-part/type/dimension potential 与 learned scores 相乘，pattern mappings 通过 metric/layout 一致性枚举。（Secs. 6.4-8, pp. 15-18; Fig. 8, p. 13）；作者报告六 assembly comparison set 的完整自动流程 ACCc74.79%、ACCv92.86%；16-assembly extended set ACCc64.09%，有 GT face labels 时 80.93%。（Tables 2-3, p. 20）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "assembly constraints、interface compatibility 和可编辑 CAD 输出直接进入生成方法，命中 fabrication 与 part assembly。",
+    "caveatZh": "对称/多解仍无法可靠识别 intended assembly。；接口跨多个 parts 才形成、孤立约束不被当前表示覆盖。；初始 pose 影响 solver 并可能把可行 mate 错拒；主要 hole/shaft interfaces。；最终装配样本小，训练样本随机切分不等于完整 assembly 级泛化；baseline inputs 版本不同。；没有证明生成 assembly sequence 或实际机器人可装配过程，只生成静态约束与配置。"
+  }
+}

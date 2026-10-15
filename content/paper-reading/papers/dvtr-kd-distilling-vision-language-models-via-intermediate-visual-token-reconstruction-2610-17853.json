@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.17853",
+  "slug": "dvtr-kd-distilling-vision-language-models-via-intermediate-visual-token-reconstruction-2610-17853",
+  "title": "DVTR-KD: Distilling Vision-Language Models via Intermediate Visual Token Reconstruction",
+  "authors": [
+    "Haolan Wei",
+    "Jiahui Wang",
+    "Junli Zha",
+    "Xinkai Lu",
+    "Yunxiao Zou",
+    "Chao Zhou",
+    "Xiang Song"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17853"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "DVTR-KD",
+    "Distilling",
+    "Vision-Language",
+    "Models",
+    "via",
+    "Intermediate",
+    "Visual",
+    "Token",
+    "Reconstruction"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) have achieved strong performance on diverse vision-language tasks, but their computational demands limit deployment under constrained budgets, particularly on edge devices. Many works focus on Knowledge Distillation (KD) and try to transfer knowledge from powerful teacher models to students. In addition to reducing model size, visual token compression provides a complementary route to efficiency, but introduces mismatched visual token counts that complicate direct token-wise knowledge transfer. To mitigate this, we propose DVTR-KD, a knowledge distillation framework based on \\textbf{D}ense \\textbf{V}isual \\textbf{T}oken \\textbf{R}econstruction, which reconstructs the teacher's dense visual tokens from the student's compressed tokens. We reconstruct visual states after the final LLM layer and at the input to an intermediate layer identified as important for visual-information readout. At the intermediate layer, reconstruction is supervised through the teacher's response predictions rather than by direct token-wise KL or MSE matching. An auxiliary attention-readout loss complements this response-level supervision by aligning how the student and the original teacher integrate contextual information when predicting responses. Evaluations on diverse benchmarks demonstrate that DVTR-KD improves the performance of token-compressed students while retaining the inference efficiency afforded by visual token compression.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17853v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17853v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17853v1 的 13 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "DVTR-KD 在 token-compressed student 中重建 teacher 的 dense visual grid，并在对视觉值最敏感的中间层通过 teacher 下游 response loss 蒸馏。作者报告 4×/16× token compression 的 OCR 和综合能力恢复；值得借鉴 response-conditioned visual distillation，但证据限于 Qwen3 两种规模与固定视觉 encoder。",
+    "motivationZh": "teacher 和 token-compressed student 的 visual sequence 长度不同，逐 token 蒸馏无法覆盖 teacher 的完整细粒度视觉证据。",
+    "methodZh": "DVTR-KD 在 token-compressed student 中重建 teacher 的 dense visual grid，并在对视觉值最敏感的中间层通过 teacher 下游 response loss 蒸馏。作者报告 4×/16× token compression 的 OCR 和综合能力恢复；值得借鉴 response-conditioned visual distillation，但证据限于 Qwen3 两种规模与固定视觉 encoder。",
+    "methodFlow": [
+      "干预 visual values 测量每层 ΔNLL",
+      "选 principal visual readout layer",
+      "双线性升采样加残差 reconstructor 恢复 teacher grid",
+      "用 teacher remaining layers 的 response loss、attention readout 与 final visual alignment 训练 student",
+      "推理保留压缩 student"
+    ],
+    "experimentsZh": "MoonViT-SO-400M frozen encoder；Qwen3-0.6B/4B；same/data-rich teachers；11 benchmarks 涵盖一般 QA、knowledge、OCR/chart。 以下结果为作者报告：作者报告 data-rich Qwen3-0.6B teacher 的 16× student Avg11 从 SFT 48.5 升至 53.0，高于 reimplemented LLaVA-KD* 50.6；4B 的 4× student 为 69.5，teacher 为 75.9。（Table 2, p. 7） 对照范围：比较 MiniLLM、EM-KD 和补加 reconstructor 的 LLaVA-KD*；同配置 reimplementation，有 teacher data regime 对照。 消融与诊断：Tables 3-5 测 loss、MSE/response reconstruction 与 layer selection；4× 时 MSE 略优，16× response 更优，不能宣称全部设置统一领先。",
+    "insightZh": "相对 one-to-one matching，密集重建覆盖全部 teacher tokens；中间层监督经 response objective，而非强制逐 token 匹配。",
+    "evidenceZh": "PVRL 通过逐层 visual-value zeroing 对 response NLL 的影响独立选取。（Sec. 3.3, Fig. 2, p. 4）；reconstructed visual states 替换 teacher 中间输入，保留 teacher 文本 states，再监督 answer distribution。（Sec. 3.4, p. 5）；作者报告 data-rich Qwen3-0.6B teacher 的 16× student Avg11 从 SFT 48.5 升至 53.0，高于 reimplemented LLaVA-KD* 50.6；4B 的 4× student 为 69.5，teacher 为 75.9。（Table 2, p. 7）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "将细粒度视觉知识保留进压缩表示，属于 VLM 方法推进，而非单纯 VQA benchmark。",
+    "caveatZh": "未见明确 limitations section；跨 language model family、video 与复杂 multi-image reasoning 尚未验证。；不应将 token compression ratio 直接当作端到端 speedup，主表报告能力而非完整 latency。"
+  }
+}

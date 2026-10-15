@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2610.17829",
+  "slug": "qk-edit-revisiting-attention-based-injection-in-mm-dit-for-image-and-video-editing-2610-17829",
+  "title": "QK-Edit: Revisiting Attention-based Injection in MM-DiT for Image and Video Editing",
+  "authors": [
+    "Tiancheng Shen",
+    "Zilong Huang",
+    "Xiangtai Li",
+    "Zhijie Lin",
+    "Jiyang Liu",
+    "Yitong Wang",
+    "Jiashi Feng",
+    "Ming-Hsuan Yang",
+    "Jun Hao Liew"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17829"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "video-generation",
+    "QK-Edit",
+    "Revisiting",
+    "Attention-based",
+    "Injection",
+    "in",
+    "MM-DiT",
+    "for",
+    "Image",
+    "and"
+  ],
+  "abstract": "Multimodal Diffusion Transformers (MM-DiTs) have recently emerged as a powerful framework for unified text-vision synthesis, surpassing traditional U-Net architectures in generative tasks. One key innovation lies in its Multimodal Self-Attention (MM-SA) interaction, where image and text tokens are concatenated and processed via self-attention. However, this mechanism poses significant challenges for editing, rendering conventional U-Net-based attention manipulation methods ineffective. To address this limitation, we propose QK-Edit, a training-free framework that exploits the unique attention dynamics of MM-DiTs for precise text-guided image and video editing. By introducing a novel query-key manipulation strategy, our method isolates and adjusts critical attention components to achieve an optimal balance between prompt fidelity and structural consistency. This enables seamless edits across various tasks, including object addition, object removal, object replacement, changing background, changing material, changing color, and style transformation. Notably, it can be easily implemented with feature replacement in inference. QK-Edit demonstrates superior editing performance on state-of-the-art models, such as FLUX and HunyuanVideo, effectively bridging the gap between generative power and editable flexibility in MM-DiTs, and paving the way for scalable multimodal content creation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17829v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17829v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17829v1 的 13 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "QK-Edit在source generation/inversion缓存vision Q/K，target denoising早期替换二者、保留target text与V，实现FLUX/HunyuanVideo共用的training-free编辑。作者在PIE/TGVE+报告结构与语义指标改善，并展示1K/129frames；但real-video inversion、未编辑区泄漏与复杂运动仍失败，且Tab3的ViCLIPdir不如Flatten，不能称所有指标最佳。适合skim其MM-DiT注意力接口，不是新的foundation generator。",
+    "motivationZh": "U-Net独立cross/self attention操控不能直接适用MM-DiT joint text/vision softmax，编辑目标与source structure容易互相干扰。",
+    "methodZh": "通过block/FFN/attention quadrant移除分析，作者认为vision→text决定semantic alignment、vision→vision决定spatiotemporal structure，而text→vision影响小，故用Qvision/Kvision替换近似控制主要quadrants，兼容encapsulated FlashAttention。image首30%steps、video首20%；real inputs需inversion，generated inputs直接记录QK。实验FLUX.1-dev、HunyuanVideo/A100，PIE-Bench、TGVE+两设置及43-video高分辨率HiLo ablations。",
+    "methodFlow": [
+      "输入source image/video、source/target prompts，generation或inversion缓存所选timesteps的vision Q/K。",
+      "target denoising前30%image或20%video steps把vision Q/K换为source对应值。",
+      "保留target text Q/K与target V，用joint attention传递source structure和target semantics。",
+      "余下steps正常生成edit；用结构/语义/一致性metrics与failure cases核验。"
+    ],
+    "experimentsZh": "FLUX.1-dev images、HunyuanVideo videos；image injection前30%steps，video20%；320²65frames至1280×720129frames；A100。PIE/TGVE+和43挑战videos的HiLo，CLIP/DINO/PickScore/ViCLIP。 以下结果为作者报告：作者报告PIE CLIP-T .264、DINO .776、Pick22.33，对RF-Solver .257/.769/21.98；TGVE+generatedvideo CLIPframes .951对DiTCtrl .904、Pick21.24对20.01。（Tables1–2, PDF p.6）；作者报告realvideo CLIPframes .921/Pick20.52/ViCLIPout .258较高，但ViCLIPdir .196低于Flatten .204。（Table3, PDF p.6） 对照范围：对比U-Net旧methods、RF inversion/solver与MM-DiT DiTCtrl；HiLo把V/KV baselines ideas重实现到Hunyuan，不等原始完整methods等compute评测。没有new unified editors/跨更多MM-DiTs、wallclock/cache memory或统计CI。 消融与诊断：Fig8和Table4比较Q/K/V/QK/KV/QV/QKV；QK在结构/目标tradeoff更好。43-video HiLo QK CLIPframes.908/Pick20.08相对KV .901/19.92；principal blocks与early injection主要定性经验。",
+    "insightZh": "有用的接口推进是把U-Net attention injection重新组织为MM-DiT vision Q/K替换，从images扩到video且不显式materialize attention；沿用现有generator/inversion，不能描述为通用edit guarantee或新训练范式。",
+    "evidenceZh": "QK替换近似同时控制vision-text与vision-vision quadrants；text-vision影响小是pilot经验而非定理。（Sec.3.2–3.3, Eqs.(5)–(8), Figs.5–6, PDF pp.4–6）；作者报告PIE CLIP-T .264/DINO .776/Pick22.33；generatedvideo比同Hunyuan DiTCtrl全面高。（Tables1–2, PDF p.6）；real-video ViCLIPdir .196低于Flatten .204，其余三项更高；保留此反例。（Table3, PDF p.6）；真实inversion、unedited区变化、text/complex motion等缺陷仍在。（Sec.5 Limitations; Fig10, PDF pp.8,12）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "MM-DiT editing hook可作为image/video creation工具的可控结构接口；目前无structured 2D/3D/CAD任务验证，相关性medium。",
+    "caveatZh": "Sec.5：real-video inversion复杂motion准确性不足；未编辑区会小幅变化，未来mask可能改进；继承base model文字渲染与gymnastic motion缺陷。；CLIPframe similarity偏好少改动，不能替代object identity/motion真实性；数字为作者报告、未复现。；缺exact prompt/sample count/seedCI与实测cache成本，不能把training-free当成低显存或速度保证。"
+  }
+}

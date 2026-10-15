@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.18774",
+  "slug": "greenwam-a-world-foundation-model-for-robotics-2610-18774",
+  "title": "GreenWAM: A World Foundation Model for Robotics",
+  "authors": [
+    "Gennady Sidorov",
+    "Valerii Kornilov",
+    "Denis Grankin",
+    "Polina Fedotova",
+    "Aleksey Postnikov"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18774"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "GreenWAM",
+    "World",
+    "Foundation",
+    "Model",
+    "for",
+    "Robotics"
+  ],
+  "abstract": "A robot needs a world model that predicts how its actions will change the scene and a policy that chooses those actions. Models are usually built and evaluated for only one of these roles, and every robot records its actions in its own format. We ask whether one robot world model can serve both roles across different bodies, and what makes this work. We present GreenWAM, a world foundation model for robotics, together with the recipe that produces it: (1) a shared anatomical action space that describes 20 robot families, from bimanual arms to dexterous humanoids, in common joint coordinates; (2) joint training on these families in visual, action-conditioned and world-action modes; and (3) policies that split an action expert off the generator. As a world model, GreenWAM attains top-tier trajectory, depth and 3D accuracy on WorldArena 1.0, ahead of every world-action model and video generator in our comparison. As a policy, it scores among the top entries of the RoboTwin 2.0 leaderboard, reaches the highest zero-shot LIBERO-plus success among the compared methods and is competitive with dedicated vision-language-action and world-action policies on CALVIN and LIBERO. We further adapt GreenWAM to a real humanoid, where it succeeds more often than policies adapted from $π_{0.5}$ and from Cosmos 3 Edge, and distill it into a single-step policy for real-time control. Controlled experiments yield three findings: robot specialization improves world prediction and control together; an action expert helps when split off at the start of adaptation; and keeping world-model modes during policy adaptation preserves robustness to scene changes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18774v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18774v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/greenvla/GreenWAM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18774v1 的 43 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "GreenWAM 从Cosmos3Edge4B扩到20个双臂robotfamilies，用79anatomicalslots与七种video/state模式联合训练，再复制generator分出actionexpert。作者报告RoboTwinclean86.98/random48.10%，保留worldmodes对randomsuccess再增8点；是值得skim的world/action模型报告，但每benchmark分别posttrain，真实机器人仅单humanoid单packingtask。",
+    "motivationZh": "robotaction接口因embodiment而碎片化，worldprediction与policy常分别训练或评价，动作学习也可能损失预测能力。",
+    "methodZh": "layoutcodecs按channel/sign/zero/statistics映射共享anatomicalslot并mask缺失坐标，projector本身不做kinematics。冻结reasoner/VAE，generator以相同noisetimestep学习T2V/I2V/history/forward/inversedynamics/WAM七模式。多viewcanvas与四固定historyanchors接video；policy从generator复制actiontower保持初始化function后分开训练，保留少量forward/I2Vmodes避免忘记预测，consistencydistill为一步控制。",
+    "methodFlow": [
+      "20familiessubtaskatoms与measuredstates对齐",
+      "nativecodecs映射79sharedanatomicalslots",
+      "冻结reasoner/VAE联合七modeflow训练",
+      "视频history用四RGBanchors继续",
+      "复制generator为function-preservingactionexpert",
+      "benchmarkposttrain保留worldmodes并可一步distill"
+    ],
+    "experimentsZh": "1.44M admittedatoms1688.5h、20bimanualfamilies；quality1.43M/1674.7h，1.19Macceptedcommands；64H10036.5ksteps；WorldArena1000episodes及RoboTwin50tasks、CALVIN1000chains、LIBERO/+、RoboDojo；realhumanoid70instructions。 以下结果为作者报告：作者报告RoboTwin86.98clean/48.10random/67.54mean；LIBERO97.4、LIBEROplus86.8%。（Table3 p.16; Table14 p.42）；作者报告retainedworldmodes使randomizedRoboTwinsuccess+8.0点；distilledpolicy35.4ms/28.3Hz为RTX4090测量。（Sec.7.3 p.23; Fig.15 p.19） 对照范围：主leaderboards分清clean50demonstrations与含randomizedpretraining/500randomdemos；受控Cosmosparent/expertsplit/worldmode预算比较较可靠。WorldArenaaggregate改用motioncap，其他model均值cap仅upperbound，不能直接和原boardscores混比。 消融与诊断：roboticsstartvsparent、sharedvscopiedexpert、worldmodesvsWAMonly、individualrandomization与backgroundaugmentation；supportspredictivepreservation，imaginationerror和success关联不证明充分causation。",
+    "insightZh": "新意集中共享anatomicalinterface、可复用roboticscheckpoint与对world/policycoupling的受控分析；CosmosMoT、多modeflow和consistencydistillation均已有基础。",
+    "evidenceZh": "79slots共享projectors，abs/relative掩码与missingvaliditymask不同。（Sec.3.2 pp.6–7; Fig.4 p.7）；expert复制generator使split时function不变，之后参数独立。（Sec.6.1 pp.14–15; Fig.3 p.5）；保留forward/I2V而非只WAM改善randomizedrobustness。（Sec.7.1–7.3 pp.22–23）；真实robot与scenegeometry仍有明确限制。（Sec.8 p.26; Table14 p.42）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "重要embodiedworld/video模型recipe，跨body状态表示与保留预测能力对physicalvisualgeneration有迁移思路；不将robotpolicy自动归VLM或native3D生成。",
+    "caveatZh": "taskgeometry改变仍敏感；ARblockerror累积；每benchmark需posttrain；real仅一个humanoid/packingtask（p.26）。；所有20families双臂，single-arm要targetadaptation，未证任意新bodyzero-shot。；本文Fig.11RoboDojo条形label与Sec.6.3.3/Table13不一致，本review采用Table13的16.12score/10.49success，不引用图中33.95。；worldmode条件有recordedfutureactions，不代表自主规划；RTX4090latency不是已验证onboard性能。"
+  }
+}

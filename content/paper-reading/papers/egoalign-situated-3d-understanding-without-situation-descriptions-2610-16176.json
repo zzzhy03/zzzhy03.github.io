@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.16176",
+  "slug": "egoalign-situated-3d-understanding-without-situation-descriptions-2610-16176",
+  "title": "EgoAlign: Situated 3D Understanding without Situation Descriptions",
+  "authors": [
+    "Yiyang Li",
+    "Tianyi Ma",
+    "Zehong Wang",
+    "Yanfang Ye"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16176"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "EgoAlign",
+    "Situated",
+    "Understanding",
+    "without",
+    "Situation",
+    "Descriptions"
+  ],
+  "abstract": "Situated 3D Question Answering requires models to interpret a 3D scene relative to an agent's pose. Existing methods commonly convey that pose through a natural-language situation description, which may be unavailable or costly to obtain in real-world deployments. While some methods additionally incorporate numerical pose, we find that randomly shuffling the agent pose causes little performance degradation, indicating limited functional dependence on the numerical pose. To address this gap, we introduce EgoAlign, a simple 3D language model that represents a scene in an agent-centric coordinate frame, together with a dedicated egocentric alignment stage comprising four complementary tasks: object category recognition, egocentric direction prediction, metric distance estimation, and spatial relation prediction. This stage teaches the model to consistently interpret scene geometry relative to the agent's pose before task-specific fine-tuning. EgoAlign achieves the strongest performance on SQA3D, Real-3DQA, and MSQA among compared methods while remaining highly efficient. More importantly, removing textual situation descriptions yields comparable or better downstream performance, whereas shuffling EgoAlign's numerical pose causes substantial degradation. These results show that EgoAlign establishes agent-centric spatial context directly from numerical pose without requiring textual situation descriptions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16176v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16176v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Yiyang-Ian-Li/EgoAlign"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16176v1 的 16 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "EgoAlign 将pointcloud旋到agent frame，并按encoder pooling追踪每token的metric XYZ/RGB再融合semanticfeatures；300K四任务/four-heading counterfactual alignment明确教pose-dependent关系。作者无situation SQA3D60.4EM，pose shuffle降10.88pp，而LEO/PoseAlign近零变化。值得深读metric geometry接口与监督设计；仍需完整metric cloud/pose，不能把shuffle敏感性当精确空间推理。",
+    "motivationZh": "numerical pose输入或ego变换不代表3D-language model真的使用pose，语言situation descriptions可提供shortcut。",
+    "methodZh": "frozen Concerto+Qwen2.5，训练semantic/coord/colorMLP与LoRA。ego XYZ按16/16/4m缩放，坐标来自token支持point的均值。category/direction/distance/relation各75K，对固定scene/position/refobjects变heading0/90/180/270，scene-disjoint训练。finetuneSQA3D/MSQA并直接测Real3DQA；counterfactual、yawnoise和alignment-transfer检验pose使用。",
+    "methodFlow": [
+      "metric RGB pointcloud按position/heading变agent frame",
+      "Concerto encoder跟踪每token支持的points",
+      "poolXYZ/RGB与semantic独立投影融合",
+      "300K四任务/four-heading alignment训练MLP+LoRA",
+      "downstream QA可省situationtext",
+      "pose shuffle/yawnoise检验geometry依赖"
+    ],
+    "experimentsZh": "ConcertoLarge+Qwen2.5 1.5/3/7B；SQA3D train scenes518/alignment300K，scene-disjoint65validation；SQA3D/Real3DQA/MSQA；A40batch1latency；posecycled/shuffle/yawnoise。 以下结果为作者报告：作者7B SQA3D+sit61.2/-sit60.4，Real3DQA-sit33.7EM/VRS19.1；MSQA58.5→60.0去situation。（Tables1–2 p.6）；作者-sit pose-shuffle60.39→49.50（10.88pp）；LEO48.28→48.11，PoseAlign52.00→51.55；1.5B无alignment56.8→49.0EM且∆pose9.72→0.14。（Table5 p.13; Table3 p.7） 对照范围：广泛point/vision3D LMs；same300Kalignment转LEO/PoseAlign仍不敏感；预训练/encoder参数差异未matched。无真实online定位/部分cloud下游design实验。 消融与诊断：defaultcoords、coordproj、fixed300K各task删除、singleheading、scales/yawnoise、matchedposecycles；支持表示+监督共同作用而非数据量alone。",
+    "insightZh": "显式metric token位置与multi-heading监督共同建立pose dependence，区别仅把pose作为额外输入；方法简单但诊断、matchedtaskcomposition和architecturetransfer有实质价值。",
+    "evidenceZh": "token支持points的metricXYZ/RGB显式融合，baseencoder/LLM冻结。（Fig.2/Sec.3.2 p.3 Eq.2; AppendixB pp.13–14）；fixedscene/position四heading supervision减少heading捷径。（Fig.3/Sec.3.3 pp.4–5）；作者跨QA任务报告准确率与pose dependence。（Tables1–4 pp.6–9; Table5 p.13）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "明确geometric reference frame进入multimodal reasoning，对3D设计工具的坐标/视角解释有方法价值；没有实际设计生成验证。",
+    "caveatZh": "qualitative closest-object仍错，部分Real3DQA GT也错误（pp.9,15–16）。；完整metric coloredscan和numericalpose是输入条件；0.40s不含scan acquisition/localization。；pose sensitivity说明依赖而非稳健/正确；90°noise降至49.8，无positionnoise/partialocclusion测量。；horizontal8bin关系和0.1m距离取instanceboxes，实际连续精细geometry或designartifacttransfer未证。"
+  }
+}

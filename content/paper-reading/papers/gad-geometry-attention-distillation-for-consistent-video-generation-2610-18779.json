@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.18779",
+  "slug": "gad-geometry-attention-distillation-for-consistent-video-generation-2610-18779",
+  "title": "GAD: Geometry Attention Distillation for Consistent Video Generation",
+  "authors": [
+    "Junfeng Ni",
+    "Ziyu Zhu",
+    "Fan Jiang",
+    "Yu Liu",
+    "Chiyu Wang",
+    "Jiawei Zhang",
+    "Zhaoxu Sun",
+    "Mu Xu",
+    "Siyuan Huang",
+    "Yixin Chen"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18779"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "GAD",
+    "Geometry",
+    "Attention",
+    "Distillation",
+    "for",
+    "Consistent",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Video diffusion models generate visually compelling short-term sequences but often struggle to preserve scene geometry and object structure over time. In this paper, we first demonstrate that current video attention cannot identify reliable correspondences across frames, with responses dispersed across multiple regions even after recognizable scene structure has emerged. We argue that reliable cross-frame associations are essential for information exchange as scene structure forms in video generation. Thus, we introduce Geometry Attention Distillation (GAD), which transfers correspondences from a frozen geometry model's attention to video attention. Extracted from clean videos, these correspondences link the same static surface or moving object across frames. Since structure formation begins in deeper layers at higher noise and shallower layers at lower noise, we apply attention distillation at a student layer selected according to the noise timestep. After training, video attention focuses more consistently on corresponding locations. Experiments across all three video backbones demonstrate improved long-range scene consistency and dynamic temporal consistency, with geometric gains across generation lengths. On Wan2.2 5B, GAD improves cross-frame matching accuracy by at least 30% over the Wan baseline on both long-range benchmarks. Notably, GAD achieves these gains without additional inference modules, offering a promising approach to efficient and consistent video-based world simulation. Project page: https://fantasy-amap.github.io/GAD/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18779v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18779v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18779v1 的 32 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "GAD从冻结VGGTΩ单head的cleanvideo attention提取跨帧对应，以target-frame mass降权不可靠匹配，pair/track监督只施加到按noise选择的student layer。作者报告Wan2.2DL3DV15s matching hit0.257→0.335、Rerror9.573→4.890度；几何先验通过关系而非feature传入生成模型值得skim，visibilityconfidence不等matchaccuracy，尚无autoregressive/worldstate验证。",
+    "motivationZh": "camera-controlled视频attention会混合不同surface/objectregion，scene结构已出现也未形成准确跨frameassociation。",
+    "methodZh": "teacherhead13/10由staticpseudoGT与dynamicTAPVid挑选，cacheargmax/mass并对齐VAEtoken代表frame。masslogistic由573visibilityannotations拟合；Gaussian3×3target、multiheadgatingMLP重构studentmatchingdistribution，pairfullkeys+hardnegative与trackrandomnegativeloss加入flowmatching。L5/L15/L25分别对应t<850/850–950/≥950。",
+    "methodFlow": [
+      "冻结VGGTΩ在cleanvideo缓存指定head对应argmax与frameattentionmass",
+      "对齐teacherframe/space与studentlatenttoken grid",
+      "以staticvisibility-fit massconfidence加权Gaussianmatchtarget",
+      "noise timestep选择L5/15/25studentattention",
+      "pairfullkeys与trackmultiframe监督配合flowmatching训练",
+      "推理仅trainedDiT，不加载teacher/gating/caches"
+    ],
+    "experimentsZh": "35Kclips/10epoch/32A800、Wan1.3/5/14B；15sRE10K/DL3DV、5sOmniWorldGame，firstimage/text/camera共同conditioning，Wan/GADmatchedtrain。 以下结果为作者报告：作者报告5BWanRE10KMrate0.263→0.350，DL3DV0.257→0.335；14Bgeometrymetrics均改善。（PDF p8 Table1）；作者报告5Bdynamic subject0.825→0.853/background0.900→0.913；5s/10sFID或FVD有小tradeoff。（PDF p8 Table2; p26 Table7） 对照范围：pairedWan/GAD最可信；外部baseline有nativeframecount/resampling/scaleadapters，runtime只三scene/nativeprecisionoffload不同。 消融与诊断：fixedlayer/reversedrouting、confidence/pair/track，各duration独立trainpair；无teacherchoice/multiseeduncertainty。",
+    "insightZh": "geometrycorrespondencerelations、confidence与noise-dependentguidance组合有直接视频几何迁移价值；attentiondistillation已有CAMEO，新增动态teacherattention和routingschedule。",
+    "evidenceZh": "teacher注意力最大点与frame总mass分别表示location与weight。（PDF pp5–6 Eqs1–3; pp19–21 B.1）；按noise选择一层蒸馏、gatingMLP只训练使用。（PDF p6 Eq2; pp21–22 B.2–B.3）；作者报告Wan2.2DL3DVMrate0.257→0.335、Mdist48.90→38.85pixels。（PDF p8 Table1）；作者报告无confidence时Mrate降至0.230；static/dynamic均需要reliability。（PDF p10 Table5）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对geometryconsistentgeneration与多视图视觉内容有明确迁移意义；当前只RGBvideo，不生成editable3Drepresentation，故不加3d-generationtopic。",
+    "caveatZh": "teacherresolution/matching能力限制target；固定noise-onlyrouting未adapttraining；autoregressiveextension待做。；PCA结构形成motivation来自单example，未证明普遍causalmechanism；visibilitymappingstaticfit用于dynamic。；联合生成15s并非causal长rollout，不能与LongForcing24h或persistentworld直接等同。；camera translations独立normalize，评估非absolutephysicalscale；matching是referencevideo2Ddescriptorproxy非true3Dshape验证。；外部modeltemporalresampling与scaleadapter不隔离architecturalranking；partialteacherpseudoGT有teacherbias。"
+  }
+}

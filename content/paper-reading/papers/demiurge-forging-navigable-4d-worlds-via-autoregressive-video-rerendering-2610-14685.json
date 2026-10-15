@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2610.14685",
+  "slug": "demiurge-forging-navigable-4d-worlds-via-autoregressive-video-rerendering-2610-14685",
+  "title": "Demiurge: Forging Navigable 4D Worlds via Autoregressive Video Rerendering",
+  "authors": [
+    "Hanxin Zhu",
+    "Jianqi Ma",
+    "Cong Wang",
+    "Zhihao Hu",
+    "Junyao Gao",
+    "Tianyu He",
+    "Junyan Lin",
+    "Jiayin Xiao",
+    "Jiateng Shou",
+    "Sen Liang",
+    "Weidong Zhang",
+    "Zhibo Chen",
+    "Jun Zhang"
+  ],
+  "publishedAt": "2026-10-10",
+  "updatedAt": "2026-10-10",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.14685"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "video-generation",
+    "Demiurge",
+    "Forging",
+    "Navigable",
+    "Worlds",
+    "via",
+    "Autoregressive",
+    "Video",
+    "Rerendering"
+  ],
+  "abstract": "Recent advances in video diffusion enable novel-view video synthesis from a single input video, supporting world modeling, embodied intelligence, and robotic simulation. However, existing methods process camera trajectories independently, lacking the cross-trajectory consistency needed for coherent, navigable 4D worlds. We introduce Demiurge, an autoregressive video rerendering pipeline built on a dynamic 4D point-cloud memory cache. It promotes cross-trajectory consistency through four components: (1) an appearance video diffusion model that synthesizes photorealistic novel-view videos conditioned on the 4D memory; (2) a memory-consistent video depth completion model that aligns known-region depths with cached geometry and completes missing regions, mitigating scale ambiguity and discontinuities during memory updates; (3) memory-aware dual-stream warping that provides high-fidelity visual guidance and occlusion cues for novel-view synthesis; and (4) geometry-aware video refinement that enhances perceptual quality. Extensive experiments demonstrate state-of-the-art performance and three key capabilities: coherent spatiotemporal lattice construction over dense multi-view trajectories; large-parallax video rerendering under challenging camera motions, including 180-degree rotations with no input-view overlap; and geometry-faithful outputs that can be directly optimized into high-quality 3D Gaussian Splatting representations with minimal artifacts. Project page: https://hanxinzhu-lab.github.io/demiurge_project_page/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.14685v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.14685v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/HanxinZhu-lab/Demiurge"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.14685v1 的 52 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "Demiurge 以 time-indexed 4D point-cloud memory 连接多个目标 camera trajectories：先从 memory 渲染条件，再生成 RGB、补全并对齐 depth、回写 cache。appearance/geometry dual streams 分别防止颜色漂移与遮挡泄漏，作者报告多轨迹与后续 3DGS 一致性改善；这是离线的 plausible world completion，约五分钟/轨迹且 memory 会增长。",
+    "motivationZh": "独立生成的 camera-trajectory videos 缺少共同动态世界状态，难以维持跨轨迹 geometry、appearance 和 occlusion consistency。",
+    "methodZh": "Demiurge 以 time-indexed 4D point-cloud memory 连接多个目标 camera trajectories：先从 memory 渲染条件，再生成 RGB、补全并对齐 depth、回写 cache。appearance/geometry dual streams 分别防止颜色漂移与遮挡泄漏，作者报告多轨迹与后续 3DGS 一致性改善；这是离线的 plausible world completion，约五分钟/轨迹且 memory 会增长。",
+    "methodFlow": [
+      "输入 monocular video、camera trajectory 初始化 4D point memory",
+      "dual-stream warping 产生 RGB/depth/visibility 条件",
+      "appearance video diffusion 补全新视角",
+      "cached-depth anchored video depth completion 与 Poisson refinement",
+      "按 provenance 更新 4D memory，继续下一条 trajectory"
+    ],
+    "experimentsZh": "Wan2.1-1.3B 各 diffusion stages，236k training clips；128 in-the-wild videos、14 fixed trajectories，81 frames、480×832。 以下结果为作者报告：作者报告 128×14 generated videos 上 FVD 334.518、View Sync64.893；由生成视频重建的 3DGS PSNR24.360、LPIPS0.237。（Tables 1-2, pp. 7-8） 对照范围：与 TrajCrafter、InSpatioWorld、ReCamMaster、Gen3C、Voyager、Spatia 比较；3DGS rendering consistency 是间接几何评估，非 dense ground truth recovery。 消融与诊断：Table 3 测 noise monitor、替换 monocular depth、dual streams 与 optional refinement；去 dual-stream 后 P-MSE 从 0.0010 升至 0.0049。",
+    "insightZh": "不再独立生成每个 novel-view video，而将新 appearance/geometry 持续合入显式 time-indexed world state；双 logical streams 共享观测但用不同 source masks。",
+    "evidenceZh": "depth completion 用 cached metric depth 锚定已观测区域，再全局对齐与 Poisson refinement。（Sec. 3.2, p. 5）；appearance stream 只收新区域，geometry stream 使用全部有效观测，按 rendered depth conflict 选择。（Sec. 3.3, pp. 5-7; Fig. 2, p. 2）；作者报告 128×14 generated videos 上 FVD 334.518、View Sync64.893；由生成视频重建的 3DGS PSNR24.360、LPIPS0.237。（Tables 1-2, pp. 7-8）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "显式 4D cache 把 video prior 转为可续建的世界表示，直接服务 generative 3D/4D scene assets。",
+    "caveatZh": "多模块串行约 5 分钟生成一条 target trajectory，难以交互。；重复点增加 storage/rendering cost；当前 representation 未压缩。；100 条轨迹 long-horizon claim 主要定性；细节由 diffusion 补全，不能称忠实重建 unseen surfaces。；公开仓库已确认 inference workflow 和 fine-tuned checkpoints，但未提供完整训练配方，本项目未独立复现。"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2610.18694",
+  "slug": "georeader-learning-latent-geometry-for-spatial-reasoning-in-vision-language-models-2610-18694",
+  "title": "GeoReader: Learning Latent Geometry for Spatial Reasoning in Vision-Language Models",
+  "authors": [
+    "Rong Li",
+    "Shijie Li",
+    "Jiangyong Huang",
+    "Lingdong Kong",
+    "Jiaming Zhou",
+    "Dongyue Lu",
+    "Zeying Gong",
+    "Baoxiong Jia",
+    "Junwei Liang",
+    "Siyuan Huang"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18694"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG",
+    "cs.MM"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "GeoReader",
+    "Learning",
+    "Latent",
+    "Geometry",
+    "for",
+    "Spatial",
+    "Reasoning",
+    "in",
+    "Vision-Language"
+  ],
+  "abstract": "Vision-language models (VLMs) struggle with metric and multi-view relationships that remain implicit in RGB observations. Geometry foundation models recover this structure from RGB, but existing methods either fuse the estimated features with visual tokens and learn to use them from question answering alone, or align VLM latents with geometry features. Capturing geometry, however, does not ensure its use: zeroing the aligned latents of a released feature-alignment model leaves its accuracy unchanged. We introduce GeoReader, a framework that learns geometric representations for the VLM that reads them. First, we train lightweight Geometric Readers to produce continuous input tokens, supervising them with geometry descriptions decoded by a frozen VLM, so that the Readers express geometry in a form the target model can already read. We then freeze the Readers to preserve this interface while fine-tuning the VLM on spatial QA, with geometry injection conditioned on the question. Geometry descriptions serve only as training targets: at inference, the VLM answers directly from the continuous geometric tokens without generating a geometry chain of thought. With geometry predicted from RGB images, our approach reaches 94.3 on MindCube-Tiny with Qwen3-VL-4B and, with a multi-source QA mixture, an average of 72.5 across six additional spatial benchmarks with Qwen3.5-9B. These results suggest that a useful geometric representation is one the receiving model can use, not merely one from which geometry can be reconstructed.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18694v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18694v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18694v1 的 35 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "GeoReader先让小Reader把camera/depth压成每view每signal一个连续token，通过冻结VLM预测geometrydescription训练可读性；随后冻结Reader，question-conditionedinjector与VLM学QA。作者报告预测几何Qwen3VL4B MindCube94.3%，受控annotation消融zero/shuffle使89.2→77.2/63.1；可读interface与冻结分工值得deep，但几何估计cost另计、姿态/参考系错会直接传播。",
+    "motivationZh": "外部geometryfeatures可被重建或对齐，但回答MLLM未必真的使用；QA-only融合也不明确训练可读几何interface。",
+    "methodZh": "DA3从RGB预测poses/depth，Reader通过patchdescriptorMLP+两decoderblocklearnedquery为每view输出token；stage1descriptionCE仅监督geometriccontent。stage2readpass获得questionhiddenstate，gate/adapter缩放几何残差加入slots，answerpass后置geometrytokens；readKVcache复用，推理不生成geometrytextCoT。",
+    "methodFlow": [
+      "DA3从RGB提取pose/depth，构造perviewpatchdescriptors",
+      "两blockReader聚合每signal/view一个连续token",
+      "冻结VLM，以reference-targetpair的geometrydescription训练Reader",
+      "冻结Reader，RGB+questionreadpass提取context",
+      "questiongate/adapter注入geometrytokens，QAfine-tune语言模型",
+      "推理复用readKVcache直接答题，geometrytext只训练监督"
+    ],
+    "experimentsZh": "stage1约65KScanNet/++description、stage2约135KmultiQA；MindCubeablation单独10KQA/annotationgeometry；Qwen2.5/3VL/3.5三个family，DA3main估计。 以下结果为作者报告：作者报告Qwen3VL4B MindCube94.3%，Qwen3.5.9B六benchmark均值72.5%。（PDF pp6–7 Tables1–2）；作者报告matchedQwen2.5.3BSFT metricquestions56.7→59.6，非metric67.3→67.5；DA3pair81.1vsannotation89.2。（PDF p7 Table3; p27 Tables14–15） 对照范围：matchedvanillaSFT隔离geometry输入+stage1额外训练总体效果；historicalbaselinemainrows不同recipe，alternativefusion是adaptation不是原完整system。 消融与诊断：stage1none/alignment/readability、Readerfreeze、pair/group、injectordirect/fixed、geometryzero/shuffle、textCoT/prompts，无multiseeduncertainty。",
+    "insightZh": "以接收模型的languagecontentloss训练几何输入，而非外部featuredistance；冻结interface+questionconditioned注入有清晰representation与training贡献。Intervention证明dependence而非一定正确使用。",
+    "evidenceZh": "Reader从geometryalone生成perviewtokens，冻结VLMdescriptionloss更新Reader。（PDF pp4–5 Eqs1–2/Figure2; pp21–23 A.2.1）；question-conditionedinjector用先read再answer，后置geometry允许KVcache复用。（PDF p5 Eqs3–4; p23 A.2.2）；作者报告同checkpointzero89.2→77.2、poseshuffle→63.1。（PDF p8 Table8; p28 A.4.6）；3DThinker零化诊断只第一阶段releasedcheckpoint。（PDF pp27–29 A.4.4/A.4.6/A.5.1）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接关联空间推理与通用geometry→language接口，对多视图3D设计理解可迁移；无CAD/fabrication具体验证不加技术topic。",
+    "caveatZh": "pose/depth误差会导致错误，参考系混淆即使geometry近对仍发生；benchmark不建立真实导航控制可靠性。；attentionusage与intervention仅证明geometry影响输出，不能证明每个token可解释或因果正确；zero保留slots故baseline不完全equivalent。；main与关键消融geometrysource不同，Readerpretrainingbudgetpair/group也不同；性能差不能全归单设计因素。；0.5sec排除offlinegeometryconstruction，不能宣传rawRGB端到端无cost；外部DA3仍推理依赖。；3DThinker比较只releasedstage1，有不同输入/latent干预，泛化批评需受限。"
+  }
+}

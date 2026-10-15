@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2603.00466",
+  "slug": "dreamworld-unified-world-modeling-in-video-generation-2603-00466",
+  "title": "DreamWorld: Unified World Modeling in Video Generation",
+  "authors": [
+    "Boming Tan",
+    "Xiangdong Zhang",
+    "Ning Liao",
+    "Jingtao Zhang",
+    "Yuqing Zhang",
+    "Xiaoqiu Zhong",
+    "Xiaosong Jia",
+    "Xue Yang",
+    "Yanyong Zhang",
+    "Shaofeng Zhang"
+  ],
+  "publishedAt": "2026-02-28",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.00466"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "DreamWorld",
+    "Unified",
+    "World",
+    "Modeling",
+    "in",
+    "Video",
+    "Generation"
+  ],
+  "abstract": "Despite impressive progress in video generation, existing models remain limited to surface-level plausibility, lacking a coherent and unified understanding of the world. Prior approaches typically incorporate only a single form of world-related knowledge or rely on rigid alignment strategies to introduce additional knowledge. However, aligning the single world knowledge is insufficient to constitute a world model that requires jointly modeling multiple heterogeneous dimensions (e.g., physical commonsense, 3D and temporal consistency). To address this limitation, we introduce \\textbf{DreamWorld}, a unified framework that integrates complementary world knowledge into video generators via a \\textbf{Joint World Modeling Paradigm}, jointly predicting video pixels and features from foundation models to capture temporal dynamics, spatial geometry, and semantic consistency. However, naively optimizing these heterogeneous objectives can lead to visual instability and temporal flickering. To mitigate this issue, we propose \\textit{Consistent Constraint Annealing (CCA)} to progressively regulate world-level constraints during training, and \\textit{Multi-Source Inner-Guidance} to enforce learned world priors at inference. Extensive evaluations show that DreamWorld improves world consistency, outperforming Wan2.1 by 2.26 points on VBench. Code will be made publicly available at \\href{https://github.com/ABU121111/DreamWorld}{\\textcolor{mypink}{\\textbf{Github}}}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.00466v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.00466v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ABU121111/DreamWorld"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.00466v2 的 17 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "DreamWorld 在 Wan2.1 joint latent 中联合生成 pixels、RAFT flow、DINOv2/VGGT features，用 cosine CCA 放松辅助loss再做多源self-guidance。作者报告VBench80.97 vs fine-tuned78.71，但WorldScore只从50.95到51.48，推理约翻倍。可skim借鉴多源几何训练，不能称可靠物理模拟器。",
+    "motivationZh": "多个异质 teacher priors 的联合 alignment 会冲突，视频的外观好看也不等于几何/物理一致。",
+    "methodZh": "将flow转RGB并VAE encode，DINOv2/VGGT features对齐、PCA压缩后拼接video latents，扩展projection联合预测velocity。world-loss权重cosine退火；测试从joint noise自预测priors，对masked channel做多路guidance。证据限于单Wan2.1-1.3B与32K WISA短clip。",
+    "methodFlow": [
+      "提取RAFT flow RGB latent与DINOv2/VGGT",
+      "对齐normalize/PCA压缩",
+      "扩展projection联合预测pixels/world velocity",
+      "LoRA与CCA退火world loss",
+      "masked-subspace inner guidance",
+      "VAE解码视频"
+    ],
+    "experimentsZh": "8×A100,batch16,2,000steps LoRA,32K WISA；81frames/480×832；Wan2.1-1.3B，官方VBench/VBench2/VideoPhy/WorldScore prompts。 以下结果为作者报告：作者报告VBench80.97 vs fine-tuned78.71，WorldScore51.48 vs50.95，3D consistency73.16 vs71.73。（Tables1 p.6,4 p.7）；作者Table2/AppendixC.7给VBench2总分52.97，正文p.6称53.64，内部不一致。（Table2 p.6; TableC.7 p.14） 对照范围：原始/同数据fine-tuned Wan2.1与reimplemented VideoJAM；AppendixA扩展VideoREPA。未证跨骨干、interactive/long rollout或实际物理状态。 消融与诊断：Table5移除teacher/guidance，Fig5 PCA维度，TableE.1固定/增/减CCA，TableE.2分支成本。支持配置内权衡，未证明物理因果建模。",
+    "insightZh": "扩展VideoJAM式joint appearance/motion为多源world-feature预测，结合退火和self-guidance；不构成显式3D/物理状态求解。",
+    "evidenceZh": "pixels和teacher features在joint-channel velocity objective下训练，辅助loss余弦退火。（Fig.2 p.3; Sec.3.2–3.3 pp.4–5, Eqs.4–10）；作者报告VBench80.97、VideoPhy PC26.2%，物理失败仍很多。（Tables1–3 p.6）；WorldScore与推理成本显示收益有限且有额外forward开销。（Table4 p.7; AppendixB p.13; TableE.2 p.15）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "多源geometry/motion/semantic priors可供一致视觉creation借鉴；没有LEGO/embroidery/fabrication实验。",
+    "caveatZh": "Sec.5 p.9承认数据多样性和计算资源限制。；短clip代理指标不能等同可执行world simulator；VideoPhy PC仅26.2%。；单骨干/数据；guidance显著增加延迟且控制指标并非全面提升。；VBench2正文/表格不一致；摘要+2.26相对fine-tuned而非原始baseline。"
+  }
+}

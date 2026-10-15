@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2605.08703",
+  "slug": "rewardharness-self-evolving-agentic-post-training-2605-08703",
+  "title": "RewardHarness: Self-Evolving Agentic Post-Training",
+  "authors": [
+    "Yuxuan Zhang",
+    "Cong Wei",
+    "Penghui Du",
+    "Bo Li",
+    "Junwen Miao",
+    "Huaisong Zhang",
+    "Songcheng Cai",
+    "Yubo Wang",
+    "Dongfu Jiang",
+    "Yuyu Zhang",
+    "Changqian Yu",
+    "Ping Nie",
+    "Wenhu Chen",
+    "Kelsey R. Allen"
+  ],
+  "publishedAt": "2026-05-09",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2605.08703"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "RewardHarness",
+    "Self-Evolving",
+    "Agentic",
+    "Post-Training"
+  ],
+  "abstract": "Aligning generative models with human preferences remains a central challenge. While RLHF is widely adopted, it relies on large-scale preference data. This limitation is particularly evident in evaluating instruction-guided image edits, even though humans can often learn such preferences from only a few examples. We present RewardHarness, a training-free, self-evolving agentic reward framework that reframes reward modeling as context evolution rather than weight optimization. Instead of learning from large-scale annotations, RewardHarness aligns with human preferences by iteratively evolving a library of tools and skills from as few as 100 preference demonstrations. Given a source image, an edited image, and an editing instruction, an orchestrator agent selects the most relevant subset of tools and skills from the maintained library, and sub-agents invoke them to construct a reasoning chain that produces a reward score. By comparing predicted scores with ground-truth preferences and analyzing successes and failures in the reasoning process, the orchestrator automatically refines its library of tools and skills without additional human annotation. Using only 0.05% of the EditReward preference data, RewardHarness achieves 47.4% average accuracy on EditReward-Bench K=2/3/4 and GenAI-Bench, surpassing GPT-5 by 5.3 points. When used as a reward signal in FlowGRPO, RL-tuned models achieve 3.52 on ImgEdit-Bench. Code and model are available at the project page: https://rewardharness.com/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2605.08703v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2605.08703v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/TIGER-AI-Lab/RewardHarness"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2605.08703v2 的 18 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "RewardHarness 将 image-edit preference learning 从更新 reward-model weights 改为演化可读的 Skills/Tools library：orchestrator 用 100 个偏好样例分析错误并按 held-out improvement 接受修改，冻结 VLM 执行评价。作者报告更好的 edit ranking 与 FlowGRPO editor training；亮点是低数据、可检视 reward context，尚未验证 3D/结构设计迁移及 API 成本。",
+    "motivationZh": "instruction-guided image edits 的 human preference reward 通常依赖大规模偏好标注和模型 finetuning，适配成本高且评价过程不透明。",
+    "methodZh": "RewardHarness 将 image-edit preference learning 从更新 reward-model weights 改为演化可读的 Skills/Tools library：orchestrator 用 100 个偏好样例分析错误并按 held-out improvement 接受修改，冻结 VLM 执行评价。作者报告更好的 edit ranking 与 FlowGRPO editor training；亮点是低数据、可检视 reward context，尚未验证 3D/结构设计迁移及 API 成本。",
+    "methodFlow": [
+      "100 preference demonstrations 分 training/calibration validation",
+      "orchestrator 路由 rubric skills 与 visual-analysis tools",
+      "冻结 VLM 生成分项证据与候选排名",
+      "对照 human preferences 分析失败并提议 library edits",
+      "validation 严格改善才提交，最终冻结 library 作为 editor RL reward"
+    ],
+    "experimentsZh": "EditReward 训练 split100 样本，独立 EditReward-Bench 和 GenAI-Bench；FLUX.2-klein-base-4B+FlowGRPO；测试 Qwen 与 Gemini subagents。 以下结果为作者报告：作者报告 Qwen subagent 的平均准确率 45.7%，相同 backbone EditReward42.0%；同 FlowGRPO editor 的 ImgEdit-Bench overall 从 3.32 到 3.52，EditReward 为 3.45。（Table 1, p. 6; Table 2, p. 8） 对照范围：与 proprietary VLMs、EditReward 等比较，并控制同 backbone 和同 RL 算法；系统含强 orchestrator，数据量优势不等于总成本更低。 消融与诊断：Fig. 6 分析 77 轮 evolution 与 pruning，附录给 library composition；缺少完整多 orchestrator 成本和能力对照。",
+    "insightZh": "用 context/library evolution 取代 reward model finetuning；工具在此多为 VLM 执行的 procedural specification，非独立训练的视觉 detector。",
+    "evidenceZh": "Skills 是 declarative rubrics，Tools 是 targeted visual analysis 的文档化程序。（Secs. 2.2-2.4, pp. 4-5; Fig. 2, p. 3）；candidate library 仅在约 30 held-out demonstrations 的准确率严格提高时保留，最终 library 有 3skills+4tools。（Sec. 2.5, pp. 5-6）；作者报告 Qwen subagent 的平均准确率 45.7%，相同 backbone EditReward42.0%；同 FlowGRPO editor 的 ImgEdit-Bench overall 从 3.32 到 3.52，EditReward 为 3.45。（Table 1, p. 6; Table 2, p. 8）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "低数据、可审计的视觉 reward context 为生成模型反馈提供不同于普通指标微调的 post-training 路径。",
+    "caveatZh": "依赖 capable orchestrator；API cost、latency 与不同 backbone tradeoff 未系统刻画。；主要限 instruction-guided image edits，video/3D 与其他生成任务尚待验证。；约 30 验证样例反复门控存在 selection overfitting 风险；作者避免 reward hacking 的宽泛结论不能由单表完全证明。；public implementation 已确认含 evolution、evaluation 与 benchmark Python modules，但本项目未运行复现。"
+  }
+}

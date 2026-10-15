@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2610.15565",
+  "slug": "genesis-visual-augmentation-primitives-for-multimodal-chain-of-thought-reasoning-2610-15565",
+  "title": "Genesis: Visual Augmentation Primitives for Multimodal Chain-of-Thought Reasoning",
+  "authors": [
+    "Fan Yang",
+    "Lifeng Chen",
+    "Yipu Wang",
+    "Han Wang",
+    "Feilong Chen",
+    "Yidong Ma",
+    "Zhiyang Chen",
+    "Chaoyang Zhao",
+    "Lingxiang Wu",
+    "Hanqi Jiang",
+    "Yibo Chen",
+    "Xu Tang",
+    "Yao Hu",
+    "Ming Tang",
+    "Xiaojie Jin",
+    "Xiaolong Zheng",
+    "Jinqiao Wang"
+  ],
+  "publishedAt": "2026-10-11",
+  "updatedAt": "2026-10-11",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.15565"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Genesis",
+    "Visual",
+    "Augmentation",
+    "Primitives",
+    "for",
+    "Multimodal",
+    "Chain-of-Thought",
+    "Reasoning"
+  ],
+  "abstract": "Recent multimodal large language models achieve promising results on visual reasoning tasks, approaching human-level performance on existing STEM benchmarks. However, these capabilities degrade under complex real-world scenes. We identify that chain-of-thought reasoning remains largely confined to the linguistic space, rarely anchoring each step in visual evidence. The main cause is the absence of such data during training. In this work, we introduce a training data augmentation pipeline, \\textbf{Visual Augmentation Primitives} (VAP), which leverages state-of-the-art vision generative models to synthesize diverse photorealistic training samples and corresponding reasoning text. VAP introduces some basic operators and applies them to a seed image and gets a variant. It also constructs coherent multimodal reasoning chains throughout the generation process. Such training data force models to perceive visual content and perform logical reasoning according to them at every step. We further introduce multimodal chain-of-thought rubric-based reinforcement learning to enhance this. It rewards not only text reasoning but also visual reasoning by scoring intermediate reasoning steps for logical validity, completeness, and consistency. Moreover, we construct the UNREAL benchmark to systematically evaluate visual reasoning on hyperrealistic scenes across controllable difficulty levels. Experiments show that a 4B model built on this framework surpasses 8B baselines, with performance improving consistently as the model scales to 32B, validating the scaling law for visual reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.15565v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.15565v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.15565v1 的 25 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "Genesis 用 Visual Augmentation Primitives 做 answer-changing edits，再在保留推理关键属性的条件下多轴扩增，并以逻辑有效、完整与一致性 rubric 奖励中间推理。作者报告多尺度 Qwen3-VL 的 STEM 收益；其新 UNREAL 上提升较小，部分 benchmark 退化，commercial generators 和 LLM judge 使精确可复现性受限。",
+    "motivationZh": "多模态 CoT 常依赖文本逻辑而未逐步绑定视觉事实，现有训练样例多样性与仅 final-answer reward 限制 grounded reasoning。",
+    "methodZh": "Genesis 用 Visual Augmentation Primitives 做 answer-changing edits，再在保留推理关键属性的条件下多轴扩增，并以逻辑有效、完整与一致性 rubric 奖励中间推理。作者报告多尺度 Qwen3-VL 的 STEM 收益；其新 UNREAL 上提升较小，部分 benchmark 退化，commercial generators 和 LLM judge 使精确可复现性受限。",
+    "methodFlow": [
+      "Analyst 区分 reasoning-critical frozen 属性与可变化轴",
+      "Add/Remove/Modify/Relate 改变可观察事实及答案",
+      "验证后生成答案保持的多样 scene variants 与 CoT",
+      "用 logic/completeness/consistency rubric 评分",
+      "GRPO 结合过程与 final-answer reward 训练 VLM"
+    ],
+    "experimentsZh": "Qwen3-VL4B/8B/32B；八 STEM 与三 VQA 表列 benchmarks，UNREAL600 样本独立训练 pool 且人验；single-image setup。 以下结果为作者报告：作者报告 Genesis-32B 的 MMMU-Pro 从 47.9 到 66.5；同数据/optimizer 的 rubric vs RLVR 仅 66.47 vs66.42，LogicVista68.46 vs66.22；UNREAL overall24.3 到 25.7。（Tables 1,3-4, pp. 9-11） 对照范围：主要证据是 scale-matched base 与相同 compute rubric/RLVR 对照；closed-model 引用结果只作 reference，缺失条目不能参与排名。 消融与诊断：比较 rubric/RLVR、GRPO/SAPO 和 SFT/RL 阶段；32B MathVista 与 BabyVision 较 base 下降，不能宣称全指标一致改善。",
+    "insightZh": "把可控的视觉事实编辑与推理过程奖励连接，贡献不限于 600-item benchmark；frozen/free partition 是数据一致性约束。",
+    "evidenceZh": "先做可验证的 answer-changing edit，再沿 free dimensions 生成保持答案的 variants。（Sec. 3, Fig. 2, pp. 5-6）；过程 rubric 由 LLM judge 评分，与 format 和 final answer 相加，answer 权重最高。（Sec. 4, Fig. 3, pp. 6-7）；作者报告 Genesis-32B 的 MMMU-Pro 从 47.9 到 66.5；同数据/optimizer 的 rubric vs RLVR 仅 66.47 vs66.42，LogicVista68.46 vs66.22；UNREAL overall24.3 到 25.7。（Tables 1,3-4, pp. 9-11）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "将 grounded visual changes 与 multimodal process supervision 结合，直接属于 VLM reasoning 方法。",
+    "caveatZh": "依赖 GPT-Image/Gemini/Qwen commercial pipelines；LLM rubric 有噪声。；仅单图、仅 Qwen3-VL，UNREAL 规模 600 且领域有限。；大部分方法总收益无法单独归因某一 augmentation 或 rubric 项；需要更细的数据质量与 seed-control 消融。；合成 scene 的 reasoning validity 需要可靠 verifier，符号属性 predicate 不等于所有生成图都满足。"
+  }
+}

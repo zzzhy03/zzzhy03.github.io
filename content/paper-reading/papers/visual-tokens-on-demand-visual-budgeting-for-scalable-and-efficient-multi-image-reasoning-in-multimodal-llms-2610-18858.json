@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.18858",
+  "slug": "visual-tokens-on-demand-visual-budgeting-for-scalable-and-efficient-multi-image-reasoning-in-multimodal-llms-2610-18858",
+  "title": "Visual Tokens on Demand: Visual Budgeting for Scalable and Efficient Multi-Image Reasoning in Multimodal LLMs",
+  "authors": [
+    "Aimon Rahman",
+    "Joymallya Chakraborty",
+    "Vidit Bansal",
+    "Abhishek Dan"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18858"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Visual",
+    "Tokens",
+    "on",
+    "Demand",
+    "Budgeting",
+    "for",
+    "Scalable",
+    "and"
+  ],
+  "abstract": "Multimodal large language models have advanced rapidly, but most remain optimized for single-image inputs. Multi-image reasoning is costly because each image adds many visual tokens, increasing encoding and attention demands. Existing techniques that address the above issue, including visual token pruning, token merging, visual token compression, learned resampling, hierarchical compression, retrieval-augmented visual reasoning, and memory-based architectures, have largely been designed for single-image scenarios, where redundancy is primarily spatial and local. Multi-image reasoning introduces additional challenges: redundancy may occur across images, task-relevant evidence may be sparse or distributed, and aggressive per-image compression can remove details needed for comparison, counting, temporal reasoning, retrieval, or evidence grounding. Moreover, existing token-reduction methods are often either (i) training-free but inference-inefficient, typically relying on accessing attention matrices to get token-importance that may be impractical to access with memory-efficient attention implementations such as FlashAttention, or (ii) training-dependent, requiring the base MLLM to be retrained or adapted to a new compressed-token paradigm. In this work, we study scalable multi-image reasoning and understanding without retraining the base model and without accessing attention matrices at inference time. To this end, we propose mmVB, a lightweight plug-and-play module that assigns query-conditioned per-image token budgets via cross-image context, adding only 1.6M trainable parameters while reducing visual input tokens by 9x. This reduction yields 5x faster time-to-first-token and 7x fewer prefill FLOPs, while maintaining 94.4% of full-resolution accuracy across eight multi-image reasoning benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18858v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18858v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18858v1 的 14 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "mmVB 在视觉编码前，联合读取缩略图与问题，预测每图五档分辨率；冻结原 MLLM，不读 attention maps，且可迁移到黑盒模型。作者报告八个多图 benchmark 几何平均 token 减少9.2×、准确率保留94.4%，但 MIRB/ReMI 从67.2/24.7降至56.5/19.2；适合参考跨图 compute allocation，不能把平均保留率理解成细粒度推理无损。",
+    "motivationZh": "多图 MLLM 对每张图默认分配视觉计算，既浪费无关图的 token，也可能丢失跨图推理所需细节。",
+    "methodZh": "用冻结 EfficientNet-B0 和冻结 LLM query embeddings，经两层 cross-image Transformer 预测 ordinal resolution levels。离线以目标模型回答正确性搜索分辨率标签，丢弃 full-resolution 已答错样本，逐图搜索后进行联合校验和贪心放宽；训练534K单图/多图样本，推理只调整输入尺寸。",
+    "methodFlow": [
+      "冻结轻量视觉编码器提取每图缩略图特征",
+      "冻结 MLLM embeddings 对问题 mean-pool，投影至256维",
+      "两层 Transformer 融合 N 张图与 query，预测四个 ordinal thresholds",
+      "离线逐图降采样搜索后联合校验、放宽得到五档监督",
+      "推理按预测档缩小各图，再交给冻结 MLLM；可选全局预算贪心分配"
+    ],
+    "experimentsZh": "冻结 Qwen3.5-4B，greedy decoding/thinking disabled；八个多图 benchmark，另有27B及两个闭源模型迁移与单图MM-Vet。 以下结果为作者报告：作者报告 token 几何平均减少9.2×、prefill FLOPs减少7.3×、accuracy保留94.4%；Table1 MIRB/ReMI降幅显著。（PDF pp5–6 Table1/Section3.2）；作者报告多图训练比单图训练通常更稳；MM-Vet59.8→53.3、tokens1146→63。（PDF p8 Table3; p12 Table5） 对照范围：VisionZip/ToFu/VisionTrim/ZooPrune、uniform/random分辨率；主表预算不同，另用 matched-budget 曲线比较。 消融与诊断：单图/多图训练、档数、query bottleneck、跨图Transformer；architectural validation以档位预测accuracy衡量。",
+    "insightZh": "贡献是将多图视觉预算显式建模为 query-conditioned、跨图联合、编码前的可训练接口，区别于编码后 attention pruning；黑盒模型迁移使它具备一般 multimodal 输入接口价值。未建立最低预算或正确性保证。",
+    "evidenceZh": "预算器在原模型编码前调整每图分辨率，使用两层跨图 Transformer 与 ordinal head。（PDF p3, Section 2.1, Figure 2; p11 Appendix A）；作者报告9.2×几何平均 token reduction、94.4% accuracy retention；部分推理任务下降显著。（PDF pp5–6, Table 1, Section 3.2）；同一4B训练预算器迁移到27B/Claude/Pixtral，保留率约89.8–92.9%。（PDF p7, Table 2, Section 3.4）；细图案与无文字query会导致预算不足。（PDF p8, Figure 5, Section 6）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "提供面向多视图/多图视觉推理的通用计算分配表示；目前对 CAD/3D 或 structured design 未专门验证，因此推荐 skim。",
+    "caveatZh": "预算预测可能丢失细粒度模式，无文本query也可能失败；医学图像等分布未覆盖。；最低分辨率标签是过滤 full-resolution 正确样本后的启发式搜索，不是全域最优或概率正确性保证。；94.4%是benchmark保留比例的几何平均，掩盖MIRB/ReMI细粒度推理下降。；视觉Haystack仅最多10图，未证明上千图规模；独立ordinal阈值没有显式单调约束。"
+  }
+}

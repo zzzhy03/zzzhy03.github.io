@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.17348",
+  "slug": "hairflow-modeling-3d-hair-strands-with-multi-modal-conditioned-diffusion-2610-17348",
+  "title": "HairFlow: Modeling 3D Hair Strands with Multi-Modal Conditioned Diffusion",
+  "authors": [
+    "Yating Wang",
+    "Kui Wu",
+    "Ran Yi",
+    "Zixuan Lu",
+    "Tongtong Wang",
+    "Zhongtian Zheng",
+    "Lizhuang Ma",
+    "Yuefan Shen"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17348"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "3d-reconstruction",
+    "HairFlow",
+    "Modeling",
+    "Hair",
+    "Strands",
+    "with",
+    "Multi-Modal",
+    "Conditioned",
+    "Diffusion"
+  ],
+  "abstract": "Modeling 3D hair strands is challenging due to complex hairstyle geometry, scarce high-quality training data, and incomplete or noisy input observations. Foundation models offer broader hairstyle priors, but their outputs are not directly usable for strand-based rendering and simulation. Existing approaches require costly per-instance optimization to fit hair priors to meshes from foundation models and 2D orientations from specialized predictors trained on limited hair data, restricting efficiency and generalization. We present HairFlow, a multimodal conditioned diffusion framework for efficient and controllable hair strands modeling. HairFlow conditions strand generation on two complementary representations: a coarse mesh that constrains global shape and multi-view sketches that specify local strand flow. HairFlow combines an Orientation VAE with a conditioned diffusion transformer to generate volumetric fields that are traced into explicit strands. To overcome the lack of paired sketch-strand training data, we introduce an automatic synthesis pipeline that generates geometrically aligned multi-view sketches with diverse styles representative of inference-time inputs. Experiments show that HairFlow generates plausible 3D strands that faithfully follow the input conditions across diverse hairstyles, substantially reduces inference time, and supports flexible multimodal control.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17348v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17348v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17348v1 的 18 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "HairFlow 以coarse mesh约束外形、posed multi-view sketches约束flow，在orientation-only VAE latent中用DiT直接生成field再trace strands。作者报告30real-image IoU0.912、326hairstyle orientation22°，核心generation6.9s但conditions+strand-growing仍4–5min。值得skim显式curve资产控制；VAE容量/2Dcue不匹配且connectivity未建模。",
+    "motivationZh": "hair foundation meshes不含strand flow；既有orientation prior per-instance fitting慢且复杂hairstyle泛化受限。",
+    "methodZh": "48M OrientationVAE仅编码directions，latent2048×64；DORA mesh tokens attentionpool，DINOv2 intermediate features与Plucker patch rays组成multi-view sketch tokens，crossattention条件化flow-matching DiT。55K strandassets以orientation-map tracing合成多风格sketches；图像/text先经外部生成/Tripo重建并注册，artist3D strokes可直接投影控制不同flow。",
+    "methodFlow": [
+      "从55Kstrand assets生成orientation fields与multi-view sketches",
+      "orientation-only VAE学习2048×64latent",
+      "DORA mesh encoder/pooling和DINOv2+Plucker编码",
+      "conditional DiT flow matching采样latent",
+      "在mesh内部decode directions并trace explicit strands",
+      "图像/text或artist mesh strokes统一为条件"
+    ],
+    "experimentsZh": "约55K DiffLocks/Perm/UniHair/HairCS hairs，326holdout，30real images；VAE200epochs、DiT300epochs四GPU；30Euler；Unrealwind只有定性。 以下结果为作者报告：作者报告real IoU0.912 vsHairLRM0.855；326synthetic orientation error约22° vs29°。（Table1 p.7）；作者meshonly27.43°→加sketch22.92°；HairLRM36.81→29.52；core6.9s对latentfitting10min，外部conditions3min/trace1–2min仍在。（Table2/InferenceTime p.8） 对照范围：HairStep/DiffLocks/Im2HairCut/HairLRM；HairGPT/Hao只用原论文输出/runtimes非同平台；HairLRM同mesh但orientation cue不同。 消融与诊断：meshonly+sketch与artist/multiview/style qualitative；未capacity-matched VAE、固定2Dcue生成vsoptimization或connectivity/simulation定量验证。",
+    "insightZh": "在mesh envelope+sketch方向条件下直接生成较大orientation-only latent，替代per-instance fitting；自动几何对齐sketch数据有贡献。并非新foundation mesh generator，且VAE容量增大与diffusion优势未分离。",
+    "evidenceZh": "只建模orientation并将HairLRM512×2latent增至2048×64，移除SDF/instance fitting。（Sec.3.1 p.4）；mesh/global shape与camera-aware sketches/local flow独立条件化strand latent。（Fig.2 p.3; Sec.3.2–3.3 pp.4–5; Fig.6 p.9）；作者报告质量提升但快的是core而非整个foundation preprocessing。（Tables1–2 pp.7–8; InferenceTime p.8; AppendixA p.12）；connectivity/fine curls和input mesh质量仍限制生成。（AppendixD p.15）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "显式strand/curve资产生成、mesh外形与sketchflow解耦对可控3D设计有直接方法价值；不声称已迁移embroidery或fabrication。",
+    "caveatZh": "orientation fields平滑fine curls不显式connectivity；依赖mesh拓扑，localediting待开发（p.15）。；主文Eq8用independent sketch-only CFG，AppendixEq9改joint-conditional difference，实现口径需要核对。；IoU不能验证不可见strands真实；syntheticangle评价与条件构造/生成face域有关，无realstrandGT。；geometry/appearance来自外部foundationmodel，不保证hiddenhairfaithfulness；winddemo不能证明物理参数或strandtopology真实。"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.15681",
+  "slug": "rethinking-human-intent-to-cad-parametric-cad-model-generation-via-cooperative-multi-task-alignment-and-spatial-aware-reinforcement-learning-2610-15681",
+  "title": "Rethinking Human Intent-to-CAD: Parametric CAD Model Generation via Cooperative Multi-Task Alignment and Spatial-Aware Reinforcement Learning",
+  "authors": [
+    "Qingwang Zhang",
+    "Jiahao Li",
+    "Xiangdong Zhou"
+  ],
+  "publishedAt": "2026-10-11",
+  "updatedAt": "2026-10-11",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.15681"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Rethinking",
+    "Human",
+    "Intent-to-CAD",
+    "Parametric",
+    "CAD",
+    "Model",
+    "Generation",
+    "via",
+    "Cooperative"
+  ],
+  "abstract": "Parametric Computer-Aided-Design (CAD) modeling from human intent remains challenging, particularly during the conceptual design stage, where design goals are expressed through incomplete and unstructured modalities (e.g., hand-drawn sketches and textual descriptions). In this work, we rethink the human intent-to-CAD pipeline and propose a unified method that directly maps multi-level human intents to executable codes, without assuming the prior existence of target CAD models. To support our study, we construct HiCAD, the first large-scale dataset aligning hand-drawn sketches, textual descriptions, and parametric CAD codes. Based on this, we introduce HiCAD, a two-stage framework comprising Cooperative Multi-Task Alignment to bridge the representational gap between heterogeneous inputs, and Spatial-Aware Reinforcement Learning to enforce geometric and topological consistency. Extensive experiments demonstrate that our method significantly outperforms existing baselines across multiple tasks, validating its effectiveness and robustness in transforming heterogeneous human intents into high-fidelity parametric CAD models. Our project page: https://zqwlearning.github.io/HiCAD.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.15681v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.15681v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/zqwlearning/HiCAD-Code"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.15681v1 的 15 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "HiCAD 将草图、完整/部分文本到 CadQuery 的四个任务联合 SFT，再用 B-Rep adjacency graph edit distance、体积 IoU 和执行有效性做 GSPO。作者报告 sketch+完整文本 IoU 80.90%、invalid rate 0.42%；可直接借鉴 CAD program reward，但所谓 human intent 数据主要由现有 DeepCAD 模型反向合成，真实草图仅 100 个。",
+    "motivationZh": "草图和不完整文字无法直接保证可执行、几何与拓扑一致的 parametric CAD programs。",
+    "methodZh": "数据由 CAD-Recode 的 DeepCAD CadQuery 执行生成可见线草图，Qwen3-VL-32B 结合代码、render 和尺寸生成描述，再随机删句模拟部分意图。Qwen3-VL-4B 联合四任务学习，SARL 以 0.2 topology+0.8 volume IoU 奖励有效程序、无效程序 -0.1，并采用 sequence-level GSPO。输出可编辑 CAD，证据主要是配对形状恢复和受控补全，尚非自由开放设计意图。",
+    "methodFlow": [
+      "DeepCAD/CadQuery 构造草图与完整/部分文字配对",
+      "Qwen3-VL-4B 交错四任务 supervised alignment",
+      "执行每 query 的 10 个 CadQuery rollout",
+      "计算 B-Rep graph topology、volume IoU 和 validity reward",
+      "GSPO 联合多任务优化后输出可执行 CAD"
+    ],
+    "experimentsZh": "82,075/4,536/4,015 train/val/test，DeepCAD split；4 A100 80GB，Qwen3-VL-4B；IoU、invalid rate、Chamfer distance；通用 API 模型仅 500 个 test 样本，真人草图 100 个。 以下结果为作者报告：作者报告 HDS+CTD IoU 80.90%、IR 0.42%，Cadrille 72.56%/7.57%。（Table1 p.7）；作者报告真人 HDS-only IoU 43.27%、IR 3%；加 CTD 后 73.37%/0%。（Table3 p.8） 对照范围：CAD-Coder 和 Cadrille 在 HiCAD 上训练；GPT/Claude/Gemini/Qwen-VL 采用 retrieval 2-shot 未 fine-tune，不能视为严格同训练资源比较。 消融与诊断：Table2 支持 CMTA 和 SARL 的叠加收益；Fig.6 支持多任务 RL。主表与消融的 HDS/CTD 数值略有不同，未单独隔离 topology reward 与 GSPO 的所有因素。",
+    "insightZh": "主要新意是配对数据、联合意图任务和 topology-aware 执行奖励的组合；GSPO 本身并非新算法，仍依赖 ground-truth geometry。",
+    "evidenceZh": "数据主要来自现有 CAD 的反向合成；真实草图仅测试。（Sec.3 pp.3–4; Appendix A p.13）；奖励包含 face adjacency GED、IoU 和 execution penalty。（Sec.4.2.2 pp.5–6; Fig.4 p.5）；作者报告四种输入任务和 100 个真人草图结果。（Tables1–3 pp.7–8）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究可编辑 parametric CAD generation；topological execution reward 可迁移到结构化设计程序。",
+    "caveatZh": "复杂结构仍弱、草图视角/杂乱有歧义、synthetic-to-real gap（Appendix E p.14）。；生成意图由目标 CAD 反推，无法直接证明真实设计过程的开放域泛化。；可执行不等于制造可行或尺寸约束完全满足；未给 fabrication/interactive editing 实验。"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2610.17080",
+  "slug": "scaling-unified-multimodal-models-to-long-horizon-interleaved-generation-2610-17080",
+  "title": "Scaling Unified Multimodal Models to Long-Horizon Interleaved Generation",
+  "authors": [
+    "Ziqiao Peng",
+    "Yutao Cui",
+    "Wang Lin",
+    "Zhong-Yu Li",
+    "Qingwen Gu",
+    "Tianhui Song",
+    "Chengyou Jia",
+    "Guozhen Zhang",
+    "Xuerui Qiu",
+    "Qixun Wang",
+    "Miles Yang",
+    "Zhao Zhong",
+    "Yonglong Tian",
+    "Hongyan Liu",
+    "Jun He"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17080"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "image-generation",
+    "Scaling",
+    "Unified",
+    "Multimodal",
+    "Models",
+    "to",
+    "Long-Horizon",
+    "Interleaved",
+    "Generation"
+  ],
+  "abstract": "Unified multimodal models (UMMs) provide an interface for interleaved text-image generation, where generated visual states can directly inform subsequent reasoning and synthesis. However, existing systems are still primarily demonstrated on short trajectories or simplified visual content. We develop a large UMM natively trained on interleaved multimodal data, with strong capabilities in image synthesis, text rendering, complex composition, and multimodal planning, and study how to extend these native capabilities to substantially longer autoregressive trajectories. The main challenge is that generated images continuously accumulate in context: irrelevant or imperfect visual states interfere with future synthesis, while previously established characters and scenes must still be recovered after long intervals. We introduce a visual-memory framework that maintains persistent visual references, selectively retrieves scene-relevant historical states while preserving the complete semantic history, and uses few-step self-rollout to adapt the model to imperfect generated histories. We further introduce LongMIG-Bench for evaluating long-horizon text-to-multi-image and image-to-multi-image generation. Our model achieves high-fidelity long-horizon interleaved generation with strong character and scene consistency, demonstrating how visual memory can scale native interleaved generation to substantially longer trajectories.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17080v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17080v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17080v1 的 29 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "这项 long-horizon unified generation 把历史图像拆为持续保留的 semantic history 与按 scene 路由的 generative memory，再以自生成 visual anchors 和 self-rollout adaptation 缓解身份漂移。作者在 100-story LongMIG-Bench 与 24-image stress test 报告一致性收益；核心价值是可训练的视觉记忆管理，而不是简单扩大 context。",
+    "motivationZh": "原生 UMM 随生成图像增多积累无关与有误的 dense visual history，导致远程 character/scene consistency 与推理成本恶化。",
+    "methodZh": "这项 long-horizon unified generation 把历史图像拆为持续保留的 semantic history 与按 scene 路由的 generative memory，再以自生成 visual anchors 和 self-rollout adaptation 缓解身份漂移。作者在 100-story LongMIG-Bench 与 24-image stress test 报告一致性收益；核心价值是可训练的视觉记忆管理，而不是简单扩大 context。",
+    "methodFlow": [
+      "原生 UMM 生成 character reference anchors",
+      "保留完整 semantic trajectory",
+      "预测 scene state，路由 anchors、最近帧与同场景早/晚记忆",
+      "在 self-generated history 上用 ground-truth target 继续训练",
+      "交替输出文本与连续图像"
+    ],
+    "experimentsZh": "256K-context large MoT UMM；LongMIG 含 100 stories、922 specified shots；另有 24-image long stress test，质量使用 GPT-6 rubric 与 SigLIP2/DINOv3 scene gaps。 以下结果为作者报告：作者报告同 backbone 下 Scene 从 UniLongGen* 的 2.61 升至 3.35、Visual Memory 从 2.60 升至 3.77；32-image 平均用时由 full history 的 102.9 降至 54.9 秒/图。（Table 1, p. 8; Table 5, p. 27） 对照范围：覆盖 agent-planned 与 native interleaved systems，并有 UniLongGen 同 backbone reimplementation；跨模型对比仍混合 training/model scale。 消融与诊断：Table 2 分别移除 anchors、scene routing、self-rollout；noisy scene 与 Recent-2/4 测试说明 retrieval 的依赖。",
+    "insightZh": "将 understanding history 与 synthesis memory 分离，并联合训练 references、scene-aware routing 和 self-rollout；相对同 backbone 的 UniLongGen context curation 有控制比较。",
+    "evidenceZh": "semantic representations 全保留，dense generative visual states 按 scene、recency 与 anchors 选择。（Secs. 3.1-3.3, Fig. 2, pp. 4-6）；self-rollout 仅替换历史条件，监督 target 仍为 ground-truth image。（Sec. 3.4, pp. 6-7）；作者报告同 backbone 下 Scene 从 UniLongGen* 的 2.61 升至 3.35、Visual Memory 从 2.60 升至 3.77；32-image 平均用时由 full history 的 102.9 降至 54.9 秒/图。（Table 1, p. 8; Table 5, p. 27）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进多模态生成模型的可持续 visual state，也可迁移到长程 design iteration 与跨图资产一致性。",
+    "caveatZh": "object-level continuity 未显式绑定，细小道具仍会消失；scene retrieval 依赖正确输出离散 state。；crowded identities、long scene gaps、repeated composition、rendered text 和早期错误累积仍失败。；主结果主要依赖自建 benchmark 与模型 judges；超过 50 图的证据主要是 qualitative，不等价于长程无漂移保证。；模型具体可复现训练信息和 public implementation 在已读 PDF 中未确认。"
+  }
+}

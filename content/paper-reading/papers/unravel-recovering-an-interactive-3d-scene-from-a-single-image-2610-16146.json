@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2610.16146",
+  "slug": "unravel-recovering-an-interactive-3d-scene-from-a-single-image-2610-16146",
+  "title": "Unravel: Recovering an Interactive 3D Scene from a Single Image",
+  "authors": [
+    "Hui Shan",
+    "Keyang Luo",
+    "Binjia Zhou",
+    "Ming Li",
+    "Kai Li",
+    "Xin Wang",
+    "Zhenyang Li",
+    "Zesong Yang",
+    "Weikai Chen",
+    "Runze Zhang",
+    "Xin Wang",
+    "Yanwei Fu",
+    "Zhen Chen",
+    "Xiangru Huang"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16146"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "visual-design-agents",
+    "Unravel",
+    "Recovering",
+    "an",
+    "Interactive",
+    "Scene",
+    "from",
+    "Single",
+    "Image"
+  ],
+  "abstract": "We present Unravel, a training-free framework that turns a single image into an interactive 3D scene, where every object is an independent and movable asset. Existing generators either produce one entangled geometry in which no object can be moved, or predict all objects in one feed-forward pass, where a wrong guess cannot be detected or repaired. Unravel instead takes a different approach: it first takes the scene apart, and then puts it back together. Starting from the input image, an agentic harness that iteratively peels the image layer by layer, and adopts point cloud as major modality for spatial relationship recovery. Specifically, a vision-language model plans which objects are fully visible, an image editor removes them and restores the occluded regions. Every edit is verified before being incorporated into the reconstruction. This process gradually turns occluded parts of the scene into direct observation, allowing objects to be reconstructed when they are best exposed rather than hallucinated from the original image alone. The scene is then rebuilt in reverse removal order, so that the supporting objects are naturally placed before the objects they support. Since a single-view image only reveals part of an object, we treat the observed points as a lower bound on its size: an asset may grow to cover its points, but can not shrink away from them. Finally, we physically settle the reconstructed scene to remove floating objects and interpenetrations, followed by an agentic audit that corrects remaining placement errors. Extensive experiments on diverse indoor scenes show that Unravel recovers more objects, places them more faithfully, and produces scenes that are more physically-plausible than existing methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16146v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16146v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16146v1 的 19 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "Unravel 先用经验证的逐层image removal暴露物体，再记录point provenance、逆序重组独立mesh，并以单侧尺寸约束与物理settling修正布局。它把遮挡补全变成可检查中间过程，适合研究editable scenes；但隐藏内容仍由image editor生成，五场景量化参照也来自自身重建，不能称为真实隐藏几何恢复。",
+    "motivationZh": "从单张室内图得到可独立移动、布局可信且减少浮空/穿插的3D物体与场景。",
+    "methodZh": "VLM规划可见物体、editor移除并补全、verifier查漏改，每轮固定camera以稳定anchors对齐MoGe3 point maps；mask与removal round给点赋予object label。各资产由最佳暴露视图生成，再按逆移除序放置，partial cluster只给尺寸下界，最终小幅translation settling与render audit。",
+    "methodFlow": [
+      "VLM规划暴露物体、image editor移除并验证",
+      "最佳暴露snapshot生成独立TRELLIS.2 mesh",
+      "固定camera与未编辑anchors对齐、融合多轮point maps并保留provenance",
+      "逆removal order组装，single-sided extent约束注册partial clusters",
+      "物理settling及rendered agent audit修正局部placement"
+    ],
+    "experimentsZh": "训练自由地调用GPT-5.5、gpt-image-2、SAM3、MoGe3、TRELLIS.2和Astra audit；与MIDI/SAM3D/agentic baselines做多视图定性，5场景160物体做direct reconstruction消融，15名人类评分。 以下结果为作者报告：作者报告human/VLM asset fidelity 8.6/8.2，对照4.9/4.7；point count由1.53M到2.81M。（Table 1, p.8）；direct reconstruction对后续轮物体mask面积为Unravel参照的77.2%。（Sec.4.3, pp.8–9） 对照范围：shared-asset Astra控制mesh source以比较placement；未提供大规模独立GT的geometry/physical success评估。 消融与诊断：direct与deconstruction共享SAM3/TRELLIS.2/MoGe3，支持暴露式重建；registration、settling、audit各独立贡献缺少量化拆分。",
+    "insightZh": "有价值的是将deconstruction history同时用于几何provenance、point attribution和support-order recomposition，并以observed extent作为下界；不是新的3D生成模型。",
+    "evidenceZh": "点保留其source round/pixel并沿removal顺序赋予object身份。（Sec.3.2, pp.5–6; Fig.3, p.4）；单侧extent约束允许under-observed轴扩张，防止partial observation让完整asset缩小。（Sec.3.3, p.7; Appendix A.2, pp.13–14）；作者在5场景160对象报告human fidelity 8.6，对照direct reconstruction为4.9。（Table 1, p.8; Appendix A.3, p.14）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可移动独立assets、几何证据与render/physics feedback对editable scene reconstruction有明确迁移价值。",
+    "caveatZh": "复杂clutter中image editing会改变剩余物体外观与位置，误差可积累并破坏point alignment；verifier不能完全消除小误差。；生成的隐藏内容不是新观测，geometry fidelity应限于可见输入与生成一致性。；coverage reference用自身masks/clusters，不能当成绝对恢复率。；多项闭源模型且Astra通过web界面调用，成本与复现性尚未量化。"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.15227",
+  "slug": "understanding-unified-vlms-from-attention-probing-to-guidance-tuning-for-multimodal-generation-2610-15227",
+  "title": "Understanding Unified VLMs: From Attention Probing to Guidance Tuning for Multimodal Generation",
+  "authors": [
+    "Zhengyang Luo",
+    "Xiaoyu Qiu",
+    "Zhiheng Tan",
+    "Yuchen Liang",
+    "Yingbin Liang",
+    "Liyue Shen"
+  ],
+  "publishedAt": "2026-10-10",
+  "updatedAt": "2026-10-10",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.15227"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "image-generation",
+    "Understanding",
+    "Unified",
+    "VLMs",
+    "From",
+    "Attention",
+    "Probing",
+    "to",
+    "Guidance",
+    "Tuning"
+  ],
+  "abstract": "Unified vision-language models (VLMs) perform both text-to-image (T2I) and image-to-text (I2T) generation with one shared Transformer backbone, yet how the backbone processes the condition in either direction remains poorly understood. We study this question from the perspective of conditional guidance: we probe every attention head to show the activation difference between two branches of classifier-free guidance (CFG) with different conditional guidance. On two unified VLMs of autoregressive and masked-diffusion paradigms, the probing reveals a subset of heads that are more sensitive to the change of condition while others are agnostic to it. This characteristic pattern holds in both T2I and I2T generation and is largely stable across data samples, demonstrating the internal mechanism of unified VLMs. Motivated by this, we propose a new inference-time intervention approach for unified multimodal generation, named \\textit{HeadTuned-CFG}, which uses the probed condition-change awareness to select and tune the conditional guidance at the attention-head level. Experiments show consistent benefits in both multimodal generation directions of unified VLMs without additional training, and in particular substantial improvements over strong baselines in T2I generation. These results further support the key finding of our probing analysis: the observed pattern of functional specialization is an intrinsic property of unified VLMs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.15227v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.15227v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.15227v1 的 19 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "HeadTuned-CFG 用conditional/unconditional分支的head activation差异找出condition-aware与agnostic heads，再对选中heads做外推或内插。相比整体CFG，它提供可检验的head specialization与轻量inference intervention；收益集中在两个较小统一模型，Muddit理解方向失败，适合skim其分析而非视作通用统一模型突破。",
+    "motivationZh": "统一VLM共享backbone内不同attention heads如何响应conditioning，以及CFG是否应按head区分。",
+    "methodZh": "500样本probe每个head两分支activation L2差异；diffusion逐step、AR平均排名。T2I压低bottom-k差异，I2T强化top-k差异，再用原CFG/VCD聚合；local Gaussian KL projection解释线性tuning。",
+    "methodFlow": [
+      "500样本对CFG两分支逐head记录activation差异",
+      "按condition awareness排名选择top或bottom heads",
+      "对positive activation沿pos-neg方向外推或内插",
+      "保留原CFG/VCD最终输出，网格选w/k/s"
+    ],
+    "experimentsZh": "Muddit masked diffusion与Janus-1.3B，MJHQ 30k T2I、POPE/MME hallucination I2T，PAG/CFG/VCD对照。 以下结果为作者报告：作者Muddit FID降低4.61、Janus降低0.59；Janus MME hallucination总分466.67到475.00。（Tables 1–4, pp.7–8） 对照范围：best-CFG与PAG，selection对random/reverse/late-layer controls；未覆盖当代大型模型与复杂editing。 消融与诊断：probe selection优于random/reverse，Muddit late-layer prior 30.71接近probe30.41，粒度本身新增收益有限。",
+    "insightZh": "把conditional guidance的head功能异质性用probe和干预联系起来，贡献主要是解释与inference rule，不训练新foundation能力。",
+    "evidenceZh": "head awareness由pos/neg activation L2计算并用于top/bottom选择。（Sec.3–4, pp.4–7; Fig.3, p.6）；作者MJHQ full Muddit FID 20.90到16.29，Janus10.51到9.92。（Tables 1–2, p.7）；Janus POPE overall accuracy85.89到86.45，但Muddit I2T未改善。（Table 3, p.8; limitation, pp.8–9）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为统一理解生成的attention机制与conditioning设计提供可复用诊断。",
+    "caveatZh": "Muddit I2T ranking不稳定且不提升VCD；每模型任务都要grid search。；activation距离并不直接证明head语义因果功能，局部Gaussian假设有限。；生成alignment、human preference及强大backbone迁移证据不足。"
+  }
+}

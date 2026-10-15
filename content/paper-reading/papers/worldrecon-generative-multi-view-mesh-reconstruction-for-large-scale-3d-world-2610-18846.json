@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.18846",
+  "slug": "worldrecon-generative-multi-view-mesh-reconstruction-for-large-scale-3d-world-2610-18846",
+  "title": "WorldRecon: Generative Multi-View Mesh Reconstruction for Large-Scale 3D World",
+  "authors": [
+    "Mengchen Zhang",
+    "Yang Li",
+    "Chunshi Wang",
+    "Tong Wu",
+    "Chunchao Guo"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18846"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "3d-generation",
+    "WorldRecon",
+    "Generative",
+    "Multi-View",
+    "Mesh",
+    "Reconstruction",
+    "for",
+    "Large-Scale",
+    "World"
+  ],
+  "abstract": "Reconstructing complete, high-quality meshes of large-scale scenes from unposed multi-view images requires faithful geometric grounding while plausibly completing surfaces that are unobserved or only sparsely captured. We present WorldRecon, a generative multi-view reconstruction framework for recovering complete, large-scale 3D scene meshes from unposed RGB images. WorldRecon uses a coarse, noisy global point cloud and camera poses estimated from the input images by a reconstruction model as a global scaffold for whole-scene generation and partitions it into overlapping spatial blocks. To robustly leverage these imperfect geometric priors, we equip the native 3D generative model TRELLIS.2 with a dedicated reconstruction-based conditioning architecture that generates each block from its local point-cloud crop and block-relevant image observations, producing sparse structure, detailed geometry, and PBR materials. To maintain scene-level coherence, we introduce neighbour-aware latent inpainting and a causal world-generation procedure that propagates structural, geometric, and material context across overlapping blocks. Together, these designs scale multi-view generative reconstruction to large-scale scenes, yielding coherent, unified meshes. Extensive experiments demonstrate that WorldRecon achieves state-of-the-art reconstruction performance, reducing Chamfer distance by 14.9% and 43.1% while improving F-score by 17.3% and 12.0% over the strongest baselines on synthetic and real-world indoor scenes, respectively, thereby demonstrating faithful and complete generative reconstruction as well as strong sim-to-real generalization. Project page: https://kszpxxzmc.github.io/WorldRecon-website/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18846v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18846v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18846v1 的 22 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "WorldRecon 从 unposed RGB 估计的 noisy 全局点云搭建 scaffold，再用 TRELLIS.2 的 multi-view/pointconditioning 生成 4m mesh blocks，并以 neighbor-aware latent inpainting、trajectory clamping 和 blending 拼成完整 PBR 场景。作者报告 synthetic-to-real indoor 重建改善，直接面向 editable assets；只支持单层室内场景，未观测表面是 plausible completion。",
+    "motivationZh": "从 unposed sparse RGB 恢复完整大型 scene meshes 时，既要容忍 noisy geometry/cameras，又要补全未观测表面并避免分块边界断裂。",
+    "methodZh": "WorldRecon 从 unposed RGB 估计的 noisy 全局点云搭建 scaffold，再用 TRELLIS.2 的 multi-view/pointconditioning 生成 4m mesh blocks，并以 neighbor-aware latent inpainting、trajectory clamping 和 blending 拼成完整 PBR 场景。作者报告 synthetic-to-real indoor 重建改善，直接面向 editable assets；只支持单层室内场景，未观测表面是 plausible completion。",
+    "methodFlow": [
+      "VGGT-Ω从 unposed RGB 恢复 coarse cameras / point cloud",
+      "切 overlapping 4 m blocks 并选择 local views",
+      "DINOv3 / Plücker camera 与 point tokens 条件化三阶段 TRELLIS.2 flows",
+      "按 voxel priority 传播 neighbor latents",
+      "sparse clamping、geometry / material blending 与 mesh merge 输出 PBR scene"
+    ],
+    "experimentsZh": "只 synthetic indoor 训练，3D-FRONT 30 held-out 与 ScanNet++ 30 scenes 测试；每 scene32 unposed RGB、50 held-out depth / normal views，F-score threshold 10 cm。 以下结果为作者报告：作者报告 30 个 3D-FRONT 场景 CD0.1583/Fscore0.7271，GenRecon0.1861/0.6196；30 个 ScanNet++场景 CD0.0638/Fscore0.8363，VGGT-Ω+TSDF0.1121/0.7467。（Tables 1-2, p. 7） 对照范围：VGGT-Ω+TSDF、Murre、MonoSDF、FineRecon、GenRecon 共享上游重建；实验覆盖 3D geometry 和 2D depth / normal，material fidelity 证据弱于 geometry。 消融与诊断：Table 3 逐步适配 SS、Geo/Mat、Inpaint、Stitch；Inpaint alone 会略损 3D CD，最终 stitch 改善，不能孤立宣称每 component 全指标更好。",
+    "insightZh": "把 object-level native 3D prior 适配 large scenes 重建，并在 sparse / geometry / material 三阶段保持跨 block 因果上下文；不只对独立 chunks 做后期 mesh 拼接。",
+    "evidenceZh": "训练 117kblocks，使用 GT-noisy 与 VGGT point cloud 混合暴露 inference 噪声；multi-view query fusion 提供 fixed-length condition。（Secs. 3.1-3.2; Fig. 2, pp. 4-5）；known overlap 在每 denoising step clamp 到 forward trajectory，geometry / material world latents 在线 feather blend。（Sec. 3.3, p. 6）；作者报告 30 个 3D-FRONT 场景 CD0.1583/Fscore0.7271，GenRecon0.1861/0.6196；30 个 ScanNet++场景 CD0.0638/Fscore0.8363，VGGT-Ω+TSDF0.1121/0.7467。（Tables 1-2, p. 7）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "完整 PBR mesh、跨块 generative prior 与 sim-to-real transfer 可直接构造可编辑 3Dassets，越过 selective reconstruction 门槛。",
+    "caveatZh": "训练室内，outdoorgeneralization 未确立。；单层 4m-highblocks 只支持 single-story，未做 vertical block generation。；生成补全的 hiddengeometry 不保证真实，依赖上游 camera/point quality。；public repository 仅 project/README assets，无实现，不能 available Code。"
+  }
+}

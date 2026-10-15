@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2606.03877",
+  "slug": "mlp-splatting-object-centric-neural-fields-2606-03877",
+  "title": "MLP Splatting: Object-Centric Neural Fields",
+  "authors": [
+    "Shinjeong Kim",
+    "Yuzhou Cheng",
+    "Xin Kong",
+    "Paul H. J. Kelly",
+    "Andrew J. Davison"
+  ],
+  "publishedAt": "2026-06-02",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2606.03877"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "3d-segmentation",
+    "MLP",
+    "Splatting",
+    "Object-Centric",
+    "Neural",
+    "Fields"
+  ],
+  "abstract": "3D representations are fundamental for scene rendering, understanding, and interaction. Approaches like Neural Radiation Fields and 3D Gaussian Splatting achieve impressive photorealistic novel-view synthesis, but lack the ability to easily decompose scene elements into object level, requiring additional segmentation or grouping. We present MLP-Splatting, a method that enables scene decomposition via a few expressive light-field primitives while providing photorealistic novel-view synthesis. MLP-Splatting models each primitive as an independent compact MLP with localized spatial support that predicts radiance and opacity. In contrast to low-level Gaussian primitives or a single global radiance field, our neural primitives provide greater expressive capacity while remaining spatially localized. Rendering is performed through efficient sparse volumetric compositing over ray-primitive interactions. Our primitives are supervised using RGB supervision alone, which yields primitives that represent local scene regions often corresponding to objects or object parts, enabling interactive object-level editing without segmentation masks by selecting a handful of primitives. Our method, augmented with optional semantic feature distillation, enables open-vocabulary scene interaction and open-set instant segmentation. Compared to state-of-the-art semantic 3DGS methods, we achieve substantially lower memory usage (1/7$\\times$) and faster rendering (5$\\times$). Project Page: https://shinjeongkim.com/mlp-splatting",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.03877v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.03877v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kxhit/mlp-splatting"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.03877v2 的 33 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "MLP-Splatting 用带Gaussian局部support的独立小MLP替代低级splats，按ray接触位置/方向预测radiance与opacity，再用tile排序和稀疏alpha compositing渲染。RGB训练形成可手选的object/part-like regions，语义功能仍需LSeg/SAM distillation。作者报告Replica mIoU77.7、32MB/约8FPS，对照Feature-3DGS78.9、629.7MB/约3FPS；ScanNet mIoU64.3。适合研究可编辑part表示，不能把emergent grouping当作可靠自动分割或把条件化memory theorem当作所有3DGS普遍下界。",
+    "motivationZh": "低级Gaussians或全局NeRF需要另加grouping才能以object/part作为编辑单位。",
+    "methodZh": "COLMAP octree初始化局部MLP，独立72-32-32-4网络有显式position/scale/rotation；ray-support最小距离给6D query。8x8 tile用virtual-center ray排序。4个direction-conditioned feature slots可联合2Dteacher训练；primitive操作支持删除、SE(3)、缩放与last-layer color edits。训练60k iterations，室内photometry/semantics有优势，户外COLMAP稀疏背景较弱。",
+    "methodFlow": [
+      "COLMAP point cloud用octree初始化局部MLP supports",
+      "ray求soft contact，拼接方向和offset并encode",
+      "独立MLP预测RGB/density，Gaussian falloff限定locality",
+      "tile culling/sorting与稀疏alpha compositing",
+      "RGB训练，可选LSeg/SAM蒸馏到slots",
+      "选primitive组进行删除、变换、缩放或颜色编辑"
+    ],
+    "experimentsZh": "Replica/ScanNet photometry与LSeg semantics、SAM prompts；Mip-NeRF360 full与sparse12-view；60k Adam、RTX6000Ada训练、RTX4090测量。 以下结果为作者报告：作者报告ScanNet PSNR25.35 vs23.32、mIoU64.3 vs60.0、206MB vs1120MB，但LPIPS0.403劣于0.362。（Tables1/3, PDF pp.10/13）；作者报告co-train使Replica PSNR35.57到36.25；1/4/8 slots mIoU76.5/77.7/78.2，memory和speed随slots增加恶化。（Appendix A, Tables4/5, PDF p.19） 对照范围：NeRF-DFF和Feature-3DGS standard variant；补充MipNeRF360/3DGS/RadiantFoam，不是现代全部open-vocabulary方法的全面比较。FPS为full-forward wall-clock。 消融与诊断：semantic co-train、slots、primitive init threshold、tile sorting；无RGB自动object全集分割保证。",
+    "insightZh": "独立neural predictors作为基本功能单位，结合splat renderer与primitive editing，compact semantics优于大量低级Gaussians。Memory theory假设bounded anisotropy、piecewise-smooth界面及interface-fitted partition，不等同于训练算法保证。",
+    "evidenceZh": "primitive独立局部MLP输入ray direction和soft-contact residual。（Sec.3.1-3.3, Fig.2, PDF pp.5-7）；RGB-only手选primitive编辑；promptable semantics仍需teacher。（Sec.4.3-4.4, Fig.3, PDF pp.8/10-11）；作者报告Replica mIoU77.7、32MB/约8FPS，对照78.9、629.7MB/约3FPS。（Table3, PDF p.13）；相似纹理primitive可越过part边界；初始化和popping限制泛化。（Sec.6, PDF p.15; Appendix C.3, PDF pp.22-23）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对象/部件editable表示连通reconstruction、promptable segmentation与editing；LEGO迁移是研究推论，论文未验证。",
+    "caveatZh": "缺少density control；scale扩张/参数振荡可降质量。；相似纹理跨object边界，有popping/multi-view artifacts。；依赖COLMAP，户外clutter弱；不支持dense nonrigid deformation。；object-centric主要由定性手选编辑支持，不等于自动object/part分解定量保证。；memory law仅覆盖受限Gaussian与理想构造，不可外推所有3DGS。"
+  }
+}

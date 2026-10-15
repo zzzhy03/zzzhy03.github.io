@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.16793",
+  "slug": "viewstruct-view-grounded-articulation-and-connectivity-inference-2610-16793",
+  "title": "ViewStruct: View-Grounded Articulation and Connectivity Inference",
+  "authors": [
+    "Wenjing Bian",
+    "Ranran Huang",
+    "Andreas Geiger"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16793"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "ViewStruct",
+    "View-Grounded",
+    "Articulation",
+    "and",
+    "Connectivity",
+    "Inference"
+  ],
+  "abstract": "Interacting with unfamiliar objects requires understanding how their parts connect and move. We introduce ViewStruct, a framework for jointly predicting connectivity and articulation in objects and scenes. Given an RGB image with aligned part segmentation and depth, optionally supplemented by images or video, ViewStruct predicts rigid-body groupings, attachments, and joint parameters. Its view-grounded representation links predictions to observed regions and expresses joint geometry in a gravity-aligned, view-relative frame, without requiring category-specific canonical orientations. A pretrained vision--language model is adapted to predict structure in seconds, without requiring observed articulation motion or per-instance optimisation. Experiments demonstrate improved structural prediction over evaluated baselines and transfer to unseen categories, asset sources, and real-world human-interaction videos, despite task-specific training exclusively on synthetic data. Simulated manipulation experiments further demonstrate the utility of predicted joints for generating robot motion trajectories.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16793v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16793v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16793v1 的 22 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "ViewStruct 将part connectivity和articulation预测为view-grounded rigid groups：gravity-aligned frame避免canonical朝向歧义，image pivot+depth保证投影一致。跨asset/category与真实视频有实质结构迁移，适合interactive assets；但image实验提供joint count、part masks/depth，scene所有joint成功率仅24.8%，robot demo也关闭碰撞并辅助接触。",
+    "motivationZh": "从视觉与已分割parts恢复可执行rigid grouping、attachments和joints，避免category-specific canonical坐标与任意rigid内部树。",
+    "methodZh": "LoRA Qwen3-VL4B预测static base和各moving rigid bodies、parent-body attachment以及joint type/axis/pivot/range；gravity/view-relative frame统一scene坐标，pivot由image位置与相对depth反投影，固定规则展开part-level forest；synthetic多source标注统一并split/merge part augmentation。",
+    "methodFlow": [
+      "RGB、indexed part masks、depth和gravity形成reference-view inventory",
+      "VLM输出object membership与joint-centered rigid groups",
+      "预测view-relative轴、image pivot+depth及motion limits",
+      "确定规则展开connectivity并回投3D joint geometry",
+      "可用additional views/motion减少歧义，作用于已有part geometry"
+    ],
+    "experimentsZh": "387 PhysX objects、559 GRScenes room views、242 SimReady和291held-out categories、342 Arti4D interactions；4A100、synthetic训练、singleA100约6.5秒。 以下结果为作者报告：作者unseen SimReady all-joint success31.5，held-out GRScenes48.5；真实video clip将hinge error0.31降0.23m。（Tables3–4 p.8）；assisted Panda10trials成功8；collisions disabled且contact supplied。（Appendix D.2 p.21） 对照范围：PhysX-Anything/Omni、URDF-Anything、OPDMulti和ArtiPoint等；输入modalities不同，Table1 masks/depth、image joint count额外提供。 消融与诊断：gravity frame、rigid grouping、pivot表征和part decomposition augmentation有补充控制；real comparison单图/额外motion证据应分开。",
+    "insightZh": "将joint-centered grouping、view-relative坐标与image-grounded pivots协同，减少任意hierarchy和canonical orientation负担；输出直接对应可编辑结构。",
+    "evidenceZh": "rigid-body grouping避免同体parts的任意hierarchy，pivot由image coordinate与depth解码。（Sec.3.2 p.4; Fig.2 p.3）；作者PhysX所有reference joint success78.2对PhysX-Omni66.6，matched成功81.5低于85.3。（Table1 p.6）；scene joint recall94.7但所有joint success24.8，更多views仅到26.6。（Table2 p.7）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "恢复rigid connectivity、joint hierarchy和animatable结构可直接迁移editable 3D asset与part representation。",
+    "caveatZh": "依赖给定part decomposition、depth/calibration/gravity，image实验还提供joint count。；隐藏pivot/direction/limits静态不可辨识，synthetic domain gap与4B容量限制。；robot仅supplied contact和简化physics，不覆盖grasp/collision/free闭环控制。；不能称从任意RGB全自动恢复simulation-ready asset；geometry为已有parts，结构参数仍可大幅错误。"
+  }
+}

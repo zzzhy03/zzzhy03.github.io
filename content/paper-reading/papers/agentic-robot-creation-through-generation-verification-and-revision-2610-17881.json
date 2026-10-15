@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.17881",
+  "slug": "agentic-robot-creation-through-generation-verification-and-revision-2610-17881",
+  "title": "Agentic Robot Creation through Generation, Verification, and Revision",
+  "authors": [
+    "Xuebing Li",
+    "Yibo He",
+    "Sitong Liu",
+    "Ran Ji",
+    "Jiayuan Gu"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17881"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "fabrication",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "fabrication",
+    "3d-generation",
+    "Agentic",
+    "Robot",
+    "Creation",
+    "through",
+    "Generation",
+    "Verification",
+    "and",
+    "Revision"
+  ],
+  "abstract": "Can an AI agent turn high-level user intent into a functioning robot and teach it how to behave? We study this question from two complementary aspects: embodiment and behavior creation. For embodiment creation, we investigate how well current multimodal models capture mechanical requirements, and introduce computational metrics for evaluating generated designs before fabrication. For behavior creation, we present Roboforge, an agentic framework that turns task specifications into executable policies through motion generation, policy learning, and execution-grounded revision. Given a robot embodiment and task, the agent generates a reference motion, configures the learning objective, and trains a policy. Crucially, motion remains in the loop: rollout feedback can revise the reference motion, reward, or both. We evaluate a generated embodiment across multiple MLLMs and behavior creation across four diverse robots against reward-refinement and one-shot motion baselines. Our computational metrics expose recurring mechanical failures in generated designs, while behavior experiments show that execution-grounded refinement improves task-level behavior and execution quality. Finally, we fabricate an agent-generated Gorilla and directly deploy learned behaviors on the physical robot.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17881v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17881v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17881v1 的 30 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "RoboForge 将CAD前制造/装配/运动检查，与motion→PPO→execution diagnosis→motion/reward revision结合。作者报告四embodiment19tasks评分3.97vsone-shot3.60，并打印8DoFGorilla部署walking/waving；但最强原设计仍8/23检查失败，作者手动修后才制造，行为loop固定形态，不能写成端到端自动co-design或全自动build-ready机器人。",
+    "motivationZh": "生成机器人CAD与reference motion即便看起来合理，也可能无法装配、超过机械间隙/扭矩，或RL不能实现；需要工程检查和可修正行为实现。",
+    "methodZh": "参考图+任务+actuatorCAD/assemblyexamples生成STEP/STL/URDF；23条件检查前制造可行性。固定embodiment后，agent生成roottrajectory/end-effector目标/部分jointtrajectory，IK求余joint；DeepMimicstyletrackingreward训练PPO，最多3trials，execution区分reference/command/actualcontact失败并修motion/reward，再从头训练。",
+    "methodFlow": [
+      "参考图、任务与真实actuatorCAD生成STEP/STL/URDF",
+      "检查part/assembly/tolerance/load/cable/motion23项并人工修残余问题",
+      "固定embodiment生成proceduralroot/limbtargets，经IK验证reference",
+      "trackingreward+PPO训练并回放policyexecution",
+      "诊断motion与reward原因，修姿态/时序/support或reward，从头重训",
+      "制造Gorilla并部署walking/waving演示"
+    ],
+    "experimentsZh": "四robot19tasks；IsaacLab/Sim、PPO4096env50Hz；GPT/RoboForge/Eureka最多9Kiterations，one-shot3K；CAD每模型一gorilla、两task检查，hardware一Gorilla两behavior。 以下结果为作者报告：作者报告整体ratingRoboForge3.97/Eureka2.10/one-shot3.60；Ostrich3.99反低于one-shot4.04。（PDF p6 Table2; p24 Table9）；作者报告11/19tasks修motion15次；unguidedGPT也16/19生成motion、7/19修motion，overall3.61。（PDF pp7–8 Table4/Section5.3） 对照范围：同agent+RLstack但Eureka是受限adaptation非原论文fullsearch；one-shot额外训练预算少，不能隔离revisionvscomputebenefit；unguidedmaxbudget对照更适用。 消融与诊断：unguidedGPT、one-shot及reward-only；未分别controlledmotion-only/reward-only或matchedrepeated-trainingbudget。",
+    "insightZh": "explicit工程检查与execution-informed可修motionguidance构成设计验证方法，超过genericrewardagent；并非新的morphologygenerator，embodiment生成评估与behaviorrefinement是两段未联动co-design。",
+    "evidenceZh": "生成三representation，并在制造前检查geometry/tolerance/toolaccess/load/cable/motion。（PDF p3 Section3.1; pp27–30 AppendixI）；行为loop可修reference与reward，embodiment固定；每trial从头训练。（PDF pp4–5 Figure2/Section4; pp18–20 D.1–D.4）；作者报告humanoverall3.97vs3.60，foot-slip0.0131vs0.0716m/s。（PDF p6 Tables2–3; pp21–25 F/G）；作者手工修残余设计问题，打印PLA并部署walking/waving。（PDF p3 Section3.2; p9 Section6/Figure6; p14 Figure8/A.4）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接提供fabrication-awareCAD输出、assembly约束与可编辑motion闭环，符合visualdesignagents与fabrication主要方向；对结构化可制造生成的验证边界尤有价值。",
+    "caveatZh": "originaldesign需manualcorrection；structural/cablerouting检查依赖冻结假设，fail只对应候选。；每MLLM只一个morphology，agent执行checkprograms不能建立普遍机械能力ranking；最强设计8项failed。；manufacturedrobot人工修正，不能将physicaldemo归原未修设计或autonomousco-design。；one-shot最大PPO预算三分之一，未分离更多samples、不同seed与motion/rewardrevision收益。；default无observationnoise/domainrandomization，hardware仅qualitative且未给延迟/安全/多次成功统计。；human评分std描述个体差异非多训练seed置信区间；smoothness可受stationaryjoints影响。"
+  }
+}

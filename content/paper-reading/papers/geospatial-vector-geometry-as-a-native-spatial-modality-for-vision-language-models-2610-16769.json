@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.16769",
+  "slug": "geospatial-vector-geometry-as-a-native-spatial-modality-for-vision-language-models-2610-16769",
+  "title": "Geospatial Vector Geometry as a Native Spatial Modality for Vision-Language Models",
+  "authors": [
+    "Huang Fei",
+    "Boyi Chen",
+    "Hao Xue",
+    "Yang Yue",
+    "Yehong Xu",
+    "Xiaofang Zhou"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16769"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Geospatial",
+    "Vector",
+    "Geometry",
+    "as",
+    "Native",
+    "Spatial",
+    "Modality",
+    "for",
+    "Vision-Language"
+  ],
+  "abstract": "Geospatial reasoning links VLMs to real-world action and decision making. Reliable reasoning requires accurate spatial information and effective spatial representations. However, current VLMs obtain this information mainly from language and vision. At larger geographic scales, limited visual observations make it difficult to establish accurate spatial references and recover precise spatial relations. This leads to a bottleneck for VLM spatial perception and reasoning. This paper proposes that geospatial vector geometry can become a native spatial modality within a VLM and introduces GeoVec-VLM. First, we develop a structured geometry representation that preserves the spatial structure and arrangement of vector objects, building an explicit spatial basis. Second, we introduce a geometry interaction strategy that brings this basis into multimodal computation, where it interacts with visual content and language references according to the queried spatial relations. Together, these designs allow perception and reasoning to operate on shared geometric references. Across five spatial reasoning tasks, GeoVec-VLM improves mean accuracy by about 11\\% relative to the strongest baseline, maintains its gains under geographic transfer, and shows greater geometric consistency. Our results show that geospatial vector geometry offers a promising internal spatial basis for VLM spatial reasoning. https://github.com/TXFR/GeoVector-VLM",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16769v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16769v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16769v1 的 28 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "GeoVec-VLM 将 polygon 的 reference-point/path tokens 保留到 Qwen3-VL 内部，再用 object、role、relation states 把几何与视觉和语言答案对齐。作者报告五类地理任务 mean accuracy 77.2%，美国/新加坡迁移 77.5/78.3%；值得借鉴结构不被过早 pooling 的接口，但证据仅限准确对齐的静态 2D 地块。",
+    "motivationZh": "把精确 polygon geometry 序列化为文字或压成单一向量，VLM 难以同时保持边界、跨对象距离和语言指代的一致空间依据。",
+    "methodZh": "object encoder 用 arc position 建模有序边界，scene encoder 用 metric 2D RoPE 建模跨 polygon 关系；几何元素 token 与视觉/query 在选定层双向交互，object states 仅读取对应区域，role states 绑定 query 所指对象，relation states 组成可供语言层 gated cross-attention 读取的 spatial memory。辅助 structured decoder 提供监督但其预测不直接喂给语言答案。",
+    "methodFlow": [
+      "有序 polygon reference points 与 path elements",
+      "object encoder 与 scene-context encoder 保留 element tokens",
+      "与视觉 patch/query 在 VLM 层交互",
+      "object state 聚合并由语言角色绑定",
+      "relation state 形成 spatial memory",
+      "gated cross-attention 生成答案并接受辅助几何监督"
+    ],
+    "experimentsZh": "63,973 中国 scenes，359,340 train QA；地理隔离 splits，五类六任务；Qwen3-VL-8B；美国 900、新加坡 300 scenes 零样本地域迁移。 以下结果为作者报告：作者报告 direction/proximity/topology 80.4/80.7/81.1%，area/distance 77.8/65.9%。（Table1 p.7）；作者报告 pooled→element tokens 的五项精度分别 70.4→80.4、75.6→80.7、74.8→81.1、60.3→77.8、56.8→65.9%。（Table2 p.8） 对照范围：受控 Qwen3-VL 的 GeoJSON/Geo2Vec/Poly2Vec/pooled；SpatialRGPT/SR-3D 用 region masks adaptation；API 大模型训练量与输入不同，不能单因 architecture 解释其差距。 消融与诊断：去掉 O/A/Z、structured decoders、role binding 以及 shuffle geometry/disable interaction；支持 geometry 含信息不等于语言有效利用；transfer 仍同一任务构造流程。",
+    "insightZh": "贡献是保留细粒度 vector geometry 并显式组织几何到语言的状态接口，而非将 GeoJSON 塞入 prompt。对 SVG/CAD representation 有概念迁移，但论文未验证。",
+    "evidenceZh": "表示保留 object membership、arc order、metric position。（Sec.3.2 pp.4–5; Fig.2 p.4）；O/A/Z 将 query 角色与几何证据连接，辅助解码不替代语言推理。（Sec.3.3–3.4 pp.5–6）；同 backbone 表示和 state 消融支持结构与监督的作用。（Tables2–3 pp.8–9）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对 VLM 显式空间表示有直接方法贡献，可为 structured vector 设计提供接口思路。",
+    "caveatZh": "需要准确 vector/raster alignment；未处理噪声、过期或缺失几何；仅静态 2D polygons（p.10）。；地域迁移不等于任务/表示泛化，更不证明 3D 或 SVG 编辑能力。；规则生成空间 QA 可能比自然场景推理更封闭，精确 metric geometry 直接作为输入。"
+  }
+}

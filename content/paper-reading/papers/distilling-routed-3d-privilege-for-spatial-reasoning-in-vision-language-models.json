@@ -13,9 +13,9 @@
     "Yongliang Shen"
   ],
   "publishedAt": "2026-10-08",
-  "updatedAt": "2026-10-08",
+  "updatedAt": "2026-10-12",
   "collectedAt": "2026-10-12",
-  "venue": "arXiv v1",
+  "venue": "arXiv v2",
   "identifiers": {
     "arxiv": "2610.12355"
   },
@@ -33,20 +33,21 @@
     "vlm-mllm",
     "Distilling",
     "Routed",
-    "3D",
     "Privilege",
+    "for",
     "Spatial",
     "Reasoning",
+    "in",
     "Vision-Language",
     "Models"
   ],
   "abstract": "Spatial reasoning remains a persistent weakness of vision-language models (VLMs), because RGB inputs do not directly provide geometric evidence. Existing remedies either inject 3D into the model at inference, paying architecture and latency costs, or train with outcome rewards that supervise only the final answer. Spatial errors originate in perception: a misjudged depth or direction can be corrected only by the scene's true geometry, which the 3D-scanned sources of spatial training corpora already provide. We propose GPD (Geometry-Privileged Distillation), which makes geometric evidence the privilege in on-policy self-distillation (OPSD). For each question, depth, semantic, and bird's-eye-view (BEV) cues are rendered as compact text and routed to the teacher alongside the reference answer; a privileged KL, applied only to incorrect trajectories, augments GRPO, and the deployed model remains RGB-only. On the 4B backbone, GPD achieves 57.1 on VSI-Bench and 37.6 average across MindCube, SPARBench, MMSI-Bench, and ViewSpatial, outperforming both GRPO and answer-privileged OPSD across spatial reasoning benchmarks. Ablations confirm the complementarity of 3D and answer privilege, the advantage of question-conditioned routing over full-context injection, and the benefit of restricting distillation to incorrect trajectories.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2610.12355v1",
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.12355v2",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2610.12355v1"
+      "href": "https://arxiv.org/abs/2610.12355v2"
     },
     {
       "label": "Code",
@@ -55,24 +56,24 @@
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 exact version 2610.12355v1 的 9 页全文与关键图表核验整理。实验数字与比较均为作者报告，本项目未独立复现。",
-    "ideaZh": "GPD 把 depth、object semantics 与 BEV 转成按问题路由的 teacher privilege，只在错误 student trajectories 上施加 token KL，并保留 RGB-only inference。作者报告 Qwen3-VL-4B 的五个空间 benchmark 平均比 GRPO 高1.7点；值得读的是几何证据如何纠正 perception-originated reasoning errors，增益仍较小且限于两个 Qwen 尺度。",
-    "motivationZh": "空间 VLM 的 outcome-only RL 难以定位中间推理错误来自 depth、object grounding 还是 layout，直接加入几何输入又会增加部署依赖。需要把训练时可得的 3D privilege 转移到 RGB-only reasoning，并区分几何证据与答案提示的收益。",
-    "methodZh": "空间推理RL只奖励最终答案，无法判断中间错误来自depth、方向还是layout。GPD离线从3D annotations或Depth Anything3/Grounded-SAM2生成textual geometry cues，用base VLM按question选模态，与reference answer共同组成teacher context。相同参数的RGB-only student生成rollout，再由带privilege的teacher逐token打分；GRPO与error-gated/clipped OPSD KL联合训练。作者以15K VSI/SPAR/MindCube samples训练2B/4B模型，比较受控GRPO、answer-only OPSD及跨benchmark结果；论文未证明geometry已以特定内部表示被存储，internalization来自test-time privilege依赖减小的行为证据。",
+    "sourceNote": "依据 exact version 2610.12355v2 的 13 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。 本次实质更新：9→13页，main methods/results不变；新增Table4 matched训练成本(+30.8%)、Fig9 response dynamics及显式cue/router/teacher/scale limitations，补可复现协议。",
+    "ideaZh": "GPD v2 沿用已收录的 routed 3D privilege+answer self-distillation：只在错误student trajectories上加teacher KL，部署仍RGB-only。本次新增有意义的成本/边界证据：作者报告训练从GRPO57.1h增至74.6h（+30.8%），peak memory几乎不变，并补cue/router错误、teacher noise和15K scale限制。旧main benchmark分数没有新提升；『无推理额外成本』不能写成『无额外成本』，短response也不是内部3D机制的因果证明。",
+    "motivationZh": "RGB空间错误来自perception，outcome-only RL不定位中间几何错误，而test-time 3D增加部署成本。",
+    "methodZh": "VSI/SPAR由ScanNet annotations提取text depth/semantics/BEV；MindCube由Depth Anything3与Grounded-SAM2估cue，因缺可靠pose禁止BEV。question-only base-VLM router离线挑cue，fallback到dataset task mapping。相同参数VLM在RGB student与cue+reference-answer teacher contexts打分，以GRPO+仅incorrect(R<.5) trajectories的single-sample reverse KL训练，microbatch scalar clip1.5，λ.003。v2新增4页supplement，完整prompt/reward/training/eval settings、response length curve、matched cost table与显式limitations。",
     "methodFlow": [
-      "从3D annotations或depth/instance estimators提取带frame IDs的distance、object regions与BEV relations。",
-      "用base VLM按question离线路由可用几何模态，拼接compact scene text和reference answer作teacher privilege。",
-      "RGB+question student采样group rollouts，计算outcome reward与GRPO advantage。",
-      "同一模型在privileged context下重打student tokens，只对reward<0.5的错误轨迹累计reverse-KL estimator，microbatch scalar clip至1.5。",
-      "以GRPO+λ·privileged KL更新policy；部署仅输入RGB与question。"
+      "从scan annotations或估计模型生成离线depth/semantic/可靠BEV text，保留frame IDs与valid masks。",
+      "question-conditioned routing固定cue，teacher context附reference answer；student只RGB+question。",
+      "student采样8rollouts并算outcome GRPO；teacher沿相同student tokens重新评分。",
+      "错误轨迹KL单样本估计在microbatch聚合后clip1.5，与GRPO联合更新。",
+      "推理只RGB；v2补充完整training/evaluation协议与matched training-cost测量。"
     ],
-    "experimentsZh": "Qwen3-VL-Instruct 2B/4B；10K VSI、4K SPAR、1K MindCube训练split，一epoch、LR1e-6、rollout n=8、λ=.003。五个空间benchmark含VSI视频八subtasks及MindCube/SPAR/MMSI/ViewSpatial多视图/关系任务；3D annotations来自ScanNet，MindCube用估计cue。 以下结果为作者报告：作者报告4B VSI平均57.1，对同backbone GRPO56.4为+0.7点、OPSD55.7为+1.4点；并非所有subtasks均最佳。（Table1, PDF p.5）；作者报告4B其余四benchmark平均37.6，比GRPO35.7高1.9点，比OPSD31.5高6.1点；MindCube38.0对GRPO33.0。（Table2, PDF p.5）；作者报告五benchmark ablation中routed3D+answer41.5，answer-only40.2、routed3D-only40.5、full3D+answer39.8，表明信息选择与互补性。（Fig.4, Sec.4.3, PDF p.6） 对照范围：含general VLM、3D-augmented和outcome-supervised参考结果；最可靠比较是相同data/backbone训练的GRPO与OPSD。大型闭源及不同训练来源的行不构成严格同compute因果比较，未见跨其他foundation家族验证。 消融与诊断：分离answer/geometry privilege、text/image/full/routed injection、λ及incorrect-only/all-trajectories，支持routing和error-gating；单次entropy曲线不能独立证明探测到正确3D reasoning mechanisms，未报告多seed不确定性。",
-    "insightZh": "贡献不是新3D encoder或新的大teacher，而是把question-relevant geometry作为self-distillation privilege，在学生实际错误路径上分配token监督；offline text routing和incorrect-only gate的组合将几何训练监督与RGB-only部署解耦。依赖已有GRPO/OPSD、Depth Anything3和Grounded-SAM2，不能描述为从零发明过程奖励。",
-    "evidenceZh": "离线几何cue按question选择，BEV只在camera poses/layout可靠时使用。（Sec.3.2, Eq.(1)–(2), Fig.2, PDF p.3）；privileged KL仅作用于错误轨迹并在scalar聚合后clip至1.5。（Sec.3.3, Eq.(4)–(7), PDF p.4）；受控4B五benchmark平均提升来自routed 3D+answer而非更多context。（Fig.4, Sec.4.3, PDF p.6）；test-time privilege gap缩小支持训练内化，但不是内部几何表示的直接因果证明。（Fig.7, Sec.4.4, PDF p.7）",
-    "caveatZh": "Sec.3.2 明确BEV仅在camera poses与scene-layout可靠时可提供，其余cue可由外部模型估计。；全文没有单独Limitations节；正文中distillation scalar clipping用于抑制偶发大teacher信号。；仅Qwen3-VL两个尺度与室内场景相关数据，不能外推到CAD/LEGO的part geometry和metric reasoning。；VSI总分改进较小，MMSI/ViewSpatial改善有限；没有seed/error-bar报告，作者结果未复现。；teacher同时看reference answer，token agreement并非经过标注的逐步正确性；错误geometry或routing可能形成错指导。",
+    "experimentsZh": "Qwen3-VL-Instruct2B/4B，15K（10K VSI/4K SPAR/1K MindCube），one epoch，LR1e-6，group8，λ.003。v2声明scene/question disjoint，16VSI frames，统一pixel budget；cost在2×96GB RTX PRO6000、111steps matched。 以下结果为作者报告：本次新增：作者报告GPD平均step40.3min、total74.6h，相对GRPO30.8min/57.1h为30.8% overhead，peak64.5vs64.4GB。（Appendix D.2 Table4, PDF p.13）；本次新增：作者报告末期validation response140.1vsGRPO171.7tokens（18.4%短）；旧VSI57.1对GRPO56.4及四bench37.6对35.7沿用，不是v2新增成绩。（Fig9, Tables1–2, PDF pp.5,12） 对照范围：受控GRPO/answer-only OPSD同data/backbone有解释力；general foundation references不同scale/data，不能同比复现。cost两模型配置有限，不支持大scale/其他家族结论。 消融与诊断：原Fig4分开answer/geometry、text/images/full/routed、λ及错误gate，未新增对应分数；v2补complete reward/validmask/prompts并量化成本。",
+    "insightZh": "原贡献是geometry privilege的question routing与incorrect-only OPSD；本次没有新方法/主bench分数，新增科学证据在训练成本与supervision noise边界，协议使该训练成本可追踪。",
+    "evidenceZh": "BEV只在reliableposes/layout时构造，MindCube明确不给BEV；无validcue不伪造fallback。（Sec.3.2, Appendix A.1, PDF pp.3,10）；错误轨迹gate和scalar KL clipping避免给已正确rollouts额外noise。（Sec.3.3 Eqs.(4)–(7), Algorithm1, PDF pp.4,11）；v2新增matched training cost：40.3 vs30.8min/step，74.6 vs57.1h；64.5 vs64.4GB。（Appendix D.2 Table4, PDF p.13）；main VSI57.1/others37.6沿用v1，新增shorterresponse curve不证明内在geometry因果机制。（Tables1–2, Fig9, PDF pp.5,12–13；v1/v2 word delta）",
     "relevance": "high",
-    "readingAction": "deep",
+    "readingAction": "skim",
     "evidenceMaturity": "mixed",
-    "whyRelevantZh": "直接涉及VLM spatial reasoning，并提供把真实3D结构作为训练监督而不增加部署输入的路径，可作为设计agent/3D几何判断训练参考；尚未实验证明在LEGO或CAD任务有效。"
+    "whyRelevantZh": "把真实3D训练监督移入RGB VLM而不改变推理输入，适用于design-agent geometry审阅参考；本轮新增训练成本与teacher reliability边界对实际采用有意义。",
+    "caveatZh": "Appendix E新增：offline cue/router误差传播到teacher；15K mixture的scale行为未知；teacher hard-case token distribution可能错误；training re-scoring增加计算。；main gains小：4B VSI仅+0.7GRPO，无multi-seedCI；appendixresponse/privilege gap不是显式内部geometry因果证明。；reference answer与geometry一起给teacher，不能把所有token agreement当geometry正确性。；所有数字作者报告，未复现；无CAD/LEGO part geometry验证。"
   }
 }

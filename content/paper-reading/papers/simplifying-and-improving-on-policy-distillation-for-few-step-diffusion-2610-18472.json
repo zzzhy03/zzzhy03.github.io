@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2610.18472",
+  "slug": "simplifying-and-improving-on-policy-distillation-for-few-step-diffusion-2610-18472",
+  "title": "Simplifying and Improving On-Policy Distillation for Few-Step Diffusion",
+  "authors": [
+    "Jiawei Zhang",
+    "Ziyu Wan",
+    "Nanye Ma",
+    "Long Zhao",
+    "Dong Chen",
+    "Hongyu Liu",
+    "Qifeng Chen",
+    "Dongdong Chen"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18472"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG",
+    "eess.IV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "3d-generation",
+    "video-generation",
+    "Simplifying",
+    "and",
+    "Improving",
+    "On-Policy",
+    "Distillation",
+    "for",
+    "Few-Step",
+    "Diffusion"
+  ],
+  "abstract": "Few-step distillation reduces the sampling cost of diffusion and flow models, but existing approaches often require auxiliary score models or specialized architectures. We show that simple on-policy velocity regression already provides a strong foundation for 4-NFE generation. To represent teacher velocity variation within each coarse transition, we introduce Pivot, a training-only residual proxy that separates local corrections from the student's interval-mean prediction. We further repel the student from weaker teacher predictions, providing a lightweight mechanism for avoiding undesirable modes. The resulting framework, Simplified Matching Distillation (SMD), remains entirely regression-based, requires neither online score estimation nor adversarial training, and leaves the deployed generator unchanged. We evaluate SMD on image generation and editing, 3D generation, video synthesis, and joint audio--video generation, scaling to 33 billion parameters. At 4-NFE, SMD outperforms strong few-step baselines and surpasses multi-step teachers on several benchmarks. It also supports cross-model, multi-teacher, and causal-video distillation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18472v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18472v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/zjwfufu/SMD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18472v1 的 59 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "SMD 以简单 on-policy velocity regression 蒸馏few-step diffusion，再用训练期零积分 Pivot residual 表达step内部曲率，并排斥较弱teacher prediction；推理仍只有原student。跨image/edit/video/audio-video与3D示例说明适用面广，但teacher更强或加correction并非总改善，3D的4-NFE只指指定stage。",
+    "motivationZh": "不训练fake-score或对抗模型，如何让少数coarse student steps有效吸收teacher局部dynamics。",
+    "methodZh": "沿student自己coarse rollout取中间query点，拟合冻结teacher velocity；Pivot预测zero-integral basis coefficients，改变中间path和local velocity但不改endpoint，再加入weak teacher reference的负平方距离。student和Pivot联合训练，inference删除Pivot与teacher。",
+    "methodFlow": [
+      "student少步rollout并对各transition stop-gradient",
+      "在coarse path采样query time并取得teacher velocity",
+      "Pivot提供零积分residual构造endpoint-preserving proxy path",
+      "回归target teacher并repel weaker reference prediction",
+      "推理仅student coarse updates，无额外网络"
+    ],
+    "experimentsZh": "FLUX/Qwen image与edit、Wan1.3B/14B、MiniMax H3 33B；3D shape/texture与reference audio-video主要定性；matched few-step inference多指标比较。 以下结果为作者报告：作者报告Qwen 4-NFE GenEval 0.873、DPG 88.7；FLUX提升至0.715/84.8。（Sec.4.1, p.16; Tables 1–2, pp.17–18）；TRELLIS.2仅high-resolution shape和texture各蒸馏到4-NFE，前置stages不变。（Sec.4.3, p.21） 对照范围：pi-Flow、Hyper-SD、SenseFlow、Lightning、TwinFlow、rCM/AnyFlow及reproduced DMD；部分PDD数值引用原文而非同checkpoint复测。 消融与诊断：prompt数量、Pivot有无/初始化/层/basis、reference CFG与repulsion weight；single-prompt generalization只是定性，repulsion/bigger teacher不是全面单调增益。",
+    "insightZh": "将few-step distillation简化为on-policy回归，Pivot把local curvature与coarse displacement分离；适配多teacher和causal compression而不改inference架构。",
+    "evidenceZh": "Pivot的zero-integral residual保持transition endpoint，只训练期使用。（Sec.3.1–3.3, pp.11–16; Fig.10, p.12）；作者FLUX.1-dev 4-NFE GenEval 0.715对pi-Flow 0.675，OneIG overall 0.420仍略低50-NFE teacher 0.430。（Table 1, p.17）；cross-model stronger teacher对Lens会降低多项alignment指标，causal correction也不单调。（Tables 6/8, pp.25/29）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "简单可迁移的few-step生成训练范式可直接作用image/video与3D资产生成backbone。",
+    "caveatZh": "未见独立limitations节；训练需teacher queries与Pivot并非免费，文中inference NFE不代表总训练成本。；3D与部分reference task仅定性，少步数字不可解释成完整asset pipeline只需4次。；多个指标依赖VLM evaluator，未做本项目复现。"
+  }
+}

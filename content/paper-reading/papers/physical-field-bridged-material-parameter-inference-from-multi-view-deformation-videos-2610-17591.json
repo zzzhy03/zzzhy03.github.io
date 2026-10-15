@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.17591",
+  "slug": "physical-field-bridged-material-parameter-inference-from-multi-view-deformation-videos-2610-17591",
+  "title": "Physical-Field-Bridged Material Parameter Inference from Multi-View Deformation Videos",
+  "authors": [
+    "Linrui Shou",
+    "Jie Li",
+    "Yu Liu",
+    "Tao Huang"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17591"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Physical-Field-Bridged",
+    "Material",
+    "Parameter",
+    "Inference",
+    "from",
+    "Multi-View",
+    "Deformation",
+    "Videos"
+  ],
+  "abstract": "Estimating simulation-ready material parameters from visual observations is crucial for deformable-object manipulation but challenging because material properties are only indirectly revealed through physical responses. We introduce physical-field-bridged material inference, a single-pass framework that uses dense physical responses to connect multi-view RGB deformation videos with constitutive-type classification and continuous parameter regression. Unlike inverse-physics methods requiring per-scene reconstruction, online tuning, or simulation-in-the-loop optimization, our model predicts force/contact masks, projected motion-flow fields, and projected stress-response maps, then conditions material inference on these fields to reduce reliance on appearance or category shortcuts. We construct DeformFieldBench, a 3DGS MPM learning environment comprising 5,000 simulations across 100 object shapes and five mechanically informative loading modes, with dense pixel-aligned physical supervision. Our method achieves the best median errors on all four continuous parameters, improves stress-hotspot recall from 0.0762 to 0.5121, and attains 0.8676 SSIM/36.82 dB PSNR in same-simulator replay on unseen objects. Under a protocol-matched GSO evaluation, inference and future-state prediction take approximately 30 seconds, compared with 15-120 minutes for per-scene optimization. The method also yields measurable replay agreement on five real-world sequences. These results support dense physical fields as an effective bridge for fast material inference, while cross-simulator and real-world tests reveal remaining domain and identifiability gaps.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17591v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17591v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/3365538768/DeformFieldBench"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17591v1 的 31 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "以 contact/flow/stress 预测作为真正进入 regressor 的中间证据，从三视角形变视频估计全局材料参数；对 simulation-ready assets 有迁移价值。作者无过滤 mean SPE 弱于 direct baseline，跨 simulator 精度也下降，适合借鉴 physical bottleneck，不能把 replay 一致视为精确材料辨识。",
+    "motivationZh": "如何从形变视频快速估计可供MPM使用的constitutive type与参数，同时减少appearance shortcuts。",
+    "methodZh": "5000模拟、100 shapes、五类loading提供dense投影fields；DINOv2时空多视角编码经contact/deformation/stress bottleneck，先flow/contact再stress，fields编码回流type与log-space参数预测，分阶段训练。",
+    "methodFlow": [
+      "三视角RGB经DINOv2和temporal/cross-view adapter",
+      "physics latents预测contact与flow并条件化stress",
+      "field encodings回流constitutive与参数regressor",
+      "预测type/参数送MPM进行replay"
+    ],
+    "experimentsZh": "90/10 object split，约496有效test samples；同DINO backbone baseline、field intervention、GSO/Spring-Gaus迁移、50新objects与5真实序列。 以下结果为作者报告：作者报告stress hotspot recall 0.0762到0.5121、flow coverage IoU 0.4054到0.6675。（Table 3, p.22）；真实wallet/bottle五序列SSIM为0.7714–0.8430，未具真实force/parameter GT。（Table 14, p.27） 对照范围：控制backbone的direct regression；跨benchmark有协议对齐但训练domain与simulator不同。 消融与诊断：field masking支持实际利用fields；组件消融部分均值不单调。",
+    "insightZh": "physical fields从auxiliary targets成为parameter分支输入，并用field intervention与跨domain replay分析其作用。",
+    "evidenceZh": "预测fields被重新编码进入parameter分支，非仅辅助输出。（Sec.4.3–4.6, pp.16–18; Fig.2, p.14）；作者E MedAE 1.521对1.901，但mean SPE 0.334差于baseline 0.314。（Table 1, p.20）；GSO replay为17.15dB/0.882，Vid2Sim为25.07/0.945，推理约30秒。（Table 7, p.24）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "physical bottleneck可迁移simulation-ready 3D asset pipeline，属于外围重建方向。",
+    "caveatZh": "synthetic单simulator、全局均质材料、canonical三camera无extrinsics、fields非volumetric。；高刚度材料不可辨识、真实replay无参数GT、simulator/domain gap明显。；不输出fabrication设计或空间材料分布；迁移限于动态asset物理赋值。；top-20%过滤按method各自剔除最差样本，须同时看无过滤长尾。"
+  }
+}

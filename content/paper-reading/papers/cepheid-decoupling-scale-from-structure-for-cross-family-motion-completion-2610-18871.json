@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.18871",
+  "slug": "cepheid-decoupling-scale-from-structure-for-cross-family-motion-completion-2610-18871",
+  "title": "Cepheid: Decoupling Scale from Structure for Cross-Family Motion Completion",
+  "authors": [
+    "Chih-Hai Su",
+    "Tsung-Wei Ke",
+    "Yu-Lun Liu"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18871"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "3d-generation",
+    "Cepheid",
+    "Decoupling",
+    "Scale",
+    "from",
+    "Structure",
+    "for",
+    "Cross-Family",
+    "Motion",
+    "Completion"
+  ],
+  "abstract": "Sparse-to-dense motion completion recovers dense mesh motion from sparse vertex displacements. Residual priors trained on one geometry family frequently fail to beat parameter-free harmonic extension off-family. Moreover, cross-family training meets a scaling barrier: residual amplitude varies by more than an order of magnitude across geometry families and collapses as observations become denser. Since this scale depends on unknown target motion, it cannot be measured directly at test time. We decouple residual structure from physical scale by learning a dimensionless prior, estimating amplitude from observables and a lightweight correction fitted only on training sources. Our unified model surpasses harmonic extension across all evaluated families, including unseen cloth and legged bodies, without skeletons, registration, or cross-mesh correspondence. The same prior applies without retraining to point-tracked animal video and a robot grasping a soft body. Project page: https://su-terry.github.io/cepheid-website/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18871v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18871v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18871v1 的 31 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "Cepheid 用 harmonic extension 作为无学习基线，将 residual structure 与物理幅度分开：flow matching 学无量纲 residual，观测位移尺度乘冻结回归修正恢复幅度。作者报告单个动物/人体/机械臂联合模型在未见 cloth/legged family 的 pooled error 比 harmonic 低15.6%/10.1%；对稀疏 handle-driven 可编辑资产有直接价值，但精确位移假设与逐帧预测限制真实4D应用。",
+    "motivationZh": "从已知 mesh 的少量顶点位移完成稠密运动；不同 geometry family 的 harmonic residual 尺度相差甚大，单域 learned prior 常产生负迁移。",
+    "methodZh": "给定初始mesh及稀疏顶点位移，求图Dirichlet harmonic field；用11个无量纲密度、图连通与观测/基线特征，拟合冻结ridge log amplitude ratio；MGN-T 条件 OT-CFM 生成单位化 residual，30 Euler steps并平均8个draw，乘预测幅度加回基线。训练不要求skeleton、registration或跨meshcorrespondence，但输入观测必须对应本mesh顶点。",
+    "methodFlow": [
+      "mesh图上用稀疏观测作为边界，求 harmonic extension H",
+      "由观测dispersion与11个无量纲特征估计 residual 幅度",
+      "冻结幅度回归，以 (F−H)/预测幅度作为训练目标",
+      "12-NN MGN-T 对geometry/观测/H进行条件 flow matching",
+      "30步采样8次取均值，恢复幅度并加回 H 得稠密位移"
+    ],
+    "experimentsZh": "DT4D116train/7heldoutidentity、AMASS官方分割、Franka54train/12heldouttrajectory；cloth/9leggedembodiment不训练。随机观测density0.5–50%，pooled motion-weighted error。 以下结果为作者报告：作者报告cloth0.4377→0.3692、legged0.2474→0.2225；7/12 specialist offdiagonal不优于harmonic。（PDF p6 Table2）；作者报告DT4D0.5% ours0.3533 vs harmonic0.6255/DOMA0.5750；fixed3marker微调error2.283→0.991mm。（PDF p6 Table1; p31 Table15） 对照范围：harmonic、retrainedNSDP、per-sceneDOMA；DOMA每density用目标评分后选bestbudget/read，仍属于作者报告。 消融与诊断：harmonic、幅度、conditioning、flowmatching、samplemean均有消融；额外TPS无meshconnectivity、attention和samplecount对照。",
+    "insightZh": "可解析基线、目标无关幅度恢复与跨family无量纲prior组合，有明确negative transfer对照及源域完全held-out实验；贡献不是普通更换GNN。Flow sampling主要作为点估计均值，未证明物理约束或时序生成能力。",
+    "evidenceZh": "物理幅度由观测gauge与冻结ridge校正恢复，不使用目标motion。（PDF pp4–5 Section3; pp26–28 Appendix C/Table9/Algorithm1）；作者报告联合模型在全部五family pooled error低于harmonic；cloth/legged分别减少15.6%/10.1%。（PDF pp6–7 Table2/Section5.2; p24 Table7）；移除harmonic或amplitude recovery可使learning产生negative transfer。（PDF p8 Table4; p25 Table8）；真实视频远侧补全无groundtruth，overlay有逐帧拟合。（PDF p9 Figure4; pp29–30 Appendix D）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对通用3D资产稀疏handle编辑、动态mesh补全和异拓扑deformation表示有明确迁移价值，符合reconstruction选择性门槛。",
+    "caveatZh": "量化默认无噪准确顶点位移；大多数数据由动画、kinematics或simulation产生。；训练randommask，fixedsensorlayout可明显受益于finetuning；未验证loss tracks与depth distortion。；已知mesh和顶点关联输入并非从rawvideo自动恢复；逐帧独立，不保证temporalcoherence或contact/物理约束。；pooledrelativeerror按motion幅度加权，且跨familyunits不直接可比；未见legged最稀疏rung有negative transfer。；真实robot/视频应用主要qualitative，视频overlay逐帧配准无GT；不能宣称物理或3D精度已验证。；Appendix C.8由triangle inequality推出每个嵌套samplemeanerror单调，逻辑强于该不等式实际保证，samplecount趋势应视作报告数据。"
+  }
+}

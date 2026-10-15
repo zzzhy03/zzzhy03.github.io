@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.14734",
+  "slug": "align-vae-aligning-attention-and-geometry-in-vecset-vaes-for-3d-reconstruction-2610-14734",
+  "title": "Align-VAE: Aligning Attention and Geometry in VecSet VAEs for 3D Reconstruction",
+  "authors": [
+    "Huaizhi Qu",
+    "Mingxin Yang",
+    "Xintong Han",
+    "Fangneng Zhan",
+    "Chunchao Guo"
+  ],
+  "publishedAt": "2026-10-10",
+  "updatedAt": "2026-10-10",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.14734"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Align-VAE",
+    "Aligning",
+    "Attention",
+    "and",
+    "Geometry",
+    "in",
+    "VecSet",
+    "VAEs",
+    "for"
+  ],
+  "abstract": "Set-based variational autoencoders (VecSet VAEs) represent 3D shapes as compact sets of latent tokens. Although each token originates from a query at a sampled surface location, whether these latents truly align with geometry remains unclear. We investigate this alignment and identify four issues: (i) attention-sink-like tokens that attract queries from across the shape; (ii) spatially periodic repetitions in decoder attention responses; (iii) mismatched normal information in encoder and decoder query features; and (iv) missing supervision of the intrinsic relation between signed distance fields and surface normals. To address these issues, we introduce Align-VAE with four corresponding modifications: (i) a shared bank of learnable decoder tokens provides a workspace for global computation; (ii) distance-biased cross-attention guides retrieval toward nearby predicted spatial anchors; (iii) normal-free encoder queries align the two stages' access to normal information while retaining normals in the encoder keys and values; and (iv) a screened Poisson-inspired regularizer supervises surface values and normal-direction derivatives. These changes align latent retrieval and field prediction with geometry without enlarging the per-shape code. On the ABO dataset, Align-VAE reduces Chamfer distance by 26.6% compared to the standard VecSet VAE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.14734v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.14734v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.14734v1 的 23 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "Align-VAE 将decoder global workspace、预测anchor的distance bias、normal-free encoder queries和field supervision组合，保持每shape code大小。作者报告8192token ABO CD降低26.6%；值得深读attention与几何对齐诊断，但normal supervision在4096消融中反而增大gradient角误差，生成能力仍未评估。",
+    "motivationZh": "VecSet token虽由表面位置初始化，其encoder/decoder attention会跨空间取证、过度重复，并依赖decoder不可获得的query normals。",
+    "methodZh": "encoder query去掉normal而support keys/values保留normal；decoder prepend共享learnable bank承担global context，shape tokens由FPS target回归anchor，并在crossattention施加stop-gradient distance prior。表面零值和法线方向finite difference loss约束TSDF；共享bank不占per-shape latent storage但增加decoder计算。",
+    "methodFlow": [
+      "surface points/normals提供support",
+      "normal-free FPS queries编码M个shape latents",
+      "decoder bank与shape tokens交互",
+      "预测anchor施加distance-biased dense retrieval",
+      "surface与normal-direction监督implicit field",
+      "coordinate query重建mesh"
+    ],
+    "experimentsZh": "4096/8192 latent budgets，Objaverse/ABO/in-the-wild与DoraBench；VecSet/LATTICE reproductions和released Dora/HY3D；CD、F1、sharp-feature与attention profiling；固定storage和单独成本表。 以下结果为作者报告：作者报告ABO8192tokens CD3.927→2.884×10^-3，F1@.00134.53→41.20%。（Table1 p.8）；作者报告4096token每shape512KiB保持，latent refinement53.99→56.32ms。（Table10 p.19） 对照范围：与同code预算VecSet/LATTICE比较较有解释力，released AE训练数据/latent conventions不完全等同；无生成模型或editing downstream验证。 消融与诊断：累计加bank/distance/query-normal/normal-supervision，bank先贡献主要CD下降；distance与normal-free具有attention诊断收益，部分successive reconstruction置信区间含零。",
+    "insightZh": "新意是系统诊断后把global workspace与local retrieval职责拆开，并修正query normal的不一致；不是单纯加token或loss提分。",
+    "evidenceZh": "bank共享且不增大存储code，distance bias基于预测anchor而非解码时使用原FPS点。（Sec.5.1–5.3 pp.5–6; Fig.4 p.5）；normal-free只去query normal，support仍携带观测orientation。（Sec.5.2 p.6）；reconstruction与normal方向并非单调共同改进。（Tables3–4 p.9）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "compact native3D shape representation直接服务3D资产方法，局部geometry与latent alignment有明确迁移价值。",
+    "caveatZh": "global bank增加decode计算；surface accuracy和field orientation需进一步平衡（p.10）。；仅reconstruction并不能证明latent diffusion易学或生成更好。；normal supervision在某配置反而恶化orientation，不能笼统称所有几何对齐指标改善。；cumulative消融受交互影响，独立因果贡献有限。"
+  }
+}

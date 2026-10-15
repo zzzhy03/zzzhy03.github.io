@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.18690",
+  "slug": "just-respect-the-semantics-image-token-compression-via-pre-llm-semantic-variable-resolution-tokenization-and-in-llm-relevance-pruning-2610-18690",
+  "title": "Just Respect the Semantics: Image-Token Compression via Pre-LLM Semantic Variable-Resolution Tokenization and In-LLM Relevance Pruning",
+  "authors": [
+    "Tianhao Fu",
+    "Austin Wang",
+    "Charles Chen",
+    "Roby Aldave-Garza",
+    "Victor Xie",
+    "Xiyue Jiao",
+    "Yucheng Chen",
+    "Martin Tin"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18690"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Just",
+    "Respect",
+    "the",
+    "Semantics",
+    "Image-Token",
+    "Compression",
+    "via",
+    "Pre-LLM",
+    "Semantic"
+  ],
+  "abstract": "Image-token compression must reduce computation without hurting the semantics. We introduce Varest, guided by semantic fungibility: tokens within a coherent semantic region can be summarized coarsely, while object boundaries and literal text require finer distinctions. Object and text localizers guide variable-resolution merging, preserving spatial coverage and finer detail at boundaries and text. Learned [REL] registers then prune visual tokens after early decoder processing. Training across budgets enables one checkpoint per backbone. Across three backbones and 13 benchmarks, Varest outperforms 15 baselines in mean performance retention at every evaluated budget, retaining 86.10-92.33% of full-token performance with only 5.56% of the original layer-averaged image-token count.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18690v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18690v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18690v1 的 10 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "Varest 把视觉预算先分配给语义区域与文字，再让 early decoder 吸收上下文后用 REL registers pruning。作者在3个 LLaVA backbones、13个benchmarks报告最低5.56% layer-averaged token budget仍保留86.10–92.33%平均表现；这不是同幅度延迟加速，论文不报告latency，且文字/grounding仍依赖预算。值得skim的是 semantic granularity 与 decoder-depth allocation，而非把 REL 解读为 query-specific grounding。",
+    "motivationZh": "均匀 patch pruning/merging 忽视文字与object boundary 的不同信息密度，压缩可能破坏语义区域或OCR细节。",
+    "methodZh": "冻结的轻量object/text localizers分别蒸馏 DINOv3 boundaries 与 EasyOCR text boxes；按预算保留文字patch并做mean-boundary agglomeration，每region平均pool加centroid/extent tag。四个 learned REL tokens 在L/2层对region评分，保留Kp，前段Km=4Kp；projector、LoRA、registers等以原VLM tuning data的answer CE联合训练。一checkpoint跨budgets，optional logit-lens halting依赖first-token稳定/低熵。实验覆盖VQA、OCR、counting、grounding，比较15类baselines。",
+    "methodFlow": [
+      "输入 projected image grid、object boundary 与textness fields。",
+      "按预算分配text/non-text quotas，邻接弱边界区域agglomeration，mean-pool并加spatial tags。",
+      "region tokens+prompt+4 REL registers经early decoder，Km=4Kp。",
+      "L/2层learned bilinear scores保留Kp tokens，后续decoder作答。",
+      "可选first-answer logit stability/entropy判断visual access halting；跨budget CE adaptation使用同checkpoint。"
+    ],
+    "experimentsZh": "LLaVA-1.5-7B/13B与LLaVA-NeXT-8B，13 benchmarks（15metrics）覆盖general VQA/OCR/referring/counting；4 budgets，以各方法对应uncompressed reference归一化平均。 以下结果为作者报告：作者报告最小r=5.56%时3模型平均performance retention为92.33/91.31/86.10%；r=22.22%时两个LLaVA-1.5约100%。（Table1, PDF p.7）；作者报告较HiDrop平均retention高3.79–6.39个百分点，同时measured FLOPs低1.0–4.7%；optional halting额外省3.0–5.1%FLOPs但retention少0.30–0.48个百分点。（Sec.4.4, Fig.8, PDF pp.7–8） 对照范围：15 baselines含ToMe/VisionZip/DivPrune/FastV/PyramidDrop/HiDrop/CORE及trained token reducers，预算matched layer-averaged count；同一LLaVA family之外未测Qwen/InternVL，latency未测且训练/localizer成本非全生命周期公平对照。 消融与诊断：Table4分开trained tokenizer-only及inference-time random/oracle/object/text localizer interventions。低budget去object localizer损5.76–11.99retention点；去text localizer对TextVQA更明显，aggregate可掩盖单项损失。REL与token allocation共同改变，不能仅归因某scorer。",
+    "insightZh": "相对object-mask pooling CORE，明确把literal text与semantic transitions作为不同压缩粒度；相对attention pruning，REL以答案训练learned relevance，结合预合并与decoder-depth预算。Components沿用localizer distillation、LoRA与hierarchical pruning；不是无需训练的新foundation模型。",
+    "evidenceZh": "tokenizer按object boundaries/textness决定邻接region merging，并保持全空间覆盖。（Sec. 2.1, Algorithm 1, Eq. (1)–(2), PDF pp.2–3）；REL位于prompt后、无答案可见性；decoder midpoint保留top-Kp，layer-averaged预算排除text/registers。（Sec. 2.2/2.4, Eq. (3), PDF pp.3–4）；作者报告最低budget的平均retention为92.33%、91.31%、86.10%。（Table 1, Fig.6, PDF pp.6–7）；作者发现REL对两种prompts保留近似tokens；实现延迟与跨新VLM家族尚待验证。（Fig.7, Sec.4.4–5, PDF pp.6,8）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进VLM multimodal tokenization；semantic boundaries与文字的区别可参考结构化设计rendering观察，但实际design-agent benefit未验证。",
+    "caveatZh": "Sec.4.4明确latency依赖implementation，未报告；Sec.5称Qwen-VL/InternVL与其他domains需另外validation。；r小会压缩文字，OCR/document/grounding需要更大budget；REL实测prompt-blind，oracle attention非formal upper bound。；均值归一化与POPE重复metrics会隐藏能力类别掉点；没有CAD/LEGO visual-checking评测，不能外推设计细节保真。；所有数字是作者报告，本项目仅阅读与视觉核验，未复现。"
+  }
+}

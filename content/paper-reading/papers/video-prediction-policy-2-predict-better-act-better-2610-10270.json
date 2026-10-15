@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2610.10270",
+  "slug": "video-prediction-policy-2-predict-better-act-better-2610-10270",
+  "title": "Video Prediction Policy 2: Predict Better, Act Better",
+  "authors": [
+    "Yanjiang Guo",
+    "Haodong Yan",
+    "Zhide Zhong",
+    "Zhongru Zhang",
+    "Qingyuan Yang",
+    "Qingzhou Lu",
+    "Xiaoyu Chen",
+    "Yen-Jen Wang",
+    "Shuying Deng",
+    "Chenghan Yang",
+    "Puzhen Yuan",
+    "Chenxin Liu",
+    "Tun Ban",
+    "Xiang Zhu",
+    "Yichen Liu",
+    "Kun Feng",
+    "Haoang Li",
+    "Jianyu Chen"
+  ],
+  "publishedAt": "2026-10-07",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2610.10270"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Video",
+    "Prediction",
+    "Policy",
+    "Predict",
+    "Better",
+    "Act"
+  ],
+  "abstract": "World action models (WAMs) have emerged as an important class of generalist robot policies, aiming to transfer video prediction priors to action learning. However, we find that existing WAMs frequently produce incorrect motion predictions in open-ended environment, leading to erroneous actions. We attribute this limitation to two factors: (1) base video models are not optimized for manipulation, and (2) naively incorporating action components into video models can substantially degrade their generalization capabilities. We introduce Video Prediction Policy 2 (VPP2), a WAM that enables strong zero-shot generalization in both video prediction and action generation. First, we curate a large-scale, diverse dataset of manipulation videos to continue pretraining the base video foundation model. We annotate video clips with detailed captions and perform \\textit{event-level} video pretraining to promote generalization across open-ended manipulation tasks. Second, we post-train and distill the video model into a single-step visual planner with fixed prediction horizon. Finally, we introduce action module via a mixture-of-transformers (MoT) architecture to learn implicit inverse dynamics model. Experiments demonstrate three key results: (1) VPP2-14B outperforms Cosmos3-64B by 11.0\\% points in video prediction instruction-following success rate on open-ended tasks; (2) VPP2 surpasses the strongest baseline by 18.5\\% points in success rate on real-world zero-shot ALOHA manipulation tasks; and (3) following benchmark-specific post-training, VPP2 achieves the highest success rates among evaluated methods on the challenging LIBERO-Pro, LIBERO-OOD, and RoboDojo benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.10270v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.10270v3"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/roboterax/video-prediction-policy-2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.10270v3 的 21 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "VPP2 先用详细caption做完整event prediction，再固定时长posttrain并single-step distill，最后让action expert读取video KV。作者报告真实ALOHA未作task-specific tuning时成功率58.5%，LIBERO-OOD63.9%；值得关注world/action训练顺序，但zero-shot不包括未见robotembodiment，多个benchmark仍分别posttrain。",
+    "motivationZh": "通用video prior不一定能遵循manipulation intent，加入action learning又可能破坏其预测泛化。",
+    "methodZh": "整合20多embodiments的人手/robot/general manipulation video，按event分段、caption明确effector/object/camera，统一bimanualworkspace与effectorframe、多viewTshapecanvas。Wan2.1-I2V14B event49frame预训练后转fixed-horizon chunk prediction、consistencydistillation到one-step，0.9B actionDiT以MoT读取futurelatents；VLMplanner额外拆分复杂task。",
+    "methodFlow": [
+      "event segmentation与dense unambiguouscaption",
+      "统一双臂coordinates和multi-viewcanvas",
+      "Wan14B完整event continuedpretrain",
+      "fixed-horizon posttrain与one-stepdistillation",
+      "videoKV条件的0.9B actionexpert训练",
+      "可选VLMsubtaskplanning与闭环执行"
+    ],
+    "experimentsZh": "Wan14B，eventpretrain30ksteps batch1024，49frame416×240；人手/robot各50imageinstructionpairs评视频；ALOHA10类任务，LIBEROID/Pro/OOD与42taskRoboDojo。 以下结果为作者报告：作者报告ALOHA58.5%，相同ALOHA训练数据的pi0.5 40.0%、FastWAM20.5%。（Fig.8 p.8）；作者报告LIBERO-Pro45.0%、LIBERO-OOD63.9%，ID98.8%。（Table3 p.8） 对照范围：video对Wan/LVP/Cosmos3；robot对同ALOHA数据pi0.5/FastWAM，simulationbaseline多为官方报告，不同pretrain/data未严格同预算。 消融与诊断：fixed-stepevent对照及subtaskplanner对照；详细caption/eventpretrain/data规模等因素尚未全面独立消融。VLMplanner五组任务27.6→57.6但属于额外系统。",
+    "insightZh": "核心是event-level semantic-to-trajectory训练与保护video泛化的分阶段recipe；MoT和consistencydistillation已有，非全新generatorarchitecture。",
+    "evidenceZh": "完整event与fixed-horizon阶段承担不同语义/时间对齐作用。（Sec.2–3 pp.3–5; Fig.4 p.5）；actionexpert读video预测，earlytraining冻结base并以LoRA适配。（Sec.3.2 p.5）；实际robot与多个OOD任务评估支持manipulation generalization。（Fig.8/Table3 p.8; Table4 p.9）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "广域world/video雷达中具有实际跨任务control证据的模型recipe；仅video-generation作为worldprediction路径，不因使用VLM就归VLM方法。",
+    "caveatZh": "zero-shottask并非zero-shotembodiment；open-ended示例不能证明通用物理或3D生成。；video评测100cases和GPTjudge/humanpairwise样本有限，需区分distilled与原pretrainmodel。；0.22s不含高层VLMplanning等完整control开销。"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.16293",
+  "slug": "clothatlas-joint-garment-identification-and-state-estimation-under-self-occlusion-2610-16293",
+  "title": "ClothAtlas: Joint Garment Identification and State Estimation under Self-Occlusion",
+  "authors": [
+    "Jens Lundell",
+    "Alberta Longhini",
+    "Lei Shu",
+    "Hemal Arora",
+    "Evan Robert",
+    "Carlota Parés-Morlans",
+    "Marcel Büsching",
+    "Mårten Björkman",
+    "Jeannette Bohg"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16293"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "ClothAtlas",
+    "Joint",
+    "Garment",
+    "Identification",
+    "and",
+    "State",
+    "Estimation",
+    "under",
+    "Self-Occlusion"
+  ],
+  "abstract": "Garment manipulation requires inferring both garment identity and complete configuration from partial, self-occluded observations. This creates a chicken-and-egg problem: completing a partial observation requires a garment-specific deformation prior, while identifying the garment requires a configuration that explains the observation. We introduce ClothAtlas, which jointly identifies garments and estimates their complete configurations from partial point clouds and a library of canonical meshes. A shared graph-conditioned flow-matching model samples configurations for each candidate mesh and ranks candidates by observation fit. The model accommodates different mesh shapes, vertex counts, and connectivities, allowing new garments to be added from canonical meshes alone without retraining. On held-out DexGarmentLab garments, ClothAtlas ranks the correct mesh first among 221 candidates for all 22 test garments from a single flat observation. From a single self-occluded observation, it identifies 15/22 garments, compared with 8/22 for a deterministic graph estimator. Persistent vertex identities support grasp-target localization on real garments, reducing mean error from 15.4 to 6.4 cm overall and from 17.0 to 8.3 cm on occluded targets compared with dense descriptor matching. Project page: https://clothatlas.github.io/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16293v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16293v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16293v1 的 9 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "ClothAtlas 用跨拓扑共享的 graph-conditioned flow matching，从部分点云生成带 persistent vertex IDs 的完整 garment mesh，再按 observation fit 在 canonical mesh library 中识别与累积候选。作者报告可定位遮挡 grasp points；对分层可变形资产状态表示有迁移价值，但并不生成服装设计或制造指令。",
+    "motivationZh": "部分自遮挡点云下，garment identity 与完整 deformation 相互依赖，visible descriptors 无法持续定位遮挡表面。",
+    "methodZh": "ClothAtlas 用跨拓扑共享的 graph-conditioned flow matching，从部分点云生成带 persistent vertex IDs 的完整 garment mesh，再按 observation fit 在 canonical mesh library 中识别与累积候选。作者报告可定位遮挡 grasp points；对分层可变形资产状态表示有迁移价值，但并不生成服装设计或制造指令。",
+    "methodFlow": [
+      "部分 garment point cloud 与 canonical candidate meshes",
+      "共享 graph flow matcher 采样完整顶点配置",
+      "以 point-to-surface fit 计算与累积 candidate weights",
+      "保留 top-k 并输出完整 mesh 与 persistent surface coordinates"
+    ],
+    "experimentsZh": "1,800 simulated episodes，176/23/22 garment-disjoint split；真实实验含 6 garments、109 target localization trajectories，模型无 real-data finetuning。 以下结果为作者报告：作者报告 221-candidate library 中单次 lifted observation 识别 15/22，D-GNN 为 8/22；47 个 occluded targets 的 Success@10 为 85.1%，DDM 为 36.2%。（Tables II-III, pp. 6-7） 对照范围：比较 registration、D-GNN、LRE、DDM、BootsTAPIR；UniClothDiff 因每 mesh 训练成本未纳入共享 library 实验。 消融与诊断：测试遮挡、missing patches、noise、outliers、true mesh exclusion 与候选剪枝；展示识别错误和 completion accuracy 不等价。",
+    "insightZh": "把 mesh-specific generative completion 改为支持不同 connectivity 的共享 graph estimator，并把重建拟合当作 identity evidence。",
+    "evidenceZh": "同一 GPS graph transformer 接受 canonical vertex coordinates/connectivity 与 PointNet++ observation features。（Sec. IV-A, Fig. 2, pp. 2-3）；候选分数累积后不可逆剪枝，表面点的 barycentric coordinates 可跨重建定位目标。（Sec. IV-B; Sec. V-D, pp. 3-4,7）；作者报告 221-candidate library 中单次 lifted observation 识别 15/22，D-GNN 为 8/22；47 个 occluded targets 的 Success@10 为 85.1%，DDM 为 36.2%。（Tables II-III, pp. 6-7）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "完整 mesh、跨拓扑共享 prior 与 persistent vertex identity 可迁移到可变形 3D asset reconstruction 和编辑。",
+    "caveatZh": "10% outliers 可令 top-1 identification 从 64.6% 降至 2.0%；早期剪枝可能永远排除正确 mesh。；真实 garment 需要手工 global scale；thin-shell prior 不含 stacked layer thickness，library 缺少近似形状时失败。；全库一次推理作者报告 139.1 秒，不能视为实时可用。；没有展示服装 synthesis/fabrication；迁移到 generative assets 仍需新验证。"
+  }
+}

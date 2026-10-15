@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2610.18072",
+  "slug": "lenserase-a-foundation-model-for-erase-anything-2610-18072",
+  "title": "LensErase: A Foundation Model for Erase Anything",
+  "authors": [
+    "Yunuo Chen",
+    "Xiuyu Wu",
+    "Qinhong Yang",
+    "Jinjing Zhao",
+    "Yanchen Dong",
+    "Sirui Zhang",
+    "Dong Chen",
+    "Fangyun Wei",
+    "Lei Shi",
+    "Ji Li",
+    "Dongdong Chen",
+    "Guo Lu",
+    "Yan Lu",
+    "Baining Guo"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18072"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "LensErase",
+    "Foundation",
+    "Model",
+    "for",
+    "Erase",
+    "Anything"
+  ],
+  "abstract": "We introduce LensErase, a general-purpose mask-based Erase Anything foundation model designed to cover a broad spectrum of real-world erase scenarios. LensErase supports diverse objects, visual text, watermarks, associated visual effects, multiple-object removal, and a wide range of object scales, aspect ratios, and image resolutions. First, to enable such broad coverage, we construct LensErase-100M, a large-scale dataset containing 101.07 million paired source-mask-target examples spanning diverse erase scenarios. Second, we pretrain LensErase from the text-to-image model Lens, adapting its strong generative prior to mask-based erasing. To efficiently incorporate the source image and erase mask, we propose Mask-Aware RoPE, a 3D rotary positional encoding that directly injects mask information into the source-image tokens without introducing a separate mask token sequence. Finally, we refine the model through supervised fine-tuning and reinforcement learning with contract-guided, region-aware rewards, and apply TraceFusion at inference to preserve high-fidelity content outside the effective edit region. Across six public benchmarks and the proposed LensErase-Bench, LensErase achieves substantial improvements under both reference-based objective metrics and reference-free VLM evaluation. We hope LensErase can serve as a foundational model for erase-related applications and systems.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18072v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18072v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18072v1 的 57 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "LensErase 以 101.07M source-mask-target 预训练、Mask-Aware RoPE 和 contract-guided diffusion RL，覆盖对象、文字、水印和 poster 元素擦除。作者报告 500-case LensErase-Bench HiFi removal 82.8%；规模和 preservation recipe 值得关注，但同一 VLM 同时筛选、奖励和评测，自定义评测优势不能当作独立复现。",
+    "motivationZh": "通用擦除既要移除目标及 shadow/reflection，也要保留邻近内容，单一 mask 内重绘与均匀奖励容易残留或误删。",
+    "methodZh": "从 Lens image branch 初始化双分支 MMDiT，保留完整 source latent，mask/unmask 与 noisy target 用额外 RoPE modality 维度区分。区域加权 flow matching 后 SFT；源图固定 target/effects/protected contract，五类 reward 经 removal failure gating 再 DiffusionNFT。TraceFusion 按源输出残差估 effective edit region，线性 RGB 混合还原其余像素。",
+    "methodFlow": [
+      "合成/分层 rendering 构造 101.07M erase pairs",
+      "Lens 双视觉分支与 mask-aware 3D RoPE",
+      "region-weighted flow matching 和 140K SFT",
+      "19K tasks 构建固定 erase contracts",
+      "多维奖励加 removal gate 做 DiffusionNFT",
+      "TraceFusion 在 effective edit support 外还原源图"
+    ],
+    "experimentsZh": "101.07M 数据含 77.6M general、9.99M watermark、4.02M large-mask、1.44M text、8.02M poster；pretrain 96 A100 约两周；六个公开 paired benchmarks 与 500 自建 cases。 以下结果为作者报告：作者报告 HiFi Removal：pretraining65.8→SFT70.8→RL81.6→TraceFusion82.8%。（Table3 p.10）；作者报告 TraceFusion 将六 benchmark mean PSNR 28.70→30.82 dB，LPIPS .0816→.0684。（Table3 p.10） 对照范围：12 个公开 erasure baselines，主表每 benchmark 只显示部分，附录完整；商业模型主要可视示例，未同资源训练。 消融与诊断：mask injection、training stages、去掉各 reward；去 removal+gate 大幅降性能，TraceFusion 尤其改善 unchanged fidelity；未隔离 100M data scale 的全部贡献。",
+    "insightZh": "主要是大规模统一 erase model 和完整 data/posttraining/preservation 配方；mask RoPE 与契约奖励可迁移局部设计编辑，但输出仍是 raster。",
+    "evidenceZh": "mask 不擦掉 source token，以保留 effect 和透明背景线索。（Sec.3.1 pp.6–7; Fig.3 p.6）；contract 固定 target/effect/protected，零分移除项逐个惩罚。（Sec.3.2 pp.7–8 Eqs.4–6）；stage/reward ablation 区分 RL 与 TraceFusion 效果。（Tables2–4 p.10; Table17 p.42）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "重要通用视觉编辑模型；poster 局部擦除和 contract-based preservation 对 visual creation 有明确迁移价值。",
+    "caveatZh": "4K/ultrahigh-res 编辑数据受既有 editor 稳定性限制（Appendix H p.42）。；同一 GPT-5.6 Sol 用于筛选、RL judge、LensErase-Bench，需独立人工/跨 judge 确认。；多数 pair 由插入或图层合成反向构造；复杂真实遮挡的可恢复背景不唯一。；不是 structured layer recovery，不能把 raster 擦除称可编辑图层输出。"
+  }
+}

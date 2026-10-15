@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.17976",
+  "slug": "seeing-depth-but-choosing-cues-in-vision-language-models-2610-17976",
+  "title": "Seeing Depth but Choosing Cues in Vision-Language Models",
+  "authors": [
+    "Zhengtao Zou",
+    "Pekka Marttinen"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17976"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Seeing",
+    "Depth",
+    "but",
+    "Choosing",
+    "Cues",
+    "in",
+    "Vision-Language",
+    "Models"
+  ],
+  "abstract": "Do vision-language models use depth information to judge which object is closer, or rely on image-plane cues? We investigate this question through controlled depth--cue conflicts, representation analysis, and interventions. Among the many image-plane cues relevant to depth perception, we focus on apparent size and vertical position. We compare depth judgments under cue-consistent and cue-conflict conditions in both rendered scenes and real-world photographs. Across model families and scales, depth judgments systematically shift toward misleading cues. Yet the correct depth order remains decodable from the queried objects' visual representations, including when the model answers incorrectly. Image and category controls support interpreting this signal as image-dependent depth information beyond the two target cues. Strengthening the model's own depth readout through object-level write-back can correct conflict decisions without updating model parameters or using ground-truth depth annotations. Interventions show that the effect of this correction depends on the direction and target tokens of the written signal, while its strength varies across architectures and domains. Together, these findings reveal a mismatch between a model's ability to represent depth and use this information when deciding the answer. VLMs can retain useful depth information while allowing competing image-plane cues to exert greater influence on their answers.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17976v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17976v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17976v1 的 18 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "这篇把『表征中有depth』与『回答会用depth』分开：在cue-decorrelated calibration上拟合object-contrast linear probe，再按当前readout符号对两物体tokens作反向write-back。作者报告Qwen3-8B合成size-conflict50.2→90.8%、vertical42.8→71.4%，但真实vertical仅75.0→80.6%，Gemma真实图反而受损，外部CV-Bench也下降。值得deep的是带random/location/reversal controls的空间机制审计；不能说无需校准标签、无需object masks或普遍修复空间推理。",
+    "motivationZh": "VLM可能包含depth信息但答案更依赖apparent-size/vertical-position shortcuts；decodability与实际决策因果影响需要分开验证。",
+    "methodZh": "Render独立控制depth、angularsize和vertical，四split各500；SUN RGB-D 947object pairs使用sensor median-depth、mask area/row定义cue条件。11VLM/5families诊断显示冲突掉点；每层mask内mean-pool的cA-cB，经decorrelated数据logistic regression读取depth，image/category controls验证依赖当前图像。real intervention direction在development用DA3 pseudo-depth重新拟合，layer/strength以balanced recovery和consistent-gap约束选择，evaluation固定；VLM权重冻结，仅更新object tokens。bootstrap、负面architectures及external transfer结果保留。",
+    "methodFlow": [
+      "构造或选择true-depth与size/vertical cues一致、冲突、decorrelated的object pairs。",
+      "用object masks mean-pool每层hidden tokens，差分并在calibration上拟合standardized logistic depth probe。",
+      "把probe方向换回raw hidden-space，development选择layer/strength，real方向用DA3 pseudo-depth refit。",
+      "evaluation同一次forward读取z=v·(cA-cB)，仅对两组object tokens按sign(z)作±α·mean-token-norm·v。",
+      "冻结VLM参数，用direction/location/random/image替换与外部benchmark controls检查benefit/harm。"
+    ],
+    "experimentsZh": "Rendered 4×500，448²，两不互相遮挡primitives；SUN947pairs：305consistent/209size/144vertical/289decorrelated。诊断11VLM/5families，多尺度与SpaceThinker；intervention9models。depth-order A/B logit评分、random option assignment；calibration80/20，direction/layer/α先fixed，real用DA3 development。 以下结果为作者报告：作者报告Qwen3-VL8B Render size50.2→90.8、vertical42.8→71.4、consistent94.4→99.6%；real size77.5→78.9、vertical75.0→80.6、consistent89.2→87.9%。（Table1, PDF p.8）；作者报告Gemma4-12B real size60.3→52.6、vertical39.6→38.2、consistent85.2→78.4%；CV-Bench8B95.7→93.5与32B95.5→93.6。（Tables1/3, PDF pp.8,11） 对照范围：比较cue-avoidant CoT、depth-map input、VCD/DoLa、mean-difference方向、random direction、answer-token写回与reversal/all-token位置controls。无自动object detection/segmentation pipeline对照，无general multi-hop/CAD metric-space证明。 消融与诊断：random/location改变不复现object-local gains，reversing sign反转行为，matched correct-readout probe方向比mean-diff更少harm；可支持specific causal influence，不能证明所有depth机制已隔离。grey/mismatch仍保留masks位置，patch shuffle仍有fog/shading。",
+    "insightZh": "沿用linear probing/activation steering，但把self-oriented antisymmetric object-local write与depth-cue conflict、decodability-vs-use诊断合起来，给出方向/位置特异性及跨model负例；不是发现完整3D表示或模型无监督学新depth。",
+    "evidenceZh": "decorrelated object contrasts可decode depth，但回答仍跟误导cue；image replacement使readout掉点。（Secs.4.1–4.2, Fig6, Table4, PDF pp.5–6,16）；intervention符号来自当前readout，不看evaluation GT，但方向与layer/strength依赖development calibration和object masks。（Sec.5.1, Eq.(7), Fig7; Appendix E.1–E.2, PDF pp.7,16–17）；作者报告synthetic Qwen size+40.6/vertical+28.6pp，real size+1.4/vertical+5.6pp；Gemma真实图负效应。（Table1; Tables5–6, PDF pp.8,17）；外部CV-Bench两Qwen尺度均下降，SpatialRGPT仅13conflict例且有近重复。（Appendix C, Table3, PDF p.11）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接针对VLM geometry-use与空间推理，提供可用于design-agent错误审计的probe/intervention模板；未验证CAD/LEGO metric/part推理。",
+    "caveatZh": "Sec.6仅pairwise depth和两种cue，natural photos其他depth signals未隔离，效果依model/domain。；Appendix C externaltransfer多数不提高，CV-Bench下降，SpatialRGPT conflict仅13且5near-duplicates（1calibration）。；Appendix E mean norm含left-padded positions，batchpadding可能改变强度；Gemmaharm与InternVLweak是干预失败，不表示无depth。；已知object masks与target-domain calibrator是deployment前提，不能外推design agents自动选择part/correspondence。；将易线性readout表述为统一3D world representation过强；测试是单关系pairwise且物体不遮挡。；所有实验为作者报告，未复现；真实improvements小且有consistent损失。"
+  }
+}

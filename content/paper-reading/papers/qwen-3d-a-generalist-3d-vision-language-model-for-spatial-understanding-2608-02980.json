@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2608.02980",
+  "slug": "qwen-3d-a-generalist-3d-vision-language-model-for-spatial-understanding-2608-02980",
+  "title": "Qwen-3D: A Generalist 3D Vision-Language Model for Spatial Understanding",
+  "authors": [
+    "Lucy Lin",
+    "Ayush Jain",
+    "Yifan Liu",
+    "Katerina Fragkiadaki"
+  ],
+  "publishedAt": "2026-08-04",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2608.02980"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "3d-segmentation",
+    "Qwen-3D",
+    "Generalist",
+    "Vision-Language",
+    "Model",
+    "for",
+    "Spatial",
+    "Understanding"
+  ],
+  "abstract": "Large Multimodal Models (LMMs) have achieved remarkable success on images and short videos, yet scaling them to long videos remains challenging due to frame-centric tokenization and limited context windows. 3D geometry provides a natural compression mechanism for visual streams: depth and camera pose enable observations from multiple views and time steps to be fused into a persistent, world-aligned representation. While recent 3D LMMs leverage geometry-aware representations to improve spatial reasoning, they continue to lag behind specialist 3D perception systems on grounding and segmentation tasks. We argue that a key limitation is geometry-aware decoding: existing methods communicate 3D predictions through language tokens, proposal selection, or lightweight grounding queries, creating a bottleneck between language reasoning and dense geometric prediction. Building on these insights, we introduce Qwen-3D, a geometry-aware LMM that compresses visual information within the Qwen backbone using multi-view geometric cues, enabling efficient long-horizon visual reasoning over static scenes. Qwen-3D augments visual tokens with 3D Rotary Positional Embeddings, allowing attention to operate directly in 3D scene space rather than across independent image frames and thereby facilitating scalable cross-view and temporal reasoning. To bridge language and geometry, Qwen-3D incorporates a query-based segmentation decoder that grounds language directly in the underlying 3D scene representation, unifying referential grounding, instance segmentation, and visual question answering across both images and videos. Across a diverse set of benchmarks, Qwen-3D surpasses existing 3D LMMs and outperforms several large proprietary 2D models. Notably, Qwen-3D achieves these improvements while maintaining strong performance on standard 2D vision-language benchmarks by jointly training on 2D and 3D data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.02980v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2608.02980v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ll220/qwen3d"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2608.02980v2 的 21 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "Qwen-3D 将posed RGB-D视觉tokens抬到world coordinates，用5cm voxel pooling与均衡频谱3D RoPE压缩并关联多视角；关键是完整contextualized visual/text features直接送入Mask2Former-style queries，而非单REF token。作者报告3B ScanRefer62.2/55.3 Acc@25/@50、ScanNet200 mAP25.3，对照Grounded3D12.1；但仍低于language-prompted UniVLG27.9，RealWorldQA也由62.6降至60.4。值得深读dense grounding接口及segmentation迁移，静态场景和外部depth/poses是硬边界。",
+    "motivationZh": "3D LMM用text boxes、proposal selection或单REF token与grounding通信，限制dense geometry预测，multi-view frame tokens又冗余。",
+    "methodZh": "共享Qwen2.5VL backbone与2D/3D mask decoder，visual features world-voxelized，非autoregressive任务全attention，text answers仍causal。Hungarian mask BCE/Dice、text-span grounding及QA cross-entropy联合训练，冻结ViT、LoRA调VL layers、约50M trainable。255k 3D与2D数据混训200k steps/8L40S，inference平均约90帧、forward约2s，含SLAM约3-7s。",
+    "methodFlow": [
+      "posed RGB-D经Qwen ViT提features并unproject到XYZ",
+      "5cm voxel均值合并多视角冗余tokens",
+      "shared VL attention用均衡3D RoPE，grounding全attention",
+      "object queries访问dense visual/text tokens预测masks和language scores",
+      "text head回答QA，2D/3D混训保留base能力"
+    ],
+    "experimentsZh": "SR3D/NR3D/ScanRefer、ScanNet200、ScanQA/SQA3D、Locate3D ScanNet++ OOD、2D RefCOCO/RealWorldQA；额外3EED outdoor需MapAnything depth completion/SAM重新对齐GT。 以下结果为作者报告：作者报告3B ScanRefer62.2/55.3，7B62.8/54.7；Locate3D ScanNet++3B55.7/43.4 vs UniVLG32.3/24.6。（Tables1/2, PDF p.7）；作者报告RealWorldQA60.4 vs原Qwen2.5VL3B62.6，RefCOCO88.1 vs89.1；保留能力不等于完全无降幅。（Table4, PDF p.8） 对照范围：3D specialists及single/two-stage LMM，包含different backbones/data；modern LMM checkpoint不全公开，outdoor GT经新depth/SAM对齐，不能与原protocol无条件比较。 消融与诊断：dense/REF接口、PE频谱、causal/full masks与VLM fine-tuning；aligned3D53.5仅略高2D53.2，主要增益来自full attention和dense decoding。",
+    "insightZh": "重点是dense backbone-to-mask-decoder接口及geometry-aware attention/masking的结合；voxel pooling与3D PE本身有先例。模型不是官方Qwen团队新foundation release，作者来自CMU，名字表示backbone extension。",
+    "evidenceZh": "完整visual/text tokens送入mask decoder，避开REF token bottleneck。（Sec.3.3, Fig.3, PDF p.5）；5cm voxel merging与world 3D RoPE、full attention在静态scene工作。（Sec.3.1-3.2, PDF pp.4-5）；作者报告ScanNet200 mAP25.3，Grounded3D12.1、UniVLG27.9。（Table3, PDF p.8）；作者报告full-token53.5对REF39.7；full attention53.5对causal36.4。（Table5, PDF p.9）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "将language reasoning与dense 3D segmentation直接耦合，有open-vocabulary object/part表示迁移价值；未实际验证LEGO或fabrication。",
+    "caveatZh": "静态world representation不处理nonrigid motion、interaction/topology changes。；多数任务单次grounding，未证明多entity长程planning。；依赖external depth/poses，geometry错误限制grounding。；scene-level object masks不等于object part/LEGO segmentation；需独立迁移验证。；名称不应误写成官方Qwen foundation model；3D LMM SOTA不等于所有expert SOTA。"
+  }
+}

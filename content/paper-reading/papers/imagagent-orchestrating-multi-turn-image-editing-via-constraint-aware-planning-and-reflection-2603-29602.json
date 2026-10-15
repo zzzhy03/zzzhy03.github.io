@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2603.29602",
+  "slug": "imagagent-orchestrating-multi-turn-image-editing-via-constraint-aware-planning-and-reflection-2603-29602",
+  "title": "IMAGAgent: Orchestrating Multi-Turn Image Editing via Constraint-Aware Planning and Reflection",
+  "authors": [
+    "Fei Shen",
+    "Chengyu Xie",
+    "Lihong Wang",
+    "Zhanyi Zhang",
+    "Xin Jiang",
+    "Xiaoyu Du",
+    "Jinhui Tang",
+    "Tat-Seng Chua"
+  ],
+  "publishedAt": "2026-02-12",
+  "updatedAt": "2026-10-11",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2603.29602"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR",
+    "cs.MA"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "image-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "image-generation",
+    "IMAGAgent",
+    "Orchestrating",
+    "Multi-Turn",
+    "Image",
+    "Editing",
+    "via",
+    "Constraint-Aware",
+    "Planning",
+    "and"
+  ],
+  "abstract": "Existing multi-turn image editing paradigms are often confined to isolated single-step execution. Due to a lack of context-awareness and closed-loop feedback mechanisms, they are prone to error accumulation and semantic drift during multi-turn interactions, ultimately resulting in severe structural distortion of the generated images. To address this, we propose IMAGAgent, a multi-turn image editing agent framework based on a ``plan--execute--reflect'' closed-loop mechanism that achieves deep synergy among instruction parsing, tool scheduling, and adaptive correction within a unified pipeline. Specifically, we first present a constraint-aware planning module that leverages a vision-language model (VLM) to precisely decompose complex natural language instructions into a series of executable sub-tasks, governed by target singularity, semantic atomicity, and visual perceptibility. Then, the tool-chain orchestration module dynamically constructs execution paths based on the current image, the current sub-task, and the historical context, enabling adaptive scheduling and collaborative operation among heterogeneous operation models covering image retrieval, segmentation, detection, and editing. Finally, we devise a multi-expert collaborative reflection mechanism in which a central large language model (LLM) synthesizes evaluations from multiple vision-language models into holistic feedback, triggering fine-grained self-correction and recording feedback outcomes to optimize future decisions. Extensive experiments on our constructed MTEditBench and the MagicBrush dataset demonstrate that IMAGAgent achieves performance significantly superior to existing methods in terms of instruction consistency, editing precision, and overall quality. The code is available at https://github.com/hackermmzz/IMAGAgent.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2603.29602v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2603.29602v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/hackermmzz/IMAGAgent"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2603.29602v2 的 14 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "IMAGAgent 把多轮编辑做成有历史约束的 plan–execute–reflect：VLM 将当前指令拆成视觉可执行原子步骤，工具链结合此前图像/计划/critique 选择编辑器，三位视觉专家给出文本纠错并由 LLM 汇总。作者报告 MTEditBench 五轮平均 DINO 0.766、AugCLIP 0.299；matched GPT-4o 与同工具池 retry 控制支持闭环贡献。适合借鉴设计 agent 的 constraint memory，但数据来自 VINCIE training corpus，且额外 critics/API 成本不能用1.4次编辑调用代替总开销。",
+    "motivationZh": "多轮 raster editing 会覆写既有编辑与结构，单纯重试缺乏可操作反馈。",
+    "methodZh": "框架保留当前/此前图像、工具计划和正负反馈。每个子任务最多3次编辑，平均expert score达到7则接受，否则选择已有最高分候选；benchmark的原turn顺序不跨轮重排。MTEditBench由VINCIE corpus筛出1000条至少4轮序列并经VLM与人工审阅，另在MagicBrush和50人偏好调查验证。",
+    "methodFlow": [
+      "输入当前图像、原turn指令及历史轨迹",
+      "按单目标、语义原子性、视觉可感知性拆任务并在当前turn内排序",
+      "controller调用retrieval/detection/segmentation/local或global editor",
+      "三位VLM评估语义、感知、审美和逻辑，LLM合并正负critique",
+      "分数达到阈值或预算耗尽后选图，保留计划/反馈并继续"
+    ],
+    "experimentsZh": "MTEditBench 1000长序列、MagicBrush；单A100并混用Qwen/GLM/Doubao/DeepSeek API与本地工具，acceptance7/max3。50cases×50participants偏好研究。 以下结果为作者报告：作者报告MTEditBench平均DINO0.766、AugCLIP0.299，对应VINCIE0.739/0.271；第五轮DINO0.721。（Table I, PDF p.5）；作者报告相同工具池IMAGAgent平均1.40 editing calls、DINO0.766，Best-of-3为3.00calls、DINO0.720。（Table V, PDF p.9） 对照范围：ACE++/HQEdit/UltraEdit/ICEdit/VAREdit/VINCIE/OmniGen/GPT-4o，另固定GPT-4o和同工具池反馈对照；1.4调用不包含critic/aggregator total inference。 消融与诊断：移除history降DINO到0.646、reflection降至0.689；single expert0.742，支持历史与反馈，尚无全系统token/latency-matched比较。",
+    "insightZh": "新意在把跨轮constraint preservation、动态工具计划和多专家可操作critique组合为明确的有预算闭环；不是新image generator。固定编辑backbone与反馈策略对照，比只与弱旧编辑器比更能支撑agent机制。",
+    "evidenceZh": "历史包含工具计划、图像与critique，约束已接受修改。（Sec. III, Fig. 2, PDF p.3）；每子任务最多3次尝试，未达阈值时用最高分fallback；完整原turn顺序不跨轮改动。（Algorithm 1, PDF p.4; Appendix VII, PDF p.10）；作者报告同GPT-4o backbone的Turn5 DINO从0.657到0.753。（Table III, Sec.IV-C, PDF p.6）；编辑调用统计不包括专家评估/aggregation，训练语料重叠未排除。（Appendix VII/X, PDF pp.10–11）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可借鉴到SVG、embroidery或3D设计agent的跨轮约束memory和可执行反馈，但论文实证限raster editing。",
+    "caveatZh": "多专家反思增加推理时间与API成本。；2D priors难以处理严格3D几何、复杂姿态/服装等。；MTEditBench来源偏差与各model training overlap不能排除。；embedding consistency不是所有修改和preservation约束的逐项成功率；由生成模型构建且筛选的数据可能偏爱特定工具。；未来原turn指令对所有方法可见；结果不等同于未知用户后续指令的在线交互。"
+  }
+}

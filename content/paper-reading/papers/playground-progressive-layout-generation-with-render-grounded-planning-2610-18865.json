@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.18865",
+  "slug": "playground-progressive-layout-generation-with-render-grounded-planning-2610-18865",
+  "title": "PLAYGROUND: Progressive Layout Generation with Render-Grounded Planning",
+  "authors": [
+    "Jaeho Lee",
+    "Junhwan Heo",
+    "Junghyun Park",
+    "WonJun Moon",
+    "Eunju Yang",
+    "Seungho Jang",
+    "Seongchan Kim",
+    "Seungryong Kim"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18865"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "2d-design",
+    "vlm-mllm",
+    "PLAYGROUND",
+    "Progressive",
+    "Layout",
+    "Generation",
+    "with",
+    "Render-Grounded",
+    "Planning"
+  ],
+  "abstract": "Generating editable graphic designs requires arranging visual and textual elements into a coherent composition while preserving their content and editability. Although recent MLLM-based approaches employ iterative generation and visual refinement to reflect the real-world design workflows, their high-level plans are predetermined prior to execution, limiting their adaptability as the design evolves. To address this limitation, we propose PlayGround, a progressive layout generation framework that dynamically adapts to the current rendered canvas. PlayGround establishes a progressive design loop comprising a Progressive Planner, a Layout Generator, and a Visual Verifier, guided by a Structure-Aware Retriever. Given an initial set of unordered elements, the Structure-Aware Retriever initially infers a coarse layout structure to retrieve structurally similar reference designs. Subsequently, at each turn, the Progressive Planner examines the current rendered canvas alongside the remaining elements, forms the next functional group, and plans its composition. The Layout Generator then predicts editable layout attributes, while the Visual Verifier evaluates rendered candidates and provides feedback when refinement is necessary. To train the Progressive Planner with step-wise supervision, we construct a two-stage data generation pipeline that extracts functional groups and turn-level planning trajectories from completed designs. Experiments on Crello and LICA demonstrate the effectiveness of PlayGround over existing methods. Our code and weights will be publicly released.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18865v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18865v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18865v1 的 39 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "PlayGround 以当前rendered canvas为状态，每轮重新组成功能group并计划layout，生成多个可编辑候选再visual verify/retry。它直接命中结构化图文设计的动态规划，有训练数据与static-planner对照；但不能修改已放置groups，成本包含每轮5候选最多3轮，LICA“zero-shot”还使用从GT render提取的title metadata。",
+    "motivationZh": "可编辑graphic design的预先固定plan会在实际layout偏离后过时，如何根据当前render重规划下一组elements。",
+    "methodZh": "先从完成Crello设计反推functional groups、order和cumulative states，再让annotator生成turn-level rationales/placement instructions。retriever预测role-region coarse structure并取五参考；planner看当前canvas和remaining elements，generator预测boxes、stacking和text属性；verifier选candidate并返回retry instruction。",
+    "methodFlow": [
+      "完成设计经functional grouping/order和turn-level planning构建监督",
+      "role-region结构检索五个reference designs",
+      "planner依current canvas动态挑group与layout plan",
+      "generator预测editable boxes/stacking/text attributes并render五候选",
+      "visual verifier选优并最多三轮retry，accept后进入下一group"
+    ],
+    "experimentsZh": "Crello-v4训练Qwen3-VL8B的3个LoRA模块，GPT5.6Luna verifier；Crello与LICA测试，GPT5六criteria、rule metrics、32人25设计rank study。 以下结果为作者报告：作者Crello layout composition3.794对VFLM3.335，LICA3.698对3.427。（Table1 p.7）；作者human study六criteria rank1约81–84%，25随机Crello samples/32participants。（Appendix D.2.3 pp.33–34） 对照范围：FlexDM、LaDeCo、PosterCopilot、VFLM；部分输入native formulation不同，VFLM不生成完整layout，表中rule metrics需按coverage读。 消融与诊断：top/lowest/no retrieval、candidate K、verifier与static planner；functional grouping额外GPT zero-shot loop对照，不是所有learned组件完全matched。",
+    "insightZh": "把functional grouping和plan本身放进render feedback loop，而不仅refine固定plan；completed designs提供可规模化逐turn监督。",
+    "evidenceZh": "planner每轮依当前accepted canvas共同预测group与plan，旧groups保持固定。（Sec.4.3–4.5 p.6; Fig.3 p.5）；作者Crello六个VLM评分均优baseline、LICA五项优，但structural validity未全面最佳。（Table1 p.7; Table5 p.32）；static-planner VLM3.894对progressive3.958；去verifier3.698，wrong references3.867低于无retrieval3.901。（Table2 p.9）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可编辑graphic layout、render-grounded planning、functional grouping及feedback correction直接命中visual design agents与structured 2D。",
+    "caveatZh": "未见独立limitations节；每轮最多15候选、3个LoRA模块+closed verifier，未给完整latency/token成本。；LICA title由ground-truth rendered image和metadata生成，含额外语义信息，zero-shot不代表完全无target-derived metadata。；只当前group可retry，早期错误无法全局回改；SFT使用oracle cumulative states有train/test差异。；VLM metrics不检查准确文字或source fidelity，用户研究sample小。"
+  }
+}

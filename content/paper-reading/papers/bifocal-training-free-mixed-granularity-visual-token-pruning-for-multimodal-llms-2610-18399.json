@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.18399",
+  "slug": "bifocal-training-free-mixed-granularity-visual-token-pruning-for-multimodal-llms-2610-18399",
+  "title": "Bifocal: Training-Free Mixed Granularity Visual Token Pruning for Multimodal LLMs",
+  "authors": [
+    "Peiran Yin",
+    "Hao Wu",
+    "Zihao Yang",
+    "Fengyu Zhou",
+    "Yijuan Liang",
+    "Haozhe Hu",
+    "Xudong Wang",
+    "Wei Zhang",
+    "Xiaoyu Shen"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18399"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Bifocal",
+    "Training-Free",
+    "Mixed",
+    "Granularity",
+    "Visual",
+    "Token",
+    "Pruning",
+    "for",
+    "Multimodal"
+  ],
+  "abstract": "Visual token pruning for multimodal large language models (MLLMs) appears highly effective, with existing methods retaining over 95% of unpruned performance on common VQA benchmarks using a quarter of the visual tokens or fewer. However, our extensive evaluation of ten methods across three MLLM families and five ability groups reveals a critical gap: strong general performance often comes at the cost of severe degradation on fine-grained tasks such as OCR and visual grounding. We trace these failures to two limitations of the prevailing paradigm of retaining the highest-ranked native patches. A single importance ranking overlooks the complementary evidence required by different tasks, while sparse patch selection disrupts both image content and spatial integrity. To address these limitations, we propose Bifocal, a training-free, two-stage pruning method built on a mixed-granularity framework. It allocates separate budgets to query-focused and image-intrinsic evidence, complemented by a pooled coarse representation of the entire image. Before the LLM, Bifocal matches question words to visual regions through a soft conjunction balanced against norm-debiased image saliency, while selecting image-intrinsic evidence to maximize representational coverage. Inside the LLM, it further prunes tokens using density-adjusted text-to-image attention. With roughly a quarter of the original visual tokens, Bifocal is the only evaluated method to retain over 90% of unpruned performance in every ability group across all three models, and ranks first on average in all nine model-budget settings. The code is available at: https://github.com/EIT-NLP/Bifocal",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18399v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18399v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18399v1 的 32 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "Bifocal 将 visual token budget 分给 query-focused 细证据、image-intrinsic 覆盖证据与 pooled coarse context，再在 LLM 内按 density-adjusted attention 剪枝。作者报告普通 VQA 保真可能掩盖 grounding 崩溃，而混合 granularity 更平衡；最激进 budget 下 grounding 仍丢失约三分之一，不是无损压缩。",
+    "motivationZh": "visual token pruning 在普通 VQA 保留高分时仍可能严重破坏 OCR 和 grounding，因为单一 ranking 丢失互补证据和空间完整性。",
+    "methodZh": "Bifocal 将 visual token budget 分给 query-focused 细证据、image-intrinsic 覆盖证据与 pooled coarse context，再在 LLM 内按 density-adjusted attention 剪枝。作者报告普通 VQA 保真可能掩盖 grounding 崩溃，而混合 granularity 更平衡；最激进 budget 下 grounding 仍丢失约三分之一，不是无损压缩。",
+    "methodFlow": [
+      "word / patch saliency 软 AND 与 norm-debiased image saliency 找 query evidence",
+      "greedy submodular coverage 保留 image-intrinsic 细证据",
+      "剩余 patches 合为 coarse context",
+      "native / pooled tokens 以位置进入 LLM",
+      "density-weighted text-to-image attention 再剪枝"
+    ],
+    "experimentsZh": "三 MLLM families、九 model / budget settings，14 benchmarks 覆盖 general/reasoning/OCR/hallucination/grounding，按 layer-averaged budget 匹配。 以下结果为作者报告：作者报告 Qwen2.5-VL7B 在 25%tokens 时 general relative94.9%、grounding90.2%；15%时分别 89.0%、67.9%。LLaVA1.5 的 128-token grounding 相对 base101.8%。（Tables 2-3, p. 11） 对照范围：比较 10 种 pruners，包括 FastV、VisionZip、DART、Nüwa、HiPrune、EADP 等；不应用 general average 代替 fine-grained grounding 结果。 消融与诊断：Table4 分 coarse、intrinsic、query allocation，full 并非所有单指标最佳；混合配置在能力组间取平衡。",
+    "insightZh": "贡献不仅是新 ranking：承认互补证据与空间完整性，显式混合 fine/coarse token types；无需新增训练。",
+    "evidenceZh": "word weighting 结合 image saliency，并以 geometric mean 实现 soft conjunction。（Sec. 3.1, pp. 7-8; Fig. 4, p. 7）；coverage greedy selection 与 nonselectedpatch pooling 分工，每 patch native 保留或进入一个 coarsetoken。（Secs. 3.2-3.4, pp. 8-9）；作者报告 Qwen2.5-VL7B 在 25%tokens 时 general relative94.9%、grounding90.2%；15%时分别 89.0%、67.9%。LLaVA1.5 的 128-token grounding 相对 base101.8%。（Tables 2-3, p. 11）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "多粒度 visualrepresentation 与细粒度 grounding 保真直接属于 VLM tokenization / grounding 方法。",
+    "caveatZh": "未见独立 limitations section；低 budget 对 OCR / grounding 仍有显著损失，平均分隐藏个例风险。；PDF 声称 GitHub code available，但本轮仓库 API404，未确认可公开实现，Code 按 promised 记录。；静态 image 证据不说明 multi-image / video 或设计 agent 长期观察的性能。"
+  }
+}

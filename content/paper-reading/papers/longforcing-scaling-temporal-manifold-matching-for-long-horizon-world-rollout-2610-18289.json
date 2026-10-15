@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.18289",
+  "slug": "longforcing-scaling-temporal-manifold-matching-for-long-horizon-world-rollout-2610-18289",
+  "title": "LongForcing: Scaling Temporal Manifold Matching for Long-Horizon World Rollout",
+  "authors": [
+    "Ziyu Zhu",
+    "Zhaoxu Sun",
+    "Fan Jiang",
+    "Mengchao Wang",
+    "Junfeng Ni",
+    "Ting-Bing Xu",
+    "Zhicheng Liu",
+    "Mu Xu"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18289"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "LongForcing",
+    "Scaling",
+    "Temporal",
+    "Manifold",
+    "Matching",
+    "for",
+    "Long-Horizon",
+    "World",
+    "Rollout"
+  ],
+  "abstract": "Autoregressive video diffusion models have emerged as a foundation for long-horizon world rollout. However, when extended far beyond their training windows, these models suffer from progressive drift: visual quality deteriorates, motion becomes inconsistent, and object identity gradually collapses as generated frames are recursively reused as context. We study a supervision-horizon gap: short-horizon distillation leaves later rollout states without direct supervision. We show that matching short-window marginals need not determine long-horizon behavior, while longer on-policy trajectories expose delayed failures to training. This motivates temporal manifold matching at scale for long-horizon world models. Building on this insight, we introduce LongForcing, a distillation approach that scales teacher supervision to long student self-rollouts. LongForcing preserves the short-horizon teacher-forcing and causal ODE-distillation stages, while replacing the realscore teacher in the final distribution-matching stage with an extended-horizon bidirectional teacher. The long-horizon teacher supervises extended student self-rollouts using the standard distribution-matching formulation, without modifying the student architecture or increasing inference cost. We evaluate LongForcing on text-to-video generation and interactive action-conditioned world models, achieving a VBench Quality score of 85.52 and improving WorldRoamBench 60s action score by 23.9 points in first-person ablations. Qualitative stress tests further sample interactive rollouts up to 24 hours, far beyond the training horizon. These results suggest that scaling supervision along the temporal axis is a practical step toward long-horizon world models. The project website and code are at https://github.com/Fantasy-AMAP/LongForcing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18289v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18289v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18289v1 的 25 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "LongForcing 保留 Causal Forcing 的短teacher-forcing/ODE stages，换成长bidirectional teacher 对321帧student on-policy完整路径做DMD。作者报告60s first-person action64.39→88.26、59s drift67.46→31.91；24小时只snapshot压力演示，不能当持续世界状态正确性的验证。值得skim时间监督覆盖，horizon ablation同时更换teacher且未matchedcompute。",
+    "motivationZh": "short-window self-rollout distillation看不到后来才出现的drift，局部windowmatching也不能确定长路径的跨窗口依赖。",
+    "methodZh": "Wan1.3B/5B causalstudent沿自身上下文rollout，长real-scoreteacher与onlinefake-score双向评分整段共同噪声路径。theory区分localmarginal不可识别性、有限cleanpathKL与conditionaldriftrecovery；实际使用noisyDMD，推理架构不增加操作。",
+    "methodFlow": [
+      "短cleanclip teacher-forcing训练causalmodel",
+      "短causalODEdistillation初始化few-stepstudent",
+      "用长视频/action数据适配extendedbidirectionalteacher",
+      "student生成321帧on-policycontiguoustrajectory",
+      "整path共享噪声，longreal/fakescores进行DMD更新"
+    ],
+    "experimentsZh": "T2VWan1.3B832×480、VBench5s/Long30s；interactive5Bthirdperson与1.3Bfirstperson60s；321frameDMD1000steps/8GPU，教师另32/256GPU训练。 以下结果为作者报告：作者报告VBenchQuality85.52vs84.59，LongQuality83.99vs83.44；LongSemantic78.19vs71.52，但LongLive81.17更高。（PDF p8 Tables2–4; p22 Table7）；作者报告blindedhumanoverall72%preferlongvs16.2%short，20cases×20raters；24h为qualitativesnapshot。（PDF p9 Figure3; p23 C.4; p2 Figure1） 对照范围：CausalForcing/selfforcing/LongLive同family；interactive历史模型不同size/data，weightedvisual合并controlrate；17FPS/0.69s借自CausalForcing未本模型实测。 消融与诊断：81/161/241/321horizon各用单独teachercheckpoint，非固定teacher或matchedcompute；趋势非严格单调。",
+    "insightZh": "长on-policyjointpathsupervision作为temporal训练scaling方向有实质意义，结合actionconditioning与完整finitehorizon分析；核心操作是已有DMD的teacher/horizon扩展，不是新的世界状态记忆架构。",
+    "evidenceZh": "延长最终DMDreal/fakescore上下文与studentrollout，保留student推理。（PDF pp6–7 Section5/Algorithm1; p15 AppendixA.1）；作者报告1.3Bfirstpersonaction64.39→88.26，strict42.89→85.16。（PDF p9 Table5）；59s作者自定义driftscore67.46→31.91。（PDF pp22–23 AppendixC.3/FigureC1）；CleanKL/Pinsker理论不自动适用于实际noisyDMD或feedbackactions。（PDF pp16–21 AppendixA.2/A.4/B.4–B.5）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "涉及重要长时一致性与controllability训练，可迁移长视觉生成workflow；没有explicit3D或fabrication输出，因此medium/skim。",
+    "caveatZh": "训练compute与长pathattention增加；finite/longrun理论依赖teacher质量和studentmismatch条件。；longtermplanning/persistentmemory是未来方向，视觉持续不等于state/goal正确。；horizon与teacherquality/data/compute同时改变，无法isolatetemporalcoverage的独立因果收益。；24h仅qualitative选帧，没有均衡小时级benchmark或worldrevisitaccuracy。；理论cleanKL未从noisyDMDloss得到可验证bound；不能声称保证永不drift。；latency/throughput是baseline引用，未实测本模型。"
+  }
+}

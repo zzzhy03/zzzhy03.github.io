@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2610.14654",
+  "slug": "prospective-forcing-learning-to-look-ahead-for-autoregressive-long-video-diffusion-2610-14654",
+  "title": "Prospective Forcing: Learning to Look Ahead for Autoregressive Long Video Diffusion",
+  "authors": [
+    "Yifan Shen",
+    "Yewei Xia",
+    "Gongxu Luo",
+    "Peiyuan Zhu",
+    "Boyang Sun",
+    "Zhenhao Chen",
+    "Guangyi Liu",
+    "Guangyi Chen",
+    "Kun Zhang"
+  ],
+  "publishedAt": "2026-10-10",
+  "updatedAt": "2026-10-10",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.14654"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Prospective",
+    "Forcing",
+    "Learning",
+    "to",
+    "Look",
+    "Ahead",
+    "for",
+    "Autoregressive",
+    "Long"
+  ],
+  "abstract": "Autoregressive video generators synthesize long videos through chunk-wise rollouts, yet they are typically trained to predict only the immediate future. This limited prediction horizon makes it challenging to maintain video quality over extended rollouts. To address this problem, we introduce Prospective Forcing, a multi-head prediction framework that injects long-range predictive signals into autoregressive video representations. Built on a rolling-window generator, Prospective Forcing attaches lightweight, offset-specific heads that share the same conditioning information and independently predict chunks at different future temporal offsets. By extending supervision beyond the next chunk, these heads encourage the shared history representation to retain information useful for longer-horizon prediction, supporting temporally consistent generation. At inference time, we accelerate sampling by using accepted future-chunk predictions to skip full-window backbone executions. We equip the head with learnable embeddings to generate multiple candidates for the next chunk, and a learned verifier either selects a candidate or rejects all and falls back to standard autoregressive generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.14654v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.14654v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.14654v1 的 22 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "Prospective Forcing 用共享backbone未来特征/velocity自蒸馏训练多步预测head，再以learned verifier选择可接受的speculative chunk。作者报告30秒VBench Quality82.71、9.23FPS；长一致性与motion平衡值得skim，但正式比较仅30秒，theorem的exact-alignment单chunk假设不证明实际rollout物理状态或drift界。",
+    "motivationZh": "AR video diffusion只监督眼前chunk，history表示缺少对远期的约束，长视频容易漂移或停滞。",
+    "methodZh": "rolling window五chunk按不同noise level联合denoise；末chunk特征并行预测未来offset1/2，提前采样noise确保后续self-distill target对应。stage1加feature与velocity alignment；stage2第一head多candidate和reject verifier。accepted预测可跳过一个backbonewindow，cache保留首chunk和最近chunk，仍需cache update pass。",
+    "methodFlow": [
+      "五chunk noise-staggered rolling window",
+      "共享末chunk特征预测未来1/2chunk",
+      "后续同noise backbone输出自蒸馏",
+      "stage2训练多candidate与reject verifier",
+      "接受预测则额外提交chunk否则标准推进",
+      "更新首/最近KVcache继续rollout"
+    ],
+    "experimentsZh": "Wan2.1-T2V1.3B causalCD初始化、14Bteacher；W5,K2,M2；200MovieGen prompts、30秒832×48016FPS；6同backbone AR baselines，VBench/Long/VideoScore/MUSIQ与user study。 以下结果为作者报告：作者报告VBenchQuality82.71、total81.40、FPS9.23；RollingForcing80.05/78.63/7.95。（Table1 p.8）；作者报告stage1标准7.69FPS/Quality81.29，stage2verified9.23/82.71。（Table3 p.9） 对照范围：同base model多AR方案，多数retrain官方code，VideoMirai用released checkpoint；LongLive drift/VideoScore略优但motion低。未验证native3D/world/interactive control。 消融与诊断：future horizons、independent/shared/sequential heads、feature/velocityloss、initialization、verified/unverified/standard；多未来输出可导致dynamic degree17–23.5，说明低drift不自动好。",
+    "insightZh": "把multi-offset predictive representation训练与speculative inference复用连接起来，而非单纯改cache；state identifiability为高度理想化理论。",
+    "evidenceZh": "未来feature/velocity targets来自之后window的stop-gradient backbone，复用noise。（Sec.4 pp.4–5; Fig.3 p.4）；verifier可拒绝所有candidate，接受后仍需cache-update。（Sec.4 pp.5–6; AppendixD.3 pp.20–21）；stage1标准推理与stage2验证分离，收益不全来自多算。（Tables1–4 pp.8–9）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对长视频representation与visualcreation的一致性/动态平衡有直接方法价值。",
+    "caveatZh": "cache-update开销限制加速（p.9）。；定量只30秒，数分钟示例不是系统长时benchmark。；Theorem1假设W1、exact alignment、matched teacherdistribution、无KVanchor，不给实训drift guarantee。；数字和偏好均作者报告，未复现。"
+  }
+}

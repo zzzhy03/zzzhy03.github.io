@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.15357",
+  "slug": "uniforge3d-joint-3d-reconstruction-and-generation-in-a-shared-anchor-guided-space-2610-15357",
+  "title": "UniForge3D: Joint 3D Reconstruction and Generation in a Shared Anchor-Guided Space",
+  "authors": [
+    "Wenjue Chen",
+    "Wenyue Chen",
+    "Heliang Zheng",
+    "Rongfei Jia",
+    "Yuan Liu",
+    "Meng Li"
+  ],
+  "publishedAt": "2026-10-11",
+  "updatedAt": "2026-10-11",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.15357"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "3d-generation",
+    "UniForge3D",
+    "Joint",
+    "Reconstruction",
+    "and",
+    "Generation",
+    "in",
+    "Shared",
+    "Anchor-Guided",
+    "Space"
+  ],
+  "abstract": "Generating complete 3D assets from sparse, unposed images requires preserving observed geometry while completing unseen regions. Joint reconstruction and generation offers a way to address both goals: reconstruction recovers the geometry observed in the input images, while generation contributes learned shape priors. However, combining camera-relative reconstruction with canonical-space generation introduces a coordinate mismatch that makes direct geometric interaction more difficult. Moreover, conditioning each 3D location on all views without accounting for their relevance may mix useful geometric evidence with unrelated image content, hindering local detail recovery. We present UniForge3D, which jointly models reconstruction and generation in a shared anchor-guided space, resolving their coordinate mismatch. This space follows the anchor view's azimuth while keeping the object upright. The two branches exchange features bidirectionally to predict per-view point maps and a complete sparse voxel structure. We further condition point-map prediction on the generated structure to establish pixel-to-voxel correspondences and select the most informative input view for each voxel. Features from the selected views then guide detailed shape generation, helping preserve observed geometric details. Our method achieves state-of-the-art appearance and geometry results on Toys4K and GSO, generating complete 3D assets with improved fidelity. Project webpage: https://xishuxishu.github.io/uniforge3d-project/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.15357v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.15357v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.15357v1 的 27 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "UniForge3D 把VGGT pointmaps与TRELLIS.2生成放进anchor-azimuth/upright shared space，双向feature交换后用structure-conditioned pointmaps给每voxel选最大connected-pixel-support view。作者GSO F-score0.8897 vsMix3R0.7174，CD1.4047×10−2；适合深读联合几何设计。但评测全用GT Sim3 alignment，upright/synthetic假设与hidden completion仍受prior限制。",
+    "motivationZh": "稀疏unposed views需faithful visible geometry与complete hidden structure，camera-relative与canonical generation空间不一致，local evidence跨views会混杂。",
+    "methodZh": "训练GT canonical objects按anchor azimuth绕vertical旋转，两branch共同监督pointmaps与sparse structure。VGGT features残差加DINOv3条件生成；noise-gated generator features回注reconstruction。固定生成structure再预测point/confidence，quantize对应voxel按connectedsupport选view；fine shape DiT交替全view/selectedview attention，独立shape-conditioned texture stage输出PBR。目标faithful sparse-view资产，归reconstruction并交叉native3Dgeneration。",
+    "methodFlow": [
+      "构造anchor-azimuth且upright shared target space",
+      "VGGT与TRELLIS.2双向交换生成sparse structure/pointmaps",
+      "structure-conditioned VGGT估pixel-to-voxel对应",
+      "每voxel取最大connected-pixel support的view",
+      "shape DiT交替global和selectedview conditioning",
+      "固定shape生成texture并decode mesh/PBR"
+    ],
+    "experimentsZh": "TRELLIS500K subset210Kobjects，Toys4K/GSO各500holdout、每object四unposed RGB；32A800，多stageVGGT/TRELLIS2 LoRA/fulltune；GT Sim3对齐后RGB/mesh/pointmaps评测。 以下结果为作者报告：作者GSO PSNR24.826、CD1.4047×10−2、Fscore0.8897；Mix3R21.040/2.3202×10−2/0.7174。（Table1 p.10）；作者shared-anchor sparseIoU0.5827 vs crossspace0.4563；structure-conditioned pointOverall3.313×10−3 vsjoint4.152×10−3。（Tables2–3 p.11） 对照范围：Hunyuan2MV/MVSAM3D/ReconViaGen两versions/Mix3R/Stream3D+TRELLIS2四相同views；训练/预训练差异未严格matched，真实examples仅qualitative。 消融与诊断：DINO/VGGT/双向joint/canonical/crossspace、structure-conditioned pointmaps、同structure fullviews vsselectedviews。支持sharedframe与evidence routing；缺pose/upright错误或下游editing/fabrication量化。",
+    "insightZh": "共享anchor geometry直接消除branch坐标对齐，再让生成structure反向改善correspondence与voxelwise view selection。区别Mix3R crossspace、仅reconstructionconditioning；关键不是单一新generator。",
+    "evidenceZh": "两branch在anchor-guided shared object coordinates共同学习，generation通过time-gated crossattention反馈reconstruction。（Fig.3 p.5; Sec.3.1 pp.5–6 Eqs.1–4）；selectedview依pointmap/confidence和最大connected-component support，随后仍读取该view完整tokens。（Sec.3.2 p.7; AppendixA.1.2 pp.21–22; Fig.9 p.26）；作者报告两dataset完整mesh的appearance/geometry改善。（Table1 p.10）；真实复杂条件仍困难。（Sec.5 Limitations p.12）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "faithful editable object资产与native3Dprior结合，关联3D reconstruction/generation主要方向；可学习visibility/evidence routing而无主项目实证。",
+    "caveatZh": "synthetic训练；严重occlusion/reflection/extreme lighting仍难（p.12）。；GT Sim3 alignment消除scale/orientation误差，结果不等于native pose/metric恢复。；visiblepointmapping受generatedstructure错误影响，pixel-support仅proxy；hidden geometry是plausiblecompletion非可验证真实。；多stage32GPU训练和推理成本未完整报告；upright/canonical对象假设限制任意姿态/场景。"
+  }
+}

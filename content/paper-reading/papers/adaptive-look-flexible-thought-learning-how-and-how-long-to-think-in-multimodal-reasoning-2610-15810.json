@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.15810",
+  "slug": "adaptive-look-flexible-thought-learning-how-and-how-long-to-think-in-multimodal-reasoning-2610-15810",
+  "title": "Adaptive Look, Flexible Thought: Learning How and How Long to Think in Multimodal Reasoning",
+  "authors": [
+    "Quanlin Chen",
+    "Xiuwei Chen",
+    "Kun Xiang",
+    "Zehua Ma",
+    "Chunjin Ye",
+    "Boqiang Guo",
+    "Xianming Liu",
+    "Xiaodan Liang"
+  ],
+  "publishedAt": "2026-10-11",
+  "updatedAt": "2026-10-11",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.15810"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Adaptive",
+    "Look",
+    "Flexible",
+    "Thought",
+    "Learning",
+    "How",
+    "and",
+    "Long"
+  ],
+  "abstract": "The introduction of long chain-of-thought (CoT) reasoning and external tools has substantially improved the performance of multimodal large language models (MLLMs) on general and reasoning tasks. However, existing fast-slow reasoning paradigms mainly regulate textual reasoning length, while visual computation introduced by external tools or visual tokens is often treated as an auxiliary component. This separation prevents MLLMs from jointly optimizing visual perception and textual reasoning. To address this issue, we propose L2T (adaptive Look, flexible Thought), a unified reasoning framework that jointly optimizes the form and depth of computation. L2T first discretizes tool-produced visual states into visual tokens, bringing visual perception and textual reasoning into a shared autoregressive space. Based on this unified representation, L2T introduces a modality-aware routing reward to select appropriate reasoning modes and a difficulty-aware fast-slow strategy to adapt reasoning depth according to task complexity. Experiments on general perception and reasoning-intensive tasks demonstrate the effectiveness of L2T. Compared with explicit tool-calling approaches, L2T maintains competitive performance while achieving 1.7--3.6 times higher throughput.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.15810v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.15810v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.15810v1 的 28 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "L2T把tool-produced imagefeatures量化为可自回归visualtokens，SFT蒸馏tooltrajectory，再RL按粗任务route标签与group成功率偏好视觉/文本比例及长短。作者报告7B平均63.9vs同SFTGRPO62.9，HR8K吞吐约3.6×toolbaseline；是值得skim的统一visual/text计算接口，生成visualcodes不等实际重新crop获取新证据，route本身几乎不改accuracy且有reward表述差异。",
+    "motivationZh": "fast/slow CoT只调文本长度，tool-based视觉计算额外执行昂贵，连续latent固定长度难token-levelRL联合budget优化。",
+    "methodZh": "冻结visiontower，VQfeatureencoder/codebook/decoder重建features；执行既有toolcode后用visualindices替代code与imagefeedback，加入词表并语言SFT。Stage2accuracy+formatGRPOwarmup90steps，stage3route shaping+passratepairwiselengthadvantage30steps，onlinefilter抑制全对/全错group。",
+    "methodFlow": [
+      "冻结visionfeatures训练VQcodebook重建",
+      "执行tooldata中的imageoperation，把中间image转visualindices",
+      "visual/textinterleavednexttokenSFT",
+      "accuracy/formatGRPO稳定policy",
+      "粗任务route与keywordlabel shaping视觉/文本比例",
+      "rolloutgroup成功率驱动easy短成功/hard长成功偏好"
+    ],
+    "experimentsZh": "Qwen2.5VL3/7B、SFT433256samples、RL96144；8H200SFT/8H100RL，8standardbench+SeePhysOOD，localQwen30Bjudge。 以下结果为作者报告：作者报告route移除visualCoT206.8→292.6/reasoning416.2→547.0，accuracy63.9→63.8。（PDF p9 Table2）；作者报告H100HR8K throughput约3.6×DeepEyesV2、其他1.7–1.9×；OODmean13.5仍低绝对accuracy。（PDF pp7–8 Figure2; p14 Table4） 对照范围：同SFTGRPO/GSPO可比overallallocation；外部tool/latent历史scores与部分本地评估混合，throughputbatch/strict工具配置细节不足。 消融与诊断：route/fastslow、visualindices换unk、twoRLwarmup、shortestalways、overtrainingcollapse；无multi-seedCI或独立visualcodecausaluse。",
+    "insightZh": "离散visualreasoning空间与adaptive modality/lengthRL联合提供一般MLLM训练接口，超过普通VQA调头；VQ与fastslow各已有先例，主要是组合，需看效率/真实evidenceuse。",
+    "evidenceZh": "toolintermediateimages转featureVQindices进入统一AR词表。（PDF pp3–4 Eqs1–6; p15 Figure4）；route标签来自datasetcategory加keywordrule，passrate含routecorrectness。（PDF pp5–7 Eqs10–23; pp25–27 Algorithms5/A.7）；作者报告平均63.9vsGRPO62.9、GSPO62.5；route消融accuracy仅0.1pp。（PDF pp8–9 Tables1–2）；visualtoken扰动similarity证明input-sensitive但不证明正确perception。（PDF pp14–16 Table5; pp21–22 Figure8/failedcase）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对视觉空间推理和visualagent内部计算预算有通用迁移价值，尚无CAD/structureddesign验证因此medium/skim。",
+    "caveatZh": "VQ丢细节，冻结visionencoder早期perception错无法靠更多visual/textreasoning修复；passrate粗difficulty不识别知识缺口。；生成codes只是语言条件预测，不重新获得更高分辨率证据；‘croppedimage确认’文字不证明实际工具执行或视觉correctness。；mainEq16乘rstable=accuracy×format，Algorithm4乘format，incorrectroute部分reward行为不同；需实现澄清。；Appendix正确性ordering sufficientbound beta<1−tau=0.01，报告budgetcoef1.00未说明满足，不能宣传理论保证不会重排correctness。；codebook训练corpus/超参数不完整、无公开代码；routekeywordprior与dataset分布可能决定所谓adaptive结果。"
+  }
+}

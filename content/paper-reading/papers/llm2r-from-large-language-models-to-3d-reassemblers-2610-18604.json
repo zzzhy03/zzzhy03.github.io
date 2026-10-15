@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.18604",
+  "slug": "llm2r-from-large-language-models-to-3d-reassemblers-2610-18604",
+  "title": "LLM2R: From Large Language Models to 3D Reassemblers",
+  "authors": [
+    "Zhouhan Zhong",
+    "Qiuhong Shen",
+    "Xingyi Yang",
+    "Jinyi Xu",
+    "Xinchao Wang"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18604"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "LLM2R",
+    "From",
+    "Large",
+    "Language",
+    "Models",
+    "to",
+    "Reassemblers"
+  ],
+  "abstract": "3D part assembly aims to reconstruct a complete shape from a set of unassembled parts by predicting a rigid SE(3) transformation for each part. Because the placement of a part is rarely determined by its own geometry, the task demands reasoning over the entire part set, and existing methods, which rely on pairwise relations or iterative generation and verification, scale poorly to objects with many parts. We present LLM2R, which casts part assembly as sequence modeling with a pretrained decoder-only large language model (LLM): a Point-BERT encoder and a Q-Former compress each part into a block of geometric tokens, the blocks of all parts are concatenated, and a causal LLM adapted with Low-Rank Adaptation (LoRA) processes the sequence in one forward pass. Causal attention, however, lets the hidden states of a part observe only the parts that precede it. LLM2R therefore appends a block of learnable summary tokens after the last part: these tokens follow every part, so their states aggregate the whole assembly at a constant token cost, and a part-aware pose head fuses each part's states with them before predicting its rotation and translation. One architecture thus handles semantic and geometric assembly and predicts all poses in a single non-autoregressive pass. LLM2R achieves the highest part accuracy and success rate on all three PartNet categories, the best rotation error, translation error, and part accuracy on PartNeXt, and the lowest translation error and fastest inference on Breaking Bad, where only a fracture-specialized method is more accurate. Its advantage grows with the number of parts: at 100 parts it exceeds GARF by 33.5 points in part accuracy on Breaking Bad and Assembler by 29.1 points on PartNet, and it transfers zero-shot to unseen categories with more than 16 points higher part accuracy than the strongest of three baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18604v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18604v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18604v1 的 20 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：promised。",
+    "ideaZh": "LLM2R 用Point-BERT/QFormer将每part编码64tokens，LoRA Qwen3.5后追加64summary tokens，pose head把每part与全assemblysummary配对后一次预测所有SE3。作者PartNetChair PA71.42/SR41.40，unseen Bed PA31.03仍不高；100parts有明显优势，但CD/接口严密性弱于specialists，order不变性与physicalbuildability未解决。可深读global-part reasoning。",
+    "motivationZh": "给定unassembled parts，每个SE3 pose依赖整套parts；causaldecoder早部件无法看到后续geometry。",
+    "methodZh": "PCA把各part输入规范为intrinsic geometry，pose target回assembledobjectframe。summary放全partblocks之后解决causalprefix不全；连续rotation由32signedquaternionanchors混合归一化，translationMLP。pose+partChamfer+interchangeable-group repulsion训练，无textgeneration/LMloss；KVcache支持incrementalparts，最终posesparallel。",
+    "methodFlow": [
+      "给定parts归PCAcanonicalframe",
+      "PointBERT+QFormer每part64geometrictokens",
+      "串接所有partblocks及末尾64summarytokens",
+      "LoRA causaldecoder一次forward汇总全partset",
+      "posehead融合part与summary输出rotation/translation",
+      "pose/Chamfer/repulsion监督并行reassembly"
+    ],
+    "experimentsZh": "三个benchmark各自独立trainmodels：BreakingBad Everyday7872/Artifact3697test，PartNetChair/Table/Lamp，PartNeXt15563train/3903test；100epochs8H200约10h；noimages/templates/semanticlabel输入。 以下结果为作者报告：作者PartNetChair PA71.42/SR41.40 vsCFPAPA69.24/AssemblerSR22.59；PartNeXtPA67.93但CD6.37×10−3 vsCRAG2.40×10−3。（Tables2–3 p.8）；作者unseenBed/Door/Storage PA31.03/32.49/26.35；100parts BBPA57.85 vsGARF24.33，PartNet36.83 vsAssembler7.78。（Table5/Fig.2 p.9） 对照范围：同publishedprotocol多baseline多数来自原报告；无random/frozenvsfinetunedLLM或permutation-matched/physicalassemblybaseline，跨benchmark同架构但不是单trainedmodel统一。 消融与诊断：summary删除PA−7.7，MLPprojector/instruction删除，tokens16–128与positionPA；未randomorder/LLMpretraincapacitycontrol，尾部partPA低约24pp。",
+    "insightZh": "预训练causalLLM连续SE3readout加post-inputglobal-summary解决assembly全局条件；sharedsummaries本身不新，但geometrytask与singlepasshead有实质贡献。instructionremoval只能说明prompt有用，未证明languagepretraining优于randomsamecapacity。",
+    "evidenceZh": "summary在所有part之后，每个pose读取part+wholeassembly summary，不改causalmask。（Fig.1 p.4; Sec.3.2–3.3 pp.5–6）；作者semantic assembly/largepart/unseencategory有提升，globalCD仍落后。（Tables1–5 pp.7–9）；PCA canonicalization与symmetry/单pose/ctx限制明确。（AppendixA p.15; Limitations p.10）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "globalpart-set reasoning与可扩展reassembly直接关联object/part结构重建；对LEGOassembly可借鉴接口设计但没有brick实证，不能归LEGO核心。",
+    "caveatZh": "partorder敏感、context约125parts；singlepose不能多plausibleassemblies；PCA symmetrylabels不唯一；CD较差（p.10）。；unseenPA仅26–32%，不能称可靠generalassembly；CA/局部contact不全面优，未验证collision/stability/buildpaths。；wholeobject归一化/PCAcompletepartcloud假设限制现实fragment/partialscan；indices/dataorder可带structureprior。；promptablation不隔离pretraining优势；KVspeed是逐个appendprefix而非普通singlepass全workflowcost。"
+  }
+}

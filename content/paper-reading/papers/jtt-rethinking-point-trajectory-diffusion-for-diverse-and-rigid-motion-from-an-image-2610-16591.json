@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.16591",
+  "slug": "jtt-rethinking-point-trajectory-diffusion-for-diverse-and-rigid-motion-from-an-image-2610-16591",
+  "title": "JtT: Rethinking Point Trajectory Diffusion for Diverse and Rigid Motion from an Image",
+  "authors": [
+    "Gabrijel Boduljak",
+    "Yushi Lan",
+    "Christian Rupprecht",
+    "Andrea Vedaldi"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16591"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "JtT",
+    "Rethinking",
+    "Point",
+    "Trajectory",
+    "Diffusion",
+    "for",
+    "Diverse",
+    "and",
+    "Rigid"
+  ],
+  "abstract": "We study forecasting rigid-body motion from a single image: generating diverse and physically plausible future trajectories for arbitrary points in a scene, without building rigidity into the architecture or relying on geometric inputs such as depth. Like video generators, recent trajectory generators fail at this task, even in simple synthetic Kubric scenes, despite scaling up model size and training on real data. We show how to solve this with the right architecture and parameterization. Our model, JtT, is a simple diffusion transformer that operates directly in coordinate space and decodes arbitrary and dense query patterns, without the trajectory VAEs or fixed grids assumed in prior work. Through a systematic study of the design space of point trajectory diffusion, we find that diffusing per-frame velocities is the only parameterization that captures rigidity, that it must be paired with the right timestep schedule, and that adding full-resolution RGB at the query points resolves the boundary failures of prior methods. However, evaluating such 2D models rigorously is itself non-trivial. To our knowledge, we are the first to observe that physical plausibility and diversity do not improve together during training: larger models, as used in prior work, memorize the single ground-truth future per training image, becoming more rigid while covering fewer possible futures. Yet prior work has paid little attention to this, so we show how model rankings depend on model size, metric, and stopping time, and adopt a stricter, checkpoint-averaged evaluation protocol. Under this protocol, JtT improves over prior methods on both distributional and rigidity metrics and approaches ground-truth rigidity, with only about 50M parameters.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16591v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16591v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16591v1 的 35 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "JtT直接在每帧2D位移增量上做flow diffusion，full-resolution query RGB与多层DINO条件、随机support/readout分工允许任意密度轨迹。作者报告55M Dense FVMD11807、rigidity proxy6.84接近GT6.68；值得skim结构化motionprior与多未来评估，但2D低秩proxy不证明真实physics，真实视频只有定性，论文S-Dense平均实际仅列四checkpoint。",
+    "motivationZh": "单图未来轨迹生成在任意query/densepatterns、rigidmotion与多未来覆盖之间权衡，VAE/fixedgrid及单checkpoint评估掩盖退化。",
+    "methodZh": "每querytoken编码位置/RGB/noisytrajectoryvelocities，support组互注意与imagepatch交叉注意；non-support由support读出，训练每步随机partition。logitnormalnoise与rectifiedflow，默认1000stepSDE，ODE10step有更好分布metric但稍差rigidity。Kubric多未来GT训练/评估study发现large模型后期distributioncollapse。",
+    "methodFlow": [
+      "imagepatch拼RGB、多层DINO与位置，query拼RGB/位置/noisyframevelocities",
+      "随机query分support与non-support，每步重采样",
+      "support互注意并读取imagefeatures",
+      "non-support并行读support，输出trajectoryflowvelocity",
+      "logitnormaltimestepflow训练，采样并累加framevelocities得多future"
+    ],
+    "experimentsZh": "KubricA多未来物理re-simulation，24frametrajectory；A/Doraclegeometry重新render，Cityscapes/Physics101各训练再qualtest，非零样本realtransfer。 以下结果为作者报告：作者报告DenseS FVMD(D/S)11807/15695、LRTL6.84，WHNlatent13745/17838、14.10；GPTF BestofK95.60更好。（PDF p8 Table2）；作者报告10stepODE FVMD11614/LRTL7.05，1000SDE11957/6.77，单B70Kcheckpoint。（PDF p17 Table8） 对照范围：priorpublishedsinglecheckpoint，MotionForecasting自reimplementation、GPTFparametersestimate；不能claimallpriorcheckpointfairprotocol或所有metric优。 消融与诊断：coordinates/offsets/velocities×noise、queryRGB/DINO/privilegegeometry、support/featureextractor/sampler/size/trainingcurves。",
+    "insightZh": "coordinate-spacevelocityparameterization与query-supportgenerativearchitecture提供可迁移densemotion表示，systematictradeoff评估超纯benchmark；只测试三parameterization与Kubric，不能称velocity是唯一物理正确方案。",
+    "evidenceZh": "随机support/non-supportpartition允许query数量和空间pattern变化。（PDF pp5–6 Figure2/Sections3.1–3.4）；velocity配logitnormaltimestep改善rigidity/diversitytradeoff。（PDF p9 Table3）；作者报告DenseS FVMD11807/LRTL6.84，GT6.68；checkpointaveraging协议有分母不一致。（PDF p8 Table2; p21 Table11）；large模型训练后期FVMD变差而LRTL/BestofK改善。（PDF p7 Figure3; pp20–21 Tables9–11）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "作为显式motioncontrol先验和dynamicvisualgeneration的结构化中间表示有迁移价值；当前不是RGBvideo生成或3Dshape/motion输出，推荐skim。",
+    "caveatZh": "rigorousrealdataevaluation未来工作；真实单未来无objectrigidityGT。；2D LRTL rank5只proxy，staticoutput也低；不证明3Dcontact/friction/energy或物理法则。；DenseS平均只有四checkpoint，mainfive说法不符；不同GTmetricpositivebias，必须按作者报告引用。；parameters不含冻结DINOencoder；1000SDE推理cost大且未densequerylatency实测。；真实video是重新训练后qual展示，不能宣称OODzero-shot或实际robotpolicy验证。"
+  }
+}

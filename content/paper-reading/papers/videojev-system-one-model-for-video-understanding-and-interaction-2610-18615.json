@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2610.18615",
+  "slug": "videojev-system-one-model-for-video-understanding-and-interaction-2610-18615",
+  "title": "VideoJev: System One Model for Video Understanding and Interaction",
+  "authors": [
+    "Yuhan Zhu",
+    "Xiangyu Zeng",
+    "Qingyi Si",
+    "Chenxu Yang",
+    "Yifei Li",
+    "Luozheng Qin",
+    "Junhao Zhou",
+    "Dingyu Yao",
+    "Jun Zhang",
+    "Chuanyu Qin",
+    "Zhiqiu Zhang",
+    "Yuandong Yang",
+    "Yuqi Xu",
+    "Tianyu Zhang",
+    "Hongcheng Guo",
+    "Jiaqi Wang",
+    "Nan Duan",
+    "Limin Wang"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18615"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "VideoJev",
+    "System",
+    "One",
+    "Model",
+    "for",
+    "Video",
+    "Understanding",
+    "and",
+    "Interaction"
+  ],
+  "abstract": "Visual agents must turn video observations into timely decisions to track progress and choose what to do next. Building on the emerging System One paradigm, we introduce VideoJev, a family of models that cast video understanding and interaction as structured decision tasks. We adapt pretrained multimodal large language models (MLLMs) by replacing autoregressive answer decoding with a shared head that scores temporal intervals and textual options against video evidence. These scores yield event spans or answer choices, unifying temporal grounding and multiple-choice video question answering. This combines the semantic flexibility of MLLMs with efficient decisions that agents can use directly. As an interaction unfolds, new goals and intermediate results prompt further queries about the same visual history. VideoJev therefore reuses visual computation through Cached inference for queries as they arrive and Joint inference for multiple queries in a single forward pass. Across three temporal grounding benchmarks, VideoJev-4B and VideoJev-35B-A3B improve mean mIoU over their backbones by 6.7 and 10.8 points, respectively, with measured inference speedups of $2.8$-$3.1\\times$. On four video QA benchmarks, both achieve performance comparable to their backbones in Thinking mode, with measured inference speedups exceeding $100\\times$. These results offer a unified, reusable decision interface for composing structured visual judgments into complex, open-ended workflows.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18615v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18615v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/MCG-NJU/VideoJev"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18615v1 的 23 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "VideoJev 用共享 candidate scorer 同时判断时间区间 membership 和多选答案，重复 query 共享 video prefix，并以 BCE+soft IoU 与 CE 联合训练。作者报告 4B grounding mean mIoU 65.3，matched-data AR control 的差距仅 1.3/1.9 点；价值是直接决策接口和多 query 共享计算，尚不支持开放生成与真实 agent 闭环。",
+    "motivationZh": "同一视频反复输出时间戳/答案 token 增加计算与格式负担，决策任务需要稳定可组合候选分数。",
+    "methodZh": "Qwen3.5-4B/Qwen3.6-35B-A3B 移除末层 MLP/LM head，option_end 与 decide readouts 投影并归一化相似度为分数。temporal candidates 是 frame pairs，sigmoid membership 用 Kadane 最大连续区间解码；QA softmax。先固定 backbone 对齐 head，再共同训练语言层；cached 每 query 分支或 joint concat 多 query，视觉 encoder 冻结。",
+    "methodFlow": [
+      "视频编码为共享 causal prefix",
+      "query 加时间区间或 textual answer candidates",
+      "candidate/decision tokens 经共同 scoring head",
+      "temporal BCE+soft IoU 或 QA CE 联合训练",
+      "cached/joint reuse visual prefix",
+      "最大连续区间或最高分 option 输出"
+    ],
+    "experimentsZh": "TimeLens100K/2-93K 与内部 240K QA/19K long videos；64 H200；三个 temporal benchmarks、LVBench/Video-MME/LongVideoBench/MLVU，timing 只 model forward、不含 preprocessing。 以下结果为作者报告：作者报告 4B/35B grounding mean mIoU 65.3/67.7，4B QA mean74.3%。（Tables1–2 pp.6,8）；作者报告 matched single-stage AR control 比 direct scorer 低 1.3 grounding/1.9 QA 点。（Table3 p.8） 对照范围：包括 Qwen、Molmo、VideoChat/ORA、TimeLens 等；thinking speedup 对长 reasoning decoding，direct-option baseline 时间接近，不能泛称所有 inference 100x。 消融与诊断：同数据 AR、cached/joint、single/joint task、soft IoU、末层 MLP、two-stage；soft IoU 对 grounding +4.6，MLP移除仅约+0.2。",
+    "insightZh": "对既有 System One scoring 路线的 video 联合扩展，统一 interval/option interface 与 multi-query layout；不是新 pretraining foundation model。",
+    "evidenceZh": "同一 head 对 intervals 和答案用不同概率归一化。（Sec.2.1–2.3 pp.3–5; Fig.2 p.3）；joint query 可读取前面的 question/candidates，无预测/GT answer。（Sec.2.1 p.4; Sec.3.4 pp.7–8）；同数据同 schedule AR 对照支持有限但明确架构收益。（Table3 p.8）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "新的 video multimodal decision/readout 方法，可为视觉检查接口提供借鉴；不归 video generation。",
+    "caveatZh": "closed-set→open agent workflows、streaming 和 calibration 仍待研究（Future Work p.12）。；多选强不等于开放理解；概率过度自信。；joint 后 query 可访问 earlier text；实际交互控制与 design verification 未验证。；计时排除 IO/预处理且共享视频，100x thinking 比较不能等同端到端部署提升。"
+  }
+}

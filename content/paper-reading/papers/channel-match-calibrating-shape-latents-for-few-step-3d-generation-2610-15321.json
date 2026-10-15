@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.15321",
+  "slug": "channel-match-calibrating-shape-latents-for-few-step-3d-generation-2610-15321",
+  "title": "Channel Match: Calibrating Shape Latents for Few-Step 3D Generation",
+  "authors": [
+    "Di Yang",
+    "Zhihao Li",
+    "Yanhai Xiong",
+    "Yufei Wang"
+  ],
+  "publishedAt": "2026-10-11",
+  "updatedAt": "2026-10-11",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.15321"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Channel",
+    "Match",
+    "Calibrating",
+    "Shape",
+    "Latents",
+    "for",
+    "Few-Step",
+    "Generation"
+  ],
+  "abstract": "Recent native 3D generators achieve high-quality asset creation by modeling structured 3D latents with flow-based transformers, but their high-resolution generation remains computationally expensive due to costly iterative sampling. In this work, we introduce a few-step distillation framework for native 3D generation, enabled by continuous self-consistency training with a custom JVP FlashAttention kernel and an analytic velocity regression objective for sparse structured 3D latents. To stabilize joint optimization, we further introduce an adaptive loss weighting strategy that automatically balances them without manual tuning. Beyond acceleration, we reveal a previously overlooked failure mode of few-step native 3D generation: sampling-induced latent distribution drift preserves geometric correctness but disrupts downstream PBR texture synthesis, causing texture artifacts on geometrically valid assets. To address this issue, we propose Channel Match, a training-free adaptive per-channel latent calibration method that restores the latent distribution without modifying either generator. We validate our approach on TRELLIS.2 at the $1024^3$ resolution setting. Our two-step model achieves $4.5\\times$ faster geometry sampling while maintaining geometry quality comparable to the many-step teacher, and Channel Match further improves rendering quality by recovering the latent interface between geometry and appearance generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.15321v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.15321v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.15321v1 的 15 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "Channel Match诊断few-step 3D shape latent的channel统计漂移：几何仍可用，冻结的PBR stage却产生材质伪影。它结合稀疏JVP consistency distillation与training-free校准；作者报告shape sampling 4.5倍、端到端1.5倍加速。重点是生成阶段之间的latent interface，而非全模型提速；校准不恢复几何细节，且full match在简单Toys4K上可能变差。",
+    "motivationZh": "将3D flow压到少步后，geometry latent的channel统计可能脱离下游PBR generator的训练分布，几何指标正常仍会出现材质错误。",
+    "methodZh": "在TRELLIS.2-4B中只蒸馏1024-resolution shape flow，冻结sparse prefix、512 shape flow和texture stage。GT velocity loss固定正确transport，EMA self-consistency压缩步数，学习时间相关loss weights，fused JVP attention支持可变长度sparse latents。Channel Match用训练集channel统计校准生成shape latent，再进入冻结texture flow；以collapse score决定应用。",
+    "methodFlow": [
+      "构造稀疏输入：image-conditioned frozen prefix确定active voxels，加载shape latent与noise/时间。",
+      "联合蒸馏：analytic velocity regression加EMA continuous self-consistency，fused JVP attention取得空间和时间导数，按时间学习loss balancing。",
+      "少步生成：student以1/2/4步Euler生成shape latent，保持prefix和texture模型一致。",
+      "校准接口：计算channel std collapse score，必要时匹配训练集channel mean/std，再送入冻结PBR stage解码mesh。"
+    ],
+    "experimentsZh": "100K Objaverse/XL assets蒸馏、8×A800-80GB；full Toys4K 3216 assets与72 demonstration assets，四固定视角textured mesh渲染。评测使用teacher renders作为paired calibration reference，单A800计时，固定seed42。 以下结果为作者报告：作者报告two-step shape sampling 5.29→1.18秒（4.5×），end-to-end 11.51→7.55秒（1.5×）。（PDF p.7, Table 2）；作者报告two-step student FD-Incep14.09、FD-DINO127.44、ULIP-I38.48；12-step teacher12.56/106.66/38.45，Fréchet仍有差距。（PDF p.7, Table 1）；作者报告72示例full match LPIPS0.0802→0.0747、SSIM0.8819→0.8885、PSNR24.44→24.85；默认gate PSNR24.89为另一配置。（PDF pp.7–8, Tables 3/5） 对照范围：同prefix/texture/mesh protocol的teacher2/12步、reimplemented MDT、SCM为受控比较；LGM/TRELLIS等starred行仅引用异协议结果，不能据此统一宣称SOTA。 消融与诊断：GT loss、CM full/std-only、gate threshold、1/2/4步及JVP开销；Table4显示full CM在简单Toys4K FD略差，std-only更安全。gate的GT oracle仅为upper bound。",
+    "insightZh": "统计仿射校准本身沿用经典mean/std matching；新意是few-step structured 3D流水线中geometry正确而appearance失配的诊断、无需重训两stage的interface修复，以及使连续consistency在高分辨率sparse latents可训练的JVP kernel。",
+    "evidenceZh": "只蒸馏高分辨率shape stage，prefix与texture冻结。（PDF pp.3–5, §3.1/§4, Algorithm 1）；Channel Match校正每channel统计，std-only与full形式并非对所有资产等价。（PDF pp.5–6, §4.5/§5.6, Eq.(9), Table 4）；作者报告shape 5.29→1.18 s，而端到端11.51→7.55 s。（PDF p.7, Table 2）；72个demonstration assets的paired render接近teacher；不是对ground-truth外观的独立验证。（PDF p.7, Table 3）；CM不生成新几何细节且忽略channel相关性和空间结构。（PDF p.6, §6）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "3D generation流水线可借鉴跨stage latent统计检查；当geometry和PBR generator分别训练或蒸馏时，不能只看几何质量。",
+    "caveatZh": "只蒸馏shape stage，冻结texture限制端到端加速。；per-channel affine不能生成几何detail，忽略跨channel及空间结构。；主要骨干TRELLIS.2，TRELLIS.1与1536分辨率补充以qualitative展示为主；不保证任意latent pipeline适用。；训练单seed与teacher-reference评价限制泛化与真实性判断；72 demonstration资产与full Toys4K的校准效果不同。；§5.5文字与Table3的SSIM/PSNR有轻微数值差异，报告分别绑定表格配置。；论文提供kernel pseudocode但未找到公开code URL，尚未独立复现。"
+  }
+}

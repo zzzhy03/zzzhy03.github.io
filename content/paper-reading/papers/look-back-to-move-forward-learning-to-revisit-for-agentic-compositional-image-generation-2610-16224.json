@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2610.16224",
+  "slug": "look-back-to-move-forward-learning-to-revisit-for-agentic-compositional-image-generation-2610-16224",
+  "title": "Look Back to Move Forward: Learning to Revisit for Agentic Compositional Image Generation",
+  "authors": [
+    "Zixu Wang",
+    "Xiaoran Zhao",
+    "Yahui Liu",
+    "Feng-ao Wang",
+    "Junhao Xiao",
+    "You Shu",
+    "Bing Liu",
+    "Yiting Liu",
+    "Songlei Jian",
+    "Zhiliang Tian",
+    "Dongsheng Li"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16224"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "image-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "image-generation",
+    "Look",
+    "Back",
+    "to",
+    "Move",
+    "Forward",
+    "Learning",
+    "Revisit",
+    "for"
+  ],
+  "abstract": "Text-to-image models have made remarkable progress in visual fidelity and instruction following, yet complex compositional generation remains challenging. Existing agentic approaches address this limitation through iterative generation and editing, adapting their actions based on interaction history. However, they typically fix the continuation state (i.e., the image from which refinement proceeds) to the latest image. Since iterative editing is not necessarily monotonic, the agent may continue refining from the latest image even when it has already degraded. In this work, we introduce GenRevisit, an agentic framework that extends action selection to joint continuation-state and action selection. The agent can not only use interaction history to adjust editing instructions but also select an image candidate to edit, jointly deciding where to continue from and how to refine. We train GenRevisit with SFT followed by agentic reinforcement learning. To address the coarse credit assignment of final outcome reward in GRPO, which assigns the same trajectory-level advantage to all actions, we further propose Normalized Action Credit Assignment (NACA) to redistribute positive advantage according to each action's contribution to reducing the remaining objective. On GenEval2, GenRevisit achieves GM scores of 84.3 and 74.4 with Qwen-Image-2512 and Z-Image-Turbo, surpassing the strongest baselines using the same generators by 12.7 and 10.9 points respectively. GenRevisit achieves state-of-the-art performance on GenEval, GenEval++, and GenEval2 among baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16224v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16224v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Flipped-zx/GenRevisit"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16224v1 的 50 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "GenRevisit 让image agent同时决定“从历史哪张图继续”和“执行什么edit”，保留失败attempt作为context，再用source-relative normalized progress分配正trajectory credit。受控teacher和SFT对照支持非best/latest候选的价值；作者GenEval2很高，但大部分提升来自SFT，NACA不是因果credit，视觉美感也未随组成分数得到证明。",
+    "motivationZh": "iterative image editing会退步，强制从最新或当前最高分图继续会错失更可修复的历史状态。",
+    "methodZh": "Qwen3-VL8B planner可Generate/Edit/Retrieve/Submit，edit含source index与target/preserve constraints；固定atomic verifier更新archive。GPT5.5轨迹只对改进action做SFT，失败保留context；NACA按剩余utility gap闭合比例重新分配正advantage，负advantage仍广播。",
+    "methodFlow": [
+      "prompt拆固定atomic constraints并生成初图",
+      "planner读取历史图、actions、feedback与budget",
+      "联合选择历史source及edit specification，或generate/retrieve/submit",
+      "tool执行后逐constraint验证，append历史与更新best",
+      "SFT冷启动加NACA RL，最终提交historical GM-best"
+    ],
+    "experimentsZh": "800training prompt groups/3473 SFT targets，1280RL trajectories；冻结Qwen image/edit tools，最多5image calls；GenEval2及跨benchmark/跨Z-Image generator。 以下结果为作者报告：作者GenEval2 GM84.3，平均2.62calls；同policy换Z-Image GM74.4，无额外训练。（Table1 p.7）；Joint-demo SFT81.5对Best-only-demo77.5，pairedCI[2.81,5.18]。（Sec.5.4 p.9） 对照范围：external agentic baselines部分原文分数，tool、budget与planner不全匹配；source-selection controlled teacher与paired SFT更可解释。 消融与诊断：untuned49.7、SFT81.5、standardGRPO80.3、NACA84.3；作用归因应区分workflow、teacher imitation与credit。",
+    "insightZh": "动作空间显式包含continuation state，并为非单调trajectory设计local-progress credit；不是仅增加reflection或best-of-N。",
+    "evidenceZh": "edit可选择任意历史candidate并保留后续历史和已消耗budget。（Sec.4.1 pp.4–5; Fig.2 p.4）；matched 200teacher prefixes Joint GM55.2对Best52.4、Latest50.2，Joint-Best CI[0.46,5.15]。（Sec.5.4 p.9）；作者SFT81.5、GRPO80.3、NACA84.3，主体增益来自SFT。（Table3 p.9）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "history state选择、tool action、视觉反馈与correction闭环直接命中visual design agents，可迁移非单调创作流程。",
+    "caveatZh": "frozen tools可不服从，五calls限制搜索；verifier不保证视觉正确。；source-relative改进不一定archive改进，NACA不估causal contribution，负advantage与response-length问题保留。；GM-best提交受环境控制，美学无提升保证。；强metric反馈与GenEval-family监督可能放大benchmark针对性，需独立人类评估和复杂design迁移。"
+  }
+}

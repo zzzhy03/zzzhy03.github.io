@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.17844",
+  "slug": "what-makes-a-good-visual-representation-for-spatial-understanding-in-mllms-2610-17844",
+  "title": "What Makes a Good Visual Representation for Spatial Understanding in MLLMs?",
+  "authors": [
+    "Xiaohu Huang",
+    "Yumin Guo",
+    "Kai Han"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17844"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "What",
+    "Makes",
+    "Good",
+    "Visual",
+    "Representation",
+    "for",
+    "Spatial",
+    "Understanding",
+    "in"
+  ],
+  "abstract": "Spatial understanding is a necessary step in moving multimodal large language models (MLLMs) toward reasoning about the 3D physical world. Their visual pretraining data, however, is almost entirely 2D, so the visual tokens processed by MLLMs often lack inherent 3D structural information. A growing number of methods inject such structure by transferring representations from external vision or geometry models, and collectively establish that such transfer helps. Behind these methods lies a largely underexplored question: what makes a visual representation good for spatial understanding? To answer it, we first separate what is transferred from how it is transferred, and then trace the resulting differences back to properties of the representations themselves. What we transfer comes from 3D geometry models, self-supervised image and video models, vision-language models, and generative models, in the form of latent features or explicit depth and point maps. We transfer it either by distillation, using it as a supervision target, or by fusion, feeding it as an additional input. We find that a representation's 3D structure correlates strongly with how much it helps, measured by cross-view consistency for latent features and by depth and reconstruction accuracy for explicit geometry. We further show that the form of a representation dictates the mechanism it needs. Latent features gain as much from fusion as from distillation; explicit geometry gains little from fusion, and most of its distillation gain depends on a geometry decoding head. Guided by these findings, we distill both latent features and explicit geometry into a single MLLM. Taking only RGB video as input, it consistently improves over its base model on both static 3D and dynamic 4D spatial reasoning benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17844v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17844v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17844v1 的 15 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。 本次实质更新：PDF p2列五项扩展：五teacherfamily、两form、fusion/distillation+DPT、representationtraitsdiagnostics、DSR4D评估；并新增联合feature/geometry设计。非本run possible-update候选，promotion仍须核查canonical去重。",
+    "ideaZh": "这篇3DRS扩展将 source model、latent feature/explicit geometry、distillation/fusion 分开控制。作者发现跨视图对应一致性与feature收益相关，而geometry通过冻结VGGT DPT蒸馏比直接融合更有效；联合两种监督让Qwen3-VL8B在纯RGB输入下VSI57.64→62.15。值得读的是可计算的representation诊断与geometry训练接口，而非把7个/3个teacher上的相关性当普遍因果定律。",
+    "motivationZh": "MLLM spatial reasoning 中，external prior 的来源、表示形式与transfer接口纠缠，难判断何种3D结构真正带来收益。",
+    "methodZh": "七个teacher来自geometry、自监督image/video、visionlanguage与video生成五family；同852K空间训练样本与MLLMrecipe下比较feature/geometry以及fusion/distillation。feature用MLP SmoothL1对齐，geometry由冻结VGGT DPT从四层MLLMfeatures解码depth/point maps。最终同时蒸馏VGGTfeature和geometry，推理discardteacher及辅助head。",
+    "methodFlow": [
+      "在共享3Dvoxel坐标评估same/differentpoint feature一致性",
+      "固定base/data/visualbudget，比较teacher来源与两种representation",
+      "latentfeature用投影头蒸馏或gatedfusion",
+      "MLLM四层features经冻结VGGT DPT解码geometry并蒸馏",
+      "联合feature+geometry监督；推理仅RGB进入MLLM"
+    ],
+    "experimentsZh": "Qwen3-VL8B、64GPU一epoch、852K共有空间instruction与indoorQA；VSI/ScanQA/SQA3D/SPAR/ViewSpatial/CV/SPBench，DSR另finetune。 以下结果为作者报告：作者报告联合VGGT蒸馏VSI62.15 vs57.64、SPBenchMV65.08 vs56.58、ScanQACIDEr93.15 vs84.61。（PDF p9 TableII）；作者报告DSR70.7 vsDSRSuite58.9，使用同DSRsplit进一步finetune；无需externalgeometry输入。（PDF pp10–11 TableIV） 对照范围：共享base/data对照可解释componenteffect；历史模型表不同训练与输入协议，不能等同head-to-headcausalranking。 消融与诊断：七teacherfeature、三geometryteacher、fusion/distill、DPT/linear与jointloss；geometry只三teacher样本。",
+    "insightZh": "超过纯benchmark：给出可提前测量的crossviewdiagnostic并将factorizedstudy导向jointdistillationdesign，明确训练接口与representationform匹配。是3DRS会议工作的实质扩展，需要canonical去重。",
+    "evidenceZh": "same-voxel减different-voxel similarity预测featuretransfer收益。（PDF pp5–6 Eq1/Figures3–5）；geometrydistillation平均相对收益约4.7%，fusion约0.6%；改用linearhead降至约1.4%。（PDF pp8–9 Figure9/SectionIII-D）；联合监督改善共享recipe八accuracyaverage58.76→61.98。（PDF p9 TableII）；动态4D70.7%使用额外DSRtraining，不是zero-shot。（PDF pp10–11 TableIV/DSR paragraph）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接关联空间推理与3Dprior怎样进入MLLM，适合多视图设计理解与geometry-aware视觉representation研究；未验证CAD/LEGO具体任务。",
+    "caveatZh": "diagnostics只中等规模teacherpool/staticindoor；DPT对照未隔离architecture/init/trainability。；crossview与transfer的相关性不证明因果；三geometryteacher的同序不足建立领域普适predictor。；DSR额外训练不能宣传zero-shotdynamic能力；ScanQA/SQA共享indoor训练限制outdoor泛化。；文中visual-tokenbudget称固定但表未给具体frame/resolutionbudget，recipe完整性有缺口。；可访问代码仍会议3DRS LLaVA-Video7B方案；当前Qwen3-VL/DPT/journal实验implementation未确认。"
+  }
+}

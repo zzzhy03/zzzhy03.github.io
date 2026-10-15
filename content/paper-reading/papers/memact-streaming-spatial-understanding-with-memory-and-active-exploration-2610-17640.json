@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.17640",
+  "slug": "memact-streaming-spatial-understanding-with-memory-and-active-exploration-2610-17640",
+  "title": "MemAct: Streaming Spatial Understanding with Memory and Active Exploration",
+  "authors": [
+    "Yuxi Wei",
+    "Wei Huang",
+    "Qirui Chen",
+    "Lu Hou",
+    "Xiaojuan Qi"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17640"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "MemAct",
+    "Streaming",
+    "Spatial",
+    "Understanding",
+    "with",
+    "Memory",
+    "and",
+    "Active",
+    "Exploration"
+  ],
+  "abstract": "Spatial understanding is essential for embodied agents navigating and interacting with the physical world. As observations arrive incrementally, agents must reason in a streaming manner. Yet streaming understanding must also be closed-loop: task-relevant evidence may require both recalling past observations and actively acquiring new views. Existing streaming approaches largely emphasize processing incoming observations, leaving task-driven active exploration underexplored. We introduce MemAct, a framework for streaming spatial understanding with memory and action. A shared vision--language model incrementally writes structured historical memory, retrieves records and past frames on demand, and acquires additional evidence through movement and turning. Retrieved evidence and action observations inform subsequent decisions, enabling the agent to continue exploring or answer within a unified reasoning loop. We develop the MemAct suite, a data generation pipeline and collection across real and simulated environments, with approximately 1M training examples for spatial reasoning, memory writing, retrieval, and exploration. Its MemAct-bench comprises 20,000 main QA pairs evaluating current-observation understanding, historical evidence use, and active exploration, plus 2,000 separate Timing questions. MemAct combines supervised fine-tuning for memory and interaction with counterfactual action optimization using cumulative evidence gains, action costs, and terminal answer quality to improve exploration and stopping decisions. Experiments show that MemAct outperforms existing spatial understanding and streaming baselines and approaches frontier multimodal models on MemAct-bench while retaining streaming inference efficiency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17640v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17640v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/vfishc/memact"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17640v1 的 49 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "MemAct 在同一 streaming VLM 中学习 memory writes、历史图像检索与主动 camera 探索，counterfactual action optimization 按累计新证据、动作成本和答案质量学习何时行动与停止。作者报告自建套件与外部空间 benchmark 收益；Action QA 只在 simulation、最多 3 步离散动作，0.420 秒是 answer latency 而非整个交互耗时。",
+    "motivationZh": "streaming spatial QA 的必要证据可能已离开视觉 cache，或尚未观察到，模型需要联合历史检索与主动新视角获取。",
+    "methodZh": "MemAct 在同一 streaming VLM 中学习 memory writes、历史图像检索与主动 camera 探索，counterfactual action optimization 按累计新证据、动作成本和答案质量学习何时行动与停止。作者报告自建套件与外部空间 benchmark 收益；Action QA 只在 simulation、最多 3 步离散动作，0.420 秒是 answer latency 而非整个交互耗时。",
+    "methodFlow": [
+      "causal1 FPS stream 与 compact KV cache",
+      "每 5 秒写 category/count/frame/relations memory",
+      "按需检索 structured records 和历史 images",
+      "选择 answer-now 或 5 种 move / turn 命令",
+      "用 counterfactual cumulative returns 改进行动/停止并输出答案"
+    ],
+    "experimentsZh": "约 1M training examples+VSI590K，20k main QA 与 2k Timing；真实 ScanNet/ScanNet++/ARKitScenes 及 3D-FRONT simulated streams。 以下结果为作者报告：作者报告 MemAct9B Overall ACC67.27/MRA60.23；Action ACC 从 SFT52.92 到 58.28，GRPO57.92；无 explicit memory 的 Memory ACC54.52，full68.11。（Tables 1-3, pp. 8-9） 对照范围：含 dataset-finetuned streaming models、Cambrian-S-FT、general/spatial models；offline baselines 只取 causalprefix32 frames，comparison 不是无限 offline context。 消融与诊断：memory content/retention/writeinterval，reward composition 和 1-3actionbudget；bandit 与 GRPO 相近，不能把全部收益归算法独特性。",
+    "insightZh": "把被动 streaming、外部历史证据与主动新视角获取统一在共享模型；reward 用 best historical evidence 防止重复获取同一 view 刷分。",
+    "evidenceZh": "模型看不到 future observations、GT geometry 与 private IDs；harness 只验证 memory 结构而不语义纠正。（Secs. 4.1-4.3, Fig. 3, pp. 5-6）；从相同 causal state / budget 渲染 counterfactual branches，累计 evidence gains 和 terminal answer，KL 锚 SFT。（Sec. 4.4, p. 7）；作者报告 MemAct9B Overall ACC67.27/MRA60.23；Action ACC 从 SFT52.92 到 58.28，GRPO57.92；无 explicit memory 的 Memory ACC54.52，full68.11。（Tables 1-3, pp. 8-9）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可检索历史 visual evidence 与主动观测支撑设计 agent 空间推理和验证，是 VLM 通用能力推进。",
+    "caveatZh": "未来需 continuous actions、larger/cluttered/dynamic scenes；当前最多 3 次 0.5m/45°动作。；Action QA 只在 simulation 验证，memory / real streaming 收益不等于现实 robot 探索成功。；latency 排除 frame acquisition、memory、action/rendering 与 network 等，不应当作完整系统实时延迟。"
+  }
+}

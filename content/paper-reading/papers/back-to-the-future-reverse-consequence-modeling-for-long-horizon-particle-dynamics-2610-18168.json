@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.18168",
+  "slug": "back-to-the-future-reverse-consequence-modeling-for-long-horizon-particle-dynamics-2610-18168",
+  "title": "Back to the Future: Reverse-Consequence Modeling for Long-Horizon Particle Dynamics",
+  "authors": [
+    "Leyan Zhang",
+    "Nantian He",
+    "Jiajun Ma",
+    "Yanpeng Zhao",
+    "Yunbo Wang"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18168"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Back",
+    "to",
+    "the",
+    "Future",
+    "Reverse-Consequence",
+    "Modeling",
+    "for",
+    "Long-Horizon",
+    "Particle"
+  ],
+  "abstract": "Accurate prediction of object trajectories is fundamental to mechanical understanding and robotic control. However, autoregressive models inherently suffer from cumulative errors, leading to severe drift in long-horizon rollouts. Observing that in many physical systems with dissipative or convergence-to-rest behavior, the final states are often more predictable than transient dynamics (e.g., a sliding object resting under friction or a pendulum stabilizing at equilibrium), we propose ReStep, a cascaded approach that reverses the conventional forward-prediction paradigm. ReStep first employs a stochastic model to directly predict the final state, then leverages Anchored Diffusion to generate goal-conditioned intermediate trajectories. By conditioning on both ''boundary states'', it effectively constrains dynamics and reduces uncertainty, producing physically plausible and temporally coherent transitions. We further integrate ReStep dynamics as the physical engine within a 3D Gaussian Splatting pipeline, enabling a unified physical-visual framework for intuitive inference from images. Extensive experiments on diverse rigid and non-rigid collision datasets show that ReStep achieves superior long-term accuracy, substantially mitigating error accumulation via reverse-consequence modeling.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18168v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18168v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18168v1 的 18 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "ReStep 先用conditionalVAE预测终态，再用initial/final-anchored diffusion一次补全particletrajectory，并接3DGS做可控visualdynamics。作者报告Physion100step多个scene误差下降；值得skim终态锚定的动态资产生成，但错误终态会污染全轨迹，所谓temporalOOD由线性插值构造，不能当新物理泛化。",
+    "motivationZh": "particle dynamics逐步AR预测累积误差，而不少dissipative场景的最终状态比完整中间轨迹更容易预测。",
+    "methodZh": "kNNGNN编码初始particles与velocity/friction/mass/elasticity，prior/posteriorVAE预测终态displacement；DoubleUNet分别沿time与particle维度做卷积/attention，以首尾条件生成轨迹。3DGS多视图重建映射到simulatorparticles，frozenendpointpredictor可优化物理参数，轨迹更新Gaussian刚体或形变motion。",
+    "methodFlow": [
+      "初始particlepositions与physicalattributes",
+      "conditionalVAE采样plausibleendpoint",
+      "DoubleUNet以首尾锚定diffusion轨迹",
+      "可选从多视图3DGS提取particlestates",
+      "优化physicalparameters或生成新motion",
+      "将particlemotion映射Gaussianrendering"
+    ],
+    "experimentsZh": "FlexiFall25kseqs含rigid/topple/drape；Physion5scenes；EGNN/EGNO/GMN/SGNN、LatentFlow/STFlow同particleinterfaces；Toppleparameterinversion与Deform3DGSin/outtime比较。 以下结果为作者报告：作者报告Physiont100 Collide/Contain/Drop/Dominoes/Roll MSE .105/.163/.019/.002/.091，SGNN1.365/.310/.091/.031/.616。（Table2 p.7）；作者报告TopplefuturePSNR34.793vsDeformGS27.433，in-domain41.927vs43.226。（Table4 p.8） 对照范围：包括generativeparticlebaselines与ARgraphmodels；render对DeformGS不同inductivebias，synthetic多视图环境不等于真实generalization。 消融与诊断：去endpoint/diffusion、GT/predicted/randomendpoint、GNN/Transformer、VAE/deterministic和cost；endpoint有效但GNN不是必要；全trajectorycost按长度归一化不等于online一步latency。",
+    "insightZh": "把长期dynamics改为预测consequence后补全，端点stochasticity与trajectorydiffusion耦合；并非真实反时间物理求解或守恒保证。",
+    "evidenceZh": "终态从learnedprior采样，GTposterior只用于训练。（Sec.4.1 pp.3–4; Fig.2 p.4）；3DGS桥接支持physicalparameterinference与visualmotiongeneration。（Sec.4.3 pp.5–6; AppendixB pp.14–15）；endpoint敏感性和failureanalysis说明错误端点可破坏trajectory。（Sec.6 p.9; Tables8,12 pp.16,18）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "particletrajectory与Gaussianvisualmotion生成为4D/physicalasset提供明确transfer路线，超出单纯tracking。",
+    "caveatZh": "predictedsteady-state错误会传播并产生implausibletrajectories（p.9）。；只适合可预测终态/收敛场景，持续driven或chaoticmotion未检验。；temporalOOD为插值延长，不是新dynamicslaw；compositionOOD为删objects。；最终状态并不唯一辨识mass/friction，合成可控参数实验不能证明真实物理identification。"
+  }
+}

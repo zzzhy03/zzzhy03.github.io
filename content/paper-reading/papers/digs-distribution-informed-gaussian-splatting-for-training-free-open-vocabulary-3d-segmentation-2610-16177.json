@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.16177",
+  "slug": "digs-distribution-informed-gaussian-splatting-for-training-free-open-vocabulary-3d-segmentation-2610-16177",
+  "title": "DIGS: Distribution-Informed Gaussian Splatting for Training-Free Open-Vocabulary 3D Segmentation",
+  "authors": [
+    "Zhifan Zeng",
+    "Wenbo Xiao",
+    "Arcot Sowmya",
+    "Changming Sun"
+  ],
+  "publishedAt": "2026-10-12",
+  "updatedAt": "2026-10-12",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.16177"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3d-segmentation",
+    "DIGS",
+    "Distribution-Informed",
+    "Gaussian",
+    "Splatting",
+    "for",
+    "Training-Free",
+    "Open-Vocabulary",
+    "Segmentation"
+  ],
+  "abstract": "Open-vocabulary 3D Gaussian segmentation typically binds semantic features to the per-Gaussian state via per-scene gradient training (1-4 h) or the more recent closed-form distillation. Both commit each primitive to a single feature; therefore, boundary Gaussians spanning multiple 2D instances are forced into a hard decision that degrades retrieval accuracy and yields unstable mask boundaries at render time. We present DIGS, a training-free framework with two stages, class-agnostic mapping and multi-modal encoding, that decouples instance discovery from linguistic naming. At the Gaussian level, our distribution-informed representation maintains an explicit top-$M$ label distribution per primitive, updated by a tempered Dirichlet rule; preservation of multi-peaked label distributions at boundary primitives allows a late-argmax renderer to recover clean instance boundaries. A bidirectional state machine aggregates these distributions into a persistent class-agnostic instance ontology. The instance-level encoding stage then fuses the CLIP visual embedding of each instance's isolated 3D footprint with the CLIP-text embedding of an LLM-generated attribute description, disambiguating visually similar instances. On a single A100, DIGS completes mapping and instance encoding on LERF-OVS in 1.0-3.2 min per scene, depending on whether LLM fusion is enabled, and serves native 3D queries in 5.4 ms. It reaches 71.95% mean mIoU on LERF-OVS, outperforming both the training-free SFS and training-based LaGa baselines. DIGS also achieves the highest mean mIoU on LERF-Mask and 3D-OVS and surpasses Gaga and ObjectGS on Replica under their respective evaluation protocols. Code is available at https://github.com/ZephyrZos/DIGS.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.16177v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.16177v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ZephyrZos/DIGS"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.16177v1 的 30 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "DIGS 在冻结 3DGS 上维护 top-M instance label distribution，以 tempered Dirichlet 投票和 late-argmax 保留边界歧义，再按 instance 做 CLIP/LLM 命名。作者报告 LERF-OVS 71.95 mIoU、语义阶段 1–3.2 分钟；值得深读可拆换的 instance ontology，但 training-free 不包含预先重建 3DGS，部分 benchmark 使用 test RGB 或 GT masks。",
+    "motivationZh": "每 Gaussian 单一语义承诺在跨实例边界失真，逐场景训练昂贵且与 language embedding 耦合。",
+    "methodZh": "逐帧 SAM masks 与渲染标签 Hungarian 匹配，visibility-aware decay 后进行 bounded evidence update；双层 state machine 维护 Gaussian 分布和实例生命周期。渲染时先按 alpha weights 混合分布再 argmax。稳定实例的 isolated views 经 CLIP 编码，并与 GPT-4.1 属性描述的 CLIP text embedding 融合；可选 detection-bridging 使用 test RGB 的 GroundingDINO+SAM。",
+    "methodFlow": [
+      "冻结预重建 Mip-Splatting geometry",
+      "SAM masks 匹配 persistent instance IDs",
+      "tempered Dirichlet 更新稀疏 top-M evidence",
+      "Late-Argmax 渲染并反馈下一帧匹配",
+      "isolated instance CLIP 与 LLM text 融合",
+      "文本 query 检索实例或可选 detector bridging"
+    ],
+    "experimentsZh": "固定 30k-step Mip-Splatting，SAM ViT-H、CLIP ViT-B/16、GPT-4.1；LERF-OVS 4、LERF-Mask 3、3D-OVS 5、Replica 8 scenes，单 A100。 以下结果为作者报告：作者报告 LERF-OVS CLIP-only/融合 mIoU 66.85/71.95，reproduced SFS 62.16、LaGa 60.55。（Table2 p.8）；作者报告 mapping+CLIP 1.00 min、加 LLM 3.2 min；3D-only query 5.4 ms。（Table1 p.7） 对照范围：含 SFS、LaGa、OpenGaussian、LangSplat 和 ObjectGS/Gaga；明确区分 paper-reported、reproduced 与 2D/3D-native 协议，跨协议分数不能混比。 消融与诊断：SF +6.03、distribution preservation +8.84、LLM +5.10 mIoU；naive eta 替换 tempered 更新退化 8.05。支持组合机制，仍无动态几何/层级 part 泛化验证。",
+    "insightZh": "不是单个 segmentation head 提分：核心表示将 boundary primitive 的多标签不确定性保留到像素，语义命名与 class-agnostic mapping 分离。注入上界并不证明全局关联正确或闭环收敛。",
+    "evidenceZh": "每 Gaussian 保留 top-M，bounded update 与 late argmax 联合工作。（Sec.3.3–3.5 pp.4–6; Fig.2 p.4）；命名可在实例 map 固定后融合 CLIP 和 LLM 属性。（Sec.3.6 p.6）；作者在四类 benchmark 报告结果，协议不同。（Tables1–5 pp.7–9）；SAM granularity 和固定 geometry 限制 part 与透明边界。（Limitations p.10; Figs8–9 p.23）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中 open-vocabulary/class-agnostic 3D instance segmentation；分布边界和后置语言接口具有方法价值。",
+    "caveatZh": "依赖 SAM、CLIP/LLM/detector 能力；冻结 geometry 在透明/薄结构上受限（p.10）。；所谓 training-free 仅语义阶段，30k-step reconstruction 成本另计。；几何和 mask provenance 不同的 benchmark protocol 不应合并成统一 SOTA 幅度。；实例 ontology 不自动支持细粒度 part；单步 bound 不是 convergence guarantee。"
+  }
+}

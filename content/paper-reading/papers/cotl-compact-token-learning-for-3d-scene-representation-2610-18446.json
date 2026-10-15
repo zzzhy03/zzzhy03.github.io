@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.18446",
+  "slug": "cotl-compact-token-learning-for-3d-scene-representation-2610-18446",
+  "title": "CoTL: Compact Token Learning for 3D Scene Representation",
+  "authors": [
+    "Han Liang",
+    "Sibo Wu",
+    "Anpei Chen",
+    "Rüdiger Westermann"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18446"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "3d-generation",
+    "CoTL",
+    "Compact",
+    "Token",
+    "Learning",
+    "for",
+    "Scene",
+    "Representation"
+  ],
+  "abstract": "We present CoTL, a framework that learns a compact set of tokens that preserves scene geometry and appearance from unposed multi-view images. Our encoder compresses the input images into small per-view sets of latent tokens that aggregate information across views to form a view-consistent scene representation. Each additional view expands the representation with only a small, resolution-independent set of tokens, allowing its capacity to grow with the available observations. To force this compact bottleneck to retain sufficient scene information, a query-based Gaussian decoder uses scene-independent queries to attend to the learned tokens and recover an explicit, renderable set of 3D Gaussian primitives. Novel-view rendering supervision trains the compact representation end to end through the reconstructed Gaussian scene. Experiments on \\retenk{} and ACID show that the resulting compact, unstructured token set supports competitive novel-view synthesis and can serve as the latent space of a generative model for 3D Gaussian scene generation. Together, these results show that 3D Gaussian reconstruction is an effective objective for compact scene representation learning and the learned token space provides a basis for broader downstream tasks in 3D vision.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18446v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18446v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18446v1 的 15 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "CoTL 让VGGT-Ω每view16register features成为Gaussian decoder唯一scene信息，camera rays锚定coordinates，固定queries预测32K Gaussians；该memory还能供flowmodel生成。作者ACID24views PSNR26.24但LPIPS0.361弱于ZipSplat0.244。值得skim严格bottleneck表示；17token预算不是15×runtime，generation只是单图+8camera的六例proof-of-concept。",
+    "motivationZh": "compactGaussian output不等于compact scene memory；densepatch encoder-decoder接口阻碍scene generativelatent建模。",
+    "methodZh": "encoder保留camera/registers而decoder不能访问densepatch/RGBbranch；raymappooled embeddings加registers，1024scene-independent queries经12blocks输出32768Gaussians。rendering/visibility loss训练memory，auxcameraheadstopgradient到registers，trainGTposes/testpredposes。第二stage固定128×1024scene features做image+8cameras conditionalflow，再解码同一个explicit3Dscene。",
+    "methodFlow": [
+      "VGGT-Ω编码unposedviews为camera/16registertokens",
+      "pooledPlucker rays加到scene features",
+      "fixedscene-independentqueries只attend compactmemory",
+      "Gaussianhead预测32Kexplicitprimitives",
+      "rendering/visibility/camera辅助监督",
+      "frozenmemorydecoder搭128tokenconditionalflow生成"
+    ],
+    "experimentsZh": "RealEstate10K训练，4H100/batch24，256px，6–36contextviews/threeoverlapbands；ACIDzeroshot；同32KoutputZipSplat、2KC3G；500Kfirststagesteps加finetune；generation100K+50Kcroppedsteps。 以下结果为作者报告：作者RealEstate24largeoverlap PSNR28.06/SSIM0.875/LPIPS0.211，ZipSplat28.32/0.860/0.128；ACID24views26.24/0.776/0.361 vsZip24.90/0.718/0.244。（Tables1–2 p.6）；作者ray-conditioning相对no/globalcamera使validationPSNR约+2.5dB，activeGaussians增加>10pp。（Sec.4.5.1 pp.7–8） 对照范围：C3G不同outputbudget，Zip同32K但dense/RGBfeatures；GT photometric poseoptimization一致，非nativeposeaccuracy；无scene generationFID/FVD/3Dgeometry或editing对照。 消融与诊断：rayanchor与global/noanchor、cameradistance vspoint-radius/noscale；只定性/简述部分ablation，无tokenbudget sweep或end-toend runtimebench。",
+    "insightZh": "strict encoder-decoder bottleneck隔离scene-specific视觉内容并输出可render explicit3D，区别dense-memory Gaussianqueries或直接target-viewdecoders；token到nativegenerativeinterface是实质transfer。",
+    "evidenceZh": "Gaussianqueries跨scene共享且无image-derived3Danchor，scene信息仅通过compactmemory。（Fig.2/Sec.3 pp.4–5）；作者compactmemory支持NVS/crossdataset但fine texture还有gap。（Tables1–2 p.6; Fig.3 p.7）；flow generation必须输入firstimage及8camera，只有qualitativeproofconcept。（Sec.4.4 p.7/Fig.5 p.8; AppendixE pp.12–13）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "compact geometry+appearance memory可直接作为3Dscene generationlatent，符合重建到生成表示迁移；VLM/editing仅future。",
+    "caveatZh": "openworld泛化、variablegenerationviewcounts/textcontrol及editing是futurework（p.8）。；GT target pose photometric优化可补pose误差，NVS指标不验证geometry/topology；fineLPIPSgap明显。；main17Ntoken说法包含camera，而generativememory为16register/view；15×数量不能推导15×compute。；generation6examples且依8cameras，无quantitative分布/controlledediting；explicitGaussians不代表simulation-ready几何。"
+  }
+}

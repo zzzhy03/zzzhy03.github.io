@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.17926",
+  "slug": "cinemem-attention-aligned-fine-grained-memory-retrieval-for-multi-shot-long-video-generation-2610-17926",
+  "title": "CineMem: Attention-Aligned Fine-grained Memory Retrieval for Multi-Shot Long Video Generation",
+  "authors": [
+    "Xiaoxue Wu",
+    "Xinyu Gao",
+    "Fang Yu",
+    "Yu Qiao",
+    "Xinyuan Chen"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17926"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "CineMem",
+    "Attention-Aligned",
+    "Fine-grained",
+    "Memory",
+    "Retrieval",
+    "for",
+    "Multi-Shot",
+    "Long",
+    "Video"
+  ],
+  "abstract": "Autoregressive video generation relies on memory retrieval to model long-range dependencies. This capability becomes particularly critical for multi-shot generation, where models must reconcile substantial visual changes across shot transitions with persistent semantic continuity. Existing methods tend to perform memory retrieval at the frame level and share the same historical context across all query tokens, overlooking the heterogeneous information needs and leading to redundant retrieval and inefficient use of historical memory. To bridge this gap, we introduce CineMem, an attention-aligned fine-grained memory retrieval framework that combines online memory organization with query-adaptive retrieval for autoregressive multi-shot video generation. Specifically, guided by intrinsic memory-access patterns revealed through attention analysis, we propose an online-clustered KV cache as a memory organization strategy over all historical tokens, enabling semantic-aware memory grouping and more precise retrieval. In addition, we introduce a query-level retrieval mechanism that provides broader access to historical information under a fixed retrieval budget, thereby improving long-term memory utilization. Together, these designs enable the multi-shot video generator to preserve long-range consistency across shot transitions, particularly in revisitation scenarios, while approximating full-memory access under a constrained memory budget. To facilitate evaluation, we further introduce a suite of task-specific, VLM-assisted metrics for faithful inter-shot consistency assessment. Extensive experiments demonstrate the effectiveness of our framework.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17926v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17926v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17926v1 的 35 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "CineMem 把长视频记忆由frame级改成每个head的跨frame KV clusters，让每个query/head独立取历史；first与latest chunk作锚点。它针对多shot身份与场景一致性有直接方法贡献，但memory更全不等于会规划未来，复杂多实体切镜仍失败，结论局限于1.3B backbone和自建prompt评估。",
+    "motivationZh": "多shot autoregressive video如何在有限attention预算下找回远处角色、场景和细节而不丢失真实shot transition。",
+    "methodZh": "从Wan2.1-1.3B做teacher forcing与resampled-history adaptation，full-memory probing显示cross-frame语义clusters和异质query/head需求。在线cluster带split/merge、负载与assignment稳定项；每query/head按centroid选择memory，加first/latest anchors。",
+    "methodFlow": [
+      "将bidirectional Wan适配为resampled-context autoregressive multi-shot generator",
+      "分析full-memory attention的cross-frame clusters和query/head偏好",
+      "历史KV按head在线聚类、split/merge平衡并保留first/latest anchors",
+      "每query/head独立检索相似cluster进行generation",
+      "prompt更新控制shot，PTCS联合评估preservation与transition"
+    ],
+    "experimentsZh": "Wan2.1-1.3B，16 H200训练，15s multi-shot数据适配；与causal multi-shot/multi-prompt和bidirectional模型比较，长revisit分析。 以下结果为作者报告：作者报告CineMem PTCS 0.8242、subject/background consistency 0.9716/0.9630。（Table 2, p.10）；作者估算attention+retrieval FLOPs从full 932.56降到638.82 TFLOPs。（Table 1, p.9） 对照范围：涵盖ShotStream、LongLive2、MemFlow、Self-Forcing、MultiShotMaster、HoloCine；CausalCine无公开weights，以frame/shared策略控制替代。 消融与诊断：resampled context、frame/cluster和shared/query-wise拆分；query-group接近query-wise，显示极细粒度相对收益较小。",
+    "insightZh": "从attention实际访问模式推导跨frame token clustering及query/head级retrieval，超出frame-level shared memory；PTCS避免不切镜获得高相似度。",
+    "evidenceZh": "历史KV逐head聚类，每个query/head独立选cluster并保留first/latest。（Sec.3.3–3.5, pp.5–7; Fig.3, p.5）；作者报告PTCS 0.8242对MultiShotMaster 0.7984，transition control 0.9960。（Table 2, p.10）；同base plug-in中C+Q-wise PTCS 0.8007，对frame+shared 0.7280。（Table 3, p.10）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中long multi-shot video memory与consistency，retrieval设计可迁移长程视觉生成。",
+    "caveatZh": "小模型、有限adaptation数据限制视觉质量；复杂多实体身份/空间关系和需要预知后续shots的切镜仍失败。；主要效果依赖自定义PTCS与VLM judge，需独立human/更大规模验证。；retrieval FLOPs下降不直接证明end-to-end latency同幅降低；历史KV存储仍需关注。"
+  }
+}

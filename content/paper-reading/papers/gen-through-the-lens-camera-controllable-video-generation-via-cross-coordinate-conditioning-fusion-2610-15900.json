@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.15900",
+  "slug": "gen-through-the-lens-camera-controllable-video-generation-via-cross-coordinate-conditioning-fusion-2610-15900",
+  "title": "Gen Through the Lens: Camera-Controllable Video Generation via Cross-Coordinate Conditioning Fusion",
+  "authors": [
+    "Shuai Li",
+    "Jinxu Xiang",
+    "Xinyuan Li",
+    "Hanlei Guo",
+    "Xiyang Tan",
+    "Alan Zhao",
+    "Xiaotong Zhao",
+    "Ran Zhang"
+  ],
+  "publishedAt": "2026-10-11",
+  "updatedAt": "2026-10-11",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.15900"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Gen",
+    "Through",
+    "the",
+    "Lens",
+    "Camera-Controllable",
+    "Video",
+    "Generation",
+    "via",
+    "Cross-Coordinate"
+  ],
+  "abstract": "We present Gen Through the Lens, a camera-controllable image-to-video generation framework that synthesizes videos from a given reference image while enabling realistic and physically consistent camera operations. Unlike previous models that treat camera motion as abstract conditioning or rely on a single coordinate system, our approach explicitly decomposes and fuses control signals across three coordinate spaces: the camera coordinate (modeled by intrinsic parameters), the world coordinate (represented by spatial geometry hints), and the object coordinate (described by 3D bounding boxes of target subjects). Through cross-coordinate conditioning fusion, these heterogeneous cues are unified to guide the generative process, enabling precise control of camera motion, focus, and framing while preserving temporal and spatial coherence. Extensive experiments demonstrate that our method produces controllable and visually consistent results across diverse camera operations, outperforming existing approaches in both realism and editability.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.15900v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.15900v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.15900v1 的 15 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "Gen Through the Lens 把 camera/world/object 三种坐标下的控制渲染成条件视频，以冻结 Wan2.1 的 Context Adapter 联合控制 camera trajectory、3D box 与 depth-of-field。作者报告运动与视觉指标总体改善，适合借鉴几何条件解耦；其 metric supervision 仍依赖感知估计，未证明生成视频等同于物理正确的 3D 场景。",
+    "motivationZh": "如何从单参考图像同时精确控制 camera pose、object motion、zoom 和 depth-of-field，而不把各控制因素混在同一低层表示。",
+    "methodZh": "Gen Through the Lens 把 camera/world/object 三种坐标下的控制渲染成条件视频，以冻结 Wan2.1 的 Context Adapter 联合控制 camera trajectory、3D box 与 depth-of-field。作者报告运动与视觉指标总体改善，适合借鉴几何条件解耦；其 metric supervision 仍依赖感知估计，未证明生成视频等同于物理正确的 3D 场景。",
+    "methodFlow": [
+      "视频估计 metric camera 与人类 torso 3D boxes",
+      "把 camera grid、box pose 和分层焦深渲染为条件视频",
+      "冻结 Wan2.1-14B，分阶段训练 Context Adapter",
+      "参考图像与多条件联合生成 81-frame 视频"
+    ],
+    "experimentsZh": "110k trajectory/box samples，另含 8k zoom、15k bokeh；1k held-out clips。感知抽取信号多以真实视频的 pseudo ground truth 作比较。 以下结果为作者报告：作者报告 GTL 14B 的 FVD 为 86.54，RealCam-I2V 为 98.76；bbox rotation error 为 21.73°，PAC 为 41.83°，但 GTL 的 camera rotation 4.89° 并非优于 RealCam-I2V 的 4.63°。（Table 2, p. 5） 对照范围：比较 PAC、RealCam-I2V、GEN3C；Seedance 2.0 和 CamClone 主要定性。部分 baseline 不支持 object control，论文表格已标注比较边界。 消融与诊断：Tables 3-5 比较 ray map/cubic grid、2D mask/3D box 和 camera extraction；控制表示改善不意味着所有指标均提升。",
+    "insightZh": "贡献是多坐标空间可解释条件与 metric-scale labeling 的组合，并扩展到 zoom 和 focus；不是新的基础 video model。",
+    "evidenceZh": "Pi3、MoGe2 与 MapAnything 用鲁棒距离比例恢复统一 metric camera space。（Sec. 3.2; Appendix A.2, pp. 3,13）；3D boxes 与 layered checkerboard depth-of-field 条件共同进入 Context Adapter。（Secs. 3.3-3.5, Fig. 3, pp. 3-4）；作者报告 GTL 14B 的 FVD 为 86.54，RealCam-I2V 为 98.76；bbox rotation error 为 21.73°，PAC 为 41.83°，但 GTL 的 camera rotation 4.89° 并非优于 RealCam-I2V 的 4.63°。（Table 2, p. 5）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "显式几何、主体与焦深控制可直接借鉴到 3D-aware visual creation workflow。",
+    "caveatZh": "无独立 limitations section；3D torso 注释以 humans 为主，generic object generalization 主要为定性展示。；bokeh/zoom 含合成增强，评价依赖上游估计，不能据此确认真实光学与长期几何正确性。"
+  }
+}

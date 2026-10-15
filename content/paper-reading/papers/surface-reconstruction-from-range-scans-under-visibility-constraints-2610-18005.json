@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.18005",
+  "slug": "surface-reconstruction-from-range-scans-under-visibility-constraints-2610-18005",
+  "title": "Surface Reconstruction from Range Scans Under Visibility Constraints",
+  "authors": [
+    "Gabriel Lenain",
+    "Edmond Boyer",
+    "Jean Ponce"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.18005"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Surface",
+    "Reconstruction",
+    "from",
+    "Range",
+    "Scans",
+    "Under",
+    "Visibility",
+    "Constraints"
+  ],
+  "abstract": "Surface reconstruction from range scans is challenging in the presence of noise and outliers, as fidelity to observations must be balanced against sensitivity to measurement errors. Yet, most neural approaches discard the sensor positions and corresponding visibility information, compensating for this loss with geometric priors or regularization terms. We instead formulate surface reconstruction as robust regression of the predicted first surface intersection along each acquisition ray against its measured depth, which penalizes predicted surface intersections within the segment between the sensor and the observed point. We represent the surface as the zero set of a 1-Lipschitz multi-layer perceptron, allowing the use of linearly convergent sphere tracing to compute the first hit, and use a robust Huber loss for regression. Our formulation requires neither oriented normals, sampled off-surface points, nor an eikonal loss. Comparisons with the state of the art on synthetic and real data with varying levels of noise and outlier contamination demonstrate competitive performance on clean data and much improved fidelity and robustness under even moderate corruption. Our analysis further confirms a trade-off between fidelity and robustness: greater fitting capacity improves data fidelity in the clean case but increases sensitivity to the measurement errors inherent in real acquisitions, with a sweet spot typically emerging at intermediate capacity.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.18005v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.18005v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.18005v1 的 32 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "将surface recovery直接写成 acquisition ray 第一交点的robust depth regression，sphere tracing与implicit differentiation使visibility进入唯一训练loss，不需normal/offsurface/eikonal。作者报告SRB20%outlier L2 CD0.122 vsDiffCD3.354，以及ARKitsofaMAE2.07cm；这是值得参考的逆问题约束，但实用PE/经验rescaling已失严格1-Lipschitz认证，不能把理论free-space保证推广到主结果。",
+    "motivationZh": "range scan拟合常丢弃sensor visibility，以点面loss与多重regularizer补偿，易拟合噪声和outlier产生提前surface。",
+    "methodZh": "给定sensor-pointpairs，以CPL/MaxMin MLP零集表示surface；sphere tracing找firsthit，Huber对incidenceweighteddepthresidual优化，丢弃missing/grazingrays。FourierPElevel调节fidelity/robustness，经验梯度normrescale加快trace；每shape独立拟合，非feedforwardfoundationmodel。",
+    "methodFlow": [
+      "保留sensor-point acquisition rays与firstreturn测量",
+      "以CPL/MaxMin隐式field初始化enclosingsphere",
+      "sphere tracing寻找每ray第一零交点",
+      "incidenceweight转换depthresidual，Huber抑制outlier",
+      "implicit differentiation拟合field，marchingcubes提取surface"
+    ],
+    "experimentsZh": "五SRBshape三seed噪声/outlier，ShapeNet13类65shape3K点，ARKit一sofa/36FAROview，KITTI单crop/DTU四scenequalitative。 以下结果为作者报告：作者报告SRBnoiseL0CD0.310 vsDiGS0.610；outlierL2CD0.122 vsLabatut0.144。（PDF pp6–8 Tables1/3）；作者报告ARKitMAE2.07±0.17cm、99.4%hit、66%allraywithin2cm。（PDF p8 Table4） 对照范围：SAL/NeuralPull/DiGS/DiffCD/NDFvis/SPSR/Labatut，sensororigin只visibilitymethods可用；ShapeNet均值仅successfullyscoredshapes。 消融与诊断：Huber/L1/L2、misspenalty、incidence、rescale、CPLvsSandwich、normalregularizer、sensorprovenance/LCC与PElevels。",
+    "insightZh": "实质改变监督对象为firsthitvisibility约束的inverse reconstruction formulation，区别于对既有mesh普通几何processing；源数据法向无关且有噪声/outlier跨协议验证。不是native3D生成或通用learnedprior。",
+    "evidenceZh": "直接回归firsthit，以incidenceHuber和implicitderivative优化。（PDF pp3–5 Eqs2–6/Figure2）；主实验PE与empiricalrescale不再formal1-Lipschitz certified。（PDF p5 Section3.5; pp17–19 AppendixB）；作者报告20%outlierSRBL2 CD0.122 vsDiffCD3.354，真实sofaMAE2.07cm。（PDF p8 Tables3–4）；作者报告L越高cleanfit更好但corruption更敏感，训练比baseline昂贵。（PDF pp9/24–25 Table14/Figures19–22）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为从扫描恢复可编辑3D资产提供显式free-space约束与fidelity/robustness控制；迁移价值在reconstruction目标而非meshing，本轮skim。",
+    "caveatZh": "finitefirsthit不唯一确定surface；弱观测区靠extrapolation，sensorposejointrefinement待做。；sphere tracing提高计算cost；PE与empiricalrescale不formalcertified。；只能使用已校准firstreturnprovenance；unorganizedcloud缺sensororigin无法直接应用。；practicalfield不certified，主实验不能宣传严格visibility或globallyfree-spaceguarantee。；真实量化只有一个sofa，KITTI/DTUqual；outlierraydiscard可能损失困难truegeometry。；典型几何外观恢复价值不等于CAD/partsemantics或fabricationready输出。"
+  }
+}

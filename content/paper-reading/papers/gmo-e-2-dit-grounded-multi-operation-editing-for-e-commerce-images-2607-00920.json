@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2607.00920",
+  "slug": "gmo-e-2-dit-grounded-multi-operation-editing-for-e-commerce-images-2607-00920",
+  "title": "GMO-E$^2$DIT: Grounded Multi-Operation Editing for E-Commerce Images",
+  "authors": [
+    "Zipeng Guo",
+    "Xiaoan Liu",
+    "Lichen Ma",
+    "Cheng Wang",
+    "Yu He",
+    "Xiaolong Fu",
+    "Jingling Fu",
+    "Xinyuan Shan",
+    "Shaojie Guo",
+    "Luohang Liu",
+    "Junshi Huang",
+    "Yan Li"
+  ],
+  "publishedAt": "2026-07-01",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v3",
+  "identifiers": {
+    "arxiv": "2607.00920"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "image-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "image-generation",
+    "GMO-E",
+    "DIT",
+    "Grounded",
+    "Multi-Operation",
+    "Editing",
+    "for",
+    "E-Commerce",
+    "Images"
+  ],
+  "abstract": "Real-world e-commerce image editing often requires multiple, localized, and auditable operations rather than global restyling. This compositional nature poses a dual challenge: models must precisely apply all requested edits to the correct regions while preserving unmodified content, even under ambiguous instructions. Existing one-shot editors conflate intent resolution, spatial grounding, and synthesis into a single step, frequently resulting in partial execution failures, which is unacceptable for commercial scenarios. To address this, we introduce GMO-E$^2$DIT, an agentic editing framework that couples a Vision-Language Model (VLM) with a mask-conditioned image editor to tackle structured multi-turn task completion. Given an underspecified instruction, the VLM agent constructs a region-grounded edit agenda, effectively decoupling cognitive reasoning from generative rendering. The framework then executes sub-programs via operation-aware masks and references, utilizing a reflection-driven loop to inspect intermediate results and determine the subsequent state. This iterative mechanism reliably preserves safe partial progress, retries unfinished operations, and recovers from errors. Furthermore, we develop a unified data pipeline providing aligned supervision for planning, execution, and reflection, alongside EComEditBench, a comprehensive benchmark for instruction-driven evaluation. Extensive experiments demonstrate that GMO-E$^2$DIT achieves competitive performance compared to strong closed-source models, yielding superior instruction accuracy and edit fidelity over existing baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2607.00920v3",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2607.00920v3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2607.00920v3 的 23 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：not-found。",
+    "ideaZh": "GMO-E2DIT 把局部图像编辑编译为typed agenda：operation、source/target boxes、attributes及patch references，再用mask-conditioned editor执行。VLM反思分别选择success、continue或rollback，保留安全partial progress；SFT/GRPO训练planner与diagnosis，最后冻结editor做agent-loop RL。作者报告1000例EComEditBench fuzzy IA/EF/BP为8.66/8.25/8.87；7-10操作集reflection相对fixed-turn的IA仅7.29对7.21。适合借鉴结构化edit programs和rollback，但主要证据来自合成电商海报及单VLM评分，无通用设计迁移实证。",
+    "motivationZh": "电商图像包含多个需准确局部操作的标签/产品；模糊指令下one-shot会漏做、混淆source/target或损坏已完成修改。",
+    "methodZh": "Qwen3.5-9B agent与Flux2-Klein-9B editor分离reasoning/rendering。数据从YOLO/SAM/OCR拆poster assets并恢复background，HTML作replacement中间结构，再合成aligned plan/edit/reflection samples。训练16B200，agent LoRA SFT与rule GRPO、editor LoRA、冻结editor的multi-round agent RL。精确协议给region annotations，fuzzy协议要求自行ground。",
+    "methodFlow": [
+      "源图与指令生成含operation/source-target/attributes的edit agenda",
+      "scheduler取subset编译operation-aware masks与reference patches",
+      "mask-conditioned editor生成candidate",
+      "VLM诊断success/continue/rollback与remaining tasks",
+      "安全继续或回退last-safe image并重新规划"
+    ],
+    "experimentsZh": "1000 EComEditBench，500单操作/500多操作，训练test在product/edit-program层disjoint；Gemini3Pro固定judge，另1000fuzzy cases human head-to-head；7-10操作集验证multi-turn。 以下结果为作者报告：作者报告完整Stage1-3 fuzzy整体8.664/8.247/8.871，SFT agent为8.528/8.079/8.768。（Table2, PDF p.9）；作者报告reflection7.29/6.47/8.42，相同Stage3 fixed-turn7.21/6.37/8.08。（Table3, PDF p.9） 对照范围：NanoBanana2/Pro、Seedream5、Wan2.7ImagePro及Qwen/Flux/FireRed；新增domain LoRA训练和agent算力不与所有baseline匹配，主评分依赖Gemini。 消融与诊断：editor domain SFT带来大提升；agent SFT/GRPO/joint-loop incremental比较与one-turn/fixed-turn/reflection；未报告跨一般图像域或SVG操作迁移。",
+    "insightZh": "实质贡献为program-level state diagnosis与operation-role compiler，加上对planning/execution/reflection的统一数据和分阶段训练；editor在joint RL中冻结，不能说两模型同时RL更新。",
+    "evidenceZh": "typed agenda与compiler把region roles转换为masks/references。（Sec.3.1-3.2, Fig.2, PDF pp.3-4）；continue保留正确progress，rollback丢弃corrupt candidate；Stage3仅更新agent、editor frozen。（Sec.3.2-3.3, PDF pp.4-5）；作者报告fuzzy平均IA8.66/EF8.25/BP8.87；precise9.82/9.62/9.85。（Table1, PDF p.8）；作者报告reflection比fixed-turn IA7.29对7.21、BP8.42对8.08。（Table3, PDF p.9; Appendix E.1, PDF p.20）",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "typed edit agenda、safe-progress与rollback可迁移到结构化视觉工具控制；实证限于电商raster editing。",
+    "caveatZh": "VLM错误grounding或reflection可破坏全部流程。；数据以synthetic/semi-synthetic e-commerce posters为主。；多轮VLM/editor增加latency，实时使用受限。；单judge打分不是确定性region-preservation保证；精确协议给boxes且转换masks，本方法有专门训练优势。；未找到本文打印的公开Code URL，复现门槛包括训练数据和16B200配置。"
+  }
+}

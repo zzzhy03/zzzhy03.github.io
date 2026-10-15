@@ -9,9 +9,9 @@
     "Seunghoon Hong"
   ],
   "publishedAt": "2026-08-11",
-  "updatedAt": "2026-08-11",
+  "updatedAt": "2026-10-13",
   "collectedAt": "2026-08-13",
-  "venue": "arXiv preprint · v1",
+  "venue": "arXiv v2",
   "identifiers": {
     "arxiv": "2608.10864"
   },
@@ -26,44 +26,50 @@
   ],
   "primaryTopicId": "vlm-mllm",
   "keywords": [
-    "multi-view",
-    "relational",
-    "distillation",
-    "spatial",
-    "reasoning",
     "vlm-mllm",
-    "3d-reconstruction"
+    "Multi-View",
+    "Relational",
+    "Distillation",
+    "for",
+    "Spatial",
+    "Reasoning",
+    "with",
+    "Vision-Language",
+    "Models"
   ],
   "abstract": "Vision-language models (VLMs) have achieved strong image and video understanding, yet their visual-spatial representations remain geometrically fragile, leading to failures in spatial reasoning needed for embodied AI, robotics, and autonomous driving. Prior approaches to geometry grounding either fine-tune VLMs on spatial question answering, which can perpetuate spurious visual representations, or fuse features from large geometry-grounded vision models, which substantially increases model size at inference. Knowledge distillation from geometry-grounded vision models offers an alternative, but directly matching multi-view teacher features can disrupt the pretrained alignment between visual and textual representations, degrading object- and language-semantic capabilities. We propose multi-view relational distillation (MVRD), which distills patch-wise cosine similarities across views instead of the teacher features themselves. These relations encode geometric correspondences adequate for spatial understanding, while leaving the student representation underdetermined, allowing it to remain close to its pretrained vision- language space. Across representative VLMs, MVRD improves visual-spatial reasoning, outperforming supervised fine-tuning and feature distillation while approaching feature fusion methods with considerably fewer added parameters and lower latency. We show that MVRD makes visual representations more geometric while retaining language alignment, and generalizes to 3D scene understanding tasks such as object grounding, dense captioning, and question answering.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2608.10864v1",
+  "abstractSourceUrl": "https://arxiv.org/abs/2608.10864v2",
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2608.10864v1"
+      "href": "https://arxiv.org/abs/2608.10864v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kietngt00/MVRD"
     }
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据 arXiv 2608.10864v1 exact-version PDF 全文、文本抽取与页面渲染核验；代码状态按该版本 PDF 记录为 not-found，未发布 Code link。",
-    "ideaZh": "MVRD 不直接蒸馏多视图 features，而是匹配 teacher/student 跨视图 relation matrix 的 rank-order 结构，减少 backbone/feature-space mismatch；作者在 3D scene understanding、VSI-Bench、ScanQA/SQA3D 等报告稳定提升，但仍依赖 teacher views 与 relation construction，且不保证恢复显式 geometry。",
+    "sourceNote": "依据 exact version 2608.10864v2 的 23 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。 本次实质更新：主要方法和表格数值沿用；新增已验证非空public code，scene training独立protocol细化和Table10，禁止宣称新增benchmark改善。",
+    "ideaZh": "MVRD 的研究结论沿用已收录 v1：蒸馏跨view cosine relations并用row-wise Pearson/dual LoRA pathways保留几何与语言对齐。本次 v2 的实质事件是公开可运行代码，以及澄清3D scene-understanding结果来自另行训练的模型；没有新main-method或benchmark分数。作者报告Dual Pathway在VSI为60.4，对SFT57.7/feature distillation58.5，接近fusion60.9；不要把scene-task成绩写成VSI训练后的zero-shot transfer。",
+    "motivationZh": "直接匹配geometry teacher features可能破坏VLM原有text-vision alignment，空间准确性与对象语义之间形成trade-off。",
+    "methodZh": "冻结VGGT为teacher，LLaVA-Video vision tokens经MLP构造跨view cosine relations，以causally masked、zero-diagonal row-wise Pearson loss并联SFT。主空间QA采用LoRA，20th-layer distillation及13–20 geometric/semantic parallel adapters；训练200K VLM-3R QA、32均匀stride views，8H200约17h。scene understanding另用5个task data full fine-tune、last-layer distillation与Mask3D object proposals。v2在首页打印新repo并补Table10协议，核验repo含llava/lmms_eval/训练脚本实现。",
     "methodFlow": [
-      "Multi-view teacher observations",
-      "Teacher visual features",
-      "Cross-view relation matrix",
-      "Rank/correlation distillation",
-      "Student VLM adaptation",
-      "3D scene reasoning answer"
+      "输入32 multi-view frames与question，冻结VGGT输出geometry patch features。",
+      "MLP后的student tokens与teacher分别构造cosine relation matrices。",
+      "zero diagonal/causal mask后的row-wise Pearson与SFT联合训练；geometry与semantic LoRA路径分离。",
+      "融合dual-adapter outputs，推理保留RGB VLM、不运行VGGT。",
+      "scene-understanding采用独立task-mixture/full-fine-tune protocol；public repo提供复现实现。"
     ],
-    "whyRelevantZh": "它对 multi-view VLM adaptation 和 3D spatial reasoning 直接相关，并提供跨 backbone 更稳健的 distillation abstraction。",
-    "evidenceZh": "MVRD 构造跨视图 relation matrices，并让 student 匹配 teacher 的相对关系而非原始 features。（Sec. 3 and Fig. 2, p. 6）；relation/rank objective 可容忍 teacher/student feature dimensionality 与 backbone 的表示差异。（Secs. 3.2-3.3, pp. 6-8）；作者报告在多个 3D scene-understanding/VSI tasks 和两种 VLM backbones 上多数指标优于 feature distillation；row-wise Pearson 配 cosine relation 最稳健。（Main tables and Tables 12-13, pp. 9-10 and 20-21）",
-    "caveatZh": "作者限制：性能取决于 teacher multi-view relations 的质量，错误或冗余 views 会污染 distillation target。；审阅风险：relation matching 可能提升 benchmark correlation 而未形成可解释 3D world model；需要显式 geometry probes 或 embodied transfer 验证。",
-    "motivationZh": "方法从多视图 teacher features 构造 cross-view relations，以 row-wise Pearson/cosine 等结构性目标将关系顺序蒸馏给 student VLM，再与 LoRA/SFT 结合。这样避免要求两种 backbone 的 feature vectors 逐点同构，重点保留视角间对应与相对相似性。",
-    "methodZh": "方法从多视图 teacher features 构造 cross-view relations，以 row-wise Pearson/cosine 等结构性目标将关系顺序蒸馏给 student VLM，再与 LoRA/SFT 结合。这样避免要求两种 backbone 的 feature vectors 逐点同构，重点保留视角间对应与相对相似性。 贡献是将 multi-view distillation target 从 absolute features 改为 cross-view relational geometry，并实证 Pearson-style rank structure 比 MSE 更稳健。",
-    "experimentsZh": "在 VSI-Bench、ScanQA、SQA3D 等 3D/VLM tasks 上，以不同 VLM backbones 比较 SFT、feature distillation、3DRS 与 relation variants，并给 per-task/ablation results。 作者报告：作者报告在多个 3D scene-understanding/VSI tasks 和两种 VLM backbones 上多数指标优于 feature distillation；row-wise Pearson 配 cosine relation 最稳健。（Main tables and Tables 12-13, pp. 9-10 and 20-21） Baseline boundary：覆盖 matched SFT 与 feature-distillation variants，且报告 reproduced 3DRS；但 teacher 数据/算力和 multi-view annotations 是额外资源，跨真实 agent tasks 的 transfer 未验证。 Ablation boundary：比较 relation construction、MSE/Pearson losses 和 backbones，支持结构目标；缺少 view count、pose noise、teacher error 与 relation sparsity 的全面敏感性。",
-    "insightZh": "贡献是将 multi-view distillation target 从 absolute features 改为 cross-view relational geometry，并实证 Pearson-style rank structure 比 MSE 更稳健。 建议精读 relation construction 和 Table 13；把提升解释为作者报告的 relational distillation 效果，不等价为完整 3D reconstruction。",
+    "experimentsZh": "VLM-3R约200K QA，32views，LLaVA-Video7B并扩InternVL3-8B/Qwen2.5-VL7B，8H200/17h；VSI八task。scene protocol独立在ScanRefer/Multi3DRefer/Scan2Cap/ScanQA/SQA3D full-tune，GT geometry/Mask3D proposals。 以下结果为作者报告：作者报告VSI59.9 plain/60.4 dual，SFT57.7、matched LoRA-feature58.5；Qwen plain56.1只平SFT，dual59.8。（Tables2/3/6, PDF pp.7–9）；作者报告附加参数0.19B与latency0.14s，对CUT3R fusion0.79B/.85s、VGGT1.26B/2.67s；固定32views单H200。（Fig1, Sec.5.1, PDF pp.1,7） 对照范围：matched backbone/data SFT/feature-distill最有解释力；VG-LLM backbone不同。主table与scene-table覆盖不同协议，cannot zero-shot/general-agent迁移。 消融与诊断：Table13 cosine+Pearson59.9 vs cosine+MSE58.4、Euclidean+MSE48.6；Table4 late layer比early有效；dual mitigation尤其appearance-order。A.1 representation probe筛选SFT优于distillation的42questions，有selection bias。",
+    "insightZh": "原方法新意是对relation geometry作较弱约束，避免绝对feature同构；本次方法/数值没有新增，reproducibility提升来自可验证public code与scene-task协议澄清。不能把文本改写认定为新架构。",
+    "evidenceZh": "cosine关系留下global rotation/scale自由度，Pearson可缓解matrix尺度差异。（Sec.4, Eq.(2), Fig.3, PDF pp.5–6）；作者报告Dual Pathway VSI60.4、plain MVRD59.9、controlled SFT57.7。（Table2/3, PDF pp.7–8）；scene-task结果来自另行训练的full-fine-tuned model，并用Mask3D proposals，不是VSI checkpoint zero-shot。（Appendix C.2, Table10, PDF pp.18–20）；v2首页新增Code URL；public repo具有实现代码而非空占位。（PDF p.1；work/audit/2608.10864v2.code-check.json）",
     "relevance": "high",
-    "readingAction": "deep",
-    "evidenceMaturity": "solid"
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "关系蒸馏直接关联multi-view VLM spatial grounding，并可为design-agent几何审阅提供训练参考；本次代码公开便于核验接口与teacher/student协议。",
+    "caveatZh": "moderate-scale训练仍有semantics/geometry trade-offs（Conclusion p.9）。；InternVL appearance-order明显受cross-view relation影响；Dual Pathway缓解但不说明所有任务无损（Appendix D.3 pp.22–23）。；语言对齐probe仅42个selected Object Size questions且threshold0.9max，不代表全面grounding causality。；scene模型单独训练及object proposals是额外资源，不能宣称VSI模型零样本transfer；无LEGO/CAD part reasoning验证。；所有分数为作者报告，本项目未复现；本轮只把public implementation/协议澄清作为更新。"
   }
 }

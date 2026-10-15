@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2610.17651",
+  "slug": "code2worlds-2-physically-plausible-agent-harness-for-embodied-world-simulation-2610-17651",
+  "title": "Code2Worlds-2: Physically Plausible Agent Harness for Embodied World Simulation",
+  "authors": [
+    "Haoyu Zhang",
+    "Siming Li",
+    "Zeyu Zhang",
+    "Yi Zhang",
+    "Tat-Seng Chua",
+    "Hao Tang"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.17651"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "3d-generation",
+    "Code2Worlds-2",
+    "Physically",
+    "Plausible",
+    "Agent",
+    "Harness",
+    "for",
+    "Embodied",
+    "World",
+    "Simulation"
+  ],
+  "abstract": "Recent coding large language models (LLMs) can synthesize dynamic 4D worlds from natural language, but the resulting content remains a visual artifact. It lacks physical semantics such as the collision geometry, mass, friction, inertia, and joint structure, required to enable it to simulate the physical world, and its dynamics are scripted to look plausible rather than designed to execute. What is needed is an executable world: one that a physics engine can load and step, resolving contact physically. We present Code2Worlds-2, an extension of Code2Worlds that turns 4D world generation into an embodied world simulation. We keep the original dual-stream generation pipeline intact and append two modules. First, a SimReady Scene Compiler that turns a generated visual scene into a simulator-compatible representation: it assigns collision meshes via convex decomposition, estimates physical attributes with a vision-language model, infers a lightweight support graph, instantiates the engine's contact, friction, and dynamics constraints, and applies a gravity settling pass, before exporting the scene as MuJoCo MJCF. Second, a Simulator-in-the-Loop 4D Refiner that implements an automated agent harness-a compile, simulate, critique and refine loop-that converts visual dynamics into executable rigid and articulated dynamics and evolves the physical settings rather than only the code, replacing the purely visual motion critic with a simulator critic that inspects penetration depth, collision pairs, stability, contact forces, joint limits, and robot reachability. We further propose SimCode4D, a state-based benchmark with five task templates for evaluating embodied simulation. Experiments on SimCode4D and across natural, indoor, industrial, urban, and service scenes show that Code2Worlds-2 produces physically plausible, simulator-compatible, and robot-interactable scenes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.17651v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.17651v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AIGeeksGroup/Code2Worlds-2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.17651v1 的 27 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。 本次实质更新：PDFp2声明保留原生成streams，新增SimReadycompiler、simulator-in-loopphysicalrefiner、state-basedSimCode4D。promotion应核对canonical，避免同extension重复。",
+    "ideaZh": "Code2Worlds-2 在原场景生成后加typed SimReady compiler与simulator-in-loop refiner：把collision、mass/friction、support、joints变成MJCF，state谓词指导受限物理修正。作者报告12source×3generation的RTS45/180→60/180，但case-clustered95%CI跨零，固定预算state-only81/180优于fused62/180；价值是可执行设计闭环和可审计状态接口，不能宣传普适物理正确或agent成功率100%。",
+    "motivationZh": "codingLLM生成visual4Dscene缺collision/inertia/contact与可执行动力学，视觉critic难验证simulation-ready能力。",
+    "methodZh": "继承Code2Worlds的code/object/environment streams；CoACD与terraincellprisms编译colliders，VLM估物性、geometry估mass/inertia，bboxsupport+gravitysettling初始化。受限DSL禁止改sourcegeometry/robot/probe/threshold，迭代修physicalplan与semanticbindings；MuJoCostate+visualverdict验收。SimCode4D提供独立probe/goldcontracts，reference-suite与generatedmethodeval分开。",
+    "methodFlow": [
+      "codingLLM生成visualscene与dynamicsprogram",
+      "分解collisionmesh、估物性，推supportgraph与settling",
+      "编译EmbodiedWorldGraph为MuJoCoMJCF与typedtaskoverlay",
+      "benchmarkownedrobot执行，记录contact/penetration/joint/taskstate",
+      "critic反馈受限修改physics/bindings，独立heldoutphysicsseeds验收"
+    ],
+    "experimentsZh": "Dev15reference15case×5physicsseed×3rebuild；methodfixedsource12case×3generation=36packages×5heldoutseed=180，repairseed503单独；另3matchedprompt单scenepermethod。 以下结果为作者报告：作者报告physical75/180→108/180、RTS45/180→60/180，navigation45/60→35/60反降、pick14/30/dynamic11/90。（PDF pp8–9 Tables2–3）；作者报告3matchedpromptpairedM1/M2 RT S15/15，但sourcegoal与pipelinebackbone不全匹配；只描述机制。（PDF pp23–27 TablesE.1–E.4） 对照范围：default/enriched/repairedpairedprotocol最可信；SceneSmith与C2W仅三world描述性cohort，C2WuniformMuJoCoimport非nativeBullet配置，Fable5backbone替换已披露。 消融与诊断：物性default、singlehull、noverticalseparation+settling、visual/state/fusedcritic；分母不同不应合并。",
+    "insightZh": "显式scenegraph/typedphysicalDSL与simulationstatefeedback将visualscene生成推进至可执行world，直接支持editable/sim-ready3D设计。核心模块沿用knownCoACD/VLM/settling，创新在compiler+auditableclosedloop整合，非新的physicsestimator。",
+    "evidenceZh": "typedcompiler保留scenegeometry、编译collider/physics/support并受限修physicalfields。（PDF pp4–6 Sections3.1–3.2/Figures3/5; pp20–22 C.5–C.7）；作者报告fixedsourceRTS45/180→60/180，95%CI[−11.1,28.9]pp。（PDF pp8–9 Table2/Section5.2）；作者报告stateonly81/180，fusedfixedbudget62/180，visualonly67/180。（PDF p10 Table5）；matchedprompt3scene使用Cartesiancontactproxy与contact-gatedequalitygrasp。（PDF p24 AppendixE.2/TableE.2）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中visualdesignagents与structured3Dscene生成；可借鉴编译、执行、状态predicate与可允许编辑边界，未涉及真实fabrication指令，故不加fabricationtopic。",
+    "caveatZh": "articulation有限、indoorwallcollision/generalgrasp待做，IsaacUSD只是未来export。；RTS提升CI跨零、只12sourcecase；physicsseeds重测同world不是独立scene生成。；属性估计未经真实物性验证，simulation自洽不等于realworldfidelity。；matchedprompt用sphericalproxy+equalityconstraintgrasp，不能称真实manipulator或dexterousgrasp。；fusedcritic固定预算比state-only差，不能宣称视觉与physicsfusion稳定更优。；支持graph66.7%microF1只五annotatedcases；stablepose未必preserve intendedsupport。"
+  }
+}

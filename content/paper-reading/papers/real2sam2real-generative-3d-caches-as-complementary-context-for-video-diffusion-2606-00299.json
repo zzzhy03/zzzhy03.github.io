@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2606.00299",
+  "slug": "real2sam2real-generative-3d-caches-as-complementary-context-for-video-diffusion-2606-00299",
+  "title": "Real2SAM2Real: Generative 3D Caches as Complementary Context for Video Diffusion",
+  "authors": [
+    "Jiayi Wu",
+    "Haoming Cai",
+    "Cornelia Fermuller",
+    "Christopher Metzler",
+    "Yiannis Aloimonos"
+  ],
+  "publishedAt": "2026-05-29",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-15",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2606.00299"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "3d-generation",
+    "Real2SAM2Real",
+    "Generative",
+    "Caches",
+    "as",
+    "Complementary",
+    "Context",
+    "for",
+    "Video",
+    "Diffusion"
+  ],
+  "abstract": "Video Diffusion Models (VDMs) synthesize high-quality videos, but precise camera and motion control remains challenging when large viewpoint shifts, changing occlusions, or complex dynamics reveal unseen regions. Diffusion priors alone can yield structural inconsistencies, while warped guidance can contain incomplete geometry and misleading view-dependent appearance cues. Real2SAM2Real complements VDM priors with a coarse 3D foreground cache of topologically complete meshes for intuitive editing and animation. Generative 3D lifting estimates these object and human meshes, including unobserved surfaces, from a single reference image. Normal maps rendered under specified camera trajectories and foreground motions guide video synthesis in the VDM, while the reference image provides appearance conditioning. Soft spatial-aligned injection and minimally invasive fine-tuning incorporate this guidance while largely preserving pretrained synthesis priors. Decoupled conditioning enables independent appearance and geometry editing. We train on around 2,000 monocular clips using instance-masked normal sequences with instance-level spatial perturbations to reduce sensitivity to differences between video-estimated training normals and normals rendered from coarse 3D caches at inference. Training requires neither explicit 3D assets nor paired multi-trajectory recordings. Real2SAM2Real supports decoupled camera and multi-instance motion control, including articulated humans. Across these challenging settings, experiments show strong spatiotemporal consistency and better overall control accuracy and video fidelity than evaluated state-of-the-art methods. Preliminary demonstrations suggest potential robotics applications.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2606.00299v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2606.00299v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/jiayi-wu-umd/Real2SAM2Real"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2606.00299v2 的 17 页全文与关键图表核验。实验数字与比较均为作者报告，本项目未独立复现。代码状态：available。",
+    "ideaZh": "Real2SAM2Real 将 SAM3D 完整foreground meshes 当可编辑3D cache，用沿camera/object trajectories渲染的masked normals控制Wan2.2，appearance仍走原生inpainting。约2K clips只训练1.8%/expert；作者报告人体PA-MPJPE22.8mm、物体RotErr4.19。但geometry/cache与pose评估共享模型，Sim2Real仅示例，assets不是simulation-ready。",
+    "motivationZh": "warp-and-inpaint只含可见表面且把view-dependent appearance混入geometry，导致大视角和遮挡下结构失真。",
+    "methodZh": "single-image generative lifting得到instance-complete meshes和SMPL humans，用户给camera和rigid/deformable motion；normals经frozen VAE和zero-init3D conv additive injection。原reference独立作为inpainting appearance condition。从monocular videos估计pseudo normals，跨帧一致instance perturbations弥补训练/渲染geometry gap；双噪声experts分别LoRA与geometry embedding。",
+    "methodFlow": [
+      "单图lifting分离objects与SMPL humans",
+      "编辑相机与各mesh的motion",
+      "渲染instance-masked normal sequences",
+      "VAE编码normals；zero-init3Dconv软注入",
+      "reference走独立inpainting；LoRA训练两experts",
+      "以video prior合成foreground appearance与background"
+    ],
+    "experimentsZh": "DL3DV/HumanVid/OpenVidHD约2K clips，2×H200约两天，720p81frames、checkpoint6000、rank64 LoRA；200camera cases、300human clips、100object-control cases。 以下结果为作者报告：作者报告人体PA-MPJPE22.80mm vs最佳对照ReCamMaster34.81；AKD17.80px vsTrajectoryCrafter28.37；MKR0.58%。（Table2 p.7）；作者报告object RotErr4.1932/TransErr12.0991，DaS22.7625/48.1813；camera RPE-T0.0132，GEN3C0.0143。（Tables1 p.6,3 p.8）；作者在30-case perturbation子集δ19–25%时报告ATE0.027 vs无扰0.015，VBench0.840 vs0.838。（Table4 p.17） 对照范围：camera对ReCamMaster/ViewCrafter/TrajectoryCrafter/WorldForge/GEN3C；human加Uni3C/DaS，按各自native condition/frame counts对齐；object对DaS和非原生支持manipulation的ViewCrafter。 消融与诊断：移除soft injection/instance perturbation会降低一致性/pose；AppendixD仅物体位移误差，未检验topology、joint或background错误。",
+    "insightZh": "贡献是instance-complete geometry cache与appearance-decoupled normal guidance，以及limited adaptation/perturbation；lifting和video foundation均来自现有模型，不是新3D生成骨干。",
+    "evidenceZh": "foreground geometry完整性指估计不可见表面，background由VDM补充。（Sec.3.1 p.4 Eqs.1–2）；geometry走additive branch，appearance走原inpainting，训练约1.8%/expert。（Fig.3 p.5; Sec.3.3 pp.4–5）；作者报告人体和物体控制收益；camera ATE不是全面最好。（Tables1–3 pp.6–8）；物理interaction和appearance drift仍受cache/VDM限制。（AppendixD–E pp.16–17）",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "显式editable mesh staging配合raster diffusion，直接关联可控3D/4D content creation，可借鉴geometry/appearance解耦。",
+    "caveatZh": "cache不是simulation-ready，复杂contact/deformation/fracture会误导guidance。；appearance只在reference直接锚定，大视角/长遮挡细纹理和identity可漂移。；camera用GLOMAP+Sim3，human条件与评估都用SAM3DBody，object tracker用SAM3D mesh/DAv2 calibration：模型共享会影响指标独立性。；3D完全性是生成补全，不保证真实性；3D-free仅训练数据无asset，inference仍需要lifting/rendering。；机器人章节只是定性demo，没有下游policy成功率或物理安全证据。"
+  }
+}
