@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2610.25369",
+  "title": "Painting Change Map as guidance for generating painting processes",
+  "authors": [
+    "Markus Pobitzer",
+    "Chang Liu",
+    "Niccolò Biondi",
+    "Nicu Sebe"
+  ],
+  "publishedAt": "2026-10-18",
+  "updatedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25369"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Painting Change Map as guidance for generating painting processes",
+    "video-generation"
+  ],
+  "abstract": "Digital art generation has undergone a massive paradigm shift, moving from static image synthesis to dynamic video generation that can mimic the human painting process. While existing models can synthesize visually stunning time-lapses of paintings being created or \"unpainted,\" they largely treat the creative process as a black box. Current conditioning mechanisms are either too rigid, relying on static geometric cues like Canny edges or depth maps, or too holistic, utilizing simple scalar progress variables that offer no localized control. Consequently, users lack the agency to steer how a painting evolves over time. In this work, we argue that true control over the video generation of artwork requires a joint understanding of two fundamental dimensions: where an artist acts, and when those actions take place. To achieve this, we introduce the Painting Change Map, a novel spatio-temporal control mechanism that explicitly tracks normalized structural changes across a 1,000-timestep continuum, a resolution sufficient to capture fine-grained stroke-level changes while remaining computationally tractable. By mapping localized visual differences into an encoded RGB space, our representation enables fine-grained guidance for both the forward painting and reverse unpainting processes. Extensive benchmarking demonstrates the efficacy of our approach. We outperform existing control baselines and achieve competitive or superior results compared to state-of-the-art painting methods. Furthermore, under oracle conditions, our method surpasses all baselines by a significant margin. Code is available at https://github.com/Markus-Pobitzer/painting-change-map.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25369v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25369v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "Painting Change Map将“哪里、何时变化”压成RGB控制视频，可借鉴为设计过程的局部进度接口；但强结果依赖oracle maps。预测map的完整流程不全面优于Loomis Painter，输出仍是raster video，不能当真实stroke或刺绣指令。",
+    "motivationZh": "对去除手/工具遮挡的绘画视频做相邻帧差分，阈值化后记录每个pixel最后变化时间，并与lineart合成控制信号。训练1.3B video-to-video LoRA；推理可由5B I2V先预测change-map序列再生成unpainting。显式时空接口有迁移启发，但真实色料物理与离散操作并未建模。",
+    "methodZh": "SAM3移除hands/tools；从1000帧中采样81帧。 对邻帧做L2 change detection，用τ过滤微小变化，θ过滤大范围motion。 将最近变化时刻累积为temporal map，R存progress、GB存lineart。 Oracle实验直接从真实video生成maps；实际使用5B I2V预测maps。 1.3B Wan2.1 Fun LoRA以map+finished image生成81帧unpainting video。",
+    "methodFlow": [
+      "SAM3移除hands/tools；从1000帧中采样81帧。",
+      "对邻帧做L2 change detection，用τ过滤微小变化，θ过滤大范围motion。",
+      "将最近变化时刻累积为temporal map，R存progress、GB存lineart。",
+      "Oracle实验直接从真实video生成maps；实际使用5B I2V预测maps。",
+      "1.3B Wan2.1 Fun LoRA以map+finished image生成81帧unpainting video。"
+    ],
+    "experimentsZh": "Loomis acrylic subset 132/16/13，81帧reverse video，1.3B V2V LoRA与5B map predictor。Oracle global/local masked instance评价与predicted-map完整pipeline分开。 作者报告oracle全局MSE592.81→449.68，相比Lineart；但纯temporal variants弱于Lineart。 (Table1, PDF p.5) 作者报告预测map流程MSE3127.13略优于Loomis3152.96，但CLIP0.87<0.88、DINO0.74<0.81、FID119.53>101.72。 (Table3, PDF p.8) 控制比较含Depth/Canny/Lineart并matched training；生成流程比较InversePainting/ProcessPainter/PaintsUndo/Loomis。Oracle上界不能与无oracle模型当同条件；小testset不支撑跨style普适性。 比较4种temporal编码、Lineart融合、τ/θ grid。最关键发现是纯temporal map不够，需要结构anchor；并非任意精细RGB编码都有效。",
+    "insightZh": "在已有video-control与unpainting架构上引入像素last-change-time表示及lineart融合；不是stroke parameterization，也不模拟color mixing/drying。主要贡献为局部时空控制接口。",
+    "evidenceZh": "binary change+last-event tensor，假设外部遮挡已去除；θ5%使大范围变化整帧不登记。 (Sec.3.1–3.3, PDF p.3) / R temporal/GB lineart，数据132train/16test/13val，每配置单A100训练19epochs。 (Sec.4 and Fig.2, PDF p.4) / Table1所有control-map比较使用oracle ground-truth maps。 (Sec.4.2 and Table1, PDF p.5) / 预测map流程CLIP0.87/LPIPS0.45/FID119.53；Loomis0.88/0.44/101.72。 (Table3, PDF p.8) / map生成与RGB生成解耦，可作为设计agent局部进度接口；不证明fabrication-ready。 (Sec.3, Fig.4, PDF pp.3,7)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体迁移是局部时空进度map作为视觉设计规划接口，保留结构anchor与predicted/oracle区分；没有实际embroidery或toolpath收益证据。",
+    "caveatZh": "Canvas motion使历史变化与当前几何逐渐失同步，未来需alignment。 / 多样化大规模数据不足限制medium/style等信息研究。 / 仅16 test videos且主要acrylic，不证明刺绣、可重放stroke或制造path。 / 真实推理map prediction存在明显oracle gap。 / local LPIPS只与Lineart打平，CLIP不占优，不能写成所有指标领先。 / 峰值VRAM作者报告25.84GB，不称24GB卡可直接运行；latency表只覆盖generative components。 / 论文印出代码URL但本次HTTP404，未确认public code，省略Code link。",
+    "sourceNote": "Read retrospectively on 2026-10-20 for the user-requested 2026-10-19 backfill, not a historical API/code snapshot. Exact version 2610.25369v1 (10 pages), PDF SHA-256 ffcd85c5e32fb1a3fc207ca4b87c5955b7fa09429b8fd6caeac6efb8dfe04522. Full text and key figures/tables checked; all quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "painting-change-map-as-guidance-for-generating-painting-processes-2610-25369",
+  "collectedAt": "2026-10-19",
+  "topicIds": [
+    "video-generation"
+  ]
+}

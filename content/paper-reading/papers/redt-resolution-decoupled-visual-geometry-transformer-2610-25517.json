@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2610.25517",
+  "title": "ReDT: Resolution-Decoupled Visual Geometry Transformer",
+  "authors": [
+    "Abteen Arab",
+    "Guile Wu",
+    "Dongfeng Bai"
+  ],
+  "publishedAt": "2026-10-18",
+  "updatedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25517"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "ReDT: Resolution-Decoupled Visual Geometry Transformer",
+    "3d-reconstruction"
+  ],
+  "abstract": "We introduce ReDT, a feed-forward visual geometry transformer designed to scale multi-view reconstruction to high-definition (HD) inputs. Existing visual geometry transformers are typically trained at fixed, standard definition (SD) resolutions and exhibit degraded reconstruction quality and poor computational scaling to high input resolutions. While recent efficient architectures reduce the complexity of inter-frame attention, expensive intra-frame and encoder attention remain largely unaddressed, making HD reconstruction impractical with existing architectures. ReDT addresses both limitations with a resolution-aware architecture designed to scale to high-resolution inputs. The key idea of ReDT is to first map each view to a fixed-size set of basis tokens, compute correspondences in this compact constant-size basis space, and then project the outputs back to the original resolution for dense prediction. By decoupling the internal representation from input resolution during attention, ReDT substantially reduces the computational cost of high-resolution 3D reconstruction and improves model performance at all resolutions. Extensive experiments on multiple datasets spanning SD to FHD (2K) show that ReDT outperforms state-of-the-art visual geometry transformers in both reconstruction quality and computational efficiency. For instance, on the ETH3D (2K) dataset, ReDT achieves a $16\\times$ speedup, a $34\\%$ reduction in peak GPU memory usage, and a $33\\%$ reduction in chamfer distance over VGGT-$Ω$. \\href{https://redt.github.io}{Project Website.}",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25517v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25517v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "ReDT把高分辨率patch压成带面积权重的basis tokens，再用TTT做几何交互，适合精读可扩展3D条件编码。作者报告ETH3D 2K的CD为0.1140、6.35秒；但完整模型仍有DPT二次项，且训练已混用HD/SD，不能写成纯低分辨率训练即可无条件泛化。",
+    "motivationZh": "问题是视觉几何Transformer不仅global attention随view数扩张，encoder/frame attention也受分辨率影响。ReDT以entropy quadtree合并低信息patch，再将面积加权特征投影到固定basis，在TTT中交换对应关系后映回dense网格；保留DPT与camera heads。主要证据覆盖几何CD、depth与pose，未验证生成或可编辑资产质量。",
+    "methodZh": "输入multi-view images，以entropy/quadtree合并低信息patch。 DIVA用token面积作为quadrature权重，映射到encoder 512/aggregator 64个basis。 在compact basis内以5步Muon TTT建模correspondence，special tokens单独保留。 映回空间tokens，broadcast densify并卷积平滑。 沿用DPT和camera heads输出depth、points和poses。",
+    "methodFlow": [
+      "输入multi-view images，以entropy/quadtree合并低信息patch。",
+      "DIVA用token面积作为quadrature权重，映射到encoder 512/aggregator 64个basis。",
+      "在compact basis内以5步Muon TTT建模correspondence，special tokens单独保留。",
+      "映回空间tokens，broadcast densify并卷积平滑。",
+      "沿用DPT和camera heads输出depth、points和poses。"
+    ],
+    "experimentsZh": "七个HD benchmarks并补ScanNet/7-Scenes；CD、pose AUC/RTA/RRA与depth AbsRel。统一checkpoint fine-tuning，BF16；场景相对第一camera并归一化scale。 作者报告ETH3D 2K CD由0.1702降至0.1140，runtime102.70→6.35s、peak memory98.09→64.47GB。 (Table1, PDF p.7) 作者报告去basis projection在4K OOM；encoder basis512→256令AUC@30 86.09→36.18。 (Tables4–5, PDF p.9) 比较VGGT、VGGT-Ω、π3、DA3、Fast/FlashVGGT、ZipMap，均统一fine-tune；headline并非原始checkpoint零训练对照。没有制造/mesh editability或生成下游。 分开移除adaptive tokenizer/basis/TTT，及basis counts；移除basis对4K内存关键。实验不支持把backbone渐近一致性外推所有heads或任意K。",
+    "insightZh": "贡献是将面积/离散采样一致的basis projection与自适应tokenization、TTT整合，覆盖以往只改global attention留下的encoder/frame瓶颈；并非提出新的TTT。理论是条件性的渐近discretization consistency。",
+    "evidenceZh": "非均匀patch按面积加权，special tokens不参与面积压缩。 (Sec.3.3, Fig.4, PDF p.6) / 所有baseline从公开checkpoint统一混合HD 2–4 views、SD 10–20 views训练10 epochs。 (Appendix6.1, PDF p.13) / ETH3D 2K ReDT-Ω CD0.1140/time6.35s/mem64.47GB，对照VGGT-Ω0.1702/102.70s/98.09GB。 (Table1, PDF p.7) / Encoder basis降至256使AUC@30从86.09跌至36.18；容量并非随意可压。 (Table5, PDF p.9) / 全模型复杂度保留O(NP+N²)，一致性不保证新增views或保留heads。 (Appendix6.4–6.5, PDF p.14) / 可借鉴作3D生成中的高分辨率几何条件模块；论文未测试该下游。 (Sec.3.3 and Appendix6.5, PDF pp.6,14)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可具体迁移的是高分辨率3D条件的basis/area聚合模块；对3D generation的收益尚为方法借鉴而非本论文实证。",
+    "caveatZh": "Appendix6.5明确论证不保证新增view数不变性或prediction heads一致性。 / 完整模型仍保留DPT的N²项；attention近常量不能概括全流程。 / 训练混合HD/SD，不能把结果解释成从未看过HD的纯SD训练。 / 输出是point/depth/pose，缺少可编辑mesh及制造约束证据。 / p.15的4K/8K标签与常见命名不一致，比较应跟实际像素尺寸；以表格结果为准，不合并不同runtime口径。 / 论文project URL审阅时404，未确认public implementation。",
+    "sourceNote": "Read retrospectively on 2026-10-20 for the user-requested 2026-10-19 backfill, not a historical API/code snapshot. Exact version 2610.25517v1 (16 pages), PDF SHA-256 2027be1325fa6292db10400cff34f0b5afe3ef4b2c0e7a45d394a0b15895dbe3. Full text and key figures/tables checked; all quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "redt-resolution-decoupled-visual-geometry-transformer-2610-25517",
+  "collectedAt": "2026-10-19",
+  "topicIds": [
+    "3d-reconstruction"
+  ]
+}

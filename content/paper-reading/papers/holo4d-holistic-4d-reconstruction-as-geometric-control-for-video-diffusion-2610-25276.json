@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.25276",
+  "slug": "holo4d-holistic-4d-reconstruction-as-geometric-control-for-video-diffusion-2610-25276",
+  "title": "Holo4D: Holistic 4D Reconstruction as Geometric Control for Video Diffusion",
+  "authors": [
+    "Yushi Lan",
+    "Zeren Jiang",
+    "Koichi Namekata",
+    "Xingang Pan",
+    "Chuanxia Zheng",
+    "Andrea Vedaldi"
+  ],
+  "publishedAt": "2026-10-18",
+  "updatedAt": "2026-10-18",
+  "collectedAt": "2026-10-19",
+  "venue": "NeurIPS 2026（论文自述）；arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25276"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "4D scaffold",
+    "persistent 3D trajectories",
+    "video reshooting",
+    "geometry-guided video diffusion",
+    "reconstructor transfer"
+  ],
+  "abstract": "Synthesizing a monocular video from a new camera trajectory requires preserving the observed scene geometry and motion while completing regions that become newly visible. Feed-forward 4D reconstructors recover the structure of the observed scene, whereas video diffusion models provide a generative prior for completing unseen content. We introduce Holo4D, a video reshooting framework that uses reconstructed 3D trajectories as a holistic source-view 4D scaffold. We project these trajectories into the requested views and encode their geometry and source appearance to guide a pretrained video diffusion model. Together with the source video and target cameras, the scaffold grounds generation in reconstructed observations while leaving unsupported regions to the generative prior. Experiments demonstrate the value of trajectory-based conditioning for camera control and novel-view synthesis. The framework accommodates different 4D reconstructors without retraining the video generator, allowing it to benefit from future advances in source reconstruction. More details can be found in our project page.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25276v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25276v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/NIRVANALAN/Holo4D"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Read retrospectively on 2026-10-20 for the user-requested 2026-10-19 backfill, not a historical API/code snapshot. Exact version 2610.25276v1 (43 pages), PDF SHA-256 1b597b26723ea23e258a452e98f821995ea092c4858db6176134f4428b9bfeaa. Full text and key figures/tables checked; all quantitative results are author-reported, not independently reproduced. Code: available. ",
+    "ideaZh": "Holo4D 用带 source RGB 的 persistent 3D trajectories 统一静态和动态观测，把投影后的几何特征按 channel 注入视频 DiT，以生成指定镜头下的 novel-view RGB 视频。值得精读的是可替换 reconstructor 的显式几何接口与支持区/补全区分工；作者在固定 generator 下实测四种重建后端，但不可见区域仍靠生成先验，输出并非可编辑 3D/4D 资产。",
+    "motivationZh": "单目视频换镜头需要同时保持观测到的scene geometry、appearance和动态事件，又要补齐disocclusion。逐帧point clouds缺少动态对应关系，camera-only prior则可能改变原事件；本文将外部重建的持续3D轨迹作为可查询观测骨架。",
+    "methodZh": "外部reconstructor在first-source-camera坐标系给出persistent trajectories和cameras，每个点绑定query-frame RGB。将time、XYZ、validity、target-camera depth和RGB的9维observations经MLP编码，按target projection在网格scatter-max加occupancy，再由causal 3D adapter对齐DiT。source/target latents沿width拼接，每个block按channel注入156维轨迹特征并加Plücker target-camera features；只训练conditioning和self-attention，以target RGB flow matching去噪。模型不预测geometry，null/unsupported区域由video prior补全。（Sec.3 pp.4–5; Fig.11 pp.19–20）",
+    "methodFlow": [
+      "输入 monocular source video 与指定 target-camera trajectory；外部 4RC 或兼容后端估计 source cameras 与 persistent 3D point trajectories",
+      "每个轨迹绑定 query-frame source RGB；在共同坐标系投影到各 target frame，构造 time/XYZ/validity/target depth/RGB 9维 observation",
+      "sinusoidal encoding + MLP 得32维点特征，目标网格 channel-wise max scatter 与 occupancy，再用 causal 3D adapter 得156通道 track features；无支撑位置用 learned null",
+      "VAE源视频 latent 与 noisy target latent 沿width拼接；每个DiT block将track features按channel拼接投影，并加入Plücker camera features",
+      "fine-tune conditioning modules 与 self-attention，以target RGB rectified-flow训练；推理去噪并VAE解码为new-view RGB video",
+      "长视频按49帧、单帧overlap分窗：首窗用Holo4D，后窗用见过robot数据的I2V continuation，以上一生成边界帧续接"
+    ],
+    "experimentsZh": "主模型Wan2.1-T2V-14B训练49帧，15k低分辨率+4.5k高分辨率steps；训练混合dynamic multiview与real/synthetic static data。DAVIS50clips×2 trajectories中，作者报告ATE1.657×10^-2、RPE-T2.415×10^-3，相比同4RC输入的Vista4D约降54%/33%，但RPE-R0.102°略逊ReCamMaster0.099°（Table2 p.8）。iPhone五held-out scenes作者报告两阶段后端PSNR13.20dB、LPIPS0.465优于所列baseline，SSIM0.348低于EX-4D0.366（Table1 p.7）。Table21固定checkpoint/cameras/sampler/seed替换四backend，直接支持无需retrain；GT track α=0.1噪声使RPE-R0.073°至0.221°，表明仍强依赖几何。受控stage-1消融去source color使ATE约增44%，加rendered RGB/masks未改善camera指标（Table4 p.9）。",
+    "insightZh": "相对 camera-only ReCamMaster 与独立渲染 point-cloud 条件，贡献是把静态点视为恒定轨迹、动态点视为持续身份轨迹，将 source appearance 与其重建运动共同暴露给共享视频 generator。相对 Vista4D 的额外 rendered-video token stream，channel injection 保持 attention sequence length；相对 LaVR 的 reconstructor-specific hidden state，接口以显式几何量定义。3D tracks、Plücker rays、source-target latent concatenation 和 ControlNet式初始化各有先例，不宜宣称首次几何控制。Table21 固定 checkpoint/camera/sampler/seed 更换四种后端，直接支持无需重新训练的接口通用性；这不等同任何重建器都即插即用或对上游错误免疫。",
+    "whyRelevantZh": "对主线3D-generation有具体transfer：以persistent point identities绑定重建位置、时间和appearance，将观测支撑作为可替换的几何接口约束生成，再把unsupported内容交给prior。这可作为dynamic 3D/4D内容生成中的view synthesis或几何一致先验模块设计参考；Table21的fixed-generator换后端与noise诊断直接说明接口收益和误差传播边界。它的主任务仍是video-generation，现有证据没有达到asset generation或manufacturing-ready输出。",
+    "evidenceZh": "接口证据：Sec.3.1–3.3 pp.4–5和Fig.11 p.19明确定义显式轨迹与channel injection。固定generator替换4RC/V-DPM/VGGT-Ω+CoWTracker或Open-D4RT的Table21 p.28显示兼容性与指标trade-off，优于仅凭定性图宣称通用。Table4 p.9受控消融支持轨迹绑定RGB的作用。Table1 p.7与Table2 p.8支持held-out-view画质、trajectory/translation改进；Table6 p.10及Table14 p.24则显示strong rotation与source-aligned orientation仍不稳。Fig.19 p.35和Appendix K p.30明确暴露无支撑补全边界。",
+    "caveatZh": "输出是given-source/target-camera的novel-view RGB视频，不是mesh、CAD或可编辑3D/4D资产，也未验证任意多target paths可融合为同一完整3D对象。validity不是精确occlusion或truth标记；first-frame queries会漏掉晚进入内容，大disocclusion与手部细节仍可能不可信（Appendix K p.30; Fig.19 p.35）。native Vista4D110 paths上两阶段Pi3 RotErr6.098°仍逊Vista4D4.169°，不同backend和alignment混合了多个因素（Table6 p.10）。iPhone仅5场景，Syn4D有训练domain优势；main metrics无repeated-training CI。1.34×仅denoising，full run570.9vs581.9s（Table24 p.30）。长rollout后窗见过robot数据，Fast-WAM单seed transfer mixed，camera perturbation没有改善。所有数字为作者报告，本项目未复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

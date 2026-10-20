@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.25015",
+  "slug": "iecla-interpretable-emotion-contribution-learning-for-affective-image-editing-2610-25015",
+  "title": "IECLA: Interpretable Emotion Contribution Learning for Affective Image Editing",
+  "authors": [
+    "Yijie Guo",
+    "Dexiang Hong",
+    "Weidong Chen",
+    "Xinyan Liu",
+    "Zhendong Mao"
+  ],
+  "publishedAt": "2026-10-18",
+  "updatedAt": "2026-10-18",
+  "collectedAt": "2026-10-19",
+  "venue": "arXiv preprint v1",
+  "identifiers": {
+    "arxiv": "2610.25015"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "affective image editing",
+    "signed attribution",
+    "counterfactual supervision",
+    "evidence-grounded planning",
+    "preservation constraints"
+  ],
+  "abstract": "Affective image editing (AIE) aims to evoke a target emotion while preserving the content and structure of a source image. Existing methods improve emotional expression or visual fidelity, but the target emotion alone does not reveal which source regions should be changed and which should remain intact, especially in complex scenes. We introduce Interpretable Emotion Contribution Learning for Affective Image Editing (IECLA), a framework that separates source-emotion attribution from target-aware editing. IECLA constructs signed object-level supervision through counterfactual interventions and trains a context-conditioned contribution predictor to localize evidence that supports or opposes the source emotion. At inference, an image-level evaluator estimates the source emotion directly from the input, while the predictor identifies editable and preservation evidence without repeated interventions. A target-aware editing agent then translates this evidence and the desired emotion into localized, content-aware operations for existing editors. Extensive evaluations show that IECLA predicts counterfactual contributions more faithfully on both in-domain and cross-dataset tests, while external VLM and independent human references support the quality of its localized evidence. Across six editing backbones, IECLA consistently strengthens target-emotion expression while preserving image content and structure, and user studies further show improved perceived target expression and naturalness.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25015v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25015v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Read retrospectively on 2026-10-20 for the user-requested 2026-10-19 backfill, not a historical API/code snapshot. Exact version 2610.25015v1 (32 pages), PDF SHA-256 bff552576a844feabfbbf70b057a8b43a371b7b67f53f8ab1dcf42b4ec675c77. Full text and key figures/tables checked; all quantitative results are author-reported, not independently reproduced. Code: promised. ",
+    "ideaZh": "IECLA 把情绪编辑拆成 signed source-emotion attribution 与 target-aware editing：学习哪些区域适合改、哪些应保护，再由 VLM 预算化规划并调用 editor。作者报告 Qwen-Edit 目标成功率29.96%→35.79%，同时改善结构保留。可借鉴 evidence-to-action 接口，但sign相对teacher/blur baseline定义，四轮critic/auditor均在执行前，未展示编辑结果反馈闭环。",
+    "motivationZh": "单个emotion word没有说明视觉线索应在哪里改变。复杂场景中，盲目加强目标情绪可能重绘主体与背景，保守编辑又可能仅维持原有情绪。需要把source evidence定位、应保护内容与target-specific操作分开表示。",
+    "methodZh": "训练时用EmoVerse-supervised frozen evaluator E推断source emotion，对Grounding DINO+SAM候选区域做blur intervention，并减去matched-reference blur的校准均值；SigLIP2 predictor融合区域、互补context和完整图像的global/local features，联合Huber、absolute/signed ranking、focal sign及VAD/intensity辅助目标学习signed scores。推理时选择positive editable evidence、保留negative preservation evidence；VLM依次验证线索、预算化规划local/atmosphere/minor-object操作、做结构critic和完整instruction审计，再由deterministic compiler调用现有editor。Fig.10呈现执行前计划校验，未展示编辑图像反馈驱动的重执行。",
+    "experimentsZh": "主实验680图×8目标=5,440任务（含680 same-emotion），六editor各自配对native/guided。作者报告Qwen-Edit Target Success .2996→.3579、Emo-A .2588→.3081、SSIM .5790→.6137、LPIPS .3698→.3440（Table2 p.7）；五外部集3,370图/26,960任务仅用Qwen-Edit，情绪及结构指标均改善（Table3 p.8）。Locked attribution test为7,278图/53,180 masks；相对同target SigLIP2，Signed rho .2314→.5088（Table1 p.6）。40人editing User Study每editor20对，两项均值方向一致；20-task heatmap方法排序检验不显著（AppendixE pp.23–24）。",
+    "evidenceZh": "Table4（p.8）作者报告full/w/o-attribution/w/o-learning/w/o-agent的Success为.3579/.2915/.3046/.3540，主要收益来自attribution与representation，agent边际为.39个百分点；Table21（p.24）random matched region降至.2739，支持emotion evidence选择而非prompt结构本身的作用。Human Review Signed rho .4525、Sign Macro-F1 .3601（Tables16–17 pp.22–23）；teacher replay Sign F1 .1522对learned .3601（Table23 p.26），提供超出teacher benchmark的有限外部支持。",
+    "insightZh": "设计控制接口可同时输出editable evidence、preservation evidence和action budget，把新增物体明确记录为hypothesis；这提供了比笼统反思更可审计的规划机制。只有进一步加入generated output观测与可定位的执行后检验，才能扩展为真正的视觉闭环。",
+    "whyRelevantZh": "直接命中Visual Design Agents：以signed evidence驱动受约束planning，再调用editor真实修改raster视觉产物，满足至少两个环节（planning、tool action）。贡献包括可学习的attribution接口，超出纯UI或现有模型编排；可关注如何显式分离应改内容和保护内容，但不能把执行前审计宣传为rendered feedback闭环。",
+    "caveatZh": "ci是相对teacher/blur baseline的残差，negative不等于绝对人类因果反证；无需source label推理不等于无image-level监督。Human Review每item仅一名annotator，Sign Macro-F1 .3601仍有限；40人User Study是不同协议，heatmap比较不显著。主表含12.5% same-emotion任务；跨集编辑仅Qwen-Edit，稳定性仅16图/3seeds/2resolutions/单editor且一组CI跨0。四轮审计都在执行前，未见post-render correction、充分latency/cost数据或同backbone下直接对比EmoAgent/Moodifier；代码待发布。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "methodFlow": [
+      "训练监督：EmoVerse image-level evaluator 推断 source emotion，Grounding DINO+SAM 提取 object masks。",
+      "Counterfactual targets：候选区域 blur 的 source-score drop 减去 matched-reference blur 的校准均值，得到相对 signed contribution。",
+      "Predictor：SigLIP2 融合区域、互补context、完整图像的 global-local views，联合学习 magnitude、sign、ranking 和 affective auxiliaries。",
+      "推理 grounding：原图一次 source-emotion inference 与逐区域 predictor 输出 positive editable evidence 和 negative preservation evidence。",
+      "Target-aware planning：VLM 验证线索并预算化选择最多各一个 local、atmosphere、minor-object operation，经 structural critic、compiler 和 auditor 审核。",
+      "Tool execution：将审核后的 instruction 交给现有 image editor；论文报告事后评价，未展示编辑结果反馈驱动的再次执行。"
+    ]
+  }
+}

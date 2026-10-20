@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.25011",
+  "title": "FineSplat: Fine Patches, Local Groups, Detailed Splats",
+  "authors": [
+    "Hyebin Kim",
+    "Hwasik Jeong",
+    "Joonhyuk Park",
+    "Gyeongjin Kang",
+    "Jungwoo Kim",
+    "Younghyun Kim",
+    "Eunbyung Park"
+  ],
+  "publishedAt": "2026-10-18",
+  "updatedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25011"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "FineSplat: Fine Patches, Local Groups, Detailed Splats",
+    "3d-reconstruction"
+  ],
+  "abstract": "Feed-forward 3D Gaussian Splatting (3DGS) promises instant scene reconstruction with high-quality novel-view synthesis. Yet, fine-grained geometry and appearance remain difficult to recover, motivating us to revisit how feed-forward models represent, aggregate, and refine detailed visual information. We introduce FineSplat, a feed-forward 3DGS framework built around fine-grained image patches. Since global multi-view attention becomes prohibitively expensive at such high token resolutions, we develop a dual-grouping strategy that combines two complementary forms of locality: view-wise grouping enables efficient interaction among neighboring views, while 3D spatial grouping reconnects geometrically related tokens that may never have interacted under view-wise grouping by lifting them into the 3D scene space. We further leverage reconstruction error as direct feedback, providing an explicit rendering-based signal to recover fine-grained structures and appearance, thereby overcoming the limitations of one-pass feed-forward prediction. Finally, a compact Gaussian generation scheme preserves the benefits of fine-grained features without unnecessarily increasing the number of primitives. Together, these designs enable FineSplat to recover richer geometry and appearance while remaining efficient and compact, achieving state-of-the-art results by a substantial margin, under the same or smaller Gaussian budgets than existing methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25011v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25011v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://hyebinny.github.io/FineSplat/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "FineSplat值得精读“view局部→3D局部→渲染误差反馈”的4步refinement，较少Gaussians也能保留细节。边界很重要：主要证据是224²/252² novel-view指标，pose-free还用target图像做200步pose alignment；不能据此宣称无目标观测部署或制造级几何。",
+    "motivationZh": "FineSplat用4×4 tokens与MVP层级view grouping初始化3DGS，再用Gaussian中心lift tokens，结合可见view渲染残差/ResNet差分做PTv3序列化局部attention并迭代更新。每patch只生成4个可偏移subpixel Gaussians，可再按context blending contribution裁剪。对主线的价值是具体误差汇聚和局部修正机制，不是把rendering指标当可编辑mesh证据。",
+    "methodZh": "4×4 patches经MVP coarse-to-fine/view-pair grouping生成tokens。 每token预测4个subpixel ray Gaussians，得到初始场景。 Render context views，计算signed pixel error与ResNet18 feature difference。 在frustum+depth可见views采样并聚合误差，以Gaussian均值位置lift到3D。 PTv3 serialized attention跨view groups交互，4步更新并重新渲染；可按context贡献prune。",
+    "methodFlow": [
+      "4×4 patches经MVP coarse-to-fine/view-pair grouping生成tokens。",
+      "每token预测4个subpixel ray Gaussians，得到初始场景。",
+      "Render context views，计算signed pixel error与ResNet18 feature difference。",
+      "在frustum+depth可见views采样并聚合误差，以Gaussian均值位置lift到3D。",
+      "PTv3 serialized attention跨view groups交互，4步更新并重新渲染；可按context贡献prune。"
+    ],
+    "experimentsZh": "DL3DV训练单checkpoint；140个DL3DV场景、1600RE10K、MipNeRF360/ScanNet++跨域。Main evaluation224² Lanczos，附录252² Bilinear+AA；posed与pose-free分开，后者有target pose alignment。 作者报告DL3DV 24views posed PSNR27.233dB/301K GS，对照2Xplat24.354dB/1.2M；prune249K仍27.164。 (Table1, PDF p.8) 作者报告24views Stage2四步比Stage1提高1.457dB；额外16步反而降至26.796dB。 (Table4, PDF p.10) 作者报告ScanNet++ pose-free 32/64views仍落后ZipSplat，128views22.389超过21.465。 (Table9, PDF p.22) 含pixel-/patch-/compactGS、posed/posefree等baselines；2Xplat不使用view-dependent opacity。不同native resolutions/training data不完全matched；没有表面CD/part-edit/manufacturability实测。 测试Stage2steps、推理时view-group size、self/agg errors、同数量随机移除跨组views与context贡献prune。多数group/error变更仅inference-time，不等于各变体从头训练最优控制。",
+    "insightZh": "将fine-patch/view grouping、3D serialized locality、真实render error feedback和patch-aligned compact GS组合；继承MVP/PTv3/learned refinement，未将其包装为全新基础架构。",
+    "evidenceZh": "4×4 token预测4个Gaussians并在3D邻域汇聚cross-view残差，T=4。 (Secs.3.1–3.3, Fig.2, PDF pp.4–6) / DL3DV 24view posed PSNR27.233、301K GS；2Xplat24.354、1.2M。 (Table1, PDF p.8) / 24views Stage1 25.776→4-step27.233dB，16steps降至26.796。 (Table4, PDF p.10) / pose-free评价冻结GS后对每target camera用target图像L2优化200iterations。 (AppendixB.1, PDF p.18) / error自身源view贡献大于agg；去agg降低24viewPSNR0.170dB。 (Table7, AppendixC.2, PDF p.21) / 可借鉴为3D生成后的local detail/error refinement；论文不证明mesh/manufacturing质量。 (Sec.3, Sec.4, PDF pp.4–8)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "局部显式3D表示、跨view residual gathering与learned correction可具体迁移到3D生成细化；未证明生成分布或可编辑资产收益。",
+    "caveatZh": "作者不主张fine patches普适优于scale-up的coarse foundation models。 / 其初步实验未从foundation features与fine tokens组合获得显著收益。 / pose-free评测用target image进行200步pose optimization，与完全无target观察部署不同。 / 主要novel-view224²/252²，未直接度量editable surface、connectivity或制造精度。 / 训练后期unfreeze包括DA3 pose estimator，不能称全模型不依赖/不训练geometry backbone。 / 跨dataset训练/resize协议影响比较；group-size消融仅inference切换，不能分离训练匹配因素。 / 4步refinement不是纯一次线性head；Fig.7 runtime为posed对照，不能据此外推pose-free端到端含EPA。",
+    "sourceNote": "Read retrospectively on 2026-10-20 for the user-requested 2026-10-19 backfill, not a historical API/code snapshot. Exact version 2610.25011v1 (25 pages), PDF SHA-256 7fcf56070db9700b9a51718f8d542181ba2496714326dc2856702b0bc2cfcd3d. Full text and key figures/tables checked; all quantitative results are author-reported, not independently reproduced. Code: available. PDF p.1印出的project入口提供public repository链接，实际仓库状态另有访问审计。Code入口保留PDF印出的URL。"
+  },
+  "slug": "finesplat-fine-patches-local-groups-detailed-splats-2610-25011",
+  "collectedAt": "2026-10-19",
+  "topicIds": [
+    "3d-reconstruction"
+  ]
+}

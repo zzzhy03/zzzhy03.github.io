@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.25503",
+  "slug": "from-seeing-to-reporting-a-theory-of-reliable-visual-set-generation-in-vision-language-models-2610-25503",
+  "title": "From Seeing to Reporting: A Theory of Reliable Visual Set Generation in Vision-Language Models",
+  "authors": [
+    "Junzhe Shi",
+    "Yuan Gan",
+    "Shida Jiang"
+  ],
+  "publishedAt": "2026-10-18",
+  "updatedAt": "2026-10-18",
+  "collectedAt": "2026-10-19",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2610.25503"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "visual set reporting",
+    "task-compatible matching",
+    "deterministic readout",
+    "GUI grounding",
+    "output verification",
+    "cross-model selection"
+  ],
+  "abstract": "Vision-language models (VLMs) are asked to report what they see: to count objects, box them, parse a screen or pick a click target (GUI grounding). We argue that reporting is part of the visual task, not merely its formatting. In a dense scene with 173 shapes, GPT-6.1 lists 173 records that match every shape, yet the counts it states in the same response sum to 188. From Seeing to Reporting (FSR) is a theory of visual reporting and a set of inference-time procedures that improve the reports of frozen VLMs. It models reporting as a chain from responses to decoded records, constructed sets and task answers, linked by task-compatible matching. The chain gives exact relations for deleting records, averaging their coordinates and switching readouts, and it splits the error of one answer chosen among several calls into missing candidates, lost representatives and wrong choices. These relations guide procedures for counting, detection, document layout, screen parsing and GUI grounding that use the task specification and a shipped configuration, without requiring labels from the target task. On 50 dense synthetic scenes, a one-call reporting-and-decoding protocol cuts per-type count error by 85.2% for GPT-6.1 and 98.8% for Claude Sonnet 5.5. On 600 ScreenSpot-Pro items, a GUI-grounding tier that combines three models lowers the miss rate from 13.67% for GPT-6.1's two-stage zoom to 9.33%, against 12.67% for three such zooms combined by a cluster vote at about the same cost. A plain vote over the same three models misses 12.33%: the other models supply the candidates, and selecting among them turns those candidates into fewer misses. We release the protocols, the stored responses and the analysis code.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25503v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25503v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/shijunzhe/vlm-set-reporting"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Read retrospectively on 2026-10-20 for the user-requested 2026-10-19 backfill, not a historical API/code snapshot. Exact version 2610.25503v1 (56 pages), PDF SHA-256 6a3ab912bc899827463d4c9b16fd09ae5277e24056c6c05c2245031fb53f79dd. Full text and key figures/tables checked; all quantitative results are author-reported, not independently reproduced. Code: available. ",
+    "ideaZh": "FSR 将 VLM visual reporting 拆成 response → records → constructed set → readout，把候选未覆盖、代表丢失和最终选择错误分开审计。作者报告三模型 GUI tier 在 600 个独立 ScreenSpot-Pro items 上将 miss rate 从单模型 zoom 的 13.67% 降至 9.33%，代价约 3.2 倍；synthetic counting 的巨大改善来自可恢复的 list/readout gap，不能外推为自然图像或设计任务的通用保证。对 visual design agent 最有价值的是结构化对象核验与 agreement 不等于 correctness 的边界。",
+    "motivationZh": "本文研究 frozen VLM 输出对象列表、计数、boxes、screen elements 和 click points 时，感知覆盖与最终交付之间的差异。理论以 task-compatible maximum matching 的 rank r、scored record count c 及 readout 定义 loss：E=c+n−2r；equal FP/FN cost 下，删除未获确认的 records 只有在 marginal matching rate p1<1/2 时降低 set error，coordinate averaging 是可以正也可以负的独立项。GUI 的 miss 被拆成 F（无正确 candidate）、L（有 candidate 但无正确 representative）、W（选错 representative）。默认程序以明确 task contract 和源数据上确定的 configuration 运行，含 alias normalization、degeneracy fallback、bounded recovery、任务相关 constructions 和多模型 click tier。作者的 67,364 次调用、1,746 张图像、54,475 个 annotated targets 实验覆盖 synthetic shapes、自然图像计数、aerial/document detection、screen parsing 与 GUI grounding；附录给出 proofs、全量表、cost registry 和 prompts。已完整阅读 56 页及 Appendices A–E；本项目未执行作者复现实验。",
+    "methodZh": "本文研究 frozen VLM 输出对象列表、计数、boxes、screen elements 和 click points 时，感知覆盖与最终交付之间的差异。理论以 task-compatible maximum matching 的 rank r、scored record count c 及 readout 定义 loss：E=c+n−2r；equal FP/FN cost 下，删除未获确认的 records 只有在 marginal matching rate p1<1/2 时降低 set error，coordinate averaging 是可以正也可以负的独立项。GUI 的 miss 被拆成 F（无正确 candidate）、L（有 candidate 但无正确 representative）、W（选错 representative）。默认程序以明确 task contract 和源数据上确定的 configuration 运行，含 alias normalization、degeneracy fallback、bounded recovery、任务相关 constructions 和多模型 click tier。作者的 67,364 次调用、1,746 张图像、54,475 个 annotated targets 实验覆盖 synthetic shapes、自然图像计数、aerial/document detection、screen parsing 与 GUI grounding；附录给出 proofs、全量表、cost registry 和 prompts。已完整阅读 56 页及 Appendices A–E；本项目未执行作者复现实验。",
+    "methodFlow": [
+      "声明 task contract：class vocabulary、alias map、coordinate frame、task-compatible matching 与 loss；选择 task/budget 对应的固定配置。",
+      "按 list-first、region registry 或 two-stage zoom 请求 frozen VLM；保留 raw responses、调用成本与 failure status。",
+      "确定性 decoder 解析或显式 salvage records；映射 aliases 与坐标，记录 transport、syntax、record validity 状态与 degeneracy flags。",
+      "对 set error 的 over-reporting family 用三次 unanimity，分开核算 deletion 与 coordinate averaging；counts、F1 或 under-reporting family 默认保留单次结果。",
+      "counts 从有效 records 程序计数；单视图 list 退化且有 stated count 时回退，显式标出 readout branch。",
+      "高预算 clicks 用三个模型的 zoom points，按距离 clustering；固定 candidate IDs，scorer 选 cluster representatives，只有多个 clusters 才双顺序比较并选择最终 point。 输出 set/answer、status、alarm 与全部调用成本；optional labels 可校准配置，output agreement 本身不构成 correctness certificate。"
+    ],
+    "experimentsZh": "作者报告 67,364 次 model calls（含 retries/pilots），1,746 张图像、54,475 个 targets，总 priced cost $757.99（Qwen 调用未计价）。主模型 GPT-6.1、Claude Sonnet 5.5、Gemini 3.8 Flash，另有 GPT-5.6/Opus 5.5 pilots 和 Qwen3-VL-235B readout。覆盖 SCP/SCP-dense、PixMo-Count、FSC-147、SKU-110K、DOTA、DocLayNet、GroundCUA、ScreenParse 与 ScreenSpot。独立 600 ScreenSpot-Pro items 与前 260 GUI items 无 item/screenshot 交叉；主要 95% CI 为 paired image bootstrap，GUI paired comparison 按 screenshots resample，并报告 exact McNemar 和相关比较 Holm 校正。 作者报告 dense count 完整协议 error：GPT-6.1 10.84→1.60（−85.2%），Sonnet 5.5 35.02→0.42（−98.8%）；Gemini lowest 45.68→52.80（+15.6%，CI 跨零）。 (Table 8, p. 23) 作者报告独立 600 GUI items：single GPT default zoom 82/600 misses，3 次同模型 vote 76/600，相同三模型 plain vote 74/600，完整 tier 56/600。完整 tier 对 single zoom 差 −4.33 points [−6.33,−2.33]。 (Table 13, p. 31) 作者报告 tier 均价 $0.0273/item、9.45 calls；single default zoom $0.0085/2 calls。对 crop-first 差 −2.17 points [−4.17,0.00]，不显著且成本约 2.3 倍。 (Table 13 and Sec. 7.7, p. 31) 作者报告 same-model unanimity 在 15 个 over-reporting cells 中 9 个 set-error 显著改善、无显著恶化；F1 跨 18 cells 为 2 改善/4 恶化/12 不显著，under-reporting FSC-147 set-error 有 2/3 恶化。 (Tables 4/15, pp. 16/34; Sec. 7.9, p. 33) 作者报告按其他三个 detection sources 选 single-call interface/setting，held-out macro F1 42.1→49.1；12 cells 中 5 显著改善、1 显著恶化，成本 1.44 倍。 (Table 16, p. 35) 作者报告 set-selection constrained oracle 降低 45.2% error，cross-fitted logistic selector 15.6%（12 cells median），10-label selector 13.2%；oracle room 不是可实现收益。 (Table 14, p. 34)",
+    "evidenceZh": "任务须事先声明 vocabulary、alias map、coordinate frame、compatibility relation 与 loss；跨 calls 的 association 是另一条规则，不能与 evaluation matching 混为一谈。 (Sec. 3.2–3.6, Table 2, pp. 6–9; Appendix D, p. 50) 删除 records 的 equal-cost set-error 改善为 Δc−2Δr；阈值是 marginal matching rate 而非 deleted precision，averaging 可以反转 deletion 的收益。 (Propositions 1–3, pp. 9–11; Table 11, p. 27; Appendix A, pp. 41–42) 作者报告 list-first/alias/readout 完整协议在 50 张 dense synthetic 图像的 per-type count error 降低 85.2%（GPT-6.1）与 98.8%（Sonnet 5.5）。 (Sec. 7.2, Table 8, pp. 22–24) 自然图像、aerial 和 document 的 readout gap 或已在 list 中的错误限制了 count readout repair，模型间也不能照搬。 (Sec. 7.2–7.3, Table 9 and Table 10, pp. 25–26; Table B.1, p. 44) 作者报告 600 个与早期 GUI 实验无 item/screenshot 重叠的 ScreenSpot-Pro items 上，三模型 tier miss rate 为 9.33%，单 GPT-6.1 default zoom 为 13.67%。 (Sec. 7.7, Table 13, pp. 29–32; Appendix D, p. 51) 相同三模型 points 的 plain cluster vote miss 12.33%，scorer+comparison 后 9.33%；comparison 单独增量与 crop-first baseline 差异均未显著。 (Table 13, p. 31; Sec. 7.7, pp. 31–32) GUI tier 剩余 56 个 miss 分为 43 个无正确 candidate、3 个 representative 丢失、10 个 wrong choice；第四 source 降低 F 却增加 L/W。 (Sec. 7.7, pp. 31–33; Table E.1 H24/H26, p. 56) 默认运行不读 target labels，但 configuration 在 evaluation/source data 上选择；optional label 校准与 oracle 都使用 labels，不能称为完全无 label 学习或无监督认证。 (Sec. 5 and Algorithm 1, pp. 14–18; Sec. 7.8–7.9 and Tables 14–16, pp. 33–35) Output agreement 不能无条件 certify correctness；这不是声称带额外假设或像素证据的验证都不可能。 (Proposition 11 and Corollary 1, pp. 13–14; Scope of the results, p. 37; Appendix A, p. 43)",
+    "insightZh": "贡献主要是将已有 matching、cost-sensitive deletion threshold、submodularity、ensemble 和 two-point impossibility 思路统一到 reporting chain，并用 frozen API 输出作 operation-level diagnosis；不是新的 foundation model，也不是首次提出 enumeration counting、zoom 或投票。较具体的新价值是区分 scored-record deletion 与几何移动，要求 oracle 与 selector 使用同一 feasible family，以及 GUI 的 F/L/W 审计和 candidate identity 绑定，让增加模型、选 representative、最终选择的收益与损失可分别计量。作者在 Related Work 明确承认若干关系是已知结果的特化。",
+    "whyRelevantZh": "按 landmark-or-transfer 门槛收录为 VLM 方法论向 visual-design-agents 的明确 transfer，而非声称 landmark。设计 agent 对 rendered outputs 做对象数目、类别和位置核验时，可借用 deterministic record decoding、程序 readout、candidate identity 绑定、view-contained confirmation 和 F/L/W 错误审计，避免把看到了什么与交付了什么混在自评中。GUI grounding 提供真实 screen 机制证据；设计任务适用性仍是审阅者推断，需目标 artifact 与约束定义验证。",
+    "caveatZh": "迁移至 visual design agent 是机制推断：对象语义、遮挡、空间/制造约束和视觉质量可能无法简化为当前 matching contracts，需目标任务数据验证；没有设计 artifact 生成质量直接证据。 85%–99% 的 dense count 改善来自五类 synthetic shape；natural/multiclass aerial/document 结果弱得多，不能以摘要数值覆盖差异。 无需 target labels 是 inference scope；defaults/threshold/scorer 仍由作者 evaluation 经验选择，leave-one-source-out 不等于跨任意任务保证。 理论多为已知结果特化、恒等式或行为假设；truth matching 要有 labels 才能测量，output disagreement 不识别哪份报告正确。 GUI tier 平均 9.45 次调用，最坏计划 15 次（technical retries 不在上界内），约 3.2 倍单 zoom 成本；未报告真实交互延迟、闭环任务成功率。 公开 code 可访问但未执行 reproduction；README 的 LiveClient 为未实现 hook，不能描述成完整 live 服务。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.25404",
+  "title": "MT Forcing: Towards Stable and Consistent Multi-Turn Image Editing with Autoregressive Diffusion",
+  "authors": [
+    "Houyuan Chen",
+    "Fanzhou Wang",
+    "Xiangyu Fan",
+    "Zesong Qiu",
+    "Yukun Wei",
+    "Songlin Yang",
+    "Zhitao Yang",
+    "Lvmin Zhang",
+    "Pei Yang",
+    "Hao Zhao",
+    "Lei Yang",
+    "Anyi Rao"
+  ],
+  "publishedAt": "2026-10-18",
+  "updatedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25404"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "MT Forcing: Towards Stable and Consistent Multi-Turn Image Editing with Autoregressive Diffusion",
+    "image-generation"
+  ],
+  "abstract": "Multi-turn image editing aims to modify an image according to a sequence of instructions, enabling more effective interactive visual content creation for users. However, existing methods often exhibit noticeable drift after only a few editing turns, manifesting in two aspects: 1) unstable visual quality, with accumulating artifacts and degraded details; and 2) inconsistent image content, with unintended changes to preserved regions and prior edits. To address these challenges, we propose MT Forcing, a novel training paradigm for multi-turn image editing with unified multimodal models (UMMs) based on autoregressive diffusion. Specifically, we propose Single-Turn Distribution Matching Distillation (Single-Turn DMD), which supervises student self-rollouts with a teacher that applies cumulative edits to the source image in a single turn, providing visual-quality guidance without recursive error accumulation. Additionally, we introduce Teacher-Forcing Guidance, which supervises history-dependent transitions on reference trajectories during warmup and as a regularizer during distillation, encouraging cross-turn content consistency beyond what per-turn distribution matching alone can ensure. Extensive experiments demonstrate that our approach significantly improves the multi-turn image editing capabilities of UMMs, yielding more stable visual quality and stronger cross-turn consistency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25404v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25404v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://houyuanchen111.github.io/mt-forcing.github.io/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "MT Forcing最值得记住的是：每轮marginal匹配并不能保证跨轮一致。它用累计指令的一次teacher编辑稳定student self-rollouts，再保留reference-history监督；八轮结果有改善，但首轮CC下降，Pixel只度量已匹配点位移，不能当编辑正确率。",
+    "motivationZh": "把多轮image editing写成AR diffusion rollout。Teacher每次从原图执行累积编辑，避免teacher自身递归污染；DMD只约束累计意图条件下的边缘分布，因而加入reference trajectories上的flow-matching warmup与持续regularization。价值在于将visual-quality与history-dependence拆开，而非给设计agent外接一个现成无训练插件。",
+    "methodZh": "将历次instructions重组为从原图执行的bundled prompt。 对reference histories做teacher-forcing warmup，初始化student/frozen teacher/fake-score model。 Student用自己的KV历史self-rollout，teacher只看source image与累计意图。 对当前turn做Single-Turn DMD，历史KV与跨turn梯度detach。 联合低权重reference-trajectory flow matching，保留history-dependent transitions。",
+    "methodFlow": [
+      "将历次instructions重组为从原图执行的bundled prompt。",
+      "对reference histories做teacher-forcing warmup，初始化student/frozen teacher/fake-score model。",
+      "Student用自己的KV历史self-rollout，teacher只看source image与累计意图。",
+      "对当前turn做Single-Turn DMD，历史KV与跨turn梯度detach。",
+      "联合低权重reference-trajectory flow matching，保留history-dependent transitions。"
+    ],
+    "experimentsZh": "两个SenseNova U1/U1.5 backbone，MTEdit-Bench stepwise的100会话×8轮。IF/CC使用VLM judge，DRS结合两个IQA评分，Pixel用MatchAnything-RoMa。 作者报告U1.5第8轮IF4.52→9.17、CC3.22→7.68；第1轮CC9.49→8.82，不能称各轮全面提高。 (Table1, PDF p.7) 作者报告八轮平均Pixel6.34→0.74，full IF9.66/CC8.40；Pixel只在valid matches上测量。 (Table2, PDF p.8; Sec.4.1, p.6) 主表比较两个base editor before/after，没有与Related Work中多轮SOTA的matched-budget主表对照；核心benchmark仅100会话8轮，未给独立human preference或长时编辑正确率。 DMD-only、TF-only、combined和TF权重0.1/0.25/0.5/1；支持两项互补，但warmup与持续regularization未完全分别控制，训练总预算/数据细节在此v1不完整。",
+    "insightZh": "把single-turn teacher的质量参照用于multi-turn rollout marginals，并以反例说明zero marginal DMD仍可忽略历史；Teacher-Forcing Guidance补足conditional trajectory监督。DMD/AR diffusion本身是已有技术。",
+    "evidenceZh": "原图+累计指令是弱条件；DMD仅匹配rollout marginal。 (Sec.3.2, Eqs.3–6, PDF pp.4–5) / 独立每轮采样teacher可令理想DMD为零但图案仍变化。 (Sec.3.3 Eq.7 and Fig.4, PDF p.5) / warmup之后继续保留reference-history regularization。 (Sec.3.3 Eq.9, Algorithm1, PDF p.6) / 100 sessions×8turn，IF/CC由Qwen3.5-Plus评分，Pixel是valid matches的平均位移。 (Sec.4.1, PDF p.6) / U1.5第8轮IF9.17/CC7.68，对照4.52/3.22，但第1轮CC9.49→8.82。 (Table1, PDF p.7) / DMD-only与guidance-only各有收益，full八轮均值IF9.66/CC8.40/DRS4.30/Pixel0.74。 (Table2, PDF p.8)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接可迁移到design agent反复编辑的history preservation训练：把累计意图正确与前次渲染细节不变分开监督，未验证SVG/embroidery结构。",
+    "caveatZh": "Sec.3.3指出marginal matching不保证trajectory consistency。 / 较大TF权重出现blur，Fig.7展示细节/一致性trade-off。 / 自动judge/IQA可能偏向保守输出；Pixel很低也可能缺少应有变化或只留下易匹配点。 / 首轮IF/CC在U1.5下降，不能声称无代价。 / 不是面向任意编辑器的免训练方法；需reference trajectories、teacher和online fake-score model。 / 主表8轮内有效，不把project较长示例当独立定量验证。",
+    "sourceNote": "Read retrospectively on 2026-10-20 for the user-requested 2026-10-19 backfill, not a historical API/code snapshot. Exact version 2610.25404v1 (14 pages), PDF SHA-256 cdaa86b458cf56494e6a349912983fc020dcc36d33b865ea56b1a2e2d18ec940. Full text and key figures/tables checked; all quantitative results are author-reported, not independently reproduced. Code: available. PDF p.1印出的project入口链接公开GitHub仓库；已核对repo含modeling、inference、configs等源码。Code入口保留PDF印出的URL。"
+  },
+  "slug": "mt-forcing-towards-stable-and-consistent-multi-turn-image-editing-with-autoregressive-diffusion-2610-25404",
+  "collectedAt": "2026-10-19",
+  "topicIds": [
+    "image-generation"
+  ]
+}
