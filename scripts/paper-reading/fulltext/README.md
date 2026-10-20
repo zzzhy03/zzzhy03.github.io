@@ -4,26 +4,6 @@ This stage follows abstract screening and still stops before canonical paper or 
 Each review is grounded in one immutable PDF version, text extracted with `pdftotext -layout`,
 and visual inspection of the relevant method, result, and limitation pages.
 
-PDFs are required for active reading and fresh validation. After receipt-backed completion they
-are removed immediately by pipeline finalization (or ledger completion for non-daily runs).
-Search, decision reuse and website builds retain the compact JSON evidence. Restore evicted bytes with `npm run cache:papers -- restore --run-dir <run>`
-before revalidating. A receipt is historical evidence, not permission to pretend a missing PDF
-has been read again. Pipeline status explicitly identifies receipt-backed historical source
-checks; the standalone full-text validator continues to require the original bytes.
-
-Conference papers without arXiv IDs use **schemaVersion 4**. Keep the same review fields, but
-replace `arxivVersion` with the `sourceVersion` provided in the prepared candidate's
-`screeningContext.fulltextIdentity`. Use its stable `paperId`, name the review
-`<sourceVersion>.json`, and add `source.paperUrl` / `source.pdfUrl` matching the discovery links.
-The PDF SHA-256 still pins exact bytes. `sourceVersion` pins the provider metadata snapshot,
-not a claim that the provider URL is immutable. Promotion preserves the official Paper link
-and records that sourceVersion in `analysis.sourceNote`.
-
-Missing abstracts or exact publication dates must be resolved from primary metadata before
-canonical promotion; do not invent a publication date from the conference year or scan date.
-Conference runs can produce independent reviewed content, but must not advance the daily
-watermark or silently append old proceedings to the day's first-publication feed.
-
 The local review file uses this shape:
 
 ```json

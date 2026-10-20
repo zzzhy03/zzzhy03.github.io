@@ -8,8 +8,6 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import { validateWithdrawalSource } from "../lib/withdrawal.mjs";
-import { candidatePaperId, sourceVersionFor } from "../lib/review-identity.mjs";
-import { verifyRemovedPdf } from "../lib/source-receipt.mjs";
 
 import {
   ACCEPT_DECISIONS,
@@ -231,15 +229,12 @@ function collectExpectedPaperIds(root, screeningRunDirectory, selection, errors)
         errors.push(`Screening decision references missing candidate '${decision.candidateId}'.`);
         continue;
       }
-      const paperId = candidatePaperId(candidate);
-      if ((candidate.identifiers?.arxiv ?? []).length > 1) {
-        errors.push(`Expected candidate '${decision.candidateId}' to have at most one unambiguous arXiv ID.`);
+      const arxivIds = candidate.identifiers?.arxiv ?? [];
+      if (arxivIds.length !== 1) {
+        errors.push(`Expected candidate '${decision.candidateId}' to have exactly one arXiv ID.`);
         continue;
       }
-      if (!paperId) {
-        errors.push(`Expected candidate '${decision.candidateId}' to have a stable paper identity.`);
-        continue;
-      }
+      const paperId = `arxiv:${arxivIds[0].replace(/v\d+$/, "")}`;
       if (expectedByPaperId.has(paperId)) {
         errors.push(`Multiple screening candidates resolve to '${paperId}'.`);
       }
@@ -249,7 +244,7 @@ function collectExpectedPaperIds(root, screeningRunDirectory, selection, errors)
   return { expectedByPaperId, runId: candidatePayload.runId ?? null };
 }
 
-function validateReview(review, filePath, topicIds, root, errors, archivedSources = null) {
+function validateReview(review, filePath, topicIds, root, errors) {
   const label = path.basename(filePath);
   if (!requireObject(review, label, errors)) return;
   if (!SUPPORTED_FULLTEXT_SCHEMA_VERSIONS.includes(review.schemaVersion)) {
@@ -261,20 +256,12 @@ function validateReview(review, filePath, topicIds, root, errors, archivedSource
   requireText(review.runId, `${label}.runId`, errors);
   requireText(review.candidateId, `${label}.candidateId`, errors);
   requireText(review.paperId, `${label}.paperId`, errors);
-  const conferenceReview = review.schemaVersion === 4 && !review.arxivVersion;
-  if (!conferenceReview) requireText(review.arxivVersion, `${label}.arxivVersion`, errors);
+  requireText(review.arxivVersion, `${label}.arxivVersion`, errors);
   requireText(review.title, `${label}.title`, errors);
   if (typeof review.reviewedAt !== "string" || Number.isNaN(Date.parse(review.reviewedAt))) {
     errors.push(`${label}.reviewedAt must be an ISO date-time.`);
   }
-  if (conferenceReview) {
-    if (!/^source-[a-f0-9]{24}$/.test(review.sourceVersion ?? "") || path.basename(filePath) !== `${review.sourceVersion}.json`) {
-      errors.push(`${label} needs a sourceVersion and matching filename from the screening candidate.`);
-    }
-    for (const field of ["paperUrl", "pdfUrl"]) {
-      if (!/^https:\/\//.test(review.source?.[field] ?? "")) errors.push(`${label}.source.${field} must be an HTTPS URL.`);
-    }
-  } else if (!/^\d{4}\.\d{4,5}v\d+$/.test(review.arxivVersion ?? "")) {
+  if (!/^\d{4}\.\d{4,5}v\d+$/.test(review.arxivVersion ?? "")) {
     errors.push(`${label}.arxivVersion must be a versioned arXiv ID.`);
   } else {
     const versionlessId = review.arxivVersion.replace(/v\d+$/, "");
@@ -382,9 +369,7 @@ function validateReview(review, filePath, topicIds, root, errors, archivedSource
     if (typeof review.source.pdfPath === "string") {
       const pdfPath = resolveFrom(root, review.source.pdfPath);
       if (!existsSync(pdfPath)) {
-        const proof = archivedSources && verifyRemovedPdf({ root, reviewFile: filePath, review });
-        if (proof?.valid) archivedSources.push({ paperId: review.paperId, ...proof });
-        else errors.push(`${label} PDF does not exist at '${review.source.pdfPath}'. Restore it before a fresh full-text verification.${proof ? ` Historical proof failed: ${proof.error}` : ""}`);
+        errors.push(`${label} PDF does not exist at '${review.source.pdfPath}'.`);
       } else {
         if (sha256File(pdfPath) !== review.source.pdfSha256) {
           errors.push(`${label} PDF sha256 does not match.`);
@@ -467,7 +452,6 @@ function validateReview(review, filePath, topicIds, root, errors, archivedSource
 
 export function validateFulltextReviews(options) {
   const errors = [];
-  const archivedSources = options.allowRemovedSources ? [] : null;
   const root = path.resolve(options.root ?? process.cwd());
   const reviewDirectory = resolveFrom(root, options.reviewDirectory);
   const researchConfigPath = resolveFrom(root, options.researchConfig);
@@ -516,7 +500,7 @@ export function validateFulltextReviews(options) {
       continue;
     }
     reviews.push(review);
-    const metadata = validateReview(review, reviewFile, topicIds, root, errors, archivedSources);
+    const metadata = validateReview(review, reviewFile, topicIds, root, errors);
     if (metadata) {
       if (paperIds.has(metadata.paperId)) {
         errors.push(`Duplicate full-text review for '${metadata.paperId}'.`);
@@ -546,16 +530,8 @@ export function validateFulltextReviews(options) {
         );
       }
       const candidate = candidateById.get(candidateId);
-      if (candidate?.arxivVersion && metadata.arxivVersion !== `${candidate.identifiers.arxiv[0]}v${candidate.arxivVersion}`) {
+      if (candidate?.arxivVersion && metadata.arxivVersion !== `${expectedId.slice(6)}v${candidate.arxivVersion}`) {
         errors.push(`Full-text review '${expectedId}' does not match the screening exact version.`);
-      }
-      if (!(candidate?.identifiers?.arxiv ?? []).length) {
-        const review = reviews.find((item) => item.paperId === expectedId);
-        if (review?.schemaVersion !== 4 || review.sourceVersion !== sourceVersionFor(candidate)) errors.push(`Full-text review '${expectedId}' does not match the conference source snapshot.`);
-        if (!candidate.links?.some((link) => link.label === "Paper" && link.href === review?.source?.paperUrl) ||
-            !candidate.links?.some((link) => link.label === "PDF" && link.href === review?.source?.pdfUrl)) {
-          errors.push(`Full-text review '${expectedId}' source URLs must match the screening candidate.`);
-        }
       }
     }
     for (const paperId of paperIds) {
@@ -576,10 +552,8 @@ export function validateFulltextReviews(options) {
   return {
     errors,
     reviews,
-    archivedSources: archivedSources ?? [],
     counts: {
       total: reviews.length,
-      previouslyVerifiedSources: archivedSources?.length ?? 0,
       expected: expectedByPaperId?.size ?? null,
       byDecision,
       byTopic,

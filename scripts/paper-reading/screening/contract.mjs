@@ -171,7 +171,6 @@ export function buildReviewContract() {
       "facetHints 是初步受控标签提示，不是 canonical facets；此阶段不会写入正式论文记录。",
       "accept-from-abstract 只允许用于 abstract 已足以可靠判断的候选；suggestedSourceScope 必须是 abstract，且 evidenceBoundary 必须把后续表述限制为 abstract-only，禁止声称已验证全文证据。",
       "full-text-review 表示 abstract 不足以完成可靠判断，下一阶段必须获取并检查全文；它不是正式收录。",
-      "配置 admissionGate 的高流量方向，进入全文前必须是 major/landmark，或补充 transferEvidence：targetTopicId（主线任务）、mechanismZh（具体迁移方法）、benefitZh（预期用途）、evidenceLocator（摘要中的依据）。泛泛的潜在相关性不满足门槛；不以数量填满日报。缺少 abstract 时先补元数据或 manual-review，不批量下载 PDF 来代替初筛。",
       "manual-review 表示身份、来源、归类或判断仍需人工核验；它不是正式收录。",
     ],
   };

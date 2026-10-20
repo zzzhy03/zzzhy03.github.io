@@ -16,7 +16,7 @@ function iso(timestamp) {
   return new Date(timestamp).toISOString();
 }
 
-export function computeDiscoveryWindow({ state, since, now, overlapHours, mode = since ? "backfill" : "daily", lookbackDays = 3 }) {
+export function computeDiscoveryWindow({ state, since, now, overlapHours }) {
   const endMs = parseTimestamp(now ?? new Date().toISOString(), "now");
   const configuredOverlap = overlapHours ?? state?.overlapHours ?? 48;
 
@@ -28,18 +28,7 @@ export function computeDiscoveryWindow({ state, since, now, overlapHours, mode =
   let basis;
   let lastSuccessfulRunAt = null;
 
-  if (!["daily", "updates", "backfill", "conference"].includes(mode)) {
-    throw new Error(`Unknown discovery mode '${mode}'.`);
-  }
-  if (!Number.isFinite(lookbackDays) || lookbackDays <= 0) {
-    throw new Error("lookbackDays must be a positive number.");
-  }
-  if (mode === "daily" || mode === "updates" || mode === "conference") {
-    if (since) throw new Error("--since requires --mode backfill; daily discovery uses a fixed recent window.");
-    startMs = endMs - lookbackDays * 24 * HOUR_MS;
-    basis = "rolling-lookback";
-    lastSuccessfulRunAt = state?.lastSuccessfulRunAt ?? null;
-  } else if (since) {
+  if (since) {
     startMs = parseTimestamp(since, "since");
     basis = "explicit-since";
   } else if (state?.lastSuccessfulRunAt) {
@@ -62,20 +51,11 @@ export function computeDiscoveryWindow({ state, since, now, overlapHours, mode =
 
   return {
     basis,
-    mode,
-    dateBasis: mode === "daily" ? "published" : mode === "updates" ? "updated" : "published-or-updated",
-    lookbackDays: basis === "rolling-lookback" ? lookbackDays : null,
     start: iso(startMs),
     end: iso(endMs),
     lastSuccessfulRunAt,
     overlapHours: configuredOverlap,
-    semantics: mode === "daily"
-      ? "First publication (publishedAt) falls inside the inclusive window; revisions of older papers are excluded"
-      : mode === "updates"
-        ? "updatedAt falls inside the window, publishedAt is older; only previously collected papers are retained"
-        : mode === "conference"
-          ? "Explicit conference edition; publication dates are preserved, never replaced with retrieval time"
-          : "publishedAt OR updatedAt falls inside the inclusive window",
+    semantics: "publishedAt OR updatedAt falls inside the inclusive window",
   };
 }
 
@@ -91,9 +71,7 @@ export function classifyWindowMatch(record, window) {
     Number.isFinite(updatedMs) && updatedMs >= startMs && updatedMs <= endMs;
 
   return {
-    inWindow: window.dateBasis === "published" ? publishedInWindow
-      : window.dateBasis === "updated" ? updatedInWindow && !publishedInWindow
-        : publishedInWindow || updatedInWindow,
+    inWindow: publishedInWindow || updatedInWindow,
     publishedInWindow,
     updatedInWindow,
     changeKind: publishedInWindow ? "new" : updatedInWindow ? "updated" : null,

@@ -21,7 +21,6 @@ import {
   writeJsonAtomic,
 } from "./lib/io.mjs";
 import { computeDiscoveryWindow } from "./lib/window.mjs";
-import { DEFAULT_PIPELINE_CONFIG, selectConferenceEditions, validatePipelineConfig } from "./lib/pipeline-config.mjs";
 
 const SOURCE_IDS = [
   "arxiv",
@@ -38,7 +37,7 @@ function parseNumber(value, label) {
 
 export function parseArguments(argv) {
   const options = {
-    sources: null,
+    sources: [...SOURCE_IDS],
     topicIds: null,
     recordSuccess: false,
     writeOutputs: true,
@@ -55,10 +54,6 @@ export function parseArguments(argv) {
     if (argument === "--help" || argument === "-h") options.help = true;
     else if (argument === "--since") options.since = next();
     else if (argument === "--now") options.now = next();
-    else if (argument === "--mode") options.mode = next();
-    else if (argument === "--lookback-days") options.lookbackDays = parseNumber(next(), "--lookback-days");
-    else if (argument === "--conference") options.conferenceIds = next().split(",").map((id) => id.trim()).filter(Boolean);
-    else if (argument === "--pipeline-config") options.pipelineConfigFile = next();
     else if (argument === "--overlap-hours") {
       options.overlapHours = parseNumber(next(), "--overlap-hours");
     } else if (argument === "--source") {
@@ -79,10 +74,7 @@ export function parseArguments(argv) {
     else if (argument === "--page-size") {
       options.pageSize = parseNumber(next(), "--page-size");
     } else if (argument === "--max-results-per-topic") {
-      const value = next();
-      options.maxResultsPerTopic = value === "unlimited"
-        ? null
-        : parseNumber(value, "--max-results-per-topic");
+      options.maxResultsPerTopic = parseNumber(next(), "--max-results-per-topic");
     } else if (argument === "--request-delay-ms") {
       options.requestDelayMs = parseNumber(next(), "--request-delay-ms");
     } else if (argument === "--record-success") options.recordSuccess = true;
@@ -90,7 +82,7 @@ export function parseArguments(argv) {
     else throw new Error(`Unknown argument: ${argument}`);
   }
 
-  for (const source of options.sources ?? []) {
+  for (const source of options.sources) {
     if (!SOURCE_IDS.includes(source)) {
       throw new Error(`Unknown source '${source}'. Expected one of: ${SOURCE_IDS.join(", ")}.`);
     }
@@ -102,26 +94,20 @@ function helpText() {
   return `Paper Reading discovery staging (always non-publishing)
 
 Usage:
-  npm run discover:papers -- --mode daily [options]
-  npm run discover:papers -- --mode conference --conference cvpr-2026 [options]
-  npm run discover:papers -- --mode backfill --since <ISO timestamp> [options]
+  npm run discover:papers -- --since <ISO timestamp> [options]
+  npm run discover:papers -- [options]  # after a successful watermark exists
 
 Options:
-  --mode <mode>                 daily (default), updates, backfill, or conference.
-  --lookback-days <days>         Rolling daily/updates window (default: pipeline config or 3).
-  --conference <edition IDs>     Explicit editions; conference mode otherwise selects active scan windows.
-  --pipeline-config <file>       Date, conference edition and cache settings.
-  --since <ISO>                  Explicit historical start; implies backfill if no mode is given.
+  --since <ISO>                  Explicit first/manual window start; no overlap is subtracted.
   --now <ISO>                    Deterministic inclusive window end (default: current time).
-  --overlap-hours <number>       Backfill overlap before lastSuccessfulRunAt (default: state or 48).
+  --overlap-hours <number>       Overlap before lastSuccessfulRunAt (default: state or 48).
   --source <ids>                 Comma-separated sources (default: all registered adapters).
   --topic <ids>                  Comma-separated research direction IDs.
   --fixture-arxiv <file>         Parse an Atom fixture without network requests.
   --state-file <file>            Discovery watermark JSON path.
   --output-root <directory>      Run archive root (default: local-assets/paper-reading/runs).
   --page-size <number>           arXiv page size, clamped to 1..200 (default: 100).
-  --max-results-per-topic <n|unlimited>
-                                Optional cap per arXiv direction (default: unlimited).
+  --max-results-per-topic <n>    Safety cap per arXiv direction (default: 300).
   --request-delay-ms <number>    arXiv delay, clamped to at least 3100 ms.
   --record-success               Low-level compatibility flag; standard daily runs use pipeline finalize.
   --run-id <id>                  Deterministic output directory name.
@@ -224,10 +210,6 @@ export async function runDiscovery(inputOptions = {}) {
     inputOptions.stateFile ?? path.join(contentRoot, "state", "discovery-state.json"),
   );
   const now = new Date(inputOptions.now ?? new Date().toISOString()).toISOString();
-  const pipelineConfigFile = path.resolve(root, inputOptions.pipelineConfigFile ?? path.join(contentRoot, "pipeline-config.json"));
-  const pipelineConfig = await readJsonIfPresent(pipelineConfigFile, DEFAULT_PIPELINE_CONFIG);
-  const mode = inputOptions.mode ?? (inputOptions.since ? "backfill" : "daily");
-  if (inputOptions.conferenceIds && mode !== "conference") throw new Error("--conference requires --mode conference.");
   const state = (await readJsonIfPresent(stateFile, null)) ?? defaultState();
   if (state.schemaVersion !== 1) throw new Error("Discovery state schemaVersion must be 1.");
   const window = computeDiscoveryWindow({
@@ -235,8 +217,6 @@ export async function runDiscovery(inputOptions = {}) {
     since: inputOptions.since,
     now,
     overlapHours: inputOptions.overlapHours,
-    mode,
-    lookbackDays: inputOptions.lookbackDays ?? pipelineConfig.daily.lookbackDays,
   });
   const runId = inputOptions.runId ?? runIdFor(now);
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(runId)) {
@@ -263,9 +243,6 @@ export async function runDiscovery(inputOptions = {}) {
     readJson(path.join(contentRoot, "venue-registry.json")),
     readJsonDirectory(path.join(contentRoot, "papers")),
   ]);
-  validatePipelineConfig(pipelineConfig, venueRegistry);
-  const conferenceEditions = mode === "conference" ? selectConferenceEditions(pipelineConfig, inputOptions.conferenceIds, now) : [];
-  if (mode === "conference" && !conferenceEditions.length) throw new Error("No conference editions selected; configure a scanWindow or pass --conference.");
   const configuredTopicIds = new Set(
     researchConfig.directions.map((direction) => direction.id),
   );
@@ -275,8 +252,7 @@ export async function runDiscovery(inputOptions = {}) {
     }
   }
 
-  const sources = inputOptions.sources ?? (mode === "conference" ? ["openreview", "venue-proceedings"] : SOURCE_IDS);
-  if (mode === "conference" && sources.includes("arxiv")) throw new Error("Conference runs use edition providers; run arXiv separately.");
+  const sources = inputOptions.sources ?? SOURCE_IDS;
   const sourceStatuses = [];
   const sourceRecords = [];
   const adapterContext = {
@@ -294,7 +270,6 @@ export async function runDiscovery(inputOptions = {}) {
     maxResultsPerTopic: inputOptions.maxResultsPerTopic,
     sleepImpl: inputOptions.sleepImpl,
     clockImpl: inputOptions.clockImpl,
-    conferenceEditions,
   };
 
   for (const sourceId of sources) {
@@ -308,11 +283,10 @@ export async function runDiscovery(inputOptions = {}) {
   }
 
   const merged = mergeSourceDuplicates(sourceRecords, venueRegistry);
-  const matchedCandidates = matchCanonicalCandidates(
+  const candidates = matchCanonicalCandidates(
     merged,
     buildCanonicalIndex(canonicalPapers),
   );
-  const candidates = mode === "updates" ? matchedCandidates.filter((candidate) => candidate.existingMatch?.paperId) : matchedCandidates;
   const dispositionCounts = candidates.reduce((counts, candidate) => {
     counts[candidate.disposition] = (counts[candidate.disposition] ?? 0) + 1;
     return counts;
@@ -323,10 +297,6 @@ export async function runDiscovery(inputOptions = {}) {
     sourceStatuses,
     writeOutputs: inputOptions.writeOutputs !== false,
   });
-  if (mode !== "daily" && inputOptions.recordSuccess) {
-    stateUpdate.eligible = false;
-    stateUpdate.reasons.push("Only daily first-publication runs may advance the daily watermark.");
-  }
 
   const candidatePayload = {
     schemaVersion: 1,
@@ -361,9 +331,6 @@ export async function runDiscovery(inputOptions = {}) {
       update: stateUpdate,
     },
     configuration: {
-      mode,
-      pipelineConfig: relativeOrAbsolute(root, pipelineConfigFile),
-      conferenceEditions,
       researchConfig: relativeOrAbsolute(
         root,
         path.join(contentRoot, "research-config.json"),
@@ -382,7 +349,6 @@ export async function runDiscovery(inputOptions = {}) {
     counts: {
       sourceRecords: sourceRecords.length,
       mergedCandidates: candidates.length,
-      untrackedUpdatesExcluded: matchedCandidates.length - candidates.length,
       new: dispositionCounts.new ?? 0,
       possibleUpdates: dispositionCounts["possible-update"] ?? 0,
       duplicateExisting: dispositionCounts["duplicate-existing"] ?? 0,
@@ -398,10 +364,9 @@ export async function runDiscovery(inputOptions = {}) {
       manifest: relativeOrAbsolute(root, manifestFile),
     },
     limitations: [
-      "Daily and conference editions are separate runs; conference publication dates may be unknown.",
-      "CVF supplies title/author/PDF metadata; missing abstracts require retrieval before substantive screening. Crossref coverage is the configured proceedings title, not all SIGGRAPH/TOG journal-track papers.",
+      "Only the arXiv Atom API adapter is implemented; other registered sources report not-configured.",
       "Retrieval-topic matches show which query surfaced a record; they are not final relevance labels.",
-      "arXiv pagination has no default result cap; an explicit cap can make a topic partial, and a partial live run cannot advance state.",
+      "The arXiv safety cap can make a topic partial; a partial live run cannot advance state.",
       "No PDF/full-text acquisition, semantic ranking, editorial analysis, or digest generation runs here.",
     ],
   };

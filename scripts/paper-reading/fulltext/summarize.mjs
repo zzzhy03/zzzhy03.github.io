@@ -67,7 +67,6 @@ const reviewedPapers = [...result.reviews]
   .map((review) => ({
     paperId: review.paperId,
     arxivVersion: review.arxivVersion,
-    sourceVersion: review.sourceVersion,
     title: review.title,
     decision: review.decision,
     sourceScope: review.source.scope,
@@ -78,7 +77,7 @@ const reviewedPapers = [...result.reviews]
     confidence: review.confidence,
     thirtySecondZh: review.thirtySecondZh,
     code: review.code,
-    reviewFile: path.join(options.reviewDirectory, `${review.arxivVersion ?? review.sourceVersion}.json`),
+    reviewFile: path.join(options.reviewDirectory, `${review.arxivVersion}.json`),
   }));
 
 const summary = {

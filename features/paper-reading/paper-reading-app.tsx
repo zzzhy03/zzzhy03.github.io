@@ -1303,7 +1303,6 @@ export function PaperReadingApp({ data }: { data: PaperReadingDataset }) {
               Daily
             </Link>
             <Link href="/paper_reading/library/">Library</Link>
-            <Link href="/paper_reading/updates/">Model Updates</Link>
           </nav>
         </header>
 

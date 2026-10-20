@@ -308,9 +308,6 @@ test("an all-full-text run with no selected papers completes receipt and finaliz
   assert.match(tamperedStatus.stages.receipt.errors.join(" "), /artifact hash changed/);
   writeFileSync(candidatesFile, originalCandidates);
 
-  writeJson(path.join(root, "content/paper-reading/pipeline-config.json"), {
-    storage: { automaticPrune: true, pdfRetention: "until-verified" },
-  });
   const finalization = await runFinalize(
     { selection: "all-full-text", digest, apply: true },
     root,
@@ -320,8 +317,6 @@ test("an all-full-text run with no selected papers completes receipt and finaliz
     lastSuccessfulRunAt: "2026-08-07T00:00:00.000Z",
     lastRunId: "run-001",
   });
-  assert.equal(finalization.sourceCleanup.enabled, true);
-  assert.equal(finalization.sourceCleanup.removedCount, 0);
   const finalizedStatus = await getPipelineStatus({ root, runDirectory: run, digest });
   assert.equal(finalizedStatus.stages.decisionLedger.state, "complete");
   assert.equal(finalizedStatus.stages.receipt.state, "complete");

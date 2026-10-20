@@ -1252,7 +1252,6 @@ export function PaperLibraryApp({ topics: initialTopics }: { topics: PaperTopic[
             <Link href="/paper_reading/library/" aria-current="page">
               Library
             </Link>
-            <Link href="/paper_reading/updates/">Model Updates</Link>
           </nav>
         </header>
 

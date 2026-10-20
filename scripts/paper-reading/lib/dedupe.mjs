@@ -47,12 +47,11 @@ function mergeSourceRecords(records) {
 function mergeWindowMatch(records) {
   const publishedInWindow = records.some((record) => record.windowMatch?.publishedInWindow);
   const updatedInWindow = records.some((record) => record.windowMatch?.updatedInWindow);
-  const conference = records.some((record) => record.windowMatch?.changeKind === "conference");
   return {
-    inWindow: conference || publishedInWindow || updatedInWindow,
+    inWindow: publishedInWindow || updatedInWindow,
     publishedInWindow,
     updatedInWindow,
-    changeKind: conference ? "conference" : publishedInWindow ? "new" : updatedInWindow ? "updated" : null,
+    changeKind: publishedInWindow ? "new" : updatedInWindow ? "updated" : null,
   };
 }
 
@@ -84,12 +83,12 @@ function mergeRecordGroup(records, venueAliasIndex) {
     publishedAt: records
       .map((record) => record.publishedAt)
       .filter(Boolean)
-      .sort()[0] ?? null,
+      .sort()[0],
     updatedAt: records
       .map((record) => record.updatedAt)
       .filter(Boolean)
       .sort()
-      .at(-1) ?? null,
+      .at(-1),
     abstract: records.reduce(
       (current, record) => richerText(current, record.abstract),
       "",
@@ -106,9 +105,6 @@ function mergeRecordGroup(records, venueAliasIndex) {
       "",
     ),
     sourceNotes: {
-      ...(records.some((record) => record.sourceNotes?.conference) ? {
-        conference: records.find((record) => record.sourceNotes?.conference).sourceNotes.conference,
-      } : {}),
       journalRef: records.reduce(
         (current, record) => richerText(current, record.sourceNotes?.journalRef),
         null,
@@ -189,7 +185,7 @@ export function mergeSourceDuplicates(records, venueRegistry) {
   return [...groups.values()]
     .map((group) => mergeRecordGroup(group, venueAliasIndex))
     .sort((left, right) => {
-      const dateComparison = (right.updatedAt ?? right.publishedAt ?? "").localeCompare(left.updatedAt ?? left.publishedAt ?? "");
+      const dateComparison = right.updatedAt.localeCompare(left.updatedAt);
       return dateComparison || left.title.localeCompare(right.title);
     });
 }
