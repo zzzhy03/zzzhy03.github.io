@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import path from "node:path";
+import { admissionErrors } from "../lib/admission.mjs";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
@@ -278,6 +279,9 @@ function validateDecision({
       `${label}.reasonCodes must include 'cross-routed' because primaryTopicId was not a retrieval topic.`,
     );
   }
+
+  // Checking a collected paper for withdrawal/correction is independent of admitting new work.
+  for (const error of admissionErrors(decision, candidate.existingMatch?.paperId ? null : primaryTopic?.admissionGate)) errors.push(`${label} ${error}.`);
 
   if (requireObject(decision.attentionGate, `${label}.attentionGate`, errors)) {
     requireFields(

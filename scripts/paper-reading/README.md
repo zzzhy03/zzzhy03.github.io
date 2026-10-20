@@ -15,23 +15,23 @@ Checked-in state has two separate responsibilities:
 - `content/paper-reading/state/decision-ledger.json` stores receipt-backed decision observations
   used to avoid repeating an identical review.
 
-The initial `lastSuccessfulRunAt` is deliberately `null`; it does not pretend that discovery has
-already run. Bootstrap with an explicit timestamp:
+The default is `--mode daily`: a rolling **three-day first-publication** window ending at
+`--now` (or the current instant). It does not expand after downtime and needs no bootstrap
+watermark. arXiv revisions of older papers do not enter this channel.
 
 ```sh
-npm run discover:papers -- --since 2026-08-06T00:00:00+08:00
+npm run discover:papers -- --mode daily
+npm run discover:papers -- --mode updates
+npm run discover:papers -- --mode backfill --since 2026-10-01T00:00:00+08:00
 ```
 
-After a successful watermark exists, the default start is:
+`updates` keeps recent revisions only for already collected papers, in a separate run. `backfill`
+explicitly enables historical retrieval, including revisions. A supplied `--since` without a mode
+also selects backfill for compatibility. Backfill without `--since` uses the old watermark minus
+48-hour overlap. Neither mode advances the daily watermark. Never label backfill
+papers as newly published today.
 
-```text
-lastSuccessfulRunAt - overlapHours
-```
-
-The default overlap is 48 hours. The arXiv adapter includes a record when either `publishedAt`
-or `updatedAt` is inside the inclusive window, so an older paper with a new version is retained.
-No artificial reports are created for dates when the machine did not run; the next run simply
-catches up from the last successful watermark.
+`content/paper-reading/pipeline-config.json` configures `daily.lookbackDays`.
 
 `--record-success` remains a low-level compatibility flag. The standard daily workflow does not
 use it: after screening, full-text closure, promotion, canonical validation and receipt creation,
@@ -68,13 +68,15 @@ limitations. Both files say that model screening and summary generation have not
 ## Sources
 
 The arXiv adapter is implemented against its Atom API. It combines all query families for one
-research direction into one provider query, sorts by `lastUpdatedDate`, paginates until it crosses
-the window boundary, and filters `publishedAt OR updatedAt` locally. Requests use a single serial
+research direction into one provider query. Daily runs add a provider-side `submittedDate` range,
+sort by `submittedDate`, and verify the exact first-publication timestamps locally. Updates and
+backfill sort by `lastUpdatedDate` and apply their respective date rules locally. Requests use a single serial
 connection with an enforced delay of at least 3100 ms across every topic, page, and retry attempt.
 HTTP 429, 5xx responses, and an explicit allowlist of transient network failures receive at most
 three attempts; ordinary 4xx responses fail immediately. Per-attempt outcomes and retry counts are
-kept in the manifest. Reaching the per-topic safety cap or exhausting a retry before crossing the
-window makes the source `partial`, which prevents a state advance.
+kept in the manifest. Pagination has no default result cap and continues until it crosses the
+window start or exhausts the provider results. Reaching an explicitly configured per-topic cap
+or exhausting a retry before crossing the window makes the source `partial`, which prevents a state advance.
 
 Discovery always writes the complete candidate set for the window. It does not consult the
 decision ledger to suppress provider results; exact decision reuse happens only when screening
@@ -133,7 +135,8 @@ npm run discover:papers -- \
   --topic embroidery
 ```
 
-Use `npm run discover:papers -- --help` for all safety caps and path overrides.
+Use `npm run discover:papers -- --help` for optional caps and path overrides.
+`--max-results-per-topic unlimited` explicitly selects the default uncapped pagination.
 
 ## Screening handoff (still local staging)
 

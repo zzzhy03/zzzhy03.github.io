@@ -181,6 +181,7 @@ function compactDirection(direction, attentionPolicies) {
     labelEn: direction.labelEn,
     attentionPolicy: direction.attentionPolicy,
     attentionGate: attentionPolicies[direction.attentionPolicy],
+    ...(direction.admissionGate ? { admissionGate: direction.admissionGate } : {}),
     descriptionZh: direction.descriptionZh,
     includeWhenZh: direction.includeWhenZh ?? [],
     excludeWhenZh: direction.excludeWhenZh ?? [],

@@ -11,6 +11,7 @@
 content/paper-reading/
   research-config.json
   venue-registry.json
+  pipeline-config.json          # 三天检索窗口
   topics.json
   papers/*.json
   digests/YYYY-MM-DD.json
@@ -83,11 +84,13 @@ npm run pipeline:papers -- status \
 
 ### 1. Discovery
 
-1. 日期按 `Asia/Shanghai` 决定日报日；检索窗口使用带时区的精确 ISO timestamp。
-2. 正常窗口从 `lastSuccessfulRunAt - overlapHours` 开始；首次运行显式传 `--since`。
-3. 论文在 `publishedAt` 或 `updatedAt` 落入窗口时均保留；随后用 DOI、versionless arXiv
-   ID、OpenReview forum ID、title+first-author+year 去重。Discovery 仍完整写出本轮所有
-   candidates，不在 provider 检索层用 decision ledger 删掉 overlap 结果。
+1. 日期按 `Asia/Hong_Kong` 冻结；检索窗口使用带时区的精确 ISO timestamp。
+2. 日常固定 `--mode daily`，从当前冻结时间减去 `pipeline-config.json` 中的
+   `daily.lookbackDays`（默认 3 天）；电脑停机不自动扩张窗口，也无需首次 `--since`。
+3. Daily 只保留 `publishedAt` 首次发布落入窗口的论文。arXiv provider query 添加
+   `submittedDate` 范围并按它排序，本地再精确校验。旧论文版本更新只有独立的
+   `--mode updates` 才检索，且只保留已有 canonical record 的论文。历史补查必须显式
+   `--mode backfill --since ...`；三者不可混成一份“今天新论文”。
 4. retrieval topic 只表示“哪条 query 找到了它”，不能直接当作最终相关性。
 5. arXiv 的单个分页请求对 HTTP 429、5xx 和明确的瞬时网络错误最多尝试 3 次；所有 attempt
    仍经过同一个全局串行限速器，起始时间至少间隔 3100 ms。manifest 必须记录 attempt、retry
@@ -98,7 +101,7 @@ npm run pipeline:papers -- status \
 
 ```sh
 npm run discover:papers -- \
-  --since <ISO timestamp> \
+  --mode daily \
   --run-id paper-reading-YYYYMMDD-HHMMSS
 ```
 
@@ -136,6 +139,12 @@ non-terminal，不会被自动跳过。
 observation 的 provenance。后出现的 non-terminal 决定会阻止旧 terminal 被复用；最终
 terminal 的证明失效时也直接回到 screening，不能 fallback 到更旧的 terminal。
 
+VLM/MLLM、Image Generation、Video Generation 和 3D Reconstruction 的新候选有强制
+`admissionGate`：只有 `major`/`landmark`，或完整 `transferEvidence`（主线 targetTopicId、
+具体 mechanismZh、用途 benefitZh、摘要 evidenceLocator），才可进入全文。普通增量、
+好 venue、泛泛“可能有用”均不足。已有论文的撤稿/更正核查不受新论文录取门槛限制。
+此规则不设 top-N，不凑数量；historical batch 使用自己的 immutable policy snapshot。
+
 Codex 对每个实际生成的 batch 写一个 review。每个未被 ledger 复用的 candidate
 必须恰好有一个决定：`reject`、`full-text-review`、`accept-from-abstract` 或
 `manual-review`。topic、relevance 和 reading action 根据论文实际贡献决定，不能
@@ -152,7 +161,7 @@ npm run validate:paper-screening -- \
 
 默认处理所有 `full-text-review` candidate：
 
-1. 下载 screening 对应的精确论文版本到 `fulltext/sources/`。
+1. 只有通过初筛需要全文的候选才下载到 `fulltext/sources/`；先复用本 run 中校验一致的精确版本。
 2. 记录 SHA-256 和页数。
 3. `pdftotext -layout` 输出放入 `fulltext/work/text/`。
 4. 需要视觉检查的页面渲染到 `fulltext/work/rendered/`。
