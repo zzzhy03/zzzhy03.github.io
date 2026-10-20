@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local downloads and paper-review artifacts are not application source.
+    "tmp/**",
+    "local-assets/**",
   ]),
 ]);
 
