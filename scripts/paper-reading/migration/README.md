@@ -1,10 +1,15 @@
-# Portable paper-reading state (local preparation)
+# Portable paper-reading state and explicit runner
 
-These modules prepare a migration; they do not deploy or schedule it. No command
-here performs research, logs in, reads credentials, uploads data, or pushes to a
-network remote. The production pipeline is not wired to the new coordination
-protocol yet. The only changes to existing pipeline behavior are the historical
-schema reconstruction and non-daily finalization status fixes.
+The export/restore CLI remains local. The separate `runner.mjs` entrypoint can
+persist state to an explicitly selected GitHub HTTPS branch, execute approved
+pipeline commands with checkpoints and lease renewal, and resume publication.
+It is opt-in: this change does not alter schedules, deploy the site, or make
+existing direct pipeline invocations participate in the lease protocol.
+
+Use the runner only after authorizing its exact state repository/ref and any
+publication repository/ref. Its local configuration and session directory are
+private machine state and must stay outside the source tree. It uses the existing
+Git credential helper and platform proxy without logging in or creating tokens.
 
 ## Export and restore
 
@@ -101,10 +106,10 @@ Required execution order:
    units are skipped. An outstanding intent is uncertain and requires explicit
    reconciliation with existing output; it is not automatically executed again.
 
-The API returns new values and local checkpoint files. The caller must implement
-the remote acknowledgement sequence; it is not implicitly performed by
-`saveCheckpoint`. There is deliberately no general command runner or research
-callback in this preparation.
+The primitive API still returns local values/files. `runner.mjs` implements the
+remote acknowledgement sequence around these primitives. `run` executes an argv
+without a shell, then a required validator; `begin` and `reconcile` support
+analysis authored by the current Codex task. No additional model API is used.
 
 This prevents automatic repeats after a durable completion. It does not promise
 exactly-once execution across a crash between an external action and its durable
@@ -126,12 +131,12 @@ Build a single-parent commit from the observed state HEAD and use ordinary
 fast-forward push. A competing writer must stop on rejection. Never force-push,
 merge or rebase a losing lease proposal.
 
-`commitControlLocal` is a **synthetic-test transport** that accepts only an absolute
-filesystem path to a bare Git repository. Tests use two clones of that local
-remote. There is no GitHub CAS transport or credentials plumbing in this patch.
-A real transport must also persist checkpoint/bundle files in the acknowledged
-commit, refresh the remote HEAD before each mutation, verify the token, and handle
-uncertain push results by reading the exact remote commit before retrying.
+`commitControlLocal` remains a synthetic fixture helper. `git-store.mjs` is the
+runtime transport: it accepts credential-free GitHub HTTPS URLs or local bare
+repositories, requires an existing explicit branch, builds single-parent commits,
+and uses ordinary fast-forward pushes. It rejects URL rewriting. Checkpoint,
+bundle and control are in the same commit; an independent remote HEAD read is
+required before work. An uncertain result retains the exact proposal locally.
 
 `publicationPlan` is a fail-closed preflight, not a publisher. It checks output
 proofs, no unresolved intents, verified content/receipt-ledger (and daily finalize),
@@ -142,8 +147,138 @@ Neither a receipt's `recordedAsPublished` flag nor a successful build proves tha
 the exact commit was deployed.
 
 The public repository and private state repository are separate transactions.
-The final production runner must retain a publication journal and reconcile
-uncertain outcomes; the local preflight is not an atomic cross-repository commit.
+`publication.mjs` persists a journal before pushing, reconciles the exact public
+HEAD after any push result, and records deployment verification. It never treats
+these operations as one atomic transaction.
+
+## Runner configuration and execution
+
+Keep `runner-config.json` outside the source tree. All values below are
+placeholders; no repository or branch is selected implicitly:
+
+```json
+{
+  "root": "research-checkout",
+  "directory": "private-runner-session",
+  "remote": "https://github.com/OWNER/PRIVATE_STATE_REPO.git",
+  "ref": "refs/heads/APPROVED_STATE_BRANCH",
+  "owner": "cloud-task-owner",
+  "ttlMs": 300000,
+  "context": {
+    "runId": "RUN_ID",
+    "mode": "daily",
+    "window": {"start": "ISO_START", "end": "ISO_END"},
+    "repositoryBaseCommit": "FULL_PUBLIC_BASE_COMMIT",
+    "codeSnapshotSha256": "SHA256_OF_GIT_ARCHIVE_TAR_AT_BASE",
+    "policyFingerprint": "sha256:POLICY_HASH"
+  }
+}
+```
+
+Resolve paths relative to the invoking process. The research checkout and session
+directory must be separate, exclusively owned directories. `start` checks the
+reviewed source archive and rejects tracked changes outside paper-reading data.
+Untracked executable inputs are the caller's responsibility; list their hashes in
+the unit's `inputs`. It is not a sandbox for untrusted commands.
+
+For the first installation only, supply `initializeFromRoot: true` and
+`expectedStateCommit` equal to the independently verified state branch HEAD.
+Review the export inventory first. This adds the `migration/` namespace and
+preserves legacy bundle files. Later starts restore the acknowledged bundle and
+refuse conflicting local files. Existing state is never silently replaced.
+
+```sh
+npm run migrate:papers -- start runner-config.json
+npm run migrate:papers -- run runner-config.json unit.json
+npm run migrate:papers -- status runner-config.json
+```
+
+A unit is a stable input/output contract, for example:
+
+```json
+{
+  "id": "screening:batch-001",
+  "stage": "screening",
+  "dependencies": ["discovery"],
+  "inputs": [{"path": "RELATIVE_INPUT", "bytes": 123, "sha256": "INPUT_HASH"}],
+  "outputs": ["RELATIVE_ALLOWLISTED_OUTPUT"],
+  "command": ["node", "APPROVED_SCRIPT", "APPROVED_ARGUMENT"],
+  "validate": ["node", "READ_ONLY_VALIDATOR", "APPROVED_ARGUMENT"]
+}
+```
+
+Use the existing discovery, screening, fulltext and pipeline scripts as appropriate
+for each unit. Inputs, command, validator and output paths are hashed into the
+contract; only that digest is durable. The output files and full current selected
+state are exported with the completion checkpoint. Excluded PDFs/extracted text
+cannot serve as the only durable output proof. Validators retain responsibility
+for domain/schema correctness; a successful arbitrary command is not scientific
+validation.
+
+During `run`, renewal occurs every third of the lease duration by default. A
+renewal failure, expiry or interrupt stops the command process group and leaves
+its intent uncertain. Commands must not daemonize or escape that process group.
+Research output stays on disk. For task-authored analysis use `begin`, author the
+review, call `renew` before the lease expires, then `reconcile` with the same unit
+specification. `reconcile` runs only its validator. Do not let a long analysis turn
+outlive its lease; pause and explicitly recover if it does.
+
+## Recovery without resetting research
+
+The transport uses a bare object cache and a fresh index for every proposal.
+It does not stage, reset, clean, rebase or force-push the research checkout.
+Abandoned staging directories remain under `transport/proposals/`; the next
+proposal uses a fresh index. Preserve this directory and `session.json` until the
+run is finished. The latter holds the original owner token, not a GitHub token.
+
+1. If a CLI was killed, use `unlock` only after it exits. This checks the recorded
+   same-host PID is absent; a live or unverifiable process retains its lock.
+2. Run `recover` to read the remote. Exact proposal HEAD acknowledges the commit.
+   An unavailable remote remains unknown; another HEAD is a conflict and stops.
+3. If the remote still equals the proposal's parent, `retry` explicitly pushes
+   the **same** proposal and checks HEAD again. It never reconstructs or rebases it.
+4. `restore` installs only missing matching state into the configured isolated
+   root. Conflicting unsaved files remain untouched. Preserve that root and
+   restore into a fresh code checkout if needed; inspect/copy unfinished output
+   deliberately, then use the original unit contract's `reconcile`.
+5. `status` identifies completed and uncertain units. Re-running a completed
+   contract skips it; re-running an uncertain one stops before its command.
+6. After independently confirming the previous worker is stopped, the original
+   owner may explicitly `resume`, including after expiry. This fences the old
+   generation while preserving the checkpoint and publication journal. It is not
+   automatic expiry takeover. A different owner cannot resume or release it.
+7. Use `release` after finishing or intentionally handing off. A lost owner
+   session needs a separately reviewed recovery; no forced takeover is provided.
+
+A conflicting CAS requires inspecting the other writer, not deleting the pending
+proposal or force-pushing it. Git acknowledgements do not provide exactly-once
+semantics for arbitrary external side effects. Any uncertain external action
+still needs independent reconciliation.
+
+## Publication and deployment evidence
+
+`publish` takes a local JSON file with `remote`, full branch `ref`, and exact
+`commit`. The commit must have the frozen public base as its single parent and
+change only allowlisted `content/paper-reading/` files. Current public data must
+match that commit; the runner does not auto-stage files or create public commits.
+Content, receipt/ledger, and daily finalization units must already be acknowledged.
+
+The journal is in the state index and its Git history. It records preparation,
+push intent, acknowledgement or uncertainty, and deployment checks. After push
+failure or deployment failure, repeat `publish` with the same target/commit.
+An already observed exact commit is not pushed again and research is not repeated.
+A changed public HEAD or wrong deployment SHA stops verification.
+
+The default verifier performs read-only GitHub REST requests for the latest
+`github-pages` environment deployment and its latest status. It requires that
+deployment's exact SHA and `success`, then rechecks public HEAD. This follows the
+[deployment API](https://docs.github.com/en/rest/deployments/deployments#list-deployments)
+and [status API](https://docs.github.com/en/rest/deployments/statuses#list-deployment-statuses).
+It uses an existing `GH_TOKEN`/`GITHUB_TOKEN` if present, otherwise public read
+access. It never fetches credentials from a new source or dispatches a workflow.
+The authorized network policy must also permit `api.github.com`; a denial or
+unavailable API leaves publication unverified. Deployment status is provider
+evidence, not a browser/content smoke test of the served site.
 
 ## Compatibility changes
 
@@ -162,11 +297,12 @@ to move the daily watermark for those modes.
 node --test scripts/paper-reading/migration/tests/*.test.mjs
 ```
 
-The preparation directory also has `run-tests.mjs` to run the selected existing
-ledger/cache/screening/radar/conference suites with a minimal environment and
-synthetic temporary directories. Production canonical fixtures are not copied
-into tests. This validates local primitives and compatibility, not a cloud
-executor, GitHub transport, API/ChatGPT authentication, or live Pages deployment.
+The migration tests include the real CLI across processes, local Git remotes,
+writer conflicts, dropped acknowledgements, interrupted execution, renewal
+failure, retained dirty output, restoration and publication recovery. The
+deployment API is mocked. No live GitHub state branch or Pages deployment is
+created by these tests; live write permissions and provider behavior require
+separately approved remote acceptance.
 
 ## Cloud network startup
 
