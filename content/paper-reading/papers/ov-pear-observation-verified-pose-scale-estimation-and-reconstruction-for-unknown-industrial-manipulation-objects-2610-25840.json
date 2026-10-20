@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.25840",
+  "title": "OV-PEAR: Observation-Verified Pose-Scale Estimation and Reconstruction for Unknown Industrial Manipulation Objects",
+  "authors": [
+    "Guoqin Tang",
+    "Qingxuan Jia",
+    "Yichen Tan",
+    "Zihang Lv",
+    "Ruiquan Wang",
+    "Zeyuan Huang",
+    "Gang Chen"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25840"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.RO"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "OV-PEAR",
+    "observation verification",
+    "RGB-D",
+    "pose-scale",
+    "free-space carving"
+  ],
+  "abstract": "Fine industrial robotic manipulation requires 6D pose, scale, and an operation-ready 3D model. Existing industrial pose estimation relies on CAD models, object-specific training data, or stable workcells, limiting use with unseen objects; zero-shot methods suffer from single-view occlusion, generative bias, and scale uncertainty. We present OV-PEAR, an observation-verified framework for 3D reconstruction and pose-scale estimation of unknown industrial objects. Its three-stage object-centric pipeline: (1) segments RGB-D instances and generates object-level 3D hypotheses; (2) anchors them to the robot frame via appearance-aware view retrieval, explicit scale search, and visibility-sensitive registration; (3) back-projects multi-view RGB-D evidence into the object-canonical frame to verify voxel occupancy, suppress hallucinations, and produce reusable trusted object models. On BOP-Industrial, OV-PEAR achieves 0.657 average AR and improves pose and voxel-level geometric consistency in real scenes; real-robot connector assembly reaches 99.67% grasp and 84.00% assembly success. The model library and pose-scale log enable short-term object-level state maintenance at 0.02 ms/frame.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25840v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25840v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "OV-PEAR 把单视图生成的 3D 模型当作待验证假设：先做 pose/scale 对齐，再把多视图 RGB-D 的 surface hit 和 free-space ray evidence 放回物体 canonical frame，修正 voxel 后解码 mesh。值得借鉴的是生成几何的观测约束核查；作者报告四视图 voxel IoU 从 0.613 升至 0.689，但工业装配和 0.02 ms 日志更新均不能当作通用生成质量或实时重建证据。",
+    "motivationZh": "目标是为无目标 CAD 和无物体专用训练的工业操作同时提供尺寸、姿态与可用几何。方法将单视图 voxel/mesh prior、外观模板旋转检索、离散尺度搜索和 visibility-weighted ICP 连接，再对多视图候选 voxel 先取 union、后结合 depth hits、free-space 冲突和多视图支持筛选。最终 mesh 与 pose-scale 状态分别存入模型库和日志。实验覆盖 BOP 单视图 pose、较小实拍工作台集、连接器和短时状态维护；对本雷达的价值是明确的 generated hypothesis verification 机制，尚未验证 LEGO、开放域生成或制造设计。",
+    "methodZh": "分割多视图 RGB-D 物体并建立跨视图 instance 对应；预训练生成器给出各视图 voxel hypotheses。 从生成 mesh 渲染模板做外观检索，初始化旋转；显式搜索尺度并用 visibility-weighted ICP 对齐局部深度。 把候选 voxel、观测点云及相机中心变换到统一 object-canonical frame，先合并候选以保留结构召回。 按 depth hit、free-space ray carving 与多视图生成支持更新置信度；hit 优先，未知区域不被单视图强制删除。 用 trusted voxels 与参考 RGB/mask 解码 mesh，写入可复用物体库；后续独立记录 pose、scale、identity 和 visibility。",
+    "methodFlow": [
+      "分割多视图 RGB-D 物体并建立跨视图 instance 对应；预训练生成器给出各视图 voxel hypotheses。",
+      "从生成 mesh 渲染模板做外观检索，初始化旋转；显式搜索尺度并用 visibility-weighted ICP 对齐局部深度。",
+      "把候选 voxel、观测点云及相机中心变换到统一 object-canonical frame，先合并候选以保留结构召回。",
+      "按 depth hit、free-space ray carving 与多视图生成支持更新置信度；hit 优先，未知区域不被单视图强制删除。",
+      "用 trusted voxels 与参考 RGB/mask 解码 mesh，写入可复用物体库；后续独立记录 pose、scale、identity 和 visibility。"
+    ],
+    "experimentsZh": "RTX4090D 上测试；BOP-Industrial 的 IPD/XYZ-IBD/ITODD-MV 按单视图 AR；实拍工作台有15场景、10物体模型及4个校准视角，pose/geometry 评测使用提供的物体 masks；机器人使用 Franka Panda、Robotiq 与腕部 RealSense。不同评测协议的 AR、IoU 与误差不能互换。 作者报告 BOP 单视图平均 AR 为0.657，对比FRTPose-WAPR0.562、FoundationPose0.495、SAM-6D0.529；该实验不测试多视图 voxel 验证。 (Table I and Sec. IV-B.1, PDF p. 11) 作者报告实拍4V相较SV voxel IoU为0.689 vs0.613，中心误差1.28 vs2.88 cm；一次建模33.45 vs12.61 s，pose均0.53 s。 (Table II, PDF p. 12) 作者报告核心消融中视图数1→3时voxel IoU0.760→0.851，AR0.715→0.762；这是独立核心评测协议，不是工作台Table II的指标。 (Table VI, PDF p. 15) 作者报告USB/HAN10/RJ45各100次抓取的平均抓取成功99.67%、完整装配84.00%；包含后续 compliant controller 和接触误差。 (Table V, PDF p. 14) 对比FRTPose-WAPR、FoundationPose、SAM-6D及状态维护的mapping系统；支持不同输出的项目诚实标N/A。缺少同等输入下更广泛生成几何验证基线、生成先验替换与开放域外推；BOP单视图结果不能支撑多视图模块优势。复现commit/config仅承诺在后续包列出。 移除coarse initialization或scale search会明显降低AR/IoU；多视图提升结构一致性；model reuse主要改变表示成本，identity log主要影响身份连续性。未见单独严格隔离union-vs-intersection、hit优先和confidence阈值鲁棒性的完整消融，无法将全部改进归给某一规则。",
+    "insightZh": "相对于直接使用单视图生成模型或纯 pose estimator，主要增量在把尺度不确定性、局部可见性 registration 与 union-first then carve 的观测验证组合成可复用物体接口。模板检索、ICP、ray carving 和预训练 mesh decoder 本身不是新的基础模型；论文也明确 decoder 不是主要创新。",
+    "evidenceZh": "生成模型只提供候选，最终几何经 pose-scale anchoring 和真实 RGB-D 验证。 (Sec. III-A, Fig. 1, PDF pp. 3–5) / Union-first 保留几何召回，再用 depth hits/free-space 与多视图支持筛选；未观测区域不等于已验证真实。 (Sec. III-C.1–3, Eq. (1), PDF pp. 7–10) / 作者报告四视图改善实拍几何与中心误差，但旋转仍有明显歧义。 (Table II and Fig. 3, PDF p. 12) / 0.02 ms/frame 仅为建库后的 state-log bookkeeping，排除 segmentation、建模与 SLAM。 (Appendix A-B, Table IX, PDF pp. 16–17) / 对 3D generation 可迁移的是观测驱动的几何核查，不是已验证的 LEGO/生成任务性能。 (Sec. III-C, PDF pp. 8–10; reviewer transfer inference)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可把生成候选与depth-backed事实分开保存，再用canonical-frame hit/free-space核查条件3D生成资产，减少将补全先验误当真实结构的风险；与3D generation的关系明确但属机制迁移，机器人装配本身不是收录理由。",
+    "caveatZh": "Sec. III-A(p.4)限定单窗口内刚体形状一致；非刚体和拓扑变化不在范围。 / Sec. IV-B.2(p.12)指出弱纹理、部分对称和侧面不足仍会保留方向歧义，需更有信息的视角或接触反馈。 / Conclusion(p.16)说明依赖instance segmentation、RGB-D质量和相机校准，不取代通用SLAM或compliant control。 / Appendix B(pp.16–17)区分前端感知与抓后滑移、socket偏差和接触卡滞；装配失败不等于重建失败。 / 无depth hit但有多视图生成支持的不可见结构仍可保留，且hit优先可能保留错误占据；trusted为规则置信度，不是物理正确性保证。 / 实拍样本较小、pose评测用提供的mask并做固定物体frame correction；几何泛化和端到端分割误差仍需复核。 / 单个scale-search与ICP配方可能对先验偏差、薄结构和深度噪声敏感；未发现可直接验证的公开方法代码入口。 / 3D generation迁移是本次审阅推断，本文未给出LEGO、可制造设计或通用条件资产生成实验。",
+    "sourceNote": "Exact version 2610.25840v1 (19 pages), PDF SHA-256 eaad502b3eb68538ac059076802e1a42d9672893444a2c17b644e0180096c2e3. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "ov-pear-observation-verified-pose-scale-estimation-and-reconstruction-for-unknown-industrial-manipulation-objects-2610-25840",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "3d-reconstruction"
+  ]
+}

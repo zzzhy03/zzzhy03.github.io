@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2610.26860",
+  "title": "OpenVLHarness: Real World Visual Agentic Tool-Use with Multimodal Memory",
+  "authors": [
+    "Yu Zhou",
+    "Cheng-Fu Yang",
+    "Rui Sun",
+    "Di Wu",
+    "Sibo Peng",
+    "Mingyang Zhang",
+    "Zhen Yang",
+    "Ruiyi Zhang",
+    "Nanyun Peng",
+    "Zhe Gan",
+    "Kai-Wei Chang"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.26860"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.CV",
+    "cs.LG",
+    "cs.MM"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "OpenVLHarness",
+    "artifact registry",
+    "evidence rendering",
+    "multimodal memory",
+    "typed bindings"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) have made rapid progress on visual reasoning, yet many tasks require evidence that is difficult to obtain through internal reasoning alone: our controlled study on 22 benchmarks shows that simply increasing the inference budget of the base model yields only modest gains. Such tasks demand grounded perception, external knowledge, and numerical measurements obtained through heterogeneous tools, whose outputs must be made interpretable to the model and retained across reasoning steps. We introduce OpenVLHarness, a multimodal reasoning harness organized around a capability layer and persistent multimodal memory. The capability layer combines task-level tool interfaces with evidence rendering, providing consistent access to heterogeneous backends and converting their outputs into model-readable observations. Persistent multimodal memory retains the corresponding images, structured data, and web references as addressable artifacts throughout each query. A coding interface executes generated programs over stored data, enabling computations that combine results from multiple tools. Together, these mechanisms support an iterative process of acquiring, inspecting, and composing multimodal evidence. Evaluated on 22 benchmarks with eight open and proprietary backbones, OpenVLHarness improves average scores by 9.7-12.6 points over matched no-tool baselines, including +11.2 with Qwen3-VL-8B, +9.7 with Kimi K3, and +9.9 with GPT-6 Astra. With GPT-6 Luna at medium reasoning effort, OpenVLHarness outperforms the base model, Codex, and Visual Sketchpad at maximum effort by 7.7-8.5 points while incurring at most 37% of their model-token cost.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.26860v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.26860v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/uclanlp/OpenVLHarness"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "OpenVLHarness值得精读的是：工具证据既能看懂，也能按handle取回mask、depth和camera参数再计算。作者报告Qwen8B平均34.24→45.41；但memory限单query，成本不含工具。公开Example14还把normalized bbox当pixel并粗估米制长度，说明有数据引用和最终答案并不保证计算链可靠。",
+    "motivationZh": "固定任务接口的capability layer把异构工具输出变成overlay、简述与compact数值；每query的artifact registry分别保存图像、typed data bindings和web references。环境更新暴露可用handle，独立Python coding context读取原始数组做跨工具计算。22 benchmarks与消融支持这种观察和复用接口的价值；本文没有CAD/SVG生成闭环。",
+    "methodZh": "MLLM读取问题、图像和当前query的artifact namespace，决定下一次工具调用。 九种typed capabilities在固定接口后调用感知、搜索或代码后端。 renderer把mask/depth等输出变成可见overlay和简洁结构化观察。 registry保存原始图像、masks、arrays、camera参数和URLs，Environment Update发布可引用handle。 Python Coding Agent在独立context中读取bindings，进行去重、聚合或跨视角几何计算。 orchestrator检查新观察并继续调用或回答；域适配可搜索harness文字或组合新工具。",
+    "methodFlow": [
+      "MLLM读取问题、图像和当前query的artifact namespace，决定下一次工具调用。",
+      "九种typed capabilities在固定接口后调用感知、搜索或代码后端。",
+      "renderer把mask/depth等输出变成可见overlay和简洁结构化观察。",
+      "registry保存原始图像、masks、arrays、camera参数和URLs，Environment Update发布可引用handle。",
+      "Python Coding Agent在独立context中读取bindings，进行去重、聚合或跨视角几何计算。",
+      "orchestrator检查新观察并继续调用或回答；域适配可搜索harness文字或组合新工具。"
+    ],
+    "experimentsZh": "22个counting/grounding、search/deep research、general VQA/hallucination、spatial benchmarks；八个backbones，九类工具。Qwen3三次重复，专有模型一次。主评估完整splits；消融对大集固定seed42抽至500。另以失败轨迹诊断后，在独立数据上进行harness text搜索或tool generation。 作者报告Qwen8B/32B平均增加11.17/12.62个百分点，GPT-6 Astra60.27→70.17；并非每个backbone的每个benchmark都提高。 (Table1, PDF p.6) 作者报告补全multimodal image memory的overall增益约3.1/4.5点；capability layer联合schema与rendering增益约3.4/3.2点。 (Table3, PDF p.8; Appendix B.2, PDF p.26) 作者报告medium Luna56.52、max Visual Sketchpad48.84；相应model-token价格0.92/5.15美元每千query，不计工具与judge。 (Table13, PDF p.32; caveats PDF p.34) 同backbone比较OctoTools、Visual Sketchpad、Codex，另比较Qwen2.5-7B训练型harnesses。但工具/搜索权限、旧expert、round limits和部分sandbox不同；主张应限于报告配置，不能概括为统一工具与总成本下的普遍排名。 严格superset ladder逐步加tools、capability layer、textual memory和image memory，包含三次方差。capability rung同时恢复完整schema和output rendering；image rung同时恢复视觉附件与handles。工具调用相关性不是单工具因果效应；selected-failure gate只测修复，不测原本正确样本回归，最终另做完整benchmark评估。",
+    "insightZh": "系统贡献在任务级接口、证据渲染与可复用多模态artifact registry的联合设计，以及失败诊断驱动的文字/工具两种适配路径；建立在既有视觉experts与MLLM上，没有训练新的foundation backbone，也不是跨任务长期记忆。",
+    "evidenceZh": "图像handle与typed numerical bindings分开存储，后续Python可直接组合mask和depth而不重新序列化原始数组。 (Sec.2.1–2.2, Fig.2, PDF pp.3–5; Table19, PDF p.41) / 作者报告Qwen3-VL-8B和32B的22-dataset平均分别34.24→45.41、38.30→50.92。 (Table1, PDF p.6) / 消融中补全image memory相对textual memory使overall 44.93→47.14和49.12→52.51。 (Table3, PDF p.8; Appendix B.2/Table8, PDF p.26) / 37%成本headline仅覆盖model-token账单，不包括工具执行与judging。 (Table2, PDF p.7; Appendix B.6, PDF pp.31–34) / 各baseline可用工具并未配平：OpenVL有web search，OctoTools base只有generalist generator，Qwen版Codex无法启动shell。 (Appendix B.7, PDF p.36; Table25/Appendix G.1, PDF p.167) / 高密度计数仍明显失败；FSC-147超过100 objects时Qwen32B exact accuracy仅1%。 (Appendix B.4/Table10, PDF p.30) / 可迁移机制是rendered observations与真实几何/参数bindings共用稳定handle，设计生成下游收益仍需实验。 (Sec.2.2 and Appendix C.4, PDF pp.4–5,41) / 公开Example14把0–1000 normalized boxes直接当depth像素索引，并用任意factor2估算物理长度。 (Appendix F, Example14, PDF pp.141,143–145)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可把CAD/renderer的preview、mask、depth与真实参数保存在同一artifact registry：agent查看rendered evidence，随后工具按handle读取数值做几何或约束检查。论文的跨视角计算给出接口可用性证据，但设计生成收益仍待单独验证。",
+    "caveatZh": "dense grounding的错漏仍主导失败，高对象数exact counting未解决。 / camera/depth metric依赖后端校准与足够view overlap。 / 工具调用统计由agent自主选择，per-tool结果是correlational。 / proprietary模型结果单次；live search不能完全固定，模型token成本未计后端工具。 / persistent memory限定单query内，不是跨天/跨任务学习。 / 感知或代码出错可经artifact registry持续传播，需要核验坐标、单位和对象对应。 / Example14不止作者承认的wrong object：normalized bbox被当作pixel读depth，再以任意perspective factor2给出米制长度（pp.141,143–145）。可寻址数值不保证单位、对应关系或计算公式正确，最终选项也不是过程可靠性的证明。 / 对照搜索权限与toolset不同，不能把全部增益归于memory。 / 没有visual design creation下游；CAD/renderer迁移是具体机制建议，尚非论文实测。 / 没有独立limitations章节；此处边界来自正文与附录明确说明。",
+    "sourceNote": "Exact version 2610.26860v1 (171 pages), PDF SHA-256 30d7db4b31ab66624ee29d89d5d255f0e9d776b5e8f6d851a1eae6135918ccca. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: available. "
+  },
+  "slug": "openvlharness-real-world-visual-agentic-tool-use-with-multimodal-memory-2610-26860",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "vlm-mllm"
+  ]
+}

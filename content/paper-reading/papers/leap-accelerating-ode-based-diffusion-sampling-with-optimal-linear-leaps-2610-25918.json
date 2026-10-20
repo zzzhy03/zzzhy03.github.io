@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2610.25918",
+  "title": "LEAP: Accelerating ODE-based Diffusion Sampling with Optimal Linear Leaps",
+  "authors": [
+    "Haowei Zheng",
+    "Zhenyu Zhou",
+    "Jiawei Chen",
+    "Can Wang",
+    "Defang Chen"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25918",
+    "doi": "10.1145/3767308.3836106"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "LEAP",
+    "linear score prediction",
+    "reference trajectories",
+    "coefficient bank",
+    "TRELLIS.2"
+  ],
+  "abstract": "Diffusion models primarily rely on general-purpose ODE-based numerical methods for training-free accelerated sampling, but performance degrades with coarse time discretization. In this paper, we propose optimal linear leaps (LEAP), a specialized method grounded in theoretical and empirical investigations of sampling trajectory geometry. Built upon low-dimensionality and cross-trajectory consistency, LEAP formulates a supervised least-squares optimization problem within the local trajectory subspace, achieving a precise approximation of future states without model evaluations. Extensive experiments demonstrate that LEAP outperforms previous methods across diverse modalities, including text-to-image (Stable Diffusion 3.5, FLUX.1-dev) and image-to-3D (TRELLIS.2) generation. Furthermore, LEAP can be seamlessly integrated into existing solver-based methods, offering a plug-and-play enhancement for modern diffusion models. Code is available at https://github.com/zju-pi/LEAP.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25918v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25918v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "LEAP 用少量离线reference trajectories拟合每步线性外推系数，在推理中交替跳过网络评估与真实score校正；无需fine-tune基础模型，但并非零准备。作者报告TRELLIS.2的GSO100图上小幅PSNR/CLIP改善，可作为3D生成sampler技巧略读；当前公开仓库为空，理论保证也只覆盖理想spherical-GMM精确PF-ODE。",
+    "motivationZh": "低NFE时通用ODE solver的粗离散误差增大，LEAP从trajectory低维性与跨样本形态一致性出发，将历史scores改写为difference basis，在reference score trajectories上逐步做ridge least-squares，得到sample-agnostic coefficient bank。推理先warm-up再交替linear extrapolation与network correction，可叠加Euler/DPM++等solver。实验覆盖SD3.5-Medium、FLUX.1-dev和TRELLIS.2；直接3D证据是GSO100图上的render-space PSNR与CLIP，并未独立验证几何精度或端到端wall-clock收益。",
+    "methodZh": "离线收集fine-grained reference score trajectories，默认32条 以recent score differences和当前score构造局部basis 每timestep做ridge least-squares生成可复用coefficient bank 用base solver warm-up形成历史buffer 交替无网络linear score prediction与真实network evaluation校正 把预测score交给原solver更新state并完成2D/3D样本",
+    "methodFlow": [
+      "离线收集fine-grained reference score trajectories，默认32条",
+      "以recent score differences和当前score构造局部basis",
+      "每timestep做ridge least-squares生成可复用coefficient bank",
+      "用base solver warm-up形成历史buffer",
+      "交替无网络linear score prediction与真实network evaluation校正",
+      "把预测score交给原solver更新state并完成2D/3D样本"
+    ],
+    "experimentsZh": "SD3.5-Medium与FLUX.1-dev的DrawBench prompts，以HPSv2、ImageReward、CLIPScore评；TRELLIS.2以100随机GSO图和PSNR/CLIP评。默认history r=5、ridge1e-4、reference trajectories M=32；NFE10/15/20为主，3D表到30。AppendixB测试HPSv2 prompt distribution shift及cross-model/solver/step coefficient transfer。 作者报告GSO/TRELLIS.2在10NFE下PSNR7.250→7.414、CLIP0.8638→0.8677；30NFE下PSNR7.405→7.408、CLIP0.8658→0.8709。 (Table2,p.7) 作者报告SD3.5 15NFE下Euler HPSv2 27.4725、LEAP(Euler)28.1826；DPM++27.8642、LEAP(DPM++)28.2152。 (Table1,p.7) 作者报告FLUX 20NFE下DPM++ HPSv2 29.6523、LEAP(DPM++)30.1514；这些为质量代理，不是实测部署加速比。 (Table1,p.7) 2D比较Euler、DPM++、iPNDM、UniPC、LTC-Accel、STORK-4，含相同NFE和多solver组合。3D只有Euler baseline，评估偏render-space而非Chamfer、mesh validity或human preference；无完整离线准备成本摊销与wall-clock/profile表。 扫描r、ridge、M并比较raw/difference basis；difference basis消除严重数值退化。AppendixB.1比较1:1与1:2 prediction-correction，B.2测试prompt shift和跨模型/solver/step coefficient迁移；支持有限场景复用，未建立任意LoRA/新模型/时间表免校准。",
+    "insightZh": "方法差异是由reference trajectories学习step-wise linear coefficients并用difference basis稳定求解，而非只用Taylor系数或cache heuristic；GMM-PF-ODE分析为动机提供受假设限制的解释。所谓training-free准确含义是无需base-network fine-tuning，仍有offline轨迹采集与回归；不能把理想模型的alignment证明当作所有真实flow模型的无误差保证。",
+    "evidenceZh": "coefficient bank由多条reference score trajectories逐步ridge regression构建，而不是每个测试样本重新优化。 (Sec.3.2,Eqs.(22)–(31),pp.4–5; Algorithm1,p.5) / 推理warm-up后交替network-free prediction和真实score correction，防止长时间纯外推漂移。 (Algorithm2,p.5; Fig.1,p.2) / 作者报告TRELLIS.2 GSO测试上10 NFE的PSNR从7.250到7.414、CLIP从0.8638到0.8677。 (Sec.4.1,p.6; Table2,p.7) / 作者报告SD3.5/FLUX多个NFE下HPSv2/ImageReward/CLIP与baseline比较，但非所有metric均最佳。 (Table1,p.7) / 低维与alignment推导假设共享spherical covariance的GMM、exact score PF-ODE及特定mean-subspace尺度条件。 (Sec.3.1,Theorem3.1/Corollaries3.2–3.4,pp.3–4; AppendixA,pp.11–14)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体迁移证据来自TRELLIS.2 image-to-3D实验，可作为3D Generation中减少sampler网络评估的候选技巧；不以raster图像小benchmark改善触发收录。",
+    "caveatZh": "Conclusion将realistic finite-step sampling下的geometry理论与实践进一步对齐列为未来工作（p.8）；没有独立Limitations章节。 / 必须提前采集reference trajectories与拟合bank；M较小也有成本，不能称无数据/零准备，模型参数不更新与无需任何学习是不同命题。 / GMM共享spherical covariance及exact PF-ODE中的低维性不自动保证真实high-dimensional learned vector field或跨prompt的有限步稳定性。 / 3D样本仅100图、对手仅Euler，PSNR/CLIP小幅提升不能证明几何拓扑、可制造性或普适3D性能突破。 / 论文反复使用steps/NFE，使用时需核对bank schedule与真实network calls；未给足完整wall-clock和离线摊销，不能自行报告固定倍速。 / 2026-10-20核查PDF印刷GitHub URL，公开repo size=0、contents API404明确This repository is empty；代码尚不可复用。",
+    "sourceNote": "Exact version 2610.25918v1 (18 pages), PDF SHA-256 5032a803f7512028606b44e92e99eec57077e71c416b2a81a8a2648b897db9df. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: promised. PDF p.1称Code is available at https://github.com/zju-pi/LEAP；实际公开页面显示repository empty，GitHub API size=0且contents返回404 This repository is empty（2026-10-20，证据保存在work/text/worker-b-code-status.json）。将其视作待发布，不能给Code link。"
+  },
+  "slug": "leap-accelerating-ode-based-diffusion-sampling-with-optimal-linear-leaps-2610-25918",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "image-generation",
+    "3d-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  }
+}

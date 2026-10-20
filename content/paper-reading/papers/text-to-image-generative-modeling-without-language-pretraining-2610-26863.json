@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.26863",
+  "title": "Text-to-Image Generative Modeling Without Language Pretraining",
+  "authors": [
+    "Keshigeyan Chandrasegaran",
+    "Yue Zhao",
+    "Armin W. Thomas",
+    "Ehsan Adeli",
+    "Jiajun Wu",
+    "Juan Carlos Niebles",
+    "Li Fei-Fei",
+    "Michael Poli"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.26863"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Halcyon",
+    "early fusion",
+    "language pretraining",
+    "controlled comparison",
+    "autoregressive"
+  ],
+  "abstract": "Modern text-to-image (T2I) systems use internet-scale language pretraining for text-conditioned image generation. We ask whether language pretraining is necessary for strong T2I generation. We introduce Halcyon, a family of early-fusion multimodal autoregressive models pretrained entirely from scratch on GPIC, a dataset of 100M image-text pairs. Halcyon-0.52B outperforms LlamaGen-XL/8 (48.0 vs. 63.3 gFD) with 18.2$\\times$ less pretraining compute. Further, Halcyon-1.6B outperforms JiT-T2I-XXL/8++ (35.3 vs. 41.0 gFD) with 275$\\times$ less pretraining compute. Controlled experiments show that text-only pretraining does not improve T2I generation. Halcyon also learns image captioning by replacing caption dropout with I2T supervision, maintaining competitive T2I generation quality under the same pretraining budget. We show that strong T2I systems can be trained from scratch without internet-scale language pretraining. Code and models are available at https://cs.stanford.edu/~keshik/halcyon",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.26863v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.26863v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "Halcyon把text/image tokens放进同一autoregressive序列，从零学习条件生成；在GPIC的256×256设定下，作者报告0.52B/1.6B模型超过受控LlamaGen/JiT基线，额外text-only pretraining没有带来收益。最值得读的是预算与I2T替代caption dropout的对照设计，不能扩大为所有数据、分辨率与多模态任务都不需要语言预训练。",
+    "motivationZh": "论文核算T2I系统从零构建时语言模型、image tokenizer和image generator的总预训练成本，并用Halcyon进行数据配比/初始化干预。图像用从零FSQ tokenizer转成1024个tokens，text用从零BPE编码，在共享Qwen3式decoder中预测；将被drop caption的无条件image序列换为I2T序列，可保留图像训练token预算并学习captioning。作者在100M GPIC pairs上训练一个epoch，评估GPIC Test-50K、GenEval、DPG-Bench与caption alignment。实证支持该规模与分布下paired data足以学到有竞争力的T2I条件表示，并非首创无语言预训练T2I，也不是高分辨率SOTA系统。",
+    "methodZh": "GPIC图像经从零FSQ tokenizer编码成32×32离散image tokens；caption经从零BPE编码 共享text/image vocabulary与decoder-only Transformer，将caption prefix和image tokens作为单序列建模 固定预算比较T2I、text-only→T2I、I2T→T2I和混合schedule，另作Qwen3预训练/随机初始化对照 用I2T序列替换caption-dropped T2I样本，保留条件/无条件图像token数并增加caption监督 autoregressive采样1024个image tokens，CFG组合条件/无条件logits后解码256×256图像",
+    "methodFlow": [
+      "GPIC图像经从零FSQ tokenizer编码成32×32离散image tokens；caption经从零BPE编码",
+      "共享text/image vocabulary与decoder-only Transformer，将caption prefix和image tokens作为单序列建模",
+      "固定预算比较T2I、text-only→T2I、I2T→T2I和混合schedule，另作Qwen3预训练/随机初始化对照",
+      "用I2T序列替换caption-dropped T2I样本，保留条件/无条件图像token数并增加caption监督",
+      "autoregressive采样1024个image tokens，CFG组合条件/无条件logits后解码256×256图像"
+    ],
+    "experimentsZh": "约100M GPIC image-text pairs，256×256，一个epoch，0.1B–4B模型；GPIC验证集选CFG，Test-50K评估分布指标；GenEval使用PixelGen重述prompt，DPG-Bench使用原prompt。语言调度干预主要0.52B，初始化对照Qwen3-0.6B；caption alignment由Qwen3-VL-Reranker-8B评分。 作者报告0.52B为48.02 gFD，LlamaGen-XL/8为63.29；1.6B为35.28，JiT-T2I-XXL/8++为40.97。 (Table4, PDF p.7) 作者报告1.6B的GenEval53.48、DPG-Bench77.90；JiT-T2I-XXL/8++分别43.17、76.85。 (Table5, PDF p.7) 作者报告0.52B额外语言预训练后仍完整T2I epoch（总compute1.5×）的gFD49.22，基线48.02；Qwen3随机/语言预训练初始化分别46.61/47.81。 (Tables6–7, PDF p.9) 作者报告0.52B以I2T替代10% caption dropout后caption NLL由18.414降到1.102，gFD46.48，对照48.02；不是所有scale均改善gFD。 (Table9, PDF p.10) 作者报告1.6B总预训练FLOPs约1.34×10^21，JiT-T2I-XXL/8++约3.68×10^23，计入后者已有语言模型的预训练账单。 (Table15, PDF p.20) 包括LlamaGen FLAN-T5 base/XL及同image-tokenizer变体、JiT加入LPIPS与更小patch的变体、Qwen3同架构随机/预训练初始化。覆盖代表性的AR与diffusion，不能视为对全部最强T2I系统的SOTA竞赛；模型结构、tokenizer与既有语言数据仍不同。 数据比例/调度、保留完整T2I epoch的额外语言预训练、Qwen3初始化及较低LR、I2T替代、caption长度与CFG均有对照。训练seed重复仅0.1B三次，作者报告gFD标准差5.54；固定checkpoint采样方差至多0.14，两者不能混淆（App.C.2–C.3/Tables20–21, PDF pp.19,23）。",
+    "insightZh": "主要新意是完整系统compute accounting和可解释的受控实验，而非全新decoder或首次从paired data训练T2I。Sec.2承认DALL-E/CogView/GLIDE等先例；从零joint modeling、语言预训练干预和同预算I2T替代共同提供针对现代语言模型依赖路线的实证反例。",
+    "evidenceZh": "共享联合词表的decoder以caption→image序列学习T2I，模型权重从零训练；BPE tokenizer仍使用GPIC caption与OpenWebText语料。 (Sec.3.1–3.2, PDF p.3; Table14, PDF p.20) / I2T序列共享无条件image prefix，可替换caption dropout并保留图像token监督预算。 (Fig.3–4, PDF p.4; Sec.4.4/Table9, PDF p.10) / 作者报告0.52B/1.6B的GPIC gFD为48.02/35.28，对应LlamaGen-XL/8与JiT-T2I-XXL/8++为63.29/40.97。 (Tables4–5, PDF p.7) / 在文中被测设定下，额外text-only pretraining和语言预训练权重初始化未改善T2I结果。 (Tables6–7, PDF p.9) / 18.2×/275×是含基础语言模型预训练的系统总FLOPs比较，不是复用现有权重的边际成本或推理加速。 (Table15, PDF p.20; Sec.5, PDF p.12)",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "作为Image Generation重大训练路线证据，适合精读paired-data与预算控制原则；对专用视觉/结构生成训练的启发属于迁移假设，论文未测试LEGO、Embroidery、SVG或CAD。",
+    "caveatZh": "限于GPIC与256×256；高分辨率、其他dataset与更大预算仍待验证（Sec.5, PDF pp.12–13）。 / 调度干预集中于0.52B，初始化对照为Qwen3-0.6B；diffusion/Transfusion式系统的受控干预尚未完成（PDF pp.12–13）。 / 生成小字/细glyph仍困难，caption alignment低于GPIC ground truth（PDF pp.5,10,20）。 / 总compute优势包含基础LLM历史预训练；不能把275×解释为直接复用开源权重的实验室实际节省，或推理提速。 / 没有观察到收益只覆盖文中设定，不能证明语言知识对长prompt、稀有概念和通用理解无价值。 / 论文未隔离joint training单独的因果作用；大部分scale缺完整多training-seed重复。 / 官网与HF已确认模型权重、配置及加载片段，未核实专用训练/采样源码仓库，因此Code保守记not-found。",
+    "sourceNote": "Exact version 2610.26863v1 (27 pages), PDF SHA-256 c865a99ad507360c7648f6e2c22f8e7ee2f895eb6efc34880674d2d093d8eeda. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: not-found. PDF p.1提供cs.stanford.edu/~keshik/halcyon。实际官网仅提供HF collection、paper及blog；公开Halcyon模型有weights/config/加载片段，未核实独立训练/采样源码仓库，故不提供Code link。"
+  },
+  "slug": "text-to-image-generative-modeling-without-language-pretraining-2610-26863",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "image-generation"
+  ]
+}

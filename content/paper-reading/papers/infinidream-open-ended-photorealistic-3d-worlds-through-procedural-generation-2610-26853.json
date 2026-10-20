@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.26853",
+  "title": "InfiniDream: Open-Ended Photorealistic 3D Worlds Through Procedural Generation",
+  "authors": [
+    "Yi-Chuan Huang",
+    "Hao-Jen Chien",
+    "Zheng-Hui Huang",
+    "Yu-Lun Liu",
+    "Kaipeng Zhang",
+    "Zhixiang Wang"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.26853"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "InfiniDream",
+    "procedural assets",
+    "symbolic constraints",
+    "frustum grid placement",
+    "seed diversity"
+  ],
+  "abstract": "Procedural generation plays a key role in synthetic data creation and game development, offering greater controllability, editability, and diversity than static mesh representations. However, VLM-based code generation often produces relatively simple 3D assets, while sophisticated photorealistic procedural systems require extensive manual development. Existing VLM-guided procedural methods remain largely constrained by predefined factories and APIs, limiting their ability to create novel asset types. We introduce InfiniDream, a VLM-driven framework for open-ended procedural 3D world generation. First, we propose Symbolically Constrained Asset Generation, which leverages existing procedural algorithms to create novel, photorealistic assets while preserving editability and seed-based diversity. Second, we develop an end-to-end text-to-world pipeline that combines semantic scene planning with Deterministic Frustum-Guided Grid Placement to construct large-scale 3D worlds with precise object placement, procedural population, and animation. Extensive evaluations on 100 object and 20 scene generation tasks demonstrate improvements across four perceptual metrics. Diversity analysis, ablation studies, and human preference evaluations further validate the effectiveness of our framework. Project page: https://yichuanh.github.io/infinidream-page/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.26853v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.26853v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "InfiniDream让VLM在显式编辑边界内扩展Infinigen procedural code，用plan→construct→render→refine保留seed变化和可编辑结构，再用确定性frustum-grid放置物体。作者报告100个object任务四种感知分数领先，但98% executability低于通用harness的99%；20场景优势还包含Ours专用70个预建coarse scenes，不能归因于SCE单组件。",
+    "motivationZh": "论文结合开放procedural asset生成与场景构造。Factory Brief以AST/dependency map拆出editable surface和read-only shared infrastructure；Planner用Tweak/Create/Promote计划指导改动，保留factory API和seed随机性，reviser查看render迭代、selector挑选成功snapshot。Director只输出离散语义与anchoring约束，continuous placement由camera rays近到远grid search检查visibility、swept collision、spacing、surface policy和projected area；无解时记录constraint relaxation。Asset pooling复用少量seed prototypes。实验含100object、20scene、25自然物体消融、15diversity prompts与30人偏好。",
+    "methodZh": "text/参考图检索Infinigen factory，AST依赖遍历形成Code Structure Map、Editable Surface与只读Linked Infrastructure Planner明确Strategy/Locate/Edit/Rely-on/Risks，选择Tweak/Create/Promote并保留factory API与seed随机性 Constructor生成asset，render-guided Reviser迭代，Selector选成功code snapshot Director把scene需求转为Hero/Scattering/Swarm、anchoring、semantic target及motion等离散约束 Frustum camera rays生成3D候选，近到远检查五类条件，无解时记录并放松部分约束 K个seed prototypes经linked duplication填入N个instances，接入terrain refinement及预定义motion动画/渲染",
+    "methodFlow": [
+      "text/参考图检索Infinigen factory，AST依赖遍历形成Code Structure Map、Editable Surface与只读Linked Infrastructure",
+      "Planner明确Strategy/Locate/Edit/Rely-on/Risks，选择Tweak/Create/Promote并保留factory API与seed随机性",
+      "Constructor生成asset，render-guided Reviser迭代，Selector选成功code snapshot",
+      "Director把scene需求转为Hero/Scattering/Swarm、anchoring、semantic target及motion等离散约束",
+      "Frustum camera rays生成3D候选，近到远检查五类条件，无解时记录并放松部分约束",
+      "K个seed prototypes经linked duplication填入N个instances，接入terrain refinement及预定义motion动画/渲染"
+    ],
+    "experimentsZh": "InfiniDream及VLM baselines统一Claude Opus4.8/Blender4.x；100object tasks六类、1024×1024四视角感知评估，20scene tasks960×540主要camera；DINOv3使用同prompt生成的held-out Gemini参考。70个coarse environments仅Ours使用。另25动物/植物消融、15prompts×5variants对比TRELLIS.2，30人对10object/10scene作forced-choice study。 作者报告100object tasks的CLIP/SigLIP2/DINOv3/ImageReward为30.07/0.148/0.554/−0.62，VLM harness为29.20/0.139/0.498/−0.82；executability为98%，对照99%。 (Table1, PDF p.7) 作者报告20scene tasks四指标为29.64/0.143/0.361/−0.877，VLM harness为28.85/0.126/0.321/−0.894；各方法各自camera，Ours独用预建基底库。 (Table2, PDF p.7; App.I, PDF p.23) 作者报告30人偏好中Ours overall object77.5%、scene83.2%；这是多方法forced-choice获选比例，不是两两胜率。 (Table3, PDF p.8; App.L, PDF pp.24–25) 作者报告全流程placement Unreadable Rate7.8%，Agent(Placement)50.9%；Ground P95为0.15m/0.54m，Spread P95为0.24m/0.75m。contact统计排除无支撑/未populate实例。 (Table6, PDF p.9; App.J, PDF p.23) 作者报告seed variants的DINOv2 diversity distance为0.6704，TRELLIS.2为0.6084；SigLIP2为0.1225/0.1317，不代表语义也全项更强。 (Table4, PDF p.8) 包括one-shot/harness、VIGA、BlenderRAG、Infinigen，scene含Code2Worlds；29个其支持的object另比，TRELLIS.2比较diversity。Object多数方法共享参考但BlenderRAG仅text；scene各自初始化/camera，Ours独有70个预建scene库，故scene主表不能隔离SCE单组件或同成本从零能力。 25自然物体拆除reference、factory retrieval、planner、refiner、编辑边界，并比六轮/三轮；20scene去grid、anchoring、semantic target及自主placement。Table5/6支持组合价值，但去grid同时改变语义规划，reference合成、factory覆盖与系统成本未全控制，非每组件纯因果收益。",
+    "insightZh": "SCE将大型procedural codebase变为带受限编辑表面、可扩展权限和稳定API的agent操作空间，避免只在既有factory参数内变化；另将VLM语义规划与确定性continuous placement分工。新意是可编辑程序生成与约束执行的系统方法，不是新VLM权重或从零生成任意世界。",
+    "evidenceZh": "SCE通过Factory Brief与Tweak/Create/Promote限制编辑，同时保持函数接口与seed-dependent variation。 (Sec.3.1/Fig.4, PDF p.4; App.G, PDF p.22) / Reviser根据render/参考图做targeted refinement，最多六轮并选择成功code snapshot。 (Sec.3.1.3, PDF p.5; App.G, PDF p.22) / Placement将语义约束转为camera-ray候选并做五类确定性过滤，无解时分层放松。 (Sec.3.2–3.3/Fig.5, PDF pp.5–6; App.H, PDF p.22) / 作者报告object/scene四种感知指标领先，但scene基底与reference-based metrics有明确边界。 (Tables1–2, PDF p.7; App.I/J, PDF pp.22–23) / 共享基础设施只读、保留高层seed参数可启发其他结构生成agent，但未验证LEGO或Embroidery。 (Sec.3.1.1–3.1.2, PDF p.4)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进可编辑procedural 3D assets和visual-feedback design agents，适合研究限制agent编辑空间并保留结构化随机性。与LEGO/Embroidery的联系只是机制迁移，本文未做专用生成或可制造实验。",
+    "caveatZh": "动画仅支持预定义motion，定制motion code与复杂室内关系/交互留待未来（Limitations, PDF p.10）。 / Scene用主camera评估，Ours从70个预建coarse environments检索，其余方法不使用该库（App.I, PDF p.23）。 / Contact指标仅对surface-supported对象计算，无support ray或populate失败被排除，部分Agent对照对象也排除（App.J, PDF p.23）。 / 自然场景优势包含预制base scene、Infinigen算法和render设置，不能表述为从零任意场景或所有视角均可靠。 / DINOv3依赖Gemini参考；感知指标与外观偏好不能代替几何准确性、物理稳定、manufacturability或animation dynamics验证。 / Placement允许constraint relaxation且contact统计排除失败/无支撑项；较低P95不证明全部请求对象均正确落地。 / Diversity比较中Ours变seed、TRELLIS.2变输入reference，protocol不同；Ours SigLIP2较低，不应描述为多样性和语义皆显著优于。 / GitHub存在但只有README和8个媒体文件，README明确Full code coming soon；不能因PDF印Code链接就展示公开源码。",
+    "sourceNote": "Exact version 2610.26853v1 (25 pages), PDF SHA-256 daf94d3b2525e5ec5a8a2e6eea0a20c6d6b5deb58bbe770b9e355f62226ec297. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: promised. PDF p.1印https://github.com/yichuanH/InfiniDream；已实际检查public repo/tree，仅9文件README与assets，README明确Full version/code coming soon，故promised而非available。"
+  },
+  "slug": "infinidream-open-ended-photorealistic-3d-worlds-through-procedural-generation-2610-26853",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ]
+}

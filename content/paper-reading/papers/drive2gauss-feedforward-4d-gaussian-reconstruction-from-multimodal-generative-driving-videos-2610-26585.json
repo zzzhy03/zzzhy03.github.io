@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2610.26585",
+  "title": "Drive2Gauss: FeedForward 4D Gaussian Reconstruction from Multimodal Generative Driving Videos",
+  "authors": [
+    "Tong Zhao",
+    "Zhiyuan Han",
+    "Lin Chen",
+    "Bowen Xie",
+    "Yunxi Qiao",
+    "Bohan Li",
+    "Weiqing Xiao",
+    "Gen Li",
+    "Shu Han",
+    "Xuyang Dai",
+    "Cheng Bi",
+    "Hao Zhao",
+    "Chaojian Li"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.26585"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Drive2Gauss",
+    "4D Gaussians",
+    "generated observations",
+    "depth-flow queries",
+    "feedforward decoder"
+  ],
+  "abstract": "Generating reusable driving environments requires both controllable future observations and an explicit representation that supports rendering from different viewpoints, yet existing methods still recover explicit scenes from generated RGB videos through optimization for each sequence. To overcome these limitations, we present Drive2Gauss, a feedforward framework that converts jointly generated RGB, metric depth, and dynamic flow into dynamic 4D Gaussian scenes. A Multimodal Video Generator predicts the three modalities from reference multiview images and future control signals. Furthermore, we introduce a Gaussian Query Decoder that uses depth to initialize sparse 3D queries and flow to associate the queries across time, and integrates appearance information through spatiotemporal feature aggregation and iterative query refinement. The reconstruction stage operates in a single feedforward pass without optimization for each scene. Extensive results on nuScenes demonstrate that our approach attains an FID of 6.38 and an FVD of 12.43 for future RGB generation, a PSNR of 29.91 dB when reconstructing its generated observations, and supports both direct rendering under lateral camera shifts and downstream video fixing. Code and more visualizations are available at https://zttt04. github.io/Drive2Gauss_page/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.26585v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.26585v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/zttt04/Drive2Gauss_"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "Drive2Gauss 将联合生成的多视图 RGB、metric depth 和 dynamic flow 一次解码成可渲染 4D Gaussians：depth 定位稀疏 query，flow 建立时间对应，再聚合外观并更新位置。值得关注的是生成观测到显式3D/4D资产的桥梁；作者报告29.91 dB仅衡量对自身生成RGB的重建，驾驶域FID/FVD和下游fixing不证明真实几何或跨域泛化。",
+    "motivationZh": "面对生成驾驶视频难以重复换视角使用的问题，方法将DiST-T初始化的multimodal diffusion generator与前向Gaussian Query Decoder串联。生成器预测RGB/depth/flow，decoder通过depth初始化、flow跟踪、多视图时序cross-attention与迭代坐标修正输出动态Gaussian；渲染高维appearance features后由UNet解成RGB。实验仅在nuScenes，场景重建使用四帧、三个前向视图窗口；完整系统仍包含迭代diffusion生成，feedforward仅指重建阶段。",
+    "methodZh": "输入多摄像头reference、road map、未来3D boxes、ego trajectory和camera geometry，用multimodal video diffusion联合生成RGB/depth/dynamic flow。 从有效metric depth反投影初始化稀疏3D queries，加入RGB、ray与Plücker信息。 用generated dynamic flow跟踪query到邻帧，再结合目标帧depth建立共同坐标中的时间anchors。 投影queries到有效camera/time observations，cross-attention聚合decoder特征，并两轮更新query位置、重新采样。 预测Gaussian offset、scale、rotation、opacity、appearance feature与lifespan；按插值motion anchors渲染，再由轻量UNet得到RGB。",
+    "methodFlow": [
+      "输入多摄像头reference、road map、未来3D boxes、ego trajectory和camera geometry，用multimodal video diffusion联合生成RGB/depth/dynamic flow。",
+      "从有效metric depth反投影初始化稀疏3D queries，加入RGB、ray与Plücker信息。",
+      "用generated dynamic flow跟踪query到邻帧，再结合目标帧depth建立共同坐标中的时间anchors。",
+      "投影queries到有效camera/time observations，cross-attention聚合decoder特征，并两轮更新query位置、重新采样。",
+      "预测Gaussian offset、scale、rotation、opacity、appearance feature与lifespan；按插值motion anchors渲染，再由轻量UNet得到RGB。"
+    ],
+    "experimentsZh": "仅nuScenes，700训练/150验证场景；6摄像头、17帧、12Hz、424×800的future generation。重建取frames0–15分成四个四帧窗口，每窗仅三个前向摄像头，frame16不在重建范围。训练用8×H20，decoder训练4天；主配置960K Gaussian queries。 作者报告future RGB生成FID6.38、FVD12.43，对比DiST-T6.83/22.67；仅在nuScenes给定控制信号协议下。 (Table I, PDF p. 5) 作者报告feedforward重建PSNR29.91、LPIPS0.101、SSIM0.884；PSNR等以各自generated RGB为reference，rendered FID/FVD为12.85/32.01。 (Table II, PDF p. 6) 作者报告横移1m时FID38.38/FVD281.27；横移4m时FID101.23/FVD1025.44，后者不及DiST-T+DGGT的956.98。 (Table III, PDF p. 6) 作者报告960K queries对应训练peak memory92GB和每sample解码1.29s；1200K在单H20上OOM。这不是包含diffusion的端到端耗时。 (Table VI, PDF p. 8) RGB-first baselines使用相同finetuned DGGT，但Drive2Gauss输入多出depth/flow且decoder不同，因此Table II是完整pipeline而非公平隔离decoder。WorldSplat等也在view-fixing中比较，部分用真实观测而本法用生成未来；下游SPVC结果是组合系统。缺少跨域数据、真实3D几何ground truth与一致输入的全套decoder替换对比。 固定generated observations、query预算和训练schedule，分别去flow、cross-attention、iterative refinement；支持decoder组成有效。query数上升带来质量/显存代价，未单独量化generation监督或真实几何质量。",
+    "insightZh": "相对WorldSplat的pixel-aligned解码和PointForward的外部depth/scene graph，主要贡献是让jointly generated depth与flow分担query初始化和时间关联，再把generated observations转成显式动态表示。各模块沿用既有VAE、STDiT、Gaussian rasterization与query设计；不是无需条件的通用4D foundation model，也不是一次前向完成整个视频生成。",
+    "evidenceZh": "联合生成RGB、metric depth和masked dynamic optical flow，为显式4D解码分配不同几何/外观角色。 (Fig. 2, Sec. III-A, PDF pp. 2–3) / Depth初始化query，flow建立跨帧anchors，cross-attention与位置refinement构成Gaussian decoder。 (Sec. III-B, Eqs. (5)–(11), Fig. 3, PDF pp. 3–4) / 29.91dB/0.884 SSIM是对自身生成RGB观测的保真度，不能替代真实几何精度。 (Table II and Sec. IV-C, PDF pp. 5–6) / 大视角偏移仍有明显残余质量退化，且4m的FVD不及DiST-T+DGGT。 (Table III and Sec. IV-D, PDF p. 6) / 同一generated observations下的decoder消融支持flow和位置refinement的作用。 (Table V and Sec. IV-F, PDF p. 7)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对3D generation的明确迁移是用联合生成的depth/flow让视频观测具备可重渲染的显式4D表示，而非驾驶感知本身；可参考多模态分工和flow-guided query设计，尚无LEGO/CAD或开放域资产实证。",
+    "caveatZh": "Sec.IV-C(p.6)明确不同pipeline的generated observations与decoder都不同，不能分解归因生成器和解码器。 / Sec.IV-D(p.6)承认4m shift FVD较差，FID/FVD衡量视觉分布而非逐点几何。 / Sec.IV-F/Table VI(p.8)指出训练显存是主要约束，1200K queries OOM。 / 没有单独limitations节；单nuScenes、短四帧context、重条件控制和前向三摄像头配置限制对通用3D/4D资产的外推。 / PSNR是拟合自己generated RGB，不是对真实世界的重建；没有真实depth/flow accuracy、collision或物理一致性证明。 / depth/flow监督依赖LiDAR、stereo、语义mask和预训练completion；不宜称完全从RGB自监督恢复真实几何。 / 显式Gaussian并不直接等于editable mesh/CAD；appearance UNet与大query预算使换域和资产再编辑仍需额外验证。 / PDF无完整端到端生成耗时；1.29秒只限重建配置，不能表述为整个4D生成成本。",
+    "sourceNote": "Exact version 2610.26585v1 (11 pages), PDF SHA-256 dbad78c1412fc208de26cb37273a5fcd282d869c7c9c54d3388b5fd4e10d873c. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: available. 已实际读取公开仓库，确认src/drive2gauss、configs、train/inference scripts、checkpoint/data说明存在；未下载权重或复现性能。项目页通过curl访问成功，web reader对该页报不可访问。"
+  },
+  "slug": "drive2gauss-feedforward-4d-gaussian-reconstruction-from-multimodal-generative-driving-videos-2610-26585",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation",
+    "video-generation"
+  ]
+}

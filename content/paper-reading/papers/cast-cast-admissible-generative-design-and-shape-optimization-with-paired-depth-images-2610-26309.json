@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2610.26309",
+  "title": "CAST: Cast-Admissible Generative Design and Shape Optimization with Paired Depth Images",
+  "authors": [
+    "Jihoon Kim",
+    "Yongmin Kwon",
+    "Namwoo Kang"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.26309"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "primaryTopicId": "fabrication",
+  "keywords": [
+    "CAST",
+    "paired depth",
+    "cast admissibility",
+    "FEA",
+    "generative fabrication"
+  ],
+  "abstract": "Deep generative design can produce complex geometries, but unconstrained representations may create undercuts that prevent release from a two-part mold. We present CAST, which reformulates three-dimensional shape generation under a selected mold-opening constraint as a two-dimensional image generation problem using paired top and bottom depth images. Each valid depth pair defines one material interval along a selected mold-opening direction, so reconstructions exclude undercuts in that direction by construction. Diffusion models generate candidate shapes in this representation, and a finite element analysis (FEA) guided optimizer refines the same two boundaries. We evaluate diffusion-based generation with limited training data comprising 211 SimJEB bracket designs. On SimJEB brackets, FEA-guided refinement with a volume penalty reduced compliance in 193 of 200 generated candidates. The median reduction across all candidates was 36.8 percent in the optimization FEA model. Reconstruction of existing brackets revealed a mass--stiffness trade-off: filling occluded regions increased material volume and reduced displacement under the evaluated loads. Paired depth images thus connect generative exploration and structural refinement in a shared design space that preserves the selected pull-direction restriction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.26309v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.26309v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "CAST 把选定开模方向上的可脱模约束编码成上下两张 depth maps：每条射线只允许一个材料区间，再以 diffusion 生成和 FEA 更新边界。这个“约束进入表示”的思路值得精读；它只保证该方向无 undercut，不保证完整铸造可行性。作者报告193/200候选的优化模型 compliance 下降，中位36.8%，但非等质量比较且导出实体未独立重算。",
+    "motivationZh": "问题是普通生成几何可能有阻碍two-part mold分离的undercuts，事后修补又改变力学行为。CAST以两张相向orthographic depth maps定义单材料区间，将三维受限生成变成二维图像生成；pixel/latent diffusion输出该表示后，固定in-plane footprint的cubic B-spline FFD沿开模方向更新两条边界，通过FEA sensitivities与volume/control penalties改善结构。实验包括一个SimJEB bracket家族的重建成本、三seed生成分析，以及200个latent生成候选的统一配置优化；这是带明确几何边界的早期design-space方法，没有实际铸造或完整process feasibility证明。",
+    "methodZh": "选择pull direction并从注册mesh提取top/bottom orthographic depth maps 把有效depth pair解释为每条射线唯一的材料区间，以marching cubes构造solid 训练pixel或latent diffusion生成新的paired depths 以固定in-plane footprint的B-spline上下边界作为优化变量 通过smoothed-density FEA的compliance gradient与volume/control penalties更新并保存最低compliance状态 导出mesh并单独恢复接口；transverse bore需要side action或secondary machining",
+    "methodFlow": [
+      "选择pull direction并从注册mesh提取top/bottom orthographic depth maps",
+      "把有效depth pair解释为每条射线唯一的材料区间，以marching cubes构造solid",
+      "训练pixel或latent diffusion生成新的paired depths",
+      "以固定in-plane footprint的B-spline上下边界作为优化变量",
+      "通过smoothed-density FEA的compliance gradient与volume/control penalties更新并保存最低compliance状态",
+      "导出mesh并单独恢复接口；transverse bore需要side action或secondary machining"
+    ],
+    "experimentsZh": "SimJEB固定264设计cohort，211/26/27 train/validation/held-out；held-out未用于生成比较。重建230对shape-IoU匹配和150对identifier-verified核查，common 2.5-mm voxel FEA。pixel/latent diffusion各三seed、每seed256样本；200个latent候选用固定60步优化配置。 作者报告193/200生成候选在优化FEA内降低compliance，全体中位下降36.8%，其余7个保留初态。 (Sec. 4.3, p. 9; Supp. Table 4, PDF p. 22) 作者报告重建体积中位增加7.8%，vertical/horizontal/diagonal/torsion最大位移中位变化分别为−16.8%、−18.3%、−13.6%、−24.4%。 (Sec. 4.1, Table 1, p. 8) 作者报告latent三seed的raw crossing比例为0.450%、0.326%、0.313%；未获得“所有原始生成结果天然有效”的实验结论。 (Supp. Table 5, PDF p. 22) 包含pixel-vs-latent、重建前后结构与优化前后比较；pixel/latent输入分辨率、clipping及autoencoder成本不同，不能视作纯encoding ablation。未比较matched 3D generators、classical topology optimization或alternative initialization，未建立更省数据的实证。 作者在3个候选上去掉FEA gradient后无compliance改善，并测试control lattice、volume penalty和单独y/z载荷；另3个候选做volume-target sweep。支持gradient作用与有限参数稳定性，不能证明完整Pareto frontier、simultaneous-load鲁棒性或所有家族泛化。",
+    "insightZh": "核心新意是将“沿选定方向单interval”的受限几何表示同时用于generation与physics-guided refinement，而非发明新diffusion backbone。与普通multi-view depth生成相比，填充两条边界之间的区间使无undercut成为表示属性；其代价是不能保留内腔/遮挡凹陷，且优化不能改变初始平面布局。与经典casting-constrained topology optimization的全面比较尚缺。",
+    "evidenceZh": "无undercut保证依赖有效depth ordering与单interval重建，只对指定pull direction成立。 (Sec. 3.1, Eq. (1), p. 5; Sec. 3.3, pp. 5–6) / 生成与FEA refinement共享上下depth边界，优化只沿z移动而保持in-plane footprint。 (Sec. 3.6, Eqs. (2)–(8), pp. 6–7; Fig. 3, p. 3) / 作者报告200候选中193个compliance改善，中位36.8%，IQR 23.7–50.8%。 (Sec. 4.3, p. 9; Supp. Table 4, PDF p. 22 (S5)) / 作者报告重建230对brackets后common-voxel-grid材料体积中位增加7.8%，四种载荷最大位移中位下降13.6–24.4%。 (Sec. 4.1 and Table 1, p. 8) / positive draft投影未用于报告实验；壁厚、填充凝固和durability仍需额外工艺评估。 (Sec. 3.4.1, p. 6; Sec. 5.2–5.3, pp. 12–13; Sec. S5.3, PDF p. 23) / 生成仍存在raw crossings与training-set clustering；latent/pixel比较没有统一3D生成器基线。 (Secs. S3.1 and S5.2, PDF pp. 20, 22; Supp. Table 5, PDF p. 22)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中Fabrication：manufacturing constraint进入几何表示，并贯穿生成和优化；对constraint-native generative representation具有清晰方法参考价值。与LEGO/Embroidery的迁移仅是研究启发，论文未在这些对象上验证。",
+    "caveatZh": "单bracket家族且少于300个filtered designs，latent runs共享autoencoder并出现训练样本附近聚集；数据效率相对3D生成仍未证实（Sec. 5.3, p.13）。 / smoothed-density optimization FEA的sharp-boundary导出实体未独立重算；三候选单因素比较和单方向载荷不足以覆盖复杂载荷（Sec.5.3, p.13）。 / 无undercut不包含positive draft、wall/rib rules、tolerances、mold filling/solidification或durability；transverse holes需要额外工艺（Secs.5.2–5.3, pp.12–13）。 / 单interval表达不了内部cavities或开模方向遮挡结构，in-plane grid限制最小特征（Sec.5.3,p.13）。 / 不得将36.8%称为等质量刚度优势；volume penalty不是constant volume，且export smoothing/interface restoration后未重算。 / 补充S2说明117个排除mesh的可执行筛选规则未找回，原reconstruction IDs靠IoU匹配；150对ID一致子集提供核查，但cohort可复现性仍受限。 / 两sigmoid density在零厚度处可能残留1/4密度，其对compliance影响未用sharp-boundary分析单独量化（S4.2, PDF p.21）。 / 没有public code入口；数据支持“upon request”，不可当作完整可复现artifact已发布。",
+    "sourceNote": "Exact version 2610.26309v1 (23 pages), PDF SHA-256 c9261b932e2cf3e2a0e4840c1dfa5de303e7ab26c3c2dc77269f81cfa22b2950. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: not-found. 全文仅给SimJEB原始数据与corresponding-author-on-request声明（p.13）；S2称retained-ID list将随public artifacts发布，但未给本方法公开代码URL。"
+  },
+  "slug": "cast-cast-admissible-generative-design-and-shape-optimization-with-paired-depth-images-2610-26309",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "fabrication",
+    "3d-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "fabricatable-object"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "method": [
+      "diffusion",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "fabrication-aware"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.26861",
+  "title": "Can It Actually Work? Synthesizing Functional CAD Mechanisms",
+  "authors": [
+    "Wenqian Zhang",
+    "Yangyi Huang",
+    "Zigeng Xu",
+    "Weiyang Liu",
+    "Zhen Liu"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.26861"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "FunCAD-Harness",
+    "functional CAD",
+    "physics feedback",
+    "test binding",
+    "source geometry audit"
+  ],
+  "abstract": "While LLM agents can generate visually plausible CAD assemblies, these designs often fail to fulfill their intended physical functions. We study functional CAD design, a setting where agents interpret underspecified requests to construct and iteratively revise mechanisms that satisfy functional requirements in physical simulation. Verifying these requirements is nontrivial: different candidate mechanisms may realize the same function through entirely different components, controls, and operating sequences. To bridge this gap, we propose FunCAD-Harness, a framework that translates abstract requirements into candidate-specific physical tests and uses simulation feedback to guide design revisions. To systematically evaluate this capability, we introduce FunCADBench, a benchmark spanning 46 mechanism families with interdependent and multi-step operations. Experiments across frontier LLM agents show that FunCAD-Harness exposes subtle mechanical failures invisible to visual inspection, substantially improving functional success rates over standard simulation-augmented baselines. Ultimately, our work marks a step toward CAD agents capable of translating human intent into working mechanisms.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.26861v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.26861v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://thegenlab.ai/funcad/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "FunCAD-Harness把“看起来像机构”升级为“固定功能要求下能完整运行”：constructor生成CAD，独立agent将冻结测试模板绑定到该设计，仿真与源几何审计返回诊断证据再驱动修正。作者报告46类任务中Astra从仅给simulation tools的8项提升到22项，Grok从10到19；成功只适用于声明物理/负载与采样审计条件，不是制造后必然可靠。",
+    "motivationZh": "论文研究欠明确自然语言请求到功能性CAD机制的闭环设计，提出46个mechanism families的FunCADBench与FunCAD-Harness。注册任务要求和抽象test templates固定，candidate-specific binding识别实际输入、载荷与观测，constructor提供几何、连接和物理假设；Chrono/Bullet执行刚体动力学，必要时使用显式声明的等效gear/contact模型，并在保存姿态上审计原CAD几何。反馈含失败要求、测量值、阈值与几何/执行问题，修订后所有功能重测，不能合并不同revision的部分pass。实物只展示选定3D打印机构，核心证据仍为仿真完成率与轨迹分析。",
+    "methodZh": "请求分解为功能要求与固定约束，注册任务保持同一抽象test template Constructor生成可重建CAD source/STEP assembly、连接、操作说明与声明物理假设 独立test-binding agent将模板映射到actuation、loads和observations，记录参数来源/允许调整 Chrono/Bullet执行物理测试及源几何审计，程序从测量信号判断各项条件 返回diagnostics；constructor修订后重新绑定并重跑完整功能集 独立最终评估检验同一交付revision在最终声明条件下的whole-task completion",
+    "methodFlow": [
+      "请求分解为功能要求与固定约束，注册任务保持同一抽象test template",
+      "Constructor生成可重建CAD source/STEP assembly、连接、操作说明与声明物理假设",
+      "独立test-binding agent将模板映射到actuation、loads和observations，记录参数来源/允许调整",
+      "Chrono/Bullet执行物理测试及源几何审计，程序从测量信号判断各项条件",
+      "返回diagnostics；constructor修订后重新绑定并重跑完整功能集",
+      "独立最终评估检验同一交付revision在最终声明条件下的whole-task completion"
+    ],
+    "experimentsZh": "46机制families，单次attempt含构造/测试/多轮修订，三小时active budget；Astra、Kimi K3、Fable5.1、Grok4.6各自wrapper，统一Astra medium做独立final binding/evaluation，context allowance 1M。另有Grok最多8次history、binary反馈、simulation tools、requirements-only、constructor no-vision及无共享records的重复尝试。 作者报告simulation tools到full harness：Astra从8/46到22/46，Grok从10/46到19/46；requirements-only分别1/46和3/46。 (Table2, PDF p.8) 作者报告单次full-harness完成数Astra22、Kimi14、Fable32、Grok19，分母46，四模型并集34；Grok≤8次共享history为36/46。 (Fig.6, PDF p.7; Table8, PDF p.32) 作者报告去掉constructor视觉后Astra20/46、Grok18/46，保留视觉为22/46、19/46；binding/final evaluator仍有视觉。 (Table2, PDF p.8; App.F.5/Table18, PDF pp.40–42) 作者报告Grok八次独立、不共享records的联合完成24/46、129/368个passing runs；共享history的≤8次设置36/46。 (App.F.6/Table19, PDF pp.42–44) 作者报告Astra binary-feedback为0/46，其中43次partial delivery、3次evidence required；不能描述为46个机构经完整测试皆失败。 (Table17, PDF p.39) 同任务比较requirements-only、agent自主simulation工具、full workflow的binary与详细diagnostics，各交付模型独立最终评估。post-hoc adaptation不完成也记未建立whole-task completion，因此完成率同时反映design、verification与stopping；不同构造模型wrapper并非同一实现。 反馈、测试组织与constructor视觉有针对性对照；binary和simulation tools改变多个支持因素，不能当单轴逐级因果链。No-vision每task一次且binding/evaluator保留视觉，只支持该harness下程序/数值证据足以产生大量成功；附录无共享history对照分离额外采样与记录复用，但仍有run-to-run variation。",
+    "insightZh": "重点是保持实现方式开放、功能要求固定的candidate-specific physical test binding与可诊断修订闭环，并非只加simulator或CAD benchmark。相较agent自选测试，harness持续保留多功能及重复操作要求，区分功能、几何与执行证据；等效模型和source-geometry audit是工程可执行性的关键设计。",
+    "evidenceZh": "注册任务要求/模板固定，但测试输入、loads与observable states依据实际CAD候选绑定。 (Sec.3.3, PDF p.4; Sec.4.1–4.3/Fig.5, PDF p.6) / 仿真允许声明等效机械模型；geometry audit只覆盖保存的采样姿态。 (Sec.3.4, PDF p.5; App.D.2–D.3, PDF pp.29–30) / 作者报告full harness提升whole-task完成数，binary反馈较低但其中包含未完成评估。 (Table2, PDF p.8; App.F.1/F.4, PDF pp.36,39) / 去掉constructor视觉后仍有大量成功，不能据此断言所有视觉能力对机械设计无用。 (Table2, PDF p.8; App.F.5, PDF pp.40–42) / 固定要求、独立测试绑定、修改后全量重验可启发受约束设计agent，但本文未测试LEGO或Embroidery。 (Sec.4.3, PDF p.6; Sec.6, PDF pp.9–11)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接对应Visual Design Agents与可执行CAD/3D generation的设计—验证—修订机制；固定要求、独立绑定和修改后全量重验对受约束几何设计有研究价值。LEGO装配或制造迁移需另写目标物理/连通约束，本文未实测。",
+    "caveatZh": "Contact/friction近似、tolerance、装配错位和material variation影响实际滑动/啮合/卡死；实物参数校准与范围鲁棒性测试待做（Sec.6, PDF pp.9–10）。 / 功能测试可能遗漏loads、initial states及operation sequences，仿真精度不自动保证coverage（PDF p.10）。 / geometry audit结论只适用于采样姿态与声明范围（App.D.3, PDF pp.29–30）。 / Partial delivery、post-hoc adaptation不完成与缺测量不证明某个机械缺陷（App.C.5/F.1/F.4, PDF pp.28,36,39）。 / 允许调整task授权的operating/performance参数，成功依赖最终条件；并非所有候选在完全相同固定载荷/速度下通过，更不是manufacturability certification。 / 最终test binding仍由LLM安排，程序判定不消除测试设计偏差；binding正确性与物理参数未获得独立全量标注。 / 实物选例照片/视频不是46任务整体sim-to-real、耐久或材料鲁棒性证据。 / 原文tool-use样本说明存在41/46/14任务口径差异，本摘要不将runtime比例作为核心定量证据。 / 公开repo有harness/free-creation实现，但README明确46类FunCADBench、模板与results不在此次release，不能宣称完整benchmark开源。",
+    "sourceNote": "Exact version 2610.26861v1 (45 pages), PDF SHA-256 9492b9d46ed7d9c1f20c89cd23804903a4ae3a7abe4b3730947a3bf76cccdcd6. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: available. PDF p.1原印入口实际链接https://github.com/thegenlab/fun-CAD-harness；API确认public、MIT，tree共701个实际文件含Python harness/runtime。README明确未发布46类FunCADBench模板/结果，Code.url保留PDF原印入口。"
+  },
+  "slug": "can-it-actually-work-synthesizing-functional-cad-mechanisms-2610-26861",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2610.26189",
+  "title": "Wan-Alpha++: Animating a Single RGBA Asset into Controllable Transparent Video Effects",
+  "authors": [
+    "Haotian Dong",
+    "Xin Wang",
+    "Wenjing Wang",
+    "Chen Li",
+    "Jing Lyu",
+    "Yan Tina Luximon",
+    "Ping Li",
+    "Wanchao Su",
+    "Ke Xu",
+    "Di Lin"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.26189"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Wan-Alpha++",
+    "RGBA video",
+    "temporal phase reparameterization",
+    "transparent effects"
+  ],
+  "abstract": "RGBA video generation is essential for creating compositable visual assets in filmmaking, game development, and digital content production. However, generating high-quality RGB appearance alongside temporally coherent transparency remains a significant challenge. Existing text-to-RGBA video methods often entangle RGB and alpha distributions and offer limited control over the precise appearance of a target asset. In addition, incorporating image conditioning typically suffers from the emergence-disappearance effects, which fail existing first-frame or first-and-last-frame conditions due to their fully transparent boundary frames. To address these issues, we present Wan-Alpha++, a unified framework that brings controllable RGBA video generation to both text- and image-to-video diffusion backbones through a shared RGBA latent space, extending our conference version Wan-Alpha from the text-conditioned setting to image-conditioned generation with an interior reference frame. Our method first learns shiftable RGB-alpha distributions while preserving the pretrained RGB prior. Specifically, we introduce a transparency-aware bidirectional diffusion objective to produce distinguishable RGBA latent representations, and a transparency-guided mean sampler that shifts the noise distribution to improve transparency generation and enable spatial controllability. Building upon this RGBA generation prior, we introduce temporal phase reparameterization for image-conditioned effect generation. By cyclically transforming a zero-positive-zero alpha pattern into a positive-zero-positive pattern, it relocates visible content to both temporal boundaries, facilitating effective appearance conditioning with limited RGBA data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.26189v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.26189v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "Wan-Alpha++ 从一张RGBA素材生成可合成的透明显隐动画：先分离RGB/alpha表示，再把“透明→可见→透明”的时间相位旋转为可沿用首尾帧条件的序列，最后用透明状态梯度指导并旋转回来。作者报告effect任务DINO-I从0.6679到0.9227；适合关注layered asset workflow，但只验证小规模素材与单段显隐，image-conditioned推理仍有显著guidance成本。",
+    "motivationZh": "现有首帧/首尾帧I2V要求边界含可见主体，而透明特效常在首尾完全消失；post-hoc matting又易丢失半透明内容。Wan-Alpha++沿用Wan-Alpha的共享RGBA latent与transparency-guided noise mean，将可见中间帧循环移到首尾以复用pretrained I2V条件接口；推理时同一RGBA输入约束两个端点，对内部透明区间执行归一化gradient guidance，再逆时间旋转输出。实验既含text-to-RGBA，也含normal/effect image-to-RGBA；主要直接用途是可合成视觉素材，非SVG或vector结构生成。",
+    "methodZh": "将RGB和alpha分别编码，merge成共享RGBA latent并用rendering/TABD目标训练 由alpha support拟合Gaussian ellipse，mean-shifted noise提供粗空间透明度先验 将zero-positive-zero视频循环旋转为positive-zero-positive并fine-tune首尾条件I2V 推理时同一RGBA asset放在首尾，指定内部invisible interval 对clean latent的透明目标做normalized gradient guidance并re-noise 逆相位旋转得到保留外观且从透明出现、再消失的RGBA video",
+    "methodFlow": [
+      "将RGB和alpha分别编码，merge成共享RGBA latent并用rendering/TABD目标训练",
+      "由alpha support拟合Gaussian ellipse，mean-shifted noise提供粗空间透明度先验",
+      "将zero-positive-zero视频循环旋转为positive-zero-positive并fine-tune首尾条件I2V",
+      "推理时同一RGBA asset放在首尾，指定内部invisible interval",
+      "对clean latent的透明目标做normalized gradient guidance并re-noise",
+      "逆相位旋转得到保留外观且从透明出现、再消失的RGBA video"
+    ],
+    "experimentsZh": "RGBA VAE训练77,237 clips/4,066 validation；T2V/I2V初始适配采用精选429素材，另196段emergence-disappearance effect videos做phase适配。以Wan2.1 T2V/I2V 14B为backbone，每个T2V和I2V设置评60个视频，作者称训练测试无同source asset/重叠clip；40名参与者ranking。 作者报告effect I2RGBA的DINO-I 0.9227、CLIP-I 0.9368，baseline Wan2.1-FLF2V+MatAnyone分别0.6679、0.7969。 (Table4,p.14) 作者报告normal I2RGBA的DINO-I 0.9066 vs 0.9033、CLIP-I 0.9445 vs 0.9089；normal与effect不能混为同一增幅。 (Table4,p.14) 作者报告effect用户temporal-effect ranking为1.12 vs baseline1.88、overall为1.16 vs1.84，越低越好。 (Table5,p.14) 作者报告rotation only DINO-I0.9136、rotation+guidance0.9227，temporal-effect rank由2.09降至1.12。 (Table6,p.16) T2V比较LayerFlow、LayerDiffuse+AnimateDiff、open/closed TransPixeler及Wan+MatAnyone；image-conditioned因缺少直接RGBA方法采用同Wan I2V/FLF2V+MatAnyone两阶段baseline。白背景composite下的RGB评估不能完全衡量alpha；baseline显隐/初始化限制也使大幅effect收益不能外推为所有I2V质量优势。 RGBA representation用rendering、TABD、mean sampler的逐项消融；新增I2V部分分离phase rotation与guidance，并扫步长和guidance步数。Table7显示过强/过久guidance损伤细节；缺少丰富multi-stage visibility、复杂多asset interaction和大规模分布外测试。",
+    "insightZh": "相对原conference Wan-Alpha，新增重点是data-efficient image conditioning：借助visibility-aware phase rotation将难学的interior reference转换为已有boundary conditioning，并用低复杂度transparent-state guidance决定消失区间。底层RGBA VAE/TABD和mean sampler来自此前版本；不能把全部T2V能力当本次独有突破。",
+    "evidenceZh": "RGBA VAE用独立RGB/alpha编码、merge与decoder LoRA，并以signed bidirectional loss保留opaque RGB先验而移动非opaque latents。 (Sec.3.2, Eqs.(1)–(11), pp.4–5; Fig.1,p.5) / temporal rotation把可见interior frames移到首尾，保留motion与alpha演变而复用预训练FLF2V接口。 (Sec.3.3.2, Eqs.(14)–(18), p.6; Fig.2,p.7) / transparent-state guidance更新用户指定invisible interval，再经inverse rotation复原特效。 (Secs.3.3.4–3.3.5, Eqs.(22)–(29), pp.6–7; Fig.4,p.8) / 作者报告effect任务reference fidelity与normal RGBA质量改善。 (Table4,p.14) / 作者报告去除phase rotation和guidance后DINO-I为0.6315，加入rotation为0.9136，二者齐全为0.9227。 (Table6,p.16) / I2V evaluation为81帧480×832、40 sampling steps，其中前32步各2–3轮guidance。 (Sec.4.1.1,p.9; Table7,p.16)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "其RGB-alpha disentanglement、可控透明边界和可直接composite的asset输出，对layered 2D visual creation有具体迁移价值；不是structured vector/SVG生成证据。",
+    "caveatZh": "Conclusion把更复杂multi-stage transparency events和减少gradient-guidance额外推理成本列为未来方向（p.16）。 / Sec.4.3明确过大guidance step或全40步指导会损伤visible-frame细节（pp.14–16,Table7）。 / Spatial ellipse仅约束coarse foreground位置和extent，保留fine details自由度，不是精确几何控制（Sec.4.2,pp.11–12）。 / 无显式独立Limitations章节；p.16 future work及p.14–16超参数边界是作者陈述，其他局限为审阅者推断。 / 每设置60视频、196 effect训练片段；尚不足以支持任意长视频、多次显隐、跨asset interaction或生产workflow稳定性。 / DINO/CLIP/aesthetic只在alpha support均值>0.5的visible frames上评，且RGB composited-white评估对真实多背景alpha质量覆盖有限。 / 40步I2V中额外gradient/VAE decode成本未给完整wall-clock对照；不能将T2V四步采样称作本新增任务实时。 / 论文页眉为TPAMI模板不单独证明录用；本轮按arXiv exact v1证据记录。",
+    "sourceNote": "Exact version 2610.26189v1 (17 pages), PDF SHA-256 874baa0773f89472cf397f45514e992f81e101ef2c3ee83804ed0fc16b585068. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: not-found. 检查全文及链接仅找到参考文献资源，没有本Wan-Alpha++公开代码入口；不把Wan backbone或原conference项目当本扩展代码。"
+  },
+  "slug": "wan-alpha-animating-a-single-rgba-asset-into-controllable-transparent-video-effects-2610-26189",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "video-generation",
+    "2d-design"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "layered-2d",
+      "raster-image"
+    ],
+    "conditioning": [
+      "single-image",
+      "text"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "controllable",
+      "asset-ready"
+    ]
+  }
+}

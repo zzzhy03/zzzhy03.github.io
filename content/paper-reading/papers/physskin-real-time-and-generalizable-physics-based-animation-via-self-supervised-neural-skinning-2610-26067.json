@@ -1,0 +1,94 @@
+{
+  "id": "arxiv:2610.26067",
+  "title": "PhysSkin++: Real-Time and Generalizable Physics-Based Animation via Self-Supervised Neural Skinning",
+  "authors": [
+    "Yuanhang Lei",
+    "Baofei Liu",
+    "Xingxuan Li",
+    "Tao Cheng",
+    "Zixuan Wang",
+    "Boming Zhao",
+    "Yujun Shen",
+    "Siyuan Huang",
+    "Ruizhen Hu",
+    "Peter Yichen Chen",
+    "Hujun Bao",
+    "Zhaopeng Cui"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.26067"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "PhysSkin++",
+    "neural skinning fields",
+    "reduced dynamics",
+    "3DGS binding"
+  ],
+  "abstract": "Generalizing real-time physics-based animation across diverse 3D shapes and spatial discretizations remains challenging. In this paper, we introduce PhysSkin++, a physics-informed framework that learns continuous neural skinning fields from static geometries to construct compact deformation subspaces. Specifically, we propose a Neural Skinning Fields Autoencoder that predicts shape-dependent deformation subspaces without per-object network training. To learn these subspaces without simulation trajectories, we develop a Physics-Informed Self-Supervised Learning strategy that combines skinning-field normalization with conflict-aware gradient correction, stabilizing joint optimization under physical and orthogonality constraints. The learned representation supports efficient reduced dynamics with user control and contact interactions, together with direct animation binding to meshes, point clouds, and 3D Gaussians. For prescribed rig animation, we further introduce a self-supervised complementarity objective to learn complementary elastic responses without enforcing complementarity constraints at runtime. Experiments demonstrate cross-shape generalization of the learned skinning fields, real-time reduced simulation, and applications to controllable, collision-aware, and rig-complementary animation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.26067v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.26067v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "PhysSkin++ 将已有静态形状转换成可控、可绑定mesh/point/3DGS的continuous skinning fields：几何encoder与cross-attention decoder预测变形子空间，再用reduced dynamics生成弹性运动和rig补充形变。值得略读其animation-ready资产表示；作者报告5种对象单步12–14ms，但主要量化指标是basis条件数/正交性，尚不是对真实物理精度的证明。",
+    "motivationZh": "传统reduced simulation或neural skinning常需每对象训练，supervised rigging又依赖昂贵注释。PhysSkin++以冻结Michelangelo shape encoder和query-based neural field decoder从静态geometry预测skin weights，在potential/smoothness/orthogonality约束下自监督，配合normalization与ConFIG稳定训练。它支持boundary/interactive control、采样点contact与3DGS局部affine binding，并为已有artist rig加入训练期rig-space complementarity loss。工作创建的是给定资产的变形表示及动态编辑，不生成新object geometry或语义动作程序。",
+    "methodZh": "从给定mesh/geometry采样surface与volumetric cubature points 冻结shape encoder产生latents，learnable handle queries与spatial queries经cross-attention解码continuous skinning fields 以potential/smoothness/orthogonality、自适应normalization与conflict-aware gradients自监督训练 可选结合给定rig Jacobian加入complementarity loss，学习补充elastic subspace 通过implicit reduced dynamics施加control/contact并更新handle transforms 将同一continuous deformation map绑定mesh/point/3DGS centers与covariances生成动态资产",
+    "methodFlow": [
+      "从给定mesh/geometry采样surface与volumetric cubature points",
+      "冻结shape encoder产生latents，learnable handle queries与spatial queries经cross-attention解码continuous skinning fields",
+      "以potential/smoothness/orthogonality、自适应normalization与conflict-aware gradients自监督训练",
+      "可选结合给定rig Jacobian加入complementarity loss，学习补充elastic subspace",
+      "通过implicit reduced dynamics施加control/contact并更新handle transforms",
+      "将同一continuous deformation map绑定mesh/point/3DGS centers与covariances生成动态资产"
+    ],
+    "experimentsZh": "RigNet与ShapeNet train/test，使用静态meshes；shape encoder预训练SDF并冻结，输入4096 surface points，训练每batch采1000 cubature points与1024 reduced vectors；4×RTX4090。ShapeSplat用于3DGS动画定性展示，RigNet rigs与Mixamo retargeting用于rig-complementary动画。 作者报告ShapeNet Ωorth×10^-2为0.0098（Simplicits0.2621），log-condition为1.0460（1.5205），spectrum entropy0.9997（0.9941）。 (Table II,p.11) 作者报告airplane/bag/camera/chair/pillow单步成本分别12.26/13.39/12.52/12.48/13.74ms；FEM为79.83–3170.93ms，MPM为141.83–251.81ms。 (Table IV,p.13) 作者报告去除ConFIG时RigNet log-condition由1.0453变为11.8595，去除normalization为8.5492；支持稳定优化组件作用。 (Table III,p.13) 比较Simplicits per-object self-supervised网络及RigNet、M-I-A、Anymate、Puppeteer supervised rigging，全部column-normalized后量basis metrics；GPU FEM/MPM比较每步速度。缺少统一deformation ground-truth误差/energy conservation及contact误差表，rig-complementary与3DGS部分主要为定性。 PISSL去除normalization、ONI、ConFIG、orth/smoothness/potential损失；orth loss移除导致退化，potential去除主要定性。rig complementarity有with/without field对比，但没有完整runtime complementarity残差、运动误差或用户可控性量化。",
+    "insightZh": "基础PhysSkin的跨shape自监督skinning autoencoder在先；++扩展明确包括可控/多对象contact reduced formulation、3DGS center/covariance binding及rig-complementary learning。新价值是将geometry-conditioned deformation basis转为可复用动态资产操作，而非单一simulation吞吐改进；语义rig生成和新geometry synthesis均不是贡献。",
+    "evidenceZh": "单一feed-forward network从geometry预测continuous weights，训练无需simulation trajectories或skinning annotations。 (Secs.III-A–III-C, pp.3–6; Fig.2,p.4) / ++以给定rig Jacobian训练complementary weights，runtime仍输入artist-authored rig trajectory。 (Sec.III-E,Eqs.(17)–(24),pp.8–9; Fig.7,p.10) / 3DGS绑定更新centers和anisotropic covariance，opacity及SH保持rest values。 (Sec.III-F,Eqs.(25)–(28),pp.9–10) / 作者报告RigNet/ShapeNet上的skinning-basis指标优于supervised rigging与Simplicits。 (Tables I–II,p.11) / 作者报告五类对象单步simulation为12.26–13.74ms，同硬件对比GPU FEM/MPM。 (Table IV,p.13) / 本方法以采样点IPC-style barrier处理contact，并保留显式reduced dynamics。 (Sec.III-D,Eqs.(14)–(16),pp.6–8)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接服务已有3D资产的animation-ready表示与dynamic editing，适合3D Generation中可控资产制作方法雷达；Fig.12的deformable Lego是示例，不足以将LEGO列为论文主要研究对象。",
+    "caveatZh": "作者明确当前未纳入complex geometries的semantic priors，未来将用于改进subspace expressiveness（Conclusion,p.15）。 / RigNet/ShapeNet basis正交、条件数和entropy接近其训练目标，不能独立证明逼近full-space physics或所有动作质量。 / 动态编辑依赖给定geometry、材料/energy与外力，rig-complementary部分还需已有rig和trajectory；不是新几何或语义motion生成。 / contact是sampled point-pair IPC-style barrier，不应继承完整mesh IPC的intersection/inversion-free保证。 / 3DGS使用中心处固定weights的局部affine且不更新opacity/SH；光照变化、空间变形梯度与剧烈形变保真度未充分量化。 / 公开项目链接到原CVPR PhysSkin code；尚未确认++新增contact/rig-complementarity/3DGS模块一并发布。",
+    "sourceNote": "Exact version 2610.26067v1 (16 pages), PDF SHA-256 a1bd1d51ad61fcf14aae883a7e58f13afa245b20a16e9996e7e7c7b4046e71fe. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: not-found. PDF p.1印刷project URL https://zju3dv.github.io/PhysSkin_plus/，2026-10-20访问200并经Code按钮找到公开 https://github.com/zju3dv/PhysSkin；README与citation明确原CVPR2026 PhysSkin，未确认++扩展代码，故不把旧版仓库标本exact paper code available。"
+  },
+  "slug": "physskin-real-time-and-generalizable-physics-based-animation-via-self-supervised-neural-skinning-2610-26067",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning",
+      "editing"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "method": [
+      "self-supervised"
+    ],
+    "output-property": [
+      "animation-ready",
+      "controllable",
+      "physically-plausible"
+    ]
+  }
+}

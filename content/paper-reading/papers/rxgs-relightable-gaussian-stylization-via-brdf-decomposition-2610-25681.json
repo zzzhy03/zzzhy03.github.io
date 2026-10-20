@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.25681",
+  "title": "RxGS: Relightable Gaussian Stylization via BRDF Decomposition",
+  "authors": [
+    "Wanrong Hong",
+    "Liu Jiang",
+    "Mukesh Prasad",
+    "Jun Li"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25681"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "RxGS",
+    "BRDF decomposition",
+    "albedo stylization",
+    "relighting",
+    "3D Gaussian"
+  ],
+  "abstract": "Reference-based 3D scene stylization transfers the appearance of a reference image onto a reconstructed 3D scene while preserving scene geometry. Recent methods perform this transfer by optimizing the appearance representation of neural scene models including Neural Radiance Fields (NeRF) and 3D Gaussian Splatting (3DGS). These methods optimize an RGB appearance representation, in which a single per-point colour combines the effects of material reflectance, environment illumination, together with the shading it produces, and the viewing direction. When stylization modifies this combined colour, the illumination effects present during stylization are baked into the stored appearance, so the stylized scene cannot be rendered under different illumination. To address this limitation, we present RxGS, a relightable 3D scene stylization framework built on a Bidirectional Reflectance Distribution Function (BRDF)-aware 3D Gaussian representation. Rather than modifying a per-point RGB colour, RxGS optimizes only the diffuse albedo field recovered by inverse rendering, while leaving roughness, metallicity, surface normals, and the estimated environment lighting unchanged. As a result, the stylized scene keeps all the components a physically-based renderer needs other than the edited albedo, and can therefore still be relit. RxGS optimizes the albedo field using a nearest-neighbour feature matching loss together with a spatial smoothness prior over Gaussian centres. We evaluate the method using a Geometry Consistency Cost (GCC) based on optical-flow warping error. RxGS achieves the lowest GCC on all evaluated NeRF-Synthetic scenes and remains competitive on real-captured scenes, while additionally supporting relightable stylization, which existing reference-based 3D scene stylization methods do not provide.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25681v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25681v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "RxGS 把 reference stylization 放到 GS-IR 分解后的 diffuse albedo 上，只优化 albedo logits，冻结几何、roughness、metallicity、normals 和环境光，因此同一风格化 3DGS 仍能换光渲染。是直接可用的3D外观编辑思路；作者报告合成场景 GCC 更低，但真实 LLFF 上整体落后 StylizedGS，且重照明主要是定性展示。",
+    "motivationZh": "传统RGB外观编辑把材质与原光照混在一起。RxGS先用现成GS-IR得到BRDF-aware Gaussian，再以VGG NNFM style loss和Gaussian-center kNN平滑只调整albedo。主要实验比较合成/真实场景的光流warp一致性，并展示同一表示在旋转或替换环境图下的响应；不生成新几何，也不估计新的材质分解。",
+    "methodZh": "输入带pose的多视图图像与reference style image，用GS-IR重建Gaussian几何、albedo、roughness、metallicity、normal及环境光。 将albedo裁剪后映射到logit参数z，以sigmoid保证反射率范围；冻结其余参数。 在无照明flat-albedo渲染上，用VGG16 conv3 NNFM匹配reference style。 在Gaussian centers的16近邻图上施加空间平滑，优化1000次得到stylized albedo。 将stylized albedo与原几何和BRDF参数重新组合，在新环境图下PBR渲染，无须重新stylization。",
+    "methodFlow": [
+      "输入带pose的多视图图像与reference style image，用GS-IR重建Gaussian几何、albedo、roughness、metallicity、normal及环境光。",
+      "将albedo裁剪后映射到logit参数z，以sigmoid保证反射率范围；冻结其余参数。",
+      "在无照明flat-albedo渲染上，用VGG16 conv3 NNFM匹配reference style。",
+      "在Gaussian centers的16近邻图上施加空间平滑，优化1000次得到stylized albedo。",
+      "将stylized albedo与原几何和BRDF参数重新组合，在新环境图下PBR渲染，无须重新stylization。"
+    ],
+    "experimentsZh": "NeRF-Synthetic八场景、LLFF八场景做GCC对比，三种style取均值；每场景1000次albedo优化；TensorIR的Lego/Hotdog及Mip-NeRF360 Garden/Kitchen/Bicycle用于额外重照明展示。GCC由RAFT估计相邻视图光流后计算可见像素warp误差。 作者报告NeRF-Synthetic Lego GCC为0.0017，对比ARF0.0038、Ref-NPR0.0045；八个合成场景RxGS均最低。 (Table 1, PDF p. 11) 作者报告LLFF Flower GCC为0.0113，对比StylizedGS0.0067、Ref-NPR0.0082；Room为0.0102，对比ARF0.0093。真实场景没有全面领先。 (Table 2, PDF p. 11) 作者报告8场景×2styles的16组中，direct-albedo监督平均style-loss下降32.2%，随机Lambertian照明监督为20.1%；这是优化loss而非用户质量分数。 (Sec. 4.4.1, PDF p. 15) 比较ARF、Ref-NPR和LLFF上的StylizedGS；Ref-NPR的reference由AdaIN处理同style得到。与TANGO只做任务区别讨论，未做同输入的可relight基线量化；未报告系统运行时、用户偏好、物理relighting精度或大规模style覆盖。 唯一明确消融比较flat-albedo与随机照明监督，支持直接albedo域更易优化；未分离smoothness、BRDF固定策略或inverse-rendering质量的影响。",
+    "insightZh": "核心是将reference-image style transfer适配到BRDF-aware Gaussian的albedo-only编辑，而非新的inverse renderer。NNFM沿用ARF，BRDF分解沿用GS-IR；相比TANGO的mesh/text-driven材质编辑，目标是Gaussian/reference-image组合。价值在可编辑、可relight的表示分工，不能泛称首次可重照明3D stylization。",
+    "evidenceZh": "编辑仅更新albedo，冻结几何及其他PBR参数，重照明来自参数仍完整。 (Fig. 2, Secs. 3.1.2–3.2, PDF pp. 6–8) / 风格优化在flat-albedo域进行，并用NNFM加kNN平滑。 (Secs. 3.2.1–3.2.4, Eqs. (6)–(13), PDF pp. 8–10) / 合成GCC领先不代表真实场景领先。 (Tables 1–2, PDF p. 11) / 替换环境图后同一风格表示产生不同照明外观。 (Fig. 6 and Sec. 4.3, PDF p. 14)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接服务3D资产的appearance editing与可重用PBR表示；启发把风格内容与光照解耦，而非将NeRF-Synthetic中的Lego展示误判为LEGO结构研究。",
+    "caveatZh": "Sec.3.1.2(p.7)说明金属BRDF下albedo也影响specular tint，冻结roughness/metallicity不等于所有反射外观不变。 / Sec.4.1(pp.10–11)明确依赖GS-IR恢复的分解，并只在原几何与材质基础上编辑albedo。 / PDF没有独立limitations讨论；可relight只表示表示和renderer支持，不证明分解真实、光照准确或风格物理一致。 / GCC是光流warp误差，可能受平滑和RAFT偏差影响，不是3D几何误差；定性stylization对比主要展示flat-albedo。 / 真实LLFF表现逊于StylizedGS，不能沿用正文“on par”概括为各场景最佳；重照明缺少定量ground truth。 / 没有找到公开code入口；只优化albedo无法改变几何笔触、roughness或metallicity等材质风格。",
+    "sourceNote": "Exact version 2610.25681v1 (20 pages), PDF SHA-256 72b9ffbd204bb5fcd2248ca6db5225bb209b18d6bc9bf4836eb17c2efb3b874b. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "rxgs-relightable-gaussian-stylization-via-brdf-decomposition-2610-25681",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "3d-generation"
+  ]
+}

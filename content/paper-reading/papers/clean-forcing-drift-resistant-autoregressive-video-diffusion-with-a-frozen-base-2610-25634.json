@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.25634",
+  "title": "Clean Forcing: Drift-Resistant Autoregressive Video Diffusion with a Frozen Base",
+  "authors": [
+    "Wenqing Wang",
+    "Joonghyuk Shin",
+    "Jonathan Tremblay",
+    "Chan Hee Song",
+    "Yun Fu"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.25634"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Clean Forcing",
+    "velocity gap",
+    "DAgger",
+    "drift contraction",
+    "LoRA"
+  ],
+  "abstract": "Autoregressive (AR) video diffusion models generate streaming video of arbitrary length by conditioning each new chunk of frames on those already generated. However, they suffer from exposure bias, where a model trained on clean context must continue from its own imperfect outputs, and errors compound until quality collapses within seconds (drift). Existing methods either require cluster-scale base retraining, apply training-free inference corrections with inconsistent results, or train frozen-base correctors for sampling and cache errors. We instead find that drift is largely deterministic and therefore learnable, as holding the noisy state fixed while varying only the history reveals a counterfactual velocity gap that is ~95% systematic across noise seeds. Based on this observation, we introduce Clean Forcing, which trains a 5.9M-parameter LoRA corrector on the frozen base model to regress this gap, with a closed-loop stage that adds DAgger-style aggregation and a drift-contraction objective to expose the corrector to its own rollouts. Because the clean histories can be the base model's own single-shot generations, training needs no real videos, and the merged corrector adds no inference cost. In 50 s text-to-video generation, Clean Forcing reduces Δ-drift from +11.3 to +1.65 without real video and to -0.16 with 40 real clips, improving on the best published result of +3.57 with over 150x less data. Extensive experiments demonstrate that Clean Forcing outperforms prior methods in aesthetic quality and data efficiency with reduced drift for long-horizon video generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25634v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25634v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/wnqw/clean-forcing"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "Clean Forcing 在相同 noisy state 下比较干净与生成history的velocity，学习其中系统性gap，再用DAgger与可反传下一chunk的drift-contraction训练5.9M LoRA。作者报告300个synthetic clips即可把50秒Δ-drift从+11.27降至+1.65，加40个real clips降至−0.16；合并后不增加NFE，但场景推进受抑、chunk闪烁和checkpoint专用性仍在。",
+    "motivationZh": "论文把AR视频exposure bias从抽象的分布失配变成同一状态、不同历史的可测velocity差，区别于sampling-noise/cache-error correctors。先冻结已causal-adapt的Wan基座，用其bidirectional single-shot生成clean references；在生成history上训练rank16 attention LoRA匹配clean-history teacher，再聚合corrected rollouts并惩罚其commit给下一chunk带来的误差。证据包括128 prompts的50秒generation、14B和独立Causal-Forcing重训迁移、失败的distilled-host实验及progression代价分析，支持重要低数据长时稳定性方法，未消除所有时间一致性问题。",
+    "methodZh": "先测同一noisy state在clean/drifted history下的velocity gap及跨seed系统性比例；选择有足够可校正误差的基座。 使用300个bidirectional single-shot synthetic clips作clean histories，并先以rank64 LoRA进行causal adaptation、合并进base。 冻结base，在self-attention q/k/v/o上训练5.9M rank16 LoRA，以normalized clean-history counterfactual velocity loss校正生成history。 启用当前corrector重新rollout，DAgger聚合旧/新pairs；append未detach的预测chunk并反传下一chunk误差，以drift-contraction共同训练。 在主设置用full-strength LoRA合并实现同NFE推理，联合报告absolute quality、drift、motion、anchoring、cuts与flicker。",
+    "methodFlow": [
+      "先测同一noisy state在clean/drifted history下的velocity gap及跨seed系统性比例；选择有足够可校正误差的基座。",
+      "使用300个bidirectional single-shot synthetic clips作clean histories，并先以rank64 LoRA进行causal adaptation、合并进base。",
+      "冻结base，在self-attention q/k/v/o上训练5.9M rank16 LoRA，以normalized clean-history counterfactual velocity loss校正生成history。",
+      "启用当前corrector重新rollout，DAgger聚合旧/新pairs；append未detach的预测chunk并反传下一chunk误差，以drift-contraction共同训练。",
+      "在主设置用full-strength LoRA合并实现同NFE推理，联合报告absolute quality、drift、motion、anchoring、cuts与flicker。"
+    ],
+    "experimentsZh": "主基座Wan2.1-T2V-1.3B，3-latent chunks、21-latent rolling KV、20-step solver、832×480、16fps、CFG6。300 synthetic clips用于causal adapt与zero-real correction，+real版本另用40真实clips；评测128 held-out MovieGen prompts、50秒，匹配prompt/seed。另有32prompt14B与独立Causal-Forcing，以及HY-WorldPlay/OmniDreams的弱校正实验。作者主文报告完整1.3B流程在单GB300约1天、至少48GB；14B约3GPU-days。 作者报告在同一adapted 1.3B base上，Δ-drift+11.27±0.81→+1.65±0.35（zero real）或−0.16±0.12（+40real），MUSIQ44.8→66.9/67.0；Δ为前20%减全片MUSIQ，不是视觉漂移全部维度。 (Table1, PDF p.7) 作者报告独立Causal-Forcing base的Δ-drift+11.99→+2.80，14B的+15.65→+0.97；是相同recipe重新训练corrector，而不是同权重零样本迁移。 (Table1 and Table7, PDF pp.7,19) 作者报告merged corrector chunk latency2.90±0.35→3.00±0.89 s（+3.5%，Welch p0.40），NFE不变、peak29.49GiB相同；decoded吞吐3.88→3.80fps。 (Table5, PDF p.17) 作者报告opening anchoring为0.679（zero-real）、0.795（+real），SelfForcing0.485；+real的t-LPIPS0.59、flicker32.8，显示低drift仍伴chunk与progression问题。 (Tables11,15, PDF pp.26–27) 作者报告33名rater对末10秒片段的总体偏好：胜base93.0%、胜SelfForcing83.9%，对SkyReels仅42.7%且不显著；不是全50秒质量偏好。 (Table16 and AppendixJ, PDF pp.27–29) 共享adapted base上实现context noising/history guidance/pathwise TTC；独立发布的SelfForcing、SkyReels在同128prompt评估，训练资源/帧率不同；BAgger仅引用不同base/prompts结果，不作严格SOTA排名。含失败的SelfForcing-distilled port、attention cache设置及更长causal adaptation对照，但不保证各baseline已充分调参。 one-step→DAgger→contraction的同域drift removed66%→70%→73%，并检验reference-free DMD失败、factual target静止、GT-anchored target错配。rank/capacity、fixed-data闭环、causal-adapt×correction、20K adapt、不同cache/strength和transfer诊断较完整；一些结果为5clips/3seeds，不能代替大规模通用性。",
+    "insightZh": "新意是可测的history-induced同state velocity gap、与之对应的低rank frozen-base correction，以及DAgger+下一chunk contraction的闭环训练；不是LoRA或DAgger本身。多基座与负面迁移实验把有效条件说得较清楚，可视为长视频稳定性的meaningful/major方法推进；不能宣称统一解决所有AR漂移、无训练成本，或直接迁移同一权重到新基座。",
+    "evidenceZh": "在同一noisy state只替换history，作者测得适用三个base的systematic fraction为0.89–0.99。 (Sec.4.1 Eq.(3), Fig.7, PDF pp.5,18) / Counterfactual teacher与DAgger/contraction构成清楚的可训练目标。 (Fig.2, Secs.4.2–4.3 Eqs.(4)–(6), Algorithm1, PDF pp.4–5,13) / 低数据50秒生成确有同prompt/seed对照，但最佳公开BAgger数值不是同基座同prompt。 (Table1 and Sec.5, PDF pp.6–7) / Merged状态NFE和peak memory相同，实测latency的差异不显著。 (Table5 and AppendixE, PDF p.17) / 更低drift伴随更强opening anchoring；distilled host上校正失败，且chunk luminance pulse保留。 (AppendicesD/E/L, Table15, PDF pp.15–18,27,33) / PDF给出项目入口，公开代码可核查，但本项目没有复现论文结果。 (PDF p.1 project URL; https://github.com/wnqw/clean-forcing)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "低数据校正长期生成history error是视频方向的重要方法推进；共享状态counterfactual与closed-loop目标可供视觉生成研究参考，但本文没有直接验证structured2D、LEGO或3D资产生成迁移。",
+    "caveatZh": "AppendixL(p.33)明确强reference correction会抑制scene progression，调整contraction weight只能权衡，无法消除。 / 每个新checkpoint/domain需新的corrector；AppendixE(pp.17–18)显示同recipe在低gap的distilled SelfForcing上反而退化。 / 基座chunk边界luminance pulse保留；AppendixG.2(p.21)的overlap decode可缓和但增加decode成本。 / AppendixD/Table15(pp.15–16,27)zero-real仍约0.89cuts/video，+real约0.04；仅报告低Δ-drift会遗漏这些行为。 / “零真实视频”仍使用基座预训练知识、300个生成clip和先causal adaptation；150×数据量比较不等于150×算力或端到端成本节省。 / 约95%只描述所测history-induced gap；训练目标拟合好不保证rollout好，distilled-host负面结果说明适用条件重要。 / Merged α=1主设置的无额外NFE不能无条件外推到任意time-dependent输出blend；弱强度实验使用预存scaled weights，算式并非任意比例精确等价。 / Δ-drift是相对质量曲线统计，会随collapsed tail饱和；需连同absolute MUSIQ、motion、cuts、anchoring与chunk flicker理解。 / 14B验证集peak checkpoint选择影响明显，domain外world-model部分样本/协议较少；用户偏好仅覆盖late excerpts，且SkyReels24fps与本法16fps不同。 / 该方法改善视频外观稳定性，未证明真实3D几何、物理交互或复杂长程事件 progression。",
+    "sourceNote": "Exact version 2610.25634v1 (33 pages), PDF SHA-256 1954b206ff32472bbcc84e7d43936113a61a6650c32fb88ee39f4a77cee25871. Full text and listed visual evidence checked on 2026-10-20. All quantitative results are author-reported, not independently reproduced. Code: available. 已读取官方项目页和public GitHub，确认self_forcing训练/推理目录、cf_external_base、evaluation scripts、checkpoint入口和Apache2.0许可；未运行代码或核验权重实验。"
+  },
+  "slug": "clean-forcing-drift-resistant-autoregressive-video-diffusion-with-a-frozen-base-2610-25634",
+  "collectedAt": "2026-10-20",
+  "topicIds": [
+    "video-generation"
+  ]
+}
