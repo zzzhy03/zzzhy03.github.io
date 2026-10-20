@@ -30,6 +30,7 @@ import { writeJsonAtomic } from "./lib/io.mjs";
 import { withdrawalRecord } from "./lib/withdrawal.mjs";
 import { parseArxivIdentifier } from "./lib/identity.mjs";
 import { validateScreeningReviews } from "./screening/validate.mjs";
+import { removeVerifiedSources } from "./cache.mjs";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_REPOSITORY_ROOT = path.resolve(scriptDirectory, "../..");
@@ -326,6 +327,7 @@ function fulltextStatus(root, runDirectory, selection, screeningState) {
     researchConfig: "content/paper-reading/research-config.json",
     screeningRunDirectory: runDirectory,
     selection,
+    allowRemovedSources: true,
   });
   const missingOnly = result.errors.length > 0 && result.errors.every((error) =>
     error.startsWith("Missing full-text review"),
@@ -333,6 +335,7 @@ function fulltextStatus(root, runDirectory, selection, screeningState) {
   return {
     state: result.errors.length ? (missingOnly ? "incomplete" : "invalid") : "complete",
     reviewCount,
+    previouslyVerifiedSourceCount: result.counts.previouslyVerifiedSources ?? 0,
     expectedCount: result.counts.expected ?? null,
     decisionCounts: result.counts.byDecision ?? {},
     topicCounts: result.counts.byTopic ?? {},
@@ -1081,13 +1084,26 @@ export async function runLedger(options, root, runDirectory) {
   if (receipt.state !== "complete") {
     throw new Error("A valid checked-in run receipt is required before ledger import.");
   }
-  return mergeVerifiedRunDecisions({
+  const merged = await mergeVerifiedRunDecisions({
     options,
     root,
     runDirectory,
     verification,
     receipt,
   });
+  const mode = verification.status.stages.discovery.window?.mode ?? "daily";
+  if (mode !== "daily") merged.sourceCleanup = await cleanupVerifiedSources(options, root, runDirectory);
+  return merged;
+}
+
+async function cleanupVerifiedSources(options, root, runDirectory) {
+  if (!options.apply) return { attempted: false };
+  try {
+    return { attempted: true, ...await removeVerifiedSources({ root, runDirectory }) };
+  } catch (error) {
+    // Content finalization remains valid if cleanup fails; the next invocation can retry it.
+    return { attempted: true, error: error.message };
+  }
 }
 
 export async function runFinalize(options, root, runDirectory) {
@@ -1147,11 +1163,13 @@ export async function runFinalize(options, root, runDirectory) {
     current.lastRunId === next.lastRunId &&
     current.lastReceiptPath === next.lastReceiptPath;
   if (options.apply && !alreadyFinalized) await writeJsonAtomic(stateFile, next);
+  const sourceCleanup = await cleanupVerifiedSources(options, root, runDirectory);
   return {
     dryRun: !options.apply,
     stateFile: displayPath(root, stateFile),
     decisionLedger: ledger,
     alreadyFinalized,
+    sourceCleanup,
     before: {
       lastSuccessfulRunAt: current.lastSuccessfulRunAt ?? null,
       lastRunId: current.lastRunId ?? null,

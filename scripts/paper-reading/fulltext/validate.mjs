@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 
 import { validateWithdrawalSource } from "../lib/withdrawal.mjs";
 import { candidatePaperId, sourceVersionFor } from "../lib/review-identity.mjs";
+import { verifyRemovedPdf } from "../lib/source-receipt.mjs";
 
 import {
   ACCEPT_DECISIONS,
@@ -248,7 +249,7 @@ function collectExpectedPaperIds(root, screeningRunDirectory, selection, errors)
   return { expectedByPaperId, runId: candidatePayload.runId ?? null };
 }
 
-function validateReview(review, filePath, topicIds, root, errors) {
+function validateReview(review, filePath, topicIds, root, errors, archivedSources = null) {
   const label = path.basename(filePath);
   if (!requireObject(review, label, errors)) return;
   if (!SUPPORTED_FULLTEXT_SCHEMA_VERSIONS.includes(review.schemaVersion)) {
@@ -381,7 +382,9 @@ function validateReview(review, filePath, topicIds, root, errors) {
     if (typeof review.source.pdfPath === "string") {
       const pdfPath = resolveFrom(root, review.source.pdfPath);
       if (!existsSync(pdfPath)) {
-        errors.push(`${label} PDF does not exist at '${review.source.pdfPath}'.`);
+        const proof = archivedSources && verifyRemovedPdf({ root, reviewFile: filePath, review });
+        if (proof?.valid) archivedSources.push({ paperId: review.paperId, ...proof });
+        else errors.push(`${label} PDF does not exist at '${review.source.pdfPath}'. Restore it before a fresh full-text verification.${proof ? ` Historical proof failed: ${proof.error}` : ""}`);
       } else {
         if (sha256File(pdfPath) !== review.source.pdfSha256) {
           errors.push(`${label} PDF sha256 does not match.`);
@@ -464,6 +467,7 @@ function validateReview(review, filePath, topicIds, root, errors) {
 
 export function validateFulltextReviews(options) {
   const errors = [];
+  const archivedSources = options.allowRemovedSources ? [] : null;
   const root = path.resolve(options.root ?? process.cwd());
   const reviewDirectory = resolveFrom(root, options.reviewDirectory);
   const researchConfigPath = resolveFrom(root, options.researchConfig);
@@ -512,7 +516,7 @@ export function validateFulltextReviews(options) {
       continue;
     }
     reviews.push(review);
-    const metadata = validateReview(review, reviewFile, topicIds, root, errors);
+    const metadata = validateReview(review, reviewFile, topicIds, root, errors, archivedSources);
     if (metadata) {
       if (paperIds.has(metadata.paperId)) {
         errors.push(`Duplicate full-text review for '${metadata.paperId}'.`);
@@ -572,8 +576,10 @@ export function validateFulltextReviews(options) {
   return {
     errors,
     reviews,
+    archivedSources: archivedSources ?? [],
     counts: {
       total: reviews.length,
+      previouslyVerifiedSources: archivedSources?.length ?? 0,
       expected: expectedByPaperId?.size ?? null,
       byDecision,
       byTopic,

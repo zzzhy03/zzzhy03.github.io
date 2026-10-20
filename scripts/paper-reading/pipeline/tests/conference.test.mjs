@@ -9,6 +9,7 @@ import { validateFulltextReviews } from "../../fulltext/validate.mjs";
 import { validatePromotion } from "../../fulltext/validate-promotion.mjs";
 import { sourceVersionFor } from "../../lib/review-identity.mjs";
 import { runFinalize } from "../../pipeline.mjs";
+import { applyCachePlan, planCache } from "../../cache.mjs";
 
 function writeJson(file, value) { mkdirSync(path.dirname(file), { recursive: true }); writeFileSync(file, JSON.stringify(value)); }
 function pdf() {
@@ -54,7 +55,16 @@ test("conference full text validates official sources without an arXiv identifie
   writeJson(path.join(papers, "test.json"), { id: review.paperId, collectedAt: "2026-10-16", primaryTopicId: "lego", analysis: { sourceScope: "full_text", readingAction: "skim", relevance: "high", sourceNote: sourceVersion }, links: [{ label: "Paper", href: paperUrl }], abstractSourceUrl: paperUrl, abstractIsOriginal: true });
   writeJson(digest, { date: "2026-10-16", paperIds: [review.paperId] });
   assert.deepEqual(validatePromotion({ root, runDirectory: run, reviewDirectory: path.dirname(reviewFile), paperDirectory: papers, digest }).errors, []);
-
+  const receipt = { status: "content-verified", runId: review.runId, generatedAt: review.reviewedAt,
+    discovery: { window: { mode: "conference", end: review.reviewedAt } },
+    fulltext: { reviews: [{ file: path.relative(root, reviewFile), sha256: createHash("sha256").update(JSON.stringify(review)).digest("hex") }] } };
+  writeJson(path.join(root, "content/paper-reading/runs/2026-10-16.json"), receipt);
+  assert.equal((await applyCachePlan(await planCache({ root }))).removedCount, 1);
+  const historical = validateFulltextReviews({ ...options, allowRemovedSources: true });
+  assert.deepEqual(historical.errors, []); assert.equal(historical.counts.previouslyVerifiedSources, 1);
+  assert.match(validateFulltextReviews(options).errors.join(" "), /fresh full-text verification/);
+  review.thirtySecondZh = "changed after verification"; writeJson(reviewFile, review);
+  assert.match(validateFulltextReviews({ ...options, allowRemovedSources: true }).errors.join(" "), /Historical proof failed/);
 });
 
 test("conference/backfill/update finalization cannot move the daily watermark", async (t) => {

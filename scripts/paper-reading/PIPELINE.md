@@ -11,7 +11,7 @@
 content/paper-reading/
   research-config.json
   venue-registry.json
-  pipeline-config.json          # 三天窗口、会议届次/检索时段
+  pipeline-config.json          # 三天窗口、会议届次/检索时段、PDF 缓存预算
   topics.json
   papers/*.json
   digests/YYYY-MM-DD.json
@@ -40,7 +40,8 @@ local-assets/paper-reading/runs/<run-id>/
   decision-ledger/
     delta.json                  # immutable decisions pinned by the run receipt
   fulltext/
-    sources/*.pdf               # exact version, immutable audit source
+    sources/*.pdf               # 活跃审阅必须保留；已验证完成后可回收的 exact-version cache
+    source-cache.json           # 回收清单：精确 URL、SHA-256、review/receipt 引用
     reviews/*.json              # one structured review per reviewed paper
     backlog.json                # explicitly deferred; never an implicit reject
     summary.json                # rebuildable convenience summary
@@ -49,14 +50,15 @@ local-assets/paper-reading/runs/<run-id>/
       rendered/
 ```
 
-一个 run 的 discovery、screening、PDF、review 和 backlog 必须待在同一个目录。不要再把
+一个 run 的 discovery、screening、当前使用的 PDF、review 和 backlog 待在同一个目录。已完成 PDF
+可以按第 8 节回收；review、delta、receipt 等审计元数据必须长期保留。不要再把
 PDF 放入 repository `tmp/`，也不要使用跨日期共享的 `fulltext-reviews/`。
 
 ### 可机械重建的产物
 
 - `public/paper-reading/data/`：由 `npm run prepare:papers` 生成。
 - `.next/`、`out/`：由 Next.js 构建生成。
-- `<run>/fulltext/work/`：由保留的 PDF 重新提取或渲染。
+- `<run>/fulltext/work/`：由保留或按校验值恢复的 PDF 重新提取或渲染。
 
 这些不是内容来源。构建正在运行时不要删除 `.next/`；`pipeline cleanup` 只会接触明确的
 `fulltext/work/`，不会删除 PDF、review、manifest、digest 或 canonical paper。
@@ -432,6 +434,34 @@ observation。它足以验证复用语义，但文件会随每日观测线性增
 
 ### 8. Cleanup
 
+网页运行只需 canonical JSON 与 public 图片。PDF 只保留到本轮全文阅读、入库校验、
+receipt 和 ledger 保存完成；不设短期保留或空间预算。`storage.pdfRetention` 固定为
+`until-verified`，`automaticPrune=true`。Daily 在 `finalize --apply` 完成后自动清理本 run，
+会议/updates/backfill 在 `ledger --apply` 完成后清理，不等待 commit、push 或网站发布。
+
+只移除 receipt 与全部本地审计 artifacts、PDF hash 一致的已读文件。已完成的 `defer`
+审阅也移除 PDF，保留待跟进笔记；真正未读、校验失败、backlog 和未知用途的对比文件保留。
+清理结果放在命令返回的 `sourceCleanup` 中，失败不回滚已完成的内容状态，可单独重试。
+
+```sh
+npm run cache:papers -- audit --report tmp/paper-cache-plan.json
+npm run cache:papers -- prune --apply
+npm run cache:papers -- restore --run-dir local-assets/paper-reading/runs/<run-id>
+```
+
+`audit` 是只读预览；`prune --apply` 在删除前写 `fulltext/source-cache.json`，记录精确来源、
+原始 SHA-256、页数、review 和 receipt 的路径/hash。恢复必须匹配旧 hash；原站文件改变
+或不再提供时停止，不能替换审阅证据。历史 receipt/decision reuse 不依赖 PDF。
+`pipeline status/verify/finalize` 对已移除文件核对原 receipt 与 review/hash，并在
+`previouslyVerifiedSourceCount` 中明确计数；不会冒充重新读取原文。独立的
+`validate:paper-fulltext` 仍是严格的原文件校验，若要重新做全文验证先 restore。
+移除清单、review 或 receipt 任一不一致时不能复用旧校验。清理失败不回滚日报，不重新 discovery。
+
+迁移保留 Git 内容和 local run 的 JSON 审计文件，包括 `decision-ledger/delta.json` 与
+`source-cache.json`；可排除 PDF、fulltext/work 和可重建的 node_modules/.next/out。
+只复制 Git 仓库可以恢复网页，但缺失 local delta 会让审阅去重失效并重新筛选。
+
+
 正常运行中的抽取文本和渲染页统一放在 `<run>/fulltext/work/`。先看计划，再应用：
 
 ```sh
@@ -448,8 +478,10 @@ npm run pipeline:papers -- cleanup \
 ```
 
 Cleanup 在删除前重新校验 screening、full-text、backlog，以及传入 digest 时的 promotion；
-目标若在计划后发生变化、包含 symlink 或逃出固定目录，就拒绝删除。第一版不会自动淘汰
-source PDFs 和 reviews；在确定长期对象存储或 retention policy 前保留它们。
+目标若在计划后发生变化、包含 symlink 或逃出固定目录，就拒绝删除。PDF 已在内容闭环时
+移除，work cleanup 可通过原 receipt 核对已完成审阅，不要求为清理工作目录重新下载 PDF。
+定时任务可用 `cache:papers audit` 检查遗留文件；仅对 receipt 完整的文件重试 prune。
+Review、来源/移除清单及审计元数据始终保留。
 
 ## 3. 失败与恢复矩阵
 
@@ -488,7 +520,7 @@ source PDFs 和 reviews；在确定长期对象存储或 retention policy 前保
 > 后依次运行 pipeline verify、lint、tsc、三组测试、build 和 diff check；通过后写入
 > receipt 及其 immutable decision delta，验证后合并 ledger，再 finalize watermark。没有明确
 > 发布授权时停在这里，不 commit、不 push。清理只使用
-> pipeline cleanup，保留 PDF、reviews、manifests 与 backlog。
+> pipeline cleanup；已验证 PDF 在内容闭环时移除，保留 reviews、manifests、backlog 与来源清单。
 
 这一段定义 terminal condition：没有通过验证、没有显式 closure 或发布步骤尚未完成时，
 任务都不能把 run 当作成功后重新开始下一天。

@@ -3,6 +3,9 @@ export function validatePipelineConfig(config, venueRegistry) {
   if (!Number.isFinite(config.daily?.lookbackDays) || config.daily.lookbackDays <= 0) {
     throw new Error("pipeline-config daily.lookbackDays must be positive.");
   }
+  if (typeof config.storage?.automaticPrune !== "boolean" || config.storage.pdfRetention !== "until-verified") {
+    throw new Error("pipeline-config storage requires automaticPrune (boolean) and pdfRetention='until-verified'.");
+  }
   const ids = new Set();
   const venues = new Set(venueRegistry.venues.map((venue) => venue.id));
   if (!Array.isArray(config.conferences)) throw new Error("conferences must be an array.");
@@ -33,5 +36,5 @@ export function selectConferenceEditions(config, ids, now) {
 
 export const DEFAULT_PIPELINE_CONFIG = {
   schemaVersion: 1, daily: { lookbackDays: 3 },
-  conferences: [],
+  storage: { automaticPrune: false, pdfRetention: "until-verified" }, conferences: [],
 };

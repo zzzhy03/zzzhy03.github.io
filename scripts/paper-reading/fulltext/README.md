@@ -4,6 +4,13 @@ This stage follows abstract screening and still stops before canonical paper or 
 Each review is grounded in one immutable PDF version, text extracted with `pdftotext -layout`,
 and visual inspection of the relevant method, result, and limitation pages.
 
+PDFs are required for active reading and fresh validation. After receipt-backed completion they
+are removed immediately by pipeline finalization (or ledger completion for non-daily runs).
+Search, decision reuse and website builds retain the compact JSON evidence. Restore evicted bytes with `npm run cache:papers -- restore --run-dir <run>`
+before revalidating. A receipt is historical evidence, not permission to pretend a missing PDF
+has been read again. Pipeline status explicitly identifies receipt-backed historical source
+checks; the standalone full-text validator continues to require the original bytes.
+
 Conference papers without arXiv IDs use **schemaVersion 4**. Keep the same review fields, but
 replace `arxivVersion` with the `sourceVersion` provided in the prepared candidate's
 `screeningContext.fulltextIdentity`. Use its stable `paperId`, name the review

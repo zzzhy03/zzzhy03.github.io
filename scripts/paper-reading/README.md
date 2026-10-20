@@ -33,7 +33,7 @@ also selects backfill for compatibility. Backfill without `--since` uses the old
 papers as newly published today.
 
 `content/paper-reading/pipeline-config.json` configures `daily.lookbackDays`, conference editions,
-provider scopes and `scanWindow` dates. Conference mode without an explicit
+provider scopes and `scanWindow` dates, plus PDF retention. Conference mode without an explicit
 edition selects only editions inside their configured scan windows. These windows are **retrieval
 schedules, not verified publication dates**. Update the edition/year/provider scope each year.
 
@@ -406,3 +406,34 @@ New runs must use `receipt --apply` before ledger import.
 - partitioning, compaction, and an indexed lookup for the aggregate decision ledger (the current
   trial version keeps one checked-in JSON file and scans matching observations in memory);
 - Zotero, user-state sync, and publishing.
+
+## Remove verified PDFs and migrate compact evidence
+
+PDFs are working inputs for reading and fresh full-text verification. After the run's full-text
+and promotion checks, receipt, and ledger are saved, remove verified PDFs immediately. There is
+no age-based cache or disk budget. `storage.pdfRetention` is `until-verified` and this repository
+has `storage.automaticPrune=true`. Daily `pipeline finalize --apply` performs cleanup for its run;
+conference/update/backfill `pipeline ledger --apply` does the same. Cleanup does not wait for
+website publication. Errors are returned in `sourceCleanup` without undoing completed content.
+
+`npm run cache:papers -- audit` previews eligible removal. `npm run cache:papers -- prune --apply`
+removes verified files across completed runs; add `--run-dir <run>` to restrict it to one run.
+It records the exact URL, original PDF hash/page count, and hashed review/receipt in
+`fulltext/source-cache.json` before unlinking bytes. Completed `defer` reviews retain their notes
+but release the PDF too. Unread/backlog files, failed verification, and unreferenced comparison
+PDFs stay protected. All metadata and public figures remain.
+
+`pipeline status/verify/finalize` recognizes a removed source only when its original receipt,
+review bytes and removal manifest still match. It reports `previouslyVerifiedSourceCount` and
+reuses historical verification, without claiming that missing bytes were checked again. An
+altered review or receipt invalidates that proof. The standalone `validate:paper-fulltext`
+command still requires actual PDFs; for a new byte-level verification run
+`npm run cache:papers -- restore --run-dir <run>`. Restoration checks the original SHA-256 and
+refuses changed upstream bytes. Publication recovery must not redownload papers merely because
+their completed input files have been removed.
+
+For migration retain Git content, public figures and the compact `local-assets/paper-reading/runs`
+evidence (manifests, candidates, reviews, deltas, backlog and source-cache manifests). Omit `*.pdf`,
+`fulltext/work`, `.next`, `out` and `node_modules` only when you accept restoring/rebuilding them.
+The local decision deltas are important: a Git clone alone keeps the website but not all local
+review-reuse evidence. Never move only the aggregate decision ledger and discard its proofs.
