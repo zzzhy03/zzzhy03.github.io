@@ -151,7 +151,10 @@ test("two local remote clients cannot both acquire; expired owner resumes withou
   await assert.rejects(new Runner({ ...f.config, owner: "other-owner", directory: path.join(f.directory, "third-session") })
     .open().then((runner) => runner.start()), /writer is active/);
   const generation = first.control.generation;
-  await first.resume();
+  await assert.rejects(first.resume(), /Confirm the exact previous instance/);
+  await first.resume({ previousInstanceEnded: true, expectedStateCommit: first.head,
+    previousOwner: first.control.active.owner, previousRunId: first.control.active.runId,
+    previousGeneration: generation, confirmedBy: "fixture-operator", reason: "The synthetic earlier execution is stopped." });
   assert.equal(first.control.generation, generation + 1);
   assert.equal(sha256(jsonBytes(first.checkpoint)), digest);
   assert.equal((await first.run(job())).skipped, true);

@@ -1,4 +1,6 @@
-import { COMMIT, jsonBytes, sha256 } from "./files.mjs";
+import { randomUUID } from "node:crypto";
+import { existsSync, unlinkSync } from "node:fs";
+import { COMMIT, inside, jsonBytes, relativePath, sha256 } from "./files.mjs";
 import { GitStore, validateRemote } from "./git-store.mjs";
 import { artifactRole } from "./state.mjs";
 import { publicationPlan } from "./checkpoints.mjs";
@@ -52,6 +54,15 @@ export async function publish(runner, { remote, ref, commit }, {
   if (existing && (existing.remote !== remote || existing.ref !== ref || existing.commit !== commit || existing.base !== base)) {
     throw new Error("Publication journal pins a different target or commit.");
   }
+  if (existing?.artifact) {
+    const pin = existing.artifact;
+    if (relativePath(pin.path) !== `migration/publications/${commit}.pack`) throw new Error("Invalid publication pack path.");
+    const bytes = await runner.store.read(runner.head, pin.path);
+    if (!bytes || bytes.length !== pin.bytes || sha256(bytes) !== pin.sha256) throw new Error("Publication pack pin mismatch.");
+    // The base comes from the reviewed source clone. Only the exact candidate's
+    // additional Git objects are in this private, content-addressed artifact.
+    await runGit(runner.root, ["index-pack", "--stdin"], { input: bytes });
+  }
   // A single publication commit contains only selected public data. Intermediate
   // commits cannot smuggle private artifacts into the pushed history.
   const parents = (await runGit(runner.root, ["rev-list", "--parents", "-n", "1", commit])).toString().trim().split(" ");
@@ -60,9 +71,18 @@ export async function publish(runner, { remote, ref, commit }, {
   if (!paths.length || paths.some((file) => !file.startsWith("content/paper-reading/") || !artifactRole(file))) {
     throw new Error("Publication commit may change only allowlisted public paper-reading data.");
   }
-  await runGit(runner.root, ["diff", "--exit-code", commit, "--", "content/paper-reading"]);
-  if ((await runGit(runner.root, ["ls-files", "--others", "--exclude-standard", "--", "content/paper-reading"])).length) {
-    throw new Error("Uncommitted public data is missing from the publication commit.");
+  const index = inside(runner.directory, `publication-index-${randomUUID()}`, { missing: true });
+  const options = { env: { GIT_INDEX_FILE: index } };
+  try {
+    // Restored files can be untracked in a new clone. Compare using the exact
+    // candidate's disposable index without staging or resetting research.
+    await runGit(runner.root, ["read-tree", commit], options);
+    await runGit(runner.root, ["diff", "--exit-code", commit, "--", "content/paper-reading"], options);
+    if ((await runGit(runner.root, ["ls-files", "--others", "--exclude-standard", "--", "content/paper-reading"], options)).length) {
+      throw new Error("Uncommitted public data is missing from the publication commit.");
+    }
+  } finally {
+    if (existsSync(index)) unlinkSync(index);
   }
   let journal = existing ?? { schemaVersion: 1, remote, ref, commit, base,
     checkpointSha256: sha256(jsonBytes(runner.checkpoint)), events: [] };
@@ -81,7 +101,16 @@ export async function publish(runner, { remote, ref, commit }, {
   };
   let publicHead = await target.head();
   await preflight(publicHead);
-  if (!existing) await event("prepared", { stateCommit: runner.head });
+  if (!existing) {
+    const bytes = await runGit(runner.root, ["pack-objects", "--stdout", "--revs"], { input: `${commit}\n^${base}\n` });
+    if (bytes.length > 100 * 1024 * 1024) throw new Error("Publication pack exceeds 100 MiB.");
+    const file = `migration/publications/${commit}.pack`;
+    journal = { ...journal, artifact: { path: file, bytes: bytes.length, sha256: sha256(bytes) },
+      events: [{ type: "prepared", at: new Date(runner.now()).toISOString(), commit, stateCommit: runner.head }] };
+    // A lost local repository cannot lose the publication candidate after this
+    // private commit is acknowledged. No public side effect precedes it.
+    await runner.journal(journal, [{ path: file, bytes }]);
+  }
   if (publicHead !== commit) {
     if (journal.events.some((entry) => entry.type === "push-acknowledged")) throw new Error("Previously acknowledged public commit disappeared; stop.");
     // Intent survives a crash before, during or after the external push.
@@ -115,5 +144,6 @@ export async function publish(runner, { remote, ref, commit }, {
   }
   // Persist only the bounded evidence fields, never a raw provider response.
   await event("verified", { deploymentId: verification.deploymentId ?? null, statusId: verification.statusId ?? null });
-  return { complete: true, commit, stateCommit: runner.head };
+  const released = await runner.release();
+  return { complete: true, commit, ...released };
 }

@@ -199,20 +199,36 @@ export function verifyBundle({ bundle, manifestSha256 }) {
   return { manifest, payloads };
 }
 
-// Installs only verified missing files. Existing bytes must match exactly.
-// An interrupted installation is safe to replay; changed existing files are never overwritten.
-export function restoreState({ bundle, target, manifestSha256, expectedContext }) {
+// Existing bytes must match the bundle, unless the caller supplies an exact
+// tracked source baseline for a fresh checkout. Other local edits are never
+// overwritten. An interrupted installation is safe to replay.
+export function restoreState({ bundle, target, manifestSha256, expectedContext, replaceMatching = new Map() }) {
   const { manifest, payloads } = verifyBundle({ bundle, manifestSha256 });
   validateContext(expectedContext);
   if (Object.keys(expectedContext).some((key) => manifest.context[key] !== expectedContext[key])) throw new Error("Restore context mismatch.");
   if (path.resolve(target) === path.resolve(bundle)) throw new Error("Restore target must differ from bundle.");
   for (const entry of manifest.files) {
     const file = inside(target, entry.path, { missing: true });
-    if (existsSync(file)) verifyRecord(target, entry);
+    if (existsSync(file)) {
+      const current = regularBytes(target, entry.path);
+      if (current.length !== entry.bytes || sha256(current) !== entry.sha256) {
+        const baseline = replaceMatching.get(entry.path);
+        if (!baseline || !current.equals(baseline)) throw new Error(`Artifact hash/length mismatch: ${entry.path}`);
+      }
+    }
   }
-  let installed = 0;
+  let installed = 0, replaced = 0;
   for (const entry of manifest.files) {
-    if (writeImmutable(target, entry.path, payloads.get(entry.path))) installed += 1;
+    const baseline = replaceMatching.get(entry.path);
+    const file = inside(target, entry.path, { missing: true });
+    const desired = payloads.get(entry.path);
+    if (baseline && existsSync(file) && !regularBytes(target, entry.path).equals(desired)) {
+      if (!regularBytes(target, entry.path).equals(baseline)) throw new Error("Clean checkout baseline changed during restore.");
+      const temporary = `${file}.${randomUUID()}.tmp`;
+      writeFileSync(temporary, desired, { flag: "wx", mode: 0o600 });
+      renameSync(temporary, inside(target, entry.path));
+      replaced++;
+    } else if (writeImmutable(target, entry.path, desired)) installed++;
   }
-  return { installed, unchanged: manifest.files.length - installed, manifestSha256 };
+  return { installed, unchanged: manifest.files.length - installed - replaced, ...(replaced ? { replaced } : {}), manifestSha256 };
 }

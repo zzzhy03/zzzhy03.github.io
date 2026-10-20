@@ -121,9 +121,11 @@ also rejects a finalize unit for backfill, updates, or conference modes.
 
 `lease.mjs` defines owner, run ID, random fencing token, generation and expiry.
 All daily/backfill/updates/conference/manual writers must adopt this protocol.
-Expiry never authorizes takeover. The known owner explicitly releases; an
-unreachable owner needs an independently verified job termination and a separately
-reviewed recovery procedure. No automatic forced takeover is implemented.
+Expiry never authorizes takeover. The known owner explicitly releases; a new
+executor uses `adopt` only after an operator explicitly confirms the exact old
+execution has ended. A missing session, a different host, or possession of the
+old token is not termination evidence. Unattended recovery without that
+confirmation stops. No automatic forced takeover is implemented.
 
 Before every state mutation, renew/check the current owner and fencing token.
 Checkpoint pins must advance one sequence at a time from the acknowledged parent.
@@ -166,7 +168,7 @@ placeholders; no repository or branch is selected implicitly:
   "directory": "private-runner-session",
   "remote": "https://github.com/OWNER/PRIVATE_STATE_REPO.git",
   "ref": "refs/heads/APPROVED_STATE_BRANCH",
-  "owner": "cloud-task-owner",
+  "owner": "unique-cloud-execution-id",
   "ttlMs": 300000,
   "context": {
     "runId": "RUN_ID",
@@ -213,8 +215,16 @@ A unit is a stable input/output contract, for example:
 
 Use the existing discovery, screening, fulltext and pipeline scripts as appropriate
 for each unit. Inputs, command, validator and output paths are hashed into the
-contract; only that digest is durable. The output files and full current selected
-state are exported with the completion checkpoint. Excluded PDFs/extracted text
+contract. New units also save the complete portable contract under
+`migration/contracts/`, pinned by hash/length in the index, in the intent commit.
+Use `node` (the current Node executable is normalized to it), other installed
+command names, and checkout-relative paths. Absolute machine paths and credential
+arguments are rejected; credentials remain in the authorized environment.
+Embedded programs must also be portable. Task-authored units can supply bounded
+`instructions`; these are also persisted and included in the contract hash.
+Restoring a contract never executes it.
+The output files and full current selected state are exported with the completion
+checkpoint. Excluded PDFs/extracted text
 cannot serve as the only durable output proof. Validators retain responsibility
 for domain/schema correctness; a successful arbitrary command is not scientific
 validation.
@@ -232,8 +242,10 @@ outlive its lease; pause and explicitly recover if it does.
 The transport uses a bare object cache and a fresh index for every proposal.
 It does not stage, reset, clean, rebase or force-push the research checkout.
 Abandoned staging directories remain under `transport/proposals/`; the next
-proposal uses a fresh index. Preserve this directory and `session.json` until the
-run is finished. The latter holds the original owner token, not a GitHub token.
+proposal uses a fresh index. Local directories are disposable caches, not the
+durable identity or recovery authority. Keeping them permits exact local proposal
+retry and preserves unpushed work, but is not required for recovery from a remote
+checkpoint. `session.json` holds a lease token, not a GitHub token.
 
 1. If a CLI was killed, use `unlock` only after it exits. This checks the recorded
    same-host PID is absent; a live or unverifiable process retains its lock.
@@ -248,16 +260,112 @@ run is finished. The latter holds the original owner token, not a GitHub token.
 5. `status` identifies completed and uncertain units. Re-running a completed
    contract skips it; re-running an uncertain one stops before its command.
 6. After independently confirming the previous worker is stopped, the original
-   owner may explicitly `resume`, including after expiry. This fences the old
+   owner may explicitly `resume CONFIG ENDED_CONFIRMATION`, including after
+   expiry, using the same confirmation fields as `adopt` below. This fences the old
    generation while preserving the checkpoint and publication journal. It is not
    automatic expiry takeover. A different owner cannot resume or release it.
-7. Use `release` after finishing or intentionally handing off. A lost owner
-   session needs a separately reviewed recovery; no forced takeover is provided.
+7. Use `release` after finishing a run that does not publish. A successful
+   `publish` now releases automatically, pushes that release, and independently
+   reads back its exact remote commit before returning `complete: true`,
+   `released: true`, `disposable: true`. A failed/unknown release is not success.
+   A later fresh `recover` can observe an already accepted release; `release`
+   then reports it idempotently. Normal subsequent runs use new run/owner IDs.
 
 A conflicting CAS requires inspecting the other writer, not deleting the pending
 proposal or force-pushing it. Git acknowledgements do not provide exactly-once
 semantics for arbitrary external side effects. Any uncertain external action
 still needs independent reconciliation.
+
+## Entire executor lost: remote recovery and its limits
+
+Every daily execution may use fresh source/state clones and fresh temporary
+directories. No session, pending proposal file, Git object cache, local PID lock,
+or old filesystem is copied into the next executor.
+
+For recovery, configure only `root`, `directory`, the approved private
+`remote/ref`, and a new unique execution `owner`. Omit `context` to discover the
+frozen run from the remote checkpoint. `inspect` reports the source commit,
+context, previous owner/generation and state commit without exposing its token.
+Prepare a fresh checkout of that exact reviewed source commit, then `recover`
+restores the acknowledged state. Proven clean tracked source-baseline data may
+be updated to the newer private bundle; other conflicting local data is never
+overwritten. This permits restoring changed aggregates before publication.
+
+```sh
+npm run migrate:papers -- inspect fresh-config.json
+# Clone the source and select the reported exact source commit in the new root.
+npm run migrate:papers -- recover fresh-config.json
+```
+
+An active lease, including an expired one, blocks work until explicit handoff.
+The operator must independently confirm the previous execution and all its
+children have ended, then supply this bounded record:
+
+```json
+{
+  "previousInstanceEnded": true,
+  "expectedStateCommit": "EXACT_INSPECTED_STATE_COMMIT",
+  "previousOwner": "OLD_EXECUTION_ID",
+  "previousRunId": "FROZEN_RUN_ID",
+  "previousGeneration": 1,
+  "confirmedBy": "OPERATOR_ID",
+  "reason": "Describe the independently checked execution termination."
+}
+```
+
+```sh
+npm run migrate:papers -- adopt fresh-config.json ended-confirmation.json
+npm run migrate:papers -- run-unit fresh-config.json ACKNOWLEDGED_UNIT_ID
+npm run migrate:papers -- reconcile-unit fresh-config.json UNCERTAIN_UNIT_ID
+npm run migrate:papers -- publish fresh-config.json
+```
+
+`adopt` validates every old identity field and exact remote HEAD, preserves the
+frozen run/checkpoint/publication journal, creates a new owner token and increments
+the generation, then commits with ordinary fast-forward CAS and reads back the
+exact result. Only after that acknowledgement may the new executor work.
+The confirmation is recorded in control history. This is an operator assertion,
+not an automatic scheduler/liveness check. Without a verifiable termination
+decision, report a blocked handoff; do not invent evidence or copy the old token.
+Revived old runners fail their state/lease checks and cannot retry stale private
+proposals. An already in-flight arbitrary external action is why termination and
+side-effect reconciliation remain required.
+
+If a private push was accepted but its reply and the whole executor were lost,
+the next clone sees the accepted checkpoint and skips complete units. If it was
+not accepted, only the preceding checkpoint survives. A durable `intent` remains
+uncertain, not complete. Local-only outputs, draft analyses, excluded PDFs and
+unpublished local commits that were never saved remotely cannot be recovered.
+Do not claim that reconstructing a local cache restores such work.
+
+An uncertain unit with lost output needs explicit recomputation approval and
+reconciliation of any external effects. Supply `expectedStateCommit`, `unitId`,
+`confirmRecompute: true`, `sideEffectsReconciled: true`, `confirmedBy`, and `reason`:
+
+```sh
+npm run migrate:papers -- recompute fresh-config.json recompute-decision.json
+```
+
+The decision is committed before executing the saved contract. The result says
+`recomputed: true, uncommittedWorkRestored: false`. Task-authored analysis has no
+command: this authorizes re-authoring, followed by `renew` and `reconcile-unit`.
+Inputs must still match their saved hashes; missing rebuildable inputs require
+explicit preparation. Nothing is automatically rerun during `recover` or `adopt`.
+Legacy digest-only intents without a saved contract still require the original
+reviewed unit specification; commands cannot be reconstructed from a digest.
+
+Before any public push, the exact publication commit's additional Git objects
+are saved as a pinned private `migration/publications/<sha>.pack` alongside its
+journal. A fresh clone imports those objects, validates the same allowlisted
+single-parent candidate with a disposable index, then reads the public HEAD.
+An accepted public push is verified without repushing; an unaccepted one retries
+the exact saved SHA. No research index is rewritten. Legacy journals lacking a
+pack cannot promise recovery of a candidate that exists nowhere remotely.
+
+The guarantee is recovery of remotely saved checkpoints, contracts and prepared
+publication objects, with explicit handoff/recomputation when required. It is
+not exactly-once arbitrary side effects, recovery of never-pushed work, or
+unattended proof that a missing executor has terminated.
 
 ## Publication and deployment evidence
 

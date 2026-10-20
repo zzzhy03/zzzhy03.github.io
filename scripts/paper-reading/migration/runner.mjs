@@ -4,10 +4,11 @@ import { hostname } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { GitStore, atomicJson, git } from "./git-store.mjs";
-import { COMMIT, ID, inside, jsonBytes, record, regularBytes, relativePath, sha256, verifyRecord } from "./files.mjs";
+import { assertNoCredentials, COMMIT, ID, inside, jsonBytes, record, regularBytes, relativePath, sha256, verifyRecord, writeImmutable } from "./files.mjs";
 import { exportState, restoreState, verifyBundle } from "./state.mjs";
 import { acquireLease, assertLease, checkpointControl, emptyControl, releaseLease, renewLease } from "./lease.mjs";
 import { beginUnit, completeUnit, newCheckpoint, resumePlan, saveCheckpoint } from "./checkpoints.mjs";
+import { commandArgv, jobRequest, portableJob } from "./contracts.mjs";
 
 const CONTROL = "migration/control.json";
 const INDEX = "migration/index.json";
@@ -16,24 +17,29 @@ const bundleContext = (context) => ({
 });
 const same = (a, b) => sha256(jsonBytes(a)) === sha256(jsonBytes(b));
 
-function jobRequest(job) {
-  if (!job || !Array.isArray(job.inputs) || !Array.isArray(job.outputs) || !job.outputs.length ||
-      new Set(job.outputs).size !== job.outputs.length ||
-      !Array.isArray(job.validate) || !job.validate.length ||
-      [job.command, job.validate].filter(Boolean).some((argv) => !Array.isArray(argv) || !argv.length ||
-        argv.some((arg) => typeof arg !== "string" || !arg || arg.includes("\0")))) {
-    throw new Error("A unit requires input records, output paths and a validation argv.");
+function confirmationRecord(value, now) {
+  if (!value || !ID.test(value.confirmedBy) || typeof value.reason !== "string" ||
+      !value.reason.trim() || value.reason.length > 2000) {
+    throw new Error("An explicit confirmation identity and reason are required.");
   }
-  job.outputs.forEach(relativePath);
-  // Only the digest is durable; commands/absolute machine paths are not state.
-  return { id: job.id, stage: job.stage, dependencies: job.dependencies ?? [],
-    inputSha256: sha256(jsonBytes({ inputs: job.inputs, outputs: job.outputs,
-      command: job.command ?? null, validate: job.validate })) };
+  const result = { confirmedBy: value.confirmedBy, reason: value.reason, at: new Date(now).toISOString() };
+  assertNoCredentials(jsonBytes(result), { json: true });
+  return result;
+}
+
+function endedConfirmation(value, control, head, now) {
+  if (value?.previousInstanceEnded !== true || value.expectedStateCommit !== head ||
+      value.previousOwner !== control.active?.owner || value.previousRunId !== control.active?.runId ||
+      value.previousGeneration !== control.generation) {
+    throw new Error("Confirm the exact previous instance ended, with its state commit, owner, run and generation.");
+  }
+  return { ...confirmationRecord(value, now), previousStateCommit: head,
+    previousOwner: control.active.owner, previousRunId: control.active.runId, previousGeneration: control.generation };
 }
 
 export class Runner {
   constructor(config, { runGit = git, now = Date.now } = {}) {
-    config = { ...config, context: newCheckpoint(config.context).context };
+    config = { ...config, ...(config.context ? { context: newCheckpoint(config.context).context } : {}) };
     if (!ID.test(config.owner)) throw new Error("An explicit owner is required.");
     this.config = config;
     this.root = path.resolve(config.root);
@@ -85,6 +91,8 @@ export class Runner {
       checkpoint = JSON.parse(bytes);
       newCheckpoint(checkpoint.context);
       if (checkpoint.sequence !== control.checkpoint.sequence) throw new Error("Durable checkpoint sequence mismatch.");
+      // A new machine can discover the frozen run without any former local file.
+      this.config.context ??= checkpoint.context;
     }
     const session = existsSync(path.join(this.directory, "session.json"))
       ? JSON.parse(regularBytes(this.directory, "session.json")) : null;
@@ -127,6 +135,7 @@ export class Runner {
       this.owned();
       return this.status();
     }
+    if (!this.config.context) throw new Error("A frozen context is required to start a new run.");
     await this.verifySource();
     if (!this.index) {
       if (this.config.initializeFromRoot !== true || this.config.expectedStateCommit !== this.head) {
@@ -135,7 +144,7 @@ export class Runner {
     } else {
       if (this.control.active) throw new Error("A writer is active; expiry does not authorize takeover.");
       if (this.checkpoint.context.runId === this.config.context.runId) throw new Error("This released run already exists; start a new run ID.");
-      await this.restore();
+      await this.restore({ freshCheckout: !this.session });
     }
     const lease = acquireLease(this.control ?? emptyControl(), {
       owner: this.config.owner, runId: this.config.context.runId, now: this.now(), ttlMs: this.ttlMs,
@@ -147,11 +156,30 @@ export class Runner {
   }
 
   async persist({ control = this.control, checkpoint = this.checkpoint, exportBundle = false,
-    publication = this.index?.publication ?? null } = {}) {
+    publication = this.index?.publication ?? null, contract = null, artifacts = [], recomputation = null } = {}) {
     const expectedHead = this.head;
     const index = structuredClone(this.index ?? { schemaVersion: 1 });
+    if (checkpoint.context.runId !== this.checkpoint?.context.runId) {
+      index.contracts = {};
+      delete index.recomputations;
+    }
     await this.store.prepare(expectedHead, (payload) => {
       const paths = [CONTROL, INDEX];
+      if (contract) {
+        const bytes = jsonBytes(contract);
+        const file = `migration/contracts/${checkpoint.context.runId}/${sha256(bytes)}.json`;
+        writeImmutable(payload, file, bytes);
+        index.contracts ??= {};
+        index.contracts[contract.id] = { path: file, bytes: bytes.length, sha256: sha256(bytes) };
+        paths.push(file);
+      }
+      for (const artifact of artifacts) {
+        relativePath(artifact.path);
+        if (!artifact.path.startsWith("migration/publications/")) throw new Error("Invalid publication artifact path.");
+        writeImmutable(payload, artifact.path, artifact.bytes);
+        paths.push(artifact.path);
+      }
+      if (recomputation) index.recomputations = [...(index.recomputations ?? []), recomputation];
       if (exportBundle) {
         const pin = exportState({ root: this.root, destination: path.join(payload, "migration/bundle"),
           context: bundleContext(checkpoint.context) });
@@ -188,16 +216,94 @@ export class Runner {
     await this.store.init();
     const result = await this.store.recover({ retry });
     await this.load(result.commit);
-    return { ...result, ...this.status() };
+    // With no local proposal, the remote checkpoint is the recovery boundary.
+    // Never infer that a lost, unpushed local result had completed.
+    if (!this.session && this.index) await this.restore({ freshCheckout: true });
+    return { ...result, ...this.status(), requiresHandoff: Boolean(this.control?.active && !this.session) };
   }
 
-  async restore() {
+  inspect() {
+    return { stateCommit: this.head, context: this.checkpoint?.context ?? null,
+      owner: this.control?.active?.owner ?? null, generation: this.control?.generation ?? null,
+      leaseExpiresAt: this.control?.active?.expiresAt ?? null,
+      released: Boolean(this.control && !this.control.active),
+      uncertain: Object.entries(this.checkpoint?.units ?? {}).filter(([, unit]) => unit.state === "intent").map(([id]) => id),
+      publication: this.index?.publication ?? null };
+  }
+
+  async adopt(confirmation) {
+    const previous = this.control;
+    if (!previous?.active || !this.checkpoint) throw new Error("No active run to hand off; start a new run after release.");
+    if (this.session) throw new Error("Remote handoff requires a new local session directory.");
+    const evidence = endedConfirmation(confirmation, previous, this.head, this.now());
+    if (this.config.owner === previous.active.owner) throw new Error("Remote handoff requires a new execution owner.");
+    if (!same(this.config.context, this.checkpoint.context)) throw new Error("Frozen run context changed.");
+    if (await this.store.head() !== this.head) throw new Error("State HEAD changed; obtain a new termination confirmation.");
+    await this.restore({ freshCheckout: true });
+    await this.verifySource();
+    // The caller attests termination. We do not infer it from TTL, token
+    // possession, a missing local lock, or a different host.
+    const lease = { ...acquireLease({ ...previous, active: null }, {
+      owner: this.config.owner, runId: previous.active.runId, now: this.now(), ttlMs: this.ttlMs,
+    }), checkpoint: previous.checkpoint, lastHandoff: evidence };
+    this.session = { remote: this.config.remote, ref: this.config.ref, context: this.checkpoint.context, lease };
+    atomicJson(this.directory, "session.json", this.session);
+    // A single-parent CAS and its independent acknowledgement precede any work.
+    await this.persist({ control: lease });
+    return { ...this.status(), adopted: true, generation: lease.generation };
+  }
+
+  async storedJob(id) {
+    const pin = this.index?.contracts?.[id];
+    if (!pin || !pin.path.startsWith(`migration/contracts/${this.checkpoint.context.runId}/`)) {
+      throw new Error("No durable portable contract for this unit; legacy digest-only intents require their original reviewed contract.");
+    }
+    const bytes = await this.store.read(this.head, pin.path);
+    if (!bytes || bytes.length !== pin.bytes || sha256(bytes) !== pin.sha256) throw new Error("Durable contract pin mismatch.");
+    const job = portableJob(JSON.parse(bytes), this);
+    if (job.id !== id || !this.checkpoint.units[id]) throw new Error("Durable contract belongs to another unit.");
+    beginUnit(this.checkpoint, jobRequest(job));
+    return job;
+  }
+
+  async resolveJob(job) {
+    if (typeof job === "string") return this.storedJob(job);
+    const portable = portableJob(job, this);
+    const existing = this.checkpoint?.units[job.id];
+    // Read compatibility for the earlier digest-only format. A caller must
+    // supply its exact old contract; no command is guessed from a digest.
+    if (existing && !this.index.contracts?.[job.id] &&
+        existing.inputSha256 === jobRequest(job).inputSha256) return job;
+    return portable;
+  }
+
+  async restore({ freshCheckout = false } = {}) {
     if (!this.index) throw new Error("No durable bundle to restore.");
     const view = await this.store.materialize(this.head);
     const bundle = path.join(view, this.index.bundle.path);
     const { manifest } = verifyBundle({ bundle, manifestSha256: this.index.bundle.manifestSha256 });
+    const replaceMatching = new Map();
+    if (freshCheckout) {
+      const base = (await this.store.git(this.root, ["rev-parse", "HEAD"])).toString().trim();
+      if (![this.checkpoint.context.repositoryBaseCommit, this.index.publication?.commit,
+        this.config.context?.repositoryBaseCommit].includes(base)) {
+        throw new Error("Fresh restore requires the frozen source checkout or its exact publication commit.");
+      }
+      // Only proven clean tracked baseline bytes may be replaced with newer
+      // durable data. Ignored/untracked research and dirty edits still conflict.
+      const tracked = new Set((await this.store.git(this.root, ["ls-files", "-z"])).toString().split("\0"));
+      for (const entry of manifest.files) {
+        if (!tracked.has(entry.path) || !existsSync(inside(this.root, entry.path, { missing: true }))) continue;
+        const current = regularBytes(this.root, entry.path);
+        if (sha256(current) !== entry.sha256) {
+          const bytes = await this.store.git(this.root, ["show", `${base}:${entry.path}`]);
+          if (!current.equals(bytes)) throw new Error("Tracked source baseline changed during restore.");
+          replaceMatching.set(entry.path, bytes);
+        }
+      }
+    }
     return restoreState({ bundle, target: this.root, manifestSha256: this.index.bundle.manifestSha256,
-      expectedContext: manifest.context });
+      expectedContext: manifest.context, replaceMatching });
   }
 
   status() {
@@ -213,17 +319,17 @@ export class Runner {
     return { stateCommit: this.head, leaseExpiresAt: this.control.active.expiresAt };
   }
 
-  async resume() {
-    // Explicit same-owner recovery, including expiry. The CLI session lock must
-    // be clear; an abandoned lock requires verified dead-PID unlock first.
+  async resume(confirmation) {
+    // Retaining the token is not proof that an earlier worker has ended.
     if (!this.session || !this.checkpoint || !same(this.checkpoint.context, this.config.context)) {
       throw new Error("Original owner session and frozen context required.");
     }
     if (await this.store.head() !== this.head) throw new Error("State HEAD changed.");
+    const evidence = endedConfirmation(confirmation, this.control, this.head, this.now());
     const previous = this.session;
     const released = releaseLease(this.control, previous.lease);
     const lease = { ...acquireLease(released, { owner: this.config.owner, runId: this.config.context.runId,
-      now: this.now(), ttlMs: this.ttlMs }), checkpoint: this.control.checkpoint };
+      now: this.now(), ttlMs: this.ttlMs }), checkpoint: this.control.checkpoint, lastHandoff: evidence };
     this.session = { ...previous, lease };
     atomicJson(this.directory, "session.json", this.session);
     try { await this.persist({ control: lease }); }
@@ -238,6 +344,7 @@ export class Runner {
   }
 
   async begin(job) {
+    job = await this.resolveJob(job);
     const request = jobRequest(job);
     await this.current();
     await this.verifySource();
@@ -249,7 +356,7 @@ export class Runner {
     if (existing?.state === "complete") return { skipped: true, unit: job.id };
     if (existing) throw new Error("Uncertain intent: inspect outputs and explicitly reconcile; never automatically rerun.");
     await this.persist({ control: renewLease(this.control, this.session.lease, this.now(), this.ttlMs),
-      checkpoint, exportBundle: true });
+      checkpoint, exportBundle: true, contract: job });
     return { begun: true, unit: job.id, stateCommit: this.head };
   }
 
@@ -278,7 +385,8 @@ export class Runner {
       }).finally(() => { flight = null; });
     }, this.heartbeatMs);
     try {
-      for (const argv of argvs) {
+      for (const command of argvs) {
+        const argv = commandArgv(command);
         await flight;
         if (failure) throw failure;
         this.owned();
@@ -304,6 +412,7 @@ export class Runner {
   }
 
   async run(job) {
+    job = await this.resolveJob(job);
     if (!job.command) throw new Error("run requires a command argv; use begin for task-authored analysis.");
     const started = await this.begin(job);
     if (started.skipped) return started;
@@ -312,6 +421,7 @@ export class Runner {
   }
 
   async reconcile(job) {
+    job = await this.resolveJob(job);
     const request = jobRequest(job);
     await this.current();
     await this.verifySource();
@@ -323,6 +433,25 @@ export class Runner {
     return this.finish(job);
   }
 
+  async recompute(decision) {
+    await this.current();
+    await this.verifySource();
+    if (decision?.expectedStateCommit !== this.head || decision.confirmRecompute !== true ||
+        decision.sideEffectsReconciled !== true || this.index.publication) {
+      throw new Error("Recomputation requires the exact state commit, explicit consent and reconciled side effects, before publication.");
+    }
+    const evidence = confirmationRecord(decision, this.now());
+    const job = await this.storedJob(decision.unitId);
+    if (this.checkpoint.units[job.id].state !== "intent") throw new Error("Only an uncertain intent can be explicitly recomputed.");
+    for (const input of job.inputs) verifyRecord(this.root, input);
+    await this.persist({ recomputation: { ...evidence, unitId: job.id,
+      generation: this.control.generation, sourceStateCommit: this.head,
+      uncommittedWorkRestored: false } });
+    if (!job.command) return { begun: true, unit: job.id, recomputationAuthorized: true, uncommittedWorkRestored: false };
+    await this.commands([job.command, job.validate]);
+    return { ...await this.finish(job), recomputed: true, uncommittedWorkRestored: false };
+  }
+
   async finish(job) {
     await this.current();
     const checkpoint = completeUnit(this.checkpoint, { id: job.id, root: this.root,
@@ -331,18 +460,20 @@ export class Runner {
     return { completed: job.id, stateCommit: this.head, sequence: this.checkpoint.sequence };
   }
 
-  async journal(publication) {
+  async journal(publication, artifacts = []) {
     await this.current();
-    await this.persist({ publication });
+    await this.persist({ publication, artifacts });
   }
 
   async release() {
-    if (!this.session || !this.control) throw new Error("Original owner session required.");
+    if (!this.control || !this.checkpoint) throw new Error("No initialized run.");
     if (Object.values(this.checkpoint.units).some((unit) => unit.state === "intent") ||
         (this.index.publication && this.index.publication.events.at(-1)?.type !== "verified")) {
       throw new Error("Reconcile unfinished intent/publication before releasing the run.");
     }
     if (await this.store.head() !== this.head) throw new Error("State HEAD changed.");
+    if (!this.control.active) return { released: true, stateCommit: this.head, disposable: true };
+    if (!this.session) throw new Error("Confirm remote handoff before releasing an abandoned active run.");
     const control = releaseLease(this.control, this.session.lease);
     await this.store.prepare(this.head, (payload) => {
       atomicJson(payload, CONTROL, control);
@@ -350,7 +481,7 @@ export class Runner {
     });
     const acknowledged = await this.store.recover({ retry: true });
     await this.load(acknowledged.commit);
-    return { released: true, stateCommit: this.head };
+    return { released: true, stateCommit: this.head, disposable: true };
   }
 }
 
@@ -375,20 +506,27 @@ export async function withSessionLock(directory, action, { unlock = false } = {}
 
 export async function main(argv) {
   const [command, configFile, jobFile] = argv;
-  if (!["start", "status", "restore", "renew", "resume", "begin", "run", "reconcile", "recover", "retry", "release", "unlock", "publish"].includes(command) ||
+  if (!["start", "status", "inspect", "restore", "renew", "resume", "adopt", "begin", "run", "reconcile",
+    "run-unit", "reconcile-unit", "recompute", "recover", "retry", "release", "unlock", "publish"].includes(command) ||
       !configFile || argv.length > 3) throw new Error("Usage: runner.mjs COMMAND LOCAL_CONFIG.json [LOCAL_JOB.json]");
   const config = JSON.parse(readFileSync(configFile, "utf8"));
   return withSessionLock(path.resolve(config.directory), async () => {
     const runner = new Runner(config);
     if (command === "recover" || command === "retry") return runner.recover({ retry: command === "retry" });
     await runner.open();
-    if (["begin", "run", "reconcile", "publish"].includes(command)) {
+    if (["run-unit", "reconcile-unit"].includes(command)) {
+      if (!jobFile) throw new Error("A durable unit ID is required.");
+      return runner[command === "run-unit" ? "run" : "reconcile"](jobFile);
+    }
+    if (command === "publish") {
+      const { publish } = await import("./publication.mjs");
+      const job = jobFile ? JSON.parse(readFileSync(jobFile, "utf8")) : runner.index?.publication;
+      if (!job) throw new Error("A publication specification or existing journal is required.");
+      return publish(runner, job);
+    }
+    if (["begin", "run", "reconcile", "adopt", "resume", "recompute"].includes(command)) {
       if (!jobFile) throw new Error("A local job specification is required.");
       const job = JSON.parse(readFileSync(jobFile, "utf8"));
-      if (command === "publish") {
-        const { publish } = await import("./publication.mjs");
-        return publish(runner, job);
-      }
       return runner[command](job);
     }
     if (jobFile) throw new Error("This command takes no job specification.");
