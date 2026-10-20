@@ -564,7 +564,10 @@ function decisionLedgerStatus(root, runId, receipt) {
   }
 }
 
-function finalizationStatus(discovery, receipt, decisionLedger, watermark) {
+export function finalizationStatus(discovery, receipt, decisionLedger, watermark) {
+  if (discovery.window?.mode && discovery.window.mode !== "daily") {
+    return { state: "not-applicable", errors: [] };
+  }
   if (receipt.state !== "complete" || decisionLedger.state !== "complete") {
     return { state: "pending", errors: [] };
   }
@@ -623,7 +626,7 @@ function workStatus(runDirectory) {
   return { fileCount: plan.fileCount, bytes: plan.bytes };
 }
 
-function nextStep(stages, digest) {
+export function nextStep(stages, digest) {
   if (stages.discovery.state !== "complete") return "repair-or-complete-discovery";
   if (stages.screening.state === "pending") return "prepare-screening";
   if (stages.screening.state !== "complete") return "complete-or-repair-screening-reviews";
@@ -634,7 +637,9 @@ function nextStep(stages, digest) {
   if (stages.promotion.state !== "complete") return "repair-canonical-promotion-or-digest";
   if (stages.receipt.state !== "complete") return "verify-and-write-the-run-receipt";
   if (stages.decisionLedger.state !== "complete") return "merge-verified-decisions-into-ledger";
-  if (stages.finalization.state !== "complete") return "finalize-the-verified-run-watermark";
+  if (stages.finalization.state !== "complete" && stages.finalization.state !== "not-applicable") {
+    return "finalize-the-verified-run-watermark";
+  }
   return "publish-separately-then-resume-the-next-run";
 }
 
@@ -815,6 +820,7 @@ async function ensureDecisionLedgerDelta({
   runDirectory,
   apply,
   verifyAgainstRun = false,
+  historicalReceipt = null,
 }) {
   const output = path.join(runDirectory, "decision-ledger", "delta.json");
   let payload;
@@ -822,7 +828,7 @@ async function ensureDecisionLedgerDelta({
   if (existsSync(output)) {
     payload = validateDecisionLedgerDelta(readJson(output));
     if (verifyAgainstRun) {
-      const expected = buildDecisionLedgerDelta({ root, runDirectory });
+      const expected = buildDecisionLedgerDelta({ root, runDirectory, historicalReceipt });
       if (canonicalJson(payload) !== canonicalJson(expected)) {
         throw new Error(
           "Unreceipted decision-ledger delta differs from current verified run artifacts.",
@@ -831,7 +837,7 @@ async function ensureDecisionLedgerDelta({
     }
     alreadyRecorded = true;
   } else {
-    payload = buildDecisionLedgerDelta({ root, runDirectory });
+    payload = buildDecisionLedgerDelta({ root, runDirectory, historicalReceipt });
     if (apply) await writeJsonAtomic(output, payload);
   }
   return {
@@ -1020,6 +1026,7 @@ async function mergeVerifiedRunDecisions({
     runDirectory,
     apply: Boolean(options.apply),
     verifyAgainstRun: !receiptValue.decisionLedger?.delta,
+    historicalReceipt: !receiptValue.decisionLedger?.delta ? receiptValue : null,
   });
   if (
     !receiptValue.decisionLedger?.delta &&
