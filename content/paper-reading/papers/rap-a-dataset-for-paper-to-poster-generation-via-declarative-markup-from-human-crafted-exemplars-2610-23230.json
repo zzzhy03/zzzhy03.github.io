@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.23230",
+  "slug": "rap-a-dataset-for-paper-to-poster-generation-via-declarative-markup-from-human-crafted-exemplars-2610-23230",
+  "title": "RAP: A Dataset for Paper-to-Poster Generation via Declarative Markup from Human-Crafted Exemplars",
+  "authors": [
+    "Haonan Han",
+    "Yukang Lin",
+    "Minliang Lin",
+    "Haoxian Tan",
+    "Jun-Yan He",
+    "Rui Yang",
+    "Zhi-Qi Cheng",
+    "Jie Hu",
+    "Guanglu Wan",
+    "Xiu Li"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-16",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.23230"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "RAP",
+    "visual-design-agents"
+  ],
+  "abstract": "Making a conference poster is visual coding in miniature: an entire paper must be compressed onto a single page, which exercises summarization, visual design, and code implementation at once, using nothing beyond the paper itself. Yet benchmarks for this task in the context of visual coding remain scarce: existing resources are small and annotated only with layout boxes, so evaluation must fall back on VLM-as-judge or human checklists rather than objective render-and-compare, and the generation methods they support design layouts from scratch, leaving human-crafted posters unusable as either a retrievable design library or as verified supervision. We introduce RAP (Reconstruct A Poster), a dataset and benchmark for paper-to-poster generation as a visual coding task. RAP contains 25K+ verified paper-poster pairs from various machine learning conferences held between 2022 and 2026, annotated with a three-level content taxonomy, plus a held-out benchmark of 150 test papers each paired with its human poster. A fully automated derendering pipeline turns each poster into styled HTML/CSS of typed, refillable slots, so every sample is a paper-poster-markup triplet verifiable by rendering against the source poster. The corpus serves both inference and training: PosterRAG, a training-free multi-agent pipeline, retrieves an exemplar and refills its slots without touching layout or styling, while an SFT+RL recipe trains a dedicated model from the same triplets. An online demo is available at https://reconstruct-a-poster.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.23230v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.23230v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/VincentHancoder/RAP"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.23230v1 (21 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: available.",
+    "ideaZh": "RAP把25,435个人工poster变成带typed slots的可渲染HTML/CSS设计库，分别用于保留版式的PosterRAG与SFT+RL训练；作者报告150篇测试集上PosterRAG的FID/FDiD为23.75/306.79。值得精读的是“人工设计→结构化模板→内容替换→受约束视觉修复”的可复用流程；分布相似度和跨论文多样性尚不能证明内容忠实性或逐篇可读性。",
+    "motivationZh": "Paper-to-poster既要压缩长论文、规划视觉层级，也要生成可编辑实现；已有数据多为box标注，难以利用人工poster作为可验证的设计监督。",
+    "methodZh": "通过layout检测、OCR字号估计和design caption把poster derender成几何锁定的HTML slots。PosterRAG按domain/task/method、叙事与审美三级检索，MappingAgent仅替换内容，Reviewer只作受保护CSS修补；同一三元组还训练Qwen3.8-27B，先SFT再以DOM规则和VLM reference评分做GRPO。",
+    "methodFlow": [
+      "人工poster经layout/OCR/design caption重建为typed HTML slots",
+      "解析论文并用类别、叙事、审美三级检索选模板",
+      "按slot容量映射文字/图表，程序化替换且保留布局样式",
+      "渲染后作局部CSS修复，拒绝隐藏/裁剪正文等退化操作",
+      "或以paper-poster-markup三元组进行SFT及渲染奖励GRPO"
+    ],
+    "experimentsZh": "150篇held-out papers，每个15个domain取10篇；训练库25,435对。Agent baselines统一Claude-Opus4.6。测跨poster pairwise LPIPS/DINOv2/DISTS及对人工分布FID/FDiD；另测poster reconstruction SSIM、layout mIoU。 作者报告PosterRAG HTML Guidance的FID/FDiD=23.75/306.79，P2P=33.24/377.25；DINOv2-CosDist=0.4443 vs 0.2847。 (Table 2(a), p. 7) 作者报告Qwen3.8-27B经SFT再RL的FID/FDiD由28.00/326.24降至23.42/306.94；仍落后Claude-Opus-5的21.56/289.49。 (Table 2(b), p. 7) 作者报告image-only guidance FDiD=1267.84，HTML guidance=306.79；完整derendering mIoU=0.6897。 (Tables 2(a),3, pp. 7,9) 对照范围：比较NanoBanana Pro、P2P、Paper2Poster、PosterGen及多种VLM；统一agent模型利于控制，但generation主表没有独立内容忠实性、阅读准确性或真人偏好指标，也未给推理成本比较。 消融与诊断：包含HTML vs image guidance、不同derendering backbones、+Layout/+OCR/+Design和RL rule/model reward消融；组合reward改善FID/FDiD但DINO diversity略低于SFT，非所有指标单调增长。",
+    "insightZh": "核心新增是可重放的人工poster-markup数据和其双重用途，不只是再包装多agent；typed、可填充slots使视觉设计成为可继承对象。检索各级与visual reviewer的独立贡献缺乏完整消融。",
+    "evidenceZh": "25,435 verified pairs及150篇held-out benchmark提供人工视觉参考 (Sec. 3, pp. 3-4; Appendix A Tables 4-5, p. 12); 固定geometry和样式，程序化填slots后视觉修复 (Sec. 4.1, Fig. 3, pp. 4-5; Appendix B.1/B.4, pp. 13-14,19); HTML guidance优于只参考poster image；SFT+RL改善基座分布指标 (Table 2, p. 7; Appendix B.6 Table 7, p. 20); Layout几何监督贡献最大 (Table 3(b), p. 9)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中visual-design-agents与editable 2D design，typed slot representation及非破坏性renderer feedback可迁移到信息图、学术figure和结构化设计生成。",
+    "caveatZh": "作者无独立limitations段；固定slots依赖检索模板适配，难以支持真正新布局。; FID/FDiD只是分布距离；高pairwise diversity可能来自模板差异，不能单独证明信息组织质量。; 部分instruction由reference layout构建，故post-training评价包含较强结构提示；不可视为纯paper自动自由设计能力。"
+  }
+}

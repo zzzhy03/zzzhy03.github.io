@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.23121",
+  "slug": "scene-designer-learning-design-intelligence-for-agentic-3d-scene-generation-2610-23121",
+  "title": "Scene-Designer: Learning Design Intelligence for Agentic 3D Scene Generation",
+  "authors": [
+    "Xuanyu Liu",
+    "Hongyan Feng",
+    "Miao Pan",
+    "Sunlai Chen",
+    "Lizhou Liang",
+    "Bing Sun",
+    "Wenqi Zhang",
+    "Xuhong Zhang"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-16",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.23121"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "Scene-Designer",
+    "visual-design-agents"
+  ],
+  "abstract": "Generating complete, coherent, and usable 3D indoor scenes from natural language requires strong \\textbf{design intelligence}: the ability to design high-quality scenes and critique their quality. However, existing approaches either rely on general-purpose models lacking domain-specific design experience or learn from static scenes. In this work, we introduce \\textbf{Scene-Designer}, an agentic framework that learns design intelligence through complementary design and critique experiences. We construct two datasets: \\textbf{Scene-OTA-35K}, which provides Observation--Thought--Action supervision for learning scene design and efficient error correction, and \\textbf{Scene-OTC-15K}, which provides Observation--Thought--Critic supervision for learning scene quality critique across physical validity, functional correctness, and layout coherence. Based on these experiences, we propose \\textbf{Scene-GRPO}, a Critic-guided GRPO framework that improves design decisions and reduces unnecessary trial-and-error corrections. Extensive experiments demonstrate that Scene-Designer achieves superior performance in physical validity, functional correctness, and layout coherence, while the learned Scene-Critic significantly outperforms general-purpose models in scene critique. Moreover, test-time Critic guidance further improves scene generation, showing that the Critic can provide useful guidance beyond training. Additional analysis suggests a trend of mutual enhancement between scene design and critique abilities.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.23121v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.23121v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/ZJU-OmniAI/Scene-Designer"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.23121v1 (39 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: available.",
+    "ideaZh": "Scene-Designer把室内场景设计与critique一起学习：先用35K经轨迹压缩的工具动作和15K扰动偏好监督SFT，再以冻结Critic评价同父节点的四个候选动作及parent-child改进做GRPO。作者报告四场景ranking准确率76%，交互朝向错误需≥5次修复的比例40%→7%；可借鉴的是动作级相对与进步奖励，需警惕小样本和VLM评价偏差。",
+    "motivationZh": "通用VLM场景agent能发现错误却反复移动和缩放对象，静态scene训练又缺少高效纠错过程与可学习的全局功能偏好。",
+    "methodZh": "用GPT-5.2+SceneSmith生成轨迹，规则筛疑似无效动作，再以causal verifier保留有下游作用的修正并重放最终状态；在场景上加入物理/功能/布局扰动构造排序数据。联合SFT后冻结Critic，对四个候选child作ranking及与parent比较，配合length/completeness奖励优化policy；推理时亦可由Critic选branch。",
+    "methodFlow": [
+      "采集SceneSmith构建轨迹并删除无因果贡献的重复操作，重放校验final scene",
+      "通过多强度场景扰动构造OTA动作与OTC偏好监督",
+      "Qwen3-VL-8B联合SFT学习构建和critique",
+      "每步采样四个候选child，冻结Critic评估sibling ranking和parent-child改进",
+      "用局部奖励及轨迹长度/完整性奖励进行Scene-GRPO",
+      "推理可继续由Critic选branch，输出可编辑3D室内场景"
+    ],
+    "experimentsZh": "Qwen3-VL-8B-Instruct full-parameter SFT两epoch、4×A800；35K OTA steps来自约1K scenes，15K OTC comparisons。RL每步4 branches、group 4、最长80 steps。Bedroom/Living room/Bathroom/Office每方法每type 10 scenes，geometry collision/boundary指标及GPT-4 0-10质量评价；独立OTC测试94/55例。 作者报告living room的layout分数Scene-Builder 8.2→Scene-Designer 9.3→w/Critic 9.6，三者out-of-bound/collision均0。 (Table 1, p. 8) 作者报告n=4完整ranking准确率Qwen基座2%、GPT-5.2 15%、OTC-only 51%、OTA+OTC 76%；五次重排75.64±6.88%。 (Figs. 10-11, pp. 10-11) 作者报告交互朝向错误≥5次纠正40%→7%，window blockage21%→5%。 (Fig. 6 and Sec. 4.1, pp. 9-10) 作者报告Scene-Designer w/Critic的mRR=0.98、FR@0.3=1.0，Scene-Builder为0.96/0.72。 (Appendix G Table 6, p. 38) 对照范围：主表含ATISS、DiffuScene、PhyScene、LayoutGPT、Holodeck、I-Design和SceneWeaver及SFT/RL/Critic变体；常见room每type仅10例，无盲真人主评，分布外风格与复杂多房间不充分。 消融与诊断：Fig.9分别去除improvement、branch-ranking、length、object-completeness，性能均有下降；joint OTA+OTC相对OTC-only提升Critic排序。没有等训练预算的大规模外部偏好Critic比较，data与reward贡献仍部分耦合。",
+    "insightZh": "将设计经验压缩、可控退化偏好与动作级Critic-guided RL相连，是设计agent训练方法而非单次prompt engineering。联合学习互利的论据一部分来自小型排序测试与定性场景，尚不能推广为普遍design intelligence定律。",
+    "evidenceZh": "Consolidation只删除高置信无用动作，保留必要中间态并replay检查 (Sec. 3.1, p. 6; Appendix D.2, pp. 23-26); 双local reward区分候选相对好坏和编辑是否真正改进parent (Sec. 3.2, Fig. 5, p. 7; Appendix C, pp. 17-19); 作者报告joint训练提高Critic四scene ranking并减少纠错 (Sec. 4.1-4.3, Figs. 6,10-11, pp. 9-11); 几何可达性提供与GPT评分不同的补充证据 (Appendix G Table 6, pp. 38-39)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中闭环视觉设计agent和3D scene generation；保留有效纠错经验、用相对偏好与parent改进约束动作的机制，可作为LEGO/可制造结构agent的训练设计参考，实际迁移仍待验证。",
+    "caveatZh": "作者无独立limitations段；语义质量主表依赖GPT-4评分和小样本，满分不能理解为实际设计近乎完美。; OTC由预设扰动形成，其排序可能学到合成退化规则，尚未证明对真实设计争议与文化偏好稳健。; 主文平均轨迹约110→30与附录tool-call减少57%的统计口径不同，不合并为同一压缩率。; 公开repo明确目前发布权重为Scene-Builder SFT阶段，非Scene-GRPO后的最终权重；未实际复现。"
+  }
+}

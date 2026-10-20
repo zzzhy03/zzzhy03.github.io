@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.23050",
+  "slug": "trifold-folding-irregular-3d-gaussians-into-structured-latents-for-3d-scene-generation-2610-23050",
+  "title": "TriFold: Folding irregular 3D Gaussians into structured latents for 3D Scene Generation",
+  "authors": [
+    "Yun Wang",
+    "Chiyu Wang",
+    "Fan Jiang",
+    "Ziyu Zhu",
+    "Zhaoxu Sun",
+    "Guangchi Fang",
+    "Mu Xu",
+    "Dapeng Wu"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-19",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2610.23050"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "TriFold",
+    "3d-generation"
+  ],
+  "abstract": "Recent progress in 3D generation has motivated growing interest in compact generative representations of complex 3D scenes. For native 3D Gaussian scenes, however, learning such representations remains challenging due to widely varying primitive counts, nonuniform spatial density, and differences in geometry and appearance even among spatially neighboring primitives. In this work, we introduce TriFold, a native 3D Gaussian VAE that encodes Gaussian scenes into a fixed-layout triplane latent and jointly reconstructs their geometry and appearance. The key insight is to impose structural regularity on the latent space while preserving the spatial adaptivity of the underlying Gaussians. During encoding, we use cell-wise learned queries to aggregate projected Gaussians into multiple slots per cell, reducing the information loss caused by single-feature pooling. During decoding, occupancy prediction identifies active regions, where query-based set prediction and candidate selection reconstruct local Gaussian sets with spatially varying primitive counts. Building on this representation, we train a latent flow-matching model for conditional scene-level 3DGS generation, enabling point-cloud-conditioned synthesis and single-image-conditioned amodal generation. Experiments demonstrate that TriFold achieves high-fidelity reconstruction and generation from a single image that provides only a partial observation of the scene, validating its effectiveness for native 3D Gaussian representation learning. https://fantasy-amap.github.io/TriFold",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.23050v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.23050v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.23050v2 (30 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: promised. 本文精确版本更新晚于补刊窗口；窗口资格依据首次publishedAt，不将后续修订当作10月18日新增事件。",
+    "ideaZh": "TriFold把数量与密度不规则的原生3D Gaussian场景编码为多slot triplane latent，再以occupancy和局部set decoder恢复可变数量Gaussians，适合作为scene generation的统一几何/外观表示。作者报告重建PSNR 26.55 dB，优于其scene-level适配的GaussianGPT；生成实验尚无同协议外部方法比较。本补刊实际审阅10月19日的v2，不能视作10月18日已存在的版本快照。",
+    "motivationZh": "场景级3DGS既有可变primitive数，又有局部密度和几何/外观属性突变；直接固定Gaussian预算或单feature pooling会损失细节，而生成backbone需要固定tensor接口。",
+    "methodZh": "PTv3提取Gaussian context；每个投影cell以四个learned queries聚合并沿共享primitive做cross-plane attention，形成固定triplane VAE latent。occupancy定位active voxels，DETR式局部decoder预测至多24个候选，以带dummy bin的Sinkhorn OT监督中心和objectness，rendering约束其余属性，并抑制phantom voxels。冻结VAE后训练conditional latent flow；图像条件由DINOv3特征与估计深度对齐到triplane。",
+    "methodFlow": [
+      "原生可变数量3DGS → PTv3逐primitive context features",
+      "投影到三平面 → 每cell多query slots与cross-plane attention",
+      "Triplane VAE编码固定布局的几何/外观latent",
+      "Occupancy选active voxels → OT监督的局部set decoder与objectness-opacity筛选",
+      "冻结VAE → 由对齐图像/point-cloud条件驱动latent flow生成完整scene"
+    ],
+    "experimentsZh": "InteriorGS与SceneSplat-49K的ASE/Aria子集按原scene 9:1切分，之后InteriorGS裁剪；VAE 80K steps，flow 100K steps。重建比较PSNR/SSIM/LPIPS与center CD；单图/完整point-cloud生成比较FID/KID及unobserved geometry COV/MMD。生成每条件固定seed取一例、16 views；flow仅InteriorGS训练。 作者报告重建PSNR由GaussianGPT 21.40提高至26.55 dB，LPIPS由0.157降至0.088；这是其共同scene-level适配协议内结果。 (Table 1, p. 8) 作者报告单图unobserved appearance FID 67.81、KID×10³为21.43，unobserved COV-CD 85.24%、MMD-CD×10³为12.75；该表是条件设定评估而非生成方法SOTA排名。 (Table 2, p. 9) 作者报告encoder从1到4 slots，PSNR 24.40→25.83；增至8 slots为26.11，反映容量/质量折中。 (Table 9, p. 27) 对照范围：使用Can3Tok、DiffGS、GaussianGPT官方实现，共同scene split和80K steps；Can3Tok先压至40,000 primitives，前两者出现低细节退化。没有同条件scene generation外部对照，不将representation胜出扩写为生成领先。 消融与诊断：Tables 5–11分别研究encoder/decoder、rendering与position目标、phantom、backbone、OT、grid resolution、slot/channel和K。收益依赖多slot/适应性set解码与rendering；OT并非所有指标均胜hard matching，Q=8与K=32仍可继续增益。",
+    "insightZh": "相对fixed-cardinality token、voxel量化及continuous field路线，贡献是fixed-layout多slot triplane与content-adaptive原生Gaussian解码的组合，而非新2D-to-3D几何估计器。K=24仍是局部容量上限，不能表述为完全无离散化或无限primitive容量。",
+    "evidenceZh": "多slot写入和cross-plane聚合缓解Gaussians投影到同一cell的多对一瓶颈。 (Sec. 3.1–3.2, p. 5; Appendix A.2, p. 18; Fig. 2, p. 4); 解码先预测occupancy再对局部无序集合做OT匹配，候选是否保留由objectness乘opacity决定。 (Sec. 3.3–3.4, pp. 5–7; Appendix A.3, pp. 19–20); 作者报告TriFold在共同scene-level测试上重建PSNR 26.55、SSIM 0.913、LPIPS 0.088、CD×10³为2.23。 (Table 1, p. 8; Appendix A.4, pp. 20–21); 单图条件的unobserved region可生成合理补全，但未与其他生成器作同协议比较。 (Sec. 4.3 and Table 2, p. 9; Appendix A.5–A.6, pp. 21–25); 当前训练先验和空间scale限制其跨分布能力。 (Limitations, pp. 29–30)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接提供scene-level native 3DGS的生成latent与可变容量解码，属于3D Generation主线表示推进；适合研究如何把可变结构显式表示接入固定tensor生成器。",
+    "caveatZh": "较少且有限多样性的scene-level 3DGS训练数据限制prior与OOD泛化。; 固定物理尺度crop和canonical triplane使大尺度差异场景可能需要额外normalization或multiscale表示。; 生成没有同协议外部方法对照；重建基线部分发生适配退化，不能把巨大差距泛化到原方法域。; 单图条件额外需要camera、共享depth scale及预定义crop，尚不是任意in-the-wild RGB即可运行。; 局部K=24会截断高密度tail的set监督；完整rendering只近似其影像效果，未保证primitive一一保真。; 10月18日补刊于10月20日审阅的exact version为2610.23050v2，更新时间2026-10-19T16:38:57Z晚于回查窗口；结论来自事后版本，不能重建当日科学快照。"
+  }
+}

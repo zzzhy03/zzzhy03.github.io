@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.24738",
+  "slug": "editing-images-into-reusable-layers-via-compositional-edit-prior-distillation-2610-24738",
+  "title": "Editing Images into Reusable Layers via Compositional Edit-Prior Distillation",
+  "authors": [
+    "Wen Xue",
+    "Yong Liu",
+    "Xueheng Li",
+    "Si Wu",
+    "Yong Xu",
+    "Yipeng Sun",
+    "Yan Li",
+    "Simiu Gu"
+  ],
+  "publishedAt": "2026-10-17",
+  "updatedAt": "2026-10-17",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.24738"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "Editing Images into Reusable Layers via Compositional Edit-Prior Distillation",
+    "2d-design"
+  ],
+  "abstract": "High-quality image editing requires precise modification of target regions while preserving the content of unrelated regions. Existing editing models produce flattened outputs that limit precise local manipulation and layer reuse, while decomposition methods typically optimize layer recovery separately from instruction-driven editing. To this end, we introduce LayerEditor, a unified framework that couples instruction-guided image editing with controllable generation of reusable RGBA layers. At its core, In-Context RGB-Alpha Token Modeling jointly represents the edited canvas and an ordered sequence of RGB-Alpha layers within a single token sequence, enabling semantic edits and explicit control over individual layer content. To retain the pretrained model's editing capability during adaptation to layered outputs, we propose Compositional Edit-Prior Distillation, which transfers its editing prior to both the edited canvas and the image composed from the predicted layers. To support training and evaluation, we construct LayerEditor-100K, a large-scale paired image-editing dataset with ordered RGBA layer annotations, and introduce dedicated benchmarks for layered editing. Extensive experiments demonstrate that LayerEditor maintains strong editing fidelity while generating accurate RGBA layers, supporting both flexible layer-level manipulation and multi-layer decomposition.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.24738v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.24738v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.24738v1 (24 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: not-found.",
+    "ideaZh": "LayerEditor把instruction editing与有序RGBA layers联合生成，以RGB/Alpha分离tokens和专用Alpha decoder输出可复用结构，再让冻结teacher同时监督直接canvas与layers重组。作者报告两组自建benchmark的Composite和Alpha指标领先；对结构化2D生成很直接，但文字仍是raster，移动层后的可靠性尚未系统验证。",
+    "motivationZh": "扁平图像编辑保留不了独立元素，而先编辑再decompose容易丢内容、混layer或破坏opacity；将预训练editor改成多层输出又会削弱其原有editing prior。",
+    "methodZh": "以FireRed-Image-Edit-1.1为底座，用layer-aware RoPE区分Direct canvas和各层RGB/Alpha字段，统一attention联合去噪，rank-256 LoRA适配。专用Alpha decoder单独训练后冻结；C-EPD在student on-policy轨迹的中间状态查询冻结原editor，匹配Direct velocity，并通过可微RGB/Alpha解码和alpha-over composition将teacher编辑先验传入整个layer stack。",
+    "methodFlow": [
+      "源图+编辑指令+层数/有序content plan → frozen条件encoders",
+      "Direct canvas与各层RGB/Alpha分字段tokens → layer-aware RoPE联合DiT去噪",
+      "专用Alpha decoder与冻结RGB decoder恢复有序RGBA layers",
+      "Flow matching保留每层监督；C-EPD同时对齐Direct velocity与teacher目标重组图",
+      "输出Direct canvas和可独立操作的RGBA stack，以alpha-over检验重组"
+    ],
+    "experimentsZh": "100K training pairs来自Crello、PrismLayersPro、ScaleEdit，2–10层。主评估Crello-Testset 2,994、ScaleEdit-Testset 1,000 documents，衍生变体先按source document平均；I2L为1,171 held-out原Crello。比较FireRed+QIL系列、QIL-Edit-SFT、RevealLayer及Seedream5-Pro Seq/Joint；用Direct/Composite SSIM/FID、匹配后RGBA L1/continuous Alpha IoU、Gemini-3.1-Pro五维rubric。 作者报告Crello Composite SSIM 0.8351、FID 33.86、Alpha IoU 0.6074；Seedream5-Pro Joint对应0.7902、55.33、0.5139。 (Table 1, p. 6) 作者报告ScaleEdit Composite SSIM 0.8839、Alpha IoU 0.6802；Seedream5-Pro Joint为0.8365与0.6583。 (Table 1, p. 6) 作者报告移除C-EPD后Crello edit-consistency 6.14→4.67、layer segmentation 6.83→5.01；这些是VLM rubric分数而非人工评分。 (Table 3, p. 9) 对照范围：部分baselines只有count条件，其他与LayerEditor同content plan；FR cascades为预训练editor而本方法有task data适配。Seedream Crello有5例refusal被排除，仅2,989例，其他方法全量。时间来自不同硬件/服务开销，41.5秒不能当受控速度排名。 消融与诊断：控制backbone steps比较双路径C-EPD、分别去Direct/Composite OPD及Alpha decoder。单独teacher项不在全部指标上超过无OPD；专用decoder的收益同时含额外opacity训练。无matched off-policy对照，不能把总体增益归结为on-policy选点。",
+    "insightZh": "贡献是把指令编辑和可控layer stack联合建模，并在结构化输出适配时用teacher同时约束直接和组合路径；并非新的alpha-over算子。数据与架构有实质方法推进，符合2D Design；on-policy本身未通过同预算off-policy对照被单独归因。",
+    "evidenceZh": "单一token序列同时表示Direct、每层RGB和Alpha，layer-aware坐标编码field identity与stacking order。 (Sec. 3.1 and Fig. 2, pp. 3–4); C-EPD在student轨迹的中间状态查询teacher，并把组合像素loss的梯度传回RGB与Alpha预测。 (Sec. 3.2–3.3, pp. 4–5; Appendix A.3–A.4, pp. 14–15); 作者报告在两组自建测试上Composite fidelity和Alpha IoU均高于比较系统。 (Table 1, p. 6; Sec. 4.2, p. 7); 作者的同backbone steps消融支持双路径teacher约束的联合价值。 (Table 3 and Sec. 4.5, p. 9; Appendix C.2, pp. 19–20); 可编辑性证据仍主要是layer isolation与原位recomposition，缺少操作后系统评估。 (Appendix E Limitations, p. 22)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接生成可编辑的有序RGBA结构，而不只输出raster canvas；teacher约束组合结果的思路能用于维护显式2D表示在下游rendering中的质量。",
+    "caveatZh": "仅训练与评估最多10层；复杂透明、细结构和半透明边界在移动/重组时仍有artifact。; 文字是rasterized而非font/vector primitives，未证明lossless重建或无artifact的后续复用。; 未系统测试layer manipulation后重建，VLM rubric未与人类判断校准，editing-prior retention未在独立通用editing benchmark验证。; 自动annotations和model-based assessments可能有错误和偏差。; 评估中的layer-content plans来自离线annotation，测试的是给定plan下的生成，不等于从任意用户指令自主规划layers。; 系统对比同时改变训练数据适配和条件信息，主表不能单独因果证明joint modeling优于cascade。; VLM平均分仍约5–7/10；较高image fidelity不等于每个layer都已可生产使用。"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.23659",
+  "slug": "flexpart-text-controlled-semantics-aware-3d-part-segmentation-at-flexible-granularity-2610-23659",
+  "title": "FlexPart: Text-Controlled Semantics-Aware 3D Part Segmentation at Flexible Granularity",
+  "authors": [
+    "Yiqun Zhao",
+    "Jiachen Xu",
+    "Yihao Zhi",
+    "Yunfei Zhao",
+    "Zibo Zhao",
+    "Xintong Han",
+    "Chunchao Guo",
+    "Shenghua Gao"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-16",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.23659"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "FlexPart",
+    "3d-segmentation"
+  ],
+  "abstract": "A 3D asset admits multiple valid part decompositions, while semantics-aware segmentation should reflect both the desired granularity and the parts a user wants to extract. Ideally, a practical segmentation model should strive for a simple principle: what you ask for is what you get. However, realizing this goal is hindered by two core obstacles: the lack of multi-granularity training data and the absence of a holistic control mechanism. We propose FLEXPART, a unified framework for text-controlled 3D mesh segmentation. To establish flexible control, we introduce a holistic control prompt comprising semantic part names with location and shape clauses. To support this mechanism, we utilize an automated Vision-Language Model (VLM) pipeline to construct a large-scale dataset of multi-granularity partitions and their corresponding prompts. Driven by this data, FLEXPART generates a view-independent part-identity field in native 3D space, directly assigning discrete part IDs to mesh faces. To compel the model to respect semantic conditions rather than rely on geometric priors, we train the model using randomized background dropping. Furthermore, an inference-time VLM planner can automatically complete descriptive clauses from 2D renderings, allowing users to simply name the desired parts in ordinary words. FLEXPART with planner-completed prompts outperforms the strongest evaluated baseline by 15% in mIoU, even when that baseline receives ground-truth guidance. On our held-out FLEXPARTBENCH, FLEXPART leads at each granularity and improves average mIoU by 22% over the strongest baseline. With only the requested part names supplied by the user, it also improves IoU by 35% over the strongest click-driven baseline on selective segmentation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.23659v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.23659v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.23659v1 (18 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: not-found.",
+    "ideaZh": "FlexPart保留输入mesh，仅生成text-controlled native3D part-ID field，用name/location/shape、ordered ID和随机background dropping统一多粒度与指定部件提取。作者报告PartObjaverse-Tiny自动prompt mIoU0.681、Selective-190 query IoU0.615；但直接按prompt匹配的成绩更低，重复部件与模糊边界仍会失败。",
+    "motivationZh": "同一mesh存在多种合理功能/结构分解，固定geometry边界或单视图click不能表达用户要哪些部件、采用何种粒度并处理遮挡。",
+    "methodZh": "FlexPart把name+location+shape item list显式绑定ordered 6-bit part IDs；part-aware VAE编码点/法线/ID并解码SDF和连续3D part-ID field，text-conditioned MM-DiT从geometry latent生成该field，在原mesh face centres查询标签。57K资产构造151492多粒度prompt-target pairs，以drop-to-background教选择性分割；planner可从16视图补全用户部件名。",
+    "methodFlow": [
+      "从artist组件构建粗中细partitions与name/location/shape文本，并明确方向约定",
+      "part-aware VAE编码position、normal、6-bit part ID，同时学习SDF与ID field",
+      "给定mesh无part的geometry latent和ordered文本，MM-DiT预测part field latent",
+      "训练时随机删去prompt items并把对应faces转成background，同时shuffle items并重标ID",
+      "解码并在原mesh face centres查询标签；planner可从16视图补全描述或生成粒度prompt"
+    ],
+    "experimentsZh": "HY3D-Bench57K objects、151492prompt-target训练；PartObjaverse-Tiny200个watertight meshes；FlexPartBench364个asset/1092partitions，UID排除训练；Selective-190来自28个heldout assets、每case2-18个namedparts。planner只见16个bare-mesh renderings，full model30Euler steps/CFG6。 作者报告自动prompt mIoU0.681，GT描述0.691，direct0.614；最高baseline SegviGen-GT0.594。 (Table 1, p. 7) 作者报告多粒度平均matched0.637、direct0.611，PartField0.521。 (Table 2, p. 7) 作者报告选择性planner query IoU0.615、BG0.895；SegviGen-click query0.456。 (Table 3, p. 7) 对照范围：含Find3D、SAMPart3D、PartField、P3-SAM、SegviGen，并清楚标示part names/count/scale/click/GT map等不同输入。CubePart只作3案例qualitative，因为输出新mesh非原face labels；MultiCube未release。训练和benchmark都经相近annotation pipeline，评价语义分组的外部泛化仍有限。 消融与诊断：background drop、RGB vs6bitID、单fine vs多粒度、prompt-order binding、固定K错配均有。unordered direct仅0.011，ordered0.804表明ID绑定有效；无drop不构成有效selective模式。",
+    "insightZh": "实质贡献是native 3D field、ordered text-to-ID binding和multi-granularity数据共同提供全局、语义可控的分割机制，而不是普通encoder/head小改。它把已有generative surface VAE/DiT用于face labeling，避免CubePart生成新part meshes的几何偏离；数据仍依赖artist atomic boundaries和VLM分组，不等于任意正确的人类语义划分。",
+    "evidenceZh": "6-bit label保留all-ones作background，prompt第i项直接绑定第i个ID；在原mesh face centres查询field。 (Sec. 3.1-3.2, Fig. 2, pp. 3-5); 作者报告PartObjaverse-Tiny Auto/GT matched mIoU0.681/0.691，direct0.614；SegviGen-GT为0.594。 (Table 1, p. 7); 作者报告FlexPartBench粗/中/细matched mIoU0.763/0.635/0.511，平均0.637；direct平均0.611。 (Table 2, p. 7); 作者报告Selective-190 planner query/BG IoU0.615/0.895，GT desc0.657/0.933；无background dropping时background泄漏0.976。 (Tables 3-4, p. 7; Appendix A.4, p. 16); 作者报告固定geometry与K时full prompt0.691、K-only0.373、same-K错配semantic0.493；证明semantic sensitivity。 (Appendix A.5, Table 8, pp. 16-17)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中promptable、open-vocabulary、object/part segmentation主线；field保留原mesh、orderedname-ID和backgrounddrop可以为后续part-level editing与3D generation建立可审计区域控制。未验证LEGO brick或制造件的精确连接边界，不能直接外推。",
+    "caveatZh": "Sec. 5, pp. 8-9：重复/对称parts的location描述不唯一，船帆会合并，leg与armour边界模糊；正确region也可能ID错配。; Appendix A.7, p. 17：part vocabulary与分解观念受常见类别和artist设计偏好影响。; partitions建立于原artist组件，不能证明可恢复atomic component内部的新边界；多粒度不严格层级嵌套。; matched mIoU隐藏part-name错配，必须同时保留direct分数。; Selective190仅28对象、FlexPartBench为本工作构造；生成mesh无GT，仅4个Hunyuan3D示例不能支持普适泛化。; 63个target parts和1024token文本预算限制极细分解；没有验证rigging、编辑或制造下游收益。"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.23795",
+  "slug": "persistent-planar-memory-for-video-world-models-2610-23795",
+  "title": "Persistent Planar Memory for Video World Models",
+  "authors": [
+    "Yuze He",
+    "Bin Tan",
+    "Zelin Gao",
+    "Yujun Shen",
+    "Yong-Jin Liu",
+    "Nan Xue",
+    "Yinghao Xu"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-16",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.23795"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Persistent Planar Memory for Video World Models",
+    "3d-generation"
+  ],
+  "abstract": "Video world models that generate and explore environments at scale need a persistent 3D memory of what they have produced. Plane primitives offer a natural candidate: a compact set of oriented planes captures the dominant structural elements (e.g., walls, floors, facades) of indoor and outdoor scenes, while requiring only 7 parameters per primitive. We present PPMem, a video world model that adopts plane primitives as its persistent 3D memory. PPMem augments a video diffusion transformer with a planar prediction head and a Depth Token Fusion (DTF) module: each autoregressive chunk jointly produces RGB video and planar geometry, which merges into a persistent plane memory that conditions subsequent chunks via rendered depth. The resulting memory is three orders of magnitude more compact than per-pixel point clouds (~100K primitives, 5MB for a full scene), geometrically explicit (metric depth, normals, exportable surfaces), cross-view consistent (jointly predicted by the shared backbone), and adaptive (refined by the merging procedure as generation proceeds). On DL3DV and RealEstate10K, PPMem outperforms prior 3D-grounded world models in video quality while jointly producing metric-scale depth, surface normals, and exportable planar geometry, sustaining coherence across hundreds of frames under large viewpoint changes. Project page: https://hyzcluster.github.io/ppmem.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.23795v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.23795v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://hyzcluster.github.io/ppmem"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.23795v1 (20 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: available.",
+    "ideaZh": "把 video diffusion 的空间记忆从稠密点改成可合并、可栅格化的平面 pool：作者报告长 rollout 106K 平面仅4.8 MiB，仍输出 metric depth、normal 和可导出的平面几何。DL3DV 121帧 LPIPS 为0.464，优于表中基线；但优势主要适用于静态、结构化场景，DTF 在对齐深度测试上并未全面胜过简单 concat。",
+    "motivationZh": "长程 camera-controlled video 用历史帧或逐像素几何作记忆时，难以同时保持空间一致性、紧凑存储和可导出的结构化场景状态。",
+    "methodZh": "PPMem 在 Wan2.2-5B 上分两阶段训练：先学相机控制视频，再冻结视频骨干，以 geometry LoRA、plane head 与 Depth Token Fusion 学每个 patch 的7参数矩形平面。每个25帧 chunk 先常规去噪，再额外一次 geometry pass；新平面经遮挡投票、质量去重及前瞻修剪并入 world-space pool，渲染出的 partial depth 和投影RGB条件化后续视频。",
+    "methodFlow": [
+      "输入首帧、文本与给定相机轨迹，准备投影RGB、mask和partial depth",
+      "Wan DiT 生成25帧视频，额外开启geometry LoRA的一次forward预测平面",
+      "将7参数平面变换到世界坐标，以遮挡投票和观察质量进行去重、替换与修剪",
+      "从累积plane pool向下一chunk相机渲染depth，同时选择历史source views",
+      "以latent concat及DTF几何分支反馈，输出长视频、depth/normal与可导出平面"
+    ],
+    "experimentsZh": "训练80K+ DL3DV/RE10K clips，主模型576×1024；两个测试集各100场景，长程DL3DV300-400帧。消融以5K indoor clips、288×512训练，56场景测试，基准提供GT相机及首帧depth；监督为估计metric depth。 作者报告DL3DV 49/121帧LPIPS为0.335/0.464，RE10K为0.168/0.254；长程约350帧的CLIP/DINO曲线领先表中系统。 (Table 2, Fig. 3, p. 7) 作者报告same-model joint memory相较无persistent memory将δ<1.25由64.0提升至70.3，AbsRel由0.272降至0.210。 (Table 3, p. 8) 作者报告106K plane pool4.8MiB；完整非模型状态峰值41MiB，额外固定几何模块状态1.1GiB。 (Appendix A.3, pp. 16-17) 对照范围：含Gen3C、Voyager、VMem、SPMem及Appendix WorldPlay/MemCam，native尺寸不同；same-checkpoint memory swap提供较干净但inference-only的比较。未覆盖动态场景、任意轨迹、长期无限增长或fabrication几何合法性。 消融与诊断：plane-vs-point/posthoc/no-memory、DTF-vs-concat、VAE初始化decoder、normal/rasterization loss、context与merge阶段均有消融。concat+DTF并未在对齐深度全部指标优于concat；scale augmentation和DTF的scale probe支持不同主张。",
+    "insightZh": "新意在把由生成骨干内部预测的显式平面表示用作持续、可自更新的几何记忆，连接已有 Plana3R planar primitives 与 Wan video prior。它比只保留两帧点云或外部重建几何更紧凑；共同骨干不等于严格几何一致性的数学保证，跨系统SOTA比较也混入不同视频骨干与分辨率。",
+    "evidenceZh": "每个chunk先视频去噪，再额外geometry pass；geometry LoRA不参与50步视频去噪。 (Sec. 3.2-3.3, Fig. 2, pp. 5-6; Appendix A.3, Algorithm 1, pp. 15-16); 作者报告DL3DV 121帧 PSNR/LPIPS为13.98/0.464，RE10K为19.34/0.254。 (Table 2 and Fig. 3, p. 7); 作者报告同checkpoint inference替换memory，joint plane pool的AbsRel为0.210、δ<1.25为70.3%，无persistent memory为0.272/64.0%。 (Table 3, Sec. 4.4, p. 8); 作者报告106K平面与metadata为4.8MiB，匹配rollout逐像素point cloud为1.7GiB；额外固定BF16几何模型状态为1.1GiB。 (Appendix A.3, pp. 16-17); DTF+concat在标准ablation的δ<1.25为70.3，concat-only为72.3；DTF的优势更明确体现在scale-faithfulness probe。 (Table 4, Fig. 5b, p. 9)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接提供可导出的结构化3D scene状态，并用它持续约束生成，可迁移到3D scene generation的显式primitive memory与几何反馈。应用到LEGO/可制造模型仍需改变primitive与约束，论文没有验证这些任务。",
+    "caveatZh": "Sec. 5, p. 10：高度organic环境如植被、水体不符合平面先验；极端训练外相机轨迹会退化。; 冻结video backbone保留prior但放弃video/geometry端到端共同适应；dynamic planes与open-world scaling留待未来。; Appendix B.3-C, p. 19：低planarity场景深度和PSNR更低，靠近原始低清细文字时会乱码。; metric scale依赖伪深度标定、相机与initial depth条件，不能等同真实测量尺度保证。; ∼100K是观察rollout的经验状态量，未证明无限生成的严格内存上界。; 生成几何是平面近似，未验证拓扑、水密、接触或制造约束；3D资产应用仍需独立几何验收。"
+  }
+}

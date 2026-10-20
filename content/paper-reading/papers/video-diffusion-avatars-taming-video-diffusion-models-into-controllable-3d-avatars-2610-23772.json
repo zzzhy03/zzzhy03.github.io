@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.23772",
+  "slug": "video-diffusion-avatars-taming-video-diffusion-models-into-controllable-3d-avatars-2610-23772",
+  "title": "Video Diffusion Avatars: Taming Video Diffusion Models into Controllable 3D Avatars",
+  "authors": [
+    "Simon Giebenhain",
+    "Tobias Kirschstein",
+    "Liam Schoneveld",
+    "Davide Davoli",
+    "Zhe Chen",
+    "Matthias Nießner"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-16",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.23772"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Video Diffusion Avatars",
+    "video-generation"
+  ],
+  "abstract": "Video diffusion models (VDMs) trained on internet-scale data encode a rich prior on appearance, motion, and physics that is difficult to replicate with explicit 3D rendering and costly 3D data capture. We introduce Video Diffusion Avatars (VDAs), a method that creates photo-realistic, multi-view consistent avatars from a single image by fine-tuning a VDM for precise control over camera viewpoint, facial expression, and upper-body pose. Departing from 3D morphable models (3DMMs), VDAs use a learned expression space that lifts the expressiveness ceiling of 3DMMs, e.g., for the tongue and mouth interior. However, learned expression codes exhibit heavy viewpoint bias, as our DISTRACT benchmark reveals. We show that this bias can be removed through disentanglement, enabling their use as driving signals for multi-view consistent avatars. Camera and upper-body pose are controlled jointly via proxy-mesh renderings, giving independent control over expression, pose, and viewpoint. A camera-triplet training strategy makes the approach efficient: our models train for 34 hours on a single A100 using only public multi-view data. VDAs outperform state-of-the-art single-image 3D avatars on novel-view reenactment, reducing face LPIPS by 29% and improving perceptual quality (JOD) by 66% on BecomingLit. A static 3DGS reconstruction probe further confirms that our generations are the most multi-view consistent. Built on a video prior, VDAs produce effects beyond the reach of explicit renderers, including physically plausible hair dynamics, shadows, reflections, and refractions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.23772v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.23772v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/SimonGiebenhain/video-diffusion-avatars"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.23772v1 (28 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: available.",
+    "ideaZh": "VDA把view-neutral表情、带局部坐标颜色的proxy mesh和camera-triplet监督接入video prior，直接渲染单图avatar。作者报告BecomingLit face LPIPS0.202，并将生成视图拟合成static3DGS后得到LPIPS0.192；这支持可迁移的多视图监督配方，但VDA本身不输出3D资产，也不是通用3D generation的landmark证据。",
+    "motivationZh": "单图avatar若完全依赖FLAME表情或显式3DGS，细微表情、口腔与复杂外观效果受限；直接用learned expression codes又将表情与视角混在一起，破坏跨视角驱动。",
+    "methodZh": "VDA以Wan-Animate-14B直接合成视频，先将X-NeMo expression code解耦出view-neutral expression，再译回Wan原生conditioning；FLAME head加SAM3D torso的局部ray-color proxy mesh控制camera与neck/body。不同reference、driver、target cameras组成triplet监督，主要DiT冻结，只微调face-fuser和控制模块。",
+    "methodFlow": [
+      "从driver取X-NeMo latent并解耦expression与camera",
+      "将expression译入Wan原生face conditioning，以平均camera latent中和viewpoint偏差",
+      "拟合FLAME head和SAM3D torso，按部件局部坐标着色并从目标camera渲染proxy与skeleton",
+      "用reference/driver/target不同camera triplet微调face与pose控制模块，保留video DiT",
+      "按独立camera、body/neck pose与expression生成avatar视频，并以静态3DGS拟合probe评估一致性"
+    ],
+    "experimentsZh": "NeRSemble/AVA256共4696个81帧clips、640身份，微调861.5M参数，34小时单A100；测试BecomingLit25self/13cross、Multiface22self及44VFHQ。static3DGS probe13身份固定expression，沿ellipse生成77-81视图，统一20K优化并在16真实相机验收。 作者报告BecomingLit/Multiface face LPIPS0.202/0.201，JOD3.99/3.49；VFHQ LPIPS0.024。 (Tables 2-3, pp. 5, 7) 作者报告static3DGS probe PSNR23.69、LPIPS0.192、ID0.869与Expr0.968。 (Table 4, p. 7) 作者报告无disentangler但cross-view triplet也可使view Rank1由0.244升至0.792；self-driven仅0.486。 (Appendix J, Fig. 14, pp. 22-24) 对照范围：含LAM、UIKA、FlexAvatar、CAP4D、MMDM及MVP4D视频模块，FaceCam只用于consistency probe；FactorPortrait仅能比较其公开selected examples，不能等价统一benchmark。动态3DGS probe和非人脸任务未评估。 消融与诊断：比较expression code来源、fuser冻结、disentanglement、triplet、proxy mesh和curation。单去disentangler差距较小，单去proxy mesh影响大；triplet是关键，DISTRACT MLP probe为transductive。",
+    "insightZh": "贡献是保留video prior条件下同时控制camera、pose、expression的具体监督与信号分离方案，并用DISTRACT识别expression latent中的view bias。学习式表情空间和proxy rendering各有先例，跨view triplet在消融中几乎可替代预训练disentangler；不是发现新的通用3D表示，也不应仅凭29%LPIPS提升判landmark。",
+    "evidenceZh": "VDA直接视频合成，没有构建显式3D资产；camera-triplet令driver-view信息对target reconstruction产生冲突，从而促进view invariance。 (Sec. 3, Fig. 2, pp. 3-5; Table 5, p. 8); 作者报告BecomingLit self-reenactment face LPIPS0.202、JOD3.99，MVP4D video model为0.282/1.85，CAP4D为0.322/2.40。 (Table 2, p. 5; Appendix A-B, pp. 15-16); 作者报告13身份static3DGS probe在16个真实rig cameras上PSNR23.69、LPIPS0.192；FlexAvatar23.28/0.203，MVP4D21.99/0.275。 (Table 4, Fig. 6, p. 7; Appendix B, p. 16); 作者报告X-NeMo DISTRACT view Rank1从18%经MLP达到98%；probe包含benchmark frames，是transductive信息可读性诊断。 (Table 1, p. 4; Appendix B, p. 15); 仅camera-triplet、无disentangler的variant接近完整模型；无proxy mesh使PSNR由22.43降至18.34。 (Table 5, pp. 8-9; Appendix J, pp. 22-24)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体迁移指向3D avatar generation的multi-view监督与expression/camera解耦；13身份static3DGS probe为可提取一致性提供实证。VDA本体是video renderer，未给出通用3D生成、动态editable资产或LEGO/Fabrication证据；以transfer而非landmark进入外围video雷达。",
+    "caveatZh": "Sec. 5, p. 9：完整模型77帧576×1024约12分钟/A100，长序列有temporal drift；不同附录计时口径存在差别。; lighting烘焙进reference，expression空间固定，方法绑定Wan-Animate；蒸馏student仅prototype且画质下降。; static3DGS probe固定表情和近轨迹rig cameras，不能证实全动态几何可提取、可编辑或制造。; 反射、折射和hair dynamics是视频合成观感，并无物理参数或真实仿真精度验证。; DISTRACT probe转导设置与有限基准规模限制泛化解释；camera-triplet配方向非人类3D生成转移仍需验证。"
+  }
+}

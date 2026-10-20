@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.23374",
+  "slug": "moss-image-technical-report-2610-23374",
+  "title": "MOSS-Image Technical Report",
+  "authors": [
+    "MOSI. AI"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-16",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.23374"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "MOSS-Image Technical Report",
+    "image-generation"
+  ],
+  "abstract": "Recent closed-source image generation systems can produce diverse visual content from simple compositions to information-dense graphics, yet open-weight text-to-image models still struggle with dense text and intricate layouts. To narrow this gap, we introduce MOSS-Image, an open generation system that combines high-fidelity visual synthesis with intent-aware composition. First, we pretrain a 5B single-stream diffusion transformer (DiT) from scratch with a carefully designed recipe, enabling bilingual long-form text rendering and precise layout control. Second, we develop an intention-aware agentic prompt enhancement (PE) module that translates diverse user requests into detailed content and layout specifications. Together, they enable MOSS-Image to generate text-rich and layout-coherent images. We further introduce LongLongTextBench (LLTB) for evaluating long-form English and Chinese text rendering, and RealLayoutArena (RLA) for end-to-end layout-rich generation. MOSS-Image achieves state-of-the-art performance among open-weight models on LLTB, with an average text coverage of 96.3%. On RLA, MOSS-Image ranks second in the end-to-end system comparison, while its backbone ranks first among generators evaluated with shared enhanced prompts. We will release the model, training recipe, and evaluation framework to support further research and promote the text-to-image community.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.23374v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.23374v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/OpenMOSS/MOSS-Image"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.23374v1 (35 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: available.",
+    "ideaZh": "MOSS-Image将5B text/layout renderer与intent-aware agentic prompt enhancement连成一套复杂图形系统。作者报告240任务LLTB双语长文本coverage96.3%，61任务RLA人类偏好端到端Elo1698.7居第二；但coverage不检查字序，7Bench的0.88只对已检测对象，全对象mIoU为0.679，且生成器尚不支持参考图编辑。",
+    "motivationZh": "复杂graphic generation同时缺少精确长文本/空间渲染能力与把简短需求展开为内容、信息层级和布局的specification能力，单靠长prompt或强raster renderer各自都不够。",
+    "methodZh": "MOSS-Image从零训练5B single-stream DiT，冻结Qwen3.5-9B与FLUX2 VAE，联合处理自然语言和带bbox/文字/typography的serialized layout。大规模保留并recaption真实图像、混用short/medium/long supervision、显式保留换行与结构、渐进分辨率和Muon-AdamW建立renderer；外部GPT6 planner按poster/infographic/UI路由、检索知识/视觉参考并输出可执行JSON layout。",
+    "methodFlow": [
+      "去重并移除AI图像后广泛保留真实数据，将水印/模糊等属性写入caption",
+      "生成多粒度caption与保留换行的literal text及bbox/typography结构，统一序列化进text encoder",
+      "以冻结encoders和5B single-stream DiT做渐进分辨率flow-matching预训练",
+      "GPT6 planner按媒介路由，检索知识及视觉参考，规划literalcopy与layout JSON并检查text fit",
+      "DiT从自然语言或JSON条件生成raster graphic，分别评测text、layout与端到端人类偏好"
+    ],
+    "experimentsZh": "LLTB240英文/中文文学文本任务，平均target1339.8字符、四sample全评；7Bench224prompt-layout/576目标；RLA61任务（20poster/20infographic/21UI）每系统每task固定单图，匿名pairwise votes、Bradley-Terry ratings。另含LongTextBench参考分与early1B optimizer/RoPE、早期过滤ablation。 作者报告 MOSS-Image 的 LLTB 六项均值（Mean-6）为 96.3%，在表中列出的开放权重模型中最高；GPT Image 2 为 99.0%，Nano Banana Pro 为 96.6%。该 coverage 衡量 OCR 单位召回，不检查字序，也不是整张图片文字全部正确的比例。 (Table 4, p. 7; Appendix G.1, p. 25) 作者报告7Bench全目标mIoU0.6788、mIoUdet0.8786、DetRate0.7726、LayoutAUC0.7031。 (Tables 19-20, p. 29) 作者报告端到端RLA Elo1698.70居第二；共享enhancednatural组1807.34居首。 (Fig. 4a,c, p. 9) 对照范围：含多种open-weight和proprietary renderer，7Bench/LLTB/RLA作者统一生成评价；LongTextBench基线来自public reports。RLA各系统保留native promptprocessing，完整系统差异包含外部planner；每组对手、votes覆盖与采样不等，CI未调整同task/rater相关性。 消融与诊断：固定MOSS的prompt-strategy和共享prompt跨backbone拆开specification与renderer；比较并非每项planner功能的独立因果试验。no-extra-filter和Muon/RoPE ablation在早期小模型，每curve单run；linebreak和bbox坐标为qualitative case。",
+    "insightZh": "作为新pretrained foundation renderer与公开technical recipe，贡献超出将现有LLM包装成应用；重点是长双语文字和显式layout共用text通路，以及与intent-level specification结合。single-stream DiT、结构caption、LLM planner各有先例，并非独创；作者也明确baseline evaluation不能单独隔离每项pretraining选择。",
+    "evidenceZh": "自然语言与结构layout通过同一text-conditioning pathway进入5B DiT；agent构造literaltext、bbox和typography，不把reference图直接送renderer。 (Sec. 2-4, Fig. 2, pp. 3-7; Appendix C.3, F, pp. 19-20, 23-24); 作者报告LLTB Mean6 coverage96.3%，EN-long97.1、ZH-long92.4；覆盖240任务，每任务4samples均入分。 (Table 4, p. 7; Appendix G.1, pp. 24-26); 作者报告7Bench已检测对象mIoUdet0.8786，全部576目标mIoU0.6788，detection rate0.7726，LayoutAUC0.7031。 (Table 3, p. 7; Appendix G.4, Tables 19-20, pp. 28-29); 作者报告RLA端到端MOSS1698.70 Elo，95%CI1655.96-1741.43，GPTImage2为1844.35；共享natural prompts组MOSS1807.34。 (Sec. 5.3-5.4, Fig. 4, pp. 8-9; Appendix G.2-G.3, pp. 26-27); 作者报告JSON layout1622.87 Elo、short request1081.70；无agent direct expansion1541.45，也带来大部分改善。 (Sec. 5.4, Fig. 4b, p. 9; Appendix F-G, pp. 23, 27)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "新foundation renderer与长文字/布局训练recipe本身满足广域重大进展门槛；planner的结构specification、reference retrieval与text-fit检查还直接关联visual-design-agents主线。输出仍为raster，不将UI海报图当作可编辑2D层结构或真实可执行界面。",
+    "caveatZh": "Sec. 8, p. 10：当前只text-to-image，不直接condition reference images、不支持image editing；layout修改是重生成。; planner依赖外部LLM，美学判断、参考解释与事实可能错误，忠实renderer不能自动纠正。; Appendix G.1-G.2, pp. 25-27：coverage不检查order或额外OCR；RLA区间没处理同task/rater相关。; 5B排除冻结Qwen3.5-9B和VAE，不应宣称完整系统仅5B；planner也有额外成本。; Table1(p.6)列4stages/Stage3 370K，正文与AppendixA.2(pp.14-15)称3stages/final310K，训练schedule存在文内不一致，复现前需核对release。; 7Bench主表0.88只对检测对象，missed objects不少；列入blocked输出与模型variant/prompt转换影响跨模型比较。; LLTB文学文本且OCR multiset recall，不能外推完整知识事实正确性、逐字顺序或任意graphics用户偏好。; 更改JSON并raster regeneration不产生editable vector/layer文件；不归入structured2D直接能力。"
+  }
+}

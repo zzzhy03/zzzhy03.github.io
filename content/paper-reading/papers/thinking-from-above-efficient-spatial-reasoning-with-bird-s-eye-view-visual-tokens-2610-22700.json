@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2610.22700",
+  "slug": "thinking-from-above-efficient-spatial-reasoning-with-bird-s-eye-view-visual-tokens-2610-22700",
+  "title": "Thinking from Above: Efficient Spatial Reasoning with Bird's-Eye-View Visual Tokens",
+  "authors": [
+    "Faizan Siddiqui",
+    "Nirav Savaliya",
+    "Sahith Reddy Chada",
+    "Enna Sachdeva"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.22700"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Thinking from Above",
+    "vlm-mllm"
+  ],
+  "abstract": "Existing video multimodal large language models (MLLMs) organize observations primarily in time, but embodied spatial reasoning requires organizing them in space. Consequently, their visual representations can remain locally consistent across nearby frames while lacking a persistent spatial context that is stable across viewpoints and time. We exploit depth and camera pose, which are naturally available to embodied agents, to explicitly establish this spatial correspondence. We introduce Cambrian-BEV, which extends Cambrian-S with a parameter-free geometric tokenization scheme that back-projects visual patch features from each frame into a shared bird's-eye-view (BEV) coordinate frame and averages features that fall within the same spatial cell. Thus, observations of the same physical location, regardless of viewpoint or time step, are aggregated into a common spatial token. In addition to providing a persistent scene representation, this formulation acts as an efficient compression mechanism: 128 frames containing approximately 100K DINOv3 patch features are consolidated into a fixed 27$\\times$27 grid of only 729 BEV tokens, cutting LLM prefill time by $2.9\\times$ and peak memory by $3.6\\times$. Cambrian-BEV requires no architectural modification beyond BEV tokenization and uses a frozen DINOv3 vision encoder with a trainable multimodal projector and LLM. On VSI-Bench, our model reaches 63.48, $+8.5$ points over an identically fine-tuned frame-token control with $12.6\\times$ fewer visual tokens, with particularly large gains on room size ($+24.5$) and relative direction ($+34.1$). On ReVSI, it reaches 44.68, $+4.5$ over the corresponding control.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.22700v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.22700v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.22700v1 (18 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: not-found.",
+    "ideaZh": "Cambrian-BEV用已知depth/pose把128帧DINOv3 patch聚合到27×27的metric BEV grid，以729tokens替代9,216 frame tokens；作者报告同样fine-tuning条件下VSI-Bench54.98→63.48，ReVSI40.17→44.68。可借鉴的是“按物理位置去重视觉记忆”及encoder locality诊断；它依赖传感深度/真实poses、丢失访问顺序与高度，端到端每题仅1.13×加速，不能把2.9×prefill当整体加速。",
+    "motivationZh": "视频MLLM把同一空间位置的多视角观测当作时间token串，既重复占context，又要求语言模型隐式估对应关系；已知几何可在进入LLM之前建立metric correspondence。",
+    "methodZh": "冻结DINOv3编码448×448帧并投影到LLM embedding，再用depth、intrinsics和pose把patch center反投影到统一gravity-aligned frame；grid朝向对齐first camera yaw、中心取观测centroid，±5m内同cell features均值融合，空cell零向量，row-major729tokens替代frame pathway。仅继续训练projector和0.5B LLM。",
+    "methodFlow": [
+      "用冻结DINOv3与projector提取128帧dense patch features",
+      "依据传感depth、intrinsics和pose反投影到同一3D frame",
+      "以first-pose yaw定朝向、观测centroid定中心的±5m 27×27 grid分箱",
+      "同cell跨view features平均，空cell置零",
+      "729个row-major BEV tokens替换frame tokens并fine-tune projector+LLM"
+    ],
+    "experimentsZh": "继承Cambrian-S四阶段训练后，在288,478 QA/4,955 train scenes上stage5两epoch微调，与frame-only control同data/recipe/precision。0.5B Qwen2.5，冻结DINOv3；VSI-Bench288 unseen scenes、ReVSI380scenes。深度为raw sensor、pose为dataset ground truth，未用预测geometry。H100 SXM测profile。 作者报告VSI-Bench63.48 vs matched frames54.98，room size85.00 vs60.49、relative direction82.67 vs48.58，但appearance order62.46 vs76.86。 (Table 1, p. 7) 作者报告ReVSI default44.68 vs40.17，bilinear first-pose更高46.39。 (Table 3, p. 8) 作者报告H100 prefill45.9→15.7ms、peak memory9.1→2.5GB；每题end-to-end267.0→236.2ms，仅1.13×。 (Appendix E Table S2, pp. 13-14) 对照范围：最有力对照是相同parent/data/precision的frame FT；官方Cambrian-S-7B仍overall66.69，高于0.5B BEV63.48，不能称全模型SOTA。depth/pose是BEV独有额外输入；未与所有近期3D-memory模型作同协议训练比较。 消融与诊断：Grid orientation/aggregation、encoder、resolution、额外adapter/attention/empty token、time chunks、hybrid frames和height filter；first-pose朝向强依赖且hard assignment对resolution有窄最优。替代模块在短预算下失败不证明永远不需要额外learned capacity。",
+    "insightZh": "几何投影/BEV本身已有长期历史；新贡献是把它作为parameter-free MLLM tokenization规则并用matched fine-tuning与encoder对比说明局部feature性质，提供了简单而有分析价值的设计。并非新通用视觉foundation model。",
+    "evidenceZh": "pooling发生在projector后，scene-indexed token直接进入LLM (Sec. 3.1-3.4, Fig. 2, pp. 3-5); matched frame FT control分离额外fine-tuning与BEV改进 (Tables 1-2, p. 7); DINOv3与SigLIP2在frame模型接近但BEV性能差8.4 (Table 2(b), p. 7; Fig. 3 and Appendix H, pp. 8,14-16); 静态BEV丢失时间、高度与细结构并受几何损坏影响 (Conclusion p. 8; Appendix J Fig. S2, pp. 17-18)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对visual-design-agents的具体迁移是有已知scene camera/depth时，用metric cell聚合多视角验证证据，降低重复token并保持相对位置；encoder locality与first-pose orientation消融给出可执行选择依据，迁移尚未由论文在设计任务验证。",
+    "caveatZh": "time-collapsed grid丢失visitation order。; 高度被压平，细或堆叠对象与背景混合。; 依赖校准depth/pose，适合静态room-scale indoor。; 大场景、动态过程、estimated geometry鲁棒性留待未来。; 传感depth/真实pose不是所有设计agent输入天然具备；迁移需已知可渲染scene geometry。; 官方full-fp32 parent与复现bf16存在约10分差，matched control公平但较弱，不应跨精度夸大进步。"
+  }
+}

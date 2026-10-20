@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.24286",
+  "slug": "uliflow-unified-latent-human-object-interaction-flow-2610-24286",
+  "title": "ULIFLOW: Unified Latent Human-Object Interaction Flow",
+  "authors": [
+    "Wenqi Cai",
+    "Chunzhi Gu",
+    "Weichen Zhou",
+    "Yawen Zou",
+    "Yijin Wei",
+    "Ran Dong",
+    "Haoran Xie",
+    "Chao Zhang"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-16",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.24286"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "ULIFLOW",
+    "3d-generation"
+  ],
+  "abstract": "Text-conditioned 3D human--object interaction (HOI) generation remains challenging because individually plausible human and object motions do not necessarily form a coherent interaction. We argue that a key limitation lies in conventional skeleton-based representations, which compactly describe body kinematics while leaving surface-level interaction geometry largely implicit, often requiring additional contact-specific regularizers. We propose ULIFlow, a framework that explicitly models continuous human--object relations within a unified latent space. To this end, we derive continuous marker--object relations from sparse body-surface markers and treat them as an explicit interaction modality alongside human motion and object dynamics. A Mixture-of-Transformers (MoT) autoencoder is then designed to jointly model these heterogeneous streams while preserving their modality-specific structures. Importantly, we let the relation stream directly participate in human and object reconstruction, encouraging the shared latent representation to preserve both individual dynamics and the interaction geometry that coordinates them. To further achieve variable-length generation, we introduce a blockwise Flow Forcing scheme with global sequence-progress conditioning, enabling progressive continuation from fixed-length training windows while maintaining consistent long-horizon dynamics. Extensive experiments demonstrate that ULIFlow consistently outperforms prior work in overall generation quality and human--object coordination, while preserving coherent interactions over requested durations beyond the training horizon.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.24286v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.24286v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/wenqi-cai297/ULIFlow"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.24286v1 (22 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: available.",
+    "ideaZh": "ULIFlow把77个body-surface markers到物体表面的连续offset、距离与时变关系作为第三模态，与人体/物体动态共同压缩，并在decoder中直接耦合关系特征；blockwise flow forcing延长HOI rollout。作者报告FID与接触协调改进，值得借鉴显式relation latent，但物理可行和任意长时稳定尚无保证。",
+    "motivationZh": "独立合理的人体和object trajectories不保证contact一致；仅skeleton弱化了表面交互几何，固定training windows也限制按指定duration延续协调的HOI。",
+    "methodZh": "由77 markers与最近object surface points构连续local关系（offset/distance/一二阶变化/canonical points）及root-object、object-ground关系。MoT保留human、object pose/geometry与relation专用变换、共享attention，在结构化708×16 latent中压缩；decoder使relation直接参与human/object readout。冻结AE后以text与object BPS条件训练block-causal DiT，blockwise独立flow times与global progress支持滑窗denoising/overlap decoding。",
+    "methodFlow": [
+      "Text+object geometry+请求时长；训练时由surface markers导出连续relation fields",
+      "Body-region queries压缩human/object/relation tokens → MoT共享attention和专用routes",
+      "AE latent normalization/whitening → relation-coupled decoding保留接触几何",
+      "Text/BPS条件DiT以blockwise flow times和global progress训练",
+      "固定context滑窗staggered rollout → overlap decode人体/物体轨迹至请求时长"
+    ],
+    "experimentsZh": "InterAct官方split，128-frame masked training windows；冻结77-marker+BPS evaluator计算FID、R-Precision、MM-Dist和diversity。五baseline输出转为统一markers，但各release支持的subsets不同。长时用nonoverlap128-frame与boundary64-frame windows，reported ±主要来自三独立generation seeds；geometry contact另作shared-condition/valid-mesh对照。 作者报告主表FID0.812±0.014，InterAct1.768±0.019；ULIFlow R-Precision Top1为0.852，MM-Dist4.852，而InterAct MM-Dist4.507更优，不能写所有指标领先。 (Table 1, p. 7) 作者报告共享condition下relation branch使2cm contact recall51.128%→69.680%、hand recall46.176%→68.850%，unsupported travel50.839%→28.624%。 (Table G, p. 21) 作者报告长时128-frame subsequence FID2.686，InterAct3.097；boundary AUJ39.300相对GT32.841，低于GT也不代表更真实，因此jerk按接近GT解释。 (Table 2, p. 8) 作者报告512帧约9.367秒、peak VRAM3.277 GiB，128帧2.817秒/3.267 GiB，体现固定context rollout的近固定内存。 (Table A, p. 19) 对照范围：Text2HOI/CHOIS/HOI-Diff/InterAct/LIGHT经各自released适配转markers；Text2HOI手部输出用固定neutral body carrier，不是同等全身生成任务。主排名跨不同支持子集，参考BEHAVE/OMOMO shared source分析而不作无条件公平SOTA断言。 消融与诊断：近似等参数MoT、relation、latent regularization重建/生成对照；relation移除同时移tokenization/reconstruction/readout，不能独立定位某子项。共享conditions的contact阈值与penetration支持协调改善；progress/blockwise消融在128frame不总优，长时收益更明确。",
+    "insightZh": "核心是将连续surface-level interaction geometry作为显式模态并直接参与解码，而非仅加contact loss；另将Diffusion Forcing思想落到blockwise flow及sequence progress。MoT与flow forcing各有前作，贡献在HOI结构化组合与协调证据，不是无需几何先验或可认证物理模拟。",
+    "evidenceZh": "relation表示由nearest surface offsets、距离、temporal derivatives与canonical nearest points组成，同时加入object-ground和root-object关系。 (Sec. 3, pp. 4–5, Eqs. 1–2; Appendix A.1, p. 14); decoder将relation读回human与object streams，而非仅辅助预测关系。 (Sec. 3, p. 5; Appendix A.1, p. 15; Fig. 2, p. 4); 作者报告整体FID较InterAct低，但对齐度指标并非全面最佳。 (Table 1, p. 7; Appendix B.1–B.2, pp. 17–18); relation消融在相同conditions下提高contact recall并减少unsupported object travel，降低穿透不只是让物体远离人体。 (Table G and discussion, p. 21; Table H, p. 22); blockwise forcing和global progress在长于training horizon的分段评估上改善协调，但不是无限稳定性证明。 (Sec. 3, p. 6; Tables C–D, p. 20)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "面向dynamic 3D/HOI内容的生成表示，显式relations和decoder耦合可借鉴于多实体可控3D animation资产；主要价值在协调表示而非human recognition。",
+    "caveatZh": "全文未独立列Limitation section；输出仅surface markers与rigid object pose，contact/penetration改善不保证受力、balance、碰撞无穿透或完整human mesh物理可行。; 长时指标采用局部/边界windows，不能证明任意长sequence的全球语义或动作顺序不漂移。; 不同baseline release覆盖不同subsets且representation conversion额外影响，主表排名有协议边界。; 训练与评估来自InterAct既有source domains；未见独立unseen object geometry或真实部署的OOD协调验证。; public repository不含weights，官方feature metrics另需外部evaluator artifacts，未实际复现论文结果。"
+  }
+}

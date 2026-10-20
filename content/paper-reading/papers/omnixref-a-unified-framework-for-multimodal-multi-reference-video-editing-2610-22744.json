@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.22744",
+  "slug": "omnixref-a-unified-framework-for-multimodal-multi-reference-video-editing-2610-22744",
+  "title": "OmniXRef: A Unified Framework for Multimodal Multi-Reference Video Editing",
+  "authors": [
+    "Xiaoyan Cong",
+    "Tianyu Wang",
+    "Hyeonho Jeong",
+    "Zhifei Zhang",
+    "Yuqian Zhou",
+    "Yijun Li",
+    "Shaoteng Liu",
+    "Zhe Lin",
+    "Srinath Sridhar",
+    "Soo Ye Kim"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.22744"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "OmniXRef",
+    "video-generation"
+  ],
+  "abstract": "Creative intent in video editing can be expressed through text instructions (e.g., \"remove the people\"), image references (e.g., subject appearance), video references (e.g., camera movement), or a combination of the above. We introduce OmniXRef, a unified framework for multimodal multi-reference video editing that allows users to combine variable numbers of text, image, and video references to control diverse attributes of a source video. We first devise a unified input design with a reference-bank interface and introduce $R^2$-RoPE to support generalization to more references. Then our model, OmniXRef-Model, uses a single-stream diffusion transformer to jointly process the source video and multimodal context from an MLLM in an interleaved sequence. To address the scarcity of training data for video-reference editing, we construct OmniXRef-Data using synthesis pipelines for different editing tasks and combinations of references. We use curriculum learning to progressively increase task complexity and resolution. To support systematic evaluation of video as a control modality, we introduce OmniXRef-Bench, a benchmark for video-reference attribute transfer across Camera, Motion, Content, Style, and Visual Effects (VFX). Comprehensive evaluations show that our OmniXRef-Model outperforms task-specific baselines and commercial models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.22744v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.22744v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.22744v1 (29 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: promised.",
+    "ideaZh": "OmniXRef把每个reference封装为task、instruction和可选image/video的bank，用冻结MLLM语义context与single-stream DiT共同处理；Mix-Patchify按属性压缩reference，R²-RoPE随机保留slot缓解从两reference到三reference的外推。作者报告125例自建benchmark综合Score3.78，高于Seedance2.5的2.73；值得关注可组合的参考接口，但≥4 references明显退化、最高480P且评价主要依赖VLM，不宜理解为任意属性已解耦。",
+    "motivationZh": "创作意图可由文本、图片、动态camera或motion参考共同表达；现有视频编辑多限单模态或单task，缺少统一多参考输入、可组合训练数据和来源保留评价。",
+    "methodZh": "每个bank包含属性task、具体编辑instruction与reference，Qwen3-VL-8B冻结编码interleaved context；single-stream DiT将文本semantic tokens、source/reference VAE tokens和target noise作full attention。Content保留细patch，其他动态/全局属性用粗空间patch但保留时间粒度；八个保留位置slot训练随机分配，配合single→two-reference→480P curriculum与约10M数据。",
+    "methodFlow": [
+      "将每条文本/图像/视频参考组织为task+instruction+asset的reference bank",
+      "冻结MLLM读取interleaved source及banks得到语义context",
+      "VAE编码source/reference，Mix-Patchify按属性选择空间patch粒度",
+      "R²-RoPE随机分配reserved reference slots，减少reference数量外推的位置偏移",
+      "single-stream DiT联合condition并去噪输出编辑video",
+      "用reference adherence、source preservation和visual quality分别验收"
+    ],
+    "experimentsZh": "约10M训练examples，7M为in-house text-only；Camera1.5M、Motion100K、Content/Style各650K、VFX100K和two-ref100K。272P single→two-ref→480P。OmniXRef-Bench125个single-video-ref案例，五属性；Gemini3.8Flash分开judge RA/VQ/SP；camera以VGGT-Ω对32frames估相对trajectory；另评VEFX/ReCo。 作者报告OmniXRef overall RA/VQ/SP/Score=3.67/3.68/4.68/3.78，Seedance2.5=3.21/3.70/3.71/2.73；VQ并非最优。 (Table 2, p. 7) 作者报告camera RotErr0.874、TransErr3.961、CamMC4.437，CamCloneMaster为2.086/9.329/10.332。 (Table 3, p. 9) 作者报告去Mix-Patchify、去R²-RoPE、去curriculum的overall Score分别2.86/3.18/3.13，对完整模型约3.77。 (Table 4, p. 9) 对照范围：比较CamCloneMaster、MotionFollower、RefVFX和Seedance2.0/2.5、MiniMax-H3；商业模型能力接口不同。主benchmark仅125例且主要评价single-reference，多reference composition缺少同规模量化；VLM判断只看稀疏frames。 消融与诊断：逐项去Mix-Patchify、R²-RoPE、curriculum与bank dropout；Mix-Patchify与curriculum对同training steps的优化/成本有影响，未严格等计算预算。reference顺序交换、固定text换reference与三reference仅定性。",
+    "insightZh": "新增价值是统一多模态multi-reference video editing的输入契约、任务化token粒度与reference slots训练，附数据合成和评测体系。三reference泛化主要是少量定性示例，广义任意组合能力尚未建立。",
+    "evidenceZh": "reference bank绑定允许迁移的属性，single-stream DiT整合语义和视觉tokens (Sec. 3.1, Fig. 2, pp. 3-4; Appendix A, p. 15); Mix-Patchify与reserved slots降低token成本及reference-number OOD (Sec. 3.2-3.3, p. 5; Appendix B.2, p. 16); 125case上的综合编辑分数高于专用与商业对照 (Table 2, p. 7; Table 3, p. 9); ≥4reference、属性内部解耦及高分辨率为明确边界 (Appendix E, Fig. 8, p. 20)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "作为视频生成广域雷达的实质能力扩展：将多参考数、modality、attribute和composition统一训练，并明确维护source；对设计工具的multi-reference contract有具体参考价值，但未实际迁移到核心对象。",
+    "caveatZh": "不能独立控制属性内部细因素，如expression与body pose。; 四个及以上references性能明显退化，高质量组合训练数据难生成。; 数据欠覆盖文字VFX等非自然场景。; 最高训练480P，720P/4K效果未探索。; 主结论依赖自建VLM-score；camera translations各自归一化，不测绝对位移尺度或focal length。; in-house数据与未公开实现使独立复现成本高；表2/表4同full模型有小幅数字差异，报告时分别引用原表。"
+  }
+}

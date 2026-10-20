@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2610.24676",
+  "slug": "from-views-to-worlds-active-exploration-over-3d-worlds-for-vision-language-models-2610-24676",
+  "title": "From Views to Worlds: Active Exploration over 3D Worlds for Vision-Language Models",
+  "authors": [
+    "Qijian Tian",
+    "Jiayu Ying",
+    "Ke Fan",
+    "Lizhuang Ma",
+    "Xin Tan"
+  ],
+  "publishedAt": "2026-10-17",
+  "updatedAt": "2026-10-17",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.24676"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "From Views to Worlds",
+    "vlm-mllm"
+  ],
+  "abstract": "Vision-language models (VLMs) have achieved remarkable progress in 2D visual understanding tasks, yet the passive view-centric perception paradigm limits their capacity for 3D spatial reasoning. Such reasoning often requires actively acquiring spatial evidence beyond the currently visible views, such as camera poses and cross-view spatial relationships, to infer 3D relationships that are not explicitly represented in 2D images. However, existing methods either lack active exploration or merely provide additional views during inference, without explicitly acquiring such spatial evidence beyond 2D images. In this paper, we propose View-to-World (V2W), an active exploration framework that enables VLMs to actively explore 3D worlds and lifts VLMs from passive view-centric perception to active world-centric spatial reasoning. Given a spatial reasoning task with multi-view images, V2W first reconstructs an explicit 3D world with geometry, camera poses, and language-grounded semantics, and exposes it to VLMs through visual and linguistic interfaces. Through multi-turn interaction with these interfaces, VLMs iteratively acquire spatial evidence from the constructed 3D world, enabling active world-centric spatial reasoning. V2W can be integrated with existing VLMs in a training-free manner and can be further enhanced by optimizing the exploration policy via reinforcement learning. Experiments on spatial mental modeling benchmarks demonstrate that V2W substantially improves VLM baselines in the training-free setting and achieves state-of-the-art performance with the learned exploration policy, highlighting the importance of active exploration for spatial intelligence. Project page: \\url{https://fangzhou2000.github.io/projects/v2w}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.24676v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.24676v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.24676v1 (27 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: promised.",
+    "ideaZh": "V2W把多视图恢复成有语义与相机坐标的显式3D world，让VLM通过转向/移动、可见对象和relative pose查询收集证据，再可用SFT+GRPO学探索。作者报告同7B模型MindCube 34.5%→43.8%（免训）或90.8%（训练）；可迁移的是可检查world-query接口，尚无design agent实验证据。",
+    "motivationZh": "固定2D views既缺遮挡区域证据，也不直接给跨视图camera pose、entity correspondence和空间关系；给VLM更多图像不等于给它可主动查询的一致3D世界。",
+    "methodZh": "Depth Anything 3估depth与camera、反投影构点图，Qwen2.5-VL提问题相关objects再以SAM3 masks提升到3D，RANSAC floor定gravity。world以novel-view rendering和语言camera/visible-object信息暴露给VLM，最多四turn多轮function calling。可选以235B teacher trajectories SFT，再GRPO训练format/answer/exploration以及step-wise action match与失败penalty。",
+    "methodFlow": [
+      "多视图+问题 → DA3几何/camera与question-relevant SAM3 masks",
+      "语义mask反投影 → gravity-aligned explicit 3D world",
+      "VLM调用转向/位移/zoom或camera-pose与可见对象查询",
+      "World返回rendered observations与语言空间证据 → 多轮选择下一动作",
+      "可选SFT+GRPO优化探索策略 → 根据收集证据回答"
+    ],
+    "experimentsZh": "MindCube-Tiny 1,050（Among600/Rotation200/Around250）及SAT-val 4,000五类。免训在MindCube比较Qwen/GPT系、CoT和pySpatial；训练在各自dataset训练SFT一epoch+GRPO，基座Qwen2.5-VL-7B，8 H200，最多4 interaction turns。主training结果与3DThinker/SpatialDreamer等比较。 作者报告Qwen2.5-VL-7B免训MindCube overall 34.5%→43.8%，Qwen3-VL-8B 30.6%→50.2%，GPT-4.1-mini 43.3%→61.7%。 (Table 1, p. 8) 作者报告trained V2W MindCube-Tiny 90.8%、SAT-val 95.5%；对应SpatialDreamer为84.9%、93.0%，其中前者标为取原论文结果。 (Tables 1–2, pp. 8–9) 作者报告SFT+RL无world为74.8%，仅visual 83.9%，完整90.8%；移step-wise reward为89.0%。 (Table 3, p. 10) 作者报告MindCube平均总耗时6.93秒，其中world construction4.64秒、model response1.94秒。 (Table 6, p. 17) 对照范围：有同backbone无tool/CoT、visual-only/linguistic-only及SFT/RL分离消融，也换VGGT重建；空间QA benchmark与外部工具信息设置不同于raw-image VLM，不能据此断言通用多模态推理胜过大模型。无design-generation/critique任务测试。 消融与诊断：Table 3表明interfaces与policy training互补，linguistic-only免训41.4%高于visual-only38.5%；去step-wise reward只降1.8points。换DA3为VGGT小幅下降；不含multi-seed或几何噪声量化鲁棒曲线。",
+    "insightZh": "重点是让几何、camera与semantics通过原生images/text接口成为可主动调用证据，并训练探索policy；非全新的reconstruction estimator。对design agents的实质价值在于可复用的view selection/空间关系critique接口，不应因为NeurIPS或benchmark高分泛化为通用VLM landmark。",
+    "evidenceZh": "显式world同时恢复几何、camera并通过question-driven masks保留对象语义。 (Sec. 3.2, pp. 4–5; Fig. 2, p. 4); visual返回新视图，linguistic返回可见对象和relative camera translation/rotation；函数调用可多轮采证。 (Sec. 3.2–3.3, pp. 5–6); 作者报告同backbone无训与SFT+RL设置均提高spatial QA。 (Table 1, p. 8; Table 2, p. 9); 消融区分world interfaces与训练，完整interface在两阶段训练下由74.8提高至90.8。 (Table 3, p. 10); 低照/反光可破坏reconstruction或segmentation并误导reasoning。 (Appendix A.6, pp. 17–18; checklist statistical significance, p. 23)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可将renderer/camera/object关系组织成VLM可调用证据接口，为Visual Design Agents的scene视角选择、layout空间检查提供具体机制；这是接口迁移推论，论文未测试design。",
+    "caveatZh": "低光、反射可让基础几何/分割模型出错，进而误导后续推理；增加verifier会提高复杂度。; 算力使RL训练限于focused datasets，未来才考察更广空间数据scaling。; checklist明确未报告multi-seed、error bars或formal significance tests。; 部分camera-motion questions可由linguistic tool直接提供接近答案的relation，收益应解释为外部几何证据计算+策略而非纯VLM内部空间能力。; 仅在空间QA测试；将接口迁移design agent需要另外验证rendered artifact、action空间和critique目标。; world construction为主要耗时，query回传会继承source views的不可见与几何错误，不能保证补得真实未观测内容。"
+  }
+}

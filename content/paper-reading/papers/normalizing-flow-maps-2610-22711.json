@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.22711",
+  "slug": "normalizing-flow-maps-2610-22711",
+  "title": "Normalizing Flow Maps",
+  "authors": [
+    "Francesco M. Ruscio",
+    "Timothy James Hitge",
+    "Fred Zhangzhi Peng",
+    "Danyal Rehman",
+    "Zander W. Blasingame",
+    "Nicholas M. Boffi",
+    "Michael M. Bronstein",
+    "Alexander Tong",
+    "Avishek Joey Bose"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.22711"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Normalizing Flow Maps",
+    "image-generation"
+  ],
+  "abstract": "Scalable approaches to learning neural dynamical systems have placed diffusion, flow matching, and few-step generators in flow maps at the forefront of generative modeling. Such state-of-the-art models have limited access to explicit model densities despite evolving from classical generative modeling approaches that leveraged tractable likelihoods, e.g., Normalizing Flows and Autoregressive models. In this paper, we combine these threads of few-step generation and tractable sample likelihoods and introduce Normalizing Flow Maps (NFM), a class of exactly invertible pushforward maps that generalizes normalizing flows and flow maps. More precisely, NFMs learn the integrator of an underlying dynamical system, but crucially, they provide efficient exact likelihood evaluation by construction. To enable scalable training of NFMs, we derive two complementary axes of consistency inherent to NFMs that yield (self) distillation objectives: (1) pointwise matching, which unlocks $\\ell_2$-based flow-map style regression losses, and (2) distributional matching, which matches pushforward distributions to the marginals of a prescribed forward process. On conditional image generation on CIFAR-10 and ImageNet-64, NFMs achieve state-of-the-art sample quality among parameter-matched normalizing flows, while supporting likelihood-based RLHF. For equilibrium sampling in Boltzmann Generators, NFMs outperform prior state-of-the-art normalizing flows on both single-system and transferable peptide benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.22711v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.22711v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/francescoshox/NormalizingFlowMaps"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.22711v1 (47 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: available.",
+    "ideaZh": "Normalizing Flow Maps把few-step flow-map transport与可计算change-of-variables density放进同一time-conditioned invertible family，分别用pointwise regression(NFM-R)和distributional matching(NFM-D)训练。作者报告ImageNet-64 NFM-D FID4.59、NFM-R3.60，对照iTARFlow4.89；真正值得关注的是能直接用终点likelihood做KL/RLOO post-training。质量最好的NFM-R却会数值失去可逆性，多步也不保留其density保证，不能把理论exact density等同所有最佳配置。",
+    "motivationZh": "常规flow maps通过学习积分器减少采样步数，却难以低成本计算样本density；normalizing flows有exact likelihood，但噪声增强后的Tweedie去噪使最终clean sample density不再由原flow提供。",
+    "methodZh": "在iTARFlow可逆architecture上加入source/target time，构造连接stochastic interpolant marginal的maps；NFM-R采用Eulerian consistency的stop-gradient regression，NFM-D将destination经inverse映到Gaussian并计算NLL，two-time以冻结single-time teacher提供tractable intermediate source。端点likelihood支持REINFORCE/RLOO及KL或entropy正则post-training。",
+    "methodFlow": [
+      "用stochastic interpolant定义noise到data的probability path",
+      "构造双时间条件的可逆autoregressive transport maps及log-Jacobian",
+      "NFM-R用pointwise consistency regression，NFM-D用distributional likelihood matching",
+      "从prior作one/few-step transport，按可逆性条件计算endpoint density",
+      "以terminal reward和likelihood ratio进行RLOO/KL或pathwise entropy post-training"
+    ],
+    "experimentsZh": "CIFAR10及ImageNet64 class-conditional generation，以40M/约120M iTARFlow variants；CIFAR部分960epochs，ImageNetD300epochs、R先FM200再iMF25。比较FID/FLD并sweep CFG。ImageNet RL只在few fixed animal/beach prompts上20/40 updates，另有peptide单系统与30+30 unseen transferable systems。 作者报告ImageNet64 NFM-D123M FID4.59/FLD6.78，对照iTARFlow122M4.89/6.98；NFM-R127M3.60/3.15但归为non-invertible。 (Table 1(b), p. 8) 作者报告CIFAR10 invertible D FID6.26，two-step6.05，noise-annealed R5.17；最佳non-invertible R3.87。 (Table 1(a), p. 8) 作者报告Chignolin NFM-D SMC energy-W2 3.42±0.27，对照SBG-iTARFlow10.87±10.18；torsion-W2并非所有方法最优。 (Table 2, p. 9) 作者报告NFM-D的ImageReward/PickScore等在20updates内优于best-of64/SMC；未实际复现。 (Fig. 3, p. 8; Appendix D.5, p. 36) 对照范围：参数匹配iTARFlow主对照，另SoftFlow、噪声/MLE/optimizer消融及diffusion与few-step模型作参考；ImageNet EDM FID1.36仍明显更优且更大。TARFlow2.90为引用结果，作者标注未复现；不将其当本项目可重复对照。 消融与诊断：对MLE输入noise、Tweedie、Muon vsAdamW、CFG interval/strength、R noise annealing及D two-step作研究；NFM-R同时改变architecture与训练recipe，不能把其所有质量提升仅归loss。分子附录以相同iTARFlow、optimizer/batch逐项控制。",
+    "insightZh": "将“少步生成+显式density”统一为模型与训练框架，而非单个采样加速trick；理论分别给条件目标与marginal KL等价及有正则前提的endpoint control。主要新意在可用于post-training与重要性采样的density接口，不是击败所有diffusion image models。",
+    "evidenceZh": "双时间可逆family端点保留normalizing flow likelihood (Definition 1, Sec. 3.1, pp. 4-5); NFM-D条件KL与marginal KL相差θ无关mutual information (Sec. 3.3 Proposition 1, p. 6; Appendix A.2, pp. 23-27); R和D在invertibility、quality间有明确权衡 (Table 1, p. 8; Conclusion p. 10; Appendix D.3.3, p. 34); likelihood可直接支持KL-regularized RLOO (Sec. 3.4, p. 7; Appendix D.5, p. 36)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "作为image-generation广域雷达的模型/训练范式进展，重点在few-step generator取得终点density后如何做不可微奖励优化与精确KL；与现有structured generative research是方法层参考，尚无直接核心项目实验。",
+    "caveatZh": "NFM-R容易数值非可逆，限制score-function及KL regularization。; 保证R可逆需noise annealing和FP64 inference；R多步sampling没有同样density guarantee。; ethics statement指出reward是偏好proxy，优化可能放大bias或reward hacking。; 图像最高64×64、class conditional；没有大规模T2I或结构化3D生成实证，故只作方法雷达速读。; 一step map由多层autoregressive flow组成，不等于一层网络或固定wall-clock低延迟；不要把step count直接当吞吐。; 公开实现存在，但README说明NFM-R paired couplings尚未公开下载，复现仍有依赖。"
+  }
+}

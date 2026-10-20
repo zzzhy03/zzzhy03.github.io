@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.22608",
+  "slug": "proactgen-learning-proactive-clarification-for-video-generation-2610-22608",
+  "title": "ProactGen: Learning Proactive Clarification for Video Generation",
+  "authors": [
+    "Zhixiao Wang",
+    "Yang Chen",
+    "Yifan Xu",
+    "Chenbin Li",
+    "Yue Chang",
+    "Kai Long",
+    "Fengming Dong",
+    "Limin Wang"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.22608"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "video-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "ProactGen",
+    "visual-design-agents"
+  ],
+  "abstract": "Recent advances in video generation let users create high-quality videos from natural language descriptions, yet obtaining results that match user intent remains time-consuming: individual generations are computationally expensive, and underspecified prompts force repeated cycles of generation, inspection, and revision. Existing video prompt optimization methods improve generation through automatic rewriting, but cannot supply the ideas and preferences that were not in the initial description. We propose ProactGen, a video generation framework that learns proactive clarification, eliciting user intent through questions grounded in generated video drafts. Specifically, we train a vision-language model as a questioning policy with reinforcement learning: observing the initial prompt and a video draft, it learns to ask the questions most valuable to downstream generation, rewarded by the alignment between the final generated video and a target reference. We further find that effective questioning does not require drafts of final-output quality, and exploit this property by generating drafts with fewer denoising steps, keeping the added cost of clarification low. Experiments show that ProactGen improves target alignment over direct generation by at least 1.8x the gain of the strongest baselines. Moreover, a single round of ProactGen already exceeds the alignment that the strongest baseline reaches after four refinement rounds, in 29% of its time.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.22608v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.22608v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.22608v1 (17 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: promised.",
+    "ideaZh": "ProactGen把设计agent的动作换成“看低成本draft后问什么”：只RL训练提问VLM，用户答案并入prompt后用冻结Wan生成，按最终视频与隐藏reference的相似度奖励。作者报告InstanceCap500的DreamSim-DTW0.658→0.678，一轮15.77s已超过四轮自动rewrite的0.669/55.14s。值得精读的是面向结果的信息采集policy与低成本preview；全部用户为模拟、draft额外+0.003的CI跨零，不能据此声称真实用户体验或每个组件均显著改善。",
+    "motivationZh": "初始prompt未表达的视觉偏好无法由自动rewrite凭空补足，反复完整video generation又昂贵；需要让agent根据生成器的实际defaults主动获取对最终结果最有价值的信息。",
+    "methodZh": "Wan2.2-TI2V-5B先用8steps产draft；Qwen3-VL-8B观察initial prompt与draft8frames，生成1-5个有范围的问题；模拟用户从隐藏reference/caption答每题≤10words，冻结LLM合并valid answers，再以20steps最终生成。仅用GRPO优化提问policy，reward为8frames DreamSim减invalid penalty，group内共享noise。",
+    "methodFlow": [
+      "用冻结video generator的8-step draft暴露prompt缺口和模型defaults",
+      "提问policy读取prompt与8个draft frames，产生范围明确的问题",
+      "用户回答后冻结refiner只合并受支持的信息",
+      "冻结generator用full20-step budget生成最终video",
+      "计算与隐藏reference的DreamSim和invalid-question罚项",
+      "GRPO只更新提问policy，支持推理时多轮复用"
+    ],
+    "experimentsZh": "约15K MiraData训练视频，caption mask2-5信息slot构造prompt；InstanceCap500及独立MiraData500测试，测试caption不mask。Qwen3-VL-8B policy、frozen Qwen3.8-27B模拟用户/refiner、Wan2.2-TI2V-5B 49frames832×480。1954 GRPO steps、group8，训练reward8frames；eval49frames DTW DreamSim并测3D-VAE/DnS与ViCLIP，失败样本回退同seed Direct。 作者报告InstanceCap DreamSim-DTW0.678 vsDirect0.658，paired gain+0.020[0.015,0.024]；四轮SSPO0.669。 (Table 1, p. 6; Appendix Table 3, p. 14) 作者报告MiraBench-500自采集集ViCLIP overall0.225 vsDirect0.198、ProactiveT2I15turns0.222；并非未发布官方MiraBench testset。 (Table 1, p. 6) 作者报告untrained draft0.668、RL draft0.678；RL text0.675，draft净+0.003未在95%CI下排除0。 (Table 2, p. 8; Appendix Table 3, p. 14) 作者报告单轮ProactGen15.77s、20step-draft18.46s、SSPO4rounds55.14s、Direct7.09s。 (Appendix Table 4, p. 15) 对照范围：对照SCMAPR、RAPO++的generator-agnostic SSPO stage和适配video的ProactiveT2I；前两无用户信息，ProactiveT2I用同模拟用户。未复现generator-specific RAPO、RAPO++ retrieval和test-time finetune，因此不能称优于完整RAPO++系统。无真实用户试验。 消融与诊断：2×2 RL×draft对照，分别训练text-only policy；8step vs20step draft各自独立训练，差异非显著。多轮3/4round timing用前两轮增量外推，不是每个budget重新测；训练+draft的interaction比draft单独效果证据强。",
+    "insightZh": "把interactive design的信息采集动作与下游生成结果直接连接，比纯不确定性prompt问答有新的训练信号；low-quality preview用于决策而非最终展示有具体成本动机。不是新的video backbone，也不应按VLM foundation architecture分类。",
+    "evidenceZh": "reference对提问policy与generator不可见，只给模拟用户和reward (Sec. 3.1-3.2, Fig. 2, pp. 3-4); GRPO最终outcome reward，只有提问policy更新 (Sec. 3.3, p. 5; Appendix A.3-4, p. 13); 一轮优于多轮rewrite但主要基于simulated-user target alignment (Table 1, p. 6; Fig. 3, p. 8; Appendix Table 4, p. 15); draft与training作用应按paired intervals限定 (Table 2, p. 8; Appendix Table 3, p. 14)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中visual-design-agents：agent在视觉预览后选信息采集动作，再用最终设计质量训练policy。该机制可用于昂贵设计生成前的用户偏好获取，证据目前仅冻结video generator与模拟用户。",
+    "caveatZh": "真实用户评价及在单次denoising中嵌入多轮clarification仍留未来。; 失败包括未知答案、merge把否定答案错归主体或引入新entity、generator未遵循refined prompt。; 仅模拟用户且能力受冻结generator约束。; 训练奖励与主评测共享DreamSim weights，虽有独立3D-VAE/DnS仍可能偏好reward特征。; server-side时间不含真实人阅读和回应，不能据29%时间推断实际用户效率。; 允许1-5questions但500InstanceCap实际每篇5问，未证明policy学会自适应节省问题数量。"
+  }
+}

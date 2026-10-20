@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2610.23039",
+  "slug": "frame-consistent-feed-forward-3d-gaussian-splatting-from-sparse-unposed-images-2610-23039",
+  "title": "Frame-Consistent Feed-Forward 3D Gaussian Splatting from Sparse Unposed Images",
+  "authors": [
+    "Viruthshaan Vinasirajan",
+    "Ranga Rodrigo"
+  ],
+  "publishedAt": "2026-10-16",
+  "updatedAt": "2026-10-16",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.23039"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Frame-Consistent Feed-Forward 3D Gaussian Splatting from Sparse Unposed Images",
+    "3d-reconstruction"
+  ],
+  "abstract": "Feed-forward Gaussian models have made novel view synthesis almost instantaneous. Feed-forward methods predict Gaussians directly, either in two stages or in a single merged pass. Using two separately trained models is attractive because each can specialize in its own objective: one for accurate pose estimation and the other for high-quality reconstruction, rather than forcing a single jointly trained network to compromise between the two. A natural instantiation pairs a frozen pose estimator, VGGT, with a frozen reconstruction backbone, TokenGS. Prior work, such as VGGT-X and 3R-GS, also adopts a two-stage design, but attributes the resulting quality degradation to noisy pose estimates and introduces learned refinement. We show that this is not the primary source of the problem. Through per-camera analysis across 107 scenes from two datasets, DL3DV and MipNeRF360, using COLMAP poses as the reference, we find that the rotation error after alignment is small (median 1.6 degrees), whereas the translation scale is offset by a large, dataset-consistent factor. Controlled ablations over 140 DL3DV scenes show that the primary obstacles are two integration failures rather than pose error: a coordinate-frame inconsistency and a translation-scale mismatch, both of which can be corrected deterministically. With these fixes, a frozen VGGT driving a frozen TokenGS achieves 22.47 PSNR, within 0.51 dB of the COLMAP reference, with no additional training, when poses are estimated from all scene views. In the sparse setting, where reconstruction uses only four context images under the standard pose-free protocol, the same pipeline matches this all-view quality, yielding a fully COLMAP-free pipeline without any refinement step.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.23039v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.23039v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.23039v1 (9 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: not-found.",
+    "ideaZh": "这篇diagnostic paper说明冻结VGGT和TokenGS直接拼接的主要失败来自相机convention、参考frame与尺度分布不一致；确定性修正后作者报告DL3DV 140场景22.47 PSNR，对比COLMAP 22.98。适合速读作模块集成检查表，但“4-view sparse”仍将target image送入VGGT估pose，且固定×7尺度只在单数据集校准，不等同于任意新视角自由渲染已解决。",
+    "motivationZh": "把独立训练的pose estimator和3DGS reconstruction backbone组合时，质量崩溃通常被归咎于pose噪声，从而引入额外训练或优化；缺少对坐标约定及训练尺度的分离诊断。",
+    "methodZh": "先以Sim(3)仅作诊断度量，发现旋转误差较小而translation存在约7倍尺度偏差；推理中将OpenCV W2C转为OpenGL C2W，将context和target在同次VGGT前向估pose以共享frame，再用训练split校准的常数放大translation，向冻结TokenGS提供一致pose。",
+    "methodFlow": [
+      "四context与一个target联合送入冻结VGGT获得同frame poses",
+      "反转W2C并把OpenCV坐标转换为TokenGS需要的OpenGL C2W",
+      "使用train split校准的×7 translation scale",
+      "冻结TokenGS仅用四context图像及修正poses输出3D Gaussians",
+      "在同frame target pose上渲染并评价"
+    ],
+    "experimentsZh": "冻结VGGT-1B及TokenGS 4-view checkpoint；DL3DV 140 eval scenes、960×540、四context和最多50 targets；尺度校准用不重叠100 train scenes。RTX3090测时间，pose级分析另含MipNeRF360七scene。 作者报告joint-eval-views VGGT 22.47 PSNR/0.333 LPIPS，sparse per-target 22.44/0.330；COLMAP reference22.98/0.328。 (Table 1, p. 6) 作者报告naive integration13.67 PSNR，经convention20.38、frame consistency22.24、scale correction22.47。 (Table 2, p. 7) 作者报告sparse per-target pose0.598s加TokenGS0.155s，总0.753s；50view setting总6.79s。 (Table 1, p. 6) 对照范围：主体对照是同一TokenGS的COLMAP ceiling及逐项integration variants；未在同设定系统对比AnySplat/TokenSplat等主流pose-free模型，不宜宣称SOTA。COLMAP用约350views且时间仅在20scenes测，表体约9min与脚注约6min不一致，故不复述速度比。 消融与诊断：Convention/frame/scale逐步消融、VGGT替换intrinsics仅22.98→22.94、不同baseline-pair采样验证尺度估计；没有跨backbone端到端实验证明通用性。",
+    "insightZh": "贡献是可控消融支持的工程诊断与training-free composition，不是新GS网络。可直接避免模块组合时把convention错误误判为模型能力不足；跨backbone与跨dataset的一般性仍未被端到端验证。",
+    "evidenceZh": "Pose误差分解指出alignment后rotation median约1.6°而scale median7 (Sec. 4.1, Fig. 2, pp. 4-5); target和context必须共同在VGGT frame中 (Sec. 4.3-4.5, Fig. 1, pp. 3,5-6); component ablation主增益来自convention/frame一致性 (Table 2, p. 7); 任意用户指定target和跨域尺度仍未解决 (Limitations, p. 8)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对3D生成/重建模块组合的直接迁移价值是相机convention、frame和scale三项可执行检查；无需迁移新的网络或重训，不是宽泛潜在联系。",
+    "caveatZh": "共享frame要求context与target views联合估pose；任意用户指定视角的交互实现待未来。; translation multiplier具有dataset-specific性；per-scene几何normalization未验证。; 端到端只测TokenGS和DL3DV，MipNeRF360仅pose分析。; 四context重建不代表pose只看四图；不得把此协议等同完全无target观测的free-view deployment。; scale correction增益远小于frame correction，结论应以具体组合为界。"
+  }
+}

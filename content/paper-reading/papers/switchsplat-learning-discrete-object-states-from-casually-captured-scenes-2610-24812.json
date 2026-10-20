@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2610.24812",
+  "slug": "switchsplat-learning-discrete-object-states-from-casually-captured-scenes-2610-24812",
+  "title": "SwitchSplat: Learning Discrete Object States from Casually Captured Scenes",
+  "authors": [
+    "Yizheng Xie",
+    "Yalda Foroutan",
+    "George Shramko",
+    "Daniel Rebain",
+    "Shrisudhan Govindarajan",
+    "Andrea Tagliasacchi"
+  ],
+  "publishedAt": "2026-10-17",
+  "updatedAt": "2026-10-17",
+  "collectedAt": "2026-10-18",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.24812"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "SwitchSplat",
+    "3d-generation"
+  ],
+  "abstract": "3D Gaussian Splatting has made high-fidelity 3D reconstruction fast and accessible, yet existing representations assume a static world. This assumption breaks down in casual captures, where a user naturally interacts with the environment -- opening doors, toggling switches, or moving objects -- introducing discrete state changes that no current framework can model. Time-conditioned dynamic methods such as 4DGS conflate when a state was observed with what state the scene is in, limiting them to replaying seen sequences rather than composing arbitrary object configurations. We present SwitchSplat, the first 3DGS representation to address this gap via a base+slot decomposition: a shared static base captures the invariant scene, while each slot independently holds the two binary states (on/off) of one interactable object. Because the assignment of Gaussians to slots is fully differentiable, the model discovers the geometry of each state directly from video, without manual annotation. At inference, the user can freely combine slot states and render the resulting scene from any viewpoint. We validate SwitchSplat on a new casual-capture dataset and show that it outperforms static and dynamic baselines in novel-view synthesis quality, while uniquely supporting rendering of state combinations never seen during capture. Project page: https://switchsplat.github.io",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.24812v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.24812v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "2026-10-20事后阅读全文并用于10月18日补刊，不是当日抓取快照。依据exact version 2610.24812v1 (19 pages)，全文文本与关键图表已核验。数字均为作者报告，本项目未独立复现。Code: not-found.",
+    "ideaZh": "SwitchSplat用共享static base与每物体on/off slots把场景状态从时间序列解耦，能组合视频从未同时出现的开门、开盖等状态。作者报告10个casual scenes平均PSNR 32.65 dB，并在两个独立recapture场景验证新组合；适合借鉴可编辑scene representation，但二值状态、VLM初始化和独立slot假设限制了范围。",
+    "motivationZh": "时间条件dynamic 3DGS通常只能重放observed sequence；若门开和灯亮从未共现，单个timestamp无法表示所需新配置，static模型又会把多状态平均成ghosts。",
+    "methodZh": "在3DGUT/3DGS每个Gaussian上添加覆盖base和各slot两个states的categorical logits，以各slot activation对opacity gating。GPT-5.6从序列帧估计交互数和起止区间，初始化normalized two-sigmoid slot windows；photometric/SSIM、base sparsity及空间compactness联合优化geometry、state logits与window endpoints/temperature，推理由用户指定binary state vector。",
+    "methodFlow": [
+      "Casual 360°视频 → capturer masks、COLMAP poses与初始Gaussians",
+      "VLM估计每次object interaction及rough temporal windows",
+      "每Gaussian学习base/on/off membership，slot window控制帧条件opacity",
+      "Photometric+SSIM与sparsity/compactness联合优化所有state和geometry参数",
+      "用户binary state vector → 独立组合slots并从新视角渲染"
+    ],
+    "experimentsZh": "12真实场景、4fps提帧与FullCircle operator mask、COLMAP校准，10 standard（8 indoor/2 outdoor），2 golden（Kitchen 2/Oslo）。固定每8帧test并排除transition，golden另录new viewpoints与unseen joint configurations。比较FullCircle 3DGS/3DGUT、DeGauss、4DGS；相应undistorted pinhole输入保持一致。 作者报告10 standard scenes平均PSNR：SwitchSplat(3DGUT) 32.65、4DGS 30.55、DeGauss 30.30、FullCircle(3DGUT) 28.99 dB；Car场景4DGS略胜本方法。 (Table 1, p. 6) 作者报告golden新state组合PSNR，Kitchen 2为32.58、Oslo为29.10；4DGS oracle分别29.63和26.53 dB。SwitchSplat的3DGS变体在Oslo为29.29，表明非每一变体/指标都全面领先。 (Table 2, p. 6) 作者报告Kitchen 2三split、五runs平均PSNR，无slots31.98、完整34.31，去compactness32.88；固定VLM windows34.25、去sparsity34.29，仅小幅低于完整。 (Table 3, p. 7) 对照范围：静态与time-conditioned dynamic对照齐全，golden给dynamic方法GT-guided oracle timestamp；附录在PARIS比较articulation baselines，但它们目标为part-level motion，与此处stable states不同。新状态recapture仅2场景，主结果多为近轨迹held-out frames。 消融与诊断：slots/slot opt/compactness/sparsity及VLM slot-count、window initialization sensitivity；compactness是明显有效约束。VLM在更高reasoning预算仍可能漏或合并event，额外slots较无害、缺slot有害；极端window初始化仍会收敛到错误区间。",
+    "insightZh": "关键推进是把stable state作为可组合变量而非timestamp，base共享减少重复场景存储。与rigid articulation方法相比无需同一Gaussian显式运动，但并未恢复可模拟关节、连续trajectory或对象因果关系。",
+    "evidenceZh": "每Gaussian有1+2K状态channels，base共享，用户state vector对各slot独立gating opacity。 (Sec. 3.1–3.2, p. 4; Fig. 2, p. 3); slot数量和交互区间依赖VLM初始化，再通过differentiable windows优化。 (Sec. 3.3–3.5, p. 5; Appendix A.5–A.6, pp. 14–15); 作者报告10个standard scenes平均PSNR提高，并以新轨迹recapture测试joint states。 (Tables 1–2, p. 6; Appendix A.2, p. 12); 主表局部scene和某些指标并非全胜，compactness影响明显而slot优化与sparsity均值增益较小。 (Table 1, p. 6; Table 3, p. 7); 作者将binary states、单operator与VLM种子列为当前限制。 (Limitations and future work, p. 8)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接产生可组合的新3D scene configurations，表示将观测重建转为可编辑状态资产；适合借鉴scene editing中的base/slot解耦。",
+    "caveatZh": "binary object states与single-operator、一只空闲手的capture约束；continuous/multi-valued或multi-operator未覆盖。; slot数量及粗时段由VLM提供，raw video完全unsupervised发现仍未解决。; 主要目标为novel-view synthesis，physics与generative scene editing/simulation属未来工作。; 可组合slots默认state局部且独立，复杂状态相互遮挡、非局部照明与物理互斥未系统检验。; golden泛化仅两个场景；原capture每8帧测试可能低估跨capture变化，不能外推任意组合/环境。; 只建稳定states，transition保留在训练但不在test，连续动作质量未验证。"
+  }
+}
