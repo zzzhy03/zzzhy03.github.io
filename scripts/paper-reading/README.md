@@ -23,15 +23,19 @@ watermark. arXiv revisions of older papers do not enter this channel.
 npm run discover:papers -- --mode daily
 npm run discover:papers -- --mode updates
 npm run discover:papers -- --mode backfill --since 2026-10-01T00:00:00+08:00
+npm run discover:papers -- --mode conference --conference cvpr-2026
 ```
 
 `updates` keeps recent revisions only for already collected papers, in a separate run. `backfill`
 explicitly enables historical retrieval, including revisions. A supplied `--since` without a mode
 also selects backfill for compatibility. Backfill without `--since` uses the old watermark minus
-48-hour overlap. Neither mode advances the daily watermark. Never label backfill
+48-hour overlap. Neither mode advances the daily watermark. Never label conference or backfill
 papers as newly published today.
 
-`content/paper-reading/pipeline-config.json` configures `daily.lookbackDays`.
+`content/paper-reading/pipeline-config.json` configures `daily.lookbackDays`, conference editions,
+provider scopes and `scanWindow` dates. Conference mode without an explicit
+edition selects only editions inside their configured scan windows. These windows are **retrieval
+schedules, not verified publication dates**. Update the edition/year/provider scope each year.
 
 `--record-success` remains a low-level compatibility flag. The standard daily workflow does not
 use it: after screening, full-text closure, promotion, canonical validation and receipt creation,
@@ -82,11 +86,22 @@ Discovery always writes the complete candidate set for the window. It does not c
 decision ledger to suppress provider results; exact decision reuse happens only when screening
 inputs are prepared, so every overlap-window candidate remains auditable.
 
-OpenReview, official venue proceedings, and official technical reports have separate adapter
-interfaces but are `not-configured`. Their status is visible in every default manifest instead of
-silently appearing as an empty search. Future implementations must preserve provider provenance:
-OpenReview should use forum IDs; venue sources should be provider-specific and registry-driven;
-official reports require a reviewed first-party feed allowlist.
+Conference adapters now support OpenReview API 2 accepted `content.venueid` scopes, the official
+CVF proceedings index, and exact Crossref proceedings titles. They retrieve metadata only; no PDF
+is downloaded during discovery. OpenReview submissions/rejections/replies are excluded. CVF has
+no precise publication date or abstract in the index: dates remain unknown, and title-only records
+require an abstract lookup or a manual decision. Crossref's SIGGRAPH conference-paper scope does
+not imply coverage of the separate TOG journal track. Configure those proceedings separately
+with verified event metadata; do not infer a SIGGRAPH event from TOG membership alone.
+
+Zero public records, truncated pagination, HTTP 403 and parser errors are reported as failures,
+not successful empty searches. The `official-reports` adapter remains unconfigured. Daily runs
+do not activate conference providers; use separate conference runs, so provider failures do not
+silently contaminate daily coverage.
+
+Primary provider contracts: [arXiv API](https://info.arxiv.org/help/api/user-manual.html),
+[OpenReview accepted notes](https://docs.openreview.net/how-to-guides/data-retrieval-and-modification/how-to-get-all-notes-for-submissions-reviews-rebuttals-etc),
+[Crossref filters](https://www.crossref.org/documentation/retrieve-metadata/rest-api/rest-api-filters/).
 
 ## Identity and deduplication
 

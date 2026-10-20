@@ -11,7 +11,7 @@
 content/paper-reading/
   research-config.json
   venue-registry.json
-  pipeline-config.json          # 三天检索窗口
+  pipeline-config.json          # 三天窗口、会议届次/检索时段
   topics.json
   papers/*.json
   digests/YYYY-MM-DD.json
@@ -106,6 +106,28 @@ npm run discover:papers -- \
 ```
 
 标准定时任务在这里不传 `--record-success`。watermark 只在后面的 `finalize` 阶段推进。
+
+### 1b. 会议专题（独立于 Daily）
+
+重点会议届次、来源与扫描时段配置在 `content/paper-reading/pipeline-config.json`。
+`scanWindow` 是用户可调整的检索时段，不是论文发表日期。显式选择可以在时段外检查该届：
+
+```sh
+npm run discover:papers -- --mode conference --conference cvpr-2026 --run-id conference-cvpr-2026-YYYYMMDD
+npm run discover:papers -- --mode conference --conference eccv-2026,neurips-2026 --run-id conference-YYYYMMDD
+```
+
+不指定 `--conference` 时只检查当前 `scanWindow` 内的届次。CVF 检索 CVPR/ICCV 官方目录；
+OpenReview 按 accepted `content.venueid` 检索 ICLR/ICML/NeurIPS/ECCV；Crossref 只匹配指定的
+SIGGRAPH/SIGGRAPH Asia proceedings title，**并不覆盖全部 TOG journal track**。
+无权限、空的未发布目录、截断或解析失败均不得声称已完成覆盖。CVF 无摘要时先按标题进行
+metadata/manual screening，再补官方摘要；不要为所有会议目录项直接下载 PDF。
+
+会议候选保留原发表/投稿时间；没有精确日期就记录 unknown，不能填发现时间或会议开会日。
+没有 arXiv ID 的论文也能使用 schemaVersion 4 全文契约（见 fulltext/README.md）。会议结果
+是独立专题/Library 工作，不自动改写现有 Daily；`receipt`/`ledger` 可审计闭环，但
+`finalize` 禁止把会议、updates 或 backfill run 当成日常 watermark。
+
 
 ### 2. Abstract screening
 
@@ -446,7 +468,7 @@ source PDFs 和 reviews；在确定长期对象存储或 retention policy 前保
 
 ## 4. 当前尚未自动化的边界
 
-- OpenReview、official proceedings 和 official technical reports adapters 尚未配置；页面和
+- OpenReview/CVF/Crossref 会议 adapter 已接入独立会议模式；官方 technical reports 仍未配置。页面和
   digest 必须持续诚实显示覆盖范围。
 - AI screening、全文阅读、摘要写作、concept image 和 promotion 内容生成仍由 Codex 执行；
   validators 负责约束输入输出，而不是替代研究判断。

@@ -28,13 +28,13 @@ export function computeDiscoveryWindow({ state, since, now, overlapHours, mode =
   let basis;
   let lastSuccessfulRunAt = null;
 
-  if (!["daily", "updates", "backfill"].includes(mode)) {
+  if (!["daily", "updates", "backfill", "conference"].includes(mode)) {
     throw new Error(`Unknown discovery mode '${mode}'.`);
   }
   if (!Number.isFinite(lookbackDays) || lookbackDays <= 0) {
     throw new Error("lookbackDays must be a positive number.");
   }
-  if (mode === "daily" || mode === "updates") {
+  if (mode === "daily" || mode === "updates" || mode === "conference") {
     if (since) throw new Error("--since requires --mode backfill; daily discovery uses a fixed recent window.");
     startMs = endMs - lookbackDays * 24 * HOUR_MS;
     basis = "rolling-lookback";
@@ -73,6 +73,8 @@ export function computeDiscoveryWindow({ state, since, now, overlapHours, mode =
       ? "First publication (publishedAt) falls inside the inclusive window; revisions of older papers are excluded"
       : mode === "updates"
         ? "updatedAt falls inside the window, publishedAt is older; only previously collected papers are retained"
+        : mode === "conference"
+          ? "Explicit conference edition; publication dates are preserved, never replaced with retrieval time"
           : "publishedAt OR updatedAt falls inside the inclusive window",
   };
 }

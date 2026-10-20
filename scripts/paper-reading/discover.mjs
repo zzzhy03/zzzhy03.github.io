@@ -21,7 +21,7 @@ import {
   writeJsonAtomic,
 } from "./lib/io.mjs";
 import { computeDiscoveryWindow } from "./lib/window.mjs";
-import { DEFAULT_PIPELINE_CONFIG, validatePipelineConfig } from "./lib/pipeline-config.mjs";
+import { DEFAULT_PIPELINE_CONFIG, selectConferenceEditions, validatePipelineConfig } from "./lib/pipeline-config.mjs";
 
 const SOURCE_IDS = [
   "arxiv",
@@ -57,6 +57,7 @@ export function parseArguments(argv) {
     else if (argument === "--now") options.now = next();
     else if (argument === "--mode") options.mode = next();
     else if (argument === "--lookback-days") options.lookbackDays = parseNumber(next(), "--lookback-days");
+    else if (argument === "--conference") options.conferenceIds = next().split(",").map((id) => id.trim()).filter(Boolean);
     else if (argument === "--pipeline-config") options.pipelineConfigFile = next();
     else if (argument === "--overlap-hours") {
       options.overlapHours = parseNumber(next(), "--overlap-hours");
@@ -102,12 +103,14 @@ function helpText() {
 
 Usage:
   npm run discover:papers -- --mode daily [options]
+  npm run discover:papers -- --mode conference --conference cvpr-2026 [options]
   npm run discover:papers -- --mode backfill --since <ISO timestamp> [options]
 
 Options:
-  --mode <mode>                 daily (default), updates, or backfill.
+  --mode <mode>                 daily (default), updates, backfill, or conference.
   --lookback-days <days>         Rolling daily/updates window (default: pipeline config or 3).
-  --pipeline-config <file>       Daily lookback settings.
+  --conference <edition IDs>     Explicit editions; conference mode otherwise selects active scan windows.
+  --pipeline-config <file>       Date, conference edition and cache settings.
   --since <ISO>                  Explicit historical start; implies backfill if no mode is given.
   --now <ISO>                    Deterministic inclusive window end (default: current time).
   --overlap-hours <number>       Backfill overlap before lastSuccessfulRunAt (default: state or 48).
@@ -224,6 +227,7 @@ export async function runDiscovery(inputOptions = {}) {
   const pipelineConfigFile = path.resolve(root, inputOptions.pipelineConfigFile ?? path.join(contentRoot, "pipeline-config.json"));
   const pipelineConfig = await readJsonIfPresent(pipelineConfigFile, DEFAULT_PIPELINE_CONFIG);
   const mode = inputOptions.mode ?? (inputOptions.since ? "backfill" : "daily");
+  if (inputOptions.conferenceIds && mode !== "conference") throw new Error("--conference requires --mode conference.");
   const state = (await readJsonIfPresent(stateFile, null)) ?? defaultState();
   if (state.schemaVersion !== 1) throw new Error("Discovery state schemaVersion must be 1.");
   const window = computeDiscoveryWindow({
@@ -259,7 +263,9 @@ export async function runDiscovery(inputOptions = {}) {
     readJson(path.join(contentRoot, "venue-registry.json")),
     readJsonDirectory(path.join(contentRoot, "papers")),
   ]);
-  validatePipelineConfig(pipelineConfig);
+  validatePipelineConfig(pipelineConfig, venueRegistry);
+  const conferenceEditions = mode === "conference" ? selectConferenceEditions(pipelineConfig, inputOptions.conferenceIds, now) : [];
+  if (mode === "conference" && !conferenceEditions.length) throw new Error("No conference editions selected; configure a scanWindow or pass --conference.");
   const configuredTopicIds = new Set(
     researchConfig.directions.map((direction) => direction.id),
   );
@@ -269,7 +275,8 @@ export async function runDiscovery(inputOptions = {}) {
     }
   }
 
-  const sources = inputOptions.sources ?? SOURCE_IDS;
+  const sources = inputOptions.sources ?? (mode === "conference" ? ["openreview", "venue-proceedings"] : SOURCE_IDS);
+  if (mode === "conference" && sources.includes("arxiv")) throw new Error("Conference runs use edition providers; run arXiv separately.");
   const sourceStatuses = [];
   const sourceRecords = [];
   const adapterContext = {
@@ -287,6 +294,7 @@ export async function runDiscovery(inputOptions = {}) {
     maxResultsPerTopic: inputOptions.maxResultsPerTopic,
     sleepImpl: inputOptions.sleepImpl,
     clockImpl: inputOptions.clockImpl,
+    conferenceEditions,
   };
 
   for (const sourceId of sources) {
@@ -355,6 +363,7 @@ export async function runDiscovery(inputOptions = {}) {
     configuration: {
       mode,
       pipelineConfig: relativeOrAbsolute(root, pipelineConfigFile),
+      conferenceEditions,
       researchConfig: relativeOrAbsolute(
         root,
         path.join(contentRoot, "research-config.json"),
@@ -389,7 +398,8 @@ export async function runDiscovery(inputOptions = {}) {
       manifest: relativeOrAbsolute(root, manifestFile),
     },
     limitations: [
-      "Only the arXiv Atom API adapter is implemented; other registered sources report not-configured.",
+      "Daily and conference editions are separate runs; conference publication dates may be unknown.",
+      "CVF supplies title/author/PDF metadata; missing abstracts require retrieval before substantive screening. Crossref coverage is the configured proceedings title, not all SIGGRAPH/TOG journal-track papers.",
       "Retrieval-topic matches show which query surfaced a record; they are not final relevance labels.",
       "arXiv pagination has no default result cap; an explicit cap can make a topic partial, and a partial live run cannot advance state.",
       "No PDF/full-text acquisition, semantic ranking, editorial analysis, or digest generation runs here.",

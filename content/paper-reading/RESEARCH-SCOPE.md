@@ -27,8 +27,8 @@ Library views use these active directions as their shared topic taxonomy.
 There is no daily paper quota. A direction can legitimately have no accepted paper on a
 given day. Broad-topic admission now requires a major/landmark contribution or explicit,
 evidence-located transfer to a main research task; a good venue or generic potential is insufficient.
-Daily discovery covers only first publications in the latest three days. Old-paper updates
-use separate runs configured in `pipeline-config.json`.
+Daily discovery covers only first publications in the latest three days. Conference editions and
+old-paper updates use separate runs configured in `pipeline-config.json`.
 
 ## Confirmed routing decisions
 

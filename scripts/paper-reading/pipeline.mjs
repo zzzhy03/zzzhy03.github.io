@@ -863,6 +863,7 @@ function buildRunReceipt(root, runDirectory, digest, status, deltaFile = null) {
     return {
       paperId: review.paperId,
       arxivVersion: review.arxivVersion,
+      ...(review.sourceVersion ? { sourceVersion: review.sourceVersion } : {}),
       decision: review.decision,
       ...hashedArtifact(root, file),
     };
@@ -1092,7 +1093,7 @@ export async function runLedger(options, root, runDirectory) {
 export async function runFinalize(options, root, runDirectory) {
   const discoveryManifest = readJson(path.join(runDirectory, "manifest.json"));
   if (discoveryManifest.window?.mode && discoveryManifest.window.mode !== "daily") {
-    throw new Error("Update/backfill runs cannot advance the daily watermark. Use receipt and ledger for their separate audited completion.");
+    throw new Error("Conference/update/backfill runs cannot advance the daily watermark. Use receipt and ledger for their separate audited completion.");
   }
   const verification = await verifyPipeline({ ...options, root, runDirectory });
   const status = verification.status;
