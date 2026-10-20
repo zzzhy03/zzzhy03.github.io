@@ -12,6 +12,7 @@ import {
   readDecisionLedgerSync,
 } from "../decision-ledger.mjs";
 import { buildReviewContract, SCREENING_SCHEMA_VERSION } from "./contract.mjs";
+import { candidatePaperId, sourceVersionFor } from "../lib/review-identity.mjs";
 import {
   pathExists,
   readJson,
@@ -181,6 +182,7 @@ function compactDirection(direction, attentionPolicies) {
     labelEn: direction.labelEn,
     attentionPolicy: direction.attentionPolicy,
     attentionGate: attentionPolicies[direction.attentionPolicy],
+    ...(direction.admissionGate ? { admissionGate: direction.admissionGate } : {}),
     descriptionZh: direction.descriptionZh,
     includeWhenZh: direction.includeWhenZh ?? [],
     excludeWhenZh: direction.excludeWhenZh ?? [],
@@ -237,6 +239,9 @@ function withScreeningContext(candidate, directionById, venueById) {
     ...candidate,
     screeningContext: {
       candidateId: candidate.discoveryId,
+      fulltextIdentity: { paperId: candidatePaperId(candidate),
+        ...(candidate.arxivVersion ? { arxivVersion: `${candidate.identifiers.arxiv[0]}v${candidate.arxivVersion}` }
+          : { schemaVersion: 4, sourceVersion: sourceVersionFor(candidate) }) },
       retrievalTopicIdsAreFinalClassification: false,
       retrievalDirections: candidate.retrievalTopicIds.map((topicId) => {
         const direction = directionById.get(topicId);

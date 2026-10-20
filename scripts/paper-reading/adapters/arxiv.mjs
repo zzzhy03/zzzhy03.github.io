@@ -140,13 +140,13 @@ function normalizeEntry(
   };
 }
 
-function queryStatusBase(query) {
+function queryStatusBase(query, window) {
   return {
     id: query.id,
     topicId: query.topicId,
     familyCount: query.familyCount,
     query: query.query,
-    sortBy: "lastUpdatedDate",
+    sortBy: window?.dateBasis === "published" ? "submittedDate" : "lastUpdatedDate",
     sortOrder: "descending",
     requestCount: 0,
     successfulRequestCount: 0,
@@ -168,7 +168,7 @@ async function discoverFixture({ fixtureFile, queries, researchConfig, window, n
     researchConfig.directions.map((direction) => [direction.id, direction]),
   );
   const queryStatuses = queries.map((query) => ({
-    ...queryStatusBase(query),
+    ...queryStatusBase(query, window),
     mode: "fixture-local-evaluation",
   }));
   const matchesByEntry = new Map();
@@ -229,7 +229,7 @@ export async function discoverArxiv({
   fetchImpl = globalThis.fetch,
   requestDelayMs = ARXIV_MIN_REQUEST_DELAY_MS,
   pageSize = 100,
-  maxResultsPerTopic = 300,
+  maxResultsPerTopic = null,
   sleepImpl = sleep,
   clockImpl = Date.now,
 }) {
@@ -245,7 +245,9 @@ export async function discoverArxiv({
   }
 
   const effectiveDelayMs = Math.max(ARXIV_MIN_REQUEST_DELAY_MS, requestDelayMs);
-  const effectiveMaximum = Math.max(1, Math.floor(maxResultsPerTopic));
+  const effectiveMaximum = maxResultsPerTopic === null
+    ? Number.POSITIVE_INFINITY
+    : Math.max(1, Math.floor(maxResultsPerTopic));
   const effectivePageSize = Math.min(
     effectiveMaximum,
     Math.max(1, Math.min(200, Math.floor(pageSize))),
@@ -357,7 +359,7 @@ export async function discoverArxiv({
   }
 
   for (const query of queries) {
-    const queryStatus = queryStatusBase(query);
+    const queryStatus = queryStatusBase(query, window);
     queryStatuses.push(queryStatus);
     let start = 0;
 
@@ -366,10 +368,17 @@ export async function discoverArxiv({
         const remaining = effectiveMaximum - start;
         const requestSize = Math.min(effectivePageSize, remaining);
         const url = new URL(ARXIV_API_ENDPOINT);
-        url.searchParams.set("search_query", query.query);
+        // arXiv supports submittedDate queries but no documented updated-date query.
+        // Apply a provider-side range for daily first publications, then filter exactly locally.
+        const minute = (value) => new Date(value).toISOString().replace(/[-:T]/g, "").slice(0, 12);
+        const searchQuery = window.dateBasis === "published"
+          ? `(${query.query}) AND submittedDate:[${minute(window.start)} TO ${minute(window.end)}]`
+          : query.query;
+        queryStatus.query = searchQuery;
+        url.searchParams.set("search_query", searchQuery);
         url.searchParams.set("start", String(start));
         url.searchParams.set("max_results", String(requestSize));
-        url.searchParams.set("sortBy", "lastUpdatedDate");
+        url.searchParams.set("sortBy", queryStatus.sortBy);
         url.searchParams.set("sortOrder", "descending");
 
         const responseText = await fetchPageWithRetry(
@@ -406,12 +415,13 @@ export async function discoverArxiv({
         start += feed.entries.length;
 
         const oldestUpdated = feed.entries
-          .map((entry) => Date.parse(entry.updatedAt))
+          .map((entry) => Date.parse(window.dateBasis === "published" ? entry.publishedAt : entry.updatedAt))
           .filter(Number.isFinite)
           .reduce((oldest, value) => Math.min(oldest, value), Number.POSITIVE_INFINITY);
         queryStatus.oldestUpdatedAtFetched = Number.isFinite(oldestUpdated)
           ? new Date(oldestUpdated).toISOString()
           : null;
+        queryStatus.oldestBoundaryDateFetched = queryStatus.oldestUpdatedAtFetched;
         const crossedWindowStart =
           Number.isFinite(oldestUpdated) && oldestUpdated < Date.parse(window.start);
         const reachedReportedTotal =
@@ -503,7 +513,7 @@ export async function discoverArxiv({
       },
       pagination: {
         pageSize: effectivePageSize,
-        maxResultsPerTopic: effectiveMaximum,
+        maxResultsPerTopic: Number.isFinite(effectiveMaximum) ? effectiveMaximum : null,
         truncationMakesRunPartial: true,
       },
     },

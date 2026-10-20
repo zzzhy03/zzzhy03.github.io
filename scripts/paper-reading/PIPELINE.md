@@ -11,6 +11,7 @@
 content/paper-reading/
   research-config.json
   venue-registry.json
+  pipeline-config.json          # 三天窗口、会议届次/检索时段、PDF 缓存预算
   topics.json
   papers/*.json
   digests/YYYY-MM-DD.json
@@ -39,7 +40,8 @@ local-assets/paper-reading/runs/<run-id>/
   decision-ledger/
     delta.json                  # immutable decisions pinned by the run receipt
   fulltext/
-    sources/*.pdf               # exact version, immutable audit source
+    sources/*.pdf               # 活跃审阅必须保留；已验证完成后可回收的 exact-version cache
+    source-cache.json           # 回收清单：精确 URL、SHA-256、review/receipt 引用
     reviews/*.json              # one structured review per reviewed paper
     backlog.json                # explicitly deferred; never an implicit reject
     summary.json                # rebuildable convenience summary
@@ -48,14 +50,15 @@ local-assets/paper-reading/runs/<run-id>/
       rendered/
 ```
 
-一个 run 的 discovery、screening、PDF、review 和 backlog 必须待在同一个目录。不要再把
+一个 run 的 discovery、screening、当前使用的 PDF、review 和 backlog 待在同一个目录。已完成 PDF
+可以按第 8 节回收；review、delta、receipt 等审计元数据必须长期保留。不要再把
 PDF 放入 repository `tmp/`，也不要使用跨日期共享的 `fulltext-reviews/`。
 
 ### 可机械重建的产物
 
 - `public/paper-reading/data/`：由 `npm run prepare:papers` 生成。
 - `.next/`、`out/`：由 Next.js 构建生成。
-- `<run>/fulltext/work/`：由保留的 PDF 重新提取或渲染。
+- `<run>/fulltext/work/`：由保留或按校验值恢复的 PDF 重新提取或渲染。
 
 这些不是内容来源。构建正在运行时不要删除 `.next/`；`pipeline cleanup` 只会接触明确的
 `fulltext/work/`，不会删除 PDF、review、manifest、digest 或 canonical paper。
@@ -83,11 +86,13 @@ npm run pipeline:papers -- status \
 
 ### 1. Discovery
 
-1. 日期按 `Asia/Shanghai` 决定日报日；检索窗口使用带时区的精确 ISO timestamp。
-2. 正常窗口从 `lastSuccessfulRunAt - overlapHours` 开始；首次运行显式传 `--since`。
-3. 论文在 `publishedAt` 或 `updatedAt` 落入窗口时均保留；随后用 DOI、versionless arXiv
-   ID、OpenReview forum ID、title+first-author+year 去重。Discovery 仍完整写出本轮所有
-   candidates，不在 provider 检索层用 decision ledger 删掉 overlap 结果。
+1. 日期按 `Asia/Hong_Kong` 冻结；检索窗口使用带时区的精确 ISO timestamp。
+2. 日常固定 `--mode daily`，从当前冻结时间减去 `pipeline-config.json` 中的
+   `daily.lookbackDays`（默认 3 天）；电脑停机不自动扩张窗口，也无需首次 `--since`。
+3. Daily 只保留 `publishedAt` 首次发布落入窗口的论文。arXiv provider query 添加
+   `submittedDate` 范围并按它排序，本地再精确校验。旧论文版本更新只有独立的
+   `--mode updates` 才检索，且只保留已有 canonical record 的论文。历史补查必须显式
+   `--mode backfill --since ...`；三者不可混成一份“今天新论文”。
 4. retrieval topic 只表示“哪条 query 找到了它”，不能直接当作最终相关性。
 5. arXiv 的单个分页请求对 HTTP 429、5xx 和明确的瞬时网络错误最多尝试 3 次；所有 attempt
    仍经过同一个全局串行限速器，起始时间至少间隔 3100 ms。manifest 必须记录 attempt、retry
@@ -98,11 +103,33 @@ npm run pipeline:papers -- status \
 
 ```sh
 npm run discover:papers -- \
-  --since <ISO timestamp> \
+  --mode daily \
   --run-id paper-reading-YYYYMMDD-HHMMSS
 ```
 
 标准定时任务在这里不传 `--record-success`。watermark 只在后面的 `finalize` 阶段推进。
+
+### 1b. 会议专题（独立于 Daily）
+
+重点会议届次、来源与扫描时段配置在 `content/paper-reading/pipeline-config.json`。
+`scanWindow` 是用户可调整的检索时段，不是论文发表日期。显式选择可以在时段外检查该届：
+
+```sh
+npm run discover:papers -- --mode conference --conference cvpr-2026 --run-id conference-cvpr-2026-YYYYMMDD
+npm run discover:papers -- --mode conference --conference eccv-2026,neurips-2026 --run-id conference-YYYYMMDD
+```
+
+不指定 `--conference` 时只检查当前 `scanWindow` 内的届次。CVF 检索 CVPR/ICCV 官方目录；
+OpenReview 按 accepted `content.venueid` 检索 ICLR/ICML/NeurIPS/ECCV；Crossref 只匹配指定的
+SIGGRAPH/SIGGRAPH Asia proceedings title，**并不覆盖全部 TOG journal track**。
+无权限、空的未发布目录、截断或解析失败均不得声称已完成覆盖。CVF 无摘要时先按标题进行
+metadata/manual screening，再补官方摘要；不要为所有会议目录项直接下载 PDF。
+
+会议候选保留原发表/投稿时间；没有精确日期就记录 unknown，不能填发现时间或会议开会日。
+没有 arXiv ID 的论文也能使用 schemaVersion 4 全文契约（见 fulltext/README.md）。会议结果
+是独立专题/Library 工作，不自动改写现有 Daily；`receipt`/`ledger` 可审计闭环，但
+`finalize` 禁止把会议、updates 或 backfill run 当成日常 watermark。
+
 
 ### 2. Abstract screening
 
@@ -136,6 +163,12 @@ non-terminal，不会被自动跳过。
 observation 的 provenance。后出现的 non-terminal 决定会阻止旧 terminal 被复用；最终
 terminal 的证明失效时也直接回到 screening，不能 fallback 到更旧的 terminal。
 
+VLM/MLLM、Image Generation、Video Generation 和 3D Reconstruction 的新候选有强制
+`admissionGate`：只有 `major`/`landmark`，或完整 `transferEvidence`（主线 targetTopicId、
+具体 mechanismZh、用途 benefitZh、摘要 evidenceLocator），才可进入全文。普通增量、
+好 venue、泛泛“可能有用”均不足。已有论文的撤稿/更正核查不受新论文录取门槛限制。
+此规则不设 top-N，不凑数量；historical batch 使用自己的 immutable policy snapshot。
+
 Codex 对每个实际生成的 batch 写一个 review。每个未被 ledger 复用的 candidate
 必须恰好有一个决定：`reject`、`full-text-review`、`accept-from-abstract` 或
 `manual-review`。topic、relevance 和 reading action 根据论文实际贡献决定，不能
@@ -152,7 +185,7 @@ npm run validate:paper-screening -- \
 
 默认处理所有 `full-text-review` candidate：
 
-1. 下载 screening 对应的精确论文版本到 `fulltext/sources/`。
+1. 只有通过初筛需要全文的候选才下载到 `fulltext/sources/`；先复用本 run 中校验一致的精确版本。
 2. 记录 SHA-256 和页数。
 3. `pdftotext -layout` 输出放入 `fulltext/work/text/`。
 4. 需要视觉检查的页面渲染到 `fulltext/work/rendered/`。
@@ -401,6 +434,34 @@ observation。它足以验证复用语义，但文件会随每日观测线性增
 
 ### 8. Cleanup
 
+网页运行只需 canonical JSON 与 public 图片。PDF 只保留到本轮全文阅读、入库校验、
+receipt 和 ledger 保存完成；不设短期保留或空间预算。`storage.pdfRetention` 固定为
+`until-verified`，`automaticPrune=true`。Daily 在 `finalize --apply` 完成后自动清理本 run，
+会议/updates/backfill 在 `ledger --apply` 完成后清理，不等待 commit、push 或网站发布。
+
+只移除 receipt 与全部本地审计 artifacts、PDF hash 一致的已读文件。已完成的 `defer`
+审阅也移除 PDF，保留待跟进笔记；真正未读、校验失败、backlog 和未知用途的对比文件保留。
+清理结果放在命令返回的 `sourceCleanup` 中，失败不回滚已完成的内容状态，可单独重试。
+
+```sh
+npm run cache:papers -- audit --report tmp/paper-cache-plan.json
+npm run cache:papers -- prune --apply
+npm run cache:papers -- restore --run-dir local-assets/paper-reading/runs/<run-id>
+```
+
+`audit` 是只读预览；`prune --apply` 在删除前写 `fulltext/source-cache.json`，记录精确来源、
+原始 SHA-256、页数、review 和 receipt 的路径/hash。恢复必须匹配旧 hash；原站文件改变
+或不再提供时停止，不能替换审阅证据。历史 receipt/decision reuse 不依赖 PDF。
+`pipeline status/verify/finalize` 对已移除文件核对原 receipt 与 review/hash，并在
+`previouslyVerifiedSourceCount` 中明确计数；不会冒充重新读取原文。独立的
+`validate:paper-fulltext` 仍是严格的原文件校验，若要重新做全文验证先 restore。
+移除清单、review 或 receipt 任一不一致时不能复用旧校验。清理失败不回滚日报，不重新 discovery。
+
+迁移保留 Git 内容和 local run 的 JSON 审计文件，包括 `decision-ledger/delta.json` 与
+`source-cache.json`；可排除 PDF、fulltext/work 和可重建的 node_modules/.next/out。
+只复制 Git 仓库可以恢复网页，但缺失 local delta 会让审阅去重失效并重新筛选。
+
+
 正常运行中的抽取文本和渲染页统一放在 `<run>/fulltext/work/`。先看计划，再应用：
 
 ```sh
@@ -417,8 +478,10 @@ npm run pipeline:papers -- cleanup \
 ```
 
 Cleanup 在删除前重新校验 screening、full-text、backlog，以及传入 digest 时的 promotion；
-目标若在计划后发生变化、包含 symlink 或逃出固定目录，就拒绝删除。第一版不会自动淘汰
-source PDFs 和 reviews；在确定长期对象存储或 retention policy 前保留它们。
+目标若在计划后发生变化、包含 symlink 或逃出固定目录，就拒绝删除。PDF 已在内容闭环时
+移除，work cleanup 可通过原 receipt 核对已完成审阅，不要求为清理工作目录重新下载 PDF。
+定时任务可用 `cache:papers audit` 检查遗留文件；仅对 receipt 完整的文件重试 prune。
+Review、来源/移除清单及审计元数据始终保留。
 
 ## 3. 失败与恢复矩阵
 
@@ -437,7 +500,7 @@ source PDFs 和 reviews；在确定长期对象存储或 retention policy 前保
 
 ## 4. 当前尚未自动化的边界
 
-- OpenReview、official proceedings 和 official technical reports adapters 尚未配置；页面和
+- OpenReview/CVF/Crossref 会议 adapter 已接入独立会议模式；官方 technical reports 仍未配置。页面和
   digest 必须持续诚实显示覆盖范围。
 - AI screening、全文阅读、摘要写作、concept image 和 promotion 内容生成仍由 Codex 执行；
   validators 负责约束输入输出，而不是替代研究判断。
@@ -457,7 +520,7 @@ source PDFs 和 reviews；在确定长期对象存储或 retention policy 前保
 > 后依次运行 pipeline verify、lint、tsc、三组测试、build 和 diff check；通过后写入
 > receipt 及其 immutable decision delta，验证后合并 ledger，再 finalize watermark。没有明确
 > 发布授权时停在这里，不 commit、不 push。清理只使用
-> pipeline cleanup，保留 PDF、reviews、manifests 与 backlog。
+> pipeline cleanup；已验证 PDF 在内容闭环时移除，保留 reviews、manifests、backlog 与来源清单。
 
 这一段定义 terminal condition：没有通过验证、没有显式 closure 或发布步骤尚未完成时，
 任务都不能把 run 当作成功后重新开始下一天。

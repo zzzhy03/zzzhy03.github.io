@@ -9,6 +9,7 @@ import {
 import path from "node:path";
 
 import { parseArxivIdentifier } from "./lib/identity.mjs";
+import { candidatePaperId, sourceVersionFor } from "./lib/review-identity.mjs";
 
 export const DECISION_LEDGER_SCHEMA_VERSION = 1;
 export const DECISION_LEDGER_POLICY_VERSION = 1;
@@ -114,6 +115,13 @@ export function buildExactDecisionKeys(candidate) {
       artifactKey: `arxiv:${result.parsed.id}@v${result.parsed.version}`,
     });
   }
+  if (!keys.length && !(candidate?.identifiers?.arxiv ?? []).length && candidate?.sourceRecords?.some((source) => ["openreview", "venue-proceedings"].includes(source.source))) {
+    const paperId = candidatePaperId(candidate);
+    if (paperId) {
+      const exactVersion = sourceVersionFor(candidate);
+      keys.push({ source: "conference", paperId, exactVersion, artifactKey: `${paperId}@${exactVersion}` });
+    }
+  }
   const byArtifactKey = new Map(keys.map((key) => [key.artifactKey, key]));
   return {
     keys: [...byArtifactKey.values()].sort((left, right) =>
@@ -134,6 +142,7 @@ export function buildExactDecisionIdentity(candidate) {
     };
   }
   const identity = keys[0];
+  if (identity.source === "conference") return { identity, reason: null, errors: [] };
   const recordedArxivIds = uniqueSorted(candidate?.identifiers?.arxiv ?? []);
   if (
     recordedArxivIds.length !== 1 ||
@@ -403,6 +412,7 @@ export function buildCanonicalExactVersionIndex(paperDirectory) {
       const parsed = parseArxivIdentifier(link?.href);
       if (parsed?.version) keys.add(`arxiv:${parsed.id}@v${parsed.version}`);
     }
+    for (const version of paper.analysis?.sourceNote?.match(/source-[a-f0-9]{24}/g) ?? []) keys.add(`${paper.id}@${version}`);
     index.set(paper.id, keys);
   }
   return index;

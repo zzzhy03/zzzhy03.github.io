@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { runDiscovery } from "../discover.mjs";
+import { parseArguments, runDiscovery } from "../discover.mjs";
 import { parseArxivAtomFeed } from "../lib/atom.mjs";
 import {
   buildCanonicalIndex,
@@ -28,6 +28,7 @@ const fixtureFile = path.join(testDirectory, "../fixtures/arxiv-window.atom.xml"
 
 test("watermark windows subtract overlap while bootstrap --since is exact", () => {
   const incremental = computeDiscoveryWindow({
+    mode: "backfill",
     state: { lastSuccessfulRunAt: "2026-08-06T00:00:00Z", overlapHours: 48 },
     now: "2026-08-07T00:00:00Z",
   });
@@ -176,6 +177,57 @@ test("query compiler emits one merged arXiv query per direction", async () => {
   assert.equal(queries.length, 1);
   assert.equal(queries[0].familyCount, 3);
   assert.match(queries[0].query, / OR /);
+});
+
+test("arXiv defaults to complete window pagination beyond 300 results", async () => {
+  for (const cap of [undefined, null, 300]) {
+    let currentTime = 0;
+    const starts = [];
+    const result = await runDiscovery({
+      root: repositoryRoot,
+      since: "2026-08-04T00:00:00Z",
+      now: "2026-08-06T00:00:00Z",
+      sources: ["arxiv"],
+      topicIds: ["lego"],
+      maxResultsPerTopic: cap,
+      fetchImpl: async (url) => {
+        const start = Number(new URL(url).searchParams.get("start"));
+        starts.push(start);
+        assert.equal(new URL(url).searchParams.get("max_results"), "100");
+        const entries = Array.from({ length: 100 }, (_, index) => {
+          const number = start + index;
+          const date = number < 350 ? "2026-08-05T12:00:00Z" : "2026-08-03T12:00:00Z";
+          return `<entry>
+            <id>https://arxiv.org/abs/2608.${String(number).padStart(5, "0")}v1</id>
+            <updated>${date}</updated><published>${date}</published>
+            <title>LEGO generation ${number}</title><summary>LEGO generation method.</summary>
+            <author><name>Pagination Author</name></author><category term="cs.CV"/>
+          </entry>`;
+        }).join("");
+        return {
+          ok: true,
+          status: 200,
+          text: async () => `<feed xmlns="http://www.w3.org/2005/Atom"
+            xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+            <opensearch:totalResults>1000</opensearch:totalResults>${entries}</feed>`,
+        };
+      },
+      sleepImpl: async (milliseconds) => { currentTime += milliseconds; },
+      clockImpl: () => currentTime,
+      runId: "window-pagination",
+      writeOutputs: false,
+    });
+    const source = result.manifest.sourceStatus[0];
+    assert.deepEqual(starts, cap === 300 ? [0, 100, 200] : [0, 100, 200, 300]);
+    assert.equal(source.status, cap === 300 ? "partial" : "checked");
+    assert.equal(source.queries[0].truncated, cap === 300);
+    assert.equal(source.inWindowEntryCount, cap === 300 ? 300 : 350);
+    assert.equal(result.candidatePayload.candidates.length, cap === 300 ? 300 : 350);
+    assert.equal(source.pagination.maxResultsPerTopic, cap ?? null);
+    assert.equal(source.rateLimit.minimumDelayMs, 3_100);
+  }
+  assert.equal(parseArguments(["--max-results-per-topic", "unlimited"]).maxResultsPerTopic, null);
+  assert.equal(parseArguments(["--max-results-per-topic", "300"]).maxResultsPerTopic, 300);
 });
 
 test("provider-only hits remain staged without becoming locally matched topics", async () => {
@@ -532,7 +584,6 @@ test("a complete mocked live fetch can explicitly advance the watermark", async 
 
   const result = await runDiscovery({
     root: repositoryRoot,
-    since: "2026-08-04T00:00:00Z",
     now: "2026-08-06T00:00:00Z",
     sources: ["arxiv"],
     topicIds: ["lego"],
@@ -540,6 +591,7 @@ test("a complete mocked live fetch can explicitly advance the watermark", async 
     stateFile,
     outputRoot: path.join(temporaryRoot, "staging"),
     runId: "mock-live-success",
+    mode: "daily",
     recordSuccess: true,
     writeOutputs: true,
   });

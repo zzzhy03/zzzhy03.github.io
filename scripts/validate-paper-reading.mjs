@@ -847,7 +847,7 @@ for (const { file, value: receipt } of runReceiptEntries) {
   requireArray(receipt.fulltext.reviews, `${context}.fulltext.reviews`);
   for (const [index, artifact] of receipt.fulltext.reviews.entries()) {
     requireText(artifact.paperId, `${context}.fulltext.reviews[${index}].paperId`);
-    requireText(artifact.arxivVersion, `${context}.fulltext.reviews[${index}].arxivVersion`);
+    requireText(artifact.arxivVersion ?? artifact.sourceVersion, `${context}.fulltext.reviews[${index}].sourceVersion`);
     requireText(artifact.decision, `${context}.fulltext.reviews[${index}].decision`);
     requireText(artifact.file, `${context}.fulltext.reviews[${index}].file`);
     requireSha256(artifact.sha256, `${context}.fulltext.reviews[${index}].sha256`);

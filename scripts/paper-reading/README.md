@@ -15,23 +15,27 @@ Checked-in state has two separate responsibilities:
 - `content/paper-reading/state/decision-ledger.json` stores receipt-backed decision observations
   used to avoid repeating an identical review.
 
-The initial `lastSuccessfulRunAt` is deliberately `null`; it does not pretend that discovery has
-already run. Bootstrap with an explicit timestamp:
+The default is `--mode daily`: a rolling **three-day first-publication** window ending at
+`--now` (or the current instant). It does not expand after downtime and needs no bootstrap
+watermark. arXiv revisions of older papers do not enter this channel.
 
 ```sh
-npm run discover:papers -- --since 2026-08-06T00:00:00+08:00
+npm run discover:papers -- --mode daily
+npm run discover:papers -- --mode updates
+npm run discover:papers -- --mode backfill --since 2026-10-01T00:00:00+08:00
+npm run discover:papers -- --mode conference --conference cvpr-2026
 ```
 
-After a successful watermark exists, the default start is:
+`updates` keeps recent revisions only for already collected papers, in a separate run. `backfill`
+explicitly enables historical retrieval, including revisions. A supplied `--since` without a mode
+also selects backfill for compatibility. Backfill without `--since` uses the old watermark minus
+48-hour overlap. Neither mode advances the daily watermark. Never label conference or backfill
+papers as newly published today.
 
-```text
-lastSuccessfulRunAt - overlapHours
-```
-
-The default overlap is 48 hours. The arXiv adapter includes a record when either `publishedAt`
-or `updatedAt` is inside the inclusive window, so an older paper with a new version is retained.
-No artificial reports are created for dates when the machine did not run; the next run simply
-catches up from the last successful watermark.
+`content/paper-reading/pipeline-config.json` configures `daily.lookbackDays`, conference editions,
+provider scopes and `scanWindow` dates, plus PDF retention. Conference mode without an explicit
+edition selects only editions inside their configured scan windows. These windows are **retrieval
+schedules, not verified publication dates**. Update the edition/year/provider scope each year.
 
 `--record-success` remains a low-level compatibility flag. The standard daily workflow does not
 use it: after screening, full-text closure, promotion, canonical validation and receipt creation,
@@ -68,23 +72,36 @@ limitations. Both files say that model screening and summary generation have not
 ## Sources
 
 The arXiv adapter is implemented against its Atom API. It combines all query families for one
-research direction into one provider query, sorts by `lastUpdatedDate`, paginates until it crosses
-the window boundary, and filters `publishedAt OR updatedAt` locally. Requests use a single serial
+research direction into one provider query. Daily runs add a provider-side `submittedDate` range,
+sort by `submittedDate`, and verify the exact first-publication timestamps locally. Updates and
+backfill sort by `lastUpdatedDate` and apply their respective date rules locally. Requests use a single serial
 connection with an enforced delay of at least 3100 ms across every topic, page, and retry attempt.
 HTTP 429, 5xx responses, and an explicit allowlist of transient network failures receive at most
 three attempts; ordinary 4xx responses fail immediately. Per-attempt outcomes and retry counts are
-kept in the manifest. Reaching the per-topic safety cap or exhausting a retry before crossing the
-window makes the source `partial`, which prevents a state advance.
+kept in the manifest. Pagination has no default result cap and continues until it crosses the
+window start or exhausts the provider results. Reaching an explicitly configured per-topic cap
+or exhausting a retry before crossing the window makes the source `partial`, which prevents a state advance.
 
 Discovery always writes the complete candidate set for the window. It does not consult the
 decision ledger to suppress provider results; exact decision reuse happens only when screening
 inputs are prepared, so every overlap-window candidate remains auditable.
 
-OpenReview, official venue proceedings, and official technical reports have separate adapter
-interfaces but are `not-configured`. Their status is visible in every default manifest instead of
-silently appearing as an empty search. Future implementations must preserve provider provenance:
-OpenReview should use forum IDs; venue sources should be provider-specific and registry-driven;
-official reports require a reviewed first-party feed allowlist.
+Conference adapters now support OpenReview API 2 accepted `content.venueid` scopes, the official
+CVF proceedings index, and exact Crossref proceedings titles. They retrieve metadata only; no PDF
+is downloaded during discovery. OpenReview submissions/rejections/replies are excluded. CVF has
+no precise publication date or abstract in the index: dates remain unknown, and title-only records
+require an abstract lookup or a manual decision. Crossref's SIGGRAPH conference-paper scope does
+not imply coverage of the separate TOG journal track. Configure those proceedings separately
+with verified event metadata; do not infer a SIGGRAPH event from TOG membership alone.
+
+Zero public records, truncated pagination, HTTP 403 and parser errors are reported as failures,
+not successful empty searches. The `official-reports` adapter remains unconfigured. Daily runs
+do not activate conference providers; use separate conference runs, so provider failures do not
+silently contaminate daily coverage.
+
+Primary provider contracts: [arXiv API](https://info.arxiv.org/help/api/user-manual.html),
+[OpenReview accepted notes](https://docs.openreview.net/how-to-guides/data-retrieval-and-modification/how-to-get-all-notes-for-submissions-reviews-rebuttals-etc),
+[Crossref filters](https://www.crossref.org/documentation/retrieve-metadata/rest-api/rest-api-filters/).
 
 ## Identity and deduplication
 
@@ -133,7 +150,8 @@ npm run discover:papers -- \
   --topic embroidery
 ```
 
-Use `npm run discover:papers -- --help` for all safety caps and path overrides.
+Use `npm run discover:papers -- --help` for optional caps and path overrides.
+`--max-results-per-topic unlimited` explicitly selects the default uncapped pagination.
 
 ## Screening handoff (still local staging)
 
@@ -388,3 +406,34 @@ New runs must use `receipt --apply` before ledger import.
 - partitioning, compaction, and an indexed lookup for the aggregate decision ledger (the current
   trial version keeps one checked-in JSON file and scans matching observations in memory);
 - Zotero, user-state sync, and publishing.
+
+## Remove verified PDFs and migrate compact evidence
+
+PDFs are working inputs for reading and fresh full-text verification. After the run's full-text
+and promotion checks, receipt, and ledger are saved, remove verified PDFs immediately. There is
+no age-based cache or disk budget. `storage.pdfRetention` is `until-verified` and this repository
+has `storage.automaticPrune=true`. Daily `pipeline finalize --apply` performs cleanup for its run;
+conference/update/backfill `pipeline ledger --apply` does the same. Cleanup does not wait for
+website publication. Errors are returned in `sourceCleanup` without undoing completed content.
+
+`npm run cache:papers -- audit` previews eligible removal. `npm run cache:papers -- prune --apply`
+removes verified files across completed runs; add `--run-dir <run>` to restrict it to one run.
+It records the exact URL, original PDF hash/page count, and hashed review/receipt in
+`fulltext/source-cache.json` before unlinking bytes. Completed `defer` reviews retain their notes
+but release the PDF too. Unread/backlog files, failed verification, and unreferenced comparison
+PDFs stay protected. All metadata and public figures remain.
+
+`pipeline status/verify/finalize` recognizes a removed source only when its original receipt,
+review bytes and removal manifest still match. It reports `previouslyVerifiedSourceCount` and
+reuses historical verification, without claiming that missing bytes were checked again. An
+altered review or receipt invalidates that proof. The standalone `validate:paper-fulltext`
+command still requires actual PDFs; for a new byte-level verification run
+`npm run cache:papers -- restore --run-dir <run>`. Restoration checks the original SHA-256 and
+refuses changed upstream bytes. Publication recovery must not redownload papers merely because
+their completed input files have been removed.
+
+For migration retain Git content, public figures and the compact `local-assets/paper-reading/runs`
+evidence (manifests, candidates, reviews, deltas, backlog and source-cache manifests). Omit `*.pdf`,
+`fulltext/work`, `.next`, `out` and `node_modules` only when you accept restoring/rebuilding them.
+The local decision deltas are important: a Git clone alone keeps the website but not all local
+review-reuse evidence. Never move only the aggregate decision ledger and discard its proofs.

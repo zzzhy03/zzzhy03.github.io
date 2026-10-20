@@ -6,11 +6,16 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "predev": "npm run validate:papers && npm run prepare:papers",
+    "predev": "npm run validate:papers && npm run prepare:papers && npm run prepare:model-updates",
     "dev": "next dev",
-    "prebuild": "npm run validate:papers && npm run prepare:papers",
+    "prebuild": "npm run validate:papers && npm run prepare:papers && npm run prepare:model-updates",
     "build": "next build",
     "pipeline:papers": "node scripts/paper-reading/pipeline.mjs",
+    "pipeline:model-updates": "node scripts/model-updates/pipeline.mjs",
+    "validate:model-updates": "node scripts/model-updates/pipeline.mjs validate",
+    "prepare:model-updates": "node scripts/model-updates/pipeline.mjs build",
+    "test:model-updates": "node --test scripts/model-updates/tests/*.test.mjs",
+    "cache:papers": "node scripts/paper-reading/cache.mjs",
     "discover:papers": "node scripts/paper-reading/discover.mjs",
     "prepare:paper-screening": "node scripts/paper-reading/screening/prepare.mjs",
     "validate:paper-screening": "node scripts/paper-reading/screening/validate.mjs",

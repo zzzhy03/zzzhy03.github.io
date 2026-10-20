@@ -284,6 +284,7 @@ test("withdrawal apply, promotion, receipt, ledger and finalize preserve auditab
   await prepareScreening({ root: f.root, runDirectory: f.run });
   const screening = JSON.parse(readFileSync(path.join(repositoryRoot, "scripts/paper-reading/screening/fixtures/reviews/batch-001.review.json")));
   const decision = { ...screening.decisions[0], candidateId: f.review.candidateId,
+    attentionGate: { ...screening.decisions[0].attentionGate, policyId: "landmark-or-transfer" },
     decision: "full-text-review", primaryTopicId: "vlm-mllm", suggestedSourceScope: "full_text",
     reasonCodes: ["direct-topic-fit", "meaningful-advance", "attention-gate-pass", "needs-full-text"], facetHints: {},
     evidenceBoundary: { screeningBasis: "abstract", basisSufficientForDecision: false, downstreamClaimScope: "full-text-required" } };

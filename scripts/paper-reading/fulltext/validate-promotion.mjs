@@ -155,7 +155,7 @@ export function validatePromotion(options) {
   for (const review of acceptedReviews) {
     const paper = papersById.get(review.paperId);
     const versionlessArxivId = review.arxivVersion?.replace(/v\d+$/, "");
-    const candidate = candidateByArxivId.get(versionlessArxivId);
+    const candidate = candidateByArxivId.get(versionlessArxivId) ?? candidates.find((item) => item.discoveryId === review.candidateId);
     if (candidatesPath && !candidate) {
       errors.push(`Accepted review '${review.paperId}' cannot be joined to this run's candidates.`);
     }
@@ -203,16 +203,16 @@ export function validatePromotion(options) {
         `${review.paperId}.primaryTopicId '${paper.primaryTopicId}' does not match review '${review.primaryTopicId}'.`,
       );
     }
-    const versionLabel = `arXiv v${review.arxivVersion.match(/v(\d+)$/)?.[1] ?? ""}`;
+    const versionLabel = review.arxivVersion ? `arXiv v${review.arxivVersion.match(/v(\d+)$/)?.[1] ?? ""}` : review.sourceVersion;
     if (
-      !paper.analysis?.sourceNote?.includes(review.arxivVersion) &&
+      !paper.analysis?.sourceNote?.includes(review.arxivVersion ?? review.sourceVersion) &&
       !paper.analysis?.sourceNote
         ?.toLocaleLowerCase("en-US")
         .includes(versionLabel.toLocaleLowerCase("en-US"))
     ) {
       errors.push(`${review.paperId}.analysis.sourceNote must name reviewed ${versionLabel}.`);
     }
-    const expectedPaperUrl = `https://arxiv.org/abs/${review.arxivVersion}`;
+    const expectedPaperUrl = review.arxivVersion ? `https://arxiv.org/abs/${review.arxivVersion}` : review.source.paperUrl;
     const paperLink = paper.links?.find((link) => link.label === "Paper");
     if (paperLink?.href !== expectedPaperUrl) {
       errors.push(`${review.paperId} Paper link must be '${expectedPaperUrl}'.`);

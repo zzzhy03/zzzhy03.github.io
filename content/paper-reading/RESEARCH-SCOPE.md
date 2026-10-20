@@ -1,7 +1,7 @@
 # Paper Reading research scope
 
 Status: **active since 2026-08-06**
-Reviewed: **2026-08-06**
+Reviewed: **2026-10-16**
 
 This document is the human-readable companion to `research-config.json` and
 `venue-registry.json`. The JSON files are authoritative for automation. The Daily and
@@ -18,14 +18,17 @@ Library views use these active directions as their shared topic taxonomy.
 | 3D Generation | Continuous | Create or edit new 3D objects, parts, scenes, CAD, appearance, and selected dynamic content. |
 | 3D Segmentation | Focused | 3D semantic/instance/part/promptable segmentation and only the point/mesh encoders that materially advance it. |
 | 3D Reconstruction | Selective | Faithful recovery of a specific object, scene, human, or dynamic input; only paradigm shifts or clearly transferable work. |
-| VLM / MLLM | Continuous | Important multimodal foundation models, visual/spatial reasoning, grounding, tokenization, and capabilities transferable to design. |
+| VLM / MLLM | Landmark or transfer | Important multimodal foundation models, visual/spatial reasoning, grounding, tokenization, and capabilities transferable to design. |
 | Visual Design Agents | Focused | Agents that plan, operate design tools, inspect visual output, and iteratively revise 2D, 3D, CAD, image, video, or fabrication artifacts. |
 | Image Generation | Landmark or transfer | Major raster generation/editing advances, or methods directly transferable to core work. |
 | Video Generation | Landmark or transfer | Major video generation/editing advances, especially consistency, control, and 3D/4D transfer. |
 | LLM | Landmark only | Important foundation models, official reports, and field-changing training or reasoning paradigms. |
 
 There is no daily paper quota. A direction can legitimately have no accepted paper on a
-given day.
+given day. Broad-topic admission now requires a major/landmark contribution or explicit,
+evidence-located transfer to a main research task; a good venue or generic potential is insufficient.
+Daily discovery covers only first publications in the latest three days. Conference editions and
+old-paper updates use separate runs configured in `pipeline-config.json`.
 
 ## Confirmed routing decisions
 
