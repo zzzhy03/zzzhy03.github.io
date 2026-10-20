@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.19729",
+  "slug": "a-diagnostic-study-of-world-space-human-recovery-under-high-camera-dynamics-2610-19729",
+  "title": "A Diagnostic Study of World-Space Human Recovery Under High Camera Dynamics",
+  "authors": [
+    "Hao-Jen Chien",
+    "Wei-Lun Chao",
+    "Yu-Lun Liu"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2610.19729"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Diagnostic",
+    "Study",
+    "World-Space",
+    "Human",
+    "Recovery",
+    "High",
+    "Camera",
+    "Dynamics"
+  ],
+  "abstract": "Monocular world-space human recovery methods excel on current benchmarks, but these rarely include fast camera motion. We introduce the K-Pop stress test, broadcast dance videos that combine fast, large camera motion with dense multi-person choreography. Leading methods produce plausible per-frame meshes on these videos, yet their world-space trajectories drift far from the performers' stage positions. Through a systematic diagnosis, we show that the camera and human estimates each remain self-consistent, and that the drift appears when they are combined at mismatched scales. Each is recovered at its own scale, so a mismatch between the two can turn camera motion into human drift that grows with camera displacement and becomes severe in broadcast dance videos. We derive a closed-form correction that estimates this mismatch and applies one scale to all performers, removing the drift while keeping their relative positions in one shared world frame. It requires no retraining and works with existing backends. Combined with physical constraints, the correction yields stable world-space reconstruction for choreography modeling, scene editing, data generation, and virtual reshooting. Project page: https://chien90190.github.io/worldhmr-fastcam-website/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.19729v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.19729v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://chien90190.github.io/worldhmr-fastcam-website/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.19729v2 (26 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: available.",
+    "ideaZh": "该工作把高相机动态下的人体世界轨迹漂移定位为 camera/HMR 的尺度失配，用落地静止足段闭式校准同一序列的共享尺度，直接利于多人场景编辑与 virtual reshooting。作者报告静止片段净位移由 PGO 的 0.581m 降到 0.153m；依赖可识别接触与相机平移，弱运动或遮挡深度错误仍会失败。",
+    "motivationZh": "快相机广播视频中，独立估计的 camera translation 与 camera-space human translation 各自尺度可自洽，但拼到世界坐标后会把相机运动误当人体漂移。",
+    "methodZh": "在预测接触的 planted-foot intervals 中令真实世界位移近零，通过 weighted least squares 闭式估计单一 camera/HMR relative scale，再共同校正相机和全体人物；PGO 用重投影、时间平滑、地面/接触与 temporal inter-person repulsion 精修。",
+    "methodFlow": [
+      "估计相机轨迹及 camera-space 多人 meshes，并建立 gravity/floor frame",
+      "按 foot-contact confidence、位移方向和旋转信噪比筛 stationary intervals",
+      "对 observed drift 与 camera displacement 做 weighted least squares 得到共享 scale",
+      "共同缩放 camera translation 并校正所有人物，保留同帧相对位置",
+      "PGO 用重投影、时间平滑、接触、地面与多人 temporal repulsion 精修世界轨迹"
+    ],
+    "experimentsZh": "616 clips、59.19k frames、336.87k pose instances，最多 12 人；只保留 VO time-reversal test 通过的 clips。11 对固定/广播相机参考、全数据 2D keypoint/mask proxies、jitter/foot skating；默认 ViPE+PromptHMR-Vid，另换 VO/HMR backbones，单 RTX A6000。 作者报告结果：作者报告 paired reference 的 W-MPJPE 47.02cm、WA-MPJPE 39.89cm、Pair Distance 29.01cm、Ratio 0.90；PromptHMR 分别 70.60cm、49.25cm、42.07cm、0.80。 (Table 1, p. 7) 作者报告静止子集 PGO+correction 的 net displacement 0.153m、foot skating 4.312mm；PGO 为 0.581m、7.568mm。 (Table 9, p. 25) 作者报告 moderate-camera EMDB-2 上 W-MPJPE 415.03mm 对 baseline 388.66mm，jitter 21.18mm 对 46.12mm；轨迹准确度变差但更平滑。 (Sec. 7.1, p. 9) 对照范围：TRAM、PromptHMR、GVHMR、HAC；后两者有 multi-person/VO alignment 或平均 per-person scale 的适配，因此并非全部原生配置。跨 ViPE、DA3、masked DROID-SLAM 与多个 HMR 的验证支持可移植性；没有真实 broadcast mocap GT。 消融与诊断：100 最动态 clips 上 PGO 有/无 correction；静止片段分解 raw/PGO/correction；还扫 contact threshold、稀少 intervals 和 constant/time-varying scale。鲁棒性属闭式初始化+PGO 两阶段整体，PGO residual 会吸收初始化扰动；不能把最终稳定性全归闭式估计。",
+    "insightZh": "尺度歧义并非首次发现；相对用背景 depth 或人体绝对 joint depth 校准的 HAC/OfCaM 等，关键是以 planted-foot 时间段的相对位移直接隔离 composition drift，并显式共享全体人物尺度。新增高相机动态 stress test 和诊断链比新 HMR backbone 更重要。",
+    "evidenceZh": "漂移在 stationary intervals 近似为 (1-s)deltaT，weighted least squares 有闭式解。 (Secs. 5-6, Eqs. 3-7, Fig. 6, pp. 6-7); 门控使用 contact、位移与 camera direction 的 alignment、rotation-error SNR，并在无合格区间时跳过校正。 (Sec. 6, pp. 7-8; Appendix B, pp. 19-20; Appendix D, pp. 22-23); 作者报告固定相机重建 reference 上 W-MPJPE 47.02cm、Ratio 0.90，PromptHMR 为 70.60cm、0.80。 (Table 1, p. 7); 作者报告 10 个静止 clips/60 人中 PGO+correction 净位移 0.153m，PGO 0.581m。 (Appendix E.2, Table 9, p. 25)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体迁移价值在于给多人动态 3D 场景提供共享坐标、稳定轨迹和相对位置，作为 choreography/scene editing 与 virtual reshooting 的输入。它修复 recovery composition，未独立验证新的场景生成能力。",
+    "caveatZh": "p. 10：单尺度无法修复单人的 camera-space depth 错误；长遮挡时人物可被放在群体后方数米。; 单 shot 内变化尺度未表示，误差继承上游 VO/HMR；小 camera displacement 时尺度信号不足，EMDB-2 轨迹指标下降。; Appendix B/D：若无有效 stationary interval 则跳过校正；rotation-error budget 与接触预测决定可辨识性。; stress test 先筛除 VO 不自洽 clips，结论不能外推到相机恢复已失败的极端视频。; paired reference 由固定相机的 PromptHMR 产生，非物理 GT；2D reprojection 本身无法证实正确世界尺度。; 共享尺度适合 scene editing 前的坐标整理，不提供生成式场景、完整碰撞检测或制造约束；no retraining 不等于无昂贵 PGO。"
+  }
+}

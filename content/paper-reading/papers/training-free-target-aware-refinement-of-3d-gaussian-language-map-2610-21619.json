@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2610.21619",
+  "slug": "training-free-target-aware-refinement-of-3d-gaussian-language-map-2610-21619",
+  "title": "Training-Free Target-Aware Refinement of 3D Gaussian Language Map",
+  "authors": [
+    "Sibaek Lee",
+    "Kyeongsu Kang",
+    "Seongbo Ha",
+    "Yewon Jeon",
+    "Joonyeol Choi",
+    "Daegeol Ko",
+    "Jaehyuk Hur",
+    "Taemin Choi",
+    "Minsu Kim",
+    "Hyungjoo Ahn",
+    "Wonsok Yoo",
+    "Hyeonwoo Yu"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.21619"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3d-segmentation",
+    "Training-Free",
+    "Target-Aware",
+    "Refinement",
+    "Gaussian",
+    "Language",
+    "Map"
+  ],
+  "abstract": "Distilling vision-language features into 3D Gaussian Splatting yields a language map that can be queried with arbitrary text. In deployment, however, a small set of user-specified targets must be reliably located, which current distilled maps often miss, while open-vocabulary queryability for other words must remain intact. We propose a training-free, target-aware refinement of an already-distilled language map. Guided by a text-promptable segmenter, the visual embedding inside each detected target region is blended with the target text embedding, a convex combination whose coefficient sets the amount of injected prior, while non-target regions are left untouched. Injecting too much overwrites appearance cues and general queryability, so we seek, for each target, the smallest coefficient that still lets it win, and we obtain every coefficient in closed form, leaving no hyperparameters to tune. We further identify a failure mode of injection in language-goal localization. Text embeddings share a common component, and injecting them makes the standard cosine read-out query-agnostic, which a centering step in the read-out removes. Across three benchmarks, the refinement consistently improves open-vocabulary segmentation, roughly doubling the base mIoU on Replica, and localizes language goals more reliably than the base map. It also transfers as a plug-in to off-the-shelf field-based and object-level language maps and supports a real-world demonstration in which a legged robot navigates to natural-language goals. Project page and code: https://lab-of-ai-and-robotics.github.io/target-aware-langmap/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.21619v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.21619v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://lab-of-ai-and-robotics.github.io/target-aware-langmap/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.21619v1 (8 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: available.",
+    "ideaZh": "方法在SAM3目标mask内向text anchor做最小强度的feature injection，用每view闭式flip point的capture-curve knee定系数，再以query centering去掉共模偏差。作者报告Replica mIoU0.207→0.436，175个室内目标top-1定位50.3→64.0%；但held-out mAcc平均仍损失9.4%。可skim目标可检索性与appearance保留的权衡，training-free仅指refinement。",
+    "motivationZh": "3D language map的视觉embedding会混入周围context，使指定目标在text retrieval中输给背景；直接贴入text又会破坏外观区分和非目标查询。",
+    "methodZh": "每view提取base与目标区域feature；对每个竞争anchor求出target翻转的alpha，取max得到检测flip point；汇总area-weighted capture曲线取knee，混合视觉/text并lift到3D；query中心化后取top fraction、DBSCAN和similarity-weighted centroid。",
+    "methodFlow": [
+      "posed RGB建立SAM2/SigLIP2 base features与3DGS几何",
+      "SAM3按指定词检测区域，计算各view闭式flip points",
+      "area-weighted capture曲线选target-level最小折中强度",
+      "混合visual/text features并lift到固定3D语言场",
+      "centered query readout、聚类并返回目标位置"
+    ],
+    "experimentsZh": "8 Replica、10 ScanNet、4 HM3D-Sem室内scene；rendered-view mIoU/mAcc。定位175查询、1m hit radius、top-K聚类centroid，HM3D用depth initialization；真实UnitreeGo2楼层demo另报结果。 作者报告结果：作者报告Replica mIoU从0.207到0.436；hard alpha=1可达0.471但破坏appearance。 (Tables I-II, p. 5) 作者报告adaptive target mAcc平均+70.1%，held-out平均-9.4%，HM3D held-out-13.7%。 (Table III, p. 6) 作者报告聚合top-1定位64.0%，base50.3%，centering-matched base53.7%；真实demo78%对22%，未报告完整样本数。 (Table IV, p. 6; Sec. IV-E, p. 7) 对照范围：field-based LangSplat/Feature3DGS及其插件版本、object-level HOV-SG/ConceptGraphs；后两者Replica无法产生缺失小object实例，插件会下降。GT类词用于注入和评价；不应与完全无deployment vocabulary方案直接混比。 消融与诊断：fixed alpha sweep、50/50 held-out、centering on/off、query排除自身centering及generic vocabulary；raw取0.5%、centered取4% Gaussians，操作点不同。navigation最短路径构造使SPL退化为定位成功率。",
+    "insightZh": "实质贡献是最小target injection的解析构造及注入后共模偏差的readout修正，不是新segmenter或新的3D重建。目标强化与open-vocabulary损失有明确实证权衡。",
+    "evidenceZh": "每检测flip point由与所有竞争anchors的线性胜出边界求max，跨view以area-weighted curve knee决定强度。 (Sec. III-B/C, Eqs. 1-4, Fig. 2, p. 3); query centering去除共享text方向且不改变类间segmentation argmax。 (Sec. III-D, Eqs. 5-6, p. 4; Fig. 6, p. 7); 作者报告base/refined Replica mIoU0.207/0.436、ScanNet0.355/0.542、HM3D0.144/0.231。 (Table I, p. 5); 作者报告adaptive held-out mAcc三dataset mean0.384→0.348，相对下降9.4%。 (Table III, p. 6); 作者报告175个查询top-1 base50.3%、base+centering53.7%、refined64.0%；无centering仅23.4%。 (Table IV, p. 6)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进3D open-vocabulary segmentation及target retrieval，最小注入/共模去除对语言特征校准有可借鉴机制；尚无part-level设计实证。",
+    "caveatZh": "未被SAM3检测的目标无法恢复；object-level地图缺失的instances不能由注入创建。; 在线mapping与稀疏观测目标是未来工作；fixed-alpha强注入会损害未注入类别及appearance。; training-free不包含3DGS重建、预训练segmenter与VL encoder成本。; 主要评估室内scene-level semantic targets，1m定位容差不能外推为细part或LEGO结构精度。; 注入词与评估类共享；held-out仍有明显下降，不能宣称开放词汇性能完全保留。; real-world demo未报告充分样本数及不确定度，导航成功不证明地图全语义准确。"
+  }
+}

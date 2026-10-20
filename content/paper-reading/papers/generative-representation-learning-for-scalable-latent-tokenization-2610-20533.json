@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.20533",
+  "slug": "generative-representation-learning-for-scalable-latent-tokenization-2610-20533",
+  "title": "Generative Representation Learning for Scalable Latent Tokenization",
+  "authors": [
+    "Alan Baade",
+    "Kyle Sargent",
+    "Vincent Sitzmann",
+    "Eric Ryan Chan",
+    "Justin Johnson",
+    "Li Fei-Fei",
+    "Gordon Wetzstein"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.20533"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Generative",
+    "Representation",
+    "Learning",
+    "Scalable",
+    "Latent",
+    "Tokenization"
+  ],
+  "abstract": "We introduce an approach for self-supervised representation learning designed to be used as a tokenizer for generative modeling. Our objective supervises a representation loss by factorizing the pointwise mutual information of the data, which we estimate by taking information differences between conditional predictions from a learned generative model. We justify our algorithm theoretically and empirically, demonstrating that our generative approach to representation learning avoids dimensional collapse and feature suppression in cases where commonly used methods like DINO and LeJEPA fail. Moreover, we show our representation learning technique is scalable; expending more compute leads to predictably better latent tokenization. For the first time, we perform a careful analysis of the combined flop efficiency of tokenizer and generative model and demonstrate that our approach is a compute-optimal improvement over direct diffusion for pixel-space generation, obtaining an FID-50K of 2.18 with JiT-L. Applied to ImageNet and the text-to-image dataset GPIC, we show tokenizer encoder scaling laws for diffusability, where extrapolating our approach achieves representations in 7x fewer FLOPs than DINOv2 on ImageNet and 8x fewer FLOPs than WebSSL on GPIC.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.20533v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.20533v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.20533v1 (22 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: promised.",
+    "ideaZh": "RePR 用生成模型的条件预测差估计weighted PMI，再直接监督patch representations，研究什么tokenizer让生成更省算力。作者计入encoder训练后报告FID2.18 vs pixel JiT-L2.36；约7×/8× encoder FLOPs优势是scaling-law外推，非实测已达到结果，公开repo目前仅LICENSE。",
+    "motivationZh": "判别features可能抑制生成所需变量，tokenizer预训练成本常被排除，难判断latent modeling是否比直接pixel diffusion更划算。",
+    "methodZh": "MAR prediction model对masked views A/B与目标patch p计算条件denoising误差差，估计weighted incremental PMI；representation dot-product增量以L2拟合stop-gradient target，采用relative-position patch features；联合优化并递归预测前轮latent，用Latent Forcing隔离diffusability。",
+    "methodFlow": [
+      "采样masked views A/B与新增patch p",
+      "MAR比较p在B和AB条件下denoising error",
+      "Monte Carlo+timestep weighting估计incremental PMI",
+      "patch-feature dot-product增量拟合stop-gradient PMI",
+      "联合训练并迭代latent prediction",
+      "Latent Forcing评估encoder+generator总FLOPs"
+    ],
+    "experimentsZh": "ImageNet256²与GPIC；width256–1024、20M–306M encoders；JiT-B80epoch/MiniT2I1epoch评估diffusability，JiT-L做总FLOPs对照；synthetic unique-watermark压力测试；RAE GAN/LPIPS为独立补充。 作者报告结果：作者报告RePR78M+pixel JiT-L FID50K2.18/IS338.4，pixel JiT-L2.36/298.5；总FLOPs3.49e20/3.57e20。 (Table 3, p. 9) 作者报告同600encoder epochs下pixel目标FID10K30.68，二/三轮latent目标24.73/23.81。 (Table 1(e), p. 9) 作者拟合预测DINOv2级质量1.504e21 FLOPs(1/7.77)，WebSSL级1.229e21(1/7.96)。 (Appendix A.7, p. 22) 对照范围：主比较同pixel-generative family，无外部decoder/perceptual/GAN以隔离encoder；DINO/WebSSL数据和规模不同，其等效质量只外推。RAE仅与ImageNet-only Mocov3/IJEPA对照，额外LPIPS/GAN成本单独披露。 消融与诊断：检查mask率/形状、loss weight、latent迭代、timestep weighting和Monte Carlo样本数；部分仅用probing proxy，不能一概视作生成收益。未验证高分辨率或3D。",
+    "insightZh": "显式用生成条件似然比的近似监督patch-feature PMI factorization，避免negative mining及仅监督CLS的间接性；将encoder与generator总训练成本比较也是重要贡献。理论最优/无限容量重建性质不等于有限网络与weighted surrogate保证。",
+    "evidenceZh": "representation objective拟合bootstrapped weighted PMI增量，生成target stop-gradient。 (Sec. 4.1–4.4, Eqs. 6–15, pp. 4–5; Fig. 1, p. 6); 作者报告同总FLOPs RePR78M+pixel JiT-L FID50K2.18 vs pixel2.36。 (Table 3, p. 9; Appendix A.3, p. 17); 7.77×/7.96× encoder FLOPs改善来自power-law外推。 (Sec. 6.2, Fig. 3, p. 8; Appendix A.7, p. 22); PMI-like weighting会NaN，改采样/weighting稳定；latent iterations改善生成。 (Table 1(e–f), p. 9)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "Image Generation representation/latent tokenization的major方法候选，讨论encoder diffusability与总生成成本；不虚构3D或刺绣迁移实证。",
+    "caveatZh": "ImageNet width1024约200epochs后overfit，GPIC仍呈scaling。; 7×/8×只为趋势外推，实际PMI近似依赖predictor质量。; 实践reconstruction受masking和convergence影响，理论factorization非有限训练保证。; 6ND FLOPs排除self-attention，不能当wall-clock/显存成本。; weighted PMI与有限32-sample估计有偏，精确likelihood/optimal denoiser假设与实用系统有距离。; watermark为构造压力测试，不能证明所有自然feature suppression均解决。; 公开repo目前仅LICENSE，尚无法复用实现或复现。"
+  }
+}

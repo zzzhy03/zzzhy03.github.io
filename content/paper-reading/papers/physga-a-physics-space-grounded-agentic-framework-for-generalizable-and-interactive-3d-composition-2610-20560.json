@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.20560",
+  "slug": "physga-a-physics-space-grounded-agentic-framework-for-generalizable-and-interactive-3d-composition-2610-20560",
+  "title": "PhySGA: A Physics-Space Grounded Agentic Framework for Generalizable and Interactive 3D Composition",
+  "authors": [
+    "Weichen Lyu",
+    "Chong Xia",
+    "Mingyu Dong",
+    "Long Xu",
+    "Shengjun Zhang",
+    "Yueqi Duan"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.20560"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "PhySGA",
+    "Physics-Space",
+    "Grounded",
+    "Agentic",
+    "Framework",
+    "Generalizable",
+    "Interactive",
+    "Composition"
+  ],
+  "abstract": "3D object composition is pivotal to digital content creation and robot simulation, while also serving as a critical testbed for physical intelligence in foundation models. Previous methods either leverage large language models to directly predict object coordinates, or utilize generative diffusion priors to synthesize composite images for visual alignment, both of which rely on static priors in digital spaces. However, these methods consistently struggle with complex compositions such as precise hanging, gravity-driven settling and hidden containment, as these tasks require interactive construction processes involving global planning, fine-grained alignment, and physical simulation. To address these challenges, we propose PhySGA, a Physics-Space Grounded Agentic Framework for 3D composition via agent exploration and physical simulation, enabling the universal interactive assembly of rigid, articulated, and deformable objects. Directly applying vanilla LLMs or VLMs to this task proves insufficient, as current models inherently lack grounded physical understanding and interactive construction experience. To overcome this limitation, we design a collaborative feedforward-feedback architecture: an Assembly Agent focuses on geometric and kinematic reasoning for global step planning and coarse adjustment, while a Critic Agent reasons over contact dynamics for simulator state diagnosis and fine-grained closed-loop correction. Furthermore, Action Routers map semantic planning and analysis onto executable physical primitives within the simulator, while a task-specific Self-Evolving Skill Library distills historical trial-and-error feedback into reusable experiences, boosting success rates and minimizing exploration attempts. Extensive experiments within Isaac Sim demonstrate that PhySGA significantly surpasses existing methods in relation fidelity, physical plausibility, and visual quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.20560v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.20560v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.20560v1 (11 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: not-found.",
+    "ideaZh": "PhySGA 把 3D composition 写成 simulator 中的交互装配：Assembly Agent 做全局计划和 metric 粗调，Critic 读取接触/运动反馈并用多视角 pixel alignment 细调，Action Routers 执行命令。作者在 40 任务×3 prompt 的 Isaac Sim 测试报告 contact rate 0.958；很贴近设计 agent，但允许缩放资产，不能视为固定零件可制造装配保证。",
+    "motivationZh": "静态坐标预测或生成图像对齐难以完成 hanging、settling、hidden containment 等依赖接触动力学与中间步骤的组合。",
+    "methodZh": "把两个 simulation-ready assets 与语言指令放入 Isaac Sim；Assembly Agent 生成步骤/校验条件并粗调；Critic 检查 simulation outcome，输出多视角像素对应，由 router 三角化到几何、关节、速度动作；历史成功/失败被蒸馏进 skill library。",
+    "methodFlow": [
+      "语言关系 + 两个 simulation-ready 3D assets",
+      "Assembly Agent 生成步骤和可观察 check conditions",
+      "metric 粗调经 geometric/articulated/velocity router 执行",
+      "Isaac Sim 给出多视角与 contact/motion feedback",
+      "Critic 以 pixel correspondences 细调并重试/回滚",
+      "验证后存入 self-evolving skill library"
+    ],
+    "experimentsZh": "Isaac Sim 4.2.0；20 rigid、10 articulated、10 deformable unique tasks，各三种 prompt 共120 scenes；主表 VLM为 GPT-5.5，另对四个基础 VLM 用相同 assets 比较 coding agents。 作者报告结果：作者报告 PhySGA CR=0.958、PR=0.033、RFS=8.75；Interact3D 为 0.717、0.133、4.45。 (Table 1, p. 7) 作者报告同 assets 的 GPT-5.5 coding agent CR=0.350，PhySGA+GPT-5.5 为0.958。 (Table 2, p. 8) 作者报告移除 self-evolving skills 后 CR=0.792，移除 global planning 后为0.733。 (Table 3, p. 8) 对照范围：覆盖 SAGE、SceneSmith object-level 与 Interact3D；它们 native asset acquisition 各异，AFS差异不能纯归装配策略。Table2同assets跨四种VLM补充控制。未报告真实机器人、固定LEGO几何、时间/API成本或大场景组合。 消融与诊断：六项移除涉及 planning、metric adjustment、error attribution、pixel alignment、action routers、skills；均影响相同120场景结果。但缺重复随机运行/置信区间，skill历史和评测任务隔离细节有限。",
+    "insightZh": "贡献是把物理 simulation 放进 construction 的内部反馈环，并分离 metric-level planning 与 pixel-grounded correction；router 和 skill memory 为可执行闭环提供支撑。不是新 VLM，也不生成新几何本体。",
+    "evidenceZh": "两个独立 assets 的 composition 是状态转移过程，允许 translation/rotation/scale/velocity。 (Sec. 3.1, Eqs. 1–2, pp. 3–4); Critic 通过 calibrated multi-view pixel correspondence 三角化细调。 (Sec. 3.2.3–3.3, pp. 5–6; Fig. 2, p. 4); 作者报告 contact rate 0.958、penetration rate 0.033、relation fidelity 8.75/10。 (Table 1, p. 7); 移除 router 后 contact rate 从 0.958 降为 0.283；移除 pixel alignment 为 0.667。 (Table 3, p. 8)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中 Visual Design Agents 与 3D Generation composition；对 LEGO 或 fabrication 的可借鉴点是物理反馈驱动的可执行装配迭代，但固定零件约束尚需独立设计。",
+    "caveatZh": "无专门 limitations section；模拟器结果不构成严格物理或现实可制造保证，图注 guarantee 用语强于实证。; 允许uniform scale与速度赋值，未处理固定LEGO尺寸、连接公差或制造约束。; 主baseline native assets不统一，visual scores由VLM评估，无法排除asset fidelity与评分偏差。; 论文未交代完整LLM调用预算、skill库初始化和跨测试泄漏控制；公开代码URL未在PDF提供。"
+  }
+}

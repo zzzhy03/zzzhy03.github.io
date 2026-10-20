@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.20965",
+  "slug": "msp-modality-self-play-for-training-multimodal-llms-without-paired-cross-modal-data-2610-20965",
+  "title": "MSP: Modality Self-Play for Training Multimodal LLMs Without Paired Cross-Modal Data",
+  "authors": [
+    "Robert Moseley",
+    "Md Kaykobad Reza",
+    "Ameya Patil",
+    "Edward Ayrapetian",
+    "Salman Asif"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.20965"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "MSP",
+    "Modality",
+    "Self-Play",
+    "Training",
+    "Multimodal",
+    "LLMs",
+    "Without",
+    "Paired"
+  ],
+  "abstract": "Large multimodal models have achieved remarkable progress by scaling model capacity and training on massive paired multimodal data. However, this paradigm introduces a fundamental bottleneck: aligned multimodal datasets are expensive to curate, difficult to scale across diverse modality combinations, and increasingly constrain further progress. We introduce Modality Self-Play (MSP), a training framework for multimodal foundation models based on proxy-mediated modality composition. Instead of relying on paired cross-modal data, MSP uses anchor-supporting proxy textual descriptions of unseen modalities as semantic bridges during training. Given an observed modality (e.g., image or audio), the model generates proxy descriptions for complementary unseen modalities, which are then encoded and aligned with the observed modality through learned bridges, enabling cross-modal interaction without real paired non-text supervision. Our central hypothesis is that proxy text, combined with contrastively trained pretrained encoders, provides sufficient semantic structure for multimodal composition to emerge. We show that MSP enables zero-shot modality composition: models trained only with a real anchor modality and accompanying proxy descriptions can integrate and reason over multiple modalities at inference time despite never observing real paired non-text data during training. Empirically, MSP achieves state-of-the-art or competitive performance on multiple multimodal benchmarks. Ablation studies further demonstrate that learned bridges improve alignment, while anchor-supporting proxy descriptions enable effective cross-modal composition. MSP removes the need for real paired non-text (e.g., audio-vision) supervision, while continuing to rely on modality-text pairs, pretrained contrastive encoders, and modality-distribution bridge calibration.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.20965v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.20965v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.20965v1 (21 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: not-found.",
+    "ideaZh": "MSP 用一份真实 audio/vision anchor 加另一模态的文字 proxy 训练 Qwen3-8B，推理时换回真实双模态；它减少真实 audio–vision 配对需求，但仍依赖 modality–text pairs、CLIP/CLAP priors 和 bridge calibration。作者报告 MUSIC-AVQA 65.65；OmniBench 43.26 仍低于 Qwen2.5-Omni 56.13，适合关注数据范式而非宣称全面领先。",
+    "motivationZh": "扩展非文本模态组合需要昂贵的真实成对数据；仅分别对齐各模态与语言，又未必学到联合推理。",
+    "methodZh": "先训练各模态 MLP projector 与 Qwen3-8B LoRA；冻结 phase-1 checkpoint 生成缺失模态的简短描述，经 frozen text encoder、离线 ridge bridge 与目标 projector 转成一个 proxy token，和真实 anchor 共同训练；推理仅输入真实音频和视觉 token。",
+    "methodFlow": [
+      "modality–text pairs → frozen CLAP/MetaCLIP features",
+      "训练 modality projectors + Qwen3-8B LoRA",
+      "phase-1 model 从真实 anchor 生成另一模态的 text proxy",
+      "proxy 经 text encoder → frozen ridge bridge → projector",
+      "真实 anchor + proxy 联合训练；推理换为真实双模态"
+    ],
+    "experimentsZh": "Qwen3-8B、LoRA ranks 128/256/512；frozen MetaCLIP B/16 与 LAION-CLAP，每模态一个 token。基准为 AVQA、MUSIC-AVQA、OmniBench，附 MUSIC-AVQA-R 与 4B paired-data control；single H100 optimization、seed 42。 作者报告结果：作者报告 r=512 MUSIC-AVQA 65.65；r=256 AVQA 85.73。 (Tables 1–2, p. 7) 作者报告 OmniBench 最佳 43.26，Qwen2.5-Omni 为 56.13。 (Table 3, p. 8) 作者报告完整 composition 相对 QA-only 在 AVQA/MUSIC-AVQA 增加 8.12/10.47 个百分点。 (Table 13, p. 19) 对照范围：比较 ImageBind-LLM、OneLLM、X-InstructBLIP、ChatBridge、GPT-4o 及多种 omni models，训练数据与 backbone 规模并非统一；针对大 r=512 主模型未给严格 matched paired-data ceiling，Appendix L 只给 4B AVQA paired upper bound。 消融与诊断：去 proxy/bridge、桥族、slot zero/Gaussian/shuffled、real-vs-proxy、QA-only 与 4B interleaved-unimodal 控制支持 proxy 与 bridge 的独立价值；未直接训练 degenerate-proxy models，多数比较单种子。",
+    "insightZh": "新意是训练时用 anchor-supporting text proxy 显式模拟模态组合，而不是只把各模态独立接入 LLM；bridge 修正 text/modality encoder 分布差异。它不是消除预训练 cross-modal supervision，也不是在推理时生成缺失感官内容。",
+    "evidenceZh": "训练样本从不含两个真实非文本模态，bridge 仍用 caption–modality calibration。 (Sec. 3.3, Eq. 3, pp. 5–6); 作者报告 MUSIC-AVQA 65.65 和 AVQA 85.73；OmniBench 最佳 43.26。 (Tables 1–3, pp. 7–8); QA-only 与完整 MSP 控制分别为 AVQA 77.46/85.58，MUSIC-AVQA 55.18/65.65。 (Appendix I, Table 13, p. 19); 真实输入优于 imagined，proxy quality 与 pretrained encoder 是已知限制。 (Sec. 5, pp. 9–10; Table 7, p. 10)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "属于 VLM/MLLM 的数据组合训练范式；可作为扩展模态时减少真实 non-text pairing 的方法线索，尚无本研究 SVG/3D 任务验证。",
+    "caveatZh": "依赖 proxy 的语义一致性与 pretrained contrastive encoders，继承其 coverage/bias。; 当前每模态单 token、两种模态为主；更大规模、复杂 reasoning 与 paired-data ceiling 尚待研究。; 单 token 和 pooled frames 限制细粒度时空推理，不能直接外推到 CAD/parts。; 主表 baseline 训练数据和 backbone 不齐，不能把数据配对节省解释为通用性能领先。; PDF 未给出可验证的本方法公开代码仓库。"
+  }
+}

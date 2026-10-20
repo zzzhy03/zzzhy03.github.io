@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.19674",
+  "slug": "remember-revisit-revise-scaffold-memory-for-long-horizon-3d-geometry-2610-19674",
+  "title": "Remember, Revisit, Revise: Scaffold Memory for Long-Horizon 3D Geometry",
+  "authors": [
+    "Soumick Sarker",
+    "Mengmi Zhang"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.19674"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3d-reconstruction",
+    "Remember",
+    "Revisit",
+    "Revise",
+    "Scaffold",
+    "Memory",
+    "Long-Horizon",
+    "Geometry"
+  ],
+  "abstract": "Geometry foundation models estimate camera poses and 3D scene structure from video sequences, but maintaining consistent reconstructions over long horizons remains challenging. Feed-forward models process long sequences as independent, fixed-length frame windows and align their predictions, causing pose and reconstruction errors to accumulate across windows. Streaming models retain information from past frames to inform future predictions, but cannot revise earlier estimates when later observations reveal errors. To address this, we introduce Scaffold MemOry for Revision (SMORE), a framework equipping frozen geometry foundation models with a revisable external memory for long-horizon inference. Inspired by hippocampal associative memory in biological brains, which links spatial context with sensory experience, SMORE associates where an observer is with what it observes, enabling past observations to be stored, retrieved, verified against new evidence, and revised when inconsistencies are detected. We evaluate SMORE with eight competitive geometry models on five datasets spanning camera pose estimation, multi-view depth estimation, 3D point-cloud reconstruction, simultaneous localization and mapping (SLAM), and novel view synthesis. Across all evaluated models, SMORE consistently improves long-sequence pose estimation, reduces multi-view depth error by up to 58%, reduces Chamfer distance for 3D point-cloud reconstruction by up to 43%, and achieves average trajectory error as low as 2.9 cm in long-horizon SLAM. By retaining corrected poses and observations, SMORE further improves the fidelity and spatial consistency of large-scale 3D scene reconstruction. These results establish revisable external memory as a flexible interface for extending pretrained geometry models beyond fixed-context prediction toward iterative, error-correcting inference over long visual sequences.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.19674v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.19674v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.19674v1 (40 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: promised.",
+    "ideaZh": "SMORE把冻结几何模型扩展为“存储—检索—核验—修订”系统，真正修订的是历史窗口的Sim(3) placement，局部几何并未重估。跨8个backbones的配对结果值得精读；重访核验会加算力，memory总量仍增长，正文online与附录final口径及默认revision实现存在不一致，切勿直接宣传2.9cm为纯online结果。",
+    "motivationZh": "冻结geometry foundation models在长视频分窗推断后累积漂移，普通streaming memory也无法回头修正历史几何的global placement。",
+    "methodZh": "以periodic pose scaffold和稀疏memory address关联DINOv2视觉描述；检索历史窗口、联合当前与两对历史帧作几何一致性核验，再修订Sim(3)窗口placement。局部poses/point maps存source-window坐标并随placement一起移动。",
+    "methodFlow": [
+      "冻结模型分窗预测局部poses和point maps",
+      "source-window存储并关联pose scaffold与DINO描述",
+      "视觉cue检索历史候选并选择两对独立窗口帧",
+      "当前+历史联合推断并做两placement一致性核验",
+      "修订窗口Sim(3) placement并回写memory供后续使用"
+    ],
+    "experimentsZh": "八geometry backbones，RE10K/CO3Dv2 pose、Replica depth、ScanNet++ point clouds、7-Scenes SLAM及NVS；32帧window、16 overlap；报告三次实验聚合。NVS为baseline/+SMORE分别训练同架构decoder、held-out targets。 作者报告结果：作者Table1报告VGGT Replica overall Chamfer9.15±0.80→2.49±0.13cm，ScanNet++24.95±2.85→6.05±0.50cm；不把这些特定例子泛化为所有模型统一百分比。 (Table 1, p. 7) 作者TableS4报告7-Scenes default online ATE0.030m、final0.029m；直接DINO cosine index为0.035/0.034m。 (Table S4, p. 31) 作者报告CO3Dv2 N100 VGGT runtime0.33→0.54min、GPU15.1→9.6GB；VGGT-Omega0.19→0.38min、11.9→6.9GB，说明省GPU并非免费。 (Table S6, p. 36) 作者Table2报告VGGT-Omega NVS 7-Scenes PSNR18.59→19.12，CO3Dv2 18.78→19.41；Fast3R CO3Dv2 PSNR16.76→16.64有所下降。 (Table 2, p. 9) 对照范围：配对八冻结模型优于仅挑一个baseline；SLAM文献结果保留各自校准/评价协议，非统一重跑。streaming原生baseline与SMORE windowed策略不同，memory优势不全由scaffold本身产生。NVS用两个分别训练decoder、GT cameras选source，需区别于纯零训练建图。 消融与诊断：TableS4保持后端比较scaffold/direct DINO cosine、稀疏度、描述、维度、pair数量、revision和window。Appendix M分local prediction与placement效应，展示真实failure。参数曾按各task性能调优；不能视为跨域无需调整。",
+    "insightZh": "新意是把关联scaffold、几何核验和可修订外部memory抽成8个冻结geometry模型共享接口，而非新几何backbone或首次loop closure。scaffold相对直接DINO cosine有配对消融，但不单独证明神经生物机制必要。",
+    "evidenceZh": "几何revision改变window placement，固定source-window局部几何一起移动。 (Sec. 2.2, p. 5; Appendix C and G, pp. 15-16, 22-24); scaffold用于提候选，几何两独立source pairs决定是否接受。 (Fig. 1, p. 2; Sec. 2.1-2.2, pp. 4-5; Appendix F, p. 22); 跨骨干几何收益有配对表支持，但online/final要区分。 (Table 1, p. 7; Table S4, p. 31); 拒绝global correction不保证joint-pass局部预测未被错误历史干扰。 (Appendix M, Tables S8-S10, pp. 36-39)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "跨模型长程几何一致性接口对3D reconstruction radar构成较大方法与泛化推进，可借鉴可修订memory及证据门控思想；本文未验证具体LEGO/分割/制造任务。",
+    "caveatZh": "retrieval verification添加compute；总memory随历史增长，只有active GPU context较有界。; 当前主要修订global window placement，local geometry correction留待未来。; 两pair几何核验可能接受重复结构等造成的错误；旋转gate不保证translation、scale或dense-point误差。; Appendix N只测试至3100存储frames，未声称无限memory能力。; Sec3称main online而S4的2.9cm属final；应使用S4明确online0.030m的限定口径。; Sec2.2/Appendix G描述Sim3插值，Appendix J.3又称默认在线重解local pose graph；本版实现口径待代码澄清。; 所谓training-free指backbone冻结，外部RLS在线更新且NVS另训decoder。; 论文未公开实装；不得将作者报告视为本项目复现。"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.21865",
+  "slug": "from-sketch-to-scene-relightable-garment-reconstruction-from-marked-sketches-2610-21865",
+  "title": "From Sketch to Scene: Relightable Garment Reconstruction from Marked Sketches",
+  "authors": [
+    "Ahmet Neçirvan Doğan",
+    "Eren Acar Başaran",
+    "Metin Sezgin",
+    "Zahra Montazeri"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.21865"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.HC"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Sketch",
+    "Scene",
+    "Relightable",
+    "Garment",
+    "Reconstruction",
+    "Marked",
+    "Sketches"
+  ],
+  "abstract": "Sketching is one of the most natural ways for people to express visual ideas. Unlike the text prompts that most generative systems rely on today, a sketch captures spatial structure and intent directly, including where a designer wants highlights and shadows to appear. Yet current sketch-to-3D pipelines have no input for that intent: they bake the drawn shading into the texture as dark paint, and the light cannot be moved. We propose a system that transforms a rough garment sketch, marked with sparse annotations (a star for a highlight and a moon for a shadow), and a short text prompt describing the texture, into a textured 3D mesh with an explicit directional light, as a scene that can be relit and edited after generation. The two symbols are the most frequent proposals in an elicitation study with art students. From the marked sketch the system predicts the scene's directional light and, separately, a displacement field that bends the surface so that the moon-marked regions fall into shadow under that light, rather than being painted dark in the texture.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.21865v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.21865v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.21865v1 (11 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: not-found.",
+    "ideaZh": "用 star/moon marks 把草图的明暗意图分解为可编辑 directional light 和实际 mesh folds，提供比把阴影画进 texture 更具体的 3D 控制机制。作者报告 79% moon marks 变暗，但 100/340 个测试 render 产生可见伪影，且展示图排除了这些失败；适合略读其控制表示，尚不是可靠服装建模工具。",
+    "motivationZh": "现有 sketch-to-3D 管线把绘图中的阴影当成纹样或线条，缺少把“哪里应亮/暗”的设计意图转成显式灯光与几何的通道。",
+    "methodZh": "marked sketch 的 U-Net 预测 irradiance 和 signed bending field，bottleneck CNN 估计 directional light；clean sketch 的 FLUX ControlNet 生成 albedo，再经 Hunyuan3D 得基础 mesh。按 moon marks 在光源侧加 rule-based crests，用薄壳受限 ARAP displacement 让标记处实际进入几何阴影，导出带显式灯光 glTF。",
+    "methodFlow": [
+      "在独立图层 stamp star/highlight 与 moon/shadow marks，同时保留 clean sketch",
+      "U-Net 预测 irradiance 与 signed fold field，CNN 从 bottleneck 预测 directional light",
+      "clean sketch 和纹理 prompt 经适配 FLUX ControlNet 生成 albedo",
+      "合成 albedo/irradiance 图像，经 Hunyuan3D-2.1 得薄壳基础 mesh",
+      "在 moon mark 光源侧加 crest，结合 predicted field、shell-thickness cap 与 ARAP 位移",
+      "导出 textured mesh、常数 roughness 与显式 directional light 的 glTF scene"
+    ],
+    "experimentsZh": "DeepFashion3D garment-level split 为 968 train、122 validation、122 held-out；每衣物 3 灯光得 366 renders。light 在全部 366 测试，geometry orientation/silhouette 过滤后 340 renders/121 garments 测 displacement；另 112 renders 人工把 moons 放在原本明亮平布料。28 名单校艺术学生仅用于符号 elicitation。 作者报告结果：作者报告 light direction mean/median angular error 22.9/20.0 degrees，best fixed direction mean 47.5 degrees。 (Sec. 5.2, p. 9) 作者报告 79% marks 变暗，对照 discs 44%；至少下降 8 灰阶时为 51% 对 13.5%；去掉 crest 后 mark 暗化 61%。 (Sec. 5.3, p. 9) 作者报告人工放置的 flat-cloth marks 86% 变暗；该子集去掉 crest 为 57%，对照约 45-47%。 (Sec. 5.3, p. 9) 对照范围：灯光对照仅 best fixed direction；阴影对照为同 garment 非标记 discs、无 displacement 与 crest-disabled。无系统与先进 garment/sketch generation、inverse-lighting 或 physical cloth baselines 的同条件比较，也没有 end-to-end geometry fidelity 指标。 消融与诊断：crest-disabled 说明 rule-based bump 对暗化贡献大；112 人工 flat-cloth annotations 减少训练/默认测试 marks 本就位于 crease 的偏差。没有独立评估 field learning 相对纯 heuristic crests 的全部效用；没有跨机构符号可读性或交互可用性验证。",
+    "insightZh": "新意是把 sketch-space shading intent 同时转成独立 scene light 与 geometry displacement，避免只在 texture 上加黑；不是单纯符号 UI。部件依赖既有 U-Net、FLUX、Hunyuan3D 与 ARAP，crest 位置/footprint 仍由规则设定；没有与当前 sketch-to-3D/editable-light 方法的充分同条件比较。",
+    "evidenceZh": "marked/clean sketches 分流，保证 star/moon marks 不进入 albedo branch，light 作为独立 scene source 导出。 (Secs. 3.3, 4.1-4.6, Fig. 2, pp. 4-6); fold head 的监督来自 normals turning measure，并在 moon 周围训练；额外 crest 的 footprint 与 offset 为规则，ARAP 位移受薄壳厚度约束。 (Secs. 4.3, 4.6, pp. 4-6); 作者报告 366 held-out renders 的 mean light-angle error 22.9 degrees，best fixed direction 为 47.5 degrees。 (Sec. 5.2, p. 9); 作者报告 79% marks displacement 后变暗，对照 discs 44%；100/340 renders 有可见伪影且被排除出 figures，但保留在数值测量。 (Secs. 5.3 and 6, p. 9)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为 sketch-conditioned 3D content generation 提供 effect-space 意图到 geometry/lighting 的控制表示，可借鉴“目标外观由结构实现”这一分工；没有刺绣路径、cloth simulation 或制造可行性证据。",
+    "caveatZh": "Sec. 6, p. 9：100/340 测试 renders 有 blob 或内外壳穿透伪影，figures 排除这些 renders；314/340 受 inward shell cap 限制。; 只建模单 directional light、常数 roughness，无 colored/area sources、translucency/interreflection；残余烘焙阴影仍可能留在 texture。; 量化仅 synthetic sketches 和规则/作者放置 marks；手绘只定性，未验证专业设计师、符号理解或 mark 移动敏感度。; 79% 暗化不等于物理可制造 garment 或正确 fold topology；没有 sewing-pattern/material constraints，不能归为 fabrication-ready。; 部分显著控制来自 rule-based crest 而非网络，伪影率约 29% 且可视化有筛选，应保留弱证据定位。; 原生 3D light 可编辑，但移动灯光后不保证原 moon mark 仍在阴影；没有 public code 入口可确认复现。"
+  }
+}

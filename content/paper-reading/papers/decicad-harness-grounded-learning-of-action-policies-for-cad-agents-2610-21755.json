@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2610.21755",
+  "slug": "decicad-harness-grounded-learning-of-action-policies-for-cad-agents-2610-21755",
+  "title": "DeciCAD: Harness-Grounded Learning of Action Policies for CAD Agents",
+  "authors": [
+    "Yufeng Peng",
+    "Yixin Zhang",
+    "Ziyi Liu",
+    "Zhikun Xu",
+    "Jiarong Yang",
+    "Sijie Wang",
+    "Wenjie Feng",
+    "Qiyu Kang"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.21755"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.LG",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "DeciCAD",
+    "Harness-Grounded",
+    "Learning",
+    "Action",
+    "Policies",
+    "CAD",
+    "Agents"
+  ],
+  "abstract": "Large Language Model agents operate through closed-loop action policies whose decision space is defined by an agent harness. We investigate how this operating space shapes agent behavior and policy learning in computer-aided design (CAD), a professional domain characterized by persistent state, geometric constraints, and long-horizon procedures. We instantiate this perspective in DeciCAD, a domain-native harness that exposes semantic CAD actions, decision-oriented observations, environment feedback, and persistent state transitions. Building on this harness, we develop a learning pipeline that extracts causal decision supervision from interaction trajectories and improves the policy through supervised fine-tuning (SFT) and geometry-grounded online reinforcement learning (RL). Across four CAD benchmarks, DeciCAD achieves the best F1 and intersection over union (IoU) while reducing model-output tokens by 45--88% relative to a general-purpose coding harness. Under matched supervision, its SFT policy improves F1 from 0.6883 to 0.7437 and outperforms the coding policy; subsequent online RL further raises geometry availability from 66.5% to 73.5% and F1 to 0.7880. These results demonstrate that the decision space induced by a harness materially affects both agent execution and policy learning in CAD.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.21755v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.21755v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/PhysAGI/PhysCAD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.21755v1 (25 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: available.",
+    "ideaZh": "DeciCAD把CAD操作绑定到持久文档中的typed semantic actions，用compact outcomes和定向inspection保留决策信息，再从因果截断轨迹做SFT与geometry-gated GRPO。作者报告Text2CAD availability由SFT66.5%到73.5%、valid-asset F1到0.7880。值得深读harness作为学习变量；两轨teacher可用数据量不同，mesh指标未验证feature tree、精确尺寸或约束正确性。",
+    "motivationZh": "通用coding harness让CAD agent同时承担程序实现与几何决策；过度压缩state又会隐藏恢复所需信息。研究action/observation接口如何影响持久CAD决策和学习。",
+    "methodZh": "LLM输出typed CAD动作；后端按单位、坐标系和稳定refs解析，事务执行并检查postcondition；返回影响对象和分类错误，按需InspectList/Get。因果history/action监督作SFT，student自身rollouts以归一化CD/F1/IoU主reward及较小process/protocol项做GRPO，过滤all-failure groups并保留parent anchors。",
+    "methodFlow": [
+      "CAD任务进入持久文档与typed semantic action空间",
+      "后端解析frame/refs并事务执行、验证postconditions",
+      "compact outcomes加定向inspection支持下一步与恢复",
+      "从teacher动作前history提取因果SFT targets",
+      "student rollout按geometry reward及parent约束做GRPO",
+      "保存native editable document并导出STEP/STL"
+    ],
+    "experimentsZh": "Claude Opus4.7执行CADPrompt200、P3D-Text-to-3D100、CADInstruct100、Assembly203任务；FreeCAD reference backend。Qwen3.5-9B/Claude Sonnet4.6用于Text2CAD/DeepCAD800/200 split学习；mesh scale-normalized、center/ICP aligned。 作者报告结果：作者报告四benchmark中DeciCAD F1为65.83/43.63/23.49/32.11，availability均100%；Claude Code65.44/40.44/20.10/31.95。 (Table 1, p. 6) 作者报告DeciCAD SFT+GRPO availability73.5%、F1 0.7880、IoU0.7036、CD0.00570；SFT对应66.5%、0.7437、0.6631、0.00782。 (Table 4, p. 8) 对照范围：同frontier model和输入比较zero-shot/CADSmith/CAD-Assistant/Claude Code；学习共享teacher、student与优化配置，但teacher轨迹独立收集、审计任务数与有效targets不同。CADPrompt改进较小，不能把输出token下降解释为同幅度latency降低。 消融与诊断：Table2去active inspection或粗错误反馈、使用raw state均降分；stage-wise SFT/GRPO与行为映射诊断无进展和invalid refs。没有跨backend/student、CAD-native correctness或完全相同teacher示例数量的独立对照。",
+    "insightZh": "把harness视为可控制的动作/观测决策空间，并将同一空间贯穿执行、SFT和online RL；理论是满足action/observation sufficiency时存在最优history policy的条件性结果，不能据经验成绩宣称整个CAD接口已被证明最优。",
+    "evidenceZh": "语义动作、persistent state、bounded observation和execution feedback共同定义执行与学习循环。 (Sec. 3.3-3.4, Fig. 2, pp. 3-5; App. C, pp. 13-15); 作者报告P3D-Text-to-3D DeciCAD F1 43.63/IoU54.22，对Claude Code40.44/51.20。 (Table 1, p. 6); 作者报告SFT+GRPO使DeciCAD availability66.5%至73.5%、valid F1 0.7437至0.7880。 (Tables 3-4, p. 8); raw state或粗failure feedback损害表现，完整SDO observation F1 43.63，RSO21.62。 (Table 2, p. 7); 两轨SFT audited tasks为642与499，train/dev分别542/100与471/28。 (App. D.3, Table 7, p. 18)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究设计agent的可编辑CAD产物、稳定对象引用、inspection及恢复接口，适合主线3D设计与约束生成方法借鉴。",
+    "caveatZh": "harness实验仅一个CAD backend和一个frontier model；policy learning一个student、一个dataset。; mesh指标不反映editability、constraint satisfaction或feature-tree validity。; 归一化及ICP后几何相似不证明尺寸、公差、装配约束或可制造性正确。; 两轨训练可用监督任务数不同，harness效果与数据可获得性共同变化。; decision sufficiency是条件性理论，未对全部FreeCAD任务逐状态认证。; 多个产品backend的能力表不代表SolidWorks/AutoCAD已做论文同等实验。"
+  }
+}

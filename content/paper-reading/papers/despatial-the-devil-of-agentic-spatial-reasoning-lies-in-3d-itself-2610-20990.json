@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.20990",
+  "slug": "despatial-the-devil-of-agentic-spatial-reasoning-lies-in-3d-itself-2610-20990",
+  "title": "DeSpatial: The devil of Agentic Spatial Reasoning Lies in 3D Itself",
+  "authors": [
+    "Yifei Liu",
+    "Xiaolong Zhou",
+    "Ziyang Gong",
+    "Yifan Zhou",
+    "Yuanyuan Gao",
+    "Yuning Gong",
+    "Yuchen Yang",
+    "Hongjie Zhang",
+    "Xue Yang",
+    "Xiao Sun",
+    "Zhihang Zhong"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.20990"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3d-segmentation",
+    "DeSpatial",
+    "devil",
+    "Agentic",
+    "Spatial",
+    "Reasoning",
+    "Lies",
+    "Itself"
+  ],
+  "abstract": "Spatial agents have access to reconstruction and segmentation tools, yet inconsistent predictions and fragmented object identities can prevent their outputs from becoming reliable 3D scene information. A simple oracle experiment exposes this perception bottleneck: replacing tool-predicted perception with ground-truth 3D bounding boxes raises an agent to nearly full score across five object-centric VSI-Bench tasks, while retaining the same reasoning tools. Motivated by this finding, we believe the devil of spatial reasoning lies in 3D itself, and introduce DeSpatial(Devil of Spatial), which explicitly decomposes spatial understanding into perception and reasoning. DeSpatial has a shared 3D perception tool to reconcile independent perception outputs into a unified, metric, gravity-aligned 3D scene. This perception tool has two core components: a) a joint segmentation--depth co-refinement module that consolidates masks of the same object and removes projection artifacts caused by inconsistent segmentation and depth within a single frame; b) a cross-view instance fusion module that consolidate voxel-overlapping instances but not allowed to merge same-frame instances. This fusion module additionally fuses spatially disjoint fragments caused by insufficient multi-view observations, by checking their 3D structure and source mask appearance. After receiving the complete and unified 3D scene information, the agent chooses reasoning or computational tools to solve the spatial problem. DeSpatial achieves leading performance on VSI-Bench, MindCube-Tiny, and ViewSpatial, with additional long-video results on VSI-SUPER, revealing the bottleneck of spatial understanding lies in a precise 3D perception itself.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.20990v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.20990v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.20990v1 (19 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: not-found.",
+    "ideaZh": "DeSpatial 先把 SAM3 masks 与重建 geometry 清理、合并为跨视角稳定 3D instances，再让空间 agent 测量和推理。关键是保留同帧互斥、用 voxel overlap 合并、再视觉核对不相交 fragments。作者报告 VSI-Bench 69.22；值得借鉴实例一致性，但实验主要是 QA 分数，未给标准 3D segmentation AP/IoU。",
+    "motivationZh": "独立 mask/depth 产生背景污染，同一物体在遮挡与不同视角下裂成多个 instance，使计数、尺寸和距离工具即使推理正确仍输入错误。",
+    "methodZh": "以 Pi3 geometry、Depth Anything 3 metric scale 与 GeoCalib gravity 建立公共坐标；同类 mask 合并后做 confidence/depth-edge/outlier/top-k component filtering；跨帧以 voxel overlap union，禁止同帧不同观察合并，对不重叠 fragments 用多视图 VLM identity judge；输出 persistent IDs、OBBs 和 provenance。",
+    "methodFlow": [
+      "视频 → masks、point maps、camera poses",
+      "metric scale + gravity 统一公共坐标",
+      "同类 mask consolidation + geometry/component filtering",
+      "voxel-overlap fusion + same-frame exclusion",
+      "视觉核对不相交 fragments → persistent 3D instances/OBBs",
+      "reasoning tools 查询统一场景并回答"
+    ],
+    "experimentsZh": "Qwen3-VL-8B-Instruct agent；32-frame oracle对比4030题、五object-centric tasks；完整VSI-Bench八类、MindCube-Tiny、ViewSpatial与VSI-SUPER；消融固定504题(每类63)，gravity人工核验156 paired scenes。 作者报告结果：作者报告完整VSI-Bench平均69.22，MindCube-Tiny87.19，ViewSpatial68.35。 (Tables 2–3, pp. 7–8) 作者报告504题消融raw lifting57.56→完整68.83；voxel fusion无exclusion64.30→有exclusion66.82→加fragment68.83。 (Table 5, p. 8) 作者报告GT boxes oracle五类平均98.23，对raw SAM3+Pi3为50.38。 (Table 1, p. 3; Appendix A, p. 14) 对照范围：覆盖trained spatial models、training-free pipelines与agents，但backbone/训练预算不同且部分原论文是subset；长视频baseline引用已有结果。缺直接3D instance segmentation AP/IoU和独立固定对象part测试。 消融与诊断：geometry filtering、largest component、same-class merge、part-aware k逐步提升；AABB IoU/DBSCAN/voxel对照与exclusion/fragment移除支撑融合设计。gravity历史run对照作者明确不隔离唯一变量，不能当纯因果消融。",
+    "insightZh": "不是训练新3D encoder，而是将mask-depth co-refinement、带负约束的跨视角实例融合和视觉fragment核验组合为共享3D perception tool；对错误来源与同帧互斥的设计比常规segmentation head更有结构性，但评估尚未独立量化segmentation质量。",
+    "evidenceZh": "co-refinement先确认可见parts数量，再保留top-k连通分量以减少背景污染。 (Sec. 3.2, Fig. 2, pp. 4–5; Appendix B.1–B.2, pp. 15–16); voxel overlap合并受group级same-frame exclusion约束，fragment association再要求跨组每对same。 (Sec. 3.3, Eqs. 5–6, pp. 5–6; Appendix B.3, p. 16); 作者报告VSI-Bench 69.22、MindCube-Tiny 87.19、ViewSpatial 68.35。 (Tables 2–3, pp. 7–8); 固定504题subset上co-refinement从57.56到68.83；same-frame exclusion贡献2.52点。 (Table 5, p. 8)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "3D Segmentation方向可借鉴跨视角object identity consolidation及保留互斥关系；不因agent外壳归Visual Design Agents，因为它没有生成/修改设计产物。",
+    "caveatZh": "依赖detection、reconstruction、metric scale和gravity准确性；无法恢复漏检或未见表面。; 错误part数或visual identity judgment可删掉有效geometry或误合并。; oracle仅五类object-centric tasks且标注与答案一致，不证明所有任务只有perception瓶颈。; 主实验是空间QA，缺独立3D segmentation AP/IoU，不能把QA收益表述成已验证分割精度提升。; 0.1m voxel默认适配场景尺度，不能直接外推LEGO细部或part granularity。; VLM judges与多源model增加运行成本，论文未给统一工具/API预算；PDF未给本方法repo。"
+  }
+}

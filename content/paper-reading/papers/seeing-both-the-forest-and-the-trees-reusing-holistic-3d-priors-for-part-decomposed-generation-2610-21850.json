@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.21850",
+  "slug": "seeing-both-the-forest-and-the-trees-reusing-holistic-3d-priors-for-part-decomposed-generation-2610-21850",
+  "title": "Seeing Both the Forest and the Trees: Reusing Holistic 3D Priors for Part-Decomposed Generation",
+  "authors": [
+    "Yiqun Zhao",
+    "Binbin Huang",
+    "Haobin Duan",
+    "Zibo Zhao",
+    "Shenghua Gao"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.21850"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Seeing",
+    "Both",
+    "Forest",
+    "Trees",
+    "Reusing",
+    "Holistic",
+    "Priors",
+    "Part-Decomposed"
+  ],
+  "abstract": "Generating 3D assets with explicit parts requires two properties at once: geometric detail inside each part and structural coherence across the whole object. Recent image-conditioned 3D generation models adopt a structured 3D representation that anchors tokens to explicit spatial positions, capturing both properties, but their output remains a single fused mesh. We ask how a part-decomposed generation model can inherit both properties of these holistic priors, and answer with STRUCTPARTS, a framework whose core technical contribution is a dual-frame coordinate interleaving mechanism: each shape latent is interpreted under both a part-local and an object-global reference frame, and processed through a global-local inter-leaved transformer that simultaneously reuses the prior's geometric detail at the part scale and its structural coherence at the whole-object scale. As its structural input, STRUCTPARTS uses a segmented mesh scaffold, a coarse mesh paired with a face-level segmentation mask kept entirely within the prior's native 3D representation. With only lightweight finetuning, both intra-part detail and inter-part coherence emerge from the same pretrained weights. On PartObjaverse-Tiny, STRUCTPARTS matches or surpasses prior part-decomposed models at a fraction of their training cost, while naturally supporting part-mesh refinement and part-level editing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.21850v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.21850v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://zhao-yiqun.github.io/structparts/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.21850v1 (26 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: available.",
+    "ideaZh": "STRUCTPARTS 把同一 latent 轮流放进 part-local 和 object-global 坐标系，让 holistic 3D prior 同时保留部件细节与整体结构；相对 matched-budget X-Part，作者报告 part CD 0.107 对 0.169。单图端到端 shape CD 0.045 仍略逊 released X-Part 的 0.043，且错误 scaffold 会直接传播，不能把显式 parts 等同可装配结构。",
+    "motivationZh": "把 holistic 3D prior 变成 part-decomposed generator 时，局部归一化有助细节却丢全局关系，统一 object frame 又让小部件占用分辨率不足。",
+    "methodZh": "single image 经 Hunyuan3D 和 P3-SAM 生成 segmented mesh scaffold。每个 part latent 同时携带 part-local 与 object-global voxel/RoPE coordinates，在同一 flow DiT 中交替 intra-part local attention 和 inter-part global attention，持续 cross-attend DINOv2 image tokens，分别解码 part meshes；改 scaffold 标签可训练自由 merge/split。",
+    "methodFlow": [
+      "single image 经 holistic generator 与 segmentation 得 face-labeled coarse mesh scaffold",
+      "按每个 part surface 采样，建立 normalized local 和 shared global voxel coordinates",
+      "每个 part 初始化 noisy shape latents，并附双套 RoPE positional indices",
+      "flow DiT 交替 intra-part/local 和 inter-part/global attention，各 block 持续读 image features",
+      "解码显式 part meshes 并在 shared object frame 组合",
+      "修改 scaffold segmentation groups，重采 edited latents，实现 merge/split 与局部 refinement"
+    ],
+    "experimentsZh": "Partverse-XL 约 36K objects/240K parts，经 watertight remesh 与 24 conditioning views；8 H200、40K steps、768 GPU-hours。PartObjaverse-Tiny 200 objects 的 UIDs 排除训练，另测 ABO 固定 200 子集。分别用 GT layout 看 part CD/F-score，和共享预测 scaffold pipeline 看 assembled shape；512 tokens/part。 作者报告结果：作者报告 GT-layout part CD/F@0.05 为 0.107/0.67，released X-Part 为 0.114/0.63，matched X-Part 为 0.169/0.55。 (Table 1, p. 8) 作者报告 image-to-parts whole-shape CD/F@0.05 为 0.045/0.63，released X-Part 0.043/0.65，F@0.10 同为 0.83。 (Table 2, p. 8) 作者报告每 object training TFLOPs 为 92.7 对 matched X-Part 137.4，allocated memory 82.71GB 对 115GB；part F@0.05 的 paired bootstrap 改善区间排除零，mean CD 的区间仍含零。 (Table 4, p. 15; Table 11, p. 17) 对照范围：布局可控 baselines HoloPart、X-Part、FullPart、OmniPart；单图直接生成另含 PartCrafter、PartPacker。released 与 matched-budget X-Part 分开，UniPart 因代码不可用仅概念对比。ABO 支持有限跨数据集效果，但 object UID 去重不证明 semantic category 不重叠。 消融与诊断：local-only、global-only、global+part embedding 验证双 frame 必要性；geometry noise 和 label corruption 显示整物指标会掩盖 part assignment 错误。20K/40K checkpoints 与 matched X-Part 28K 检查 steps/processed parts；UltraShape 与 Hunyuan 初始化在同 20K 点比较。aggregate geometry preservation 不能单独证明 high-frequency detail 恢复。",
+    "insightZh": "具体贡献是同一 shape latent 在双参考系下交替使用同一预训练 prior，而非额外 part descriptor 或两阶段 global/canonical latent 生成。scaffold 尽量保持原生几何条件接口，避免大型 learned conditioners。仍依赖外部 holistic generation/segmentation，且训练包含约 3.05B 可训练参数与 768 H200-hours；lightweight 是相对训练预算，不是小模型。",
+    "evidenceZh": "同一 latent 用 local/global 两套 RoPE，attention 按层交替 part 内与全 object，image condition 在每个 block 保留。 (Sec. 3.2, Eqs. 3-5, Fig. 2, pp. 4-5; Appendix A.1, p. 14); 作者报告 GT-layout part-level CD 0.107、F@0.05 0.67，matched X-Part 为 0.169、0.55。 (Table 1, p. 8; Tables 4-5, p. 15); 作者报告预测 scaffold 的 whole-shape CD 0.045，released X-Part 0.043；GT-layout ablation 的 shape CD 0.008 属另一协议。 (Tables 2-3, p. 8); 作者报告 dual-frame 优于 local-only/global-only，但高噪 scaffold 与 boundary label corruption 使性能下降。 (Table 3, p. 8; Appendix A.3, Tables 6-7, pp. 15-16)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进 part-aware 3D generation 与可编辑资产，双坐标系和 scaffold regrouping 对部件尺度、局部细节及全局关系的建模具有具体参考价值；不构成 3D segmentation 新方法，也不应因玩具示例标为 LEGO 论文。",
+    "caveatZh": "Sec. 5/Fig. 8, p. 10：不可靠修复 inaccurate scaffold，错误 geometry/segmentation 可传播到部件；controlled perturbations 不覆盖自然结构失败。; Appendix A.4, pp. 16-17：Animals mean CD 有 heavy-tailed failures；只有 part F@0.05 的 paired bootstrap 区间排除零。; 仅 object UID 去重；Partverse-XL 无对齐 taxonomy，不能客观核查语义类别重叠；未来才扩展 deeper hierarchy/articulated generation。; 显式 part meshes 不保证接触、连接、collision-free assembly 或 manufacturability；与 LEGO 的具体连接规则仍有距离。; scaffold shape 与 coarse topology 已由上游固定，方法主要重用 prior 做 part refinement，不是完全可控 topology invention。; 单训练 seed、有限 200-object benchmarks、约 3B trainable 参数及 768 H200-hours 限制轻量与泛化叙事；全部结果为作者报告。"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.22352",
+  "slug": "supra-tex-3d-generation-with-super-aligned-texture-2610-22352",
+  "title": "SUPRA-TEX: 3D Generation with Super-Aligned Texture",
+  "authors": [
+    "Chen Yang",
+    "Jiemin Fang",
+    "Fanpeng Meng",
+    "Zihao Huang",
+    "Jichen Pang",
+    "Guanjun Wu",
+    "Zhikuan Bao",
+    "Qi Tian"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.22352"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "SUPRA-TEX",
+    "Generation",
+    "Super-Aligned",
+    "Texture"
+  ],
+  "abstract": "Single image 3D generation aims to dress a given 3D mesh with relightable materials while faithfully preserving the visual details of a reference image. Existing methods either introduce artifacts when fusing inconsistent multi-view predictions or struggle to preserve fine details through implicit image-feature conditioning. To resolve these challenges, we introduce SUPRA-Tex, built on the principle of decoupling visible-material estimation, surface alignment, and observation-guided 3D completion. This division of labor allows the 3D generator, trained on limited 3D data, to focus its capacity on preserving visible evidence and completing unobserved surfaces. Specifically, we first train an MLLM-based image editing model to predict lighting-separated PBR maps in the reference view. We then project these maps onto the visible surface and encode them with the pretrained material VAE encoder into native observation latents that share the generation target's latent space. An interleaved flow transformer holds these latents as fixed, read-only anchors while alternating unobserved-region and full-surface updates to generate complete material latents. This design achieves super-alignment with the reference, delivering What You See Is What You Get fidelity on visible regions and coherent completion on unobserved surfaces. Trained solely on public datasets, SUPRA-Tex achieves SOTA performance in both geometry-conditioned texturing and end-to-end asset generation, matching or even exceeding leading commercial systems on in-the-wild images. Project page: https://supra-3d.github.io/supratex/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.22352v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.22352v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.22352v1 (30 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: promised.",
+    "ideaZh": "SUPRA-Tex 先把参考图变成对齐 mesh 的原生 PBR observation latents，再让 3D flow 围绕固定只读 anchors 补全表面，比泛 image-feature conditioning 更易保留文字与纹样。作者报告两套纹理数据集均提升；几何始终固定，不能修复上游突起或投影错位，商业比较另用了合成 back view。",
+    "motivationZh": "单图 3D texturing 的隐式 image features 难以精确落在表面，多视图融合又会糊化文字与纹样；可见与不可见区域承担不同生成任务。",
+    "methodZh": "先用单步 2D DiT 预测 lighting-separated PBR，经过滤的 mesh-camera projection 和 frozen sparse material VAE 编成 target-space observation latents；将其作为只读 KV anchors，flow transformer 交替更新无观测 cell 与全表面，解码完整 PBR。",
+    "methodFlow": [
+      "参考 RGB 经单步 2D material estimator 得到 albedo、metallic、roughness",
+      "用 mesh 与相机过滤轮廓和深度不连续投影，建立 partial surface PBR",
+      "frozen material VAE 仅编码 observed sparse support，附 coverage 和 boundary distance",
+      "固定 observation KV anchors 条件化 flow，交替更新无观测 cells 和全表面",
+      "25 Euler steps 生成完整 material latents，经 frozen decoder 导出 relightable asset"
+    ],
+    "experimentsZh": "public 3D assets 训练 frozen-VAE 上的 flow；2D estimator 用 Objaverse render supervision。DTC-Tex 100 与 Complex-Tex 110 物体训练去重，分 GT-geometry texturing 与单图端到端，统一 rendering。商业评测 45 张真实/合成输入、512 份有效 pairwise judgments，Ours 另合成 back-view。 作者报告结果：作者报告 GT geometry 下 DTC-Tex/Complex-Tex shaded foreground PSNR 22.34/20.64 dB，Pixal3D* 为 20.47/19.44 dB；albedo foreground PSNR 为 19.55/18.12 dB。 (Table 1, p. 6) 作者报告相对 joint-update attention 采样加速 1.20x/1.18x；KV cache 再加速约 1.067x/1.064x，但 mean peak memory 增约 1.94/1.81 GiB。 (Table 6, Sec. 4.5, p. 11) 对照范围：GT geometry 比较十种 native-3D/multiview texturing；端到端含 TRELLIS.2、Pixal3D*、Hunyuan3D 2.1、Step1X-3D、UniLat3D、CUPID。Ours/Pixal3D* 共用 geometry，可隔离 appearance 改进。NaTex/TEXTRIX 等因官方实现不可用未纳入定量。商用系统训练未知且输入 view budget 不同。 消融与诊断：匹配训练预算的 Table 5 比 residual injection、joint-update、固定/均值 MR 与 GT-PBR oracle，支持整套 observation 设计。partial/full latent diagnostic 证明 partial latent 不等于 full slice。runtime checkpoints step 不同，不能把全部 speedup 归因于 interleaving；TeaPot early-learning 只是单例 oracle-material 诊断。",
+    "insightZh": "重点是把 PBR 观测编码到原生 target latent space，并以 sparse support、coverage 和只读交错条件生成接口减少 3D 模型的学习负担；不是新 geometry generator。相对 residual feature injection，接口更贴近材料输出。只读 memory 与 interleaving 的单独因果贡献未完全分离。",
+    "evidenceZh": "partial PBR 用 sparse coordinate encoder 编成 native observation latents，未知 voxels 不作 zero fill。 (Secs. 3.2-3.3, Fig. 2, pp. 4-5; Appendix E.3, p. 24); observation stream 只产生 KV，无 query/更新；generation stream 交替查询 U 与全部 S。 (Sec. 3.4, Eqs. 7-8, pp. 5-6; Fig. 7, p. 20); 作者报告 DTC-Tex/Complex-Tex shaded PSNR 30.89/30.05 dB，Pixal3D* 为 29.19/28.84 dB。 (Table 1, p. 6); GT PBR oracle 高于预测材料；几何错位与隐藏纹样仍有失败。 (Table 5, pp. 9-10; Sec. 5, Fig. 6, pp. 11-12)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接属于 3D asset/material generation，适合可见纹样精确对齐的产品/部件外观生成。observation-space interface 可把 2D edits 转成 3D surface conditions，但不提供刺绣或制造可行性保证。",
+    "caveatZh": "Sec. 5/Fig. 6, pp. 11-12：geometry/camera 错位会错误投影；固定几何无法删除上游 hallucinated protrusions。; 单图材料估计有歧义；隐藏侧文字/花纹跨 visibility boundary 延续仍不一致。; failure cases 无 corrected-geometry controls 或 measured unseen-surface ground truth。; 商用比较仅 45 个混合输入，Ours 额外合成 back-view，不能视为严格同条件整体胜出。; material error 在 PNG encoding 中测量，不等于 physical-linear 参数误差；所有数值未经本项目复现。; 2D estimator 单步 DiT 虽约 1.2s，作者报告 peak 66.25 GiB；单步并不意味着消费级显存。; 公开仓库 README 与 PDF 的 released 表述不一致：当前推理代码待发布，且作者声明部署问题可能使当前模型输出不稳定。"
+  }
+}

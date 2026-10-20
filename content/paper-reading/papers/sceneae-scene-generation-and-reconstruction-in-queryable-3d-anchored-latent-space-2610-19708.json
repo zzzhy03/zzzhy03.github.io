@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.19708",
+  "slug": "sceneae-scene-generation-and-reconstruction-in-queryable-3d-anchored-latent-space-2610-19708",
+  "title": "SceneAE: Scene Generation and Reconstruction in Queryable 3D-Anchored Latent Space",
+  "authors": [
+    "Shuofeng Sun",
+    "Wenzhao Zheng",
+    "Yunpeng Zhang",
+    "Yi Wu",
+    "Linqing Zhao",
+    "Haibin Yan"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.19708"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "SceneAE",
+    "Scene",
+    "Generation",
+    "Reconstruction",
+    "Queryable",
+    "D-Anchored",
+    "Latent",
+    "Space"
+  ],
+  "abstract": "Recent video world models have increasingly adopted 3D memory mechanisms to integrate historical observations into a lightweight and persistent scene representation. This naturally raises a complementary question: if 3D representations can serve as an effective mechanism for memorizing observed scenes, can they also be directly used as the latent space for reconstructing and generating scenes? Motivated by this idea, we represent a scene as a compact and unstructured 3D-anchored latent space (\\textbf{SceneAE}). Each latent combines an explicit 3D position with an implicit content feature and is spatially grounded to describe its local scene region, forming a sparse latent point cloud. Unlike conventional video-VAE latents that describe how a scene appears from particular viewpoints, our representation directly describes the scene itself, making it naturally applicable to both reconstruction and generation. For reconstruction, once the scene has been generated, our persistent 3D representation can be projected and decoded into RGB-D observations by different target cameras, without the need to regenerate a video for each new camera trajectory. For generation, we leverage the geometry-content separation to first generate camera-controlled 3D geometry and then synthesize content conditioned on it, reducing camera-appearance entanglement and improving camera controllability. Experiments show that this 3D latent achieves superior generation quality, computational cost, and camera controllability.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.19708v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.19708v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.19708v1 (19 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: not-found.",
+    "ideaZh": "SceneAE让生成模型输出“3D anchors+content”而非某条相机轨迹的视频：先生成空间layout，再生成附着内容，同一latent可反复查询新视角。作者报告较低生成step开销与更好camera following；代价是渲染细节损失、静态假设，且几何表使用不同teacher伪GT，不能直接等同真实测量精度。",
+    "motivationZh": "避免view-bound video latents反复编码同一场景并纠缠相机与外观，让生成的静态场景能从任意新相机复用查询。",
+    "methodZh": "DA3深度反投影并FPS采样3000个3D anchors，以dual-path deformable attention编码64维content；低分辨率splat+local cross-attention解码RGB-D。Point DiT先按相机生成anchors，Content DiT通过3D RoPE合成content并在后段修正位置。",
+    "methodFlow": [
+      "输入posed RGB经冻结DA3获得features/depth",
+      "反投影及FPS构造3D anchors并聚合局部特征",
+      "Point DiT由reference和target camera生成未来anchors",
+      "Content DiT用3D RoPE生成content并校正geometry",
+      "同一3D latent经splat/local-attention decoder输出多相机RGB-D"
+    ],
+    "experimentsZh": "DL3DV、RealEstate10K、ScanNet训练；518x376、3000 latents，100k iterations、8xA800；每sample9views，1view或首尾2view条件；OOD TartanAir/ScanNet++。 作者报告结果：作者报告RE10K 1view生成PSNR17.1、SSIM0.60，GLD16.9/0.58；每step134ms与8348 GFLOPs，对比GLD285ms、23203GFLOPs。DL3DV PSNR15.4略低于GLD15.6。 (Table 1, p. 6) 作者报告DL3DV trajectory AUC@30 0.76、ATE0.10，GLD0.64/0.15；RE10K为0.72/0.09 vs0.67/0.15，poses由VGGT估计。 (Table 3, p. 7) 作者报告RE10K9context→20query NVS PSNR21.3，LVSM21.0；input reconstruction26.3低于Wan-VAE30.9与GLD31.1。 (Table 5, p. 8) 对照范围：Aether、Gen3R、GLD、SceneTok及LVSM/DA3-Giant分别作生成/重建对照；geometry GT随方法teacher变化，不能宣称统一真值下全面胜出。step timing不等于端到端采样时间；无动态场景或大规模长时交互证明。 消融与诊断：Table8拆jitter、low-res decoder、splat CA；Table9比较joint/content-only/decoupled和camera注入位置；Tables10-14检验dual-path、encoder、reference noise和position correction，支持显式geometry路径但主要用RE10K/DL3DV。",
+    "insightZh": "把显式3D锚定latent同时用于压缩、查询和diffusion生成，并把camera control分解成geometry→content路径；区别于view grids和无空间定位的SceneTok。不是直接输出Gaussian render attributes或可编辑mesh。",
+    "evidenceZh": "每个latent具有显式位置与隐式content，查询时仅交互附近投影latents。 (Sec. 3.1, Fig. 2, pp. 3-4; Appendix A.1-A.2, pp. 13-14); camera先控制Point DiT几何，再通过3D RoPE引导Content DiT。 (Sec. 3.2, Fig. 3, pp. 5-6; Appendix A.4, p. 15); 生成质量/速度与几何评价有明确条件。 (Tables 1-2, p. 6; Table 3, p. 7); 动态与精细外观是当前表示的限制。 (Appendix C.1-C.2, pp. 18-19)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "主线3D生成的scene-centric representation与几何/内容解耦，尤其适合研究多视角一致性和紧凑3D token设计。",
+    "caveatZh": "稀疏latents和learned decoder低于dense video-VAE的细节和sharpness，会平滑纹理、thin structures、边界与view-dependent appearance。; persistent anchor假设适合static scene；moving/deformable对象可能产生重复geometry和不一致appearance。; learned decoder不能匹配rasterized3DGS的渲染速度/细节。; 伪GT继承DA3/VGGT偏差，跨teacher几何表不保证真实几何质量。; 输出是带decoder的latent，不直接提供mesh、parts或fabrication-ready资产。; 9-view实验与有限OOD数据不足以证明长时开放世界持续生成。"
+  }
+}

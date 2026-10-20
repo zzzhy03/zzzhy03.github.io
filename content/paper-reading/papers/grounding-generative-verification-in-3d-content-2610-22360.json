@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.22360",
+  "slug": "grounding-generative-verification-in-3d-content-2610-22360",
+  "title": "Grounding Generative Verification in 3D Content",
+  "authors": [
+    "Shuanglin Li",
+    "Jiaying Lin",
+    "Shuquan Ye"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.22360"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "3d-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Grounding",
+    "Generative",
+    "Verification",
+    "Content"
+  ],
+  "abstract": "Recent advances in multimodal large language models (MLLMs) and 3D generation have expanded 3D understanding and synthesis. However, beyond visual fidelity, task-specific correctness grounded in 3D evidence remains a major challenge. We argue that building reliable 3D systems requires not only stronger generation and reasoning, but also verification feedback that identifies unmet requirements and explains their violations, allowing systems to reflect on and refine their outputs. Such feedback must integrate multi-view observations and distinguish genuine inconsistencies from projection-dependent appearances. We make three contributions. First, we introduce 3DVerifierBench, a benchmark spanning 10 tasks that evaluates decisions, rejection explanations, and responses to controlled changes in specifications and candidates. A human study reveals a 21.6 percentage-point gap between humans and the strongest tested model, GPT-6 Astra, while explanation-aware analysis exposes weaknesses in rejection reliability. Second, we analyze verification across fine-grained factual categories, exposing errors in values and target binding. We develop a scalable pipeline combining multi-view fact extraction, controlled 3D editing, and native annotations to produce 14,126 training examples with contradiction explanations and linked counterfactuals. Third, we examine how verification could support 3D generation through candidate selection and recursive refinement. In human-labeled sixteen-candidate pools, oracle selection improves complete factual success from 26.7% to 90.0%. In a separate eight-input study, human-guided recursive refinement satisfies all seven requirements for every input, compared with three under parallel Oracle@8. Together, our benchmark, analysis, and data pipeline establish a foundation for models to reflect on 3D content through reliable verification feedback.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.22360v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.22360v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.22360v1 (35 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: not-found.",
+    "ideaZh": "3DVerifierBench 用显式 requirements、矛盾解释及 linked counterfactuals，把 3D 生成质量检验变成逐项事实核查。作者报告自动 Astra selection 的完整事实成功率为 55%，human oracle 为 90%；8/8 递归成功来自人类指导，不能解读成已训练自动闭环系统。",
+    "motivationZh": "3D 资产看起来合理，不代表满足部件数量、接触、身份和局部几何等明确要求；VLM 还可能答对拒绝却给错原因。",
+    "methodZh": "将验证写成 claim 加多视图 candidate/reference，输出 boolean 与 contradiction explanation；分别固定资产修改需求（Spec-CF）和固定需求修改资产（Cand-CF），组合原生任务监督，并按 source group 隔离训练与测试。",
+    "methodFlow": [
+      "准备 source assets、固定相机多视图和原生任务监督",
+      "审核 true anchors，建立显式 claim",
+      "固定证据改 claim，或固定 claim 编辑 candidate，保存 counterfactual links 和 contradiction explanations",
+      "专家复核并按原始资产与衍生关系划分 source-disjoint 数据",
+      "以 balanced decisions、解释联合正确率及 pair/triplet consistency 测试 verifier",
+      "探索自动/人类 oracle 候选选择与人类指导递归修正"
+    ],
+    "experimentsZh": "10 个 MLLMs 测 2,581 例；human baseline 为每任务 40 例、总 400 例。静态多视图固定；motion 按接口用 native MP4 或 16-frame sheets。另以 Pixal3D/Hunyuan3D-2.1 生成 40x16 候选供人工标注，独立 8 输入用于递归修正。 作者报告结果：作者报告 Astra full-benchmark OA 69.4%、ExpOA 65.8%；matched-subset 人类 OA 87.8%、Astra 66.2%。 (Table 1, p. 7; Table G2, p. 28) 作者报告自动 Astra selection 全事实成功率 55.0%，human oracle 90.0%，random 26.7%；human-guided recursive 为 8/8，parallel Oracle@8 为 3/8。 (Table 4, p. 10) 对照范围：含 proprietary/open MLLMs、OmniVerifier 和 native point-cloud models；后者有格式失败，不能只凭低分断言缺少 3D 表示能力。生成下游含实际 Astra selector 与 human upper bound，但没有用新训练资源训练 verifier 的结果。 消融与诊断：Table 3 比较 multi-view/OBJ 及 motion frames/OBJ/video；motion 不存在统一最佳输入。解释与 counterfactual 指标表明 answer-only 排序不足。没有 verifier-training ablation；oracle/recursive 研究只支持机会与小规模可行性。",
+    "insightZh": "相对 3DGen-Bench、Hi3DEval、Eval3D 的偏好、质量和 artifact scoring，新增显式 requirement verification、reference contradiction 对齐解释及固定 claim/evidence 的成对干预。贡献主要在任务定义与可审计数据构造，不是提出更强的已训练 verifier。",
+    "evidenceZh": "Spec-CF 固定资产改需求，Cand-CF 固定需求改资产，并要求最终证据可观察到矛盾。 (Sec. 4, Fig. 4, pp. 5-6; Appendix B.2-B.5, pp. 18-20); 作者报告 full benchmark Astra OA 69.4%；同一 400 例人类子集 Astra 66.2%、人类 87.8%。 (Table 1, p. 7; Appendix G.1, Table G2, p. 28); 作者报告自动 Astra / human oracle / random 选择的全七事实成功率为 55.0% / 90.0% / 26.7%。 (Sec. 5.5, Table 4, p. 10); 作者报告人类指导递归修正全事实成功 8/8，加入无严重缺陷与源保真条件降为 6/8。 (Appendix G.5, Tables G5-G7, pp. 30-31)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "其 requirement、target-binding、counterfactual 契约可直接用于 3D generation 与 visual design agents 的有解释检验反馈；当前人类 oracle 结果不等于自动 agent 可靠性。",
+    "caveatZh": "Appendix F, p. 27：有限视角与任务规则限制 benchmark；material 指可见外观，FineGeo 仅 30 个物体。; 解释 judge 只检查 reference semantics；递归依赖 human feedback，匹配输出数而非计算/人力成本；未来才探索 verifier training。; human/model motion 输入不完全相同，模型分数也受格式遵循、精度及服务版本影响。; 模型辅助数据构造尚未通过下游 verifier training 验证；数据资源不是已验证训练方法。; 全七事实满足不保证 geometry quality、source fidelity 或 fabrication validity；LEGO 连接约束仍需原生几何检验。"
+  }
+}

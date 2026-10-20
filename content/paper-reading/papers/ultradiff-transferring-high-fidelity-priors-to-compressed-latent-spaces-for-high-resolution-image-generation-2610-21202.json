@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.21202",
+  "slug": "ultradiff-transferring-high-fidelity-priors-to-compressed-latent-spaces-for-high-resolution-image-generation-2610-21202",
+  "title": "UltraDiff: Transferring High-Fidelity Priors to Compressed Latent Spaces for High-Resolution Image Generation",
+  "authors": [
+    "Jingjing Ren",
+    "Haitian Zheng",
+    "Haoyu Chen",
+    "Connelly Barnes",
+    "Zhifei Zhang",
+    "Yuqian Zhou",
+    "Zhe Lin",
+    "Lei Zhu"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.21202"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "UltraDiff",
+    "Transferring",
+    "High-Fidelity",
+    "Priors",
+    "Compressed",
+    "Latent",
+    "Spaces",
+    "High-Resolution"
+  ],
+  "abstract": "High-resolution synthesis with Latent Diffusion Models (LDMs) faces a fundamental trade-off between computational cost and generative fidelity. This trade off is largely governed by the latent compression factor f (e.g. f8 denotes f=8 and f32 f=32). While aggressive compression (f32) significantly improves efficiency, it suffers from severe information loss and ambiguity compared to standard f8 models. We propose UltraDiff, a framework that reformulates this challenge as joint latent diffusion learning followed by marginal score distillation. We introduce MixTeacher, a dual branch DiT that models the joint f8-f32 distribution, utilizing shared attention to resolve the ambiguity of the compressed space with high fidelity f8 priors. Crucially, we propose vector field distillation in the native f32 space. Theoretically, this compels the student to learn the conditional expectation of the teacher trajectory, effectively filtering out compression artifacts. Across the evaluated 1K to 4K settings, UltraDiff approaches f8 level quality while preserving f32 efficiency. With 20 sampling steps on a single A100 GPU, it generates a 2K image in 6.2 seconds over 40 times faster than our f8 baseline.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.21202v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.21202v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.21202v1 (25 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: promised.",
+    "ideaZh": "UltraDiff 把同图的 f8/f32 latents 交给双分支共享 attention teacher，再在原生 f32 velocity 空间蒸馏，使高压缩 student 接近自家 f8 anchor 的质量。作者报告2K 6.2秒、相对自家f8 40.3×；这不是比所有生成模型快40×，Sana同表更快，且teacher/data私有，开放复现尚未验证。",
+    "motivationZh": "f32减少token与attention成本，但高压缩使细节、布局和prompt alignment难学；单纯f8参数初始化或跨网格feature matching不足。",
+    "methodZh": "冻结独立f8/f32 VAEs，以f8参数初始化f32 DiT；MixTeacher两分支参数各异、token共享self-attention，joint/f32-solo/f8-solo以0.4/0.4/0.2训练；将teacher的f32 velocity以L2蒸馏给单分支student，并加flow-matching；1K以上只用flow matching扩尺度。",
+    "methodFlow": [
+      "同一图像 → frozen f8/f32 VAEs",
+      "f8初始化f32 DiT并训练transfer checkpoint",
+      "双分支MixTeacher共享token attention、随机solo/joint routing",
+      "在原生f32空间匹配teacher velocity + flow matching",
+      "2K–4K继续flow-matching scaling",
+      "推理只运行单分支f32 student"
+    ],
+    "experimentsZh": "2.0B DiT、T5-XXL、f8/C16与f32/C64 VAEs、patch1；约0.37B proprietary text-image pairs、64A100，三阶段适配463 GPU-days，不含VAE/anchor预训练；512消融、1K DPG/GenEval/HPSv3、2K/4K Aesthetic-4K与pFID。 作者报告结果：作者报告控制实验GenEval：scratch0.54、f8-init0.61、UltraDiff0.72、f8 anchor0.73。 (Table 1, p. 6) 作者报告同mixed-resolution stage对照1K DPG74.02→85.40、GenEval0.602→0.680；4K FID149.59→146.60。 (Table 6, p. 8) 作者报告2K 6.2秒(40.3×自家f8)，4K28.3秒；Sana同表为2K5.8秒、4K21.3秒。 (Tables 7 and 9, pp. 9–10) 对照范围：同框架controls较有说服力；跨系统含SDXL/SD3/PixArt/FLUX/Sana/UltraPixel/Diffusion-4K/HunyuanImage，但architecture/data/VAE/text encoders/steps不同，作者也声明非单组件因果比较。4K FID使用299 resize并辅patchFID，不能单FID覆盖高频细节。 消融与诊断：初始化、routing配比、DINOv2/f8-feature distillation和同高分辨率stage无蒸馏控制均有；joint-only会退化，solo约束重要。feature-alignment baseline结果差不表示所有REPA设置失效；没有另一DiT家族或open teacher复现。",
+    "insightZh": "在独立latent spaces间学习joint velocity，再向student可观测f32条件期望投影，避免cross-grid feature interpolation。L2最优解的条件期望解释不自动证明所有压缩伪影消失；经验支撑来自同管线controls与routing消融。",
+    "evidenceZh": "MixTeacher分支各自参数、每层跨token attention，joint和两个solo modes保持marginals。 (Sec. 3.1, Eq. 1, pp. 4–5; Fig. 3, p. 4); student原生f32 L2 velocity distillation对应teacher条件期望，并结合flow matching。 (Sec. 3.2, Eqs. 2–4, p. 6); 作者报告相同f32 VAE/backbone下GenEval0.61→0.72，f8 anchor为0.73。 (Table 1, p. 6); 作者报告2K 6.2秒vs自家f8 249.8秒，4K为28.3秒而f8 OOM。 (Table 9, p. 10); teacher和training corpus私有，跨backbone开源验证尚属future work。 (Appendix A–B.3, pp. 14–15)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "属于Image Generation重大效率方法候选：研究如何保留高压缩latent中的生成知识；当前没有SVG、刺绣或3D generation实证，作为外围方法雷达skim。",
+    "caveatZh": "仅验证一个autoencoder–DiT pipeline，architectural compatibility不等于跨backbone实证。; 依赖强f8 anchor、独立固定VAEs和多阶段训练；数据与anchor私有。; 未探索>10B backbones或更强multimodal conditioning；exact weights可能不公开。; 40.3×仅相对自家f8 patch1 anchor，Sana更快，不可营销为通用40×提速。; 463GPU-days只计adaptation，不含预训练teacher/VAEs；不能视作从零训练总成本。; 高压缩仍受f32 VAE重建瓶颈约束，1K蒸馏再高分辨率训练不等于已验证4K teacher指导。"
+  }
+}

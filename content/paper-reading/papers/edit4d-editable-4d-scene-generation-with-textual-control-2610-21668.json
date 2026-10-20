@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.21668",
+  "slug": "edit4d-editable-4d-scene-generation-with-textual-control-2610-21668",
+  "title": "Edit4D: Editable 4D Scene Generation with Textual Control",
+  "authors": [
+    "Chanwoo Kim",
+    "Tackgeun You",
+    "Hwasup Lim"
+  ],
+  "publishedAt": "2026-10-15",
+  "updatedAt": "2026-10-15",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.21668"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Edit4D",
+    "Editable",
+    "Scene",
+    "Generation",
+    "Textual",
+    "Control"
+  ],
+  "abstract": "We introduce Edit4D, an editable text-to-4D scene generation framework that constructs 4D scenes from separate background and dynamic character representations. Recent advances in generative models have enabled text-driven dynamic scene synthesis, but editable 4D scene generation remains challenging due to the need to preserve spatial geometry and temporal dynamics. Existing approaches typically generate holistic scene videos, where the background and dynamic characters are coupled, making object-level editing and flexible camera control difficult. Edit4D addresses these limitations through a stage-specific generation pipeline. Given a user instruction, Edit4D first decomposes it into stage-specific prompts for background, dynamic character, and scene-character composition. Using these prompts, we synthesize multi-view scene images with text-to-image and camera-conditioned generative priors and reconstruct a background 3D Gaussian splatting representation. We then generate a character image, animate it with an image-conditioned video prior, reconstruct a 4D mesh, and bind Gaussian primitives to obtain a character representation. Finally, both components are composed through text-guided segmentation and contact-aware optimization. A global scene refinement is then performed to improve harmonization and rendering consistency. By integrating stage-specific components, Edit4D enables controllable camera motion, flexible object-level editing, and the practical construction of editable 4D scenes. Project page: https://chanwo0kim.github.io/Edit4D/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.21668v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.21668v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.21668v1 (21 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: promised.",
+    "ideaZh": "Edit4D分别生成背景3DGS和mesh-bound动态角色，用text mask、contact/penetration优化组合，再以diffusion refinement统一外观。作者在13个unique prompts和每类5个editing scenes上展示可复用资产与背景保留；45分钟编辑对Free4D180分钟，但100%编辑成功仅指背景保留judge，未验证动作、接触物理或大规模鲁棒性。值得深读component-wise 4D接口。",
+    "motivationZh": "整体视频蒸馏到4D会耦合背景和角色，局部编辑要重生成全场景，且新视角容易暴露几何缺陷。",
+    "methodZh": "分别合成背景3DGS和60-frame动态mesh-bound Gaussians；text-guided mask定位support region，depth tolerance过滤；固定scale后优化rotation/translation，contact与penetration损失约束放置；4000步global refinement harmonize并用估计HDR lighting和Gaussian ray tracing加阴影。",
+    "methodFlow": [
+      "instruction拆为background、character、motion及composition prompts",
+      "背景图像经multi-view prior生成3DGS",
+      "角色视频经4D mesh、Gaussian binding与deformation field建模",
+      "text mask lift到3D support region并contact-aware优化rigid placement",
+      "global refinement与估计lighting shadows统一外观",
+      "保留分离assets以重组、替换与局部颜色编辑"
+    ],
+    "experimentsZh": "4Real/Free4D/Dream-in-4D/4Dfy公开示例，3 settings7/6/6样本重合后13 unique instructions；frontal VBench。25人pairwise user study；recomposition和appearance editing各5scenes，mask外background CLIP/DINO与三个VLM评估。 作者报告结果：作者报告setting(a) VBench27.1/99.4/68.3%，对Free4D24.7/97.6/62.3%；25人study偏好3D structure60.5%、visual quality65.0%。 (Tables 1-2, p. 6) 作者报告recomposition三judge均100%，Free4D0/40/40%，但judge问题是背景是否保留；编辑45对180分钟。 (Table 3, p. 7; App. E, p. 17) 作者报告单RTX Pro6000 Blackwell约2小时：background10、character70、composition1、refinement45分钟。 (App. A.6, pp. 14-15) 对照范围：generation comparison沿用公开视频，缺原prompt时人工构造相近instruction；controlled user/edit comparisons用同图像/视频pipeline重跑Free4D。组件复用天然有利背景保留，不代表更强全instruction遵循。 消融与诊断：Table4逐项移除initialization/contact/penetration/global refinement；主要VBench与qualitative support，无大规模穿透/接触物理度量或多seed误差条。",
+    "insightZh": "贡献是可复用背景/动态角色表示的生成与text-guided contact composition整合，而非新foundation prior。新接口直接支持组件编辑，但主要实验规模小，physical plausibility来自几何loss而非动力学验证。",
+    "evidenceZh": "背景与角色作为独立Gaussian components组合，角色Gaussians绑定到动态mesh并学习residual。 (Secs. 3.1-3.4, Fig. 3, pp. 4-5); composition优化全局rotation/translation，用contact及penetration损失；scale预设0.6–1.2。 (Sec. 3.5, pp. 5-6; App. A.4, p. 13); 作者报告VBench setting(a) Text Align27.1%、Consistency99.4%、Aesthetic68.3%，Free4D24.7/97.6/62.3%。 (Table 1, p. 6); 作者报告editing背景preservation CLIP/DINO0.997/0.997与45分钟，对Free4D0.964/0.901与180分钟。 (Table 3, p. 7; App. E, p. 17); 遮挡support产生不完整mask，导致错误placement并穿入周围几何。 (App. H, Fig. 16, p. 21)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接面向可编辑3D/4D资产、组件复用与约束组合，适合主线3D generation设计；与fabrication没有直接制造证据。",
+    "caveatZh": "目标应可见且空间局部化，遮挡目标会导致mask不完整、误放置和穿透。; 预训练image/video/mesh/segmentation的错误会传递，global refinement不能修复严重上游错误。; 13 unique prompts及每类5个editing scenes规模有限；100%不是通用编辑成功率。; 组合优化不是动态contact simulation，且采用预定scale，无法证明物理可行或可制造。; 主VBench只测正面，缺多视角/3D结构的系统定量ground truth。; 示例hat insertion为人工放置，不能写为全自动资产插入；颜色编辑非任意几何编辑。"
+  }
+}

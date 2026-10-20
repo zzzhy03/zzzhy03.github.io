@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2610.19628",
+  "slug": "self-conditioning-enables-deep-sequential-reasoning-in-flow-matching-2610-19628",
+  "title": "Self-Conditioning Enables Deep Sequential Reasoning in Flow Matching",
+  "authors": [
+    "Zeyang Zhang",
+    "Linxiang Gao",
+    "Meiqi Gu",
+    "Xingyan Chen",
+    "Minrui Luo",
+    "Kaifeng Lyu",
+    "Tianxing He"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.19628"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation",
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "image-generation",
+    "Self-Conditioning",
+    "Enables",
+    "Deep",
+    "Sequential",
+    "Reasoning",
+    "Flow",
+    "Matching"
+  ],
+  "abstract": "Recent work has explored visual reasoning through image generation, where models solve visual-reasoning problems by directly generating solution images. Intuitively, iterative samplers such as flow matching are well suited to this task, since each sampling step may resemble one reasoning step. However, in this work, from a circuit complexity perspective, we show that this intuition is misleading. We prove that as long as the model outputs satisfy certain mild regularity conditions, the trajectory of the vanilla flow-matching sampler can be simulated by a constant number of sequential rounds of parallel model evaluations. Consequently, additional sampling steps cannot increase the expressive power of a constant-depth backbone model under the standard complexity-theoretic model of transformers. We then reveal that self-conditioning, which conditions the model on the previous step's estimate of the final image, plays a previously unrecognized role in removing this bottleneck. Controlled experiments on diverse visual-reasoning tasks show that flow matching with self-conditioning achieves higher accuracy and greater reasoning depth than vanilla flow matching, and its performance improves with more sampling steps. Theoretically, we prove that with self-conditioning, a constant-depth backbone can achieve expressive power equivalent to that of space-bounded Turing machines. Our study suggests a design principle for future visual reasoning research: carry more information between sampling steps, so that additional steps translate into deeper reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.19628v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.19628v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/imzzy1201/self-conditioning-deep-reasoning"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.19628v1 (55 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: available.",
+    "ideaZh": "这篇最重要的区别是“更多ODE小步”与“可突变的跨步scratchpad”：把预测终点图像回馈，能在受控视觉任务中把额外NFE转为更深推理。作者给出匹配训练FLOPs的强收益及受条件约束的复杂度分离；不能简化为所有diffusion不会推理，也不能把PSPACE存在性构造当实际训练能力。",
+    "motivationZh": "flow-matching采样增加NFE是否真的增加顺序视觉推理深度，以及如何让跨步状态承载可更新的计算scratchpad。",
+    "methodZh": "把前一步外推的clean endpoint prediction作为额外image condition，与当前noisy state和原context一起输入同一backbone；训练用两pass、stop-gradient的endpoint feedback，推理每步回馈一次。以有限精度、bounded Lipschitz模型分析vanilla与self-conditioned expressivity。",
+    "methodFlow": [
+      "原context与noisy target进入velocity model",
+      "外推当前clean endpoint prediction",
+      "将endpoint作为额外image tokens回馈下一步",
+      "更新continuous state并保留可突变scratchpad",
+      "多步迭代输出视觉解答图像"
+    ],
+    "experimentsZh": "line tracing从头训练9M FLUX式MMDiT；长乘法/文本rendering与五structured tasks微调FLUX.2-klein-base-4B；大规模用Qwen-Image-Edit-2511 LoRA。训练FLOPs对齐，通常50NFE，line100NFE；4xA10080GB。 作者报告结果：作者Table1报告五task平均accuracy65.9%→76.7%，TSP51.0→66.7、Sudoku60.5→80.0，匹配training FLOPs和NFE。 (Table 1, p. 8) 作者NFE scaling中self-conditioned line tracing LCP在10NFE为49.84，vanilla在6NFE为7.66且到50NFE仍小于8。 (Fig. 3, p. 8; Fig. 11, p. 46) 作者3seed line tracing LCP50.0±0 vs5.6±2.7；较小预算长乘法accuracy90.0±5.3% vs35.0±8.9%。 (Appendix D.2.1, Figs. 6-7, p. 41) 作者大模型task-specific平均90.0、unified90.2%；published EndoCoT分别88.3/76.6，使用额外MLLM latent CoT，论文明确非直接等价baseline。 (Table 2, p. 8; Sec. 4.3, p. 9) 对照范围：最强证据来自同architecture/data/optimizer且compute-matched vanilla对照；大模型比较引用published numbers，EndoCoT带额外MLLM。line training评测20cases、NFE scaling200，乘法/文本100；VLM judge存在识别误差，不覆盖自然图像创建或制造任务。 消融与诊断：NFE/FLOPs scaling、3seed line/乘法、Lipschitz search、attention allocation与condition-swap correction帮助解释机制。长文本无multi-seed；缺自然任务和跨模态经验验证，未证明训练会找到理论构造。",
+    "insightZh": "self-conditioning本身已有；新意是区分它作为计算状态而非regularizer的作用，给出明确假设下expressivity separation并以compute-matched视觉实验验证。PSPACE结果是存在性、允许指数steps，非实际多项式训练/推理结论。",
+    "evidenceZh": "self-conditioning额外传递endpoint，可比ODE小步作更大离散信息更新。 (Sec. 3.2, Algorithm 2 and Fig. 2, p. 5; Appendix D.1, p. 39); vanilla上界有严格bounded、Lipschitz、precision及margin假设。 (Sec. 2.2 and Theorem 1, pp. 3-4; Sec. 6, p. 10); 匹配训练FLOPs下的受控题收益支持机制，但不等同通用生成能力。 (Table 1 and Fig. 3, p. 8; Appendix D.1-D.3, pp. 39-41, 46); 实测Lipschitz不是certified upper bound。 (Appendix D.5.1, Fig. 17, p. 53)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "提出生成式视觉推理的跨步信息传递原则，理论与compute-matched实验均超出普通微调；对生成模型中结构推理与迭代修正的设计具有基础意义。",
+    "caveatZh": "Theorem1有较强Lipschitz restriction，经验估计大且不是certified上界。; video、language diffusion和visuomotor policy上的经验收益仍是开放问题。; 资源限制导致长文本无multi-seed，长乘法multi-seed预算较低。; 常深、有限精度、margin和Lipschitz假设下的结论不能扩成所有flow matching或diffusion均无顺序推理。; PSPACE/poly构造可用指数steps；不意味着实际模型高效求解PSPACE。; 同NFE下self-conditioning的额外tokens会增加每call成本，应结合附录FLOPs口径。; 本项目未复现实验，也未独立形式化验证整套复杂度证明。"
+  }
+}

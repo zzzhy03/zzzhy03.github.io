@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2610.19882",
+  "slug": "bluepixel-toward-native-4k-agentic-image-editing-2610-19882",
+  "title": "BluePixel: Toward Native 4K Agentic Image Editing",
+  "authors": [
+    "Shanyan Guan",
+    "Shiyu Li",
+    "Xin Li",
+    "Zhizhou Chen",
+    "Yunzhe Xu",
+    "Yuehao Liu",
+    "Ruixue Shen",
+    "Shiju Zhang",
+    "Min Jin",
+    "Qiang Liu",
+    "Junbo Liu",
+    "Penggang Shi",
+    "Sheng Sun",
+    "Xiao Wang",
+    "Yong Zhang",
+    "Zhongang Qi",
+    "Wei Li",
+    "Chao Ma",
+    "Ying Tai",
+    "Yanhao Ge"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.19882"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "image-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "visual-design-agents",
+    "BluePixel",
+    "Toward",
+    "Native",
+    "Agentic",
+    "Image",
+    "Editing"
+  ],
+  "abstract": "Instruction-driven image editing has reached native 4K, yet how such editors are trained remains undisclosed, and pretraining one from scratch is beyond most teams. The task itself compounds the difficulty: a single end-to-end editor cannot make precise parametric adjustments, match specialized experts, or interpret the vague instructions users actually write. We argue that 4K editing is a system problem rather than a single-model problem, and present BluePixel, which couples a native-4K editing model with an agent harness; the complete training recipe is disclosed in this paper. The model makes 4K training practical: it turns a 1K-pretrained editor into a native-4K one through progressive VAE adaptation that keeps 4K training as affordable as 1K, absorbs a long tail of vertical editing skills through continual learning, and refines the aesthetic-fidelity trade-off with reinforcement learning. Distillation via source-anchored target projection (SATP) then compresses 50 denoising steps to 4, completing a 4K edit in 8.7 s on a single Kunlunxin P800 XPU while preserving task success rate and background consistency. The harness, BluePixel Agent, makes editing controllable: it decomposes user instructions into specialist and general operations, verifies every result with the same reward model that guided training, and retries within bounded attempts. On VINS-4KEval++ (3,305 native-4K cases), BluePixel ranks second among seven models, behind only GPT Image 2 in non-edited-region consistency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.19882v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.19882v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/vivo/BluePixel"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.19882v1 (24 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: available.",
+    "ideaZh": "BluePixel把原生4K编辑器与“分解请求—工具执行—质量验证—有界重试”接成闭环，最值得借鉴的是specialist/general工具分工和版本记录。作者报告4-step编辑8.7秒；排行榜复用自家reward且有prompt rewriting差异，agent增益仅有定性案例，不能把模型成绩当作agent量化胜率。",
+    "motivationZh": "如何高效适配原生4K编辑，并用可组合工具及反馈解决含糊、多步、精确参数编辑。",
+    "methodZh": "渐进VAE适配、ACE-LoRA/MOPD技能吸收、reward RL和SATP蒸馏构成4K底座；router调用专长与通用编辑器，以BluePixReward验证、有界重试并保存候选provenance。",
+    "methodFlow": [
+      "源图、指令和历史约束进入router/intent analyst",
+      "拆分专长工具与通用4K编辑操作",
+      "执行技能并保存source/candidate及provenance",
+      "BluePixReward检查指令、非编辑区域与视觉质量",
+      "反馈改写和有界重试后选择最终候选"
+    ],
+    "experimentsZh": "ImgEdit-Bench输出缩到1K；VINS-4KEval 509任务；VINS-4KEval++总3305例、主表2513共同例；CIE-Bench测continual技能。 作者报告结果：作者Table8报告BluePixel Overall8.62、NC9.06、Success63.2%；GPT Image2为9.15、9.34、74.8%。这是编辑模型比较，非agent的量化消融。 (Table 8, p. 19) 作者报告ACE-MOPD将五项CIE平均6.24升至8.87，随后美学/编辑reward RL后为8.52/8.57。 (Table 3 and Fig. 9, p. 16) 作者报告单P800 XPU、bf16无额外优化下4-step 4K编辑8.7秒，相对50-step约4倍加速。 (Sec. 3.1.3, p. 7) 对照范围：模型表覆盖近期开闭源编辑器且注明score来源；agent只有Fig8与专长工具案例，缺少等预算agent成功率、延迟和tool-call对照。BluePixReward同时用于筛选、RL、inference和主表，150对human相关性验证不消除同judge偏置。 消融与诊断：Table3/Fig9拆continual和RL阶段，Table4给seed波动；Fig8仅3个agent定性例，缺retry/routing/verification定量拆分与SATP完整配方。",
+    "insightZh": "主要价值是渐进高压缩VAE适配、source-anchored few-step蒸馏和闭环tool repertoire的系统整合；ACE-LoRA、MOPD和DiffusionNFT源于既有方法，SATP完整推导及reward训练配方留给companion paper。",
+    "evidenceZh": "4K适配渐进切换latent压缩率并分步校准接口。 (Sec. 3.1.1, Eqs. 1-2, pp. 4-5); Agent具备工具分工、反馈、有界重试和候选选择。 (Sec. 3.2.1-3.2.3, pp. 8-9; Table 2, p. 11; Fig. 8, p. 15); 主表用2,513 shared cases、自家judge和不同采样协议。 (Table 8 and Sec. 5.1.3, pp. 18-19); 微小排名差异不显著。 (Sec. 5.1.2, p. 15; Table 4, p. 16)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究视觉产物规划、专长工具执行和反馈修正，提供技能分层、provenance与候选选择机制。",
+    "caveatZh": "Table1注明teeth retouching和clothing-wrinkle removal无held-out测试。; Sec5.1.3承认微小差异在噪声内，BluePixel有prompt rewriting而外部模型单次输出。; Sec3.1.3及4.3脚注把SATP完整recipe及reward训练细节留给后续论文。; Table8不能直接归因到agent闭环，没有agent量化task success或成本证据。; 训练/筛选/评价共用reward可能造成偏置。; 未输出SVG、layer或制造指令，向结构化任务迁移仍需另验。"
+  }
+}

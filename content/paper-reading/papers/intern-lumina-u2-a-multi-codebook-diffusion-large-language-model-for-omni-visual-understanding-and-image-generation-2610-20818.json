@@ -1,0 +1,114 @@
+{
+  "id": "arxiv:2610.20818",
+  "slug": "intern-lumina-u2-a-multi-codebook-diffusion-large-language-model-for-omni-visual-understanding-and-image-generation-2610-20818",
+  "title": "Intern Lumina U2: A Multi-Codebook Diffusion Large Language Model for Omni-Visual Understanding and Image Generation",
+  "authors": [
+    "Qian Yu",
+    "Zongyang Qiu",
+    "Juncheng Yan",
+    "Hongliang Li",
+    "Qi Qin",
+    "Keqi Wang",
+    "Siqi Luo",
+    "Junkui Ju",
+    "Yapeng Mi",
+    "Tiantian Lu",
+    "Tian Liu",
+    "Pengyu Xie",
+    "Chenhao Ji",
+    "Minghui Zhang",
+    "Yiang Zhao",
+    "Siyu Yan",
+    "Haiying Xu",
+    "Yanbo Wang",
+    "Jianghan Shen",
+    "Yuandong Pu",
+    "Jiayi Lei",
+    "Borui Zhang",
+    "Jinxin Shi",
+    "Bo Zhang",
+    "Yuhang Zang",
+    "Shenglong Ye",
+    "Lixin Gu",
+    "Hongjie Zhang",
+    "Linghan Liu",
+    "Xinyuan Chen",
+    "Yuewen Cao",
+    "Lihe Zhang",
+    "Xiaohong Liu",
+    "Junjun He",
+    "Qiangwei Liu",
+    "Qi Zhang",
+    "Yu Cheng",
+    "Tianfan Xue",
+    "Hui Xiong",
+    "Chang Xu",
+    "Yu Qiao",
+    "Yihao Liu",
+    "Bin Fu"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.20818"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "vlm-mllm",
+    "Intern",
+    "Lumina",
+    "U2",
+    "Multi-Codebook",
+    "Diffusion",
+    "Large",
+    "Language",
+    "Model"
+  ],
+  "abstract": "Unified multimodal generation covers discrete, continuous, and hybrid paradigms. Discrete approaches with single-codebook visual tokenizers align naturally with text modeling but have limited representational capacity. Continuous and hybrid approaches retain richer visual representations, but they model text and images in heterogeneous spaces with different training objectives, potentially introducing optimization conflicts between modalities with misaligned representation spaces. These choices expose a central question: how to efficiently model high-capacity visual representations alongside textual content in a shared optimization space within a single backbone. We present Intern Lumina U2, to our knowledge the first diffusion language model to represent multi-codebook visual tokens in a fully discrete space. Each visual position is represented by a group of codes from complementary codebooks, increasing its representational capacity while preserving compatibility with discrete text modeling. At the input, the embeddings are concatenated at each position; at the output, a lightweight multi-codebook autoregressive head predicts the codes within each position sequentially, while the diffusion backbone processes all positions in parallel. Built on the unified 4D representation of AToken, Intern Lumina U2 supports image, video, and 3D inputs within a single backbone and achieves leading performance among unified models in visual understanding, image generation, and image editing. We further build a full-stack training, inference, and evaluation system on both Ascend and NVIDIA platforms to verify the cross-platform effectiveness of our model. We also improve the inference efficiency through a stability-aware sampling strategy, which combines confidence-plateau-guided unmasking approach with drift-triggered cache refreshing mechanisms, accelerating image generation by 4.45x.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.20818v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.20818v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/InternLM/InternLumina-U2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.20818v1 (49 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: available.",
+    "ideaZh": "Intern Lumina U2 用AToken的8-codebook visual state连接LLaDA2.0-mini：空间位置并行masked diffusion、位置内8个codes自回归，统一image/video/3D理解与图像生成编辑。作者报告GenEval89、UniGenBench86.11；它还不生成video/3D，16.9B总参数不能只报1.4B activated，4.45×加速相对自身production path。",
+    "motivationZh": "单codebook离散视觉容量不足，连续/混合模型又把文本与图像置于异质objective；需在共享离散空间中高效建模高容量visual state。",
+    "methodZh": "冻结AToken生成8个4096-entry codes/位置；独立embedding拼接投影为一个backbone token，6层causal head在codebook维自回归；task-aware packed mask让文本block diffusion与图像spatial diffusion共享cross-entropy；PHV按confidence plateau提前commit并以hidden drift刷新cache。",
+    "methodFlow": [
+      "image/video/3D → frozen AToken 8-codebook tokens",
+      "独立codebook embeddings → concatenate/project单位置",
+      "统一packed sequence与task-aware attention",
+      "MoE dLLM并行恢复masked spatial positions",
+      "6-layer AR head依次预测位置内8个codes",
+      "AToken像素解码；PHV/cache减少推理"
+    ],
+    "experimentsZh": "16.9B总参数、约1.4B activated MoE；primary1024 Ascend910B，50B+200B+500B+300B tokens；NVIDIA192GPU参考为50B+200B+200B+200B。理解用1024图像、视频64frames、3D48³ sparse voxels；跨理解、T2I、editing和physics-diagram评测。 作者报告结果：作者报告Ascend GenEval89、DPG87.79、UniGenBench86.11；LLaDA2.0-Uni为89、87.76、79.63。 (Tables 7–8, p. 28) 作者报告AR head GenEval82.78 vs independent68.94；DPG83.27 vs83.22。 (Table 16, p. 32) 作者报告PHV35.9秒/图，4.45×相对production path；matched single-seed GenEval89.3。 (Table 4, p. 23) 作者报告ImgEdit3.82/GEdit-EN6.06低于LLaDA2.0-Uni3.92/6.61；OneIG diversity0.150 vs0.259。 (Tables 10 and 14, pp. 29, 31) 对照范围：含统一模型与专用模型，大量baseline来自原论文，data/budget/hardware不匹配；同backbone对照仍混合tokenizer/data差异。Ascend与NVIDIA预算不同，不能归因硬件。Sci-diagram为raster科学正确性，非editable vector。 消融与诊断：输入interface比较还改变classifier组织；AR/parallel/QFormer约同budget；PHV36格sweep和200prompt matched-control检验较完整。4.45×是综合实现改善，fixed60-step HVV已3.75×，不能全部归plateau。",
+    "insightZh": "将multi-codebook与masked-diffusion unified LM结合，保留code依赖而不将backbone序列延长8倍；tokenizer来自AToken、backbone继承LLaDA。关键是输入/输出factorization和统一训练格式，PHV为额外系统加速。",
+    "evidenceZh": "每视觉位置8 codes合并为单backbone token，output head在codebook维自回归而空间并行。 (Sec. 3.2–3.4, Eqs. 1–3, pp. 7–10; Fig. 3, p. 7); 作者报告512分辨率head消融GenEval：parallel68.94、Q-Former69.67、AR82.78。 (Table 16, p. 32); 作者报告主模型GenEval89、DPG87.79、UniGenBench86.11和3D MM-Vet50.5。 (Tables 6–8, pp. 27–28); 作者报告PHV159.9→35.9秒/图、GenEval86.6→89.3。 (Table 4, p. 23; Sec. 6.2, pp. 22–25); 现版本未扩展video/3D generation，长序列与AR-head开销仍限制高分辨率。 (Sec. 8, p. 33)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "重要VLM/MLLM统一离散模型及Image Generation表示范式；3D输入接口值得研究，但没有生成LEGO/CAD或3D artifact。",
+    "caveatZh": "AR head增加解码开销，高分辨率产生长visual sequences。; 当前只生成/编辑图像，video/3D generation、interleaved generation、RL和larger backbones留待未来。; 理解/生成并非全面领先，editing、RealWorldQA、WISE、diversity有差距。; 1.4B是activated，模型总参数16.9B，不能等同存储或完整推理成本。; 大量private InternVL/T2I/editing数据及synthetic teachers，训练规模和架构贡献难完全拆分。; 4.45×受自家159.9秒production baseline及单seed553prompts影响，不能外推优于所有T2I系统。"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.19777",
+  "slug": "q-magic-quad-only-mesh-autoregressive-generation-via-singularity-aware-circular-relative-offset-tokenization-2610-19777",
+  "title": "Q-MAGIC: Quad-only Mesh Autoregressive Generation via Singularity-Aware Circular Relative Offset Tokenization",
+  "authors": [
+    "Yuming Zhao",
+    "Zezeng Li",
+    "Weimin Wang",
+    "Xiang Wu",
+    "Na Lei"
+  ],
+  "publishedAt": "2026-10-14",
+  "updatedAt": "2026-10-14",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.19777"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3d-generation",
+    "Q-MAGIC",
+    "Quad-only",
+    "Mesh",
+    "Autoregressive",
+    "Generation",
+    "via",
+    "Singularity-Aware",
+    "Circular"
+  ],
+  "abstract": "Autoregressive models have proven effective for triangular mesh generation by transforming it into predicting the next face, converting the non-differentiable connectivity prediction into a sequence of token predictions. However, generating quad-only meshes remains challenging because quad faces impose stricter topological constraints than triangles. The model must not only serialize quad faces into a valid token sequence, but also support unambiguous connectivity reconstruction during de-serialization. To address this, we propose Q-MAGIC, a novel autoregressive model for quad mesh generation. We first introduce a tailored serialization scheme for quad meshes, which requires at least two new vertices for the next face and is less flexible than triangles due to strict wiring constraints. To meet these requirements and reduce serialization length, we propose a singularity-aware serialization that prioritizes wiring from singular points, leading to more coherent traversals. Additionally, we propose a circular relative offset tokenization that encodes geometry mainly via local relative offsets. Built upon this representation, an autoregressive Transformer learns the underlying distribution of quad meshes via next-token prediction, enabling effective quad mesh generation. Extensive experiments demonstrate that Q-MAGIC produces more compact sequences while consistently improving geometric fidelity and mesh quality compared to state-of-the-art methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.19777v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.19777v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.19777v1 (10 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: not-found.",
+    "ideaZh": "Q-MAGIC把quad mesh最难的奇异点连通结构放到序列前面，并以环形相对offset压缩局部几何。作者在筛后的2,100个Thing10K模型上报告更短tokens与较好quad质量；结果支持表示设计，尚不证明全局拓扑保证、跨域CAD泛化或无条件新形状创造。",
+    "motivationZh": "让autoregressive模型直接生成可反序列化的quad-only连通结构，并减少token冗余和singularity附近拓扑错误。",
+    "methodZh": "优先围绕valence不等于4的顶点构造patch；以quad-aware ownership规则记录非中心顶点，再用block re-anchoring加circular relative offsets编码坐标，Transformer在点云条件下生成tokens后解码为quad mesh。",
+    "methodFlow": [
+      "4,096个点云经冻结Michelangelo encoder提取条件",
+      "quad mesh训练数据按singularity-first构造patch",
+      "用block tokens与wrapped relative offsets表示非中心顶点",
+      "AR Transformer预测后续结构tokens",
+      "quad-aware detokenization恢复顶点和四边形面"
+    ],
+    "experimentsZh": "Thing10K obj经全quad、有效坐标、非退化、无nonmanifold edge过滤和Quad Remesher简化，得到2100 meshes，随机80/20 split及rotation augmentation；4096输入points；单A100训练约7天。 作者报告结果：作者报告平均token长度12,655，BPT14,104、QuadGPT43,106；同一mesh集合的serialization比较。 (Table 1, p. 6) 作者报告CD0.0684、HD0.1058、Scaled Jacobian0.9829；Point2Quad为0.0717、0.1069、0.9726。Manifoldness0.9999略低于Point2Quad1.0。 (Table 2, p. 7) 作者报告盲评50名testers、10个cases，Q-MAGIC均分8.84；这不是大规模编辑性或仿真验证。 (Table 2 and User Study, p. 7) 对照范围：比较BPT、TreeMeshGPT、QuadGPT、Point2Quad；前三者经统一Quad Remesher后处理，其中QuadGPT使用官方在线API而无可重训预训练模型。评估是有限同分布、点云条件任务，未覆盖CAD/artist domain或下游simulation稳定性。 消融与诊断：Table3固定relative tokens比较random/singularity traversal，Table4固定traversal比较block-offset/relative；强支持两设计在该训练设置的作用，但无多seed误差或更广分布。提高resolution128→512训练耗时约+53%。",
+    "insightZh": "将BPT式patch压缩适配到quad并处理三角表示不能直接覆盖的对角/面归属歧义，是清晰新意；优先singularity与wrapped offset结合提高生成稳定性，仍依赖先验quad数据和标准AR骨干。",
+    "evidenceZh": "quad-aware记录和解码避免直接沿相邻tokens连出无效面。 (Sec. 3.2, Fig. 3, Algorithm 2, pp. 4-5); singularity-first及relative tokens构成实际点云条件生成管线。 (Fig. 1, p. 3; Sec. 3.3, Eqs. 3-7, p. 5); 报告的质量优势限定于筛选后Thing10K分布。 (Sec. 4.1, pp. 6-7; Table 2, p. 7; Sec. 5, pp. 8-9)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进结构化3D网格连通与紧凑tokenization，可参考如何把关键拓扑约束提前到生成序列；不把quad主题夸大为LEGO或制造实证。",
+    "caveatZh": "AR成本随sequence length增长，复杂高分辨率mesh扩展受限。; 局部区域之间的global connectivity并非总有保证。; 仅展示Thing10K内泛化；CAD和artist-designed拓扑/edge flow跨域待探索。; singularity选择主要依赖vertex valence。; 随机划分的小型筛选数据集不能证明泛化到任意扫描点云或制造模型。; 基线附带remesher/API，比较混合了生成与后处理差异。; quad-only面类型不等于无自交、可模拟或fabrication-ready保证。"
+  }
+}

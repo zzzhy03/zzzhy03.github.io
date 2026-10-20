@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.19257",
+  "slug": "long-horizon-video-generation-with-slot-memory-addressed-by-region-tokens-2610-19257",
+  "title": "Long-horizon Video Generation with Slot Memory Addressed By Region Tokens",
+  "authors": [
+    "Eren Cetin",
+    "Julius Erbach",
+    "Vukasin Bozic",
+    "Hyojun Go",
+    "Zixiang Zhao",
+    "Nikolai Kalischek",
+    "Federico Tombari",
+    "Konrad Schindler",
+    "Dominik Narnhofer"
+  ],
+  "publishedAt": "2026-10-13",
+  "updatedAt": "2026-10-13",
+  "collectedAt": "2026-10-17",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.19257"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "video-generation",
+    "Long-horizon",
+    "Video",
+    "Generation",
+    "Slot",
+    "Memory",
+    "Addressed",
+    "Region",
+    "Tokens"
+  ],
+  "abstract": "Memory for long-horizon video generation must satisfy two competing requirements: it must remain bounded so generation can continue indefinitely, while still recovering what was observed at a place when the camera returns, regardless of how long ago it was seen. Reconstruction-based memories provide spatial recall by caching and reprojecting explicit geometry, but require growing storage and depend on estimated 3D structure. Recurrent memories keep a constant-size state, but retention is governed by temporal recurrence, causing old observations to fade with time. We introduce SMART, a slot memory addressed by region tokens, which combines bounded storage with spatially addressed recall. SMART stores content in a constant-size slot recurrence whose writes are addressed by the observing camera and whose reads are queried by the rendering camera, without constructing an explicit 3D representation or maintaining a growing cache. Consequently, recall is conditioned on inter-view geometry rather than on recency. Each read additionally provides a confidence estimate that conditions a chunk-causal diffusion transformer, allowing it to selectively trust retrieved content while relying on its generative prior elsewhere. On long trajectories in Memory Maze and Minecraft, SMART maintains high-fidelity recall far beyond its training horizon while using constant memory and per-step cost.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.19257v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.19257v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact version 2610.19257v1 (23 pages). 全文文本与关键图表核验。数字均为作者报告，本项目未独立复现。 Code: not-found.",
+    "ideaZh": "SMART让camera/region地址决定slot写入和读取，以SE(3)变换存储values，再用带confidence的view draft驱动chunk-causal DiT。作者在3223帧Memory Maze报告PSNR27.6，对DFoT24.0；Minecraft末段PSNR更高但FID弱于MilliVid。值得skim空间寻址与选择性写入；固定state不等于无限环境记忆，且依赖simulator poses和小型backbones。",
+    "motivationZh": "长视频重访旧地点时，时间压缩会遗忘内容，显式3D cache又会随环境增长；目标是在固定容量下按空间召回已见内容。",
+    "methodZh": "VAE压缩posed frames，content tokenizer提取values，Plücker ray field编码pose addresses；top-1固定router只更新匹配slot，SE(3) canonicalization保存values；目标pose跨attention读取、运输并输出latent draft/confidence，与noisy latent拼接后由固定window DiT生成并回写。",
+    "methodFlow": [
+      "posed RGB经frozen VAE提取区域content values",
+      "Plücker ray field独立生成keys、queries与slot地址",
+      "values按相机canonicalize，仅命中slot递归更新",
+      "目标相机读取并re-pose values，输出draft/confidence",
+      "固定window DiT生成chunk并回写memory"
+    ],
+    "experimentsZh": "Memory Maze 15×15迷宫forward-turn-return，401帧训练、最长3223帧评估，64×64。Minecraft以601帧训练，256-frame GT prefix后生成1792帧，256×256，使用simulator poses，轨迹偏重访。 作者报告结果：作者报告Memory Maze最长trajectory：SMART PSNR27.6、LPIPS0.070、0.900 PFLOPs；DFoT24.0、0.147、4.518；GeoCache(GT-D)25.7、0.073、3.772。 (Table 1, p. 8) 作者报告Minecraft最后band PSNR14.85/SSIM0.503，MilliVid13.84/0.468；SMART FID43.33对38.85较差，PFLOPs23.8对65.5。 (Table 2, p. 9) 作者报告memory-only 3201帧PSNR：slot31.9、dense21.5、no-SE(3)29.6、half-heads22.9。 (Table 3, p. 10) 对照范围：Memory Maze为作者重训DFoT和Lyra2.0-style GeoCache，后者使用GT depth且缩小backbone；Minecraft使用released checkpoints。98,304 floats只对齐context state，SMART另有64.6M/132.8M memory weights；训练、sampler和conditioning有差异。 消融与诊断：Table 3逐项去SE(3)、改dense state、减heads；Table 5增slots，支持容量改善但不能消除覆盖冲突。memory-only重建不等于生成质量；无真实pose噪声或大模型验证。",
+    "insightZh": "新意是将固定slot recurrence的地址从内容/时间改为相机几何，并显式运输values；不是新视频foundation model或显式3D重建方法。稀疏写入和SE(3)各有memory-only消融。",
+    "evidenceZh": "keys、queries、routing仅来自pose，未命中slot不衰减；values在共享坐标系保存。 (Sec. 3.2, Eqs. 1-3, Figs. 4-5, pp. 4-5); memory先作latent regressor训练，再冻结并以draft/confidence条件化generator。 (Secs. 3.3-3.4, pp. 5-6; App. A.3-A.4, pp. 16-18); 作者报告Memory Maze 3223帧PSNR27.6、0.900 PFLOPs，对DFoT24.0、4.518。 (Table 1, p. 8); 作者报告Minecraft最后band PSNR14.85对MilliVid13.84，但FID43.33弱于38.85。 (Table 2, p. 9); 作者报告memory-only 3201帧slot PSNR31.9，对dense21.5；去SE(3)为29.6。 (Table 3, p. 10)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "视频生成的重要memory机制，可参考geometry-addressed interface与generation prior分工，尚无结构化设计或3D资产下游实证。",
+    "caveatZh": "固定容量限制环境空间范围；region冲突会覆盖旧内容。; 小generator实验，强视觉prior与高分辨率迁移待评估。; 相机来自模拟器，真实pose误差、动态场景及尺度归一化失效未测试。; 迷宫刻意回返，Minecraft从300候选中偏选loop-closing轨迹，主要验证recall。; 相同state预算不等于相同总参数或系统内存，memory weights为额外成本。; 正文描述tile内tokenization，App. A.3描述queries对patch grid；实现细节需代码核对。"
+  }
+}
