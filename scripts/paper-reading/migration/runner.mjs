@@ -4,7 +4,7 @@ import { hostname } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { GitStore, atomicJson, git } from "./git-store.mjs";
-import { ID, inside, jsonBytes, record, regularBytes, relativePath, sha256, verifyRecord } from "./files.mjs";
+import { COMMIT, ID, inside, jsonBytes, record, regularBytes, relativePath, sha256, verifyRecord } from "./files.mjs";
 import { exportState, restoreState, verifyBundle } from "./state.mjs";
 import { acquireLease, assertLease, checkpointControl, emptyControl, releaseLease, renewLease } from "./lease.mjs";
 import { beginUnit, completeUnit, newCheckpoint, resumePlan, saveCheckpoint } from "./checkpoints.mjs";
@@ -64,8 +64,12 @@ export class Runner {
     return this;
   }
 
-  async load() {
-    const head = await this.store.fetchHead();
+  async load(acknowledgedCommit = null) {
+    if (acknowledgedCommit !== null && !COMMIT.test(acknowledgedCommit)) throw new Error("Exact acknowledged commit required.");
+    // A successful recover() already read the exact remote HEAD. Its objects
+    // were created locally; fetching them again adds a needless failure point.
+    // Fresh sessions still fetch, and current() fences every subsequent action.
+    const head = acknowledgedCommit ?? await this.store.fetchHead();
     const controlBytes = await this.store.read(head, CONTROL);
     const indexBytes = await this.store.read(head, INDEX);
     if (Boolean(controlBytes) !== Boolean(indexBytes)) throw new Error("Incomplete durable state index.");
@@ -175,15 +179,15 @@ export class Runner {
       return paths;
     });
     // This acknowledgement, not the local commit or push exit code, gates work.
-    await this.store.recover({ retry: true });
-    await this.load();
+    const acknowledged = await this.store.recover({ retry: true });
+    await this.load(acknowledged.commit);
     this.owned();
   }
 
   async recover({ retry = false } = {}) {
     await this.store.init();
     const result = await this.store.recover({ retry });
-    await this.load();
+    await this.load(result.commit);
     return { ...result, ...this.status() };
   }
 
@@ -344,8 +348,8 @@ export class Runner {
       atomicJson(payload, CONTROL, control);
       return [CONTROL];
     });
-    await this.store.recover({ retry: true });
-    await this.load();
+    const acknowledged = await this.store.recover({ retry: true });
+    await this.load(acknowledged.commit);
     return { released: true, stateCommit: this.head };
   }
 }

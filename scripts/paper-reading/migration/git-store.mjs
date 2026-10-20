@@ -5,6 +5,23 @@ import { devNull } from "node:os";
 import path from "node:path";
 import { COMMIT, inside, jsonBytes, regularBytes, relativePath, walk } from "./files.mjs";
 
+export function gitFailureDetails({ code, signal, timedOut, outputLimit, stderr = "" }) {
+  const match = stderr.match(/(?:HTTP(?:\/[\d.]+)?(?: code)?[ :]+|requested URL returned error: )([45]\d{2})\b/i);
+  const httpStatus = match ? Number(match[1]) : null;
+  let category = "unclassified";
+  if (outputLimit) category = "output-limit";
+  else if (timedOut) category = "timeout";
+  else if (httpStatus === 401 || httpStatus === 403 || /authentication failed|permission denied|access denied/i.test(stderr)) category = "access-denied";
+  else if (httpStatus === 429) category = "rate-limited";
+  else if (httpStatus >= 500) category = "http-unavailable";
+  else if (httpStatus) category = "http-error";
+  else if (/could not resolve|unable to resolve/i.test(stderr)) category = "dns";
+  else if (/non-fast-forward|fetch first|cannot lock ref.*expected/i.test(stderr)) category = "ref-conflict";
+  else if (/connection reset|failed to connect|connection timed out/i.test(stderr)) category = "connection";
+  return { exitCode: Number.isInteger(code) ? code : null, signal: signal ?? null,
+    timedOut: Boolean(timedOut), httpStatus, category };
+}
+
 // Inherit the already authorized credential helper and proxy. Never log Git's
 // stderr: helpers may include credentials or private URLs in diagnostics.
 export function git(cwd, args, { env = {}, input, timeoutMs = 30_000 } = {}) {
@@ -17,10 +34,15 @@ export function git(cwd, args, { env = {}, input, timeoutMs = 30_000 } = {}) {
     ], { cwd, env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GCM_INTERACTIVE: "never",
       GIT_AUTHOR_NAME: "Paper Reading Runner", GIT_AUTHOR_EMAIL: "runner@example.invalid",
       GIT_COMMITTER_NAME: "Paper Reading Runner", GIT_COMMITTER_EMAIL: "runner@example.invalid",
-      ...env }, stdio: ["pipe", "pipe", "ignore"] });
+      ...env }, stdio: ["pipe", "pipe", "pipe"] });
     const chunks = [];
-    let size = 0;
-    const timer = setTimeout(() => child.kill("SIGKILL"), timeoutMs);
+    let size = 0, stderr = "", timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; child.kill("SIGKILL"); }, timeoutMs);
+    child.stderr.on("data", (chunk) => {
+      // Retain only a bounded in-memory diagnostic for classification, never
+      // the raw text in an error, log, journal or tool result.
+      if (stderr.length < 65_536) stderr += chunk.toString().slice(0, 65_536 - stderr.length);
+    });
     child.stdout.on("data", (chunk) => {
       size += chunk.length;
       if (size > 256 * 1024 * 1024) child.kill("SIGKILL");
@@ -28,10 +50,14 @@ export function git(cwd, args, { env = {}, input, timeoutMs = 30_000 } = {}) {
     });
     child.stdin.on("error", () => {});
     child.once("error", () => { clearTimeout(timer); reject(new Error("Git could not start.")); });
-    child.once("close", (code) => {
+    child.once("close", (code, signal) => {
       clearTimeout(timer);
       if (code === 0 && size <= 256 * 1024 * 1024) resolve(Buffer.concat(chunks));
-      else reject(new Error(`Git ${args[0]} failed; diagnostics suppressed. Check access and network policy.`));
+      else {
+        const details = gitFailureDetails({ code, signal, timedOut, outputLimit: size > 256 * 1024 * 1024, stderr });
+        const action = /^[a-z][a-z-]*$/.test(args[0]) ? args[0] : "operation";
+        reject(Object.assign(new Error(`Git ${action} failed (${details.category}${details.httpStatus ? `, HTTP ${details.httpStatus}` : ""}); raw diagnostics suppressed.`), details));
+      }
     });
     child.stdin.end(input);
   });

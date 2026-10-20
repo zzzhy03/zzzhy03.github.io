@@ -6,7 +6,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { GitStore, git, validateRemote } from "../git-store.mjs";
+import { GitStore, git, gitFailureDetails, validateRemote } from "../git-store.mjs";
 import { Runner, withSessionLock } from "../runner.mjs";
 import { publish, verifyGitHubPages } from "../publication.mjs";
 import { jsonBytes, sha256 } from "../files.mjs";
@@ -102,6 +102,39 @@ test("lost state push reply is acknowledged only by exact remote HEAD; unreadabl
   assert.equal(recovery.outcome, "acknowledged");
   assert.equal(recovery.stateCommit, proposal.commit);
   assert.equal(runner.store.pending(), null);
+});
+
+test("acknowledged local objects do not need a second fetch; fresh sessions still require remote fetch", async (t) => {
+  const f = await fixture(t);
+  let pushed = false, fetches = 0;
+  const fault = async (cwd, args, options) => {
+    if (args[0] === "fetch") {
+      fetches++;
+      if (pushed) throw new Error("Synthetic post-ack fetch failure");
+    }
+    const result = await git(cwd, args, options);
+    if (args[0] === "push") pushed = true;
+    return result;
+  };
+  const runner = await started(f, { runGit: fault });
+  await runner.run(job());
+  assert.equal(runner.checkpoint.units.discover.state, "complete");
+  assert.equal(fetches, 1);
+  assert.equal(await runner.store.head(), runner.head);
+  await assert.rejects(new Runner(f.config, { runGit: fault }).open(), /post-ack fetch failure/);
+  const fresh = await new Runner(f.config).open();
+  assert.equal((await fresh.run(job())).skipped, true);
+});
+
+test("Git failure categories retain status without exposing credential-bearing diagnostics", () => {
+  const diagnostic = "fatal: https://user:synthetic-secret@example.invalid failed; requested URL returned error: 403";
+  const result = gitFailureDetails({ code: 128, stderr: diagnostic });
+  assert.equal(result.category, "access-denied");
+  assert.equal(result.httpStatus, 403);
+  assert.ok(!JSON.stringify(result).includes("synthetic-secret"));
+  assert.equal(gitFailureDetails({ code: 128, stderr: "RPC failed; HTTP 503 curl 22" }).category, "http-unavailable");
+  assert.equal(gitFailureDetails({ code: 128, stderr: "Could not resolve host" }).category, "dns");
+  assert.equal(gitFailureDetails({ timedOut: true, signal: "SIGKILL" }).category, "timeout");
 });
 
 test("two local remote clients cannot both acquire; expired owner resumes without discarding checkpoint", async (t) => {

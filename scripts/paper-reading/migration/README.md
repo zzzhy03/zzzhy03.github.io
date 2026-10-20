@@ -137,6 +137,10 @@ repositories, requires an existing explicit branch, builds single-parent commits
 and uses ordinary fast-forward pushes. It rejects URL rewriting. Checkpoint,
 bundle and control are in the same commit; an independent remote HEAD read is
 required before work. An uncertain result retains the exact proposal locally.
+After exact acknowledgement, the runner reads that commit's existing local
+objects without fetching them again. A fresh session still fetches the remote,
+and later actions check HEAD again. Git failures expose only a bounded category,
+exit/signal and any HTTP status; raw credential-bearing diagnostics stay hidden.
 
 `publicationPlan` is a fail-closed preflight, not a publisher. It checks output
 proofs, no unresolved intents, verified content/receipt-ledger (and daily finalize),
