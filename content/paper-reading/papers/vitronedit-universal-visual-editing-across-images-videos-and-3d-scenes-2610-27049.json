@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2610.27049",
+  "title": "VitronEdit: Universal Visual Editing across Images, Videos, and 3D Scenes",
+  "authors": [
+    "Jing Wang",
+    "Yanlin Li",
+    "Mong-Li Lee",
+    "Wynne Hsu",
+    "Shengqiong Wu",
+    "Hao Fei"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-19",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.27049"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "VitronEdit",
+    "cross-modal editing",
+    "geometry post-training",
+    "multi-view consistency"
+  ],
+  "abstract": "Recent advances in unified visual editing have begun to consolidate image and video editing within a single model, while 3D scene editing remains largely separate and constrained by scarce paired training data. Given the rich image and video editing supervision now available and the common editing semantics shared across modalities, a natural question is whether this knowledge can be transferred to data-scarce 3D editing. We present VitronEdit, a universal framework for image, video, and 3D scene editing. VitronEdit adopts a shared sequence representation and progressive multimodal training to transfer editing knowledge across modalities. We further introduce geometry-aware post-training, which leverages a pretrained geometry reconstruction model to provide depth and camera-pose supervision. Surprisingly, applying geometric supervision only to 3D samples yields the best overall performance, while image and video editing also improve despite receiving no direct geometric supervision, suggesting that geometric regularization transfers through the shared backbone. Our analysis further shows that image and video training mainly transfers editing semantics to 3D, whereas 3D supervision primarily improves multi-view consistency. The project page: https://vitron-llm.github.io/VitronEdit/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.27049v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.27049v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://vitron-llm.github.io/VitronEdit"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "VitronEdit以共享MMDiT和modality tokens联合训练image/video/multiview编辑，再仅对3D样本施加frozen geometry teacher的depth/camera监督。作者报告16个3D任务的跨视角CLIP方向一致性改善；值得精读数据迁移与监督范围，但主结果仍需edited views重训3DGS，评价视角来自训练视角，不能称一步3D编辑或held-out几何泛化。",
+    "motivationZh": "从OmniWeaving初始化，Qwen2.5-VL编码指令/参考图与modality tokens，HunyuanVideo1.5 VAE编码frame sequences，共享DiT LoRA以flow matching生成edited latents。Stage1按image→image+video→再加multiview循序混合训练；Stage2由frozen VIST3A-style latent-native extractor比较生成/target latent的mean-depth归一化depth与首camera对齐的pose，最终只监督3D。静态image复制5帧，3D首view一次、后续每view复制4次，缓解temporal VAE损失。",
+    "methodZh": "image/video/3D views表示为frame sequences，MLLM加入modality tokens并编码编辑指令与可选reference → VAE编码source/reference，shared MMDiT+rank32 LoRA以conditional flow matching生成edited latents → progressive mixture以10k image、7k image+video、3k加3D steps学习跨模态编辑语义 → 500step geometry posttrain用冻结latent-native teacher产生depth/camera，对齐坐标与scale后仅监督3D样本 → reported 3D评估联合编辑26views并VAE decode，再用已知cameras重训vanilla3DGS 30000iterations后渲染",
+    "methodFlow": [
+      "image/video/3D views表示为frame sequences，MLLM加入modality tokens并编码编辑指令与可选reference",
+      "VAE编码source/reference，shared MMDiT+rank32 LoRA以conditional flow matching生成edited latents",
+      "progressive mixture以10k image、7k image+video、3k加3D steps学习跨模态编辑语义",
+      "500step geometry posttrain用冻结latent-native teacher产生depth/camera，对齐坐标与scale后仅监督3D样本",
+      "reported 3D评估联合编辑26views并VAE decode，再用已知cameras重训vanilla3DGS 30000iterations后渲染"
+    ],
+    "experimentsZh": "约2.53M训练samples：2M image、500k video、8k自建3D编辑+20k Nano3D+2k DL3DV。8×H200、360p，LoRA rank/alpha32，20k Stage1+500 Stage2。Image PIE700/ICE518；video FiVE419 tasks/100videos+VIE20；3D eight scenes×two instructions=16任务、每任务8renders。 作者报告3D Consistency×100=74.34、Ph-Loss×100=18.88，EditSplat为66.30/19.69；语义CLIPDir/Sim×100=13.15/28.43，低于EditSplat13.76/28.60。 (Table3, PDF p.9) 作者报告从OmniWeaving到Stage1无3D时CLIPDir9.80→12.10，3D Consistency69.20→70.10；加入3D后到12.47/73.98。 (Fig.7, PDF p.10) 作者报告Geo-3D consistency74.34优于w/oGeo73.98与Geo-All72.82；移除单一depth或camera并不总优于完全无geometry。 (Table4, PDF p.10) 作者报告3D view四次复制使VAE重建PSNR26.02→30.24dB、高频保留41.9%→66.5%，这是表示重建实验而非最终编辑质量提升幅度。 (Sec.5.4/Fig.8, PDF pp.10–11) image含ICEdit/VAREdit/ChordEdit/ACE++/FLUX Kontext，video含VideoCoF、VACE、UniVideo、VINO、Kiwi-Edit等；3D含GaussianEditor/DGE/EditSplat并重算共同视角。Image reference fidelity及video内容/运动保持仍明显落后若干专用方法；不能称三模态全面SOTA。 区分I/V迁移、加入3D、depth/camera/all-vs-3D scope及frame replication；geometry ablation禁用组件时其余weights不重归一，故监督类型与总梯度量并未完全解耦。主表未给多seed不确定性或同预算新视角评估。",
+    "insightZh": "主要是将已知image/video联合编辑扩展到multiview，实证区分语义迁移与一致性监督，并系统比较geometry supervision的modality scope。不是新geometry teacher，也没有在主表验证direct latent-to-3DGS route；最终训练策略的价值应与完整reconstruction pipeline一起理解。",
+    "evidenceZh": "共享frame sequences与modality tokens、MLLM+VAE+MMDiT结构及渐进混合训练。 (Sec.3.1–3.3/Fig.3, PDF pp.4–5) / teacher从predicted/target latent估计depth与camera，mean-depth scale归一、first-frame pose对齐，最终Geo-3D。 (Sec.3.4/Eqs.5–8/App.B, PDF pp.5–6,17–19) / 仅image/video训练主要提高编辑语义；少量3D数据提高cross-view consistency。 (Fig.7/Sec.5.2, PDF pp.9–10) / 全部3D报告采用image-reconstruction route，direct latent decoder关闭；评价8views是26重建views子集。 (App.C3.1, PDF pp.21–22) / 3D Consistency定义为CLIP edit-direction在view pairs上的cosine，而非真实geometry误差。 (App.C3.2/Eq.19, PDF p.22)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进可控3D scene editing，跨模态共享监督和VAE sequence构造有实用研究价值；与structured 2D/Embroidery的联系目前只是潜在训练策略，本文未验证这些任务。",
+    "caveatZh": "相同geometry losses不均匀惠及所有模态，video中camera/object motion纠缠。 / 当前3D仅静态scene multiview editing，dynamic3D/4D尚待未来。 / snowy bonsai例子修改了超出目标的周围区域，一致性不等于局部编辑精确。 / 8评价视角来自26重建training views，没有held-out novel-view泛化证据。 / 3D主结果采用edited images重训vanilla3DGS30000iterations，不能描述为feed-forward/direct latent3D编辑性能。 / 所谓3D Consistency主要是CLIP方向一致性；Ph-Loss用VGGT伪depth、已知camera与有效depth区域，非ground-truth几何测量。 / 3D仅16任务；缺误差条与多训练seed，细微geometry posttrain改善应保守。 / 作者训练中target由Kling-O1合成，label的view consistency/局部性并非真实几何ground truth。",
+    "sourceNote": "Exact version 2610.27049v1 (27 pages), PDF SHA-256 8b9191329fc4c524bdca3774cbaa50dcc1c546d9f5c516d3b3aa949376f768b4. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: available. PDF p1打印该官方project URL；其Explore the code链接至https://github.com/Vitron-LLM/VitronEdit-Code。实际核对74文件，含src/univedit、MMDiT/LoRA pipeline、train/infer与geo_posttrain脚本；同名VitronEdit repo只是网页，勿混淆。"
+  },
+  "slug": "vitronedit-universal-visual-editing-across-images-videos-and-3d-scenes-2610-27049",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "3d-generation",
+    "image-generation",
+    "video-generation"
+  ],
+  "facets": {
+    "task": [
+      "editing"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "hybrid-method"
+    ]
+  }
+}

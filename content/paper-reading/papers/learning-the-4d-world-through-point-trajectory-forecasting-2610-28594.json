@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2610.28594",
+  "title": "Learning the 4D World through Point Trajectory Forecasting",
+  "authors": [
+    "Byungwoo Jeon",
+    "Sunghwan Hong",
+    "Dohyeon Kim",
+    "Jonghoon Lee",
+    "Jungwoo Park",
+    "Inhee Lee",
+    "Doosan Baek",
+    "Jinil Kim",
+    "Taehyun Lim",
+    "Hanbyul Joo",
+    "Marc Pollefeys",
+    "Saining Xie",
+    "Jinwoo Shin"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28594"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Video-Point Model",
+    "persistent 3D trajectories",
+    "multi-view forecasting",
+    "geometry supervision"
+  ],
+  "abstract": "Reliable multi-view forecasting requires videos from different cameras to describe the same evolving 3D scene. To this end, we introduce Video-Point Model (VPM), a world model that conditions on multi-view video histories and a language instruction to jointly forecast future videos from arbitrary viewpoints and the 3D trajectories of persistent scene points. We extend a pretrained world model with camera-conditioned multi-view processing that integrates complementary observations across cameras, and add a trajectory head that predicts how physical points move through time. Each trajectory tracks a single point across all views, and supervising these trajectories alongside video generation therefore anchors appearance changes in every camera to a shared description of 3D motion. To support training and evaluation, we build VPM-Data, a simulation corpus pairing synchronized multi-view videos with persistent point trajectories, and VP-WorldBench, a forecasting benchmark spanning simulated and real environments. We further extend VPM to robot control by adding robot actions as a token modality in the generator. Action tokens share the point-supervised backbone and are denoised jointly with future videos, thereby grounding the policy in the same 3D-aware representation. On VP-WorldBench and existing 4D generation benchmarks, point supervision improves both video fidelity and 3D motion accuracy over a video-only counterpart, and in simulated and real-robot experiments, it also raises the manipulation success of the action-enabled model.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28594v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28594v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://rootyjeon.github.io/video-point-model/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "VPM在Cosmos3多视图生成器中加入持久3D point trajectory预测和跨view correspondence监督，让不同camera的未来视频共享运动。作者报告同预算V+T优于video-only，并改善真实robot三类pick-and-place；值得读几何监督如何塑造生成features，但它输出稀疏查询轨迹而非完整可编辑4D资产，zero-shot轨迹IK演示尚不足定量评估。",
+    "motivationZh": "输入标定的multi-view histories、language instruction与所查询历史points，video tokens打包为共享序列，以Plücker additive/QK rotations和新增view RoPE区别几何/视角。Trajectory head读取第18层Q/K相关特征，factorized spatial/temporal/cross-view refiner迭代4次预测2D位置、depth与confidence，再提升到统一reference frame。三阶段先适配video、再warm-up head、再联合flow/track/correspondence losses；可额外joint denoise robot action tokens。",
+    "methodZh": "多视图histories、camera intrinsics/poses与instruction输入Cosmos3 reasoner/generator，history保持clean → 把camera Plücker rays加入features并调制Q/K rotation，以4D RoPE增加view轴 → 在generator中层Q/K feature grids查询指定历史points，通过space/time/view相关性迭代预测位置与depth → 把每view预测提升到统一camera reference frame，用persistent 3D trajectories及cross-view correspondence联合监督video generation → 先video适配、head warm-up再joint training；可加独立noise action tokens联合生成未来video、轨迹和robot commands",
+    "methodFlow": [
+      "多视图histories、camera intrinsics/poses与instruction输入Cosmos3 reasoner/generator，history保持clean",
+      "把camera Plücker rays加入features并调制Q/K rotation，以4D RoPE增加view轴",
+      "在generator中层Q/K feature grids查询指定历史points，通过space/time/view相关性迭代预测位置与depth",
+      "把每view预测提升到统一camera reference frame，用persistent 3D trajectories及cross-view correspondence联合监督video generation",
+      "先video适配、head warm-up再joint training；可加独立noise action tokens联合生成未来video、轨迹和robot commands"
+    ],
+    "experimentsZh": "VPM-Data为10K合成multi-view clips，另用91K机器人与504K公开video资料；VP-WorldBench有500sim robot、500sim urban/general、100real robot及100real general clips。主评估所有方法均不给future camera poses；历史camera标定仍需已知。Real robot量化为DROID训练子集与3种pick-and-place各24trials，另LIBERO/LIBERO-Plus/RoboCasa。 作者报告sim robot V+T对V-only的FVD67.35对78.52、3D δavg50.05对43.62；real robot为255.19对296.83与64.75对50.83。 (Table2, PDF p.7) 作者报告action-enabled V+T+A在real banana/cup/cube任务成功率79.2/70.8/54.2%，V+A为58.3/64.6/43.8%，每任务24trials。 (Table5, PDF p.8; Sec.6.4, PDF p.9) 作者报告去掉trajectory head warm-up，使real robot δavg由64.75降至49.77；消融总iterations固定12K。 (Table30, PDF p.38) video baselines HunyuanVideo1.5/Wan2.2/Cosmos3-Nano共享fine-tuning data，单视图模型逐view独立生成；对X-WAM、Robot4DGen、DreamZero与VLA模型。几何metrics依赖MASt3R、MVTracker/MoGe2，作者提供GT视频估计floor/upper-bound，不能解释成完美geometry。 V/V+A/V+T/V+T+A、camera conditioning、2D/depth/correspondence损失、training stages、layer/refinement次数和data sources都有控制；去掉VPM-Data最伤urban simulation，去robot数据最伤real robot。",
+    "insightZh": "核心不是从已观察future视频做tracking，而是对尚未观测的未来同步生成video与保持point identity的metric3D运动，以同预算对照验证几何监督收益；multi-view ray与view encoding、query-based refiner和可审计数据是具体工程贡献。",
+    "evidenceZh": "camera geometry与view identity分别由Plücker embeddings/QK rotations和4D RoPE表示。 (Sec.3.3, Fig.2, PDF p.4) / 轨迹从partially denoised中层features预测，2D/depth/visibility与cross-view correspondence共同监督生成表示。 (Sec.3.4–3.5, PDF pp.4–5; App.A.1, PDF p.17) / 作者报告相同训练预算下point supervision提高四个sim/real split的video与geometry分数。 (Tables2 and6, PDF pp.7–8) / 轨迹经IK的zero-shot控制只作qualitative展示，作者明确不够稳定做定量评估。 (Sec.6.5, PDF pp.9–10)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "跨camera持久point identity是动态3D生成中约束appearance/motion一致性的具体机制，对3D asset animation与多视图视频prior训练有启发；论文未验证LEGO/Embroidery或静态CAD设计。",
+    "caveatZh": "point监督只覆盖robot和标注objects，非整scene；skeletal标注不含独立cloth/hair运动（Sec.7, PDF p.10）。 / inference依赖已知intrinsics/poses；共享序列成本随views增长（PDF p.10）。 / simulation无真实sensor noise、hard urban偏pedestrians，真实general仅3位participants；physics seeds不能bit-exact重建（App.D.6–D.7, PDF p.29）。 / 生成future视频与稀疏轨迹不等于完整mesh/4DGS或可编辑动态asset，不能泛化为asset reconstruction。 / 主评估future camera未知，但模型存在可选future-camera条件，需区别协议；不可说完全pose-free。 / 三项real robot各24trial与qualitative-only IK限制zero-shot控制结论，且无完整scene contact保证。",
+    "sourceNote": "Exact version 2610.28594v1 (43 pages), PDF SHA-256 47acbadd4b1293a0c48aac62a78cd69277b1a7ab08eaa54b6cdd6d15d68d0677. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: available. PDF p.1的project入口指向官方页面，Code链接到https://github.com/rootyJeon/VPM；GitHub REST tree核实363 files，含cosmos_framework与VPM相关源码。code.url保留PDF中可验证入口。"
+  },
+  "slug": "learning-the-4d-world-through-point-trajectory-forecasting-2610-28594",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "hybrid-method"
+    ]
+  }
+}

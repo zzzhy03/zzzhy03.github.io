@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2610.28632",
+  "title": "Joints, Camera, Action! Co-Generating 3D Motion and Video for Arbitrary Rigs",
+  "authors": [
+    "Noam Rotstein",
+    "Yoad Tewel",
+    "Chen Tessler",
+    "Haggai Maron",
+    "Gal Chechik",
+    "Or Litany",
+    "Yoni Kasten",
+    "Yuval Atzmon"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28632"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR",
+    "cs.LG",
+    "cs.RO"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "arbitrary rigs",
+    "3D motion",
+    "video-motion co-generation",
+    "camera alignment"
+  ],
+  "abstract": "Video generation models can now depict remarkably realistic motion. Yet it is unclear how to use this motion beyond pixels: to animate a specific 3D asset and replay the animation in its 3D scene. For instance, a video model can show a monkey jumping over a crossbar, but it cannot return that jump as replayable 3D motion placed in the 3D scene. Here we present a model that directly co-generates the video and 3D motion for any supplied rig, along with a camera that registers this motion to the scene. Prior video-motion models either handle only human skeletons, often adding billions of parameters, or triangulate 3D motion from generated 2D pose maps. We instead keep 3D motion in a separate model that supports arbitrary skeletons, and connect it to a pretrained video model through a small set of cross-attention layers. This separation lets the motion model first learn how skeletons move from motion-only data, which is easier to obtain and augment than paired video. Additionally, our model learns to locate each joint in the video frames, which lets us recover the camera and place the 3D motion in the scene. To train across many skeletons, we use a generative video editor to place animated 3D assets in scenes suited to their actions, curating the edits so their known motion remains valid. Together with human and robot video, this yields nearly 200K training pairs. Our evaluations demonstrate that our model animates diverse rigs from text more faithfully than video-first pipelines, and its motion responds to the surrounding scene. It also turns video into rig motion, rig motion into video, and enables keyframe-based control of the 3D motion. Videos and additional results are available on our project page: https://research.nvidia.com/labs/par/projects/jca/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28632v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28632v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "JCA把任意rig视为graph，先独立学习motion prior，再以零初始化双向cross-attention连接Wan2.2，同时预测2D joints以拟合camera，输出可在scene重放的3D motion与视频。作者报告100个asset–prompt上指令分数58.4，高于ActionMesh的43.4；但general checkpoint的人体同步弱于EchoMotion，且scene只经视频进入，不能保证contact或无穿透。",
+    "motivationZh": "输入text、rest-pose rig及可选reference image/2D joints，motion branch按每joint每frame的18维位置/旋转及变化做flow matching。GAT rig encoder和graph attention处理变化拓扑，10个motion blocks通过178M级额外模块连接冻结Wan2.2；bridge guidance对连接/断开及有/无text共四次预测增强耦合。joint-localization的2D–3D对应拟合单个静态camera；最终用IK恢复固定骨长。约200K配对video–motion中包含118K经生成视频编辑与mask/camera质量过滤的OiV，以及human/robot资料。",
+    "methodZh": "text、rest-pose rig与可选reference image/2D joint位置输入GAT rig encoder → 在motion-only资料上预训练graph-aware motion flow denoiser，并单独LoRA适配Wan2.2视频分支 → 零初始化双向cross-attention连接两分支，联合denoise motion与video；bridge guidance增强跨模态作用 → joint-localization将motion joint features对video patches作attention，预测每joint 2D位置 → 以可靠性加权2D–3D对应拟合静态perspective camera，再以IK固定骨长并在原scene重放",
+    "methodFlow": [
+      "text、rest-pose rig与可选reference image/2D joint位置输入GAT rig encoder",
+      "在motion-only资料上预训练graph-aware motion flow denoiser，并单独LoRA适配Wan2.2视频分支",
+      "零初始化双向cross-attention连接两分支，联合denoise motion与video；bridge guidance增强跨模态作用",
+      "joint-localization将motion joint features对video patches作attention，预测每joint 2D位置",
+      "以可靠性加权2D–3D对应拟合静态perspective camera，再以IK固定骨长并在原scene重放"
+    ],
+    "experimentsZh": "20个Puppeteer test assets×5个新prompt，共100对；rig baselines为AnimateAnyMesh、Puppeteer、ActionMesh。另250个HumanML3D prompt比较human co-generation，67个TrueBones Zoo unseen clips评估video-to-motion。32×H100训练；主rig动画约1.6秒，JCA25帧16FPS。 作者报告100对rig动画的prompt adherence为58.4，ActionMesh43.4、Puppeteer41.1；mesh distortion为0.20%，motion-only为0.14%，不能称联合训练所有指标都更好。 (Table1, PDF p.7; Sec.5.2, PDF p.10) 作者报告general JCA的PA-MPJPE114.8mm差于EchoMotion97.7；SMPL-FT后为72.3mm，SA-MPJVE272.6mm/s对照431.3。 (Table2, PDF p.7) 作者报告移除bridge guidance使SMPL-FT的PA-MPJPE从72.27升到84.78，断开cross-attention为140.71。 (Table3, PDF p.9) 共享asset初始pose和Wan2.2 guiding video的尽量匹配，但baseline接收mesh/显式initial 3D pose，JCA接收rest rig、image和2D joints，输入不完全一致；AnimaX因未公开未比。部分ActionMesh训练asset overlap无法排除。 bridge guidance、断开连接与motion-only checkpoint支持联合耦合价值；human同步收益有专门SMPL-FT。Rig prompt adherence由GPT-6 Astra两轮judge而非human或GT评估，未报告scene contact定量保证。",
+    "insightZh": "主要增量是arbitrary-rig直接3D/video co-generation、保持独立小motion branch的桥接、可控bridge guidance以及用于scene注册的joint localization，而非仅把视频生成后再做tracking/lifting。OiV的生成背景编辑与标注保持审计是可迁移的数据构建方法。",
+    "evidenceZh": "任意rig由graph descriptor和每joint motion tokens编码，双向零初始化bridges交换video/motion信息。 (Sec.3.1–3.2, Fig.2, PDF pp.4–5) / 2D joint attention定位与生成3D joints用于拟合单个静态perspective camera。 (Sec.3.3, PDF p.6; App.A.5, PDF p.18) / 作者报告rig prompt adherence优于三种baseline，但通用模型的人体同步不及EchoMotion，需SMPL专用fine-tuning。 (Tables1–2, PDF p.7; Sec.4.3, PDF pp.8–9) / scene-aware动画不具有强制contact/无穿透保证。 (Sec.6 Limitations, PDF p.10)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接把生成视频的运动变为可编辑rig动画，尤其值得精读graph-compatible motion prior、small cross-modal bridge与camera registration；对LEGO/Embroidery没有专用验证。",
+    "caveatZh": "camera alignment假设静态camera；扩展moving camera留待未来（Sec.6, PDF p.10）。 / 训练rig与motion偏向biped/humanoid，动作分布有限（PDF p.10）。 / scene仅通过video传入，无3D geometry/contact约束，不能避免penetration；交互物体未恢复3D且每clip仅一个rig（PDF p.10）。 / 100对asset–prompt与LLM judge不足以证明任意拓扑或复杂接触的普遍可靠性。 / 四次forward/denoising step带来实际inference代价；178M是motion相关新增参数，含LoRA总trainable331.28M。 / SMPL-FT与video-to-motion-FT结果不能当作general checkpoint的zero-shot表现。",
+    "sourceNote": "Exact version 2610.28632v1 (24 pages), PDF SHA-256 2639807350000407791762f7c12596d5abe2c3c7358c4e079ef1d85d7acf3cac. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: not-found. PDF p.1仅project链接；已检查官方https://research.nvidia.com/labs/par/projects/jca/，未发现public code链接。"
+  },
+  "slug": "joints-camera-action-co-generating-3d-motion-and-video-for-arbitrary-rigs-2610-28632",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "hybrid-method"
+    ]
+  }
+}

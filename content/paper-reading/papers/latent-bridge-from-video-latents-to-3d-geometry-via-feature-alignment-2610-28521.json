@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2610.28521",
+  "title": "Latent Bridge: From Video Latents to 3D Geometry via Feature Alignment",
+  "authors": [
+    "Shuai Zhang",
+    "Zhanpeng Ouyang",
+    "Zhengqing Chen",
+    "Ruohong Mei",
+    "Shaoyu Chen",
+    "Weiqiang Ren",
+    "Hui Sun",
+    "Qian Zhang",
+    "Wenyu Liu",
+    "Xinggang Wang"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28521"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Latent Bridge",
+    "video-to-geometry",
+    "feature distillation",
+    "latent alignment"
+  ],
+  "abstract": "Video generation and feed-forward 3D reconstruction typically use separate representations, requiring RGB decoding and visual re-encoding to recover geometry from generated latents. We propose Latent Bridge, which connects video generative latent spaces with geometric feature spaces to directly predict 3D geometry from video latents. We develop representation-specific bridges for Wan2.1 and V-RAE, enabling feed-forward prediction of cameras, depth, and 3D point clouds without the intermediate RGB pathway. Each bridge is trained on RGB videos through feature distillation, while the video encoder and geometry model remain frozen. Training requires neither ground-truth geometry nor execution of the downstream geometric aggregator or prediction heads. At inference, the same video latents support both RGB decoding and geometry prediction. The same trained bridge can be reused for image-to-video and text-to-video generation within the same video latent space, without bridge retraining. Experiments on Co3Dv2 and WildRGB-D demonstrate competitive geometric reconstruction quality, efficient end-to-end generation and reconstruction, and faster latent-to-geometry decoding, highlighting latent alignment as a practical and reusable interface between video generation and 3D reconstruction. Our code is available at: https://github.com/hustvl/Latent-Bridge.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28521v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28521v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/hustvl/Latent-Bridge"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "Latent Bridge只训练encoder-specific alignment，把Wan/V-RAE video latent映射到冻结VGGT-Ω patch tokens，绕过RGB decode/re-encode后直接预测geometry。作者报告同latent、同geometry model的Wan解码耗时7.92→4.92秒；值得skim其可复用接口，但它继承teacher错误，也不约束生成视频一致性，不能把几何提取当作生成场景的正确性保证。",
+    "motivationZh": "用同RGB clip生成冻结video encoder latent与Ω patch token targets，bridge以MSE/cosine/temporal difference/relation losses拟合，训练不执行aggregator/geometry heads。Wan分支使用2×2PixelUnshuffle、causal phase expansion及spatiotemporal mixing；V-RAE分支因其DINOv3特征已共享维度/grid，仅做phase residual expansion、MLP/temporal attention与padding裁剪。Inference在同VAE/checkpoint conventions的T2V/I2V latents后接冻结aggregator和depth/camera heads，再unproject点云；另有单独训练VGGT-aligned bridge复用VGGT-S，只有定性segmentation演示。",
+    "methodZh": "RGB videos经冻结Wan2.1或V-RAE encoder得到latent，同时冻结VGGT-Ω patch encoder生成feature targets → encoder-specific bridge恢复frame/time与token grid：Wan做spatial packing/causal expansion，V-RAE做phase residual expansion → 只优化bridge，以feature value/direction及局部/全局temporal losses对齐；aggregator与heads训练时不执行 → 兼容VAE的video DiT生成final latent，bridge直接产出geometry-interface tokens → 冻结Ω aggregator/camera-depth heads解码geometry并unproject点云；RGB decoder仅用于另外的视频输出",
+    "methodFlow": [
+      "RGB videos经冻结Wan2.1或V-RAE encoder得到latent，同时冻结VGGT-Ω patch encoder生成feature targets",
+      "encoder-specific bridge恢复frame/time与token grid：Wan做spatial packing/causal expansion，V-RAE做phase residual expansion",
+      "只优化bridge，以feature value/direction及局部/全局temporal losses对齐；aggregator与heads训练时不执行",
+      "兼容VAE的video DiT生成final latent，bridge直接产出geometry-interface tokens",
+      "冻结Ω aggregator/camera-depth heads解码geometry并unproject点云；RGB decoder仅用于另外的视频输出"
+    ],
+    "experimentsZh": "DL3DV/WildRGB-D/CO3Dv2/RE10K按2:1:1:1混合，49frames、560²。几何评估300CO3Dv2与158WildRGB-D sequences；生成另140DL3DV/300RE10K。Wan bridge94Ksteps约1501GPU-hours，V-RAE50K约498GPU-hours。 作者报告同latent的Wan latent-to-geometry由RGB路径7.92s降至4.92s（1.61×），V-RAE5.76→4.64s（1.24×）；均不含diffusion sampling。 (Table3, PDF p.8) 作者报告V-RAE在Co3Dv2/WildRGB-D CD为0.2662/0.0657m；Gen3R0.2808/0.0688。Wan在WildRGB-D CD0.0699稍差Gen3R0.0688，不能说所有variant全指标最佳。 (Table1, PDF p.7) 作者报告feature监督forward-loss-backward为0.166s/3.17GiB，冻结decoder后的geometry监督5.896s/31.27GiB，同6000Pro、batch1/49frames；这是单步监督成本而非端到端训练speedup。 (Table6, PDF p.14) Aether/FantasyWorld/Gen3R等生成-重建系统，Aether仅41frames，其余49且generators不同；端到端70.09s不能只归于bridge。同latent RGB route Table3才隔离解码贡献。点云metrics先用dataset masks/GT validity与相同log-MAD/multi-view过滤，不代表完整unfiltered场景质量。 64validation videos上比较bridge容量、spatial packing/causal phase/temporal mixing和loss terms；teacher-depth consistency改善支持设计。T2V和driving无重训复用以及VGGT-S mask传播主要定性，缺少跨域segmentation量化。",
+    "insightZh": "相比联合生成geometry token或fine-tune geometry decoder，贡献是将预训练几何模型的feature接口整体固定，仅训练latent alignment，降低训练时执行heads的成本并复用同VAE不同生成任务。不是纠正几何错误的约束，也不自动跨VAE checkpoint泛化；segmentation复用使用不同VGGT-aligned分支。",
+    "evidenceZh": "只训练bridge，video encoder、geometry aggregator和heads冻结，训练时不运行后两者。 (Sec.4.1–4.4, Fig.2, PDF pp.4–6) / 同generated latent与frozen geometry model对照，bridge缩短latent-to-geometry耗时并保留近似重建质量。 (Table3, PDF p.8) / cross-task复用要求same VAE latent conventions，segmentation示例使用另训VGGT-aligned bridge。 (Sec.6/Fig.5, PDF pp.9–10; App.A.1–A.2, PDF pp.13–14) / 桥接不修正teacher几何错误，也不自动消除generated video结构不一致。 (App.A.4 Limitations, PDF p.15)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为3D Generation提供将现成video prior直接转为camera/depth/point cloud的轻量接口，具体迁移机制在same-VAE生成任务复用；未验证LEGO/Embroidery或可制造mesh。",
+    "caveatZh": "冻结teacher存在的geometry errors不能由feature matching bridge自动修正（App.A.4, PDF p.15）。 / 方法不约束video generation过程，若生成内容结构/对象跨帧不一致，无法保证coherent3D重建（PDF p.15）。 / 同VAE latent compatibility是复用前提，换encoder需独立bridge训练；不能承诺任何video model通用。 / 0.166s训练监督成本与1.61×geometry decoding加速不能误写为总generation提速。 / 默认Ω与segmentation用VGGT-aligned checkpoint不同，后者没有GT quantitative segmentation；不应当成新的part segmentation结果。 / geometry metrics依赖foreground/validity和cross-view过滤，不能证明scene完整性或manufacturability。",
+    "sourceNote": "Exact version 2610.28521v1 (15 pages), PDF SHA-256 6bbd06b1a55ab41535ca737273fd1cc9cdb23caa0de4f8c4c2042d5697a6e0aa. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: available. PDF p.1打印GitHub URL；REST tree核实44 files，包含train、infer、evaluate、Wan/VRAE bridges与geometry模块实际源码。"
+  },
+  "slug": "latent-bridge-from-video-latents-to-3d-geometry-via-feature-alignment-2610-28521",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "feed-forward"
+    ]
+  }
+}

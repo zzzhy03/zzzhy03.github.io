@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2610.28003",
+  "title": "Dancing Diffusion: Learning Continuous Programs for Image Generation and Editing",
+  "authors": [
+    "Cui Enhe",
+    "Jinyue Yang",
+    "Bojian Yin",
+    "Guoqi Li"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28003"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.GR"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Dancing Diffusion",
+    "latent programs",
+    "prefix reuse",
+    "branch editing"
+  ],
+  "abstract": "Diffusion models generate samples through a multi-step denoising trajectory, yet condition every step on the same instruction, so the trajectory cannot be addressed at the level of individual operations. We introduce Dancing Diffusion, which assigns each span of timesteps a dedicated continuous condition block and thereby turns conditioning into a latent program. A compiler maps text features into this program, and a fixed pretrained generator executes its blocks over successive sampling intervals. The trajectory can then dance, keeping its executed history while its continuation is redirected. A shared prefix is executed once and reused, and a later operation is rewritten while content fixed by earlier operations is preserved. The compiler is trained through the images it produces, with visual feedback on both the requested change and the retained content. On SANA, reusing an executed prefix preserves markedly more of the scene than regenerating from noise at a similar strength of edit, learned conditions preserve more background than native prompt switching from the same saved state, and the learned program improves generation quality over native SANA. Later branches weaken the edit, which leaves semantic control over individual operations limited. By converting a single-instruction trajectory into a program of addressable operations, Dancing Diffusion lays a foundation for structured intermediate computation in diffusion models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28003v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28003v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "Dancing Diffusion把caption编译成分时continuous conditions，在冻结SANA的已存状态上改写suffix。作者报告早分支比重生更保背景，同状态native prompt switching相比也有局部收益；但prefix可复用不等于语义解耦，晚分支主要是编辑变弱，且FlowEdit某些点更优。值得读作design-agent可回放编辑接口和机制验证范例。",
+    "motivationZh": "273.1M compiler从text features生成三个condition blocks，按固定30-step schedule交给SANA-600M。训练冻结source image/state/mask与generator/observer，反传suffix的change+retention losses仅更新compiler。推理无observer，可缓存共同prefix试多个continuations。实验仔细区分prefix复用、learned conditioning与native同状态切换：只证成早分支的局部preservation/change balance，不证成独立semantic factors、reasoning或任意照片编辑。",
+    "methodZh": "caption features经273.1M compiler产生三个continuous condition blocks与固定validity masks → 按3/9/18、6/12/12或9/12/9 schedule在冻结SANA执行30步 → 生成source并缓存完整noisy sampler state；source/region/masks全部detach固定 → target caption仅替换branch之后的active blocks，续跑suffix得到edited endpoint → 训练用固定observer对new presence/old absence、caption和region retention反馈，只更新compiler → 推理移除observer；同一prefix可复用到多个continuations，逐项分开验证编辑成功和背景保持",
+    "methodFlow": [
+      "caption features经273.1M compiler产生三个continuous condition blocks与固定validity masks",
+      "按3/9/18、6/12/12或9/12/9 schedule在冻结SANA执行30步",
+      "生成source并缓存完整noisy sampler state；source/region/masks全部detach固定",
+      "target caption仅替换branch之后的active blocks，续跑suffix得到edited endpoint",
+      "训练用固定observer对new presence/old absence、caption和region retention反馈，只更新compiler",
+      "推理移除observer；同一prefix可复用到多个continuations，逐项分开验证编辑成功和背景保持"
+    ],
+    "experimentsZh": "Toy Patterned-Sphere3D 120K64px图像、1024 val×41噪声水平，历史variants不构成单变量消融。SANA用9226 frozen source identities、3 schedules各1训练seed、最终update1423；两schedule有40步joint warm start。主评24 families×3seeds、branches0/9/15/21；独立category cohort12families，另48source双向stress test、独立DINO/OWLv2与source-box区域；MJHQ30K评FID。 作者报告6/12/12 branch9相对regeneration的BG LPIPS由0.321降0.227（61/72可用masks），semantic proxy0.092→0.088。 (Table9, PDF p.23) 作者报告MJHQ30K FID native7.349、final6/12/12为7.145；3/9/18为7.315、9/12/9为7.375，无training-seed不确定性。 (Table2, PDF p.9) 作者报告A800上四continuations缓存prefix耗时7.18s vs重算9.20s（6/12/12），约22%节省，native也能得到同类收益。 (App.K/Table22, PDF p.28) 作者报告双向stress test branch9 learned/native joint replacement13/48与8/48，但FlowEdit CFG6为14/48且BG LPIPS0.1059低于learned0.1195。 (App.O/Table29, PDF p.36) 包含same-compiler regeneration、initialized compiler、严格same-state native suffix，以及SDEdit/FlowEdit的SANA adaptation。后两者接收PNG且call数不同，不是原论文SD3/FLUX benchmark复现；不能总体排名。CLIP/mask部分同observer家族，另用独立detectors/source boxes补查，仍非人工偏好或完整caption成功。 冻结reference避免目标移动；block/schedule/source-path crossing可验证routing而不证明learned semantics。B0输入隔离variant只做到boundary state对subject不变，后续背景仍变；自动scene compiler未过input equality gate，故无该variant FID。paired family bootstrap仅描述性，无多重比较/训练seed校正。",
+    "insightZh": "可读价值是compiler–executor与detached prefix的可审计intervention接口，以及区分执行不变量和学习到的semantic control的实验。Temporal prompt conditioning、learned connector和native prefix reuse已有先例；本文未证成普遍语义因子化或新reasoning能力。",
+    "evidenceZh": "同源saved state替换future conditions；已执行block不可直接影响suffix，但共享compiler更新仍可能改变fresh prefix。 (Sec.3.3–3.4/Eqs.3,7, PDF p.4; App.C/D.1, PDF pp.15–16) / 作者报告6/12/12 branch9 BG LPIPS0.227 vs regeneration0.321，CLIP margin0.088 vs0.092；到branch21变为0.033/0.029。 (Sec.4.2, PDF p.7; App.G/Table9, PDF p.23) / 同状态native对照，早分支三schedule source-box LPIPS差−0.017/−0.022/−0.030；两schedule类别replacement相近，第三更差。 (Sec.4.2/Table1, PDF p.7; App.J/Table20, PDF p.27) / 1200次inactive-block intervention精确不变，但active响应在初始化已存在，未分离训练引发semantic factorization。 (Sec.4.2, PDF p.8; App.L/M, PDF pp.28–31)",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体迁移到visual design agents：把生成历史保存为可寻址状态，在同一视觉上下文尝试局部续写、回放与分支比较；属于方法接口启发，未在SVG/LEGO/Embroidery/CAD任务验证。",
+    "caveatZh": "不接受任意照片，缺inversion module；compiler只在caption起始运行一次（PDF pp.3,9）。 / 后期branch更保背景但削弱编辑；blocks没有验证成独立semantic factors（PDF pp.8,31）。 / 每schedule仅一训练run、warm starts不同；CLIP和mask有observer家族重叠（PDF pp.6,9,14）。 / 自动B0 scene compiler失败、large-source stratum空，没有为这些缺失实验宣称结果（PDF pp.14,35）。 / 背景LPIPS更低可因未完成请求，detector类别替换不验证属性/关系；DINO与OWLv2对generated edits存在明显分歧。 / 同prompt后继续训练仍可漂移，prefix不变仅对物化输入及完整数值状态成立。 / 273.1M compiler相对600M generator不算极小adapter，文中未作多backbone/大规模head-to-head外推。 / 缓存加速是共有执行接口性质，不是learned compiler独有收益。 / PDF提到reproducibility bundle/code但无可用public源码URL，未核实公开实现，Code不标available。",
+    "sourceNote": "Exact version 2610.28003v1 (38 pages), PDF SHA-256 9565c9d3587dd766321904ae2bacfc574b987c08355c3294c4f4d789471f3693. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "dancing-diffusion-learning-continuous-programs-for-image-generation-and-editing-2610-28003",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "image-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "diffusion"
+    ]
+  }
+}

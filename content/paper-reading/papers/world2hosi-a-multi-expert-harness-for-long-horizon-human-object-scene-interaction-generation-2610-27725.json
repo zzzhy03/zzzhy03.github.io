@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2610.27725",
+  "title": "World2HOSI: A Multi-Expert Harness for Long-Horizon Human-Object-Scene Interaction Generation",
+  "authors": [
+    "Jiushu Li",
+    "Haoran Wang",
+    "Yumeng Liu",
+    "Zhiyang Dou",
+    "Yuan Liu",
+    "Yuexin Ma",
+    "Cheng Lin"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.27725"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "World2HOSI",
+    "persistent scene state",
+    "multi-expert orchestration",
+    "contact simulation"
+  ],
+  "abstract": "Long-horizon human-object-scene interaction (HOSI) is central to embodied AI, animation, and game development. Existing human-object interaction (HOI) and human-scene interaction (HSI) models excel in their respective domains, but none alone covers tasks requiring multiple interaction skills. Training unified HOSI models is hindered by scarce and costly data. We introduce World2HOSI, a multi-expert orchestration harness that generates continuous HOSI data from 3D Gaussian Splatting (3DGS) scenes and natural language instructions. Our key insight is that long-horizon HOSI hinges not on a stronger single model but on orchestration. Given a shared, structured scene state and an orchestration harness grounded in it, existing experts can jointly accomplish tasks beyond the reach of any of them alone. World2HOSI realizes this insight as a closed loop around a persistent scene state built from decoupled background and object assets. A harness plans action stages over this state, invokes experts via their native conditioning interfaces, and writes each action's effects back, so that every invocation is grounded in the evolving world. To reduce physical artifacts, bounded residual optimization and contact-driven physics simulation further ensure the physical plausibility of human motion and object manipulation, respectively, while preserving interaction intent. Experiments and a perceptual user study show that World2HOSI achieves the best task completion and interaction quality on the evaluated HOSI tasks, while generating more diverse data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.27725v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.27725v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "World2HOSI的重点是持久scene state：先move chair，再把更新后的seat/occupancy编译给下一个motion expert。作者报告task progress76.93，但这是带阈值的部分完成分数；仍有24.92%严重穿插帧。值得借鉴ISP+MotionIR和单向边界投影，不能称为完全物理可靠或端到端无需训练。",
+    "motivationZh": "ISP将Gaussians外观与collision mesh/semantic支持区以object ID和SE(3)变换对齐，移动后回写support和navigation occupancy。Task script按阶段编译为MotionIR（坐标、单位、human/object paths和目标），分别调用Kimodo、HOI-FHLI、DIMOS，incoming motion短window对齐previous terminal再平滑释放。可选PPO residual controller经PD/真实contact驱动物体。贡献是有状态能力组合和边界协调，不是统一motion foundation model，script也可手写。",
+    "methodZh": "将3DGS/annotated scene分成background与object assets，建立带persistent ID的ISP → 按当前state把instruction拆为Activity Script，绑定同一object与object-local support region → 每stage重新编译MotionIR，统一坐标/单位/时间/human representation并查询最新pose/occupancy → 按navigation/HOI/HSI能力映射调用Kimodo、HOI-FHLI、DIMOS等专家 → incoming segment起始root/joint对齐previous终态，quintic smoothstep局部释放修正 → 可选PPO bounded residual+PD以contact执行；将结果object transforms回写ISP再编译下stage",
+    "methodFlow": [
+      "将3DGS/annotated scene分成background与object assets，建立带persistent ID的ISP",
+      "按当前state把instruction拆为Activity Script，绑定同一object与object-local support region",
+      "每stage重新编译MotionIR，统一坐标/单位/时间/human representation并查询最新pose/occupancy",
+      "按navigation/HOI/HSI能力映射调用Kimodo、HOI-FHLI、DIMOS等专家",
+      "incoming segment起始root/joint对齐previous终态，quintic smoothstep局部释放修正",
+      "可选PPO bounded residual+PD以contact执行；将结果object transforms回写ISP再编译下stage"
+    ],
+    "experimentsZh": "10 ISP scenes，20 instructions×3seeds=60 sequences；共享object/target/path等条件，比较InfBaGel、HOSIG及single HOI-FHLI。另90条diversity collection比较等量外部dataset子集。St由阶段距离/移动/姿势阈值部分计分；Sg等权组合contact/collision/foot指标。30人对8组×3个kinematic videos选best completion/quality，每criterion240票。physics另外用约10s clips报告reference tracking。 作者报告St76.93、Sg75.61、object contact84.94%、severe penetration24.92%；HOI-FHLI分别62.54/64.68/77.29%/43.36%。 (Table1, PDF p.6) 作者报告projection相较bidirectional blend的joint displacement0.593/0.840cm、joint angle0.397/1.224°、velocity jump0.208/0.637cm/s。 (Table3, PDF p.8) 作者报告physics refinement对kinematic reference的human/object tracking error5.39/3.07cm；没有该表的无refinement物理对照。 (Table4, PDF p.8) 作者报告user study中ours为best task completion约67%、best quality约72%，30人×8组三方法选择，并非两两胜率。 (Fig.6/Sec.4.5, PDF p.9; App.A.6, PDF p.16) InfBaGel/HOSIG使用各自pretrained generator并stage-wise继承实际状态；single HOI-FHLI用相同任务条件。Shared paths由A*+clearance occupancy生成。未覆盖所有潜在HSI/HOI组合，也未做同计算成本比较；foot sliding并非全项最佳（InfBaGel0.048，ours0.255）。 同pregenerated segments比较concat、双向blend与单向projection支持边界平滑净收益。physics表只给追踪误差和定性图，缺完整物理成功率/成本；persistent state无freeze-state定量消融，长程依赖主要用案例支持。",
+    "insightZh": "区别于简单拼接的是object-local支持区、更新后occupancy与expert-specific数值条件的持久状态闭环，以及只修incoming segment的单向boundary projection。以上组合使可移动物体后续动作保持指代/位置一致；没有新增统一motion generator，但optional physics需要policy优化。",
+    "evidenceZh": "ISP把appearance与collision代理用同一object transform对齐，移动后重新计算支持区和occupancy。 (Sec.3.1/Eq.1, PDF p.4) / Activity Script在每stage按当前world/human state编译成MotionIR，包含paths、targets和metadata。 (Sec.3.2/Eq.2, PDF pp.4–5) / 单向boundary projection固定previous segment，incoming修正以quintic权重衰减。 (Sec.3.3/Eqs.3–6, PDF p.5) / 作者报告task progress76.93与severe penetration24.92%，baseline HOI-FHLI62.54/43.36%。 (Table1, PDF p.6)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对可编辑3D scene与design agents有明确机制价值：持久object identity、object-local约束和执行后状态回写可避免后续计划基于旧场景；没有验证LEGO、Embroidery或制造流程。",
+    "caveatZh": "Optional physics依赖expert reference，bounded residual只能局部修正，不能修复严重motion错误或根本不可行交互（Limitations, PDF p.9）。 / ISP可人工检查修正segmentation、alignment、functional orientation与support geometry，mass/friction来自category priors（App.A.1, PDF p.13）。 / St不是binary success：object final target距离0.5m内满分、1m外零分，pose证据部分依赖末帧VLM，不能把76.93说成成功率。 / 主表仍24.92% severe penetration frames；物理refinement小样本追踪与main comparison是不同证据，不应合并成全输出可执行保证。 / 不训练新增motion generator不等于全系统training-free：可选physics通过PPO搜索residual policy，文中缺足够runtime/optimization超参。 / Scene preparation可人工修正，短20任务与10场景不能证明open-world泛化。 / 官网Code按钮实际为about:blank placeholder，没有可核实公开源码，因此不展示Code link。",
+    "sourceNote": "Exact version 2610.27725v1 (16 pages), PDF SHA-256 529aac9c1b4ee05fd21af98ff85cbf00ec3d2048399f2ba4ff093f86d9f18895. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "world2hosi-a-multi-expert-harness-for-long-horizon-human-object-scene-interaction-generation-2610-27725",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "tool-use"
+    ],
+    "content-scope": [
+      "human-avatar",
+      "scene"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "hybrid-method"
+    ]
+  }
+}

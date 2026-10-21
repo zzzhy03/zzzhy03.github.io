@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2610.27690",
+  "title": "NeoWorld-3: From Pixels to Code-Defined Physical Worlds",
+  "authors": [
+    "Eachen Soong",
+    "Zijian Niu",
+    "Haoran Xu",
+    "Yihong Dong",
+    "Yunbo Wang",
+    "Xiaokang Yang"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.27690"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "NeoWorld-3",
+    "code-defined worlds",
+    "NeoSDK",
+    "physics validation"
+  ],
+  "abstract": "Simulation-ready world reconstruction demands physical interactivity beyond visual realism, which existing black-box 3D generation fails to deliver. We present NeoWorld-3, a coding-agent framework that reconstructs interactive 3D worlds from visual observations via tunable, executable programs. At its core, NeoSDK provides the underlying computational engine for low-level geometries, part composition, differentiable parameter refinement, and physics validation. At the same time, NeoMCP exposes these capabilities as structured, tool-callable APIs for vision-language agents to visually inspect, edit code, and iteratively refine programs. Through a hierarchical coordinator-worker architecture, the framework scales seamlessly from standalone articulated objects to complex compositional scenes. Evaluations across object-level and scene-level reconstruction benchmarks demonstrate that NeoWorld-3 achieves state-of-the-art geometric fidelity and physical readiness. Crucially, manipulation trajectories planned within our reconstructed twins achieve successful zero-shot execution on a physical dual-arm robot, completing the Real-Sim-Real loop.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.27690v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.27690v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "NeoWorld-3把3D重建保留为source程序、共享参数与poses，agent改结构，tensor twin拟合参数，确定性harness按多视图和关节检查决定是否接纳。作者报告coding baselines上的object/scene指标改善；精读价值在可审计的编辑与数值refinement边界，RSI尚无adopted helper，机器人仅含布局专属示教的少量开发演示，不能扩大为自主恢复真实物理。",
+    "motivationZh": "NeoSDK把受支持的几何词汇执行为Blender native与Torch/nvdiffrast tensor twin，named constants共享部件尺寸/依赖。Scene coordinator分派object重建并保护未归属对象，agent以calibrated renders、SAM3 masks和depth diagnostics作结构编辑；refinement采用有界采样与Adam，baseline native/twin parity后仅选中候选在Blender物化，以silhouette/弱视角/mesh等规则接纳。关节声明可被geometry sweep反驳，unknown保持显式；visual URDF只检查kinematics转录，metric solid certification另属独立SDK路径。",
+    "methodZh": "multi-view RGB与camera evidence→scene coordinator建立source程序S、named参数θ与instance posesT → object specialists从分配视角改部件、材料、关节和程序，共享参数保留构造关系 → NeoMCP渲染/测量/part audit提供证据，agent修改结构，harness统一管理budget与候选接纳 → 受支持source在Torch tensor twin重放，经cross-entropy采样与Adam拟合参数，检查native/twin parity → 仅物化选中候选，按mean/weakest-view IoU及几何/scene约束接纳或保留baseline → 声明关节做离散sweep与export/playback检查；独立物理配置和robot calibration支持限定的simulation/机器人演示",
+    "methodFlow": [
+      "multi-view RGB与camera evidence→scene coordinator建立source程序S、named参数θ与instance posesT",
+      "object specialists从分配视角改部件、材料、关节和程序，共享参数保留构造关系",
+      "NeoMCP渲染/测量/part audit提供证据，agent修改结构，harness统一管理budget与候选接纳",
+      "受支持source在Torch tensor twin重放，经cross-entropy采样与Adam拟合参数，检查native/twin parity",
+      "仅物化选中候选，按mean/weakest-view IoU及几何/scene约束接纳或保留baseline",
+      "声明关节做离散sweep与export/playback检查；独立物理配置和robot calibration支持限定的simulation/机器人演示"
+    ],
+    "experimentsZh": "212个3DCodeBench对象、77个选定PartNet-Mobility对象、10个RoboCasa365场景；object用GPT-5.6 Terra、scene用GPT-6 Sol，各setting同LLM。RoboCasa16RGB views/known cameras、无sensor depth，MoGe-3 depth经per-view scale fit。Scene author64calls/10800s，子任务预算单独计。 作者报告object Exec100%、FramedIoU0.7550、CD0.0365；VIGA为99.52%、0.6547、0.0680。非Exec指标只统计成功执行assets。 (Table2/Sec.4.2, PDF pp.6–7) 作者报告77个关节对象AS-gIoU误差0.7792、AS-CD0.1297、AOR0.0000、joint type90.13%；这是选定测试集的离散几何评估。 (Table3, PDF p.7) 作者报告10scene DINOv3 0.8142、P-Pen0.67%、OCD25.9445cm；VIGA OCD41.6275cm，Complete4.5333高于Ours4.3667。 (Table4, PDF p.8) 作者报告8视角扫描后的bowl/cube IoU由0.814/0.706提高至0.861/0.858；1.4–2.2s为已分割且GPU准备后的每body拟合，采集扫描本身411s。 (App.B2/Table9, PDF pp.23–24) 作者报告bimanual演示3次约136/137/109s，成功由现场观察者判断；放碗与关门重放布局专属示教。 (App.B3, PDF p.26) object含Codex+BlenderMCP/VIGA/Articraft，scene含前两者，关节排除不支持articulation的VIGA；主SOTA范围是被测coding routes，未做广域foundation重建模型同预算比较。 Table5用direct GPT、Codex、NeoWorld+BlenderMCP与full system显示harness/tooling组合价值；同时替换多个SDK/验证组件，不能独立归因differentiability或repair。RSI未展示已采用helper收益，真实机器人不是大样本成功率评估。",
+    "insightZh": "具体系统价值在source作为唯一可编辑状态、共享参数的differentiable twin及确定性admission，使结构改写与数值拟合在同一表示里互补。不是任意Blender代码可微，也不是从外观恢复所有真实物理参数；RSI在App.A5只是有界开发机制，初始trial没有采用任何extension。",
+    "evidenceZh": "prototype由S、θ、T组成，结构编辑与参数refinement分离，shared参数联动部件。 (Sec.3.1–3.3/Fig.2, PDF pp.3–5) / tensor twin重放支持词汇，baseline parity为前提，候选接纳检查mean IoU至少+0.002及弱视角最多-0.02。 (App.A3.3–A3.4/C1, PDF pp.15,26) / joint sweep的admitted仅表示未被可测几何反驳；visual URDF不含collision/inertia/dynamics，不能证明真实mechanism。 (App.A4.2/Table7/Fig.6, PDF pp.16–17) / object/关节/scene评估优于被测coding baselines，但scene Completeness并非最佳。 (Tables2–5, PDF pp.7–8) / RSI初始开发试验没有adopted extension，机器人放碗与关门依赖当前布局录制的kinesthetic demonstrations。 (App.A5/B1/B3, PDF pp.20–21,26)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "程序作为状态、named共享参数、可微render fitting与工具级几何验证直接贴近可编辑3D设计agent；可借鉴到结构生成的想法不等于论文已验证LEGO连接、fabrication或Embroidery。",
+    "caveatZh": "外观不能确定隐藏质量、摩擦、质心和机械joint limits。 / 重建与recalibration的runtime限制高频replanning。 / unsupported tensor vocabulary与parity失败明确退出，任意Blender Python并不可微。 / joint几何sweep不能证明真实mechanism或continuous collision，未观测字段保持hypotheses。 / 主表与SDK宣称存在范围差别：watertight benchmark开关默认off，metric SafeAsset certification与visual URDF是不同路径。 / physics-in-loop使用1kg、friction0.5等配置；benchmark evaluator另用bounding-box质量，不能称真实动力学恢复。 / 真实机器人含人工board-axis确认、布局专属示教、局部wrist correction与contact控制，不能概括为通用自主zero-shot操控。 / RSI初始trial没有adopted helper，不能把有接口的self-improvement当已展示持续能力增长。 / 公开Studio与NeoSDK各仅3个文档文件，没有implementation source可复现；缺多seed误差条与总成本控制。",
+    "sourceNote": "Exact version 2610.27690v1 (29 pages), PDF SHA-256 22eb490c9c3ecf36df17b53e9bba3f78a235de01c6922f4520864f5070416a9a. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "neoworld-3-from-pixels-to-code-defined-physical-worlds-2610-27690",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "editing",
+      "tool-use"
+    ],
+    "content-scope": [
+      "object",
+      "scene"
+    ],
+    "representation": [
+      "discrete-program"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "program-synthesis"
+    ]
+  }
+}

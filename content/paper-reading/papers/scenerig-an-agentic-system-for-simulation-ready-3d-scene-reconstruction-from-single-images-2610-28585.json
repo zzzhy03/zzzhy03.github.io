@@ -1,0 +1,93 @@
+{
+  "id": "arxiv:2610.28585",
+  "title": "SceneRig: An Agentic System for Simulation-Ready 3D Scene Reconstruction from Single Images",
+  "authors": [
+    "Rundong Luo",
+    "Yunong Liu",
+    "Di Cao",
+    "Matthew Tancik",
+    "Shyamal Buch",
+    "Colton Stearns",
+    "Wenqi Xian"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28585"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.RO"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "SceneRig",
+    "simulation-ready scenes",
+    "physics feedback",
+    "edit-and-validate"
+  ],
+  "abstract": "Simulation is a powerful tool for robotics, but building diverse, simulation-ready scenes at scale remains difficult. Reconstructing scenes from single images is a promising alternative, but visual similarity alone is insufficient: objects must also be recovered, accurately placed, and physically grounded. Existing methods that rely on post-hoc physics settling often misplace objects, producing scenes that look correct but behave poorly under manipulation. We present SceneRig, an agentic system that turns a single image into an editable, simulation-ready scene. SceneRig combines geometric, visual, and physical tools to reconstruct a faithful 3D scene. An agent then performs edit-and-validate loops inside a physics simulator to achieve physical stability. Across diverse inputs, SceneRig improves instance segmentation, object-centric appearance, and 3D placement while keeping the reconstructed scenes physically stable. Furthermore, SceneRig is effective for downstream robotics: its scenes predict real-robot policy outcomes more accurately than the baseline method and more reliably support replay of recorded manipulations without trajectory adaptation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28585v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28585v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Red-Fairy/SceneRig"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "SceneRig把单图scene reconstruction拆成关系/metric初始化、分阶段scene edits和物理pose refinement：agent决定查哪个object及改哪类参数，bounded Move工具搜索幅度，simulation后才保留。作者报告80场景全过5秒稳定检查，25段robot replay成功20段；值得精读“可测量工具+rollback”，但robot证据使用额外depth/calibration，且每object仍为单rigid body。",
+    "motivationZh": "VLM提出物体/support graph，MolmoPoint+SAM3恢复mask，MoGe2给metric points与camera，SAM3D生成单object mesh。按support顺序在Isaac Sim settle后，geometry/material/light agents在同一Blender scene内分组编辑并以rule gates和visual verifier验收。最终agent反复Investigate paired crops与几何证据，选择xy/scale/yaw；Move以mask、depth、DINO评分做coarse-to-fine search，只有post-settling不劣且通过capsize/drift/penetration检查才提交，否则回滚。Edit允许直接code修改但仍simulation并由agent保留/undo；USD export另查inventory和dynamic readiness。",
+    "methodZh": "VLM构建object/root surface及support graph，MolmoPoint/SAM3修复实例masks → MoGe2估计metric geometry/camera（robot实验以真实depth/calibration替换），SAM3D恢复object meshes → 按support parent-before-child顺序物理settle与ICP，保留observed arrangement → geometry、material、lighting agents在persistent Blender scene分阶段修改，rule gate与visual verifier验收 → Investigate提供reference/render crops与测量；agent选object/aspect，Move搜索pose magnitude并simulation检查，失败恢复snapshot → 整scene重力settle后bake/export USD，分别记录reconstruction、conversion与dynamic readiness",
+    "methodFlow": [
+      "VLM构建object/root surface及support graph，MolmoPoint/SAM3修复实例masks",
+      "MoGe2估计metric geometry/camera（robot实验以真实depth/calibration替换），SAM3D恢复object meshes",
+      "按support parent-before-child顺序物理settle与ICP，保留observed arrangement",
+      "geometry、material、lighting agents在persistent Blender scene分阶段修改，rule gate与visual verifier验收",
+      "Investigate提供reference/render crops与测量；agent选object/aspect，Move搜索pose magnitude并simulation检查，失败恢复snapshot",
+      "整scene重力settle后bake/export USD，分别记录reconstruction、conversion与dynamic readiness"
+    ],
+    "experimentsZh": "80 tabletop scenes（44 simulator GT，18 real robot，6phone，8internet，4AI图）；主要VLM Claude Opus5，另shared GPT6 Astra对harness。机器人用两种fine-tuned policies各50 real episodes、5tasks×10；额外25 successful teleop demonstrations作open-loop replay。Robot重建额外输入metric depth与calibration，共享commands/physics settings。 作者报告80 scenes物理稳定率100%，SimFoundry98.8%；44GT scenes的ARI0.878、FG-IoU0.819、OSPA@5为2.4cm、F1@10为0.93（global scale aligned）。 (Tables1–2, PDF p.8) 作者报告pooled100 robot episodes的sim-real agreement为69%，SimFoundry54%，McNemar p0.017；task-level pooled r0.92/0.84仅描述10个policy-task rates。 (Sec.5.1, PDF p.9; Table10, PDF p.30) 作者报告25次replay成功20次（80%，95% Wilson61–91），SimFoundry9次（36%，20–55）；去bounded Move、保留Edit+physics降为11次（44%）。 (Table5, PDF p.9; App.C.5/Table11, PDF p.31) VIGA、REST3D、SceneConductor、SimFoundry及共享SAM3D raw-pose对照；renderer/camera recovery与工具访问不完全相同。Shared-backbone Codex基线禁止external models/assets，而SceneRig使用专用vision models，故不能归因为harness单因素。Robot只与SimFoundry比较，双方共用camera/depth、controllers与物理设置。 raw SAM3D、post-hoc settling、code-edits-only与完整placement比较支持bounded Move价值；整体初始化与refinement没有完全独立拆开。Same-model backbone替换改善appearance多于layout，说明强VLM不替代几何工具。",
+    "insightZh": "新意是把VLM的语义诊断与有边界的数值搜索、physics acceptance和精确undo组合为可审计harness，而不是让更强VLM猜坐标或仅做post-hoc settling。Persistent object identities、support propagation、阶段权限和缓存中保留fresh state对设计agent可直接借鉴。",
+    "evidenceZh": "agent选择object和edit aspect，工具决定数值幅度，并以post-settling alignment及物理检查决定保留/恢复。 (Sec.3.3, PDF p.6; App.B.4 Eqs.5–7/Fig.8, PDF pp.21–23) / rule gates只证明最小几何标准，completion/export/dynamic readiness分别记录。 (Sec.3.2, PDF p.5; App.B.4–B.5, PDF pp.21,25) / 作者报告改善object recovery、layout和5秒稳定性，并有真实robot outcome/replay对照。 (Tables1–6, PDF pp.8–10; Table10, PDF p.30) / 单物体表示不恢复joint/deformation，complex room仍困难。 (Discussion/Limitations, PDF p.10)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对Visual Design Agents直接提供对象身份、编辑权限、数值工具、simulation验收与rollback机制，适合结构化3D scene和assembly设计闭环；本文没做LEGO/Embroidery或manufacturing验证。",
+    "caveatZh": "复杂room场景受occlusion、depth ambiguity和frequent contacts限制（PDF p.10）。 / SAM3D缺少PBR materials，表示将每object当单rigid body，不恢复joints或deformation（PDF p.10）。 / 80/80稳定只指5秒displacement<50mm且最终velocity0，不证明所有接触/动作物理准确。 / robot应用使用RGB-D/标定，不能宣传为仅单张RGB的69%agreement或80%replay。 / 3D layout以global scale对齐；小物体crop metrics排除<200 visible pixels，不能推断绝对scale或全部细件都正确。 / policy级收益不同：LingBot agreement66%vs60%的差异p0.55，不能把pooled显著性扩到每policy。 / direct Edit和部分物理fallback允许改变collision/physical properties；这些近似需在其他设计/制造任务重新验证。",
+    "sourceNote": "Exact version 2610.28585v1 (37 pages), PDF SHA-256 1d3b35075a85b5f180d117a1ef50e023279ab7754cb4c270ef3bc43d350cad69. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: available. PDF App.A p.15打印repository URL；GitHub REST tree核实296 files，包含lib/agents、Isaac export、physics验证等实际源码。"
+  },
+  "slug": "scenerig-an-agentic-system-for-simulation-ready-3d-scene-reconstruction-from-single-images-2610-28585",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "editing"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ]
+  }
+}

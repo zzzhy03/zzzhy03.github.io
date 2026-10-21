@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2610.28631",
+  "title": "AEON: Unifying Video and 3D World Models",
+  "authors": [
+    "Weiqi Zhang",
+    "Wenyuan Zhang",
+    "Yu-Shen Liu",
+    "Junsheng Zhou"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28631"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "AEON",
+    "video latent",
+    "4D Gaussian Splatting",
+    "domain adapter"
+  ],
+  "abstract": "Current world models for explicit world simulation typically follow two distinct pathways: (1) video generative models (e.g., Sora), which simulate realistic appearances but fail to preserve 3D consistency; and (2) 3D generative models (e.g., Marble), which generate geometrically consistent scenes but often yield static, less realistic observations. We present AEON, a unified framework that bridges video-based and 3D-based world models and combines the benefits of both. The key insight of AEON lies in a generative model that operates within the text- or image-conditioned video latent space while producing renderable 4D graphics primitives---specifically, 4D Gaussian Splatting (4DGS)---as the explicit world representation. We train a 4D reconstruction model to predict both 4DGS and camera poses from monocular videos, serving as our initialized 4D decoder. Furthermore, we design a domain adapter that translates generative video latents into reconstructive 4D latents through a distillation process on the video VAE. AEON naturally supports video-based world modeling by rendering 4DGS at predicted camera trajectories, and constructs a persistent 4D environment with scene dynamics for realistic world simulation. Consequently, AEON empowers a diverse range of world modeling applications and achieves state-of-the-art performance on standard benchmarks. Project Page: https://weiqi-zhang.github.io/AEON",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28631v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28631v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://weiqi-zhang.github.io/AEON"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "AEON把Wan生成latent经ridge初始化的双路径adapter接到4D重建decoder，直接输出带velocity、duration的持久4DGS，避免逐帧点云。作者报告30场景生成与Dycheck/DaVis重建优于所比baseline；可编辑显式表示值得读，但时长受video窗口限制，大视角会暴露空洞，所谓simulation主要是可渲染状态重组，未验证交互物理。",
+    "motivationZh": "先以DINOv2/MapAnything初始化4DRM，从monocular video联合预测depth、camera、Gaussian appearance与temporal evolution，使用annotated depth/normal与rendering loss。再冻结teacher，以linear ridge/Conv3D加零门控Perceiver residual把video latent对齐到DINOv2第4层；student通过Gaussian attributes、dense geometry和feature蒸馏学习。最后以冻结VAE decode的伪目标作end-to-end rendering refinement。4D primitives用恒定linear/angular velocity和Gaussian time opacity描述生灭与运动。",
+    "methodZh": "annotated monocular clips训练DINOv2/MapAnything初始化的4DRM，depth/camera/appearance/evolution四heads输出4DGS → text/image输入冻结Wan DiT生成video latent，或用Wan VAE编码真实video → ridge初始化linear Conv3D分支与零gate Perceiver residual把video latent对齐到DINOv2第4层tokens → 冻结teacher 4DRM以attribute、geometry、feature losses蒸馏adapter及student decoder → 再用VAE-decoded RGB监督可微rendering，输出可按time/camera rasterize的持久4D Gaussian set",
+    "methodFlow": [
+      "annotated monocular clips训练DINOv2/MapAnything初始化的4DRM，depth/camera/appearance/evolution四heads输出4DGS",
+      "text/image输入冻结Wan DiT生成video latent，或用Wan VAE编码真实video",
+      "ridge初始化linear Conv3D分支与零gate Perceiver residual把video latent对齐到DINOv2第4层tokens",
+      "冻结teacher 4DRM以attribute、geometry、feature losses蒸馏adapter及student decoder",
+      "再用VAE-decoded RGB监督可微rendering，输出可按time/camera rasterize的持久4D Gaussian set"
+    ],
+    "experimentsZh": "30个image-text场景共享preset camera trajectories评估4D generation；Dycheck/DaVis比较video-to-4D重建；30个unseen in-the-wild videos测novel trajectory。16×H200训练，Stage1/2/3为20/30/10epochs；几何数据含PointOdyssey、TartanAir、DynamicReplica、OmniWorld-Game、SAIL-VOS3D、Spring，Stage2加Panda70M子集。 作者报告Wan2.2版在30场景上的I2V Subject0.913、Subject Consistency0.875、Motion Smoothness0.980、Aesthetic0.531；Lyra分别0.865/0.864/0.974/0.459。 (Table2, PDF p.9) 作者报告Dycheck PSNR14.487/LPIPS0.469，DaVis24.661/0.243；NeoVerse为14.269/0.501及23.929/0.283。 (Table3, PDF p.9) 作者报告去掉distill使DaVis PSNR从24.661降至16.718，单Conv3D projection为12.813；去Stage3为22.953。 (Table5, PDF p.9; Table7, PDF p.17) 生成对4DNex/Lyra；重建对L4GM、4DGT、MoVies、NeoVerse、StreamSplat，其中camera/depth输入要求不同；novel trajectories对TrajectoryCrafter/ReCamMaster/NeoVerse。未提供可比成本/多seed置信区间或闭环robot实际任务成功率。 双路径/单分支、duration、distillation、MapAnything prior、geometry loss和Stage3均有拆解；支持组合价值，生成/novel-view用VBench而非GT几何或物理interaction评价。",
+    "insightZh": "贡献在generative video latent到统一持久4DGS的桥接、双路径稳定初始化与多粒度蒸馏，区别于camera-conditioned per-frame point clouds/3DGS。4DGS或video prior本身均非新创；编辑/robotics simulation能力主要来自显式primitive可分解重组。",
+    "evidenceZh": "四task heads联合输出depth、camera、Gaussian appearance与evolution，Gaussian具time、lifespan和linear/angular velocity。 (Sec.3.1–3.2, Fig.2, PDF pp.4–5; App.C, PDF p.16) / video latent通过ridge初始化linear branch与零gate Perceiver residual注入第4层，随后teacher蒸馏和rendering refinement。 (Sec.3.3–3.4, PDF pp.6–8; App.A, PDF p.15) / 作者报告生成和动态重建指标提升。 (Tables2–3, PDF p.9) / 生成时间窗口有限，未观察区域会造成大视角空洞。 (Limitations and future work, PDF p.10)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接生成可按camera/time重放与分解的4DGS，是video prior到显式3D资产的具体路线；对editable object/scene方法有机制价值，LEGO/Embroidery未实测。",
+    "caveatZh": "时间长度受video diffusion sequence window限制；render-generate-fuse延长仍为未来方向（PDF p.10）。 / 生成video从未见过的区域不能恢复，大视角变化暴露holes（PDF p.10）。 / 每primitive恒定velocity与lifespan表示不等于可因action改变的动力学，simulation/robotics描述缺少定量contact或闭环控制实验。 / VBench appearance/consistency及PSNR/LPIPS不能保证完整geometry、碰撞或manufacturability。 / 30场景生成评估较小；没有证明真正无限时长或任意视角无空洞。",
+    "sourceNote": "Exact version 2610.28631v1 (19 pages), PDF SHA-256 5d54eb4bb70b62c294a657eef1f45056d0eca4de706e63173de377674f7ab303. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: available. PDF pp.1–2打印官方project URL；该页Code实际指向https://github.com/weiqi-zhang/AEON，GitHub REST tree核实87个文件，包含aeon4d推理/模型与renderer源码。code.url保留PDF中可验证的官方入口。"
+  },
+  "slug": "aeon-unifying-video-and-3d-world-models-2610-28631",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "environment-world"
+    ],
+    "representation": [
+      "3d-gaussian"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "hybrid-method"
+    ]
+  }
+}

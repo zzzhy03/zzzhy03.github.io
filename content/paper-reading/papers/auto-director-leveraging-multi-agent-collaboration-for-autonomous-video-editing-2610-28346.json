@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2610.28346",
+  "title": "Auto-Director: Leveraging Multi-Agent Collaboration for Autonomous Video Editing",
+  "authors": [
+    "Yuxia Chen",
+    "Wenbo Zhu",
+    "Yangguang Ji",
+    "Zhenxiang Jiang",
+    "Teng Zhong",
+    "Yu Zhang"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28346"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "Auto-Director",
+    "scene-level feedback",
+    "video editing",
+    "local repair"
+  ],
+  "abstract": "Autonomous video editing from open-world resources remains a challenging problem in multimedia content creation. Retrieval-based methods are constrained by fixed source material and lack creative flexibility, while generative models struggle with long-horizon coherence and often diverge from user intent. Both paradigms fail to replicate the structured, multi-stage reasoning that underlies professional post-production. To address these limitations, we present Auto-Director, a tool-augmented multi-agent framework that mirrors professional editorial workflows: a Planning Agent decomposes abstract topics into fact-grounded scripts via retrieval-augmented planning; a Material Agent indexes open-world footage through shot segmentation and visual tagging; an Editor Agent assembles semantically aligned clips with MLLM-driven spatial adaptation; and a Critic Agent governs an iterative Reflect-and-Revise loop that checks scene-level alignment and pacing. To rigorously evaluate this new paradigm, we introduce VEdit-Bench, a benchmark of 100 expert-curated topics with human-annotated Golden Scripts and a five-dimensional metric suite covering Narrative Logic, Factual Accuracy, Semantic Alignment, Compositional Quality, and Stylistic Cohesion. Extensive experiments demonstrate that Auto-Director significantly outperforms baseline methods in both automated metrics and human evaluation, effectively bridging the gap between amateurs and professional-grade video production.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28346v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28346v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "Auto-Director把素材检索、叙事和画幅适配接到场景级Critic：错误按retrieval/script/layout/timing分流，已通过片段冻结。作者在100题VEdit-Bench报告overall 4.19/5，高于VideoAgent 3.46；值得借鉴局部修复协议，但自建MLLM评分、未公开实现和缺少成本对照限制了结论。",
+    "motivationZh": "系统先检索事实并输出带narration、visual query和时长的JSON script；素材按shot切分，将ID/时间叠到keyframe后生成文本索引。Editor以embedding top-5检索、MLLM rerank选素材，预测ROI并Kalman平滑，必要时split-screen。Critic按语义/美学阈值路由四类局部修复，最多三轮。主要贡献是可解释的编辑工作流，不是新生成模型。",
+    "methodZh": "Google Search/Wikipedia取事实并生成scene JSON（narration/query/duration） → PySceneDetect切shot，1 FPS keyframes叠加shot ID与timestamp后生成caption索引 → Qwen3-Embedding top-5召回，MLLM按语义/氛围/时长0.5/0.3/0.2重排 → MLLM预测ROI，Kalman稳定crop；多主体时采用split-screen或picture-in-picture → Critic分别核查语义/事实和构图/节奏，路由retrieval/script/layout/timing修正 → 冻结双评分均≥4的scene，三轮预算后输出剪辑",
+    "methodFlow": [
+      "Google Search/Wikipedia取事实并生成scene JSON（narration/query/duration）",
+      "PySceneDetect切shot，1 FPS keyframes叠加shot ID与timestamp后生成caption索引",
+      "Qwen3-Embedding top-5召回，MLLM按语义/氛围/时长0.5/0.3/0.2重排",
+      "MLLM预测ROI，Kalman稳定crop；多主体时采用split-screen或picture-in-picture",
+      "Critic分别核查语义/事实和构图/节奏，路由retrieval/script/layout/timing修正",
+      "冻结双评分均≥4的scene，三轮预算后输出剪辑"
+    ],
+    "experimentsZh": "100个educational/documentary主题，40/40/20难度；local素材平均只覆盖gold milestones的58%。所有agent为Gemini3.1 Pro，最多10 scenes、3 Critic cycles；比较生成模型分scene拼接、直接MLLM和三种agent editor。另随机20视频由5人按5维打分。 作者报告NL/FA/SA/CQ/SC为4.21/4.34/4.23/4.02/4.13，overall4.19；VideoAgent overall3.46、人工4.62。 (Table1, PDF p.9) 作者报告MLLM与人工评分overall Pearson r=0.73、Spearmanρ=0.70、MAE0.32，样本20视频×5维。 (Table3/Sec.5.5, PDF p.12) 含Seedance2.0/Kling3/Veo3.1/Sora2逐scene生成后拼接、GPT5.4/Gemini3.1 Pro直接编辑、MoneyPrinterTurbo/AutoClip/VideoAgent；human使用同素材但不限制时间。未做同API成本或时延预算匹配，judge具体model与prompt细节不足。 仅移除fact retrieval、visual tagging、Critic；分别支持FA、SA及整体质量，但未拆分ROI稳定/multi-window/rerank，也未提供重复运行方差。",
+    "insightZh": "新意主要是将事实检索、shot视觉标记、可路由局部反馈统一到自主编辑任务；各组件已有先例。支持研究agent如何操作/核验artifact，但不应称为新的video foundation model或已达到professional parity。",
+    "evidenceZh": "Critic对每个scene给语义/美学1–5分，四类失败各路由一种动作，已通过scene冻结。 (Sec.3.4, Eq.4, PDF pp.6–7) / shot ID和timestamp被叠到keyframes后caption，检索从跨模态变为文本召回加多模态重排。 (Sec.3.2–3.3, PDF pp.5–6) / 作者报告100题整体4.19，对比VideoAgent3.46；人工参考4.62。 (Table1, PDF p.9) / 作者报告去fact retrieval令FA从4.34降到3.21，去Critic使五维都下降。 (Table2/Sec.5.4, PDF pp.10,12)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可借鉴scene级寻址、分型修正与冻结通过结果的design-agent协议；未验证LEGO、Embroidery、CAD或结构2D生成。",
+    "caveatZh": "作者指出人工editor各维仍领先，差距最大在Compositional Quality（PDF p.11）。 / 文中强调Fig.2是selected qualitative examples，不能当作总体数量结论（PDF p.12）。 / 没有单独limitations section；未报告完整运行成本、延迟、seed variance或error bars。 / MLLM judge与agent可能共享偏好，20视频的相关性验证不足以覆盖所有事实错误。 / externally corroborated facts与sampled keyframe检查不能保证真实历史归因或所有视频帧正确。 / 未发现作者自己的code/project URL；正文引用的GitHub多为baseline，不能作为该方法公开实现。",
+    "sourceNote": "Exact version 2610.28346v1 (16 pages), PDF SHA-256 24548fff5bbb1362efcc6c90ae46f733b70a1aaabfcb2a83f7068f5c442833a7. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "auto-director-leveraging-multi-agent-collaboration-for-autonomous-video-editing-2610-28346",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "facets": {
+    "task": [
+      "editing",
+      "tool-use"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ]
+  }
+}

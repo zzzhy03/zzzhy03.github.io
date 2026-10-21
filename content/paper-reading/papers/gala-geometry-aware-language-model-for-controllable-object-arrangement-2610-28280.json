@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2610.28280",
+  "title": "GALA: Geometry-Aware Language Model for Controllable Object Arrangement",
+  "authors": [
+    "Chucheng Xiang",
+    "Runze Wang",
+    "Zhi Deng",
+    "Ruchao Bao",
+    "Yuanwei Zhang",
+    "Yuxuan Xie",
+    "Hanliu Wang",
+    "Liangzhen Fei",
+    "Wenzheng Wu",
+    "Cheng Wan",
+    "Peifeng Li",
+    "Zhongyuan Liu",
+    "Ligang Liu"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28280"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "GALA",
+    "geometry-aware placement",
+    "point tokens",
+    "object arrangement"
+  ],
+  "abstract": "Reasoning about fine-grained placement constraints, such as support and containment, is essential for realistic 3D scene creation. It remains a significant challenge for existing methods that rely on simplified object representations like oriented bounding box (OBB), which are blind to the detailed geometry. To address this limitation, we introduce GALA, a geometry-aware language model with explicit point cloud perception for controllable object placement. Our model performs autoregressively by predicting the 6D pose of one target object at a time conditioned on the scene context and placement instruction. We utilize a two-stage training strategy: the first stage aligns geometric and textual modalities through pretraining tasks, and the second stage fine-tunes the model for placement. To facilitate this task, we also curate a multi-source scene dataset covering diverse room types and fine-grained furniture arrangements, which will be open-sourced for community benefit. Experiments on our benchmark show our model significantly outperforms baselines without explicit geometric reasoning. We further develop a multi-stage plan-place-verify agent pipeline that uses the model for text-driven scene generation. Project Page: https://xccelephant.github.io/paper/gala/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28280v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28280v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "GALA把每个asset的point tokens与文字context交错输入0.7B语言模型，逐物体输出6D pose。作者报告containment有效率65.62%，但同训练text-only也有62.40%，整体instruction validity甚至略高；真正值得读的是局部几何、数据与验证协议，不能把对zero-shot baseline的大差距全归因于点云。",
+    "motivationZh": "方法用冻结Utonia编码floor和每个asset，MLP projector对齐到Qwen3-0.6B；先做几何QA对齐，再以ground-truth前序pose作teacher-forced placement训练，推理时回写预测pose。285K placement instructions来自3D-FRONT、Imaginarium、SpatialLM-PCG和300个artist scenes。另接planner、instruction generator和几何verifier形成scene assembly系统。它生成布置而非新mesh，关系词表受限，物理有效率由近似点云/OBB谓词定义。",
+    "methodZh": "多源scene经physics/geometric与VLM过滤，OBB关系构成floor-rooted dependency tree并BFS排序 → 冻结Utonia分别编码floor、已有objects与target canonical point cloud，MLP生成geometry tokens → 交错输入object ID/category/size/pose文字与对应geometry tokens → Stage1仅训projector做几何QA，Stage2联合调projector/LLM输出固定格式6D pose → 推理回写新pose；超过8个参考时优先保留依赖、large anchors和recent context → 可选plan-place-verify agent按固定关系词表逐物体放置并反馈几何失败",
+    "methodFlow": [
+      "多源scene经physics/geometric与VLM过滤，OBB关系构成floor-rooted dependency tree并BFS排序",
+      "冻结Utonia分别编码floor、已有objects与target canonical point cloud，MLP生成geometry tokens",
+      "交错输入object ID/category/size/pose文字与对应geometry tokens",
+      "Stage1仅训projector做几何QA，Stage2联合调projector/LLM输出固定格式6D pose",
+      "推理回写新pose；超过8个参考时优先保留依赖、large anchors和recent context",
+      "可选plan-place-verify agent按固定关系词表逐物体放置并反馈几何失败"
+    ],
+    "experimentsZh": "285K instructions，多源scene按18:1:1分train/val/test，scene级held-out；0.7B Qwen3-0.6B+Utonia，8H20约7h。主表是固定scene插入单target；whole-scene比较使用给定object set与GT per-step instructions，另有text-to-scene gallery。主user study30人，point-cloud ablation另24人评23结果。 作者报告Within65.62%、Instruction78.59%、Floating4.63%、Support96.03%；GPT-OSS120B为22.53%/42.29%/7.64%/93.54%。 (Table1, PDF p.7) 作者报告point-cloud vs text-only的within height error0.0747m/0.0868m，约14%降低；Instruction有效率78.59%/78.81%。 (Table3, PDF p.8; Table8/App.J, PDF p.16) 作者报告128个unseen container样本Within59.38%、Floating31.25%、Support68.34%，seen对照61.72%/16.41%/84.21%。 (Table9, PDF p.17) 作者报告GALA单object约1s/3GB/H20，但上游planner约100s/scene、instruction generator约70s/object。 (App.L/Table10, PDF p.17) 含ATISS/ReSpace仅category物理参考、给oracle结构关系的LayoutVLM单物体优化、zero-shot GPT-OSS120B/DeepSeek/Qwen，以及PlaceIt3D pose适配。Nano-Banana+SAM+FoundationPose仅100case并从四views取最佳。很多外部baseline无相同训练数据或任务适配，不能将差距全归因于geometry branch。 同训练去point cloud、去Stage1、去高质量scene；point input提升containment和height，但overall instruction略降。高质量subset的收益集中在同来源held-out，asset级OOD只覆盖8个known-category实例。",
+    "insightZh": "贡献在于将实例级几何感知和语言pose预测结合，并配套高质量fine-grained arrangement数据。并非发明新的point encoder；其对几何的净收益需看训练匹配消融，不能用与未经任务训练的巨大LLM差距代替。",
+    "evidenceZh": "每个实例独立point encoding后与语义/pose tokens交错，LLM直接预测target numeric pose。 (Sec.3.1/Fig.2, PDF pp.3–5) / 数据关系与tree来自OBB谓词，实际collision evaluator使用2cm体素且仅overlap比>20%记collision。 (Fig.3/Sec.3.2, PDF pp.4–5; App.B/E/Table4/Eq.6, PDF pp.12,14) / 作者报告Within/Instruction valid65.62%/78.59%；text-only ablation为62.40%/78.81%。 (Tables1,3, PDF pp.7–8) / 作者报告unseen container floating31.25%，seen16.41%，仅8个未见asset/128样本。 (App.K/Table9, PDF p.17)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中3D scene composition与geometry-aware agent placement；可借鉴asset级编码、依赖排序与可审计的几何验证，对LEGO装配仅是可能机制迁移，未做积木实验。",
+    "caveatZh": "固定placement关系词表，不支持任意open-ended请求；unseen container退化，autoregressive误差累积（Limitations, PDF p.9）。 / noisy real scans、更多interactive editing、shape/part supervision及显式几何reasoning留待后续（PDF p.9）。 / unseen资产分析仅8个实例、128样本，非unseen类别泛化（PDF p.17）。 / within/on标签仍基于OBB与阈值，collision允许20%体素重叠；较高valid rate不是严格无碰撞或真实物理稳定保证。 / GT-context单物体评测和给定object/instruction的whole-scene比较不能证明自由prompt端到端可靠。 / text-only受相同数据训练后已很强；point-cloud贡献远小于对zero-shot baseline的表面差距。 / 1秒是placement模块，不能用作完整agent latency。 / 官网当前仅声明paper/code待公开链接，未提供源码，Code记promised。",
+    "sourceNote": "Exact version 2610.28280v1 (19 pages), PDF SHA-256 18a72082ae471dccc266db70f0c34df1ad84019e75268a2c49ab2853b67f42fd. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: promised. "
+  },
+  "slug": "gala-geometry-aware-language-model-for-controllable-object-arrangement-2610-28280",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "facets": {
+    "task": [
+      "composition"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "autoregressive",
+      "llm-vlm-guided"
+    ]
+  }
+}

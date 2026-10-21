@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2610.25649",
+  "title": "InteractAgent: Agentic Human Motion Interaction with Memory-Augmented Reflection",
+  "authors": [
+    "Senhe Zhang",
+    "Tao Zhang",
+    "Yujia Zhang",
+    "Zeyu Zhang",
+    "Dong Gong"
+  ],
+  "publishedAt": "2026-10-19",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v2",
+  "identifiers": {
+    "arxiv": "2610.25649"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "InteractAgent",
+    "local recovery",
+    "memory reflection",
+    "human-scene motion"
+  ],
+  "abstract": "Long-horizon human-scene interaction requires coordinated spatial reasoning, physical feasibility, and the ability to recover from compounding execution errors. Text-driven motion models are largely scene-agnostic and lack closed-loop correction, while geometry-conditioned approaches depend on paired scene-motion training or explicit 3D preprocessing that limits generalization to novel layouts and open-vocabulary goals. We present InteractAgent, an agentic multimodal LLM system for long-horizon human-scene interaction that plans, executes, observes, and reflects in a closed loop, using a single MLLM as both planner and evaluator and a frozen MotionLLM as the executor. InteractAgent integrates Online Observation for step-wise recovery decisions (continue/redo/replan) and Memory-Augmented Reflection for multi-round plan refinement with adaptive stopping. On UniHSI, InteractAgent improves task success and reduces penetration compared with training-free baselines. Code: https://github.com/AIGeeksGroup/InteractAgent.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.25649v2",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.25649v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AIGeeksGroup/InteractAgent"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "InteractAgent用同一MLLM规划并评价frozen MotionLLM的SMPL-X轨迹，将逐步continue/redo/replan与跨轮memory reflection结合。作者报告高复杂任务成功率由naive 4.4%提高至64.4%，但几何穿透仍劣于监督UniHSI-CoCo；值得略读双层恢复策略，不能把视觉Pass当物理可行保证。",
+    "motivationZh": "场景RGB或multi-view render与任务先转为自然语言动作序列，固定Motion-Agent执行器生成3D动作；每步render反馈决定保留、重做或改写后续计划，至多2次local retry。全轨迹再执行并累积各次plan/render，最多5轮反思，MLLM判Pass提前停止。实验用UniHSI语言任务与TRUMANS场景，GPT-4o planner和Gemma-2B/VQ-VAE/SMPL-X executor均不训练，贡献是组织视觉反馈与恢复的harness。",
+    "methodZh": "scene RGB/multi-view render和语言任务→同一MLLM解析objects、距离和affordances → MLLM生成atomic natural-language action list，frozen MotionLLM解码SMPL-X motion → 每步render并由MLLM判断continue/redo/replan，最多2次local retries后保留最后尝试 → 重执行修正后的完整动作列表，将plan和trajectory visualization存入跨轮memory → 同一MLLM读取过往成功/失败证据改写新plan，Pass或5轮预算耗尽停止",
+    "methodFlow": [
+      "scene RGB/multi-view render和语言任务→同一MLLM解析objects、距离和affordances",
+      "MLLM生成atomic natural-language action list，frozen MotionLLM解码SMPL-X motion",
+      "每步render并由MLLM判断continue/redo/replan，最多2次local retries后保留最后尝试",
+      "重执行修正后的完整动作列表，将plan和trajectory visualization存入跨轮memory",
+      "同一MLLM读取过往成功/失败证据改写新plan，Pass或5轮预算耗尽停止"
+    ],
+    "experimentsZh": "UniHSI长程语言任务与TRUMANS场景；SMPL-X、30FPS，GPT-4o API，Motion-Agent默认executor，单A6000。评估低/中/高复杂度success与逐帧SDF穿透的max/top10%统计。论文没有清楚列出各split任务数、重复种子与置信区间。 作者报告InteractAgent低/中/高复杂度success 84.3/79.5/64.4%，naive为25.5/18.2/4.4%，online-only为74.4/52.3/31.1%。 (Table1, PDF p.7) 作者报告完整方法pemax/pe10%为48.6/29.7，优于naive528.4/113.6，但监督UniHSI-CoCo为18.2/9.3；不能声称物理误差全局最优。 (Table1, PDF p.7) 作者报告GPT-4o/Qwen-VL-Max planner SR为64/56%，PC为81/75%；换MG-MotionLLM可将pemax从48.6降至23.3。 (Tables2–3, PDF p.8) Table1含naive、online、Ref+Offline及监督UniHSI-CoCo；Table2/3替换planner和executor。未给同调用预算的greedy/beam/multi-sample量化结果或完整runtime表，难排除更多尝试的收益。 局部反馈和跨轮反思对比显示互补性，backbone/executor影响明显；adaptive stopping的最优性、memory压缩、viewpoint鲁棒性未系统分离。",
+    "insightZh": "具体价值是局部动作恢复与跨次全轨迹反思的双时间尺度反馈；未提出新的motion architecture、memory storage或task-specific权重学习。物理判断仍依赖MLLM观察，不能等同hard constraint solver。",
+    "evidenceZh": "同一GPT-4o承担planner/evaluator等角色，Motion-Agent的Gemma-2B/VQ-VAE executor冻结。 (Sec.3–3.2, PDF p.3) / Online Observation每步做continue/redo/replan，达到retry上限后接受最后尝试，最后再执行整个动作列表。 (Sec.3.3/Algorithm1, PDF pp.4–5) / Reflection保存所有跨轮planning–execution pairs，Pass判定仅是视觉判断，不能保证几何正确。 (Sec.3.4/Algorithm2, PDF pp.5–6) / 完整方法较training-free variants成功率更高，但监督CoCo的穿透误差更低。 (Table1/Sec.4.3, PDF p.7)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接生成并反复修改3D motion artifact，可参考其局部redo/全局replan与跨次失败记忆的组织方式；LEGO/Embroidery及可制造约束未验证。",
+    "caveatZh": "MLLM规划与visual evaluation会漏掉被遮挡或采样间隙的collision/contact错误。 / frozen motion executor限制动作保真度；可读plan不证明模型内部推理可解释。 / 多轮调用、motion generation和rendering增加成本，Nmax=5/Rmax=2不是最优预算证明。 / 任务数与随机性统计不充分，缺少同预算搜索/重复采样对照。 / 几何penetration指标有3D scene/SDF支持，不能把整个实验描述成无需3D几何。 / 逐步优化动作后重新执行完整计划，stochastic executor可能改变先前被验证结果，缺少最终hard validation保证。",
+    "sourceNote": "Exact version 2610.25649v2 (14 pages), PDF SHA-256 dc1b7952f9f400e97f118f7ec4c4ed18c1051c07d97ee5356e30c83130bf0e33. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: available. PDF p1打印repo URL，已实际检查有main.py、scene_motion_planner.py、reflection/planner与Motion-Agent Python源码。未执行或复现；README说明practical implementation以Qwen-VL为主，不能视为已复现GPT-4o论文设置。"
+  },
+  "slug": "interactagent-agentic-human-motion-interaction-with-memory-augmented-reflection-2610-25649",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "tool-use"
+    ],
+    "content-scope": [
+      "human-avatar"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ]
+  }
+}

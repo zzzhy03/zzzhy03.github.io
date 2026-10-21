@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2610.28257",
+  "title": "SplatFlux: Feed-Forward 4D Gaussian Reconstruction and Generation from Video Latents",
+  "authors": [
+    "Runmin Zhang",
+    "Binglin Ren",
+    "Zhu Yu",
+    "Fudong Wang",
+    "Jiangke Lin",
+    "Yichun Shentu",
+    "Si-Yuan Cao",
+    "Yi Yuan",
+    "Hui-Liang Shen"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28257"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "SplatFlux",
+    "static-dynamic decomposition",
+    "4DGS",
+    "latent decoding"
+  ],
+  "abstract": "This work presents SplatFlux, a feed-forward latent-to-4DGS framework for both video-based 4D reconstruction and conditional 4D generation. Our key observation is that observed videos and conditionally generated content can be represented in the same pretrained video latent space, allowing both tasks to be formulated as latent-to-4DGS decoding. To construct compact and temporally coherent 4D scenes, SplatFlux introduces a static-dynamic decoupled 4D Gaussian representation that explicitly predicts dynamic probabilities for Gaussian primitives. This representation separates static scene structures from moving regions, enabling complete 4D scene construction in a feed-forward manner through static aggregation and dynamic motion interpolation. To learn static-dynamic decomposition and dynamic Gaussian motion without costly annotations, we further develop an auxiliary distillation strategy that provides pseudo dynamic masks and optical-flow cues. Extensive experiments across 3D and 4D reconstruction and generation demonstrate that SplatFlux achieves state-of-the-art performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28257v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28257v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "SplatFlux在共同Wan latent空间把真实或生成内容解码成静态聚合+局部双向速度的4DGS，换时间无需再跑网络。作者报告NVIDIA动态NVS PSNR21.56；值得读的是显式动静分解与pseudo mask/flow监督，但生成优势主要由VBench感知指标支持，未证明完整物理世界或任意视点几何都正确。",
+    "motivationZh": "Observed frames独立经冻结Wan VAE编码；生成端以LoRA fine-tuned Wan2.1-14B产生同类per-frame latent。共享decoder由DA3-Giant初始化attention/geometry heads，预测depth/ray、Gaussian appearance、dynamic probability和双向velocity。静态Gaussians经voxelization合并，动态primitives按相邻timestamp线性传播；Qwen2.5-VL+Sa2VA生成dynamic mask，UFM生成flow辅助监督。支持reconstruction和conditional 4D生成，但offline、局部线性运动以及视频模型先验共同限定其能力。",
+    "methodZh": "真实video逐frame经冻结Wan VAE编码；text/image条件经LoRA Wan2.1-14B生成per-frame latents → latent projector与DA3初始化alternating attention融合时空特征 → geometry/appearance/motion三heads预测depth、ray map、Gaussian参数、dynamic probability与双向velocity → 按dynamic probability阈值分离静态/动态；静态通过differentiable voxelization聚合 → 相邻动态Gaussians用forward/backward velocity线性传播到target time，与静态集合共同rasterize → 训练联合geometry/render损失、Qwen+Sa2VA伪mask和UFM伪flow约束",
+    "methodFlow": [
+      "真实video逐frame经冻结Wan VAE编码；text/image条件经LoRA Wan2.1-14B生成per-frame latents",
+      "latent projector与DA3初始化alternating attention融合时空特征",
+      "geometry/appearance/motion三heads预测depth、ray map、Gaussian参数、dynamic probability与双向velocity",
+      "按dynamic probability阈值分离静态/动态；静态通过differentiable voxelization聚合",
+      "相邻动态Gaussians用forward/backward velocity线性传播到target time，与静态集合共同rasterize",
+      "训练联合geometry/render损失、Qwen+Sa2VA伪mask和UFM伪flow约束"
+    ],
+    "experimentsZh": "4DGS decoder训练17个公开数据集，100K无aggregation+50K有aggregation；DiT只用四个数据集LoRA20K iterations，总pipeline约32 H20×10天。训练2–12 source frames并插值target frame。NVS评NVIDIA/DyCheck/DAVIS；generation用SceneBench、PenguinVideoBenchmark及355个VBench-I2V样本。 作者报告NVIDIA/DyCheck/DAVIS PSNR或mPSNR为21.56/14.68/20.84，NVIDIA LPIPS0.1918。 (Table1, PDF p.6) 作者报告SceneBench Imaging69.18、Aesthetic58.08、CLIP31.35；text-to-4D Dynamic degree74.49、Imaging70.92。 (Tables2–3, PDF p.7) 作者报告I2-4D subject consistency95.95低于Aether97.97，dynamic degree49.86高于Aether19.72。 (Table4, PDF p.8) NVS比4DGT/MoVieS（需pose）和NeoVerse；T2-3D比Prometheus/SplatFlow/VIST3A，T2-4D比Mochi/Hunyuan与SteerX，I2-4D比CogVideoX/SteerX/Aether。生成backbones与训练data未同预算匹配，VBench外观/运动分数不直接量化3D几何、物理或editable asset质量。 去动静分解、pseudo dynamic mask、pseudo optical flow均明显降低NVIDIA NVS指标；未提供生成端同backbone消融、系统wall-clock/memory/primitive-count对照或所有benchmark方差。",
+    "insightZh": "主要贡献是显式dynamic-probability的完整Gaussian集合及共享latent-to-4DGS接口，让目标时间渲染不必重复网络预测。相关工作已存在latent-to-3D和局部运动插值，本文组合价值应由动静分解/辅助监督消融衡量，不是首次把video prior用于3D。",
+    "evidenceZh": "dynamic probability分静态/动态，静态voxelize合并，动态按相邻帧双向velocity插值。 (Sec.3.2/Eqs.2–4, PDF pp.4–5) / Qwen2.5-VL识别动态object并由Sa2VA分割，UFM flow约束投影后的Gaussian运动。 (Sec.3.4/Eqs.6–10, PDF pp.6–7) / 作者报告去动静分解PSNR13.94，去mask18.41，去flow18.62，完整21.56。 (Table5/Sec.4.3, PDF p.9) / image-to-4D的motion/quality领先但subject/background consistency低于Aether。 (Table4, PDF p.8)",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进可渲染的dynamic 3D content生成，动静分离与pseudo motion监督可为structured asset/world表示研究提供机制参考；不涉及LEGO、Embroidery或制造。",
+    "caveatZh": "Appendix E指出只支持offline reconstruction/generation，streaming latent decoding留待未来（PDF p.20）。 / 局部线性velocity插值不等于长程身份一致、接触物理或运动因果正确。 / 源视角不完整及video先验幻觉可能产生未观测几何；文中感知生成分数不能消除该风险。 / 所谓compact表示没有独立primitive/storage/latency表支持，不能宣称具体压缩或推理倍速。 / DA3初始化、Wan14B、17数据集及多个伪标签专家均是系统成本，非轻量从零训练。 / 官网当前仅有citation壳页，无code或release promise可核实；Code记not-found。",
+    "sourceNote": "Exact version 2610.28257v1 (20 pages), PDF SHA-256 5531f2ce86c4d0f33af817867f68674f6f7b74342c26257d016860f17ef3a76a. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: not-found. "
+  },
+  "slug": "splatflux-feed-forward-4d-gaussian-reconstruction-and-generation-from-video-latents-2610-28257",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "3d-gaussian"
+    ],
+    "method": [
+      "feed-forward",
+      "hybrid-method"
+    ]
+  }
+}

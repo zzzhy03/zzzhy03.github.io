@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2610.28630",
+  "title": "SolarRenderer: Few-Step Generative Reference Rendering",
+  "authors": [
+    "Guian Fang",
+    "Shengju Qian",
+    "Dongyue Lu",
+    "Junchao Huang",
+    "Lutao Jiang",
+    "Xin Wang",
+    "Yiren Song",
+    "Li Jiang",
+    "Mike Zheng Shou"
+  ],
+  "publishedAt": "2026-10-20",
+  "updatedAt": "2026-10-20",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.28630"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "SolarRenderer",
+    "structural control",
+    "reference rendering",
+    "few-step distillation"
+  ],
+  "abstract": "Game engines and coding agents can specify the layout, motion, and camera of a scene, yet turning such coarse structure into realistic video requires a renderer that follows the structure and completes the appearance it leaves open. Existing renderers are tied to the representation of one engine, need tens of denoising steps or a costly distillation of their own, and learn from conditions that are not aligned with their target videos. We present SolarRenderer, a structure-conditioned video renderer that adapts a frozen MiniMax-H3 33B backbone with two lightweight LoRAs. Structural videos enter the native reference pathway of the backbone at the positions of the frames they describe, without a type identifier and described only in plain text, so that a single control LoRA follows arbitrary structural representations. Starting from a pretrained four-step LoRA, structure-guided distribution matching renders in four steps, 12.3 times faster than 50-step sampling, while preserving the learned control. A block-causal variant extends the same design to streaming and renders 768p video in real time. To train the model, we build a frame-aligned corpus of 136K clips from game engines, simulators, and YouTube videos. Experiments on an in-distribution test set and a generalization benchmark of 16 structural representations show that SolarRenderer achieves state-of-the-art results across both, and generalizes to 11 unseen representations, including pose skeletons, drawings, and point clouds.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.28630v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.28630v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Enderfga/SolarRenderer"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "ideaZh": "SolarRenderer复用冻结MiniMax-H3的reference pathway，让结构与target token共享frame RoPE，先训control LoRA再以structure-guided DMD适配四步LoRA。作者报告可泛化至11种未见结构，但四步主模型158帧仍约209秒；实时仅属另训causal variant，且appearance/drift更差。最有用的迁移是从既定3D结构渲染外观，不能把输出视频当成新的几何证据。",
+    "motivationZh": "系统接受结构视频、可选first frame与描述，按每种结构固定说明其约束/应忽略的属性，无type embedding。reference/target共享时空位置而保持noise-level区别。Stage1只更新rank384 control LoRA；Stage2冻结control，使用DMAD初始化的rank384 acceleration LoRA，并沿有/无结构teacher预测差异作1.5倍指导，修复通用四步adapter与control的失配。136K多来源clip中，仅时空对齐的来源提供structure监督，其余作为appearance资料。",
+    "methodZh": "3D engine、drawings、point clouds等结构转成与target同time/camera的reference video，附fixed definition/retention文本 → 冻结33B Ref2VA backbone，reference tokens共享target frame的RoPE coordinates，经native full-attention pathway读取 → Stage1训练control LoRA以flow matching学习结构约束下的appearance completion → Stage2冻结control，以DMAD四步LoRA初始化acceleration模块，structure-guided DMD对齐teacher的结构差分 → 四步生成完整clip；另训block-causal control/acceleration并使用固定窗口KV cache和streaming VAE输出blocks",
+    "methodFlow": [
+      "3D engine、drawings、point clouds等结构转成与target同time/camera的reference video，附fixed definition/retention文本",
+      "冻结33B Ref2VA backbone，reference tokens共享target frame的RoPE coordinates，经native full-attention pathway读取",
+      "Stage1训练control LoRA以flow matching学习结构约束下的appearance completion",
+      "Stage2冻结control，以DMAD四步LoRA初始化acceleration模块，structure-guided DMD对齐teacher的结构差分",
+      "四步生成完整clip；另训block-causal control/acceleration并使用固定窗口KV cache和streaming VAE输出blocks"
+    ],
+    "experimentsZh": "53个held-out in-distribution clips具有GT；57个结构videos生成208个generalization cases，16 representations中11未见，74 cases属未见结构。主要使用Gemini3.8 Flash双顺序pairwise judge与Bradley–Terry/Elo；自动分组质量、稳定、控制与首帧保持，补blind human study。 作者报告generalization overall Elo1441，与LynnReal-Omni并列；structure1338对照1241。In-distribution overall1510，LynnReal1410；各表Elo只在本表fit内比较。 (Table1, PDF p.8) 作者报告四步158frame clip约209s，对照50步2562s，即12.3×；另训causal variant可到28FPS，但generalization overall1191低于主模型1441。 (Sec.3.4, PDF p.7; Sec.5.1–5.2/Table1, PDF pp.8–11) 作者报告DMAD初始化无post-training overall1024，plain DMD为820，结构指导w1.5为1156；自动total却由72.1变71.6，稳定与首帧保持有代价。 (Table2, PDF p.11; Table9, PDF p.23) 作者报告十分之一数据的自动分数变化不超过0.2，小于full-data换seed差异；去掉misaligned supervision的收益更大。 (Table5, PDF p.12; discussion, PDF p.14) 对官方backbone、Stage1、generic acceleration LoRAs和六个structure renderers；各方法沿released resolution/framecount/sampler运行后resize，非同compute条件。Generalization无GT，主结论依赖MLLM judge；blind human study方向一致但未在主文提供完整样本/统计。 对native vs ControlNet、RoPE shared/separate、结构分辨率、数据对齐/规模、guidance强度/初始化/步数均有消融；自动指标揭示控制与stability之间tradeoff，不应只摘Elo。",
+    "insightZh": "贡献是untyped、frame-aligned native reference control与可组合的结构引导few-step adaptation，并以同步审计连接多引擎训练资料。不是新的3D生成表示；control/acceleration分开和teacher结构差分是对design-to-render pipeline较具体的迁移机制。",
+    "evidenceZh": "结构reference与对应target共享RoPE时空位置，无type identifier，通过固定文本解释约束属性。 (Sec.3.2, Fig.2, PDF pp.4–5) / control冻结后，仅用结构引导distribution matching适配DMAD初始化的acceleration LoRA。 (Sec.3.3, Eq.4–6, PDF pp.5–6) / 作者报告主模型四步相对50步提速12.3倍，而causal模型质量较低。 (Sec.5.1–5.2, Table1, PDF pp.8–11) / 偏好评分提升同时可能降低自动稳定性与first-frame preservation。 (Tables9–10 and discussion, PDF p.23)",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体支持3D Generation的结构到appearance rendering，也可给视觉design agents提供快速外观反馈；这里只是机制迁移，没有LEGO/Embroidery/制造可行性实验。",
+    "caveatZh": "causal模型后续blocks颜色从首帧漂移，主要损失appearance而非control（Sec.5.2, PDF p.11）。 / fast-camera cases相对自身50step model的net score为−0.10；不是每种困难情况都更好（PDF p.11）。 / structure-guided post-training降低部分stability和first-frame自动分数（App.C.2, PDF p.23）。 / 输出是raster video，不能由视觉一致推断完整3D geometry或真实物理。 / 53个GT与57结构video的测试规模有限；11未见结构不等于任意格式均可靠。 / 33Bbackbone和full clip209s限制interactive用途；实时causal质量与长程漂移须单独评估。",
+    "sourceNote": "Exact version 2610.28630v1 (28 pages), PDF SHA-256 d7fcdd12fc0f47e0d2cfe813a9cb9d822c4cb4764b335985b2b2107746b835cd. Full text and listed visual evidence checked on 2026-10-21. All quantitative results are author-reported, not independently reproduced. Code: available. PDF p.1打印GitHub URL；GitHub REST tree已核对196 files，包含reactor推理、comfyui、eval与训练相关源码，非占位README。"
+  },
+  "slug": "solarrenderer-few-step-generative-reference-rendering-2610-28630",
+  "collectedAt": "2026-10-21",
+  "topicIds": [
+    "video-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "diffusion"
+    ]
+  }
+}
