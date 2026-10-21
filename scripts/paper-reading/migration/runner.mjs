@@ -9,6 +9,8 @@ import { exportState, restoreState, verifyBundle } from "./state.mjs";
 import { acquireLease, assertLease, checkpointControl, emptyControl, releaseLease, renewLease } from "./lease.mjs";
 import { beginUnit, completeUnit, newCheckpoint, resumePlan, saveCheckpoint } from "./checkpoints.mjs";
 import { commandArgv, jobRequest, portableJob } from "./contracts.mjs";
+import { priorWorkspace, rememberWorkspace, workspaceDirectory } from "./workspace.mjs";
+import { validateRemote } from "./git-store.mjs";
 
 const CONTROL = "migration/control.json";
 const INDEX = "migration/index.json";
@@ -44,6 +46,7 @@ export class Runner {
     this.config = config;
     this.root = path.resolve(config.root);
     this.directory = path.resolve(config.directory);
+    this.workspaceDirectory = workspaceDirectory(config, this.root, this.directory);
     const relative = path.relative(this.root, this.directory);
     const inverse = path.relative(this.directory, this.root);
     if (!relative || (!relative.startsWith(`..${path.sep}`) && relative !== "..") ||
@@ -130,12 +133,29 @@ export class Runner {
     if (changed) throw new Error("Tracked source changed outside paper-reading data.");
   }
 
+  async prepareWorkspaceSource() {
+    if (!this.workspaceDirectory) return;
+    if ((await this.store.git(this.root, ["diff", "--cached", "--name-only"])).length) {
+      throw new Error("Staged user changes are present; the persistent workspace is unchanged.");
+    }
+    if (this.config.source) {
+      validateRemote(this.config.source.remote, this.config.source.ref);
+      // Fetch objects only: keep the user's branch, HEAD, index and working tree.
+      await this.store.git(this.root, ["fetch", "--no-tags", this.config.source.remote, this.config.source.ref]);
+    }
+    await this.verifySource();
+  }
+
   async start() {
     if (this.session && this.control?.active) {
       this.owned();
       return this.status();
     }
     if (!this.config.context) throw new Error("A frozen context is required to start a new run.");
+    if (this.workspaceDirectory && this.control?.active) {
+      throw new Error("A writer is active; a retained local checkout never authorizes takeover, even after expiry.");
+    }
+    await this.prepareWorkspaceSource();
     await this.verifySource();
     if (!this.index) {
       if (this.config.initializeFromRoot !== true || this.config.expectedStateCommit !== this.head) {
@@ -210,6 +230,7 @@ export class Runner {
     const acknowledged = await this.store.recover({ retry: true });
     await this.load(acknowledged.commit);
     this.owned();
+    await rememberWorkspace(this);
   }
 
   async recover({ retry = false } = {}) {
@@ -218,7 +239,14 @@ export class Runner {
     await this.load(result.commit);
     // With no local proposal, the remote checkpoint is the recovery boundary.
     // Never infer that a lost, unpushed local result had completed.
-    if (!this.session && this.index) await this.restore({ freshCheckout: true });
+    if (!this.session && this.index) {
+      if (this.workspaceDirectory && this.control?.active) {
+        throw new Error("A remote writer still owns the run; inspect and obtain explicit termination evidence before handoff.");
+      }
+      await this.prepareWorkspaceSource();
+      await this.restore({ freshCheckout: true });
+    }
+    if (result.outcome === "acknowledged") await rememberWorkspace(this);
     return { ...result, ...this.status(), requiresHandoff: Boolean(this.control?.active && !this.session) };
   }
 
@@ -282,10 +310,12 @@ export class Runner {
     const view = await this.store.materialize(this.head);
     const bundle = path.join(view, this.index.bundle.path);
     const { manifest } = verifyBundle({ bundle, manifestSha256: this.index.bundle.manifestSha256 });
-    const replaceMatching = new Map();
+    const prior = this.workspaceDirectory ? await priorWorkspace(this, manifest) : null;
+    const replaceMatching = prior ?? new Map();
     if (freshCheckout) {
+      await this.prepareWorkspaceSource();
       const base = (await this.store.git(this.root, ["rev-parse", "HEAD"])).toString().trim();
-      if (![this.checkpoint.context.repositoryBaseCommit, this.index.publication?.commit,
+      if (!prior && ![this.checkpoint.context.repositoryBaseCommit, this.index.publication?.commit,
         this.config.context?.repositoryBaseCommit].includes(base)) {
         throw new Error("Fresh restore requires the frozen source checkout or its exact publication commit.");
       }
@@ -297,13 +327,15 @@ export class Runner {
         const current = regularBytes(this.root, entry.path);
         if (sha256(current) !== entry.sha256) {
           const bytes = await this.store.git(this.root, ["show", `${base}:${entry.path}`]);
-          if (!current.equals(bytes)) throw new Error("Tracked source baseline changed during restore.");
-          replaceMatching.set(entry.path, bytes);
+          if (!current.equals(bytes) && !replaceMatching.has(entry.path)) throw new Error("Tracked source baseline changed during restore.");
+          if (current.equals(bytes)) replaceMatching.set(entry.path, bytes);
         }
       }
     }
-    return restoreState({ bundle, target: this.root, manifestSha256: this.index.bundle.manifestSha256,
+    const result = restoreState({ bundle, target: this.root, manifestSha256: this.index.bundle.manifestSha256,
       expectedContext: manifest.context, replaceMatching });
+    await rememberWorkspace(this);
+    return result;
   }
 
   status() {
@@ -472,7 +504,9 @@ export class Runner {
       throw new Error("Reconcile unfinished intent/publication before releasing the run.");
     }
     if (await this.store.head() !== this.head) throw new Error("State HEAD changed.");
-    if (!this.control.active) return { released: true, stateCommit: this.head, disposable: true };
+    if (!this.control.active) {
+      return { released: true, stateCommit: this.head, disposable: true };
+    }
     if (!this.session) throw new Error("Confirm remote handoff before releasing an abandoned active run.");
     const control = releaseLease(this.control, this.session.lease);
     await this.store.prepare(this.head, (payload) => {
@@ -481,6 +515,7 @@ export class Runner {
     });
     const acknowledged = await this.store.recover({ retry: true });
     await this.load(acknowledged.commit);
+    await rememberWorkspace(this);
     return { released: true, stateCommit: this.head, disposable: true };
   }
 }
@@ -507,10 +542,15 @@ export async function withSessionLock(directory, action, { unlock = false } = {}
 export async function main(argv) {
   const [command, configFile, jobFile] = argv;
   if (!["start", "status", "inspect", "restore", "renew", "resume", "adopt", "begin", "run", "reconcile",
-    "run-unit", "reconcile-unit", "recompute", "recover", "retry", "release", "unlock", "publish"].includes(command) ||
+    "run-unit", "reconcile-unit", "recompute", "recover", "retry", "release", "unlock", "unlock-workspace", "publish"].includes(command) ||
       !configFile || argv.length > 3) throw new Error("Usage: runner.mjs COMMAND LOCAL_CONFIG.json [LOCAL_JOB.json]");
   const config = JSON.parse(readFileSync(configFile, "utf8"));
-  return withSessionLock(path.resolve(config.directory), async () => {
+  const workspace = workspaceDirectory(config, path.resolve(config.root), path.resolve(config.directory));
+  if (command === "unlock-workspace") {
+    if (!workspace || jobFile) throw new Error("unlock-workspace requires configured workspace metadata and no job.");
+    return withSessionLock(workspace, async () => {}, { unlock: true });
+  }
+  const execute = () => withSessionLock(path.resolve(config.directory), async () => {
     const runner = new Runner(config);
     if (command === "recover" || command === "retry") return runner.recover({ retry: command === "retry" });
     await runner.open();
@@ -532,6 +572,8 @@ export async function main(argv) {
     if (jobFile) throw new Error("This command takes no job specification.");
     return runner[command]();
   }, { unlock: command === "unlock" });
+  // Different owner/session directories still share a single retained checkout.
+  return workspace ? withSessionLock(workspace, execute) : execute();
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

@@ -367,6 +367,87 @@ publication objects, with explicit handoff/recomputation when required. It is
 not exactly-once arbitrary side effects, recovery of never-pushed work, or
 unattended proof that a missing executor has terminated.
 
+## Retained local checkout using the same remote protocol
+
+The local fallback can keep its source repository and working directory between
+invocations. Add `workspaceDirectory` to the normal runner configuration, keeping
+it outside the research root and separate from each execution's `directory`:
+
+```json
+{
+  "root": "/path/to/retained-research-checkout",
+  "workspaceDirectory": "/path/to/persistent-workspace-metadata",
+  "directory": "/path/to/execution-specific-session",
+  "owner": "unique-local-execution-id",
+  "remote": "https://github.com/OWNER/PRIVATE_STATE.git",
+  "ref": "refs/heads/APPROVED_STATE_BRANCH",
+  "source": {
+    "remote": "https://github.com/OWNER/PUBLIC_SOURCE.git",
+    "ref": "refs/heads/APPROVED_PUBLIC_BRANCH"
+  }
+}
+```
+
+The scheduled controller creates a new owner/session and frozen `context` for
+each new run, using the same context rules as the cloud controller. It retains
+the original session for interrupted work. The optional `source` fetch obtains
+Git objects for the reviewed source/publication base; it never resets, checks
+out, rebases, advances HEAD, stages files, or changes source code. Different
+executable bytes still require an explicitly reviewed source update. A dirty
+source file or staged user change stops the invocation without overwriting it.
+
+Use the existing `inspect`, `start`, `begin`/`run`, `reconcile`, `recover`/`retry`,
+and `publish` commands. There is no second remote index, lock, schema, or
+transport. The private Git store fetches progress automatically and each unit
+saves and reads back its exact commit before proceeding. The scheduled agent
+performs these commands, including its allowlisted publication commit and
+`publish`; the user does not perform a daily data pull or push.
+
+Because the retained checkout's HEAD is deliberately unchanged, the controller
+must not use an ordinary `git commit` on that possibly older parent. Build the
+allowlisted public candidate using a new `GIT_INDEX_FILE`: `read-tree` the frozen
+`context.repositoryBaseCommit`, stage only the explicitly reviewed public data
+paths, inspect that disposable staged diff, then `write-tree` and `commit-tree`
+with that exact base as the sole parent. Keep the research index untouched.
+Pass the resulting exact SHA to the existing `publish` command, which checks
+the complete public data, journals and saves the candidate privately, pushes,
+verifies deployment and acknowledges release. Recovery uses the existing journal
+and exact SHA; it never creates a replacement commit for an uncertain push.
+
+After an acknowledged state change, the runner saves a local `baseline.json`
+containing only the checkout/target identity, accepted private commit, and
+bundle-manifest hash. On the next invocation it verifies that commit is an
+ancestor of the current private HEAD and that its index still pins the manifest.
+Only retained bytes that exactly match that old acknowledged manifest, or a
+clean tracked source baseline, may be replaced by newer durable state. All
+target files are checked before installation. Changed private data is preserved
+and blocks restoration; remote deletion of a retained artifact also requires
+explicit reconciliation instead of silently deleting or resurrecting it. An
+interrupted installation remains replayable. Missing/corrupt metadata cannot
+authorize overwrites, and the local receipt never substitutes for remote state.
+
+An active remote owner, including an expired lease, blocks a new local run.
+Persistent-workspace `recover` also refuses to restore over the retained checkout
+when a foreign remote owner is active. Use the existing explicit, exact-instance
+termination and handoff procedure if recovery is needed; a schedule toggle, TTL,
+missing machine, or local baseline never proves the cloud executor has stopped.
+No acknowledgement means no new research. A retained pending push is reconciled
+by reading the remote: an accepted commit is acknowledged; a proven unapplied
+proposal can be retried exactly; an unknown/conflicting outcome stops work.
+
+The CLI also locks the shared workspace metadata directory, so distinct local
+session directories cannot concurrently mutate the same checkout. A killed CLI
+may leave this local lock. `unlock-workspace CONFIG.json` uses the existing
+same-host dead-PID check; it does not release or steal a remote lease. The normal
+`unlock` command continues to apply only to a session lock.
+
+Initial private-state initialization remains a separately reviewed action at an
+exact expected private commit. The old raw archive is not automatically promoted
+to a live index. Configure both controllers to the same approved state branch,
+install the reviewed source, and update the scheduled prompt only after live
+state transfer, scheduler control and deployment API acceptance are approved.
+This feature does not enable a schedule or prove those live integrations work.
+
 ## Publication and deployment evidence
 
 `publish` takes a local JSON file with `remote`, full branch `ref`, and exact
