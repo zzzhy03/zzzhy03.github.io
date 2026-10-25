@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.31640",
+  "slug": "worldforge-v2-camera-trajectory-alignment-video-diffusion",
+  "title": "WorldForge V2: Eliciting Camera-Trajectory Alignment in Video Diffusion Models",
+  "authors": [
+    "Chenxi Song",
+    "Yanming Yang",
+    "Tong Zhao",
+    "Ruibo Li",
+    "Joey Tianyi Zhou",
+    "Chi Zhang"
+  ],
+  "publishedAt": "2026-10-22",
+  "updatedAt": "2026-10-22",
+  "collectedAt": "2026-10-26",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.31640"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "WorldForge V2",
+    "camera control",
+    "v-cache",
+    "Trajectory LoRA",
+    "multiview video"
+  ],
+  "abstract": "Video diffusion models have learned rich 3D/4D priors, making them promising for scene generation and video re-rendering. However, their use in spatial tasks is limited by imprecise camera control, spatial and temporal inconsistencies, and entangled camera motion with scene dynamics. Existing approaches, such as task-specific fine-tuning and post-process warping, often introduce visual artifacts, generalize poorly, or incur high computational costs. We propose WorldForge V2 to achieve accurate camera control while preserving the generative capabilities of pretrained video models. We first develop a training-free guidance framework using warped references to iteratively refine generation along a target camera path. Optical-flow analysis identifies motion-related latent channels for selective guidance, helping separate motion control from appearance. A dual-path strategy further compares guided and unguided predictions to correct artifacts from imperfect references. Together, these components guide viewpoint changes while preserving scene appearance and object motion. To reduce refinement costs, v-cache approximates the correction using the preceding denoising prediction, avoiding an additional model evaluation. We further extend motion localization from latent channels to network blocks and introduce Trajectory LoRA, which concentrates adaptation on blocks most responsive to trajectory guidance. A two-stage training strategy teaches these adapters to denoise the states encountered during guided generation, using limited supervision effectively. This enables reliable camera control with very little training data, with a single training scene already supporting generalization to unseen scenes. Quantitative and qualitative evaluations across multiple datasets show that our method achieves state-of-the-art generation quality and trajectory accuracy in camera-controlled video generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.31640v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.31640v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Westlake-AGI-Lab/WorldForge"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.31640v1; 23 pages; full text, method/results and limitation pages inspected. All experimental numbers are author-reported, not independently reproduced.",
+    "ideaZh": "WorldForge V2把warped camera参考从直接noisy-latent拼接改为状态匹配，并以v-cache复用去噪velocity、以trajectory-sensitive LoRA学习少量场景中的轨迹控制。作者报告H3用1个scene的50个trajectory pairs即可适配，主表PSNR为20.21；值得借鉴到3D场景多视角参考生成，但深度错误仍会产生失真，输出和评测主要是视频，不能当作已验证的可编辑3D资产。",
+    "motivationZh": "视频模型已有场景先验，但相机轨迹、场景外观与物体运动容易纠缠；直接拼接warped reference还存在去噪状态失配和额外计算开销。",
+    "methodZh": "用depth/pose沿目标camera trajectory warp部分参考帧与visibility mask；training-free路线以IRR clean-latent融合、FLF motion-channel选择和DSG修正去噪。V2增加noisy-latent correction的v-cache近似，并用probe/Shapley定位trajectory-sensitive self-attention blocks，在约75% blocks加入rank-128 LoRA，通过anchor warm-up与guided-state训练适配。输出是沿轨迹的视频，不是独立可编辑3D资产。",
+    "methodFlow": [
+      "输入单图或视频与target camera trajectory；用VGGT/UniDepth等geometry estimator获得depth/pose，warp出partial target frames和visibility masks。",
+      "Video VAE编码reference；training-free路线在predicted clean latent执行IRR融合、FLF motion-channel选择与DSG校正。",
+      "V2高效路线在noisy latent注入reference，并用前一步cached velocity近似clean-state correction，避免IRR额外model evaluation。",
+      "对self-attention blocks训练probe LoRA并做Shapley sensitivity ranking；在最高约75% blocks保留rank-128 trajectory LoRA。",
+      "用DL3DV 3DGS render构建trajectory–video pairs，经guided anchor warm-up及anchor-derived state训练，输出沿目标视点轨迹的视频。"
+    ],
+    "experimentsZh": "作者以200个DL3DV held-out cases比较learned control，H3主设置用1 scene的50 trajectory pairs/1500 updates，LongCat用8 scenes/1200 updates。TableIII（p.9）报告H3 PSNR 20.21、LPIPS 0.2698，TrajectoryCrafter为17.41、0.3558；但UniWorld-View ATE 0.00625优于H3的0.00685。scene-count、block-selection和guided-state消融支持具体适配设计，并非所有指标都最优。Backbone、帧长和预算不同，速度表不能当同设置全面排名；数值均为作者报告，未复现。",
+    "insightZh": "论文明确说明WorldForge有CVPR 2026 preliminary version，不能把IRR/FLF/DSG全部当成V2首次提出。此版可辨认的实质扩展是v-cache的noisy-latent correction近似，以及trajectory-sensitive block selection加guided-state two-stage LoRA adaptation。Shapley用于已训练probe的velocity-response归因，而非证明所有相机能力集中于少量独立因果模块；最终保留的是约75% self-attention blocks，轻量性来自LoRA而非仅更新几个blocks。",
+    "evidenceZh": "显式trajectory通过depth/pose warping及visibility mask进入视频latent；IRR clean-space fusion、FLF channel selection与DSG共同控制去噪。 (Fig. 2, p. 3; Sec. III-A/B, Eqs. (5)–(11), pp. 4–6) v-cache复用前一步velocity近似IRR与direct insertion之差，在首个guided step之后用单次model evaluation修正采样。 (Sec. III-C, Eqs. (12)–(13), p. 6; Fig. 4, p. 9; Supplement Sec. 3.3, p. 19) 作者报告H3在200个DL3DV测试case上PSNR 20.21、LPIPS 0.2698、RPE-T 0.1647；TrajectoryCrafter分别为17.41、0.3558、0.2013。 (Sec. IV-A, p. 7; Table III and Sec. IV-C, p. 9) single-scene结果是以固定预训练backbone和50个trajectory–video pairs进行适配；主比较H3用1 scene/1500 updates，LongCat用8 scenes/1200 updates。 (Sec. IV-C, p. 9; Table VI, p. 11; Supplement Table S2 and Sec. 3.4, pp. 19–20) 错误depth与复杂scene dynamics仍会造成face distortion和moving-person inconsistency。 (Supplement Sec. 4.5, pp. 21–22; Fig. S7, p. 22)",
+    "caveatZh": "这是既有CVPR WorldForge的实质扩展，IRR/FLF/DSG不能全部称为V2首创。单scene不是单张图或零训练，且不适用于全部主设置；仍依赖预训练模型、probe与50对trajectory数据。错误depth和复杂动态仍失真；视频/pose指标不证明可编辑mesh、度量几何或物理正确。公开V2 inference代码与说明已确认，未独立跑通。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对3D Generation的具体迁移是用target camera path与已有depth/pose生成受控多视角场景视频参考，并用v-cache或少量LoRA适配减小warping artifacts；应先作为视觉参考/采样控制机制研究，不把生成视频当作已经验证的3D asset。"
+  }
+}

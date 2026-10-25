@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2610.31651",
+  "slug": "brickwright-agentic-creation-of-physically-feasible-brick-builds",
+  "title": "BrickWright: Agentic Creation of Physically Feasible Brick Builds",
+  "authors": [
+    "Ava Pun",
+    "Kevin Dai",
+    "Sally Chen",
+    "Maxwell Jones",
+    "Ruixuan Liu",
+    "Kangle Deng",
+    "Changliu Liu",
+    "Maneesh Agrawala",
+    "Deva Ramanan",
+    "Jun-Yan Zhu"
+  ],
+  "publishedAt": "2026-10-22",
+  "updatedAt": "2026-10-22",
+  "collectedAt": "2026-10-26",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.31651"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "lego",
+    "fabrication",
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "lego",
+  "keywords": [
+    "LEGO",
+    "BrickWright",
+    "BrickLayer",
+    "typed connectors",
+    "agentic design",
+    "physical validation"
+  ],
+  "abstract": "Frontier coding agents are becoming increasingly adept at 3D modeling. Yet, they still face challenges when building objects meant to be assembled in the physical world, often creating invalid assemblies with floating, colliding, or disconnected parts. We argue that providing agents with tools for assembling builds and verifying their physical feasibility is sufficient for them to produce physically valid assemblies that still adhere to input prompts. Focusing on the domain of LEGO brick builds, we present BrickWright, a framework for generating physically feasible brick builds from text or image prompts using pre-trained agents, where a build is physically feasible if it uses only real parts, has no colliding or floating parts, and forms a connected structure if possible. BrickWright guides agents to create builds by writing code with BrickLayer, a Python toolkit with two main components: an ergonomic brick assembly API that halves inference cost compared to working in raw LDraw, and a validator that provides feedback on physical feasibility. Whereas baseline agents achieve physical validity rates ranging from only 9% (GPT-6 Luna) to 69% (GPT-6 Astra), BrickWright-guided agents achieve 100% validity on a sample of 512 prompts, while improving prompt adherence for lightweight agents and maintaining it for stronger agents. Additionally, they outperform specialized models on the text-to-brick task. Code is available on our project page: https://avalovelace1.github.io/brickwright/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.31651v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.31651v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AvaLovelace1/brickwright"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.31651v1; 20 pages; full text, method/results and limitation pages inspected. All experimental numbers are author-reported, not independently reproduced.",
+    "ideaZh": "BrickWright把LEGO agent的难点落在可执行表示和验证反馈：BrickLayer提供真实零件检索、typed-connector装配和碰撞/悬空检测，agent反复修改Python构造并查看render。作者在BrickNet-512报告四种agent均达到100%几何validity，Luna基线为8.6%；值得精读的是装配API与validator。这里的validity不包含稳定性或装配顺序，关节运动也只检查采样姿态。",
+    "motivationZh": "直接写LDraw的agent容易产生碰撞、悬空与断连；需要让真实零件和连接规则进入可执行生成过程，而非事后凭render判断结构。",
+    "methodZh": "BrickLayer以Element、LegoBuild与typed connectors表示零件和分层子装配，支持检索、相对放置、connector mating及LDraw导出。BrickWright让单agent写create_build与tests，通过固定碰撞/悬空检查、连接和任务tests、render反复修正。碰撞前将mesh inset 0.1mm；support路径可以来自mated connectors或向上的surface contact。",
+    "methodFlow": [
+      "文本或图像指定目标，agent检索17k+ LDraw零件目录及typed connector frames。",
+      "以Element/LegoBuild和可命名子装配写Python，用网格、相对放置或connector mating组合真实零件并编译LDraw。",
+      "validate运行固定碰撞/悬空检查及agent的connectivity/任务tests，返回失败后修改结构。",
+      "render提供多视图检查，通过验证并满意后finalize；可选对tree-structured joints的离散pose检查运动。"
+    ],
+    "experimentsZh": "作者在BrickNet-512的512条文字prompt上比较四种商业agent、BrickGPT、BrickNet和改造Articraft。Table1（PDF p.5）报告四种full agents Valid均1.000；Luna基线为0.086，full VQA由0.6504升至0.6945。去validator后Haiku/Luna/Sol Valid为0.586/0.529/0.779；Sol去assembly API成本从$0.19升至$0.40、平均validate由2.48增至10.02次。费用为论文当时记录。工具权限和开销不完全匹配；物理metrics使用同一validator并人工复核潜在false positives。图像、库存、关节和大场景为定性扩展，本项目未复现。",
+    "insightZh": "新意在于将LEGO装配规则落实为统一可编辑SDK和可解释执行反馈，减少raw LDraw坐标推理及反复自写验证。沿用BrickNet connectors、LDraw geometry、预训练agents和已有loop范式；论文也引用并行BrickBench，不能写成首次agentic LEGO或完整物理仿真。",
+    "evidenceZh": "统一SDK包含catalog检索、typed-connector装配和物理检查，并支持build.py—validate—render—修改闭环。 (Sec.3.1–3.2, Fig.3, PDF pp.3–5) 碰撞检测先将mesh inset 0.1mm；悬空依据通往ground的connector或向上surface-contact路径。 (Sec.3.1 Validation, PDF pp.4–5) 作者报告四种full agents的Valid均为1.000；Luna+Codex基线0.086，Astra+Codex基线0.693。 (Table1, Sec.4.1, PDF pp.5–6) 作者报告去validator后Haiku/Luna/Sol Valid为0.586/0.529/0.779；Sol去assembly API成本由$0.19升至$0.40。 (Table1, Sec.4.2, PDF pp.5–7) physical feasibility不覆盖稳定性或装配顺序；可选motion check只覆盖采样pose。 (Sec.3, Sec.5 Limitations, PDF pp.4–5,7; Supplement Listing2/4, PDF pp.15,17–18)",
+    "caveatZh": "100%仅是当前512条prompt下的几何validity，不包含连接保持力、稳定性、滑动/倾覆或可执行装配顺序。运动只检查采样pose；不能保证连续过程。首页虽展示assembly sequence，正文明确未验证该能力。项目页Luna baseline为7%，本次采用PDF v1表中的8.6%。Code由PDF打印project入口追至公开repo，确认有bricklayer/brickwright源码，未运行。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中LEGO generation核心项目：typed connectors、分层子装配、错误定位与可执行约束可用于生成/编辑及agent环境设计；稳定性与装配顺序的缺口也提供明确研究问题。使用现成agents不等于推进LLM本身。"
+  }
+}

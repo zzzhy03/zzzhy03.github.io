@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.31671",
+  "slug": "flexpart-variable-granularity-image-to-3d-part-generation",
+  "title": "A Unified Framework for Image-to-3D Part Generation via Variable Granularity",
+  "authors": [
+    "Qiwen Gu",
+    "Xin Zhou",
+    "Xiwu Chen",
+    "Zhongyang Zhu",
+    "Zhuo Zhang",
+    "Junqiao Zhao"
+  ],
+  "publishedAt": "2026-10-22",
+  "updatedAt": "2026-10-22",
+  "collectedAt": "2026-10-26",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.31671"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "FlexPart",
+    "part-aware generation",
+    "Gated AdaLN",
+    "partial optimal transport",
+    "point box mask"
+  ],
+  "abstract": "Controllable 3D part generation is pivotal for digital asset creation, yet existing methods lack the flexibility to accommodate diverse user workflows requiring varying levels of control. In this paper, we introduce FlexPart, a unified image-to-3D part generation framework that supports variable-granularity geometric conditions within a single model. By seamlessly integrating heterogeneous inputs, ranging from sparse points to dense bounding boxes and masks, via gated adaptive modulation, FlexPart unlocks a powerful cross-modal synergy. We also propose an asymmetric geometric guidance mechanism that leverages strong spatial priors to align representations across granularities, improving geometric consistency and facilitating inter-task synergy. Under mask conditioning on PartVerseXL, FlexPart reduces Part CD by 16.6% relative to TripoSG + SAM3D and by 10.5% relative to OmniPart, while maintaining competitive whole-mesh quality. The code can be found at https://github.com/Gucci233/FlexPart",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.31671v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.31671v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Gucci233/FlexPart"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.31671v1; 22 pages; full text, method/results and limitation pages inspected. All experimental numbers are author-reported, not independently reproduced.",
+    "ideaZh": "FlexPart把point、box、mask条件统一注入一个part-aware DiT，并在训练时用dense-to-sparse的partial OT guidance增强点提示。作者报告PartVerseXL的mask-conditioned Part CD从OmniPart的0.3283降至0.2938；值得精读多粒度条件协同，但指标忽略未匹配部件，不能等同于完整结构或可装配性正确。",
+    "motivationZh": "可控part generation需要兼顾快速point选择和细粒度box/mask控制，单一条件粒度难以适配不同编辑需求。",
+    "methodZh": "以point为基础输入、box/mask为可选条件，轻量encoder与null embeddings统一提示，由Gated AdaLN调制part-aware DiT，图像用DINOv2 cross-attention注入。训练时将stop-gradient的dense prompt embeddings经Visual Bridge，以带dustbin的partial OT指导稀疏point表示；联合Rectified Flow训练，推理不运行OT分支。沿用TripoSG VAE/预训练权重及前作part-aware attention。",
+    "methodFlow": [
+      "输入单张图像和按部件对应的2D point prompts；box/mask可选，point是论文方法的基础条件。",
+      "DINOv2编码图像；point用Fourier features+MLP、box用角点与类型embedding、mask用CNN编码，缺失模态用learnable null embeddings替代。",
+      "拼接并融合各提示，与part ID和timestep共同构成条件，以Gated AdaLN调制带全局/局部part attention的DiT。",
+      "训练阶段：box/mask embeddings先stop-gradient，再经共享Visual Bridge与point features形成相似度矩阵，用带dustbin的partial OT/Sinkhorn对齐。",
+      "联合优化latent Rectified Flow和对角transport匹配损失，采用分阶段part数量/token数训练与prompt dropout。",
+      "推理时只运行条件生成与VAE解码，得到分离部件mesh及其组装形态；不运行OT guidance分支。"
+    ],
+    "experimentsZh": "作者在PartVerseXL held-out 100个≤16 parts对象及PartObjaverse-Tiny评估。Table1（p.7）报告mask-conditioned Part CD为0.2938，OmniPart为0.3283、TripoSG+SAM3D为0.3523；整mesh质量competitive，并非所有指标最优。Table3/4/8分别检查多模态联合训练、guidance及partial OT相对InfoNCE；部分IoU指标不随guidance单调提高。主表存在不同输入/训练数据条件，PartObjaverse-Tiny与预训练方法共享Objaverse lineage。所有数值为作者报告，未复现。",
+    "insightZh": "实质贡献是同一part generator对point/box/mask的可切换条件建模，以及把强几何先验定向迁移到弱point表示的训练目标。Gated AdaLN、DINOv2、TripoSG VAE和part-aware attention均有明确前作来源，不宜把整个生成backbone称为新基础模型。Tab.3、4、8的控制实验分别支持多粒度联合训练、guidance及partial OT相对InfoNCE的收益；跨系统主表的不同输入和训练数据不能单独证明每个模块的因果作用。",
+    "evidenceZh": "异构提示经null embeddings与fusion MLP统一，再由Gated AdaLN调制part-aware DiT；图像通过cross-attention提供上下文。 (Sec.4.1, Fig.2, Eqs.(4)-(6), pp.4-5) dense-to-sparse guidance以box/mask embedding stop-gradient、Visual Bridge和partial OT对角监督实现，训练后无需推理额外分支。 (Sec.4.2, Eqs.(7)-(9), pp.5-6; App.A.3 p.15) 作者报告mask条件下PartVerseXL Part CD为0.2938，低于OmniPart 0.3283和TripoSG+SAM3D 0.3523。 (Table 1, Sec.6.1, p.7) 联合训练改善点提示与mask提示；guidance并非所有指标都单调改善。 (Tables 3-4, Sec.6.2, pp.8-9) part指标只统计Hungarian匹配对，排除完全遮挡GT部件，并且不额外惩罚未匹配预测/GT部件。 (Sec.5.2, p.6; App.A-A.2, pp.14-15)",
+    "caveatZh": "Part指标只统计Hungarian匹配对，不惩罚未匹配预测或GT部件，并排除完全遮挡GT部件；较低Part CD不证明完整结构覆盖。主评估用GT派生提示与有利视角，point位置和遮挡仍敏感，训练/主评估限≤16 parts。未验证LEGO连接、碰撞、装配或制造约束。公开训练/推理代码已确认，未运行。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中3D Generation的part-aware、prompt-conditioned可编辑资产生成；重点值得吸收的是point/box/mask统一条件接口、dense-to-sparse对齐和评估协议。本文不是独立3D Segmentation方法，也未验证LEGO或制造约束，不追加这些topic。"
+  }
+}
