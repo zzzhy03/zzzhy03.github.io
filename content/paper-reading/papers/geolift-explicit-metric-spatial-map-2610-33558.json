@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2610.33558",
+  "slug": "geolift-explicit-metric-spatial-map-2610-33558",
+  "title": "GeoLift: Grounding Video Spatial Reasoning in Explicit 3D Maps",
+  "authors": [
+    "Xinglin Li",
+    "TingTing Long",
+    "Jingzhi Zhou",
+    "Jiajing Chen",
+    "Jian Yang",
+    "Jin Xie"
+  ],
+  "publishedAt": "2026-10-24",
+  "updatedAt": "2026-10-24",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.33558"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "GeoLift",
+    "superpoint agreement",
+    "metric 3D map",
+    "frozen VLM",
+    "spatial reasoning"
+  ],
+  "abstract": "Video spatial reasoning requires multimodal large language models (MLLMs) to understand how objects are arranged and related across viewpoints. While these models can recognize objects in individual frames, integrating these observations to solve complex spatial tasks remains challenging. We examine route planning as a representative task and observe that existing models become substantially less accurate as the number of required turns increases, with several models achieving accuracy close to random guessing on routes requiring three or more turns. This finding suggests that recognizing landmarks alone is insufficient: models must also connect observations across viewpoints and track how landmarks are arranged in a shared space. Motivated by this observation, we introduce GeoLift, a training-free framework that uses feed-forward 3D reconstruction to map objects detected in individual frames into a shared metric 3D scene. GeoLift combines a frozen MLLM for 2D grounding with pretrained geometry models for scene reconstruction. It then uses shared geometric regions, called superpoints, to associate observations of the same object across views without a learned matcher. The reconstructed 3D map enables explicit computation of spatial relations and multistep routes, and provides geometric evidence for estimating distances and sizes. With all model weights frozen, GeoLift improves Qwen3-VL-4B's average score on VSI-Bench from 55.4% to 64.1%, including an increase in route-planning accuracy from 30.9% to 53.6%, and achieves 59.8% accuracy on MindCube. These results show that connecting frame-level object grounding through a shared 3D map can improve complex spatial reasoning without task-specific training.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.33558v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.33558v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.33558v1; 11 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "GeoLift把冻结MLLM的2D boxes提升到VGGT-Omega/MoGe-2的metric map，用superpoint投票跨视图合并对象，再调用几何工具回答空间问题。作者报告VSI-Bench 55.4→64.1，其中superpoint增量为62.8→64.1；建议略读语义到3D区域的接口，不能当作已验证的3D segmentation方法或新VLM。",
+    "motivationZh": "MLLM能识别单帧对象，却难把跨视图观察组成稳定空间参照，多步方向与route reasoning容易累积错误。",
+    "methodZh": "训练free组合冻结语义与几何模型，将单帧grounding接到共享点云；按几何region加权投票、cosine相似度与空间约束合并实例，用deterministic距离/方向/occupancy A*及geometry hints支持视频空间问答。实际验证是spatial QA，不是dense segmentation或设计。",
+    "methodFlow": [
+      "输入RGB video/多视图及query，冻结Qwen3-VL-4B搜索frame并细化目标box，过滤低置信观察。",
+      "冻结VGGT-Omega输出depth/intrinsics/pose，用MoGe-2深度least-squares标定统一scale。",
+      "缩小box并按median depth过滤，反投影至共享metric点云。",
+      "kNN+cut-pursuit构造superpoints，以vote、背景频率降权、一跳dilation及extent-aware center约束跨视图union-find关联。",
+      "用显式距离/方向、occupancy-grid/A*或geometry hint回答；不可靠地图触发原MLLM fallback。"
+    ],
+    "experimentsZh": "VSI-Bench全5130问题/288video，overall为八类macro-average，数值题MRA与选择题accuracy混合；MindCube全21154问题采用micro-average。Qwen3-VL-4B、VGGT-Omega、MoGe-2均冻结；几何ablation64frames。 作者报告VSI overall55.4→64.1，relative-direction46.1→74.4，route30.9→53.6。 (Table2 p.7) 作者报告MindCube overall23.4→59.8，但rotation56.2仍低于表中GPT-5的93.3。 (Table3 p.8) 作者报告geometry/noSP62.8→withSP64.1，route46.9→53.6。 (Table4 p.9) Table4支持geometry与SP association的增量作用；没有逐项隔离vote权重、dilation、center drift gate或fallback阈值，也没有证明跨benchmark广泛最优。",
+    "insightZh": "新意在冻结模块间的显式metric workspace与query-conditioned superpoint关联设计，使用前作geometry models和cut-pursuit。适合作为2D语言定位到一致3D区域的具体迁移参考；未给3D instance/part segmentation指标，不能将QA增益写成segmentation提升。",
+    "evidenceZh": "用VGGT-Omega的shared geometry与MoGe-2 least-squares scale进行2D-to-3D lifting。 (Sec.3.3—3.4 pp.5—6; Eqs.1—3; Fig.3 p.5; paper-method) superpoint关联采用背景降权投票、cosine及extent-aware distance约束，无learned matcher。 (Sec.3.5 p.6; paper-method) 作者报告VSI macro-average55.4→64.1、route30.9→53.6；不是所有任务均获益。 (Table2 p.7; Sec.4.2 p.8; paper-experiment) geometry branch达62.8，superpoint进一步到64.1，route从46.9到53.6。 (Table4 p.9; paper-experiment) 关联机制可作为open-vocabulary 3D区域聚合参考，但未验证dense segmentation。 (Sec.3.5 p.6; evaluation Sec.4.1 pp.7—8; reviewer-inference)",
+    "caveatZh": "依赖冻结grounding、depth/pose与metric calibration，误差会传递到关系与route。 fallback能缓解不可靠geometry，不能恢复缺失或歧义证据。 具体规则/threshold与failure覆盖未被逐项消融；训练free不意味着资源free。 没有dense 3D segmentation、part或asset-editing实验，迁移只是机制参考。 VSI和MindCube overall聚合不同，数值不可横向对比；主表不是统一协议SOTA排名。 PDF未给本方法公开code URL，不能提供Code link。 matched frozen Qwen direct/noSP比较最有解释力；其它多数baseline保留原文protocol并引用，训练数据、frame数和资源不同。未给总runtime/cost、multi-seed或3D segmentation benchmark。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "superpoint agreement将跨帧语言box聚合为一致3D物体区域，对3D Segmentation主线有具体接口迁移价值；仅按VLM/spatial reasoning收录，不追加未经验证的segmentation贡献。"
+  }
+}

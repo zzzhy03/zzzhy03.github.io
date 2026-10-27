@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.34223",
+  "slug": "single-camera-layered-simulation-avatar-2610-34223",
+  "title": "Single Camera based Simulation and Try-on Ready Avatar Modeling",
+  "authors": [
+    "Honghu Chen",
+    "Bo Peng",
+    "Jun Xiang",
+    "Jingtao Zhou",
+    "Xujing Chen",
+    "Juyong Zhang"
+  ],
+  "publishedAt": "2026-10-25",
+  "updatedAt": "2026-10-25",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.34223"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Mesh-2DGS",
+    "layered avatar",
+    "generated observation alignment",
+    "ContourCraft"
+  ],
+  "abstract": "Reconstructing and rendering high-fidelity, animatable, and try-on-ready virtual avatars using only a single camera is crucial for many applications. However, existing try-on-ready human avatar reconstruction methods struggle to achieve this from monocular videos or single images, primarily due to two issues: (1) existing approaches typically use a single layer to represent both garments and the underlying body, ignoring their distinct motion characteristics; and (2) input captured from a single camera often fails to fully cover both the garments and the underlying body. To address these challenges, we propose a physically integrated, double-layer GS-Mesh representation for reconstructing decoupled 3D clothed human avatars from monocular videos or even single images by incorporating 2D generated data. While 2D generation methods can produce video sequences from given pose sequences, they struggle to maintain inter-frame consistency. We decompose the inter-frame inconsistencies in the generated data into geometric and appearance inconsistencies. Based on our 3D representation, we ensure that the final reconstruction and rendering results are both 3D-consistent and temporally coherent. Compared with existing 3D garment transfer methods that rely on multi-view reconstruction and most 2D approaches that use diffusion models for image-based garment editing without novel-view or novel-pose synthesis, our method requires only a monocular video or even a single image while producing visually plausible cloth dynamics during virtual try-on and novel-pose animation. This represents a significant advancement toward virtual try-on with visually plausible cloth dynamics using only a single camera.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.34223v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.34223v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.34223v1; 16 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "把单相机人像重建成身体/衣物分离的Mesh-2DGS，再用预训练cloth simulator驱动；值得借鉴的是分离处理生成数据的几何与外观误差。效果证据主要是5个subject的同视角留帧与novel-pose定性；生成数据并未提高Table VI的重建指标，单图还跳过物理拟合，不能当真实衣料参数恢复。",
+    "motivationZh": "单层avatar不便换衣，单目输入又缺少身体及衣物的隐藏区域；直接混合生成观测会引入形状和外观误差。",
+    "methodZh": "问题是单层avatar难以换衣、单相机看不到身体/衣物的隐藏区域。方法先以D3-Human初始化双层mesh，在面片上锚定带global/local几何参数的2D Gaussians；MMR挑选pose并用现成2D生成器补充key-pose和underlying-body观测。真实/生成数据共享canonical模板但分开shape和non-rigid deformation，对生成帧重估pose、逐帧SH并使用perceptual监督。视频输入再根据重建轨迹微调ContourCraft的材料参数和GNN权重；单图直接使用默认物理参数。作者在PeopleSnapshot三人及SelfRecon/RecMV两人上报告渲染指标，并展示服装转移、novel pose和relighting；没有多视角或真实3D mesh GT，隐藏区域只保证视觉合理，不保证忠实。",
+    "methodFlow": [
+      "单相机视频或单图→SMPL-X/分割先验与D3-Human双层身体/衣物模板",
+      "MMR选择key poses，生成伪motion与underlying-body补充观测",
+      "面片锚定global-local Mesh-2DGS；真实/生成分开变形、重估pose和SH",
+      "真实帧重建损失+生成帧perceptual/一致性约束联合优化",
+      "视频拟合ContourCraft材料/GNN；单图采用默认值→换衣与novel-pose渲染"
+    ],
+    "experimentsZh": "PeopleSnapshot的female-3-casual/male-2-casual/male-3-casual，以及SelfRecon的CHH-female与RecMV的anran-dance共5subjects。视频从每序列留帧测试；单图从同序列取一帧，测试其它真实帧。比较iHuman、改单视角的PICA、MimicMotion与one-shot ExAvatar，LHM/IDM-VTON主要定性。AMASS七个新动作的用户研究有49份问卷；单subject核心消融。 作者报告视频f3c重建PSNR为32.49dB，PICA30.92dB、iHuman24.81dB；这是同相机留帧渲染指标。 (Table I, PDF p.8; Sec.IV-C p.9) 作者报告f3c单图结果为28.30dB，MimicMotion25.48dB、one-shot ExAvatar21.58dB。 (Table II, PDF p.9) 作者报告Table VI中不使用generated data的Ours为33.67dB，高于完整模型32.49dB；PICA直接加generated data则30.92→29.05dB。 (Table VI, PDF p.12) 作者报告200 MMR生成帧为28.30dB，200 uniform为25.33dB，1000 uniform为28.69dB，支持信息覆盖效率而非优于任意规模采样。 (Table IV, PDF p.11) Table V移除shape/style/pose/SH对齐均降低f3c指标；Table VI区分GS架构与生成数据，显示完整生成辅助并不优化原view留帧指标。Table IV比较MMR与uniform样本数；Fig.13/14对比默认/拟合物理参数及LBS/模拟主要为定性。",
+    "insightZh": "相对于PICA的mesh-anchored GS与多视角物理avatar，主要推进是面向monocular输入的双层重建、可学习local Gaussian几何，以及对生成观测中shape/pose/style/shading误差的分离处理。物理模拟器ContourCraft、D3-Human初始化和人像生成器均为已有组件；本文不是新cloth simulator，也未提出通用3D foundation model。",
+    "evidenceZh": "双层模板上的2DGS具有global-local几何参数，canonical形状共享，真实/生成观测用独立非刚性变形。 (Sec. III-B, Eqs. (1)-(4), PDF pp.4-5; Fig.2 p.4; paper-method) 生成数据的shape/pose与style/shading误差分别处理，生成帧只用perceptual外观损失。 (Sec. III-E/F, PDF p.6; Table V p.12; paper-method) 视频物理拟合仅微调ContourCraft的材料参数与GNN权重；单图T=1跳过物理拟合。 (Sec. III-G, Eq.(13), PDF p.7; Sec.IV-A p.8; paper-method) 作者报告f3c完整模型32.49dB/0.9876SSIM/0.0198LPIPS，但去掉生成数据为33.67/0.9903/0.0164。 (Table VI, PDF p.12; Sec.IV-G; paper-experiment) 重建误差、错误补全及多层衣物交互可传导到碰撞/动画，真实物理保真没有保证。 (Sec.IV-I Limitations and Future Work, PDF p.13; paper-method)",
+    "caveatZh": "严重geometry/pose/segmentation或生成先验错误可传导到最终结果；对齐不能修复完全不可见区域的语义错误。 单目逆物理欠约束，预训练模拟器偏向合理前向运动，模板误差影响碰撞；复杂多层衣物仍会穿插和产生渲染伪影。 同视角留帧PSNR/SSIM/LPIPS不能验证换衣或隐藏表面的真实3D正确性；novel-pose和physics多为定性。 Table VI显示生成补充牺牲原序列指标，不能把所有增益归因于generated data；生成部分仍可能幻觉。 作者报告200真实帧+200生成帧约10小时重建、视频再1小时physics fitting，3090约4fps，成本与实时性有明显边界。 单图跳过材料拟合；人体/cloth先验的可迁移范围有限，尚未验证对一般物体生成的效果。 全文未找到本方法的public code URL；参考文献中的其它项目链接不作为本论文代码。 包含单层monocular avatar、物理双层PICA的单视角适配、one-shot ExAvatar与2D动画生成器；LHM与IDM-VTON提供定性参照。没有真实3D几何/服装材料GT，未给出大规模跨subject、跨相机或服装类别统计。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对3D Generation的具体参考是将外观Gaussian锚定于可模拟/可替换的几何层，并分离生成数据误差；这是资产表示与编辑的迁移线索，论文自身仍是human reconstruction，未证明一般物体生成收益。"
+  }
+}

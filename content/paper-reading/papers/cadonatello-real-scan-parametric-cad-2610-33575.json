@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.33575",
+  "slug": "cadonatello-real-scan-parametric-cad-2610-33575",
+  "title": "CADonatello: Towards Real-World Multi-Part 3D CAD Reconstruction",
+  "authors": [
+    "Ahmet Serdar Karadeniz",
+    "Dimitrios Mallis",
+    "Parsa Akbari Chianeh",
+    "Kseniya Cherenkova",
+    "Anis Kacem",
+    "Djamila Aouada"
+  ],
+  "publishedAt": "2026-10-24",
+  "updatedAt": "2026-10-24",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.33575"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "2d-design"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "CADonatello",
+    "parametric sketch",
+    "cross-section",
+    "part decomposition",
+    "adaptive extrusion"
+  ],
+  "abstract": "Existing methods for CAD reconstruction from 3D scans achieve strong performance on standard benchmarks, yet their effectiveness often degrades in real-world scenarios where objects consist of multiple parts and scan artifacts such as noise. A key reason is that current CAD reconstruction datasets predominantly contain single-part models and clean geometric inputs, limiting the ability of learned models to generalize to realistic settings. In this work, we introduce CADonatello, a part-aware framework for reconstructing parametric CAD models from real-world 3D scans. Our approach first decomposes the input geometry into structurally meaningful components using a foundation-scale 3D part segmentation model, and then reconstructs each component independently through a cross-section-driven pipeline that performs sketch parameterization followed by an extrusion. To improve the robustness of sketch parameterization to scan-derived cross-sections, we further introduce CC3D Cross-Sections, a dataset of paired rasterized cross-section images from realistic scans and their corresponding parametric sketches derived from aligned CAD models. This dataset enables effective domain adaptation from clean CAD sketch images to scan-derived cross-section images. Extensive experiments demonstrate that the proposed approach improves generalization to noisy scans and enables reliable reconstruction of complex multi-part objects across multiple real-world CAD reverse engineering benchmarks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.33575v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.33575v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.33575v1; 17 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "CADonatello先用P3-SAM把scan拆part，再以OBB定向截面、参数草图和自适应extrusion恢复可编辑CAD。值得精读其scan→structured sketch接口：作者报告Fusion360 Assembly CD为1.57、Cadrille为1.81；但只支持extrusion、部件直接融合，没有joint或制造约束，且CC3D全量CD并非最优。",
+    "motivationZh": "clean single-part CAD训练分布难覆盖真实scan噪声及多部件结构；需要保留可编辑sketch-extrude程序，而非仅输出mesh。",
+    "methodZh": "针对多部件和真实扫描噪声，模块化组合现有3D分割及草图参数化模型，并用44k scan/BRep配对截面微调草图网络；分part后进行方向自适应切片和单/多extrusion拟合，输出原坐标下的参数CAD。新增数据与部件级重建接口是实质贡献，不是新3D segmentation基础模型。",
+    "methodFlow": [
+      "输入mesh归一化，以P3-SAM生成part masks并抽取submesh。",
+      "为每part计算OBB局部坐标，先尝试三个canonical截面，必要时用既有学习式plane detector筛选多截面。",
+      "将cross-section loop rasterize为128×128图像，以SketchGraphs预训练且CC3D截面微调的网络预测line/circle/arc及constraints。",
+      "先拟合single extrusion并按CD阈值决定是否转multi-extrusion，对方向、new/cut和高度做推断/优化。",
+      "在FreeCAD中实例化并按原始空间位置合并part级sketch-extrude序列。"
+    ],
+    "experimentsZh": "真实CC3D test2978、>4operations子集1528；F360 test200assemblies/3780parts、>4parts子集126（clean BRep mesh）；200随机非canonical extrusion solids；截面test2k。用CD、ECD、IR及参数primitive/constraint相关指标；本项目未复现。 作者报告CC3D CD/ECD为0.48/2.78；Cadrille0.44/3.65，本文并非全指标胜出。 (Table1 p.6) 作者报告F360 CD/ECD为1.57/5.28，复杂子集1.87/5.09。 (Table2 p.6) 作者报告草图PF1从SG+Synt0.550提高至0.844，SCD0.62→0.251；下游CC3D CD0.52→0.48但IR1.3→1.6。 (Table4 p.7) 作者报告平均约27秒/assembly，其中12秒segmentation、15秒后续重建，在RTX A4000/Xeon6226R上。 (Supplement Runtime p.12) Tables4—5分离真实截面微调、segmentation替换和single/multi extrusion；改善不完全单调，IR/NCC有trade-off。Supplement Table6显示clean F360收益较小；Fig6是阶段误差关联而非干预因果分析。",
+    "insightZh": "相对MiCADangelo，新增part-aware结构分解、OBB方向处理、自适应extrusion和真实scan截面域适配；P3-SAM、草图network与plane detection继承前作。CC3D Cross-Sections独立贡献了扫描栅格→参数草图训练数据，支持结构化2D设计接口；没有证明新的分割能力或joint-aware装配。",
+    "evidenceZh": "part分解后在局部OBB中推断平面、参数草图与extrusion，再回到原坐标合并。 (Proposed Method pp.3—5; Fig.2 p.4; Eqs.3—8; paper-method) 44k/2k scan截面/BRep参数草图对适配真实扫描噪声。 (CC3D Cross-Section Dataset p.5; Supplement Datasets p.10; Table4 p.7; paper-method) 作者报告F360 Assembly CD1.57/ECD5.28/IR0.0，Cadrille为1.81/8.39/0.0。 (Table2 p.6; paper-experiment) 作者报告CC3D全量ECD2.78最优，但CD0.48不及Cadrille0.44，IR1.6也非最优。 (Table1 p.6; paper-experiment) 只支持extrusion，未建模revolution/sweep；assembly直接fusion而非joint。 (Conclusion p.7; Failure Case Analysis and Fig.7 p.12; paper-method)",
+    "caveatZh": "仅extrusion；revolution、loft、sweep以及explicit assembly joints均不支持。 薄chamfer/fillet和disconnected components会丢失或失败。 部件volume<0.1被过滤，作者报告约0.17%预测part被移除；最多16草图primitive。 F360输入来自BRep三角化，不能将multi-part泛化包装为真实多部件scan鲁棒性。 仍依赖P3-SAM分割质量、截面候选和既有network；误差相关分析不能证明不传递错误。 参数草图支持后续编辑是表示属性，本文未验证自由生成、新装配约束或制造成品。 PDF无本方法public code URL；dataset仅承诺发布，当前不提供Code link。 比较CAD-SIGNet、MiCADangelo、CAD-Recode、Cadrille；这些模型的训练分布和参数规模不同，171M效率不能等同总pipeline算力。F360是跨数据集clean assembly，真正scanning噪声主要由CC3D覆盖。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接提供真实scan到editable parametric CAD的结构恢复路线；2D参数草图数据与part级生成/编辑接口对主线有具体迁移价值。最终目标是忠实重建，不把使用P3-SAM或制造应用背景追加为segmentation/fabrication贡献。"
+  }
+}

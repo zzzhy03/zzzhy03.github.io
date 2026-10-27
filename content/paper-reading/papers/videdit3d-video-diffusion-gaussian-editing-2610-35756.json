@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.35756",
+  "slug": "videdit3d-video-diffusion-gaussian-editing-2610-35756",
+  "title": "VidEdit3D: Flexible 3D Gaussian Editing with Video Diffusion",
+  "authors": [
+    "Yanming Yang",
+    "Chenxi Song",
+    "Tong Zhao",
+    "Juntao Xu",
+    "Wenhao Rao",
+    "Yiwen Chen",
+    "Yiwei Wang",
+    "Chi Zhang"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.35756"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "VidEdit3D",
+    "3DGS editing",
+    "TGR",
+    "FAVE",
+    "ECG"
+  ],
+  "abstract": "Recent advancements in text-guided 3D editing, particularly with 3D Gaussian Splatting (3DGS), have shown promise but still lag behind the flexibility of 2D editing tools. Existing methods face a critical trade-off between preserving multi-view consistency and allowing structural modifications. Image-based editors can also struggle to apply the intended edit to objects viewed from unusual angles. To address these limitations, we introduce VidEdit3D, a framework that reformulates 3D scene editing as a trajectory-based video editing task. By drawing a parallel between camera movement in static 3D scenes and temporal dynamics in video, we leverage the robust spatiotemporal priors of pre-trained Video Diffusion Models (VDMs) to encourage semantic and structural coherence across views. Specifically, we propose Trajectory-Guided Rendering (TGR) to select informative keyframes and construct smooth video clips aligned with VDM input requirements. To propagate edits from an anchor view to these clips, we develop Flow-Aligned Video Editing (FAVE), a training-free framework incorporating an Editing Consistency Guidance (ECG) mechanism. ECG contrasts source and edited image conditions at a shared latent state, using scheduled source-image amplification to strengthen adherence to the edited reference while maintaining original scene context. Finally, we introduce Region-Selective 3DGS Refinement (RS-GS) to strictly confine geometric and appearance updates to target primitives, reducing background attribute leakage. Experiments demonstrate stronger instruction alignment and better multi-view consistency than the baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.35756v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.35756v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.35756v1; 19 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "VidEdit3D把单张2D anchor edit沿camera轨迹传播，再局部拟合回3DGS；TGR、source/edit对比guidance与Gaussian选择把编辑强度和背景保真分开处理，值得精读。证据限50个case，依赖可靠anchor、mask和已标定3DGS，不能当通用几何正确性保证。",
+    "motivationZh": "3D scene编辑需同时允许结构变化、维持多视角一致性并控制背景泄漏；逐帧2D editing难兼顾这些目标。",
+    "methodZh": "输入已有3DGS、calibrated views、edited anchor及source/target prompts。TGR用FPS与闭环排序把视图连成从anchor双向传播的短clip链；FAVE在共享noise下耦合source/target状态，ECG于早期放大source image concat条件形成明确对比，attention差异mask调节局部source regularization。最后LangSAM mask经depth culling选择Gaussians，只优化这些primitive。作者报告50例上edit adherence与view consistency优于所测七个baseline；无需训练VDM，但需要dense clip推理及3000步3D优化。",
+    "methodFlow": [
+      "已有3DGS、标定视图与单张edited anchor作为输入",
+      "TGR按subject可见性筛选，用FPS/闭环排序和spline生成双向camera clips",
+      "FAVE以共享noise耦合source与edited latent，按source trajectory正则化",
+      "ECG调度source/edit image条件，attention差异mask控制前景与背景约束",
+      "LangSAM mask经depth-aware back-projection选择target Gaussians",
+      "固定其它primitive与camera，优化目标Gaussians得到edited 3DGS"
+    ],
+    "experimentsZh": "作者用Wan2.1-I2V-14B-480P、45个有效denoising steps及固定camera的Nerfstudio Splatfacto评估50个editing cases。比较GaussianEditor、DGE、VCEdit、GaussCtrl、EditSplat、Omni3DEdit、ViP3DE；reference-conditioned方法获相同anchor，其它方法共享source scenes/prompts。指标为CLIP-D/S、pairwise DINOv2与共同相邻camera对上的MEt3R。 作者报告主表四指标为0.1275/0.3129/0.8327/0.1126（CLIP-D/S、DINO、MEt3R），为所测baseline中的最佳值。 (Table 1, p. 7) 作者报告相同Wan下，ViP3DE-Wan及FlowAlign-Wan的CLIP-D为0.0472/0.0970、MEt3R为0.1193/0.1186；本方法为0.1275/0.1126。 (App. B, Table 3, pp. 13–14) 作者报告vanilla I2V替代FAVE时CLIP-D降至−0.0022、MEt3R升至0.1838；unordered views的CLIP-D为0.0405。 (Table 2, p. 8) Table 2分别去掉ECG amplification、FAVE、source regularization、RS-GS region/depth selection，并改变TGR顺序或插值。FAVE与unordered views影响最大；RS-GS均值差距较小，Fig.5则显示邻近sofa泄漏。支持组合设计，未证明所有场景均需每一项。",
+    "insightZh": "视频prior用于3D编辑已有ViP3DE；此处新意在inversion-free source/edit条件对比、ECG早期source concat放大，以及view组织、局部latent正则与Gaussian更新边界的组合。FAVE继承FlowAlign思想，TGR采用成熟FPS/spline；贡献应限定为具体编辑传播机制及控制实验，不宣称首创video-to-3D editing。",
+    "evidenceZh": "TGR从anchor选keyframes，闭环排序后双向传播，并在首个不相关clip前停止，覆盖并非无条件全场景。 (Sec. 3.2, pp. 4–5; App. A, p. 13; paper-method) FAVE共享noise保持source/edit可比，ECG在同一edited state比较source和target条件；动态attention mask区分前景与背景regularization。 (Sec. 3.3–3.4, Eqs. 5–8, pp. 5–6; Fig. 2, p. 4; paper-method) RS-GS以alpha/depth有效投影及多视图mask support选择Gaussians，仅选中primitive接受几何和外观梯度。 (Sec. 3.5, Eqs. 9–10, pp. 6–7; paper-method) 作者报告50个case上CLIP-D 0.1275、CLIP-S 0.3129、DINO 0.8327、MEt3R 0.1126，为表中最佳。 (Sec. 4.1–4.2, Table 1, p. 7; paper-experiment) 同Wan backbone控制保留anchor、camera、resolution、step与seed，VidEdit3D仍优于ViP3DE-Wan和FlowAlign-Wan。 (App. B, Table 3, pp. 13–14; paper-experiment) 大面积appearance edit可能向source褪色；扩大FOV增加未编辑context，却降低target resolution。 (App. E.2, p. 18; Fig. 11, p. 19; paper-method)",
+    "caveatZh": "App. E.1/Fig.10：严重遮挡、thin structures、不准mask和不干净anchor可致失败；anchor中的背景artifact与删除残留可能持续。 App. E.2/Fig.11：大面积外观替换缺乏未编辑context时会逐视角褪色，宽FOV只能在context与target细节间折中。 App. E.3：Wan14B对dense multi-view clips反复denoiser evaluation，交互成本高。 50个case与feature指标不能证明任意拓扑变化或不可见面几何正确；未验证LEGO connectivity、part editability或制造约束。 冻结未选Gaussian的参数不代表未编辑像素恒定，目标形状会改变遮挡。 公开repository目前仅README、license和assets，尚无可执行实现可独立复验。 PDF p.1印project URL；作者页面链接2hiTee/VidEdit3D。2026-10-27检查repo只有README/LICENSE/assets，README明确Code will be released soon。 七个baseline及同backbone控制较充分；主表原backbone和conditioning仍有差异。未见geometry GT、case级置信区间或耗时分布。App. D用户研究给均值和标准差，但未列参与人数/分配样本数，不作为强统计证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进可控3D scene editing，适合精读如何把2D编辑器与video prior接到局部3D primitive更新。对LEGO/fabrication仍是方法参考，论文无离散连接或制造约束证据，故不追加这些topic。"
+  }
+}

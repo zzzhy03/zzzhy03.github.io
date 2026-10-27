@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.35684",
+  "slug": "omnishowcase-multiview-video-prior-2610-35684",
+  "title": "OmniShowcase: Omnidirectional Subject-Consistent Video Generation from Multi-View Images",
+  "authors": [
+    "Junyeong Ahn",
+    "Geonwoo Kim",
+    "Kinam Kim",
+    "Gihwi Kim",
+    "Hoonjin Jung",
+    "Hyojin Jang",
+    "Jaegul Choo"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.35684"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "OmniShowcase",
+    "normal turntable",
+    "multi-view identity",
+    "geometry conditioning"
+  ],
+  "abstract": "Generating videos of a specific subject from a few reference images remains challenging when the camera reveals surfaces that are not visible in the input. Early subject-to-video (S2V) methods condition on a single reference image and must therefore infer the subject's unseen appearance and geometry as the viewpoint changes. To address this limitation, recent methods extend S2V to multiple reference views, providing more information about the subject from different viewpoints. However, they do not explicitly specify the 3D structure that connects these observations. In addition, existing training data do not guarantee that viewpoint changes preserve the same underlying 3D subject. We present OmniShowcase, built on two components: (i) a fully automated data synthesis pipeline that produces training videos along diverse camera trajectories, with viewpoint variation driven by underlying subject geometry, even spanning full 360-degree orbits; and (ii) a geometry-conditioning method that provides the video model with a turntable of surface-normal maps reconstructed from the reference views without requiring temporal alignment with the generated frames. We construct Showcase-4K, a corpus of 3D-asset-based videos covering twelve camera motions across 88 trajectory configurations with reconstruction-derived surface-normal conditioning, and ShowcaseBench, a held-out evaluation set with the source meshes and camera parameters used to render each video. Experiments show state-of-the-art subject identity and 3D consistency while maintaining competitive video quality and motion. Project page: justin4ai.github.io/OmniShowcase",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.35684v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.35684v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.35684v1; 25 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "OmniShowcase把四张reference重建为25帧normal turntable，再作为独立context条件化Wan，使subject跨大幅camera转动更一致。数据合成与geometry/appearance解耦值得作为3D多视角prior略读；输出仍是视频，GT-CD依赖π3重建及归一化/ICP，非刚体会失败，不能当几何正确mesh生成器。",
+    "motivationZh": "少量reference驱动视频在大幅camera转动时容易改变subject结构，纯appearance conditioning缺少独立几何约束。",
+    "methodZh": "从同一3D asset render四reference与轨迹target，固定subject pixels、用VACE补背景并经VLM gates筛选形成4K clips。normal来自reference的DA3/MV-SAM3D重建而非GT mesh，以匹配test-time误差。四reference、25-frame normal及80-frame target分别VAE编码、沿time轴串接，仅target带noise并承担flow loss；LoRA调Wan2.1，不需normal与target逐帧对齐，camera motion由文本给出。作者在50个held-out与35个NAVI subjects验证identity、feature consistency和normalized reconstructed geometry改善。",
+    "methodFlow": [
+      "由同一asset render references与轨迹target，保留subject、生成背景并筛选clips",
+      "四张reference经DA3与MV-SAM3D恢复粗geometry",
+      "沿固定yaw orbit render depth并转25-frame surface normals",
+      "分别编码references、normal和target，按time轴串接，用mask区分clean context",
+      "LoRA训练Wan，仅对noised target-video latent计算flow loss",
+      "新subject重复geometry条件生成，按文本camera trajectory采样80帧video"
+    ],
+    "experimentsZh": "作者用4,000 clips、2,593 assets、620 categories训练Wan2.1-I2V14B的rank128 LoRA，33K steps/4×B200。评ShowcaseBench 50个held-out subjects的四种360°轨迹及NAVI 35 subjects；比较Phantom-MV、MAGREF-MV、MV-S2V、四view优化的3DreamBooth，统一四reference。16 sampled frames算subject-masked identity/geometry，ViCLIP与VBench用全图。 作者报告held-out DINO/CLIP/MEt3R/GT-CD为0.799/0.925/0.190/0.0824，NAVI为0.828/0.918/0.249/0.0975，在这些identity/consistency项领先所测四baseline。 (Table 2, p. 8) 作者报告无geometry的GT-CD为0.2092/0.1987，normal condition为0.0824/0.0975，textured为0.1698/0.1842（held-out/NAVI）。 (Table 3, p. 9) 作者报告四reference GT-CD为0.0824/0.0975，单reference为0.1704/0.1875；少view循环填slot，normal只从实际可用reference重建。 (App. D, Table 4, p. 17) Table3固定data/backbone、独立训练None/Textured/Sparse，支持dense normals作独立context；Table4测试1–4 views。Table5比较rendered与Uni3C生成的训练clips本身，并非用两种data训练同一模型的消融，不能将模型提升全归因synthetic data。",
+    "insightZh": "相较仅多个appearance references的MV-S2V，加入无需时间对齐的重建normal turntable；相较per-subject 3DreamBooth，使用通用LoRA checkpoint。可迁移点为训练/推断均从稀疏reference重建条件、将geometry与appearance context分开，以及保留subject的asset-render/inpaint数据链。它未提出新重建器或直接生成mesh，不因geometry conditioning就改归3D Generation。",
+    "evidenceZh": "训练subject来自同一mesh的trajectory renders，background inpainting保持subject pixels；normal则从四reference重建。 (Sec. 3.2, Fig. 2, pp. 4–5; paper-method) reference、normal、target为独立time spans，normal与target不需逐帧对应，camera motion由文本指定。 (Sec. 3.3, Eqs. 1–3, Fig. 4, pp. 5–6; paper-method) 作者报告held-out/NAVI的GT-CD为0.0824/0.0975、MEt3R为0.190/0.249；aesthetic为0.574/0.551，并非最佳。 (Table 2, p. 8; paper-experiment) 去normal使held-out/NAVI GT-CD变为0.2092/0.1987；textured或sparse condition也弱于full normals。 (Table 3, p. 9; paper-experiment) GT-CD先由π3把segmented video lift为point cloud，独立center/mean-radius normalize、去外侧3%点，再rigid ICP。 (Sec. 4.1, p. 7; App. C, p. 17; paper-method) 不同pose的reference被static reconstruction融合成非真实rigid body，prompt motion不能修复；background亦可能显得synthetic。 (Conclusion, p. 9; App. H, Fig. 13, pp. 20–21; paper-method)",
+    "caveatZh": "Conclusion/App.H：background有时flat shading与synthetic材质，rendered subject和generated surroundings未保证一致light transport。 App.H Fig.13：非刚体reference pose被融合为single static geometry，产生平均pose或运动过渡缠结，text motion无法修复。 App.I.1：G3只用于training curation，未在evaluation/inference过滤失败。 GT-CD含π3/mask误差，normalization消除metric scale、ICP移除全局orientation且丢外侧3%点；低数值不等于可制造、watertight或camera-exact mesh。 DINO/CLIP取每reference最佳frame、MEt3R取最小dissimilarity，可能隐藏frame-level失败；RotCoverage亦是alignment-dependent辅助量。 3D主线迁移限video prior和data/condition设计，未验证downstream editable 3D asset质量提升。 作者project的Code和Dataset均is-soon占位，当前无实现或数据可独立复现。 PDF pp.2/9/10承诺公开code/data；2026-10-27检查作者project，Code和Dataset均is-soon，无公开实现仓库链接。 均四reference，但Phantom/MAGREF原为single-view经扩展，3DreamBooth使用四而非其常用30 views；App.F给原模式，部分GT-CD原模式反更好。比较还受数据/架构及camera执行能力差异影响；主表aesthetic非最佳，GT-CD不替代真实geometry或framewise成功率。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "重建normal turntable约束跨view subject结构，可为3D Generation的multi-view/video prior提供具体机制参考。该用途属迁移推断，论文未验证生成editable mesh的downstream效益，故仅归Video Generation、medium/skim。"
+  }
+}

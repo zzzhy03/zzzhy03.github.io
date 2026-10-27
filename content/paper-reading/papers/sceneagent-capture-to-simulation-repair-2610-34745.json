@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.34745",
+  "slug": "sceneagent-capture-to-simulation-repair-2610-34745",
+  "title": "SceneAgent: An Agentic Pipeline from 3D and 4D Captures to Simulation Environments",
+  "authors": [
+    "Luke Hollis",
+    "Tianxing Fan",
+    "Heng Yang"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.34745"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "SceneAgent",
+    "visual inspection",
+    "real-to-sim",
+    "digital sisters",
+    "asset repair"
+  ],
+  "abstract": "Visual captures provide detailed scene appearance, but converting them into interactive simulation environments requires object reconstruction, physical modeling, and correction of intermediate errors. We present SceneAgent, an agentic pipeline that coordinates these steps through simulator-based visual inspection and repair. The pipeline processes 3D Gaussian Splatting (3DGS), photogrammetry, LiDAR captures, AI-generated 3DGS scenes, and 4D videos of dynamic scenes, and combines object segmentation, physical parameter estimation, part decomposition, articulation, and deformable simulation. To support policy learning, SceneAgent generates diverse object variants (\"digital sisters\") and scripted demonstrations. On a cluttered bin scene from GraspClutter6D, SceneAgent raises F1 at 1 cm for every coding agent with scorable outputs both with and without its skills, and its reconstructions are better than SimFoundry: all agent configurations exceed SimFoundry's F1 score, with a best of 60.75% versus 6.9%. On three dynamic scenes from 4DCodeBench, SceneAgent raises the mean dynamic IoU of Gemini 4 Argon from 0.86% to 99.09%. We further demonstrate diverse simulated interactions and preliminary policy transfer to a real robot.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.34745v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.34745v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.34745v1; 27 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "SceneAgent把capture到simulation的工具链变成可检查、可修复的agent流程：用simulator renders纠正mask、mesh、scale/pose和articulation，再生成digital sisters。作者在单个20物体bin上报告最佳F1@1cm 60.75%对无skills9.51%，但每配置只运行一次，物性仍是prior，代价可达数亿tokens。",
+    "motivationZh": "capture外观无法直接成为可交互simulation，需要协调物体恢复、pose/scale、物理模型和中间错误修复。",
+    "methodZh": "工作整合COLMAP/Splatfacto、SAM与SAM3D、trimmed ICP、PartSAM/CubePart、Articulate Anything和Isaac Lab等工具。Orchestrator规划，ingest/runner执行，各阶段actor-critic检查isolated和assembled renders，并以manifest/ledger保留决定；packager/inspector检查USD输出。还用procedural perturbation、image edits和Meshy生成digital sisters，并提供用视频拟合MPM/FLIP/fracture模拟的4D路径。贡献主要是visual artifact tool orchestration与纠错workflow，而非新segmentation、生成backbone或精确inverse physics模型。",
+    "methodFlow": [
+      "准备RGB、3DGS、photogrammetry/LiDAR或dynamic video，并规划conversion",
+      "执行camera/3DGS重建、跨视角mask关联与mesh生成",
+      "用trimmed ICP及simulator多视角renders检查scale/pose，修复并登记结果",
+      "接入物性prior、parts completion与articulation；4D路径拟合动态simulator",
+      "打包USD并由inspector复核，生成object/scene/task digital sisters",
+      "可选：scripted expert收集成功episode，fine-tune并做paired policy验证"
+    ],
+    "experimentsZh": "静态评估一个MessyKitchens厨房与GraspClutter6D hard/000091（20YCB物体、13RGB views），各harness with/without skills各一次conversion；metric sampling seeds仅采样表面。动态评估3个synthetic4DCodeBench场景、5个harness各一次。真实policy实验为Panda+UMI的toy eggplant入basket，仿真200 layouts、真实50 layouts。 作者报告bin场景Codex的F1@1cm从9.51%至60.75%，SimFoundry为6.9%；其余五个SceneAgent配置为40.45%–60.46%。 (Fig. 5, p. 6; Sec. 4.1, p. 18) 作者报告三个synthetic4D场景Gemini 4 Argon mean dynamic IoU从0.86%至99.09%；GPT-6 Astra对应7.79%至36.38%，提升幅度强烈依赖harness。 (Sec. 4.2, pp. 18–19) 作者报告pick-and-place三种训练策略真实成功率22%、62%、88%（11/50、31/50、44/50）；单纯增加episode不单调，40episode的48%反而高于4k的12%。 (Tables 2–3, p. 21) 作者报告bin的with-skills conversion tokens例如Codex271.2M对10.0M、Claude838.2M对20.6M；质量收益伴随显著额外推理。 (Fig. 6, p. 7) 有整套skills的paired开关与demonstration规模/训练策略比较；未隔离visual critic、registration、各tool、sister生成和physical randomization的单独作用。Agent条件经常花更多tokens，缺少matched-compute控制。",
+    "insightZh": "相对既有real-to-sim系统，重点是显式agent inspection/repair贯穿模型接口，且统一静态capture、动态video、digital-sister生成和policy数据循环；各底层视觉/物理模型多为现成工具。量化with/without skills比较的是整套方法+指令+工具可用性，不是对单个新agent algorithm的干净消融。",
+    "evidenceZh": "Agent通过单体8视角与assembled scene检查、阈值几何验证和重试纠正当前conversion。 (Sec. 3.1, p. 6; Fig. 7, p. 8; paper-method) digital sisters包含无模型mesh/texture扰动与逐component图像编辑后Meshy image-to-3D两条路线。 (Sec. 3.8, p. 13; Fig. 15, p. 15; paper-method) 静态bin的重建改善来自单场景单conversion配置，缺失对象的F1计0，Chamfer仅平均matched对象。 (Fig. 5, p. 6; Sec. 4.1, pp. 17–18; paper-experiment) 物性模型由VLM标签训练，材质review由coding agent签署；静态物性不是物理测量。 (Sec. 3.4, p. 9; Sec. 5, p. 21; paper-method) 展示的fracture/tearing场景并不属于automatic export，且由scripted controllers执行。 (Sec. 3.5, p. 11; Sec. 3.7, p. 13; paper-method)",
+    "caveatZh": "Sec.5明确静态仅一个厨房与一个bin，每配置single conversion；4D仅3个synthetic scene，真实4D未评估。 质量检查无法保证hidden geometry或物性准确；mass/friction/rigidity/joints尚未按真实robot interactions校准。 转换需重复VLM调用和外部GPU，仍慢且易错；3DGS原始lighting会妨碍relighting/compositing。 真实policy study仅pick-and-place，object/placement/lighting同时随机化，效果未分离；需paired real/sim trials验证policy-evaluation预测性。 Fracture demo用工程假设参数与scripted controllers，未纳入automatic scene export；非rigid USD行为跨engine需重新实现。 不能把3个synthetic案例的99.09% mask IoU解释成一般4D几何/物理精度，边界band被排除且物性存在非唯一性。 with/without skills同时改变instructions、tool workflow与compute，无法单独归因于actor-critic或self-improving skills。 数亿tokens的conversion对日常资产设计是否划算、不同scene/harness的稳定性仍不明确。 88%真实成功率只对应50次特定task试验，不支持广泛dexterous manipulation、fracture或泛化机器人任务结论。 Sec.6 p.22明确code、processed scenes和example objects将随论文发布；PDF没有可确认的public-code repository URL。 有same-task with/without whole skills、官方SimFoundry及4DCodeBench published reference。Published4D baselines的token均值来自100tasks，本文只取3tasks，不能当matched成本比较。真实policy使用同一pretrained π0.5 (DROID)初始化；没有重复训练seed或一般性contact-rich transfer覆盖。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中视觉设计agent如何调用工具、读取rendered feedback并修复3D资产的主线；manifest/ledger、pose registration、隔离视图检查与variation验收可供LEGO/3D设计工具链参考，但论文没有验证LEGO约束或制造精度。"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.34473",
+  "slug": "physcreator-physical-field-3d-assets-2610-34473",
+  "title": "PhysCreator: Creating Physically-Attributed 3D Assets at Will",
+  "authors": [
+    "Shiyan Zheng",
+    "Ming Li",
+    "Lei Han",
+    "Xiangyu Xu"
+  ],
+  "publishedAt": "2026-10-25",
+  "updatedAt": "2026-10-25",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.34473"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "PhysCreator",
+    "voxel-aligned latent",
+    "physical field",
+    "VLM distillation",
+    "flow matching"
+  ],
+  "abstract": "Significant advancements in 3D asset creation have enabled high-fidelity 3D generation from images. However, most existing representations remain inherently static, lacking the ability to model physically plausible behaviors under dynamic interactions. We present \\textbf{PhysCreator}, a unified framework that directly generates simulation-ready 3D representations with spatially varying physical properties from images. Unlike prior approaches that treat physical attributes as simple post-hoc predictions or rely on expensive per-instance optimization, we reformulate physical property estimation within a unified 3D representation learning framework. We introduce a voxel-aligned latent space by lifting image observations into a spatially structured 3D representation, in which geometry, appearance, and physical properties are jointly modeled and inferred in a feed-forward manner. To enable scalable learning without densely annotated physical ground truth, we leverage vision-language distillation to transfer material-aware semantic priors from powerful vision-language models into spatially grounded voxel-level supervision. Experiments demonstrate that our method achieves superior visual quality, physical plausibility, and generalization compared to prior approaches.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.34473v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.34473v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.34473v1; 13 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "PhysCreator把3DGS与voxel-wise物性放进共享3D latent，并用image-conditioned flow matching生成带材料属性的资产；空间异质性比全局单材质更值得关注。作者的物性误差参照是VLM估值经人工动态合理性审核，不能当测量真值；训练细节和组件消融不足，建议略读表示与监督机制。",
+    "motivationZh": "静态3D表示难支持空间变化的材料响应；全局材质或逐实例优化不能同时提供细粒度物性与快速资产生成。",
+    "methodZh": "多视角端先由VGGT恢复point cloud/poses，将DINOv2特征投影并均值聚合到active voxels，经transformer latent分别解码3D Gaussians及Young’s modulus、Poisson ratio、density、material ID。VLM生成part/material/physical estimates，CLIP语义相似度把标签lift到voxel，再以simulation+VLM检查筛选pseudo-label；single-view端通过conditional flow matching学习同一latent，并可cross-attention接入soft/hard等语义物性条件。MPM只用于展示和评估动态，不表示模型恢复了真实材料常数。",
+    "methodFlow": [
+      "VGGT估计multi-view geometry/poses并构建active voxel grid",
+      "将DINOv2特征投影、跨视角聚合为voxel-aligned transformer latents",
+      "VLM给出part/material参数，CLIP映射到voxel并经simulation/VLM过滤",
+      "共享latent分别解码3DGS与空间变化的E、ν、ρ和material category",
+      "以conditional flow matching从single image生成相同3D latent",
+      "可选语义条件调节物性，将资产送入MPM模拟交互"
+    ],
+    "experimentsZh": "以Objaverse训练/评价，MPM来自PhysGaussian；比较DreamPhysics、OmniPhysGS与PhysGM。Table1列Flower、Metal Crate、Sand、Rubber Toy、Wooden Box五类，CLIPsim与26名参与者blind 5-point Likert user study。文中没有给出明确train/test对象数、split、训练步数、硬件或统计区间。 作者报告single-view平均CLIPsim26.984、Uscore4.132，对PhysGM24.932、2.808；per-object runtime约10s。multi-view版本27.002、4.170、约15s。 (Table 1, p. 6; Sec. 4.2, p. 7) 作者报告geometry Chamfer为0.0431对PhysGM0.0475，F-score@2%为72.72对59.05；没有声明CD单位或置信区间。 (Table 2, p. 9) 作者报告对人工plausibility审核的VLM-reference，E/ρ/ν mean relative errors为7.78%/11.86%/8.12%；E与ρ在log空间评价，而非真实材料测量误差。 (Sec. 4.3.2, p. 9; Table 3, p. 10) 有single/multi-view结果、异质材质可视化及soft/hard/heavy/light控制比率，但没有去voxel、去VLM过滤、去共享latent等controlled component ablation；因此无法隔离性能来源。",
+    "insightZh": "相对于PhysGM的2D/global-feature物性预测，把geometry与异质物性对齐到显式voxel support是主要贡献；VLM伪标注+CLIP spatial assignment及single-view latent生成组成统一路线。它不是新VLM或可验证真实物性辨识；joint representation/voxel supervision/semantic control各自贡献缺少组件消融。",
+    "evidenceZh": "共享voxel latent同时解码3DGS与逐voxel物性，单图通过flow matching生成该latent。 (Fig. 2, p. 4; Secs. 3.1.2–3.1.3, pp. 5–6, Eqs. 2–6; paper-method) 物性训练target源自VLM估值，经CLIP分配和simulation/VLM检查，不是dense measured physical ground truth。 (Sec. 3.2, pp. 6–7, Eqs. 7–9; paper-method) 作者报告single-view的semantic/human scores优于PhysGM，物性误差的reference仍是VLM+人工plausibility筛选。 (Table 1, p. 6; Sec. 4.2, p. 7; Sec. 4.3.2, p. 9; Table 3, p. 10; paper-experiment) 空间异质性和语义控制可能有助于可交互3D资产设计，但未验证制造或真实机器人接触安全。 (Figs. 4–5, p. 9; Table 4, p. 10; reviewer-inference)",
+    "caveatZh": "Introduction p.1明确Young’s modulus与density不能直接从图像观察。 Sec.3.2/4.3.2明确监督与reference首先由VLM推断，再按模拟动态是否合理筛选；不依赖dense annotated physical ground truth。 同类VLM/material prior既产生training labels又构成评价reference，可能主要测得语义先验一致性；人工判断视觉合理不能识别真实物性常数。 训练/评价样本量、split、模型规模、优化配置、runtime硬件和统计变异未充分交代，复现与generalization主张较难评估。 缺乏controlled component ablation，不能单独证明voxel alignment、joint learning和offline filter各自必要。 示例动态不等于真实世界校准；对制造、LEGO接触/连接或embroidery材料不能直接外推。 未在论文中找到可确认的public code链接或明确release承诺。 完整PDF未找到code repository URL或明确公开代码承诺。 使用官方实现与推荐配置比较optimization-based DreamPhysics/OmniPhysGS和feed-forward PhysGM；time表未给硬件和相同budget细节。没有独立实物材料测量、真实dynamic ground-truth或部署机器人实验；CLIPsim和human preference仅支持semantic/perceptual plausibility。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "与3D Generation的具体联系是把资产geometry、appearance和可局部调节的physical field放在同一空间表示；适合作为editable/simulation-ready资产方向的表示参考。使用VLM只为监督，不构成独立VLM或segmentation方法贡献。"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2610.34921",
+  "slug": "physevolve-executable-world-verification-2610-34921",
+  "title": "PhysEvolve: Verifier-grounded Self-evolution for Physical Reasoning with Executable Worlds",
+  "authors": [
+    "Jinyuan Hu",
+    "Yilei Jiang",
+    "Chen Tang",
+    "Minghong Cai",
+    "Xinran Liu",
+    "Xiangyu Yue"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.34921"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "PhysEvolve",
+    "PhysDSL",
+    "counterfactual branches",
+    "physics verifier",
+    "GRPO"
+  ],
+  "abstract": "Physical reasoning underpins how embodied systems understand and act in the physical world, yet vision-language models (VLMs) remain unreliable on questions about dynamics and physical causality. Progress is critically constrained by the scarcity of grounded counterfactual training data, as observational videos capture only the factual trajectory that occurred. The self-evolving paradigm offers a route beyond fixed datasets by enabling models to construct their own training problems. Extending this paradigm to physics, however, requires an external source of truth that can both validate model-proposed environments and verify alternative physical outcomes under intervention. We introduce \\physevolve{}, a verifier-grounded self-evolving framework that trains VLMs for causal physical reasoning from model-proposed executable worlds and simulation-authored tasks. At each round, a shared VLM proposes executable world programs and evidence schemas; a deterministic physics engine freezes each valid world, simulates matched baseline and body-elided counterfactual branches, and synthesizes discrete, answer-bound visual tasks. Exact verifier feedback from task solving updates both the shared policy via GRPO and an adaptive curriculum over physical intents. Starting from Qwen3-VL-8B-Instruct, \\physevolve{} achieves targeted gains across PhysBench, CausalPhys, and ContPhy without human intervention data, improving PhysBench Throwing by $8.8$ points and ContPhy Counterfactual Removal and Goal-Pit by $7.4$ and $24.4$ points. These gains concentrate on interaction-sensitive and altered-world questions, demonstrating zero-shot transfer of causal principles to unseen complex dynamics (cloth, fluid, soft bodies) and real-world video.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.34921v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.34921v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.34921v1; 26 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "PhysEvolve值得精读的是把world proposal与物理真值分开：VLM只写受限PhysDSL世界，确定性executor冻结场景、执行配对移除分支并生成唯一答案，避免单轨迹/连续近似奖励的自嗨。作者报告Goal-Pit提升24.44pp，但仅90题、单个100-step训练run；还没有设计agent或真实制造验证。",
+    "motivationZh": "观测视频只给出发生过的轨迹，缺少能验证干预结果的grounded counterfactual数据；模型自评容易优化错误proxy。",
+    "methodZh": "工作针对physical VLM缺乏可验证counterfactual训练数据的问题，使用共享Qwen3-VL-8B作为Proposer/Solver。Proposer按8种intent提出Python world program和schema，MuJoCo executor检查/有限修复后冻结世界，在相同seed与时域运行baseline及body-elided branches，以可判定性margin和唯一性条件生成离散QA。Solver仅看baseline视频，exact option-match用于GRPO与family curriculum。报告训练只覆盖Throwing/Collision/Motion三类刚体schema，并保留24个golden程序示例；不是从任意物理世界零先验自学。",
+    "methodFlow": [
+      "采样reasoning intent；共享VLM提出PhysDSL world program与evidence schema",
+      "固定executor执行typed检查与有界修复，冻结唯一world definition",
+      "按相同seed执行baseline及指定body-removal branches",
+      "检查物理margin/答案唯一性，将分支readout绑定为离散visual QA",
+      "Solver仅看baseline视频作答，以exact-match reward训练共享policy",
+      "按滚动family正确率更新intent sampling与proposal credit"
+    ],
+    "experimentsZh": "从Qwen3-VL-8B-Instruct开始，每配置一个100-step GRPO run，无seed sweep；4GPU；三种刚体world schema与8种active family。统一协议评估PhysBench 9802题、CausalPhys3057题、ContPhy1950题。24个golden demonstration programs在steps1–100持续可用。 作者报告PhysBench overall由52.92%至53.47%（+0.55pp）；Throwing在410题上46.10%至54.88%（+8.78pp），Perception分区反而下降4.35pp。 (Tables 15–16, p. 24) 作者报告ContPhy Counterfactual Removal在122题上44.26%至51.64%（+7.38pp），Goal-Pit在90题上20.00%至44.44%（+24.44pp）；ContPhy overall仅+2.46pp。 (Table 18, p. 26) 作者报告branch-enabled完整路径相对关闭分支及相关families，在Goal-Pit为44.44%对21.11%；Solver-only更新有严重parse-rate崩塌，CausalPhys parse rate仅26.07%。 (Tables 2–3, p. 9) 包含branch-enabled path与Proposer-role更新消融，并审计naive proximity reward的错误高分；但branch消融同时移除task families且exposure不同，Proposer消融伴随answer parser崩塌。未独立分解所有curriculum、repair、golden demos和各reward控制的因果贡献。",
+    "insightZh": "相对于把code self-play直接换成单轨迹physics executor，实质变化是branch-level execution及answer-bound task synthesis，而非简单增加physics QA。附录E与Table12明确本轮instance-level tent coefficient为0；learnability主要通过family sampling/credit起作用，不能把通用公式中的instance项写成本实验已激活的机制。",
+    "evidenceZh": "Proposer不掌握真值；executor冻结世界、执行匹配移除分支并绑定唯一答案，Solver只看baseline视频。 (Secs. 3.2–3.4, Fig. 2, pp. 5–6; App. C–D, pp. 19–21; paper-method) 作者报告提高了部分物理干预子任务，但overall改进较小且存在能力退化。 (Tables 15–16, p. 24; Tables 18–19, p. 26; paper-experiment) branch-path消融同时关闭分支与依赖的CF/Inverse task families，并改变实际训练exposure。 (Table 2 and Sec. 4.3, p. 9; paper-experiment) 可将受限world-program生成、匹配反事实与exact outcome checker借鉴到物理设计agent训练，但论文没有直接评估这一用途。 (Sec. 3.3, p. 5; App. A, pp. 15–16; Table 13, p. 23; reviewer-inference)",
+    "caveatZh": "Table13明确每配置只有一个训练run，无training-seed sweep，horizon为100 steps。 App.A/Table7实际启用三种world schema；Table13持续使用24个golden demonstration程序，且executor有6分支上限。 Tables16/18显示Perception、Property、Cloth等子项下降，overall与突出子任务增幅不同。 exact verification只对手写readout、margin和模拟器模型成立；不等于对现实物理或任意设计规格的真值保证。 Goal-Pit仅90题，未报告训练seed变异；作者把zero-shot效果解释为抽象causal operator，但当前实验不能排除task/template相近性等解释。 branch和Proposer消融存在exposure、task family及parse-rate混杂；单项必要性措辞应收敛。 与visual-design-agents的连接是方法迁移判断，尚无LEGO/CAD/制造或设计生成闭环实验。 PDF首页印出的GitHub链接经本轮公开GitHub API检查返回404，未确认public code，不能提供Code按钮。 PDF p.1印有https://github.com/yelonhu/PhysEvolve；2026-10-27公开repository与contents API均404，未确认可获取代码。 主要matched对照是同一8B base、naive单轨迹self-play及组件控制；其他规模open-weight模型仅作context。没有与使用相同合成题/相同budget的offline SFT或强physics-data训练做充分隔离对比，也无设计artifact成功率测试。",
+    "relevance": "medium",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对物理设计agent的具体参考是：模型提出可执行设计/环境，独立executor产生配对干预和客观checker，而不让生成者自行给分。适合借鉴verification与reward设计；它本身仍是VLM物理QA训练方法。"
+  }
+}

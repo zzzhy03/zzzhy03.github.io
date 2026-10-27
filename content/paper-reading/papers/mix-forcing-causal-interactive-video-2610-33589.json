@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.33589",
+  "slug": "mix-forcing-causal-interactive-video-2610-33589",
+  "title": "Mix Forcing: Causal Pre-Training via Mixture Attention for Interactive World Models",
+  "authors": [
+    "Zelin Gao",
+    "Hao Ouyang",
+    "Jiapeng Zhu",
+    "Qiuyu Wang",
+    "Jingye Chen",
+    "Zichen Liu",
+    "Xing Zhu",
+    "Yujun Shen",
+    "Yinghao Xu"
+  ],
+  "publishedAt": "2026-10-24",
+  "updatedAt": "2026-10-24",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.33589"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Mix Forcing",
+    "MoBA attention",
+    "causal pretraining",
+    "chunk-local prompt",
+    "video distillation"
+  ],
+  "abstract": "While interactive video world models require autoregressive generation, directly adapting pretrained bidirectional video diffusion models into autoregressive ones with teacher forcing can disrupt their visual priors and degrade autoregressive generation quality. In this paper, we introduce Mix Forcing, a causal pre-training paradigm for interactive video world models, implemented with the Mixture-of-Bidirectional-and-Autoregressive (MoBA) attention. Mix Forcing jointly trains a video diffusion model with both teacher forcing and bidirectional training, yielding a strong causal initialization for few-step post-training. In self-attention, Mix Forcing leverages teacher forcing to learn causal next-chunk prediction for autoregressive rollout, while using bidirectional attention to preserve pretrained visual priors. To support online text interaction, Mix Forcing further adopts a chunk-wise cross-attention design that conditions each video chunk on a shared environment prompt and its own local prompt, without exposing future instructions to the current chunk. Following causal pre-training on a 14B image-to-video model, we apply consistency and distribution matching distillation to obtain a four-step autoregressive generator. Experiments on our internal benchmark and public benchmarks, including WBench and SANA-WM-Bench, show that our model achieves state-of-the-art visual quality and timely event following with precise camera control. Notably, our model supports high-fidelity long-horizon generation without quality degradation even over one-hour rollouts. Project page is here: https://zelingao98.github.io/mixforcing",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.33589v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.33589v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.33589v1; 33 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "Mix Forcing在同一forward中隔离联合teacher-forcing与bidirectional训练，保留视频先验，再以chunk-local prompts实现不重算历史KV的交互。作者的受控消融支持其优于TF-only初始化；一小时证据是5分钟窗视觉Quality相对稳定，未验证同一3D世界长期几何/记忆正确性。值得精读训练mask与消融，不能把OT1.5s当真实推理延迟。",
+    "motivationZh": "将bidirectional video model改成causal生成会改变attention和noise分布，损伤视觉先验；全局文本条件还可能泄露未来指令。",
+    "methodZh": "问题是把bidirectional video DiT因果化时，attention范围和噪声分布都偏离预训练，且global prompt泄露未来事件。MoBA将clean history+independent-noise TF chunks与shared-noise BID chunks拼接，用self-attention mask隔离两个目标；TF cross-attention只看environment+当前local prompt，BID仍看global prompt。相机Plücker rays经AdaLN注入，从Wan2.1-I2V-14B开始causal pretraining，再CD/DMD成4-step KV-cached generator。作者在内部InBench、60秒SANA-WM-Bench和WBench比较质量/事件/相机；附录给一小时逐窗Quality与定性场景。结果支持因果训练保留外观和prompt响应，尚不支持通用3D simulation或几何保真；训练算力配置在正文/附录不一致。",
+    "methodFlow": [
+      "Wan2.1-I2V-14B+相机Plücker条件，准备environment/global/chunk-local prompts",
+      "TF clean-history/noisy-chunks与shared-noise BID序列拼接",
+      "MoBA self-attention隔离两训练模式，联合flow-matching优化",
+      "TF cross-attention仅访问environment+当前local prompt，历史KV不随更新重算",
+      "causal teacher→consistency distillation→DMD四步generator",
+      "按当前pose/local prompt自回归生成chunk并VAE解码"
+    ],
+    "experimentsZh": "初始化Wan2.1-I2V-14B-480P，100k自收集clips共974小时，70%有COLMAP camera。480×832/16FPS；15k causal pretrain、8k CD、1.5k DMD steps。InBench96个生成初始图：32 interactive、64 roaming，每例8–35秒/3–5次prompt更新；公开SANA-WM-Bench评60秒simple/hard轨迹，WBench Navi-158。用户研究18 sessions、318 pairwise trials，未将session数等同独立参与人数。 作者报告InBench Mix质量75.1/EA94.4/OT1.5s96.8；LingBot-World-Fast为72.4/86.5/87.3。OT为生成视频时间内响应指标。 (Table 1, PDF p.7; Appendix B.2 p.14) 作者报告SANA-WM-Bench simple/hard的Quality74.8/74.7、SIQ66.7/66.4；但simple相机Rot0.965，逊于Matrix-Game3的0.888等，不是所有控制指标最佳。 (Table 2, PDF p.7) 作者报告相同CD→DMD流程下Mix预训练四步模型Quality70.9，TF-only64.1；OT1.5s64.3 vs19.8。 (Table 5, PDF p.9) 作者报告一小时每五分钟Quality均值67.3–71.6，第一窗71.0、末窗69.3；图给标准差但未说明rollout样本数。 (Appendix C.3, Fig.S12, PDF p.27) Table3 TF+BID优于TF，并表明直接叠DF不一定好；Table4 chunkwise使EA23.4→50.0、OT1.5s18.3→62.1；Table5在相同CD/DMD下验证Mix初始化价值。没有把一小时几何/记忆、实际推理FPS、attention缓存大小或资源效率作为完整消融，不能从4-step推出real-time性能。",
+    "insightZh": "相对已有TF causal adaptation、diffusion forcing和few-step distillation，主要贡献是用隔离BID目标持续保留预训练attention/噪声设定，并配套因果chunk-local text conditioning。不是重新发明CD/DMD、KV cache或Plücker control。受控TF-only对比和跨benchmark长时外观证据使其超出普通局部视频指标改进，适合major候选精读；“一小时无退化”需缩为所测视觉Quality相对稳定。",
+    "evidenceZh": "TF与BID以不同噪声/attention设定拼接训练并通过mask隔离，等权优化两个flow-matching目标。 (Sec.3.2, Fig.3 and Eqs.(3)-(7), PDF pp.4-5; paper-method) TF chunk只cross-attend environment与当前local prompt；prompt更新无需重算历史KV。 (Sec.3.2, Eq.(4), PDF pp.4-5; paper-method) 作者在相同CD→DMD下报告TF-only四步Quality64.1/EA33.7/OT1.5s19.8，Mix四步70.9/55.1/64.3。 (Table 5, PDF p.9; paper-experiment) 作者报告InBench质量75.1、EA94.4、OT1.5s96.8；OT按生成视频时间计而非真实推理时间。 (Table 1, PDF p.7; Appendix B.2, Eq.(S6), PDF p.14; paper-experiment) 作者报告一小时rollout按12个五分钟窗计算Quality均值67.3–71.6，首窗71.0、末窗69.3。 (Appendix C.3 and Fig.S12, PDF p.27; paper-experiment) 单global prompt时相机控制变弱，且方法当前只验证分离self/cross-attention的DiT。 (Sec.5 Limitations, PDF p.9; Table 2 p.7; paper-method) 训练硬件描述在正文与附录不一致，精确compute成本尚待澄清。 (Sec.4.1 Implementation Details, PDF p.6; Appendix A.2, PDF p.11; reviewer-inference)",
+    "caveatZh": "只实现了分离self-attention/cross-attention的video DiT，unified attention适用性未验证。 模型依赖chunk-wise local prompts；只给global prompt时相机控制精度下降。 一小时Quality是AQ/IQ/flicker/dynamic/HPS五指标均值，不能证明持续同一3D世界的geometry、physics或memory正确；跨rollout样本数未列。 Appendix B.2明确OT使用generated-video time而非inference time，部分响应也可记OT；不应称低延迟硬件交互。 正文256H20与附录512H200/512H20矛盾，训练资源成本无法精确确定；本项目未复现实验。 InBench为96个自建生成初始图，user-study318pairwise trials依赖18sessions；缺少独立多seed/CI与长期控制成功率。 论文声称world model，实际输出仍是2D video，未输出可编辑3D资产或验证多视图几何。 PDF p1/p10印出的官方project入口 https://zelingao98.github.io/mixforcing 链接到公开同系列inference repo https://github.com/robbyant/lingbot-world-v2。2026-10-27确认repo含generate.py、wan/、run_fast.sh和KV-cache causal inference，但README绑定旧technical report2607.07534；未确认本稿MoBA/CD/DMD方法或exact结果的代码/模型对应关系，因此不把related prior code当作本论文实现，不提供Code链接。 比较HY-WorldPlay、JoyAI-Echo-WM、Matrix-Game3、SANA-WM-Streaming、LingBot-World-Fast，公开与内部bench均有结果；对TF/DF/BID组合、chunk size、global/local text和相同posttraining初始化有消融。跨模型训练数据/算力非统一，内部初始图与部分基准自建；长期重访记忆只给定性case。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对video generation关注点直接，尤其保留预训练先验的causal adaptation、chunk-local prompt和cached rollout训练；可能为受控视觉内容生成提供方法参考，但本稿没有实测主线3D生成/设计agent收益，故只归Video Generation。"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2610.35497",
+  "slug": "video-editing-agent-credit-assignment-2610-35497",
+  "title": "When Fine-Grained Credit Assignment Helps and Hurts: Multimodal Agentic Reinforcement Learning through Video Editing",
+  "authors": [
+    "Lei Zhao",
+    "Zongheng Cao",
+    "Xinyu Hu"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.35497"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "video editing agent",
+    "GRPO",
+    "process reward decay",
+    "OPSD",
+    "reward hacking"
+  ],
+  "abstract": "Reinforcement learning (RL) has shown promise for training multimodal agents to reason and use tools. However, it remains unclear when fine-grained credit assignment improves learning and when it fails to improve task performance. Video editing provides a useful testbed for this question, combining multimodal perception, long-horizon planning, and tool use with delayed outcome feedback. We construct four movie-trailer editing task types---Content Selection, Narrative Sequencing, Rough Cut, and Fine Cut---that reflect real-world editing workflows and span different levels of task complexity and interaction horizon. Decaying process rewards provides the largest benefit on Fine Cut, with a 45.4% relative gain over outcome-only GRPO on tasks averaging more than 60 turns under outcome-only GRPO. On the three shorter-horizon task types averaging 30--40 turns under the same baseline, outcome-only GRPO remains competitive, with decaying process rewards yielding at most a 10.4% relative gain. Process rewards from an LLM judge initially improve tool use and encourage visual inspection. As training progresses, however, GRPO+PRM with a fixed process-reward weight increasingly exhibits excessive reasoning and redundant tool calls: process rewards continue to rise while task completion rates and outcome scores decline. Decaying the process-reward weight to zero mitigates this reward-hacking behavior while preserving the early gains. Despite dense token-level supervision, on-policy self-distillation (OPSD) yields little improvement or substantial degradation and is highly sensitive to the choice of privileged information. Our analysis reveals differences in teacher--student disagreement and gradient magnitudes, and suggests possible dilution of informative signals over long trajectories.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.35497v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.35497v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.35497v1; 48 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "这项video-editing agent训练研究的价值是奖励失效边界：固定process reward诱导反复检查而不交付，作者报告衰减权重后overall从0.334升至0.447，Fine Cut相对outcome-only GRPO提升45.4%。值得精读训练与交付约束，但短程任务无一致收益，不能推出越细的credit越好。",
+    "motivationZh": "长程视觉编辑只在交付后获得结果分数，细粒度奖励可能帮助探索，也可能诱导反复检查而不完成产物。",
+    "methodZh": "以49部电影及其trailer构造797个独立阶段任务，用Qwen3.5-9B比较trajectory-level GRPO、turn-level固定/衰减PRM和token-level OPSD。agent通过shell及媒体工具观察、编辑、渲染并交付；过程奖励早期辅助探索，后期衰减为零以减少代理行为优化。",
+    "methodFlow": [
+      "将film/trailer对齐并分chunk，构造Content Selection、Narrative Sequencing、Rough Cut、Fine Cut四个独立任务。",
+      "在隔离workspace中由Qwen3.5-9B调用shell、图像/音频分析和validation工具，输出JSON或实际video。",
+      "用独立outcome grader计算最终产物奖励；Gemini 3.8 Flash以三票均值给turn级process reward。",
+      "比较纯outcome GRPO、固定λ=0.5、在update20—30三次衰减至零的PRM，以及teacher-only privileged context的OPSD。",
+      "在6部held-out电影81任务上对各最终checkpoint运行四次，联看质量、truncation、观察与tool行为。"
+    ],
+    "experimentsZh": "716训练任务/43电影，81验证任务/6电影，四类各14/15/26/26验证任务；Qwen3.5-9B训练50updates、seed42。CS/NS是deterministic目标；RC/FC含Gemini3.1Pro rubric，process judge用不同模型。最终avg@4为rollout重复。 作者报告overall：base0.284，outcome-only0.413，fixedPRM0.334，decayedPRM0.447；后者FineCut0.293且45.4%相对提升。 (Table3 p.9) 作者报告fixedPRM与decay的truncation分别44.1%和6.2%；outcome-only仅0.3%。 (Table5 p.11) 作者报告OPSD reference/suggestion overall为0.277/0.044，后者梯度更大；该诊断没有隔离因果机制。 (Table3 p.9; Tables13—15 pp.40—41) 固定与cubic decay PRM直接支持该环境中的schedule效果；OPSD的reference/suggestion比较揭示privileged context敏感性。没有系统扫decay区间；reward hacking机制解释及信号稀释为待验证推断。",
+    "insightZh": "贡献在可审计的多阶段编辑环境、统一recipe下的credit粒度比较，以及用衰减过程奖励处理不交付行为的实证分析；不是新的生成backbone或普适RL定理。OPSD控制变量并不等成本，梯度与KL诊断也不证明失效因果机制。",
+    "evidenceZh": "任务阶段独立使用reference状态，避免上游错误传递；这不是端到端trailer编辑实测。 (Sec.4.2 p.7; App.A.3 p.19; Fig.2 p.20; paper-method) 固定process weight与衰减weight共用outcome项，衰减在20—30 updates按cubic schedule归零。 (Sec.3.2 Eq.3.3 p.5; Sec.5.1 p.8; App.C.1 p.32; paper-method) 作者报告overall 0.334→0.447；Fine Cut为0.293，相比outcome GRPO 0.201有45.4%相对收益。 (Table3 p.9; Sec.5.2 p.8; App.C.3 p.35; paper-experiment) 作者报告fixed PRM的truncation 44.1%，decay为6.2%，outcome-only为0.3%。 (Table5 p.11; Fig.3 p.46; paper-experiment) OPSD只有每task1条轨迹而reward recipes有8条；四次evaluation并非四个训练seed。 (App.C.1 Tables8—9 pp.32—34; Fig.4 p.47; paper-method)",
+    "caveatZh": "结论限于movie-trailer editing的LLM-judged GRPO+PRM；其它turn-level RL方法能否推广未解决。 OPSD仅识别failure patterns，没有建立有效补救或因果机制。 reflection是正则词汇计数，不证明有效纠错；主观grader和参考解并不等同人类质量共识。 只有单一9B模型和训练seed；avg@4不提供训练seed稳定性。 各阶段使用reference输入，不能把结果解读为完整长程trailer制作能力。 OPSD与GRPO的sample预算不同，结果比较是recipes而非只改变credit粒度。 PDF印出的GitHub仓库在本次公开API核查返回404，不能提供已公开Code link。 同一base model与task/update数比较三粒度recipe；没有GiGPO、Turn-PPO或跨模型多seed验证。OPSD采样轨迹是GRPO的1/8，不能视作等算力粒度消融。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究视觉设计agent在媒体工具、渲染观察、交付反馈中的学习；可借鉴process reward与完成目标的冲突诊断，但未验证LEGO、CAD或制造任务迁移。"
+  }
+}

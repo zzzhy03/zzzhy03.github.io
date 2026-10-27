@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.35522",
+  "slug": "gensfm-native-3d-diffusion-shape-pose-2610-35522",
+  "title": "Generative Structure from Motion with Native 3D Diffusion",
+  "authors": [
+    "Haobin Duan",
+    "Binbin Huang",
+    "Mochu Xiang",
+    "Yiqun Zhao",
+    "Zibo Zhao",
+    "Yi Ma",
+    "Shenghua Gao"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-27",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.35522"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "GenSfM",
+    "joint shape-pose diffusion",
+    "UV-volume",
+    "pose-aware voxel conditioning"
+  ],
+  "abstract": "Recovering an object's 3D structure and camera motion from a few uncalibrated views is a fundamental problem in computer vision. Classical structure from motion methods recover 3D geometry consistent with the input images but cannot recover unseen regions; native generation methods produce plausible 3D objects which are related but not necessarily faithful to the input images. Methods simply concatenating reconstruction and generation allow error to cascade across the two stages, instead of producing a 3D object consistent with both the distribution and the input. We propose GenSfM, which integrates image-based 3D reconstruction with a native 3D diffusion model. In particular, we use a multi-modal diffusion transformer to jointly denoise the shape latent and per-view pose latents under shared self-attention, grounding generated geometry in the observed views while using object-level priors to infer unobserved regions. A compact 3D-native UV-volume tokenization keeps the joint sequence small as views are added, and a pose-aware stage refines geometry and texture by sampling per-voxel image features at the recovered camera poses. On Toys4k and GSO, for $4$ uncalibrated views, GenSfM improves novel-view PSNR by $3.2$-$4.5$ dB and reduces median Chamfer distance by $2.8$-$3.8\\times$ over a strong native-3D generation baseline, while recovering input-view poses over $96\\%$ Acc@$5^\\circ$ without any external pose-estimation backbone, post-hoc optimization, or known intrinsics. Project page: https://dotb1ue.github.io/GenSfm/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.35522v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.35522v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact version 2610.35522v1; 16 pages; full text and relevant method/result/limitation pages inspected. All experimental results are author-reported, not independently reproduced.",
+    "ideaZh": "GenSfM把native 3D prior从重建后补洞改为shape与camera pose联合去噪，再按预测pose给voxel采样图像特征；对多视图条件生成有直接迁移，值得精读。提升限4-view object benchmarks，表间alignment不同，pose统计还消除了front/back chirality，不能外推为野外任意视图的无歧义恢复。",
+    "motivationZh": "未标定稀疏视图同时需要观测一致的几何与不可见区域补全；独立pose estimation再接generator容易累积误差。",
+    "methodZh": "继承TRELLIS两阶段和CUPID UV-volume表示，把每view pose压缩成4³×8 latent，与16³ shape latent及register tokens组成multi-modal DiT序列；view-ID绑定pose和image-condition tokens，shared self-attention同时做完整形状与camera推断。UV volume用DLT/RQ恢复camera，fine stage按其投影采样DINO/CNN特征并跨view平均，生成可解码为mesh或3DGS的SLat。作者在Toys4k/GSO的四个未标定输入视图上报告geometry、novel-view与pose提升；未验证scene-level、野外宽松segmentation或更多view数量。",
+    "methodFlow": [
+      "四张未标定object图像提取DINOv2及multi-scale CNN特征，并加入view-ID",
+      "shape、每view压缩UV-volume pose和register tokens组成统一DiT序列",
+      "shared self-attention联合flow denoising生成完整shape与camera pose latents",
+      "UV-volume decoder产生voxel–image对应，用DLT/RQ恢复camera及intrinsics",
+      "按预测camera为active voxel采样semantic/texture特征并跨view平均",
+      "pose-aware fine-stage denoising输出SLat，解码为mesh或3DGS"
+    ],
+    "experimentsZh": "作者从Objaverse-XL、HSSD、3D-FUTURE、ABO经filter留约430K assets，每物体render24个上半球view。Toys4k/GSO各前400 objects、两组互斥4-view inputs组成800个object–viewset instances，8个novel views测PSNR/SSIM/LPIPS、median CD及F scores；另测pairwise rotation/translation与FOV。 作者报告Table3同一similarity-ICP内，Toys4k PSNR从TRELLIS-M 24.01到28.54 dB、F@.01从0.5570到0.8279、median CD从0.4329到0.1133（×10⁻³）。 (Table 3, p. 8) 作者报告GSO同协议PSNR 25.50对22.28，median CD 0.1882对0.5200；这是四view object recovery结果。 (Table 3, p. 8) 作者报告front/back ambiguity-tolerant、raw pairwise pose下，predicted intrinsics的Toys4k/GSO RRE为1.60°/1.27°、Acc@5°为97.23%/98.21%、RFOV为2.90°/2.86°。 (Table 4, p. 9; App. A.2, pp. 13–14) Table5累计加入full cross-attention、visual conditioning、register、native multi-view fine decoder；最后一项主要改善photometric fidelity，geometry已近饱和。Table6表明4³ pose latent的GT UV-volume autoencoding误差与大grid相近，但这不等同于真实输入pose预测。",
+    "insightZh": "TRELLIS原生3D prior与CUPID单图UV-volume pose表示被继承；实质推进为紧凑多view pose tokens、view绑定、shape/pose联合self-attention及pose-aware per-voxel fine conditioning。它将观测约束与未见区域生成统一，超过串联reconstructor/generator；但当前消融是累计加组件，不能把全部提升只归因joint denoising而忽略训练分布。",
+    "evidenceZh": "继承TRELLIS和CUPID，把每view pose压到4³ grid并与shape联合去噪，UV-volume再经DLT解camera。 (Sec. 3–4.1, pp. 4–5; Fig. 2, p. 5; paper-method) fine stage按预测camera投影voxel、采样DINO语义及CNN纹理并mean pooling；训练时使用GT cameras和occupancy。 (Sec. 4.2, p. 6; App. A.4–A.5, p. 15; paper-method) 作者在similarity-ICP下报告Toys4k/GSO PSNR 28.54/25.50，对TRELLIS-M的24.01/22.28；median CD为0.1133/0.1882，对比0.4329/0.5200。 (Table 3, p. 8; paper-experiment) 作者在predicted-intrinsics下报告Acc@5°为97.23%/98.21%，但angular score折叠front/back sign-flip等价类。 (Table 4, p. 9; App. A.2, pp. 13–14; paper-experiment) register tokens改善strict geometry及aligned pose；native multi-view fine decoder主要改善appearance，raw coarse cameras不变。 (Table 5, p. 9; Fig. 5, p. 10; paper-experiment) 结果仅object-centric N=4；distribution shift下pose/calibration误差会错配fine-stage features。 (Sec. 6 Limitations, p. 10; paper-method)",
+    "caveatZh": "Sec.6 p.10：仅object-centric N=4，更多view、scene-level及野外宽松segmentation待研究。 Sec.6 p.10：分布偏移时pose/calibration误差让fine-stage图像特征错位，继承TRELLIS物体分布和resolution限制。 Sec.5.2 p.9：对VGGT的RFOV优势同时反映训练分布覆盖。 App.A.2把angular pose按front/back sign-flip等价打分，高Acc@5°不覆盖chirality风险。 fine stage训练用GT projection、推断用预测pose，缺少view-count/遮挡敏感性与scene实验。 Table2/3 alignment不同，Table4/5 pose也不同；CD median可能淡化极端失败，摘要须保留同表比较。 未验证part语义、connectivity、watertight或manufacturing；输出mesh不自动成为可制造asset。 PDF p.2仅project URL，p.16谈未来open model release/attribution；2026-10-27检查作者project HTML与app.js未找到有效Code/repository链接，不能把planned checkpoints当可用source code。 比较FreeSplatter、LucidFusion、ReconViaGen、TRELLIS-S/M、SAM3D、VGGT，按输出分别用pointmap-LSQ、similarity-ICP、raw relative-pose协议，GenSfM也按对应协议重评，只在同表比较。SAM3D/TRELLIS-S逐view生成后平均，非原生四view方法；作者承认VGGT的RFOV差距含varying-FOV训练分布差异。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "主要目标为忠实恢复特定输入的object与camera，primary为3D Reconstruction；native prior又显式生成未见区域及完整可编辑3D内容，构成3D Generation交叉贡献。迁移核心是conditioned generator同时推断pose，不能据此声称LEGO装配或part segmentation已验证。"
+  }
+}
