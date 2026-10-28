@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.37046",
+  "slug": "learning-to-code-the-world-harness-evolution-for-compositional-3d-reconstruction",
+  "title": "Learning to Code the World: Harness Evolution for Compositional 3D Reconstruction",
+  "authors": [
+    "Haoyu Yao",
+    "Chenguo Lin",
+    "Ruize Du",
+    "Yadong Mu"
+  ],
+  "publishedAt": "2026-10-27",
+  "updatedAt": "2026-10-27",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.37046"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3D Reconstruction",
+    "Visual Design Agents",
+    "Learning",
+    "Code",
+    "the",
+    "World",
+    "Harness",
+    "Evolution",
+    "for",
+    "Compositional",
+    "Reconstruction"
+  ],
+  "abstract": "Reconstructing editable and compositional 3D scenes from a real image requires jointly reasoning about geometry, object structure, and spatial relationships. We introduce SceneEvolve, a framework that represents 3D scenes as executable code and improves reconstruction by evolving the harness around a small open-source agent. SceneEvolve combines SceneAct, a compositional semantic action interface built on parameterized primitives, hierarchical composition, and semantic spatial relations, with SceneHarness-RSI, which leverages a stronger teacher agent to iteratively evolve the harness using feedback from development-set reconstructions. Throughout harness evolution, the model parameters, action semantics, and execution backend remain fixed. The resulting harness provides a reusable reconstruction procedure that enables the small open-source model to reconstruct unseen scenes without parameter updates or teacher assistance. Across two in-domain datasets and one out-of-domain dataset, SceneEvolve with the comparatively compact Qwen3.8-27B model improves all four evaluated reconstruction metrics while reducing mean inference time by 47.0% relative to the base model. More notably, despite relying on a substantially smaller model, SceneEvolve achieves 32.3% higher reconstruction quality than the large proprietary GPT-5.6-Sol model, while reducing mean equivalent deployment cost by 59.8%. Furthermore, the harness evolved using Qwen3.8-27B also generalizes to Kimi-K3, achieving comparable reconstruction performance to GPT-6-Astra. The project page is https://haoyu-agent.github.io/SceneEvolve.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.37046v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.37046v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://haoyu-agent.github.io/SceneEvolve"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.37046v1 的 18 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。Code链接为PDF印出的官方project入口，已沿其链接核实public code repository。",
+    "ideaZh": "SceneEvolve把单图室内重建转为可编辑Blender scene program：SceneAct提供primitive、asset–part层级和语义空间关系，teacher在开发集上进化冻结小模型的harness。作者报告Qwen3.8-27B的平均DINOv2-S由0.198升至0.392、用时降47%；摘要“质量提高32.3%”具体指对Sol-none的平均SSIM。可精读结构接口与harness搜索，但测试仍需约800秒/scene，搜索成本未计入部署成本。",
+    "motivationZh": "单图室内重建怎样输出可编辑scene program，并通过外部动作接口和harness改进小模型的重建表现？",
+    "methodZh": "方法由SceneAct与SceneHarness-RSI组成。前者以参数化几何primitive、Scene–Asset–Part层级及align/distribute等相对关系，将高层scene intent确定性映射为Blender operations；后者固定student权重、operator语义与backend，teacher依据开发集render、execution traces及质量分数提议harness修改，经同预算评估只保留分数更高的版本。搜索30轮、每轮2提议，在100个开发scene上进行，最终harness固定后测试40个in-domain和20个ARKitScenes out-of-domain scene；可直接迁移另一模型。附录D.2实际描述planning JSON、代码执行与render/inspect/局部repair循环，因此不能把部署概括为永不迭代的一次性生成。",
+    "methodFlow": [
+      "从单张参考图和重建指令出发，用SceneAct将几何表示为parameterized primitives、asset–part层级及semantic spatial relations。",
+      "冻结Qwen3.8-27B student、SceneAct语义及Blender backend，在ScanNet/CA-1M开发集执行当前harness，保存scene code、renders和traces。",
+      "GPT-6-Astra teacher查看归档的成功/失败案例，每轮提出2个工具处理、skills、memory或控制流程修订。",
+      "同预算运行student并用SSIM、1−LPIPS及归一化DINOv2-S的平均质量分数筛选；仅严格提高开发集分数时替换harness，重复30轮。",
+      "冻结选中的harness，在未见scene通过结构化规划、SceneAct代码执行和render/inspect/局部repair获得可编辑3D scene；teacher不参与test。"
+    ],
+    "experimentsZh": "160个室内scene：ScanNet与CA-1M各50 development+20 held-out test，ARKitScenes另20个仅out-of-domain test。student为Qwen3.8-27B xhigh，teacher为GPT-6-Astra medium，30轮×2提议；测试harness、权重、配置冻结。用PSNR、SSIM、LPIPS、DINOv2 cosine和平均time/equivalent deployment cost评估，跨模型直接迁移到Kimi-K3 high。 作者报告Qwen3.8-27B平均DINOv2-S 0.198→0.392、SSIM 0.397→0.424、LPIPS 0.788→0.739、PSNR 9.049→9.166 dB；mean time 1510.7→800.2秒。（Table 2, p. 9） 作者报告对Sol-none在12个dataset×metric比较中赢11项；mean SSIM高32.3%、equivalent cost约0.290→0.117美元/scene，time则369.8→800.2秒。（Sec. 4.2.2, pp. 8-9） 作者报告移除SceneAct时DINOv2-S为0.305、time1035.0秒；移除harness evolution时为0.285、1424.0秒；完整方法0.392、800.2秒。（Table 2, p. 9; Sec. 4.4, p. 10） 作者报告直接将Qwen进化harness用于Kimi-K3，三dataset四项图像指标均优于原Kimi；ARKitScenes DINOv2-S 0.392→0.504、SSIM0.384→0.469。（Table 1, p. 6; Sec. 4.2.1, p. 8） 对照边界：主要对比同一初始prompt/harness下的Qwen、Kimi及多种proprietary模型–reasoning-effort组合；未纳入文中提及的专业scene reconstruction pipeline或成熟视觉coding-agent harness统一比较。初始baseline是单次代码输出，而最终harness含planning、执行诊断和repair，因此结果是完整系统收益，非纯模型能力对比。 消融：同一Qwen xhigh下分别替换为直接Blender操作、去掉harness evolution，显示结构接口与程序优化有互补收益；未给出teacher-search成本摊销、随机seed重复置信区间，亦未用独立3D几何/编辑正确性指标验证所有结构收益。",
+    "insightZh": "主要价值是将固定语义的3D构造动作接口与teacher-guided可执行harness搜索结合，改进冻结小模型的可编辑scene重建流程；不更新权重，也不是提出新的foundation VLM。SceneAct的层级/相对关系提供明确可迁移的设计agent结构，而单调保留只保证记录的开发分数不下降，不保证未知scene上的单调泛化。",
+    "evidenceZh": "SceneAct用parameterized primitives、显式Scene–Asset–Part层级和语义空间操作映射为确定性Blender操作。（Sec. 3.2, Fig. 2, pp. 3-5；scene.add_asset、asset.add_part及align/distribute支持模块构造和局部编辑，不依赖直接预测所有世界坐标。）；teacher只修改student外部harness；固定student参数、动作语义、backend，按开发集平均SSIM/LPIPS/DINOv2分数严格保留改进。（Sec. 3.3, Eqs. (2)-(4), pp. 5-6；明确区分harness search与模型学习，并声明记录分数单调不保证预期/测试表现单调。）；作者报告Qwen3.8-27B配置平均DINOv2-S从0.198升至0.392，平均用时从1510.7降至800.2秒，cost从0.147降至0.117。（Table 2, p. 9; Sec. 4.2.1, p. 8；47.0%加速相对同一Qwen baseline；不是相对所有frontier模型。）；作者的32.3%提升是相对GPT-5.6-Sol none配置的平均SSIM；部署cost降低59.8%，但用时比Sol-none增加116.4%。（Sec. 4.2.2, pp. 8-9；应保留metric和reasoning-effort条件，不能泛称质量全面超越或比Sol更快。）；最终harness在规划JSON和代码执行后进行render/inspect及针对具体object/part的repair迭代。（Appendix D.2, pp. 17-18；附录给出部署流程，限制了“无反复迭代”的宽泛表述。）；结构动作接口和可归档反馈驱动的harness修改，可直接供visual design agent的程序化3D构造借鉴。（Reviewer inference from Sec. 3.2-3.3 and Appendix D.2, pp. 3-6,17-18；可迁移机制是asset–part构造/关系操作及execution反馈，不宣称已验证LEGO或制造任务。）",
+    "caveatZh": "作者限制：附录E明确teacher分析、候选生成、重建、render与评估使harness evolution计算开销很大，存在搜索效率与质量权衡（p. 18）。；作者指出优化harness并不直接增强模型本体能力，系统也不能稳定超过GPT-6-Astra（Appendix E, p. 18）。；Sec. 4.3保留过亮房间、简化座椅和颜色不准等失败现象（p. 9）。 审阅边界：仅60个held-out室内scene；图像相似性不等于完整3D几何、隐藏面或可制造结构准确，未验证LEGO等主线对象。；32.3%是mean SSIM相对Sol-none，成本优势排除昂贵harness搜索；作者的“equivalent deployment cost”不应解释成经本项目复核的现实总成本。；最终harness含render/repair而初始baseline无agent loop，消融未完全拆解额外工具/推理资源与搜索策略贡献；未独立复现实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "忠实重建任务归3D Reconstruction，具体transfer来自SceneAct可编辑asset–part与空间关系接口，以及render/trace反馈改进visual design agent外部程序的机制。该连接有明确方法支持，尚无LEGO/Fabrication实测。"
+  }
+}

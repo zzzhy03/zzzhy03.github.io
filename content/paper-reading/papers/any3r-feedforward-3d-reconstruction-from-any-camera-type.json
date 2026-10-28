@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.36150",
+  "slug": "any3r-feedforward-3d-reconstruction-from-any-camera-type",
+  "title": "Any3R: Feedforward 3D Reconstruction from Any Camera Type",
+  "authors": [
+    "Jingong Chen",
+    "Qingwen Zhang",
+    "Youming Deng",
+    "Chulwoo Pack",
+    "Olaf Wysocki",
+    "Boris Jutzi",
+    "Kwanghee Won",
+    "Kyle Gao"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.36150"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3D Reconstruction",
+    "Any3R",
+    "Feedforward",
+    "Reconstruction",
+    "from",
+    "Any",
+    "Camera",
+    "Type"
+  ],
+  "abstract": "Geometry foundation models recover camera poses and dense geometry from a set of images with a feed-forward network, but they expect pinhole images. That assumption is inside the backbone too: the positional encoding and the training loss both bind an image position to a direction in space, and both depend on the lens. We condition both on the dense ray field, the unit direction through every pixel, which describes any central camera without a lens type, distortion coefficients or a bound on field of view. Angular coordinates give the rotary encoding the measured ray angle of each patch, evaluated per view, and solid-angle weighting scales the point loss by the area each pixel covers on the sphere, so neither the encoding nor the supervision depends on the lens. Any3R is therefore a feed-forward model that takes any central camera, and is robust to mixing many camera types per scene, with no retraining per lens. On a benchmark of thirteen central cameras across three datasets, where every method reconstructs with its own predicted camera poses, it is the most consistently accurate method. Any3R enables scalable 3D reconstruction from heterogeneous crowdsourced and archival imagery collections sourced across diverse camera types. Project page: https://jingong-chen.github.io/Any3R/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.36150v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.36150v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.36150v1 的 27 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "Any3R把dense calibrated ray field同时接入positional encoding、radial decoding及solid-angle-weighted loss，让一组feed-forward权重处理pinhole、fisheye和panorama。跨相机泛化有实质证据，尤其wide lenses；但“Any”限central cameras且依赖准确ray map，不是未知内参随手混拍即可重建，窄视角与部分混合设置也未全面领先。",
+    "motivationZh": "不同central camera投影给feed-forward重建带来域差异，怎样用统一ray表示和几何损失减少逐lens适配？",
+    "methodZh": "传统geometry foundation model即便在外围接intrinsics，backbone仍把pixel index当成pinhole方向。Any3R用每patch平均ray的elevation/azimuth构造rotary与absolute position，预测每pixel radial distance并以X=dR解码；loss按ray derivatives给出的solid angle重新分配监督。Released frequency split的低频用constant angular scale、高频按每view FoV归一化，ERP上保持原encoding近似一致。训练时每view随机central camera；评估8 seen+5 held-out models、三套主数据、real fisheye以及补充混合/crop/calibration controls。全文27页含完整supplement已读，数字均为作者报告，未复现。",
+    "methodFlow": [
+      "由每个central camera的已知calibration计算dense unit-ray field及validity mask",
+      "以patch mean ray的角度构造per-view rotary/absolute positional coordinates",
+      "Alternating intra/inter-frame transformer融合各相机视图并预测poses和radial distance",
+      "按X=dR得到camera-frame points，再以预测poses融合",
+      "训练时用normalized/clamped solid angle重加权point loss；同一权重用于seen及held-out camera families"
+    ],
+    "experimentsZh": "作者用32 GH200训练40 epochs约27h，数据含Matterport3D、Stanford2D3DS、Structured3D、PanoCity和DL3DV。主benchmark在三套dataset各24 held-out scenes、每scene3views，8训练camera+5未见camera；real-lens为ScanNet++ validation和FIORD两scene24triplets，另有DL3DV60scene pose测试。Acc对预测pose融合点云做similarity+ICP后计算nearest-GT距离，pose测pairwise AUC；不评完整几何coverage或绝对metric scale恢复。 作者报告8类主相机的indoor平均ERP Acc0.054m、KB4 Acc0.056m；PanoVGGT分别0.072/0.251m，π3为0.414/0.189m。（Tables 1 and 3, pp. 5,7） 作者报告real FIORD Acc0.274m/AUC@30 78.4；ScanNet++为0.055m/79.7，而训练过ScanNet++的Wid3R为0.039m/92.6。（Table 2, p. 6） 作者报告PanoCity八相机平均Acc真ray0.920m、预测ray3.378m、ERP fallback2.299m；预测ray平均角误差7.9度，表明需要准确calibration。（Table 19, p. 21） 作者报告DL3DV pose AUC@30为0.9313、Rmed3.00度；DA3为0.9543/3.32度。Released frequency split在180/200度geometry median未达到预设strict-improvement准则。（Table 20, p. 21; Table 22及正文, pp. 26-27） 对照边界：包括π3、VGGT/Ω、DA3、MapAnything及true-ray分支、OmniVGGT、Wid3R、PanoVGGT、Argus，不能表示某lens的cell明确n/a。主比较各自预测poses，部分baseline选择native/official输入中median更佳者。原生相机数据补上panorama-resampling主评估的域差，但真实fisheye场景仍少；narrow pinhole和部分mixed-camera并非全部领先。 消融：Any3R*去ray同时改变angular/absolute/radial三路径，属于joint ablation。Table4分离per-view field和solid-angle weighting；per-view给最大室内pose增益，但Matterport3D log10-depth error0.033→0.045，且PanoCity AUC可能退步。AppendicesJ-L检查matched coverage、训练收敛和frequency split；constant-angle arm几何更好但pose差，released split取舍不能包装为几何严格提升。",
+    "insightZh": "贡献在把相机模型依赖从隐含pixel-grid约定改成明确的ray geometry，同时协调encoding、decoder与supervision；不是只给外围intrinsic token。其重要泛化范围是同一central-ray接口下跨projection和FoV，尤其超过180度的相机。不能把coupled-ray ablation当作独立证明每个组件效果，也不能因模型名声称支持non-central、未知calibration或任意动态成像。",
+    "evidenceZh": "输入包含已校准ray map与validity；angular coordinates改变backbone对patch方向的读取，radial distance以X=dR解码。（Sec. 3.1, pp. 3-4; Fig. 3, p. 3; Eqs. (1)-(4), pp. 3-4；“No calibration search”不等于不需要calibration，R由已知镜头标定预先计算。）；Solid-angle weight由ray field有限差分的cross product计算，经percentile clamp和每view均值归一化，用于point supervision。（Sec. 3.3, pp. 4-5; Eqs. (5)-(6)；只在训练使用该weight；不是推理额外求解或per-lens retraining。）；作者报告real FIORD200度镜头Acc0.274m、AUC@30为78.4，对照PanoVGGT0.511m/51.2、MapA-ray0.396m/36.5。（Table 2, p. 6; Sec. 4.3, p. 7；使用各方法自己的预测pose并经similarity+ICP对齐；ScanNet++上仍落后训练过该数据的Wid3R。）；预测ray map代替真值会显著损害结果；窄crop、某些mixed-camera和frequency geometry设置存在明确退步。（Appendices F, J-L, pp. 15,21-23,26-27; Tables 8,19,21-22；这些是作者报告的边界，避免用平均wide-lens胜出抹去例外。）",
+    "caveatZh": "作者限制：准确ray map是前提，CNN预测map虽比fallback方向更准却在多数dataset不能恢复性能（AppendixF, p.15; Table19, p.21）。；Matched-coverage的53度pinhole/Brown-Conrady crop落后π3或VGGT-Ω；wide-lens优势不延伸到所有窄视角（AppendixJ, pp.21-23）。；部分mixed-camera组合在PanoCity落后PanoVGGT；cylindrical表现暴露训练混合83.6%为ERP的偏置（AppendicesB,D, pp.12,14）。；Pose改善牺牲部分depth精度；released split未达到strict geometry improvement，constant-angle在180/200度geometry median更好（Sec.4.4, p.8; AppendixL, pp.26-27）。；仅ERP协议下并非比panorama-only baseline更好的模型，作者将优势限定为跨相机（AppendixK, p.23）。 审阅边界：Central-camera假设和已知calibration排除一般non-central/rolling-shutter等未研究情况；不宜把标题解释为任意相机输入。；主benchmark以panorama重采样、cone-domain mask及3views为主；真实随手拍混合相机、多物体asset、小尺度结构和动态场景迁移尚未证明。；Acc仅评观察点且允许similarity+ICP，不能据此保证完整拓扑、metric scale或可制造geometry；geometry/pose贡献在该指标下耦合。；项目URL当前404、未核实公开实现；训练成本32GH200约27h，不能据feed-forward就推断训练或部署成本低。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "3D Reconstruction的一项实质跨相机泛化进展，ray-angle位置与solid-angle supervision是可检查的几何机制。可能为异构相机采集提供基础，但论文未验证LEGO、part segmentation或fabrication，故只归3D Reconstruction，不把潜在用途写成已证实迁移。"
+  }
+}

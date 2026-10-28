@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2610.37662",
+  "slug": "can-discrete-tokens-serve-as-semantically-lossless-representations-of-visual-signals",
+  "title": "Can Discrete Tokens Serve as Semantically Lossless Representations of Visual Signals?",
+  "authors": [
+    "Jialv Zou",
+    "Xiaotong Li",
+    "Zhengrong Yue",
+    "Xu Huang",
+    "Yaxin Luo",
+    "Wenhao Yan",
+    "Haodong Li",
+    "Wenyu Liu",
+    "Xinggang Wang"
+  ],
+  "publishedAt": "2026-10-27",
+  "updatedAt": "2026-10-27",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.37662"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VLM / MLLM",
+    "Can",
+    "Discrete",
+    "Tokens",
+    "Serve",
+    "Semantically",
+    "Lossless",
+    "Representations",
+    "Visual",
+    "Signals"
+  ],
+  "abstract": "Discrete visual tokens represent vision in a discrete form analogous to language, offering a native interface for multimodal modeling under a shared next-token prediction objective. However, quantization error is widely assumed to cause unavoidable semantic loss, fundamentally limiting the semantic fidelity of discrete visual tokens and positioning continuous visual representations as an intrinsic upper bound. Using multimodal understanding as a proxy for semantic fidelity, we revisit this assumption and find quantization error unreliable, as discrete representations with substantially larger errors can achieve better understanding. Instead, the effective bit budget of discrete indices emerges as a key determinant of downstream performance. However, existing quantizers eventually saturate as additional codebooks contribute progressively less semantic information. As one approach to alleviating this saturation, we introduce Factorized Vector Quantization, which quantizes complementary, fixed-dimensional views of the visual feature with symmetric parallel codebooks. It continues to improve at larger bit budgets, ultimately matching continuous visual representations in multimodal understanding. Trained on industrial-scale multimodal data, our model achieves state-of-the-art performance among discrete-representation models, outperforming UniAR and Emu3-Chat by 22.8% and 59.2%, respectively, on a nine-metric average. To our knowledge, it is also the first discrete-representation model competitive with strong continuous-representation models such as Qwen3-VL, including on fine-grained OCR tasks. We further identify the key principles and a practical recipe enabling this competitiveness. These results and insights support the potential of discrete visual representations to underpin large-scale native multimodal foundation models. Code and models are available at https://github.com/hustvl/FVQ",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.37662v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.37662v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/hustvl/FVQ"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.37662v1 的 23 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "FVQ反驳以feature MSE直接判断离散visual token语义损失的做法：它把完整feature投影为固定维互补views，用对称并行codebooks维持新增bits的信息量。作者报告受控设置224bits/patch时8项理解均分65.3，接近或略超continuous的64.6；“semantically lossless”仅是benchmark层面的操作化结论，不是量化后精确无损或任意视觉任务保证。",
+    "motivationZh": "离散visual tokens是否必然丢失理解所需语义，以及为什么增大codebook预算后仍会饱和？",
+    "methodZh": "方法先冻结VFM特征，以固定Gaussian矩阵的QR构建tight frame A，使AᵀA=ρI；每个dense projection提供固定维的full-feature view，独立codebook并行量化，再用ρ⁻¹Aᵀ合成并重建feature来训练tokenizer。VLM阶段冻结tokenizer，只向新随机embedding表和merger传递离散IDs，而非原codeword或连续特征。论文用相同training/eval设置比较VQ、RVQ、PQ的bit-budget scaling，并训练Qwen3-8B+16-codebook FVQ模型验证industrial-scale理解能力。证据集中在multimodal understanding/OCR/document/chart，未实测图像生成或所有语义可逆性。",
+    "methodFlow": [
+      "冻结Qwen3 ViT/VFM并提取每个patch的continuous feature",
+      "固定QR tight-frame将完整feature投影成多个互补固定维views",
+      "对称并行codebooks独立nearest-neighbor lookup，输出L个discrete IDs",
+      "合成量化views重建冻结feature，训练tokenizer的projection/codebooks/decoder",
+      "冻结tokenizer，以新embedding与merger对齐IDs并训练LLM理解任务"
+    ],
+    "experimentsZh": "main model为Qwen3-8B与Qwen3 ViT+16-codebook FVQ，使用1D RoPE且无DeepStack；探索/多数消融用Qwen3-1.7B。四阶段tokenizer/alignment/PT/SFT分别报告100B/10B/60B/30B tokens；PT/SFT保持tokenizer冻结。受控suite涵盖8项理解任务，industrial评估增加MMMU-Pro、OCRBenchV2、OmniDocBench和CharXiv等。 作者报告受控设置中16-codebook、224bits/patch的FVQ理解均分65.3；同budget RVQ为64.0、PQ为64.3，continuous QwenViT为64.6。（Table2, p.8） 作者报告RVQ odd-groups feature MSE为0.246、理解均分60.7，而single VQ为0.027、51.2；较低MSE未对应较高理解分数。（Table1, p.4） 作者报告industrial Ours-8B MathVista为77.4、MMMU为64.3，Qwen3-VL-8B为77.2、69.6；CharXiv DQ/RQ为86.1/49.3，对照83.0/46.4，但OCRBench为867对896。（Tables3-4, pp.8-9） 对照边界：受控bit-budget设置比较single VQ/SimVQ与多codebook RVQ/PQ及continuous QwenViT，是主要机制证据；另比较UniAR、ViQ、Emu3-Chat和Qwen3-VL/InternVL等工业模型。只有部分标星baseline由作者统一重评；整体模型比较未匹配预训练数据量、DeepStack等架构差异。 消融：Table5将MoonViT-v2/SigLIP2的14bit VQ与112bit FVQ比较，支持跨encoder趋势但同时改变quantizer和budget；Table6排除industrial PT/SFT后仍有优势，但LLM版本与部分baseline不同。Table8比较merger前后量化；未逐项独立消融tight-frame、dense fixed views和parallel symmetry，不能单独归因每个设计。",
+    "insightZh": "核心不是仅增加codebook数，而是让每个新增codebook仍接收完整feature的固定维dense view，用tight-frame collective constraint避免factorization额外丢失方向，再以并行对称角色避免RVQ残差信息递减与PQ通道变窄。MSE与理解表现分离的对照、同设置bit scaling和大数据模型共同支撑视觉token设计的重要方法结论；tight-frame只保证量化前分析-合成无失真。",
+    "evidenceZh": "feature reconstruction MSE并不能单独预测离散IDs的下游理解能力。（Sec.2.1, Table1, p.4；RVQ odd groups的MSE比VQ大，但理解均分更高；比较对象是新embedding学习的IDs，并非直接输入重建feature。）；固定dense projections与tight-frame constraint使多views在量化前集体保留feature，codebooks并行且对称。（Sec.3.2, Fig.3, Eqs.(1)-(3), pp.5-6; Appendix A, Eqs.(8)-(16), pp.16-17；每个投影本身不要求可逆；A整体在Ld>=D时满足AᵀA=ρI，nearest-neighbor量化仍产生误差。）；VLM训练只接收离散indices，新embeddings从随机初始化学习，tokenizer保持冻结。（Fig.3, p.5; Sec.4.1, p.7; Appendix C.1, Table7, p.19；不把连续重建支路当作VLM隐藏输入；tokenizer training只重建VFM features，没有pixel decoder监督。）；作者报告FVQ在高bit budget仍提升理解均分，而RVQ/PQ趋于饱和。（Sec.4.2, Table2, p.8；使用同QwenViT features、C=16384及相同VLM训练/评测设置；只说明所测task suite平均表现。）；industrial model在多项任务接近continuous VLM，但并非全面超过Qwen3-VL。（Tables3-4, pp.8-9; Fig.3, p.5；MathVista/RealWorldQA/CharXiv较强，而MMMU-Pro、OCRBench和若干document指标仍有差距；跨模型比较受data/architecture差异影响。）",
+    "caveatZh": "作者限制：作者明确以multimodal understanding作为semantic fidelity的proxy，“lossless”是相对于问题回答信息的操作化，而非像素或feature精确可逆（pp.1-2）。；Appendix C.3说明Fig.5-9为手工选择的qualitative examples，不是统计证据（p.19）。 审阅边界：tight-frame exact recovery只成立于量化前；有损nearest-neighbor steps之后不能声称数学上semantic lossless，有限benchmarks也不能涵盖所有视觉问题。；main model依赖大规模四阶段训练；跨工业模型比较混有data/architecture因素，不能把所有差距归因FVQ。；论文未评估图像生成、3D representation或embroidery等任务；不能把统一token接口的潜力写成已验证跨领域收益。；高budget提升并非每项任务都超continuous，且RVQ/PQ饱和的机制解释尚缺各设计成分的独立因果消融。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "视觉tokenizer、multimodal representation与理解/生成统一接口属于VLM/MLLM主线的重要基础机制；重点借鉴effective bit budget与feature MSE分离，以及固定维多view编码。本文实际贡献止于理解表示，不因潜在统一建模用途额外归入Image或3D Generation。"
+  }
+}

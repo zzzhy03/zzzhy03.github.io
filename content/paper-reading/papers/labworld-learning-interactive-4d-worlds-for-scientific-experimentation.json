@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2610.36592",
+  "slug": "labworld-learning-interactive-4d-worlds-for-scientific-experimentation",
+  "title": "LabWorld: Learning Interactive 4D Worlds for Scientific Experimentation",
+  "authors": [
+    "Suozhi Huang",
+    "Kelsey Fu",
+    "Binxu Li",
+    "Luna Lyu",
+    "Kaize Wu",
+    "Wenbo Lu",
+    "David Smerkous",
+    "Jiahan Li",
+    "Siqi Zhu",
+    "Zhizhou Sha",
+    "Jiacheng Guo",
+    "Zhixuan Liang",
+    "Shilong Liu",
+    "Le Cong",
+    "Mengdi Wang"
+  ],
+  "publishedAt": "2026-10-27",
+  "updatedAt": "2026-10-27",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.36592"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3D Reconstruction",
+    "LabWorld",
+    "Learning",
+    "Interactive",
+    "Worlds",
+    "for",
+    "Scientific",
+    "Experimentation"
+  ],
+  "abstract": "Autonomous scientific agents must not only reason about experiments but also interact with the physical environments in which they are executed. Existing laboratory simulators typically rely on manually constructed assets and predefined procedures, while laboratory videos capture real equipment, layouts, and interactions but leave this information implicit in pixels. We introduce LabWorld, an agent-driven Real2Sim framework for reconstructing interactive 4D laboratory worlds from monocular RGB video. LabWorld recovers reusable 3D assets, a metric scene, time-varying object states, and procedure events. Multi-frame observations provide complementary evidence for asset and scene reconstruction, while motion reconstruction combines visual and geometric observations with event constraints encoding the spatial and temporal requirements of laboratory interactions. We evaluate LabWorld on real pipetting and vortexing videos collected in our laboratory against general-purpose agentic and dedicated reconstruction baselines. For pipetting, LabWorld achieves a mean Mask IoU of 0.501, exceeding the strongest baseline by 0.033. For vortexing, it achieves a mean Tube-Length-Normalized PCK-AUC of 0.638, exceeding the strongest baseline by 0.035. On five pipetting videos, event-conditioned reconstruction increases the fraction of modeled physical constraints satisfied from 14.3% (5/35) to 100% (35/35). The resulting worlds expose geometry, motion, articulation, and events as explicit, editable state for replay, inspection, and future embodied scientific systems.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.36592v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.36592v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.36592v1 的 20 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "LabWorld把实验室单目视频拆成可复用3D资产、metric scene、轨迹/关节和事件，再以approach-entry-dwell-withdrawal等时空约束纠正仅在2D看似对齐的运动。值得借鉴的是可编辑场景的功能关系表示；作者报告的35/35约束满足与优化目标重叠，不代表独立验证隐藏接触或液体转移。",
+    "motivationZh": "单目实验视频中2D看似正确的轨迹未必满足3D接触与操作事件关系；怎样恢复可编辑、可复用的场景状态？",
+    "methodZh": "方法先用VLM识别对象与事件、SAM3传播mask、MapAnything估计几何和camera；多帧canonicalization与image-to-3D生成或复用逐对象资产，附加物理尺寸、support、collision geometry与功能landmark。完整轨迹同时接受视觉、几何、平滑、事件和物理约束，导出可独立编辑的资产、camera、rigid pose、articulation和events。作者在10段pipetting与10段vortexing视频上比较图像投影一致性，并在前5段pipetting做35项物理诊断；尚未证明通用场景迁移或raw-video全自动复现。",
+    "methodFlow": [
+      "单目视频识别对象/功能部位与带时间窗口的交互事件",
+      "SAM3 masks与MapAnything深度/相机对齐多帧观察",
+      "生成或复用逐对象3D资产，标注尺度、support、collision与功能landmarks",
+      "联合优化完整轨迹的视觉、几何、平滑、事件与物理项",
+      "导出独立可编辑的资产、scene、camera、轨迹、关节与events"
+    ],
+    "experimentsZh": "自采10段pipetting与10段vortexing；先固定由static scene估计的camera，再逐视频等权平均。Pipetting以visible SAM3 masks测IoU；vortexing以385个scheduled observations测tube-length-normalized 2D中心PCK-AUC。前5段pipetting以24Hz重算7项几何条件，共35checks。 作者报告pipetting mean Mask IoU为0.501；Do as I Do 0.468、GPT-6 Astra 0.156、RGB-adapted FoundationPose 0.026。（Table2, p.9） 作者报告vortexing PCK-AUC为0.638；Do as I Do 0.603、GPT-6 Astra 0.479、FoundationPose 0.232。（Table2, p.9） 作者报告移除event-conditioned reconstruction后，IoU从0.508升至0.572，但几何约束满足从35/35降到5/35；移除visual refinement则IoU降到0.223而仍为35/35。（Table3, p.10; Table5, p.19） 对照边界：比较video-based GPT-6 Astra agent、Do as I Do与FoundationPose+SAM3D+MoGe；各保留native geometry/camera/trajectory且不按得分事后挑选。输入和可用先验不同，非完全相同感知前端；没有独立3D轨迹GT或跨实验领域验证。 消融：事件、时间正则、depth initialization与visual refinement逐项功能移除；在5段视频上支持各组件的局部作用。时间正则移除使作者报告加速度由5.410升至6.070 m/s²；几何条件的通过不能被解释成真实隐含动作恢复的独立验证。",
+    "insightZh": "主要推进是把实验步骤的功能关系转成显式时空约束，统一可复用资产与动态场景重建；不是新的基础3D生成器。相较仅优化silhouette或tracking，本文清楚展示图像IoU与交互几何一致性可能冲突。向主线可编辑3D场景迁移的是对象/功能landmark/events表示，跨领域效果仍待实测。",
+    "evidenceZh": "可编辑world将资产、metric scene、camera、rigid poses、articulation和events分层保存。（Sec.3 Eq.(1), pp.4-6; Appendix B Eq.(7), p.15；导出的是可检查的结构状态；不据此声称已评估下游规划或机器人学习。）；事件按参与对象、时间窗口和功能空间关系实例化约束，与视觉/几何/平滑/物理项联合优化。（Sec.3.1-3.3, Fig.2, Eqs.(2)-(4), pp.4-6; Appendix C, Table4, pp.15-16；插入、开合、放置等事件显式约束轴对齐、深度、support和阶段顺序。）；作者报告全模型在两类操作上的mean IoU/PCK-AUC优于三个所测baseline。（Sec.5.1, Table2, pp.8-9；IoU使用同样提供给系统的SAM3 mask；PCK-AUC只测2D full-tube中心定位。）；事件消融显示更高2D重合可以伴随更差的约束一致性。（Sec.5.3, Table3, p.10; Appendix H-J, pp.18-20；35项诊断与所施加条件重叠；不证明隐藏源事件准确恢复。）；cached-input复现不独立证明由raw video开始的全自动过程。（Appendix A, p.15；作者要求另行记录agent actions、输入来源和人工干预，不能把solver复现当作端到端自动化证据。）",
+    "caveatZh": "作者限制：严重手部遮挡及薄/反光物体使几何和运动不确定，生成资产可能漏掉细功能几何、透明性、材质或精确尺寸（Sec.6 p.10; Appendix F p.17）。；错误事件会施加错误关系；contact/non-penetration尚不能替代质量、摩擦、柔顺和流体动力学system identification，跨科学领域迁移仍开放（Appendix F p.17）。；当前105-108 reproduction package从cached observations、assets与saved configs开始，不能独立建立raw-video全自动性（Appendix A p.15）。 审阅边界：评估仅20段两类实验室操作，且IoU mask也用于系统观察；结果不能外推为通用3D重建或可编辑生成能力。；35/35指标与planner约束共享定义，缺独立3D隐藏接触、液体转移或下游planning收益验证；Fig.1 planning/editing仅概念示意。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可迁移到3D Generation主线的是逐对象可复用资产、articulation/events和功能约束的显式表示，适合思考可编辑场景与装配交互的一致性；论文主要目标仍为faithful reconstruction，不交叉标为生成贡献。"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.36371",
+  "slug": "boxworld-let-world-engines-control-and-video-generators-render",
+  "title": "BoxWorld: Let World Engines Control and Video Generators Render",
+  "authors": [
+    "Zike Wu",
+    "Ahmed Hatem",
+    "Chintan Trivedi",
+    "Wallace Michel Pinto Lira",
+    "Xuebin Qin",
+    "Lele Wang",
+    "Renjie Liao"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.36371"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Video Generation",
+    "BoxWorld",
+    "Let",
+    "World",
+    "Engines",
+    "Control",
+    "and",
+    "Video",
+    "Generators",
+    "Render"
+  ],
+  "abstract": "We tackle the challenge of building real-time interactive video worlds with user-defined behaviors. Such worlds must track object states, apply interaction rules, and render the resulting consequences as users act. Yet existing end-to-end video world models typically learn interaction dynamics within the generator, making it difficult to specify object-level rules and reason about their consequences. In this work, we introduce BoxWorld, which separates interaction reasoning from generative rendering. Given user-specified rules, a coding agent creates a Box World Engine that determines interaction outcomes and exposes the resulting object states through a lightweight interface of layout boxes, persistent object attributes, and dynamic status variables, leaving appearance and physical effects to generative rendering. A Box-State Generative Renderer then renders this evolving state stream into video autoregressively, enabling online control over object motion, state switches, and conditional events. Rendering this state stream is non-trivial: the renderer must respond to object-level state updates in real time while remaining coherent with the generated history. To this end, we introduce a three-stage training strategy that learns object grounding from open-domain videos and state transitions from gameplay videos, both annotated automatically, and finally performs rollout distillation on self-generated histories. We further propose PairedStateBench, a paired benchmark for fine-grained interaction control. BoxWorld substantially outperforms end-to-end world models and remains competitive across multiple public benchmarks. Project page: https://boxworld-web.github.io.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.36371v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.36371v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.36371v1 的 27 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "把“规则决定发生什么”交给显式engine，把“如何呈现”交给streaming video generator：仅用box、persistent attributes和dynamic status连接两者，就能在线控制事件前提及状态变化。作者在自建87-case PairedStateBench报告97.3%双分支成功，但这主要证明renderer忠实执行给定状态，不代表生成器自己学会物理或规则推理。",
+    "motivationZh": "实时交互式视频怎样显式维护对象状态和用户规则，同时保留generative renderer的视觉表现？",
+    "methodZh": "现有端到端video world model把状态、规则和渲染耦合，难以指定何时允许事件。BoxWorld先由coding agent按模板实现外部state machine，通过异步buffer发布对象box、身份属性和动态status，再在LongLive/Wan2.1 causal generator各block插入frame-wise masked cross-attention。三阶段分别以Diffusion Forcing学layout grounding、gameplay teacher forcing LoRA学状态转移、Self-Forcing-style rollout DMD恢复four-step生成。全文及附录给出自动video-to-structure标注、engine规范、87案例/37branch pairs与judge协议、公共benchmark和消融；未在本项目复现。",
+    "methodFlow": [
+      "用户定义rules，由coding agent从共享模板实现Box World Engine",
+      "Engine随action更新状态，发布每对象layout box、persistent attributes与dynamic status",
+      "State Grounding Module按box mask把当前对象条件注入每帧visual tokens",
+      "依次训练open-domain grounding、gameplay dynamics LoRA及self-rollout distillation",
+      "Renderer异步读取最新state并用four-step causal sampling连续生成视频"
+    ],
+    "experimentsZh": "Stage1为VideoGen-1M/4DNeX过滤视频，Stage2为4000 gameplay clips，Stage3混合state sequences；20K/10K/400 iterations。推理832×480、four denoising steps，报告20.7FPS generation throughput。PairedStateBench含87 cases/16 families/37 pairs；另测VBench、30秒VBench-Long及YouTube-VIS2021。Judge为Kimi K2.5与Qwen3.8-27B contact sheets，522视频中39处意见不一致由人工处理。 作者报告Paired-CF 97.3%、Task83.9%，所列baseline最高16.2%/25.3%；其输入条件不完全一致，体现显式state控制整体系统优势。（Table 1, p. 7; Appendix C.2, pp. 22,25） 作者报告20.7FPS，与LongLive相同；VBench Semantic为79.54对76.47，但Total83.76低于LongLive84.87；30秒Total83.00也低于LongLive83.52。（Table 3, p. 25） 作者报告YouTube-VIS FVD62、mIOU0.572；BlobGEN-Vid为FVD317、mIOU0.598，因而不属于所有指标均领先。（Table 4, p. 26） 对照边界：互动对照LingBot-v1、仅公开camera-control的LingBot-v2、带文本resolved-outcome的oracle及LongLive。BoxWorld使用完整engine state，LongLive仅global prompt，LingBot输入采用其原生接口；公共video/layout分数引用各自设置而非全部同硬件重训。没有证明对任意规则或新物理交互的无engine泛化。 消融：Stage2将Suppress60.3提升85.7、Task49.4提升64.4但Trigger/OnTime略降；Stage3把Paired-CF67.6提升97.3。Spatial mask/object attributes去除使YouTube-VIS mIOU降至0.291/0.323；dynamic status换静态描述使Trigger92.2降42.5。还比较high-noise-only/open-domain LoRA，均弱于gameplay adaptation（Tables5-7, pp.26-27）。",
+    "insightZh": "关键不是新的foundation video backbone，而是可在线执行的最小object-state接口，以及分角色训练使few-step causal renderer既接受新状态又保持历史一致。外部engine决定逻辑、生成器只补全视觉，提供区别于隐式world model和重型simulator条件的可创作接口；其显著贡献在controllability，不能归功为新学到的交互推理。",
+    "evidenceZh": "Engine决定每次action的结果，接口只传box、persistent appearance和dynamic status，renderer不承担规则求解。（Sec. 3.1, pp. 4-5; Fig. 2, p. 3; Appendix B and Algorithm 1, pp. 19-22；界定因果职责及engine authoring成本。）；Frame-wise box-masked cross-attention注入对象条件，三阶段训练分别学习grounding、state transition与self-generated-history适配。（Secs. 3.2-3.3, pp. 5-6; Fig. 3, p. 4; Eqs. (1)-(5)；支持具体结构和训练流程，未把不同阶段混成端到端world learning。）；作者报告PairedStateBench Trigger/Suppress为92.2%/90.5%、Paired-CF为97.3%、Task为83.9%。（Table 1, p. 7; Appendix C.2, pp. 22 and 25；Benchmark为87 cases、16 scene families及37 pairs，BoxWorld得到engine-exported状态条件，baseline输入不同。）；去掉spatial mask使mIOU由0.572降至0.291；去掉dynamic status使OnTime由91.2降至16.1。（Table 2, p. 9; Tables 6-7, p. 26; Appendix C.5, p. 27；支持区域路由和时变status的必要性，数字为作者报告。）；粗box接口对精细几何、关节运动与contact-rich interactions不足，结果正确性仍由engine决定。（Appendix D: Limitations, p. 27；作者明确的能力边界，不是从生成质量推测。）",
+    "caveatZh": "作者限制：Box/attributes/status接口对fine-grained geometry、articulated motion、contact-rich interactions可能不足（Appendix D, p.27）。；每个新rule system需独立engine实现，视觉后果只与engine正确性一致（Appendix D, p.27）；实验新engine为205-714行代码、median351（Appendix B, p.21）。；自动标注中的漏追踪及错误可能引起缺失事件或identity swaps（Appendix D, p.27）。 审阅边界：PairedStateBench为作者自建且BoxWorld获显式reference state；与原生接口不同的baseline差距不能解释为生成器自身学会更强规则推理。；Judge使用contact sheets且7.5%视频有分歧；未见大规模独立人工复核或真实用户交互研究。；20.7FPS是生成吞吐，不能直接当作端到端action latency；公共benchmark总质量略低于backbone，30秒也不足以证明无限长稳定。；代码与benchmark仍待发布；当前无法从公开实现独立复现。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "Video Generation的明确控制范式变化：将可编辑、可检查的状态逻辑与视觉先验分离，可作为交互式visual creation系统的架构参考。论文没有提供可编辑3D geometry或fabrication产物，故不额外交叉归入3D Generation。"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.37471",
+  "slug": "perceptrl-making-visual-perception-rewardable-in-mllms-from-answers-to-interactions",
+  "title": "PerceptRL: Making Visual Perception Rewardable in MLLMs from Answers to Interactions",
+  "authors": [
+    "Tongkun Guan",
+    "Zhibo Yang",
+    "Mingkun Yang",
+    "Haocheng Wang",
+    "Wei Shen",
+    "Xiaokang Yang"
+  ],
+  "publishedAt": "2026-10-27",
+  "updatedAt": "2026-10-27",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.37471"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VLM / MLLM",
+    "PerceptRL",
+    "Making",
+    "Visual",
+    "Perception",
+    "Rewardable",
+    "MLLMs",
+    "from",
+    "Answers",
+    "Interactions"
+  ],
+  "abstract": "Fine-grained visual perception remains a bottleneck during post-training of multimodal large language models (MLLMs), as perceptual errors can constrain gains from reasoning-focused optimization. Although image-caption pre-training improves perception, its influence can weaken as subsequent stages change data mixtures and objectives. Continuing caption supervision during post-training is challenging because subjective, information-dense descriptions complicate verifiable reward design. We present PerceptRL, which strengthens perception at two complementary levels. Perception RL uses a multi-agent pipeline to extract verified errors from dense image captions and convert the corresponding visual facts into QA pairs with fixed answer labels and rule-based rewards. Chain QA links correlated errors, while multiple-choice QA combines unrelated errors. A specialized route targets high-error domains with tailored verification, and a domain-agnostic general route covers errors beyond these domains. Perception Agentic RL addresses fine-grained and dense cases unresolved by single-turn Perception RL through multi-turn inspection with visual tools. We observe coordinate drift even in models trained to use tools, where incorrect crops or annotations distort evidence and propagate errors. Coordinate Injection corrects spatial operations in cold-start trajectories, while a grounding-aware process reward supervises intermediate spatial fidelity alongside final-answer correctness. Training proceeds through shared cold-start SFT, single-turn Perception RL, and multi-turn Perception Agentic RL. Across seven benchmarks under a shared tool-use protocol, PerceptRL achieves 71.6% average accuracy, surpassing the base model with the same tools and the strongest evaluated frontier VLM by 15.7 and 5.2 percentage points, respectively.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.37471v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.37471v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.37471v1 的 13 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "将dense-caption感知错误变成可验证QA，再用Coordinate Injection重写crop/annotation坐标与逐turn grounding reward训练视觉工具。作者报告同工具协议均分55.9到71.6%，process reward把计数45.5到53.9%；适合skim空间操作监督。设计agent迁移尚无实证，且缺public code及部分附录。",
+    "motivationZh": "开放caption难以直接定义可验证reward，且视觉工具的坐标偏差会进入后续观察并累积；怎样训练中间空间准确性？",
+    "methodZh": "base dense captions经独立VLM交叉验证、人审和specialized/general route组成MCQ或chain QA。共享SFT混合QA与CI修正轨迹，DAPO single-turn RL后从困难子集做agentic RL。CI仅替换坐标并重执行，让后续观察基于纠正context；process reward按目标声明在原图patch评分并逐turn分配。完整13页没有其引用的附录，只验证感知QA与视觉工具，未做设计生成。",
+    "methodFlow": [
+      "从base dense captions挖错，经独立VLM及人审形成确定标签QA。",
+      "无关错误合成MCQ，关联错误合成chain QA。",
+      "提取工具坐标和目标说明，用VLM或detector纠正并重执行cold-start轨迹。",
+      "共享SFT后以36,445 QA和exact-match reward做single-turn DAPO。",
+      "筛Level1八次rollout成功率低于5/8的19,810子集做agentic RL。",
+      "原图上tiling空间操作供judge评分，以turn最差操作分数加shaping及answer reward监督。"
+    ],
+    "experimentsZh": "Qwen3.6-Flash35A3约35B/active3B，64A10080GB；共享SFT57,678例，Level1 QA36,445，Level2严格子集19,810。DAPO group8各1epoch；Level1 32K/batch128/LR1e-6，Level2 128K/batch64/LR5e-7，最多64turn Python。八single-turn与七shared-tool任务分别报告。 作者报告single-turn均值base61.7、SFT61.9、Level1 69.8%。（Table1, PDF p.9） 作者报告shared-tool均值55.9到71.6%，高于列出最强frontier66.4%。（Table2, PDF p.10） 作者报告process reward使RealWorldQA85.1到87.1、BLINK73.4到76.4、TreeBench63.5到68.6、RealWorldCounting45.5到53.9%。（Table8, PDF p.12） 对照边界：Table2统一tool接口、上限及scoring；Table7较小工具模型采用原论文协议，非同预算排名。没有真实设计任务、latency或token实耗。 消融：specialized/general/combined保持QA总预算；CI inference纠偏与训练作用分开；process reward固定CI初始化对outcome-only，grounding及四项accuracy改善。缺无CI最终训练对照、judge校准、多seed与成本匹配。",
+    "insightZh": "新增点是caption错误转verified QA、坐标纠偏轨迹与局部process reward结合；DAPO、crop及VLM judge本身并非新范式。固定CI初始化的Table8支持空间监督，但不证明设计任务迁移。",
+    "evidenceZh": "CI仅替换坐标并重执行后继续trajectory，各turn以原图坐标系操作。（Sec.3.3.1, Fig.3, Eq.8-11, PDF pp.6-8；保留图像及代码结构，用target声明监督。）；turn最差操作score减0.5加shaping；answer reward到全trajectory，turn reward只到当前turn。（Sec.3.3.2-3.3.3, Eq.12-18, PDF p.8；一次VLM judge评分composite patches，不是GT IoU。）；作者报告shared-tool七任务均值71.6，对base55.9及列出最强frontier66.4。（Table2, Sec.4.2, PDF p.10；统一64turn/128K上限不等于相同实耗。）；作者报告process reward使RealWorldCounting45.5到53.9，step200 grounding .63到.81。（Table6 p.11; Table8 and Sec.5.4 p.12；固定CI初始化消融，缺多seed方差。）；可试迁移空间监督到设计agent rendered observation局部检查。（Sec.3.3 pp.6-8; reviewer inference；具体机制假设，不是已验证的SVG/CAD/编辑收益。）",
+    "caveatZh": "作者限制：Sec.6 p.12将video temporal consistency、joint grounding及GUI迁移留为未来方向。；Sec.5.2 p.12明确其他工具模型保留各自评估设置。 审阅边界：Sec.3.2/Fig.2仍有Table/Appendix ??，13页v1没有对应附录，完整capability map及部分构造细节无法核查。；VLM和人审不能保证标签无噪；grounding judge按policy声明target评分，缺系统校准与反作弊证据。；未报告推理实耗、多seed方差或本文代码/model release；相同上限不等实际预算匹配。；Sec.4.2提到Level2 RefSpatial下降但Table2无该列，不能编造数值。；设计agent迁移仅空间监督机制，未验证SVG/CAD或图像编辑闭环。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体可迁移机制是rendered observation crop/annotation纠正目标区域并奖励中间空间准确性；只有感知QA证据，推荐medium/skim。"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.37098",
+  "slug": "splatscout-query-driven-part-level-referring-segmentation-in-gaussian-scenes",
+  "title": "SplatScout: Query-Driven Part-Level Referring Segmentation in Gaussian Scenes",
+  "authors": [
+    "Yihan Zang",
+    "Da Li",
+    "Shinkyu Park",
+    "Ivan Viola",
+    "Dominik Engel"
+  ],
+  "publishedAt": "2026-10-27",
+  "updatedAt": "2026-10-27",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.37098"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3D Segmentation",
+    "SplatScout",
+    "Query-Driven",
+    "Part-Level",
+    "Referring",
+    "Segmentation",
+    "Gaussian",
+    "Scenes"
+  ],
+  "abstract": "Existing referring segmentation methods on Gaussian scenes primarily target whole objects, relying on segmenter-generated candidates from which a vision-language model (VLM) selects. Such predetermined fixed candidates may omit fine-grained parts needed as targets or cues for identifying objects. We introduce SplatScout, a query-driven, closed-loop approach that places perception under VLM control. The model actively selects views, directs segmentation, and inspects rendered 3D results to refine its predictions. For part-level evaluation, we introduce PartRef-ScanNet++, comprising 261 manually verified queries across 12 ScanNet++ scenes with mesh-derived ground truth. On PartRef-ScanNet++, SplatScout achieves 0.538 mIoU, substantially outperforming existing methods. Ablations demonstrate the benefits of iterative refinement, while comparisons across VLM backbones highlight the importance of effective tool-feedback utilization. SplatScout also achieves higher scores on four existing referring benchmarks. Code and the PartRef-ScanNet++ benchmark are available at https://github.com/kaust-violab/SplatScout.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.37098v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.37098v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kaust-violab/SplatScout"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.37098v1 的 18 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "SplatScout让VLM决定看哪里、分割什么及何时重新分割，再把多视角mask提升为2D Gaussian实例并render-back检查，解决固定候选表遗漏细粒度部件的问题。作者报告GPT-5.6配置在新PartRef-ScanNet++上达0.538 mIoU，但Qwen-397B配置为0.450，小模型仅0.128；值得精读其query-adaptive part perception，不能把收益归结为免费、更通用的VLM能力。",
+    "motivationZh": "固定object候选往往遗漏query需要的部件，怎样在3D Gaussian场景里主动选择视角、产生候选并核验分割？",
+    "methodZh": "输入为带pose的RGB帧、2DGS场景和referring expression。Navigator用几何覆盖与角度多样性选视角；VLM调用SAM3 Segmenter，以parent mask限制part粒度；Lifter用FlashSplat式多视角foreground/background贡献投票构造Gaussian子集，并将渲染、分割和几何反馈交回VLM修正。论文同时构建12个ScanNet++室内场景、261条人工复核query的PartRef-ScanNet++，在216个held-out frames上用mesh-ray-traced可见mask评估，256条query可评。全文和附录已检查；方法不是新训练的3D foundation model，也没有在LEGO或制造对象上验证。",
+    "methodFlow": [
+      "输入referring query、posed RGB frames与预先重建的2DGS场景；只预建几何可见性索引，不预建semantic候选。",
+      "Navigator按未覆盖Gaussian面积选全局帧，并为目标区域检索互补视角与高分辨率crop。",
+      "VLM以frame、box、text及可选parent scope调用SAM3，查看mask overlay、cut-out和质量反馈后修正。",
+      "Lifter合并多视角track，用foreground/background贡献投票和至少两视角一致性得到Gaussian实例，可迭代增加观测。",
+      "将实例render-back给VLM，循环选视角/分割/提升，最终返回已lifted实例union或明确not-found。"
+    ],
+    "experimentsZh": "PartRef-ScanNet++含12个ScanNet++室内场景、261条人工复核query，目标为201个object及95个part实例；216个held-out test frames不供perception使用，256条query达到可见像素条件。另评估Ref-LERF、Causal-LERF、GR-LERF、Causal-ScanNet、GR-ScanNet，附录还在共享12场景抽取OpenTarget query评估box grounding。 作者报告GPT-5.6 SplatScout整体/part/multi mIoU为0.538/0.519/0.548；Qwen3.5-397B整体为0.450。（Table 1, p. 8） 作者报告四个外部benchmark超过其引用的published baselines；GR-ScanNet为24.0，对比ZeroSplat 41.2。（Table 2, p. 8） 作者报告Qwen3-VL-30B与Qwen3.5-397B使用同一工具/预算时整体mIoU分别0.128与0.450；30B有65条query耗尽预算未合法终止，397B为0。（Table 3, p. 9; Appendix E, p. 17） 作者报告Qwen-397B完整方法0.450；one-look/one-cut 0.209；GT box 0.571，进一步GT mask 0.689，显示分割质量仍是瓶颈。（Table 4, p. 9） 作者报告完整设置平均11.0 interaction steps、2.5 segmentation calls；附录记录约118k tokens/query，并非低成本实时方法。（Appendix F, pp. 17-18, Table 9） 对照边界：比较Search3D、GaussDet、OpenGround、ZeroSplat及CLIP retrieval；Table 3统一多个VLM检验控制perception的作用。GaussDet与ZeroSplat的作者复现比原发表Ref-LERF结果低（40.2 vs45.9、28.4 vs32.7），主表还存在不同backbone；外部benchmark结果多来自原论文，未做统一预算重跑。 消融：Table 4隔离一次性交互、三个反馈channel及GT box/frame/mask oracle；visual exploration移除损失最大，lifting feedback较小，反馈间存在补偿。Appendix F报告去掉segmentation feedback导致lifting次数及tokens上升。没有独立证明对所有物体类别或开放世界part定义均有效。",
+    "insightZh": "贡献是把VLM从固定候选选择器改为query-time的感知控制器，并将2D分割、3D构造及反馈纳入同一闭环；Gaussian lifting和SAM3是复用组件。新benchmark显式覆盖part作为target、discriminator和anchor，比仅用object label的评估更贴近语言部件定位。没有证明新的VLM模型能力或任意对象的零样本part泛化。",
+    "evidenceZh": "VLM动态协调Navigator、Segmenter、Lifter并可根据反馈重访和修改目标，不是对预分割候选做一次选择。（Sec. 3.2-3.3, Fig. 1, p. 4; Appendix A, Algorithm 1/Table 5, p. 13；方法图和完整工具接口明确区分perception控制与工具执行；termination只允许返回已提升实例。）；parent mask约束分割粒度，Gaussian实例由多视角贡献投票恢复，render-back允许纠正错误提升。（Sec. 3.4.2-3.4.3, pp. 6-7, Eqs. (5)-(7)；mask保留阈值为parent覆盖比例0.8；多视角时要求至少两个观测支持，不应描述成学习到新的Gaussian特征场。）；作者报告PartRef-ScanNet++上GPT-5.6配置0.538 mIoU，Qwen3.5-397B配置0.450；主表最强baseline为GaussDet 0.253。（Sec. 4.2, Table 1, p. 8；不同方法原始backbone不完全相同，不能把主表差距全归于pipeline。）；作者报告同一Qwen3.5-397B下one-look/one-cut为0.209，完整方法为0.450；去掉visual exploration为0.319，去掉lifting feedback为0.440。（Sec. 4.4, Table 4, p. 9; Appendix F, p. 17；支持交互和早期观察有效；3D render-back单独移除的损失相对小，不能称它独立解释全部提升。）；作者在GR-ScanNet上报告24.0 mIoU，低于ZeroSplat的41.2，并提出instance与category ground truth粒度不一致的可能解释。（Sec. 4.2, Table 2, p. 8；解释是作者推测，结果本身不应被“外部benchmark普遍领先”掩盖。）；用强VLM主动调用part分割工具可作为主线3D部件定位系统的设计参考，但对LEGO的迁移尚未验证。（Reviewer inference from Sec. 3, pp. 4-7 and benchmark scope in Appendix B, pp. 14-16；适用性判断与作者实际测试范围分开。）",
+    "caveatZh": "作者限制：作者指出GR-ScanNet的category-level labels可能惩罚具体instance预测（Sec. 4.2, p. 8）。；作者报告小VLM较难利用反馈，30B模型65次预算耗尽而397B为0（Appendix E, p. 17）。；GT masks将mIoU提升到0.689，表明query-directed segmentation仍有很大改进空间（Sec. 4.4, p. 9）。 审阅边界：数据仅12个室内场景且有261条query；在LEGO、装配、细小重复部件或未重建目标上的泛化未验证。；主表backbone不同、两baseline为较弱复现，因此0.538对0.253不能解释为严格同模型同计算预算优势。；每query约118k tokens及强API模型依赖影响部署成本和复现稳定性；本项目没有复现实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接推进language-grounded、part-level 3D segmentation主线；其query-dependent粒度与render-back纠错可指导部件工具调度。与LEGO连接只是方法参考，非论文已验证结论。"
+  }
+}

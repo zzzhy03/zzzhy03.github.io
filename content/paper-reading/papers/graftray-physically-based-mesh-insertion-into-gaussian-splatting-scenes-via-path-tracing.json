@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.37036",
+  "slug": "graftray-physically-based-mesh-insertion-into-gaussian-splatting-scenes-via-path-tracing",
+  "title": "GraftRay: Physically Based Mesh Insertion into Gaussian Splatting Scenes via Path Tracing",
+  "authors": [
+    "Jinxin Ai",
+    "Matthias Niessner"
+  ],
+  "publishedAt": "2026-10-27",
+  "updatedAt": "2026-10-27",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.37036"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D Generation",
+    "GraftRay",
+    "Physically",
+    "Based",
+    "Mesh",
+    "Insertion",
+    "into",
+    "Gaussian",
+    "Splatting",
+    "Scenes",
+    "via"
+  ],
+  "abstract": "Inserting virtual objects into scenes reconstructed via 2D or 3D Gaussian Splatting (2DGS/3DGS) is a key capability for content creation, AR, and synthetic data generation. However, realistic insertion requires the object to be seamlessly lit by the scene and, conversely, to cast physically plausible shadows onto it. Existing approaches either harmonize appearance in image space, sacrificing multi-view consistency, or approximate scene illumination with an environment map at the insertion point, which cannot represent near-field area lights such as windows and lamps that dominate indoor lighting. To address this, we present GraftRay, a unified method for physically consistent insertion of mesh objects into indoor scenes represented by either 2D or 3D Gaussians. We recover scene materials and surface normals with diffusion-based priors, and explicitly model spatially-extended emitters, solving their radiance in closed form. A hybrid renderer then jointly path-traces the scene Gaussians and inserted meshes, producing view-consistent shading, interreflections, and soft shadows. On FIPT, GraftRay sets a new state of the art, outperforming recent baselines such as ComGS and EAG-PT in rendering fidelity and shadow accuracy, while maintaining highly competitive rendering efficiency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.37036v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.37036v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.37036v1 的 11 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "GraftRay把mesh物体插入Gaussian场景：将多视角intrinsic priors提升到Gaussians，人工标出的光源拟合为近场area emitters，再joint path tracing与differential compositing传递软阴影和反弹光。作者报告FIPT插入变化∆PSNR达35.17 dB，但只在少量室内scene验证，需手动标灯，单视角插入约1.6分钟；适合skim其scene composition和照明约束，不能当作自动或实时3D生成。",
+    "motivationZh": "把新mesh插入Gaussian场景后，怎样恢复局部光源和材质并生成跨视角一致的光照、交互及阴影？",
+    "methodZh": "针对已有2DGS/3DGS scene的mesh composition，而非从零生成形状。方法从虚拟渲染多视角估计albedo/roughness/metallic/normals，经可见性测试和跨view/seed聚合写回Gaussians，冻结geometry/materials；SAM辅助用户标注的灯或窗经RANSAC/PCA形成analytic rectangles。OptiX以stochastic transparency联合追踪Gaussians和mesh、显式area-light NEE/MIS与多bounce transport；每光源unit-radiance basis使线性radiance空间的拟合为NNLS，饱和LDR作为单侧下界。实际含camera response的目标通过低维Levenberg–Marquardt求解，不能简单复述为任意情况下闭式解。最后with/without-object renders的ratio调制原Gaussian rendering，保留背景细节。",
+    "methodFlow": [
+      "输入已有Gaussian scene、待插入mesh及用户在一或数view用SAM标出的light regions。",
+      "从多视角render用RGB↔X或DiffusionRenderer估计intrinsic maps，按可见性back-project并跨view/seed聚合为固定per-Gaussian BRDF与normal。",
+      "将light-region Gaussians以RANSAC/PCA拟合为有位置、面积与方向的analytic rectangular emitters。",
+      "OptiX stochastic-transparency Gaussian/mesh联合path tracer渲染各光源unit-radiance bases，用unsaturated像素和clipped像素单侧下界估计非负radiance。",
+      "在mesh插入前后做多bounce path tracing，以differential ratio compositing将照明、阴影和bounce-light变化传到原场景render。"
+    ],
+    "experimentsZh": "6个有path-traced ground truth的合成室内scene（4 FIPT+2 NFINITE）、7个real capture（2 FIPT-Real+5 ScanNet++）、5个SpAItial生成Gaussian scenes；每scene三个view、各方法相同objects/placements/lights。合成用∆PSNR、object mask PSNR、shadow IoU/RMSE隔离插入变化；无GT的real/generated用VQAScore ratio。方法在单RTX3090上运行。 作者报告FIPT：DiffusionRenderer variant ∆PSNR35.17 dB、maskPSNR29.14、shadowIoU0.76、RMSE0.08；RGB↔X为34.29/28.49/0.77/0.07。（Table 1, p. 6） 作者报告NFINITE：RGB↔X ∆PSNR32.51、shadowIoU0.49；IRGS 29.50、0.52。提升以插入变化和图像fidelity为主，shadowIoU并非全面领先。（Table 1, p. 6） 作者报告bedroom消融：full ∆PSNR35.4；point lights26.5；1/2 bounce25.7/30.8；gray albedo23.5；无differential composite24.8。（Table 2, p. 7） 作者报告1024×576单view插入耗时1.6分钟（with/without各256spp）；FIPT bedroom重建22分钟、DiffusionRenderer prior每seed1.5小时、back-projection6分钟、radiance fit13.5分钟。（Implementation details, pp. 7-8） 对照边界：对比DOT3D、MV-CoLight、GS-IR、GI-GS、GaSLight、IRGS、EAG-PT、ComGS、LumiTokens、GO-Renderer。GS-IR/GI-GS/IRGS的recovered light放到作者renderer内比较；EAG-PT未跑real/generated，GO-Renderer在ScanNet++只评部分view，三个real/generated scene使用preliminary placements，均在Table1脚注披露。真实/生成scene无GT且VQAScore barely separates methods。 消融：bedroom消融point/env-map light、bounce次数、单向/双向interaction、材料prior、differential compositing和emitter geometry扰动，支持物理area emitter及多bounce/合成必要性；不能将单scene消融泛化到任意复杂材料和大规模真实场景。",
+    "insightZh": "区别于只预测局部environment map或image harmonization，方法显式建模near-field发光区域的空间范围、Gaussian–mesh双向光传输与饱和LDR约束；通过固定geometry/material priors，将照明估计压缩为每channel少量emitter未知量。主要是可控scene insertion的物理渲染/组合机制，不是全自动inverse rendering或新的形状生成模型。",
+    "evidenceZh": "多视角intrinsic预测被聚合为固定per-Gaussian材料和normal；光源由用户标mask再自动估geometry。（Sec. 3.1-3.2, Fig. 2, pp. 3-4；明确手动light-region输入与prior误差来源；不应称全自动恢复场景illumination。）；stochastic transparency在OptiX中联合处理Gaussian与mesh，area emitters和多bounce integration产生双向光交互。（Sec. 3.3-3.4, Eqs. (1)-(5), pp. 4-5；shadow rays另用deterministic transmittance；对比纯env-map近似有明确物理建模差异。）；固定scene transport下用unit-radiance basis线性组合光源；clipped pixels只约束下界，camera response后的目标用LM而非通用闭式求解。（Sec. 3.5, Eqs. (6)-(7), p. 5；线性空间目标为NNLS，实际相机非线性仍保留低维优化，修正abstract过度压缩表述。）；作者报告FIPT上DiffusionRenderer variant的∆PSNR为35.17、shadow IoU0.76，对比IRGS为28.40与0.50；NFINITE上其IoU0.51低于IRGS0.52。（Table 1, p. 6；受控合成scene支持插入效果提升，但不能称所有dataset所有metric均第一。）；作者报告bedroom full method ∆PSNR35.4、shadow IoU0.80；point light为26.5/0.51，去掉differential compositing为24.8/0.49。（Table 2, p. 7; Sec. 4.2, p. 8；支持near-field area lights和preserved-background合成的重要性，但消融仅一个room。）；物理一致的mesh–Gaussian组合可用于生成场景中的asset插入与appearance编辑，无法据本文推断有fabrication或LEGO性能收益。（Reviewer inference from Sec. 3 and experiment scope, pp. 3-8；实际归3D Generation的composition/editing；使用reconstructed input不等于主要贡献属于faithful reconstruction。）",
+    "caveatZh": "作者限制：Sec. 4.3明确光源须由用户用SAM在一或数view手动标出，虽然mask不需特别精确（p. 8）。；依赖RGB↔X/DiffusionRenderer等2D intrinsic priors；albedo、roughness、metallic与normal错误会传到光源拟合和插入结果（Sec. 4.3, p. 8）。；作者指出真实/生成scene的VQAScore很难区分方法，full-image指标易被未改变背景主导（Sec. 4, pp. 7-8）。 审阅边界：有GT的结果仅6个室内scene，核心消融仅bedroom；真实scene阴影/照明精度没有独立GT证据，不能据此称现实全场景验证。；固定材料会使inverse lighting吸收prior误差；differential compositing可隐藏原场景不准确部分，不代表恢复了真实BRDF或mirror transport。；每view1.6分钟和长prior预处理不支持实时编辑；全文未提供本方法可核实的public code URL或明确release承诺，本项目未复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接支持3D scene composition与appearance editing：已生成的mesh可在Gaussian scene中获得空间一致照明、软阴影和反弹光。它对editable assets workflow有方法价值，制造、LEGO和自动几何生成不在验证范围。"
+  }
+}

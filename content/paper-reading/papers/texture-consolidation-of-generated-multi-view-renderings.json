@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2610.36098",
+  "slug": "texture-consolidation-of-generated-multi-view-renderings",
+  "title": "Texture Consolidation of Generated Multi-View Renderings",
+  "authors": [
+    "Hongyi Liu",
+    "Yifan Wang",
+    "Vladimir G. Kim",
+    "Misha Kazhdan"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.36098"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D Generation",
+    "Texture",
+    "Consolidation",
+    "Generated",
+    "Multi-View",
+    "Renderings"
+  ],
+  "abstract": "We present a system for consolidating a sparse set of multi-view renderings into a single coherent texture image, providing a framework for integrating generative models for image generation within the geometry-processing pipeline. Given a texture-atlased triangle mesh and a set of renderings with associated camera parameters, we generate the texture image by: (1) back-projecting the renderings onto the mesh to obtain texture images with normalized colors and confidences; (2) solving for flow-fields on the mesh that align the colors to each other, taking into account the associated confidences; and (3) fusing the registered colors into a single texture image using gradient-domain stitching, again incorporating confidences. Our approach complements existing techniques for multi-view image generation, leveraging mesh-based optical flow and texture-space stitching. In doing so it addresses the challenge that while modern image generation pipelines generate highly convincing renderings, they struggle to produce renderings that are consistent across views. Code is available at https://github.com/hliuw/TextureConsolidation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.36098v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.36098v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/hliuw/TextureConsolidation"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.36098v1 的 18 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "用confidence-aware surface optical flow先对齐生成多视角纹理，再做gradient-domain stitching，把少量互相矛盾的renderings整理为mesh可用的单张texture。价值在3D asset生成的后处理接口；作者小规模实验中LPIPS/ECD较好，但SSIM、密集扫描速度和大相机误差仍有取舍。",
+    "motivationZh": "独立生成的多视角图像在细节、颜色与布局上不一致，怎样整合为可用的单张mesh texture？",
+    "methodZh": "生成多视角图像未必来自同一view-independent表面，直接回投与平均会产生ghosting和接缝。方法输入已知camera和texture-atlased mesh，按visibility、normal及depth discontinuity建立texel confidence，归一化低频颜色后在mesh域逐次求解flow，最后对原色及confidence做advection和梯度域融合。Quadrature支持mesh-resolution平滑flow与texel-resolution颜色共同求解。全文及附录覆盖两套各10物体的生成数据、两真实RGB-D扫描、扰动及参数设置；没有从零生成geometry，未在本项目复现。",
+    "methodFlow": [
+      "输入texture-atlased mesh和带已知camera的生成renderings",
+      "回投颜色与visibility/normal/depth confidence，并归一化低频颜色",
+      "按confidence overlap选择source/target，在mesh域分层求optical flow",
+      "沿flow advect原始颜色和confidence，保留texel细节",
+      "Confidence-aware gradient-domain stitching输出单张texture"
+    ],
+    "experimentsZh": "两套生成数据各10物体：Instant3D每物体9视图、MeshLRM重建mesh；SyncDreamer由GSO reference image生成16视图，并设12输入/4 held-out。真实Fountain33与Armchair55视图。评估LPIPS/SSIM/ECD、runtime及camera/mesh/texture扰动；论文硬件为i7-8700K与RTX2080。 作者报告Instant3D LPIPS/ECD为0.167/5.95，对照blending 0.192/6.36；SSIM 0.615低于blending 0.684。（Table 2, p. 11） 作者报告SyncDreamer-L4O LPIPS/ECD为0.256/1.98，对照ColorMap 0.260/2.07、Im2SurfTex 0.268/2.05。（Table 2, p. 11） 作者报告Instant3D/SyncDreamer每物体71/83秒；Fountain/Armchair为842/1725秒，慢于ColorMap的348/408秒。（Table 3, p. 12） 对照边界：包含weighted blending、MVS-tex、ColorMap、AdvIA、Im2SurfTex，另展示MeshLRM NeRF。仅20个生成物体和两扫描；附录B中AdvIA/Im2SurfTex在生成数据使用256平方纹理、ours通常1024平方，分辨率及手工调参构成比较边界。 消融：Fig. 3分离blended、registered+blended和registered+stitched，支持flow抑制ghosting和stitching消除色差；Fig. 14展示与camera optimization兼容。附录B展示hierarchy level取舍，附录C说明LPIPS/SSIM/S3对一致性不足；未见大规模逐组件量化消融。",
+    "insightZh": "不是发明optical flow或Poisson blending，而是将它们改写为面向稀疏、不一致generated input的confidence-aware surface-domain流程。Quadrature-based FEM支持不同分辨率和sub-triangle confidence，逐次overlap注册避免同时优化所有view的昂贵系统；与RGB-D方法的view selection和image-space correction形成区别。",
+    "evidenceZh": "流程包含back-projection、normalization、surface optical flow、advection及gradient-domain stitching。（Sec. 3, pp. 3-4; Fig. 2, p. 4; Algorithm 1, p. 9；图和算法固定已知mesh/camera输入，不能称为直接text-to-geometry生成。）；Quadrature将texel颜色/confidence与mesh-resolution flow耦合，confidence进入registration和stitching能量。（Sec. 5, p. 5; Eqs. (3)-(9), p. 5; Sec. 6.4, pp. 7-8；支撑不同离散分辨率的具体机制。）；作者报告Instant3D LPIPS 0.167，对照blending 0.192；SyncDreamer-L4O LPIPS/ECD 0.256/1.98，但SSIM 0.508低于Im2SurfTex 0.519。（Table 2 and Fig. 8, p. 11; Fig. 9, p. 12；作者表格结果，未复现；不能称全部指标领先。）；视图重叠不足、重复纹理计数冲突和共同形变会带来ghosting、blur及drift。（Sec. 8, pp. 12-13; Figs. 13 and 15, pp. 15-16；作者展示失败，固定粗texture target仅缓解drift。）",
+    "caveatZh": "作者限制：重复图案数量或布局不一致时无法完美注册，仍有twisting和局部blur（Sec. 8, p. 12; Fig. 13, p. 15）。；重叠不足或photometric detail缺失导致ghosting；共同形变不变性造成texture drift，固定粗target仅缓解（Sec. 8, pp. 12-13; Fig. 15, p. 16）。；不做view selection导致密集输入耗时恶化；部分参数需要微调（Secs. 7.5-8, pp. 11-13）。 审阅边界：依赖已知camera、mesh及atlas，不能修复任意拓扑错误；未观察区域是平滑插值，不是语义可信补全。；生成样本规模有限且部分基线纹理分辨率不同，不能将优势归因于单一模块。；未独立复现；SSIM和若干sharpness结果不占优，作者的感知解释不能当作无条件质量保证。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接服务3D Generation的texture/appearance阶段，把2D prior生成的多视图转为mesh纹理，是可复用后处理模块；不把它包装为新geometry generator或制造方法。"
+  }
+}

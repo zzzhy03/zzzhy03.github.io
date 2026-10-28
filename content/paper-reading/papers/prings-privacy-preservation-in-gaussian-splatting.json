@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2610.36168",
+  "slug": "prings-privacy-preservation-in-gaussian-splatting",
+  "title": "PrinGS: Privacy Preservation in Gaussian Splatting",
+  "authors": [
+    "Gaurav Behera",
+    "Abhinav Raundhal",
+    "Archisha Panda",
+    "Saumya Balina",
+    "Gargi Shroff",
+    "Ponnurangam Kumaraguru"
+  ],
+  "publishedAt": "2026-10-26",
+  "updatedAt": "2026-10-26",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.36168"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D Generation",
+    "PrinGS",
+    "Privacy",
+    "Preservation",
+    "Gaussian",
+    "Splatting"
+  ],
+  "abstract": "3D Gaussian Splatting (3DGS) has rapidly become the preferred representation for high-fidelity novel view synthesis and 3D scene reconstruction. However, the learned representation encodes sensitive visual information including human faces, license plates, documents, and computer screens, raising significant privacy concerns when trained splats are shared or deployed. In this work, we address the underexplored problem of privacy preservation in Gaussian Splatting by proposing a representation-level anonymization framework that directly anonymizes a trained splat. Given a trained splat and a user-provided reference view identifying sensitive content, our method localizes the corresponding regions in the underlying 3D representation and directly anonymizes them, ensuring that the sensitive information is absent from all subsequently rendered novel views while preserving the overall scene geometry and visual fidelity. We achieve this post-training anonymization in less than 1 second. Furthermore, we extend our framework with a privacy-by-design training strategy that prevents sensitive content from being embedded into the representation during optimization, enabling the generation of privacy-preserving splats directly from training images. Our method achieves a remarkably low Face Similarity Measure (FSM) of 9.79% at a retained Face Detection Rate (FDR) of 39.47% and makes sensitive text completely unreadable with an OCR Character Error Rate of 1.00. Our work aims to serve as the primary stepping stone towards privacy-aware 3D representations and motivates further research along these directions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.36168v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.36168v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://privacypreserving3dgs.github.io/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.36168v1 的 9 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。另参考官方独立supplement，来源、SHA-256和证据边界保存在本轮review；它不属于arXiv主PDF。Code链接为PDF印出的官方project入口，已沿其链接核实public code repository。",
+    "ideaZh": "PrinGS把单视图敏感mask经rasterizer贡献映射到3D Gaussians，再用局部k-NN blur编辑SH颜色，文字还同时改位置，从而让匿名化随3D表示传播到新视角。值得借鉴的是无需原训练图像的局部3D appearance editing接口；FSM下降同时伴随face detection大幅下降，不能读成隐私保证或几何无损。",
+    "motivationZh": "没有原始训练图像时，怎样在3D Gaussian表示中局部修改敏感appearance，使编辑传播到新视角？",
+    "methodZh": "论文针对已训练3DGS泄露人脸、车牌和文字的问题，在alpha compositing中统计Gaussian对mask内外像素的有效贡献，经Isolation Forest去除投影背景outliers，再选择敏感subset。人脸仅对SH做scale-weighted k-NN平均以保留头部位置，文字用uniform blur同时修改SH和means。Post-training只需要已有splat、reference camera和2D mask；所谓privacy-by-design的人脸分支仍标准训练后对导出splat匿名化，文字分支才使用masked loss和训练中周期干预。主PDF9页及官网独立6页supplement均已读取；结论限于作者的2个人工室内scene、9个合成人物及5个文字scene，无独立复现。",
+    "methodFlow": [
+      "输入已训练3DGS、reference camera及用户/SAM3敏感2D mask",
+      "Rasterizer按transmittance统计mask内外贡献，用Isolation Forest筛除空间outliers",
+      "单视图选择或多视图计数汇合为敏感Gaussian subset",
+      "人脸以scale-weighted k-NN平均SH；文字以uniform k-NN同时平均SH与means",
+      "导出编辑后的splat供新视角渲染；训练内文字分支另使用masked loss与周期blur"
+    ],
+    "experimentsZh": "RTX3090Ti 24GB，每8帧留1评估；PrinGS-Humans为Blender的House/Hospital两scene、共9个合成人物；文字为Tanks and Temples的Truck/Barn/M60及DL3DV的Car/Piano。面部用SCRFD-10GF与ArcFace，文字用Google OCR recall-based CER。主表privacy-by-design定量，post-training主文定性、补充提供controlled held-out定量。 作者报告privacy-by-design总体FDR94.74→39.47、FSM83.87→9.79；未检出按FSM0计，必须同时看utility下降。（Table 1, p. 7） 作者报告5个文字scene的OCR-CER全部1.00，对照原3DGS分别0.500/0.028/0.207/0.149/0.158。（Table 2, p. 8） 作者报告所列post-training阶段runtime0.24-0.70秒；补充controlled post-training的House/Hospital FSM为7.00/14.20。（Table 3, p. 8; Supplement Table 6, p. 5） 对照边界：主PDF主要对照vanilla3DGS。补充再比较pre-COLMAP blur、clean-COLMAP+blur-supervision及pruning；前者在人脸scene注册失败，后两者FDR接近0。缺少跨方法强identity-recovery attack、隐私强度统一匹配或更大真实人脸数据；不能宣称普遍不可恢复。 消融：主Fig.6在House考察k和blur迭代数，增大二者降低FSM后饱和；Supplement给每subject结果、三种trivial baseline、PSNR/SSIM/LPIPS与post-training定量。缺少逐项隔离raster contribution、Isolation Forest、多视图threshold的完整消融。",
+    "insightZh": "主要推进是把匿名化从逐帧rendering后处理转到显式3D Gaussian参数层，并给出不依赖原图像的selection/editing接口及privacy-utility评价。核心算子仍是贡献计数、Isolation Forest和局部平均，不能宣传为新的通用3D foundation representation；也不能把输出匿名化描述为训练阶段从未接触或存储人脸细节。",
+    "evidenceZh": "Sensitive Gaussians由alpha compositing贡献统计和空间outlier过滤得到，人脸改SH、文字同时改SH和means。（Algorithm 1, p. 3; Secs. 3.1-3.2 and Fig. 2, p. 4；支撑表示层局部编辑；人脸和文字的几何处理并不相同。）；人脸privacy-by-design在标准训练迭代后匿名化；文字使用masked photometric loss及周期性参数修改。（Sec. 3.4 and Fig. 3, p. 5; Supplement Sec. 1.5, pp. 1-2；Supplement明确人脸中间导出副本匿名化，后续训练继续未匿名化stream；必须与文字分支区分。）；作者报告总体FSM从83.87降为9.79，同时FDR从94.74降为39.47；未检测人脸在FSM中按0计。（Secs. 4.4.1-4.4.2 and Table 1, p. 7；低FSM不等于face structure无损，也不是对抗身份恢复的正式保证。）；作者报告5个文字scene的OCR-CER均为1.00，post-training修改阶段所列场景为0.24-0.70秒。（Tables 2-3 and Sec. 4.6, p. 8；不把该runtime扩展为含SAM3、COLMAP或训练的端到端成本；CER限于所用OCR协议。）；Supplement说明mask质量限制敏感区域检测，验证主要覆盖人脸与文字。（Supplement Sec. 8: Limitations, p. 5；补充PDF是单独来源，主source SHA仅固定9页arXiv PDF。）",
+    "caveatZh": "作者限制：Sensitive-region detection依赖用户/SAM3 binary mask及部分scene erosion，mask质量限制最终3D选择（Supplement Sec.8, p.5）。；主要研究人脸和文字，screens、personal belongings等仍是待适配场景（Supplement Sec.8, p.5）。；Post-training若敏感Gaussians与scene deeply entangled可能残留信息（Sec.3.4, p.5）；face训练中破坏gradient会损害头部几何，故延后匿名化。 审阅边界：FSM未检测按0会奖励破坏可检测性；FDR降至39.47，作者将其解释为保留结构不能视为独立几何评价。；人脸privacy-by-design分支仍优化未匿名化表示，不能说敏感人脸从未被编码；文字分支也没有正式差分隐私或unlearning证明。；两个合成scene与9个人物不足以支持真实人脸全视角、任意identity-recovery攻击下不可恢复；OCR-CER1.00不等于任何识别器都无法读字。；文本编辑改变Gaussian means，不能一概称geometry-preserving；runtime仅限列出的post-training阶段。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "属于3D Generation中的显式appearance editing：raster贡献到局部Gaussian subset再改参数的路径可作编辑接口参考。任务本身是privacy anonymization，与LEGO/Embroidery/Fabrication并无直接已证实迁移，因此relevance为medium且不增加这些topic。"
+  }
+}

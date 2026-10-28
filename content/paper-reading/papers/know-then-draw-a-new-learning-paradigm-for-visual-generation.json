@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.37626",
+  "slug": "know-then-draw-a-new-learning-paradigm-for-visual-generation",
+  "title": "Know, then Draw: A New Learning Paradigm for Visual Generation",
+  "authors": [
+    "Yucheng Mao",
+    "Chongjian Ge",
+    "Zhuowen Tu",
+    "Hao Tan",
+    "Hanwen Jiang"
+  ],
+  "publishedAt": "2026-10-27",
+  "updatedAt": "2026-10-27",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.37626"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Image Generation",
+    "Know",
+    "then",
+    "Draw",
+    "New",
+    "Learning",
+    "Paradigm",
+    "for",
+    "Visual",
+    "Generation"
+  ],
+  "abstract": "Visual generation requires both high-level semantic knowledge and fine-grained pixel details. We propose a learning paradigm that assigns these roles to autoregressive pretraining for knowledge acquisition and diffusion post-training for high-fidelity rendering. Within this framework, we study the objective, representation, and scaling of knowledge acquisition and rendering. Controlled comparisons identify autoregression as the stronger pretraining objective for downstream rendering, improving both learning efficiency and final generation quality. We further find that AR-only generation quality does not necessarily correlate with final performance; semantic quality matters more. This motivates a purely semantic tokenizer trained with language supervision alone, without an image decoder or reconstruction loss. We establish compute-optimal scaling laws for knowledge acquisition and rendering, and find that autoregressive pretraining lowers the fitted asymptotic rendering loss compared with pixel diffusion models trained from scratch. Guided by the laws, we train a 3B-parameter text-to-image model with only 6,600 H100 GPU-hours, achieving 86 on GenEval and 87 on DPG-Bench and validating the proposed paradigm at scale.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.37626v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.37626v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.37626v1 的 27 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "先用AR学习semantic visual tokens，再冻结backbone让pixel diffusion负责rendering。约400M、匹配图像曝光的对照支持这种分工，并不要求token能独立解码；值得skim训练接口。3B的0.86 GenEval/87.78 DPG为作者报告，评估按分数选择prompt变体；6600 GPU-hours和48倍省算力不能视为严格同口径结论。",
+    "motivationZh": "高层语义知识获取与低层像素rendering是否需要不同目标，以及如何选择visual tokens和分配两阶段算力？",
+    "methodZh": "将知识学习和像素rendering拆开：冻结visual tokenizer/text encoder，以随机位置RandAR预测离散token；冻结训练后AR及attention projections，新增noisy-patch adapter、AdaLN、diffusion FFN和readout做pixel flow matching。Semantic-LM只以冻结Qwen2.5-VL的language loss训练codebook，无图像decoder。完整27页含附录覆盖约400M控制、18 AR/14renderer/8scratch scaling和3B验证，未验证编辑或3D迁移。",
+    "methodFlow": [
+      "冻结visual tokenizer与text encoder生成semantic targets。",
+      "RandAR以随机空间顺序及position-instruction tokens做text-conditioned pretraining。",
+      "冻结AR/QKVO，增加pixel adapters、AdaLN、diffusion FFNs及readout。",
+      "训练以GT图像tokens做pixel flow matching；推理改用AR rollout tokens。",
+      "分别拟合stage scaling，以6ND proxy分配约3:2预算，再用50-step Euler rendering。"
+    ],
+    "experimentsZh": "约400M控制400k updates，AR/LDM150k+PDM250k，固定sample order、curriculum与token预算。18AR55.71M-2.43B，14renderer25.1M-2.03B，8scratch23.83M-1.76B拟合training loss。最终3B独立recipe：GenEval553 prompts/seed42，DPG1065×4/seeds42-45，含LLM rewriting和prompt selection。 作者报告AR→PDM65.51 GenEval/71.11 DPG；PDM61.16/62.56。（Table1, PDF p.5） 作者报告Sem-LM64.84/67.72、Sem-Recon65.51/71.11、Recon54.67/62.98。（Table2, PDF p.5） 作者报告3B0.86/87.78，约6600 H100 GPU-hours预算。（Table3 p.8; Appendix A.9 p.26） 对照边界：有PDM、FLUX.2 LDM、DINOv3 SVG LDM→PDM；表示/tokenizer不同使objective比较未完全隔离。最终分数跨不同数据/encoder与部分原报告，不是统一重训。 消融：三tokenizer同generator protocol支持semantic targets；独立LR搜索及envelope/IsoFLOP/parametric fits核查scaling，但post-training指数随拟合法变化，3:2并非测得最优。",
+    "insightZh": "新增点是objective/representation角色分离、可不支持reconstruction的semantic tokenizer及跨stage scaling，并非首次组合AR和diffusion。Table2支持语义优于像素重建目标，但Sem-LM未超过Sem-Recon，不能称纯语言监督最优。",
+    "evidenceZh": "冻结AR并复用attention训练renderer；GT-token训练条件与AR推理条件不同。（Sec.2.1-2.2, Fig.2-3, PDF pp.2-4；图明确frozen/trainable模块。）；作者报告AR→PDM65.51/71.11，PDM61.16/62.56，LDM→PDM56.61/60.01。（Table1 p.5; Table4 and Appendix A.2 pp.16-17；约400M final参数和图像曝光匹配，tokenizer/表示并非相同。）；作者报告Sem-LM64.84/67.72，Sem-Recon65.51/71.11；无decoder仍可render。（Table2 p.5; Sec.3.2 p.6；并不证明去除reconstruction一定提高质量。）；最终0.86/87.78评估包含按分数选择prompt variants。（Table3 p.8; Sec.3.4 p.9; Appendix A.9 p.26；跨系统比较存在选择与协议差异。）；loss-floor比较混合weights/GT-token conditioning；6ND排除冻结AR前向。（Sec.3.3 pp.7-8; Appendix A.8 pp.24-25；不支持纯预训练因果优势或实测硬件最优预算。）",
+    "caveatZh": "作者限制：Sec.3.3 pp.7-8承认loss-floor比较未隔离weights与GT-token条件。；Sec.3.4 p.9承认跨系统比较近似，未证明compute allocation最优。；Appendix A.8 pp.24-25排除冻结AR前向；A.9的3960/2640GPU-hours是预算分配而非单独计时。；A.10 p.26将semantic tokens与rich textual/agentic context如何交互留为未来问题。 审阅边界：A.9按评估分数选prompt variants可能引入评估适配，不能据此公平排名。；A.1 p.15 tokenizer训练独立于generator预算，依赖外部Qwen/FLAN和in-house数据；6600非端到端研发算力。；训练GT/推理AR条件gap、推理成本与设计/3D迁移未充分验证。；未找到本文自身public code/model release链接，无法独立复现。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "广域Image Generation的训练角色与表示分工方法参考，超过局部指标推进；缺乏主线设计迁移实证，推荐medium/skim。"
+  }
+}

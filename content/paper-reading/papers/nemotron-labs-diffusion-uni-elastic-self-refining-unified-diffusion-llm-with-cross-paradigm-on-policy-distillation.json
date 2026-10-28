@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2610.36466",
+  "slug": "nemotron-labs-diffusion-uni-elastic-self-refining-unified-diffusion-llm-with-cross-paradigm-on-policy-distillation",
+  "title": "Nemotron-Labs-Diffusion-Uni: Elastic Self-Refining Unified Diffusion LLM with Cross-Paradigm On-Policy Distillation",
+  "authors": [
+    "Shufan Li",
+    "Hanrong Ye",
+    "Greg Heinrich",
+    "Yonggan Fu",
+    "Haotian Zhang",
+    "Sifei Liu",
+    "Aditya Grover",
+    "Pavlo Molchanov"
+  ],
+  "publishedAt": "2026-10-27",
+  "updatedAt": "2026-10-27",
+  "collectedAt": "2026-10-29",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.36466"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VLM / MLLM",
+    "Image Generation",
+    "Nemotron-Labs-Diffusion-Uni",
+    "Elastic",
+    "Self-Refining",
+    "Unified",
+    "Diffusion",
+    "LLM",
+    "with",
+    "Cross-Paradigm",
+    "On-Policy",
+    "Distillation"
+  ],
+  "abstract": "We propose Nemotron-Labs-Diffusion-Uni (NLD-Uni), a unified discrete diffusion large language model (DLLM) for visual understanding and generation tasks. Compared with prior unified diffusion models, NLD-Uni introduces two major innovations. First, we propose a unified cross-paradigm on-policy distillation (OPD) framework that successfully transfers the visual understanding ability of autoregressive VLMs and visual generation ability of continuous flow models, to a unified DLLM. Second, NLD-Uni incorporates a novel progressive self-refining diffusion process that gradually corrupts each token across multiple steps during training, as opposed to adopting the conventional masked diffusion formulation that directly corrupts a clean image token to an uninformative mask token. At inference, this design allows NLD-Uni to make intermediate commit to a token, enabling progressive self-refinement for better visual quality. Through extensive experiments, we show that NLD-Uni achieves state-of-the-art performance among unified DLLMs on diverse tasks including visual question-answering, multi-modal reasoning, object grounding, text-to-image generation, and image editing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.36466v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.36466v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/NVlabs/Nemotron-Labs-Diffusion-Uni"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.36466v1 的 33 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "NLD-Uni把AR视觉教师的知识经student AR view与diffusion consistency传给统一DLLM，再让flow教师修正student生成图作为编辑监督；image tokens按VQ embedding ball-tree逐步去噪，避免mask到clean后无法自修正。作者报告MathVista由71.5升至77.0、ImgEdit由3.81升至4.17；值得精读训练接口与消融，整体理解优势也依赖大规模数据。",
+    "motivationZh": "统一离散diffusion模型如何利用AR/flow教师，同时让已解码visual tokens继续逐步自修正？",
+    "methodZh": "模型沿用Elastic-MoT的理解/生成双塔与SBD block generation，按任务载入8B、12B或16B参数；input images同时用semantic embeddings和VQ codes，输出图只用VQ。新机制有两部分：理解蒸馏先监督student AR rollouts，再以stop-gradient AR分布监督masked diffusion view，缓解直接复制异构教师scores的context mismatch；编辑蒸馏将student输出转入Qwen-Image连续latent、加噪并多步denoise，再转回VQ codes做SFT。另用token age和131k-code ball-tree构造渐进中间状态，使图像token可coarse-to-fine修正。主要实验横跨理解、grounding、数学推理、T2I和编辑，作者并未给T2I做教师OPD。",
+    "methodFlow": [
+      "文本与图像经semantic/VQ双编码进入Elastic-MoT与SBD统一序列",
+      "AR教师监督student AR view；stop-gradient self-consistency传至diffusion view",
+      "student编辑图转入flow教师latent，加噪再denoise得到对齐的修正target",
+      "VQ codes沿ball-tree与token-age中间状态渐进corruption/refinement",
+      "联合SFT与两类蒸馏训练，按理解/生成/交错任务选择elastic参数视图"
+    ],
+    "experimentsZh": "NLD初始化理解塔并复制生成塔，RADIO-H semantic encoder与IBQ VQ encoder；三阶段训练，127M image-text样本、visual instruction/grounding和editing mixtures。最后OPD用76.8k reasoning prompts与100k editing prompts，教师为Nemotron-3 Nano Omni与Qwen-Image；64 H100训练26天，OPD5天。评测11项generic understanding、7项reasoning、GenEval/DPG/HPSv3及ImgEdit。 作者报告cross-paradigm OPD后MathVista由71.5升至77.0、We-Math由59.8升至74.9；直接复制teacher scores的naive OPD为47.7与42.0。（Table2, p.9） 作者报告ImgEdit由Base 3.81升至4.17，off-policy KD为3.90，Qwen-Image teacher为4.27。（Table4, p.10） 作者报告T2I GenEval 0.89、DPG 86.6、HPSv3 11.12；Qwen-Image相应为0.87、88.3、10.91，因此优势并非所有指标全面领先。（Table3, p.9） 对照边界：与Qwen3-VL、BAGEL、LLaDA2-Uni、LaViDa-O、MMaDA等及Qwen-Image/FLUX generation模型比较；Base、naive OPD与off-policy KD提供更有解释力的对照。跨模型main table混合数据量/参数/训练预算，不能隔离所有recipe因素；没有独立复现。 消融：Fig.7在同样20k训练步与64sampling steps比较self-refining、uniform、masked、token-edit diffusion，主要优势在细节/偏好；Table6显示低NFE时多refinement会严重退化，64NFE下8steps已足够。Fig.16/Table8区分AR-OPD、consistency、SFT和rollout来源/温度；Table9比较teacher-refinement噪声r，0.9优于1.0独立teacher target。",
+    "insightZh": "Elastic-MoT和block diffusion继承已有设计；实质创新是异构教师到统一DLLM的可训练桥接，以及利用VQ几何的渐进token state。理解端区分teacher-student差距和AR-diffusion context mismatch，编辑端以teacher-refined student rollout而非独立teacher sample构建target；这比只堆模型与benchmark更有可迁移的方法信息。",
+    "evidenceZh": "token-age中间状态沿VQ ball-tree扩散，反向逐步细化，允许修正已部分生成的image token。（Sec.3.2, Fig.4, Eq.(2), pp.4-6; Appendix A.2, pp.20-24；text blocks仍采用标准masked diffusion；self-refining过程针对image blocks。）；AR教师只直接监督student AR view，再通过self-consistency监督diffusion view。（Sec.3.3, Fig.5, Eq.(3), pp.6-7; Appendix A.3, pp.24-26；避开把异构teacher的AR scores直接作为未来context不同的diffusion target；作者不宣称理论上完全消除context mismatch。）；编辑蒸馏在teacher连续空间修正student输出，并以重新编码的VQ target训练。（Sec.3.4, Fig.6, pp.7-8; Appendix A.4, Algorithm1, pp.26-27；作者明确目标是SFT-style，并非严格分布匹配意义的OPD，on-policy指target源于当前student rollout。）；作者报告推理和编辑都从cross-paradigm OPD受益，直接teacher-score baseline反而退化。（Tables2-4, pp.9-10; Appendix C.3, Fig.16, pp.30-31；main run为统一多任务训练；部分appendix ablation从不同checkpoint或单任务训练开始，不应直接横比。）；整体理解结果的提升很大部分来自数据扩展，不能全归因于OPD。（Sec.4.1, Table1, p.8; Appendix B, Table5, p.28；作者明确generic understanding gains mostly attributed to scaling training data，训练使用64 H100共26天。）",
+    "caveatZh": "作者限制：理解OPD仍要求teacher/student共享vocabulary，此处都用Ministral3 tokenizer；跨tokenizer蒸馏留待未来（Appendix F p.33）。；non-Markov固定corruption interval与uniform intermediate progression主要为简化实现，architecture仍可优化（Appendix F p.33）。；训练mix缺少fine-grained text-rendering数据，模型文本绘制能力不足（Appendix F p.33）。 审阅边界：总训练需64H100共26天；公开推理/示例代码不等于可以低成本复现完整训练优势。；Base到OPD的局部对照支持方法，但generic understanding强成绩也受数据scale影响；较强teacher未必更好，Table7显示tokenizer/分布差距可能妨碍迁移。；T2I未做OPD且部分指标仍低于专用teacher/模型；self-refinement不能被描述成普遍提升质量或跨所有NFE加速。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "统一多模态模型的训练接口和离散visual token self-refinement直接关乎VLM/MLLM与Image Generation方向；teacher-refined rollout对视觉编辑监督设计有方法参考，但本文没有验证SVG、3D或fabrication任务，不扩写跨任务收益。"
+  }
+}
