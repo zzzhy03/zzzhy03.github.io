@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2610.40614",
+  "slug": "l3g-world-real-time-infinite-world-generation-with-latent-3d-gaussian-memory",
+  "title": "L3G-World: Real-Time Infinite World Generation with Latent 3D Gaussian Memory",
+  "authors": [
+    "Jinhyeok Choi",
+    "JoungBin Lee",
+    "Jongmin Lee",
+    "Minkyeong Jeon",
+    "Jiyoung Kim",
+    "Kaeun Han",
+    "Yoonjin Yoon",
+    "Seungryong Kim"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.40614"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D Generation",
+    "L3G-World",
+    "Real-Time",
+    "Infinite",
+    "World",
+    "Generation",
+    "with",
+    "Latent",
+    "Gaussian",
+    "Memory"
+  ],
+  "abstract": "Interactive world models generate visual content conditioned on user actions, yet maintaining spatial consistency over long-horizon exploration in real time remains challenging. Existing approaches rely on either temporal context or explicit 3D memory, both of which scale poorly because memory grows with the length of the generated stream. Moreover, explicit 3D memories condition latent video generators by re-encoding RGB renderings, which precludes real-time generation. In this paper, we introduce a Latent 3D Gaussian Memory (L3G) that combines the efficiency of feed-forward reconstruction with a compact, rapidly renderable scene representation. Building on this memory, we propose L3G-World, in which a memory updater and a video diffusion transformer (DiT) alternate autoregressively to generate spatially consistent worlds. The memory updater spawns Gaussians in newly observed regions and refines existing ones, so that the memory grows with scene extent rather than stream length. Each Gaussian further stores a VAE latent feature, allowing the memory to be rendered directly into the DiT's latent space without VAE re-encoding. Experiments show that L3G-World achieves state-of-the-art generation quality and long-horizon spatial consistency, with up to $38.6\\times$ fewer 3D primitives, $3.2\\times$ faster memory updates, and $359\\times$ faster memory rendering relative to the most efficient prior 3D-memory baseline for each metric, enabling real-time world generation at 9 FPS.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.40614v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.40614v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.40614v1 的 24 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "L3G-World把3D memory从逐帧累积改为按coverage/error增生、可residual refine的Gaussians，并直接渲染其中VAE features来条件化video DiT。值得精读的是可更新的latent-space场景接口；作者报告Fast版在单H100为9.02 FPS，但“infinite”不是恒定内存，动态物体和长期误差传播仍未解决。",
+    "motivationZh": "如何让长时interactive world generation维持空间一致性，同时避免记忆随视频时长不断膨胀和重复RGB编码？",
+    "methodZh": "为降低长程camera-controlled世界生成的重复3D存储及RGB→VAE编码成本，L3G-Mem以DA3几何特征和spawn mask初始化少量queries，对可见旧Gaussians做残差更新，同时提升16-D VAE features；L3G-Gen在目标相机下直接读取latent memory，并以few-step on-policy distillation形成Fast版。DL3DV/RealEstate10K的481-frame往返轨迹支持外观自一致性与存储效率，但并不验证生成世界的真实几何、物理或任意长探索。",
+    "methodFlow": [
+      "输入单图、text prompt及camera trajectory，初始化persistent 3D Gaussian memory",
+      "render旧memory得到opacity/RGB error mask；仅为缺覆盖或高误差区域聚类spawn queries",
+      "联合处理spawn与可见refine tokens，预测新Gaussians及旧Gaussians的残差更新",
+      "将VAE features绑定到Gaussians并直接render到目标相机latent space",
+      "memory-conditioned video DiT生成下一chunk，RGB解码一次后写回memory",
+      "以flow-map及on-policy distillation得到4步Fast学生，循环生成"
+    ],
+    "experimentsZh": "DA3/ZipSplat初始化memory updater，Cosmos-Predict2.5-2B构建generator；memory在DL3DV训练，generator在DL3DV+RealEstate10K训练。使用481-frame loop-closure往返轨迹评估对应相机帧自一致性、FID/LPIPS、VBench、估计pose和MEt3R。Table2效率为单A100；Table1 400-frame总成本为单H100。 作者报告400-frame生成时Fast版480×832达到9.02 FPS、peak7.4GiB（单H100）。 (Table 1, p.3) 作者报告RealEstate10K上Full版self-consistency PSNR18.36、LPIPS0.269，generation FID36.09；Fast版相应PSNR16.19、FID49.94，显示加速存在质量代价。 (Table 2, p.8) 作者报告DL3DV的VAE条件render throughput为1086.58 FPS，对NeoVerse3.11 FPS约349×；这只是memory条件构造吞吐，不是整管线加速。 (Table 2, p.8) 比较GEN3C、Spatia、SPMem、Lyra2.0、3DScenePrompt、NeoVerse、Yume1.5、MatrixGame3.0；统一DA3 metric-depth尺度。部分多输入baseline改为单图初始化，NeoVerse重建autoregressive pipeline，离散action方法由camera轨迹映射控制；分辨率、backbone和生成预算不同。Appendix D另比ReCoSplat/OF3GS并承认低分辨率ReCoSplat重建更准。 Table3移除adaptive spawning、refinement、global attention、RGB loss和VAE lifting；无spawning用75K对Full41K Gaussians，无refine的PSNR15.52对16.52。Table4支持部分生成指标改善，但其“degrades all”文字过强：无VAE lifting自一致PSNR15.41高于Full15.11，MEt3R也更低，不能声称所有指标一致获益。",
+    "insightZh": "基于ZipSplat/DA3与Cosmos的组合创新在于持久memory的选择性增生和原位修正，以及Gaussian→video-VAE的可直接render接口；不是新的video foundation model，也不以独立高保真重建取代专用online 3DGS。",
+    "evidenceZh": "spawn mask由低opacity或高RGB error构成；只检索可见旧Gaussians并预测残差。 (Sec. 3.2, Fig. 2, pp.4–5; Appendix B.1, pp.18–19; 将新增区域与旧区域纠错明确区分，避免逐帧无差别累积。) ; VAE features和Gaussian geometry共用rasterization，直接形成DiT的空间条件。 (Sec. 3.3, Fig. 3, p.6; Appendix B.2, p.20; Fast学生每次生成3个latent frames、4步denoising；与35步teacher区分。) ; 作者报告DL3DV的L3G-World为33K primitives、11.88MiB，self-consistency PSNR16.00、generation FID40.57。 (Table 2, p.8; 该表在A100测量，包含单独memory/reconstruction/rendering指标，不能当整管线FPS。) ; 作者明确指出主要面向static scenes，大范围探索仍增内存且autoregressive错误会传播。 (Appendix E, p.24; “infinite”指按scene extent伸展的生成框架而非无界运行保证。)",
+    "caveatZh": "主要为静态场景，不显式建模独立运动物体（Appendix E,p.24）。 memory仍随探索空间增长，需pruning/hierarchy；长程生成误差仍可能传播（Appendix E,p.24）。 481-frame往返的相同视点一致性不等于真实/物理正确，也不是任意复杂路径或无限长任务保证。 速度最大倍数对应不同单项baseline；H100总FPS与A100 memory吞吐不能混算。 Fast版部分质量/geometry指标落后Full或baseline；Table4正文与数值的全指标表述不一致。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对3D scene generation和可持续编辑的空间memory接口有直接方法价值；latent特征随explicit primitives存储并可更新，比普通video时间上下文更接近持久3D资产。"
+  }
+}

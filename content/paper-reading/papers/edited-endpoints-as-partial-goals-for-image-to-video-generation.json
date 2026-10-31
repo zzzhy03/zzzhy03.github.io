@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.39179",
+  "slug": "edited-endpoints-as-partial-goals-for-image-to-video-generation",
+  "title": "Edited Endpoints as Partial Goals for Image-to-Video Generation",
+  "authors": [
+    "Sihyun Kim",
+    "Sanghyun Jo",
+    "Kyungsu Kim"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39179"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Video Generation",
+    "Edited",
+    "Endpoints",
+    "Partial",
+    "Goals",
+    "Image-to-Video",
+    "Generation"
+  ],
+  "abstract": "Edited endpoint images make the target of an image-to-video transition explicit and can improve transition completion, but also preserve context in the source image's layout. Full-frame endpoint conditioning turns this preserved context into requirements on the video's final state, potentially inducing temporal artifacts. We measure discontinuity with Hard-Cut (HC), late background reversal with Background Motion Reversal (BMR), and motion suppression with Dynamic Degree (DD). These artifacts appear across five video models spanning training-free and learned endpoint conditioning, in model-specific forms. We study Partial, a selective conditioning scheme that constrains only an edit-relevant region estimated from image-editor attention and leaves the remaining terminal content to the video model. Across three backbones on TC-Bench-I2V, Partial reduces temporal artifacts relative to full-frame conditioning, with no significant difference in Transition Completion Ratio (TCR); on Wan2.2-Turbo, uniformly weakening conditioning does not reproduce these reductions. A donor-context intervention keeps full-frame conditioning and replaces only the context outside the edit-relevant region with the final frame of a Partial video. It lowers HC and BMR on HunyuanVideo-1.5 and lowers BMR while restoring DD on Wan2.2-Turbo, with no significant difference in TCR, so constraint extent alone does not account for these artifacts. Together, these findings suggest that edited endpoints should serve as partial future goals, although edit relevance does not guarantee future validity. Code and data will be released at https://github.com/wannagetacat/Edited-Endpoints-I2V.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39179v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39179v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39179v1 的 34 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "把编辑后的整张图当作视频终态，会把源时刻背景也冻结为未来要求；Partial只在editor attention估计的改动区域施加endpoint约束。作者报告Wan2.2的BMR由0.599降至0.387、DD恢复9.90个百分点，而TCR差异不显著。值得skim其“局部目标与未来有效性分开”的工具接口；不是新guidance算子，静态mask仍会让遮挡物重新出现。",
+    "motivationZh": "编辑后的endpoint保留了源时刻背景，怎样避免把这些内容错误地当成视频未来的全帧约束？",
+    "methodZh": "论文研究image editing goal与未来视频状态之间的spatial over-specification。FLUX.2生成终态图，用object/edit短语attention和GMM-Ising估计固定支持M0；复用现有masked projection，只在M0约束视频终态latent，其他位置保留生成预测。用endpoint-free、Full、Partial和global softening作同backbone paired比较，再保持Full support不变、仅替换外部context为Partial rollout末帧，分离terminal content与constraint extent。正文、34页内的实现细节与所有附录实验已检查；donor是额外生成轨迹，非真实未来，Partial也不预测future validity。",
+    "methodFlow": [
+      "用同一source及transition prompt生成一个FLUX.2 edited endpoint，保留Full/Partial配对的相同图像。",
+      "汇总固定object/edit短语在各layer、head、editing step的attention，以GMM-Ising得到edit-relevant固定mask M0。",
+      "在各backbone的终态latent实施同一加权投影：Full全帧、Soft全局常权、Partial用M0并保留其他位置预测。",
+      "以相同prompt与五个seed测TCR、HC、DD与BMR，用prompt-cluster paired bootstrap估计区间。",
+      "保持Full support和sampler不变，将M0外endpoint context换为Partial rollout末帧，检验terminal内容的独立影响。"
+    ],
+    "experimentsZh": "TC-Bench-I2V的120prompts中103个source仍可访问：50attribute、38object、15background，每条件五paired seeds。主测Wan2.2-Turbo、SANA-Video、HunyuanVideo1.5；另有MfM/OmniWeaving等observational baselines及CogVideoX Frame Guidance。TCR用Qwen2.5-VL judge，temporal诊断统一8FPS；100000次prompt-cluster bootstrap区间未做多重比较调整。 作者报告Wan2.2 Full到Partial：TCR41.94到42.91%、HC6.47到5.76（乘100）、DD66.8到76.7%、BMR0.599到0.387。 (Table1, p.5) 作者报告Hunyuan Full到Partial HC12.96到5.69、BMR0.585到0.333，TCR46.60到44.47%且paired CI包含零。 (Table1, p.5; TableC1, p.22) 作者报告同Full support的Hunyuan donor使HC降低4.86、BMR降低0.227；cross-seed donor降低1.70/0.105。 (Fig.3, p.7; TablesD2-D3, pp.28-29) 作者报告CogVideoX masked Frame Guidance将DD由30.5恢复42.7%，但HC由5.40升6.90；该guidance约57min/video而endpoint-free7min。 (Table3, p.9; TableC12, p.27) Full/Partial/Soft/area/placement在同backbone内配对，控制较充分；learned endpoint baselines用native configs，只是观测对照，Partial尚未在learned conditioners验证。不同backbone的投影实现不同，不能把跨模型指标当同条件排名；FPS不计endpoint生成。 fixed-support donor、cross-seed donor、native-latent contrast、global softening、support area/placement和controlled overlap检验terminal content与support作用。HC以blinded VLM judge交叉验证AUROC0.777，排除Hunyuan；track指标仅公共398/515 pairs，主BMR用全部515。BMR与TRR/BTR相关不等于独立因果证明。",
+    "insightZh": "作者明确复用RePaint/Blended Latent Diffusion式mixing及既有masked conditioning，而非提出新的guidance operator。新增认识在edited endpoint的源时刻context不应自动成为未来约束，并用fixed-support donor intervention及area/placement/softening控制检验；支持特定设计原则，未分离donor位置/可见性、图像属性和轨迹兼容性各自贡献。",
+    "evidenceZh": "M0由editor attention估计且固定在terminal spatial coordinates，不跟踪运动，也不是future-validity mask。 (Secs.3.2-3.4, pp.3-4; Appendix A.1, p.16; 需要可访问editor attention；object/edit短语经AI辅助并人工核验，不是全自动适配任意closed API。) ; 作者报告Wan2.2 Partial对Full的TCR+0.97pp，95%CI[-3.50,+5.44]；BMR-0.213、DD+9.90pp。 (Table1, p.5; TableC1, p.22; CI含零表示未发现显著差异，不等于证明等效或non-inferiority；HC显示值乘100。) ; 在保持Full support时，用同seed donor context使Hunyuan HC12.96到8.10、BMR0.585到0.358。 (Sec.5.2, Fig.3, p.7; TablesD2-D3, pp.28-29; donor需额外rollout，替换共同改变多个因素；不能把gap closure解释为causal mediation比例。) ; 局部goal support可作为视觉设计agent调度image editor与video工具的约束接口。 (Reviewer inference from Fig.1, p.2; Sec.6, p.9; 没有训练/测试设计agent闭环或3D生成，迁移只限目标表示与验证原则。)",
+    "caveatZh": "edit relevance不能保证future-valid位置/visibility，固定mask可使遮挡sign在末尾重新出现（Sec.6, p.9; Fig.4, p.10; Appendix F, p.33）。 Partial未提高相对Full的TCR，仍有比endpoint-free更高的HC；support扩大增加BMR（p.9）。 主用一个FLUX.2 editor；spatial controls仅Wan、cross-seed仅Hunyuan；诊断衡量特定伪影而非总体视频质量（p.9）。 不显著的completion差异不是等效性保证；pointwise bootstrap区间条件于五个seed且未调整多重比较。 M0依赖editor attention、人工复核短语与固定像素位置；对closed API、显著运动或遮挡的泛化未验证。 donor不是GT future，position/visibility、生成图属性与trajectory compatibility仍混在一起，gap closure非causal mediation。 Code仅承诺发布，指定GitHub当前404；未提供公开Code链接。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "为visual design agent的image-editor到video工具链提供具体partial-goal接口，帮助把请求改动与源图背景、目标内容与未来位置分开。论文没有设计agent闭环实证，迁移假设需独立检验。"
+  }
+}

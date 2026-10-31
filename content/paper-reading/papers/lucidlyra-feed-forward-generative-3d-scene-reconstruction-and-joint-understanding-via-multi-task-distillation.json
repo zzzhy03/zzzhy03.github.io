@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2610.40495",
+  "slug": "lucidlyra-feed-forward-generative-3d-scene-reconstruction-and-joint-understanding-via-multi-task-distillation",
+  "title": "LucidLyra: Feed-Forward Generative 3D Scene Reconstruction and Joint Understanding via Multi-Task Distillation",
+  "authors": [
+    "Oliver Hahn",
+    "Rodrigo Marcuzzi",
+    "Sangeetha Grama Srinivasan",
+    "Alessandro Burzio",
+    "Sherwin Bahmani",
+    "Jiahui Huang",
+    "Stefan Roth",
+    "Shengyu Huang",
+    "Qunjie Zhou",
+    "Laura Leal-Taixé"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.40495"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D Generation",
+    "LucidLyra",
+    "Feed-Forward",
+    "Generative",
+    "Scene",
+    "Reconstruction",
+    "Joint",
+    "Understanding",
+    "Multi-Task",
+    "Distillation"
+  ],
+  "abstract": "We present LucidLyra, a framework that makes generatively reconstructed 3D scenes directly queryable for semantics and instances in a feed-forward manner from video latents. While generative 3D reconstruction can synthesize virtual environments from a single image, downstream applications in robotics and physical AI require not only visual realism but also access to scene semantics and object identities. Existing 3D understanding approaches, however, require captured multi-view scenes, have limited generalization capabilities, or rely on expensive per-scene processing and optimization. To bridge this gap, our method distills complementary knowledge from a camera-controlled video diffusion model and frozen 2D vision foundation models into a unified model to jointly infer 3D Gaussians encoding geometry, appearance, open-vocabulary semantics, and class-agnostic instance cues. The resulting scenes support novel-view rendering, open-vocabulary segmentation, and object grouping without per-scene optimization, while training requires neither manual 3D annotations nor captured multi-view data. Our method outperforms baselines combining state-of-the-art 3DGS segmentation approaches with generative 3D scene reconstruction on curated synthetic and real-image-conditioned benchmarks, while preserving reconstruction quality. Furthermore, our latent formulation naturally extends to monocular video, reconstructing structured dynamic 3D scenes across time. By turning renderable but unstructured outputs into queryable 3D worlds, LucidLyra enables downstream applications including 3D scene editing, 3D asset mining, and robotic simulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.40495v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.40495v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.40495v1 的 37 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "LucidLyra把Lyra的video latent→3DGS decoder扩为重建与semantic/instance双头，用SAM tracklets聚合跨视角SigLIP监督，让单图生成场景可查询、分组和编辑。作者报告static SDG mIoU64.1%，但每套benchmark仅25 scenes、实例mTrackPR21.5%，2.1分钟从已生成latents起算；simulation-ready不代表可靠接触物理。",
+    "motivationZh": "如何让单图生成的3D场景同时支持语义查询和实例分组，而无需逐场景优化与人工3D标注？",
+    "methodZh": "目标是让生成的3D场景同时携带可查询语义和对象边界。冻结camera-controlled video generator产生多视角latent与RGB，SAM1/SAM2建立first-frame-seeded tracklets，RADSeg/SigLIP2特征压缩并按track pooling；带C-RADIO输入条件的共享Gaussian decoder联合学习重建、semantic和contrastive instance fields。推理无需2D教师或per-scene优化，但仍需视频生成和HDBSCAN grouping；动态扩展逐time独立decode并以prototype matching维持ID。",
+    "methodFlow": [
+      "单图条件化video generator，生成多camera trajectory latents与RGB teacher views",
+      "SAM1初始masks经SAM2追踪，RADSeg/SigLIP2投影特征在track内pooling",
+      "video latents、camera rays和C-RADIO输入图特征进入共享3DGS decoder",
+      "双头联合预测geometry/RGB、semantic及object/part embeddings",
+      "以重建、2D/3D semantic和跨视角instance contrastive losses蒸馏",
+      "推理按text相似度标类、HDBSCAN分组，可选input anchor refinement和动态tracking"
+    ],
+    "experimentsZh": "59031 static和7378 dynamic Lyra-SDG scenes、53M frames构造teacher targets；SDG static、ADE20K真实图条件generated completions、SDG dynamic各25 curated held-out scenes。评估重建、present ADE20K classes内语义以及annotated thing regions内track precision–recall product；单A10080GB报告后续处理耗时。 作者报告SDG语义mIoU相对Lyra+LangSplatV2为32.4→64.1，instance mTrackPR相对Unified-Lift为11.7→21.5；同教师直接lift的22.8仍更高。 (Table1,p.9) 作者报告LucidLyra+将SDG/ADE20K mIoU64.1/49.8提升至67.9/53.7。 (Table1,p.9) 作者报告动态plain/plus mIoU53.2/62.6、mTrackPR11.7/12.3；PSNR21.88比Lyra22.16略低。 (Table4,p.21) 比较frozen Lyra上的LangSplatV2、SFS、Unified-Lift、Chorus，generated RGB输入IGGT及同教师lift reference；dynamic比较4DLangSplat、TRASE、IGGT4D。IGGT限制11 views避免OOM，部分baseline有generated domain shift；已知词表及foreground约束使评估并非完全开放场景检测。 Table2去C-RADIO使mIoU64.1→56.9、mTrackPR21.5→14.9；direct Gaussian semantic loss增0.7/2.7pp，part supervision影响较小。256-D训练OOM，128-D压缩使独立SigLIP ImageNet top1降6.89pp（Table5），不是语义无损。",
+    "insightZh": "贡献是把生成视频latent-to-Gaussian重建与可跨视角对齐的语义/instance监督接合，避免生成后逐场景附着特征；继承Lyra及2D foundation教师，不是新VLM能力。Part fields主要由定性例子和小幅消融支持，未给完整part benchmark。",
+    "evidenceZh": "共享双头让每Gaussian携带geometry/RGB、128-D semantic、12-D object及4-D part features。 (Sec.3.2,Fig.2,p.5; 属性共用source-ray grid，无需事后2D→3D关联。) ; SAM2 tracks仅由初始视图seeds传播，晚显露且无seed区域不进入instance监督；语义按track pooling。 (Sec.3.3,p.6; 跨视图监督有明确覆盖边界，不能说所有生成对象都有完整标签。) ; 作者报告static SDG mIoU64.1、mTrackPR21.5、PSNR25.02，ADE20K条件为49.8、18.5、24.72。 (Table1,p.9;Sec.4.1,p.8; ADE20K输入是真图，但新视角仍是generated completions；每套仅25 scenes。) ; 作者报告2.1min从video latents到final结果，不含video生成；teacher preprocessing为1580 A100 GPU-days。 (Sec.4.2,p.9;Appendix A.1,p.18; 后续推理收益不等于整管线或训练数据成本低。) ; asset articulation使用PARTICULATE，编辑背景由OmniPaint加再重建补全。 (Appendix D.2–D.3,pp.30–32; 下游额外组件的能力不归给Gaussian decoder本身。)",
+    "caveatZh": "无初始seed的晚显露区域不进入instance监督（Sec.3.3,p.6）。 动态各time独立decode需额外tracking，重建有小幅trade-off（Sec.3.5,p.7;Table4,p.21）。 128-D压缩有accuracy损失，256-D训练超80GB预算（Appendix B.2,pp.21–22）。 三套benchmark各25个curated scenes，reference来自固定generated trajectories及SAM传播+human refinement，无法直接证明真实3D几何或一般场景可靠分割。 实例mTrackPR21.5/18.5%的绝对水平仍显示明显分组错误。 2.1min不含video生成，offline教师成本高；simulation和asset mining依赖额外mesh extraction/Pixal3D/PARTICULATE。 未设独立Limitations节，作者边界分别来自method、实验和appendix，不虚构限制页。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接连接3D generation与open-vocabulary/object/part segmentation，为可编辑场景提供queryable feature fields；真实LEGO拆件和制造可用性未验证。"
+  }
+}

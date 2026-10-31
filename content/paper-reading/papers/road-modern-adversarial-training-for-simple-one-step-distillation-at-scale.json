@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.39539",
+  "slug": "road-modern-adversarial-training-for-simple-one-step-distillation-at-scale",
+  "title": "ROAD: Modern Adversarial Training for Simple One-Step Distillation at Scale",
+  "authors": [
+    "Xiaoou Li",
+    "Shan You",
+    "Tao Huang"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39539"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Image Generation",
+    "ROAD",
+    "Modern",
+    "Adversarial",
+    "Training",
+    "Simple",
+    "One-Step",
+    "Distillation",
+    "Scale"
+  ],
+  "abstract": "One-step distillation turns pretrained diffusion models into fast generators, but strong results often require substantial training machinery and compute. Pure adversarial distillation offers a simpler route, yet has struggled at modern text-to-image scale. To address this limitation, we propose ROAD (Representation-grounded One-step Adversarial Distillation), a one-stage framework that distills text-to-image models with one adversarial objective and a lightweight representation-space critic. First, we replace the classical convolutional head with a Lipschitz-controlled Transformer head with token-level text conditioning, which matches the semantic tokens of modern visual encoders. Second, we observed a fixed random feature mixing leads to long-horizon degradation. We attribute it to generator-critic co-adaptation around one realization-specific view, and periodically re-draw the mixing to keep the randomization effective. Third, for our dense and vector-valued logits, we introduce Jacobian R1 which penalizes the full input-logit Jacobian, overcoming pooled R1's limitation of neglecting most of logit sensitivities. A single adversarial objective then suffices: in one step, ROAD reaches 11.03 FID on SDXL and 13.73 on SD3.5-M on COCO-10K, surpassing the multi-step teachers at a fraction of distribution matching's training compute.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39539v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39539v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Lixiaoou729/ROAD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39539v1 的 37 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "ROAD让初始化自diffusion/flow模型的单步generator仅靠真实图文GAN目标训练：冻结视觉encoder，配text-conditioned受控ViT critic、周期重采样mixing和完整Jacobian R1。作者报告SDXL/SD3.5-M的COCO-10K FID为11.03/13.73；值得skim其简化蒸馏训练接口，FID优势并不等于prompt能力保留，SD3.5-M的GenEval为0.66、低于teacher的0.69。",
+    "motivationZh": "如何以较简单的纯adversarial接口训练现代text-to-image的one-step generator，并保留必要的质量与对齐？",
+    "methodZh": "问题是单步推理常靠online score network、多阶段teacher supervision换来复杂训练，纯adversarial distillation又不稳定。ROAD从base权重初始化generator，随后不用teacher queries；真实与生成图像经frozen encoder四层feature、随机多核mixing与token-level text-conditioned ViT heads产生dense logits。spectral normalization、clamped cosine attention及residual scaling稳定head，每5K steps重采样非学习mixing，保留generator/head/optimizer；critic以单个Rademacher probe估计全input-logit Jacobian R1。generator是单GAN目标，但critic另有JR1正则。证据覆盖SDXL与SD3.5-M、500K真实LAION数据及COCO-10K，较强结论是现代T2I可用此较简接口训练，未证明所有生成能力或模型规模全面领先。",
+    "methodFlow": [
+      "从SDXL或SD3.5-M架构与权重初始化单步student，固定timestep/sigma接收noise和text",
+      "真实图文与生成图像进入frozen视觉encoder，提取四个semantic feature levels",
+      "1x1/3x3/5x5随机mixing组合feature，受控ViT heads通过token cross-attention输出dense real/fake logits",
+      "交替优化generator非饱和GAN loss和critic logistic loss，critic加full input-logit Jacobian R1",
+      "每5K steps重采样frozen mixing，保留generator、trainable heads及optimizer以打断固定视图co-adaptation",
+      "每500steps按COCO-10K FID选checkpoint，同checkpoint报告alignment/preference；推理只用一次student"
+    ],
+    "experimentsZh": "SDXL-Base-1.0 UNet和SD3.5-Medium MMDiT；500K固定LAION-Aesthetics5.5+真实图文。默认DINOv3 ViT-B frozen encoder、四tap/head depths4/3/2/1；8GPU effective batches64/32，GAN alternating1:1、refresh5K、JR1一probe/lazy16。COCO-2014固定10K prompts各生成1024平方图，FID中心crop/resize512，CLIP有固定prefix；SD3.5另做553 GenEval prompts各4图。 作者报告SDXL ROAD的FID11.03/CLIP.338，SDXL teacher19.29/.331；ROAD HPS28.58、Pick22.13并未超过所有单步competitors。 (Table2 p.11) 作者报告SD3.5-M ROAD一次评估的FID13.73、CLIP.342、GenEval.66；teacher FID18.01/GE.69，4-step SwD GE.71，ROAD HPS28.85/IR.94也非全面领先。 (Table3 p.11) 作者报告受控SDXL的ViT+pooled R1 FID14.54，加5K refresh为12.08，再加JR1为11.03；naive ViT collapse。 (Tables1/4 pp.6/12) 作者在其SDXL runs的FID/GPU-hours曲线报告，达到ODE-initialized DMD2最佳FID仅用其1/9.25训练GPU-hours；这是指定runs和阈值的比较。 (Fig.1 p.3; Sec.1 p.4) SDXL包括Hyper-SDXL、DMD2、DMDX、SiDA、Turbo、Lightning、Nitro；除DMDX取原论文外用official checkpoints共享评测。SD3.5比较teacher及4-step Turbo/SenseFlow/SwD/SiD-DiT。baseline目标、预训练阶段和steps不同，FID曲线只比较作者runs；GPU-hours不自动代表硬件无关或端到端成本，step减少也未给同硬件wall-time speedup。 head设计/conditioning、ViT大小和PE/SigLIP2、fixed/2K/5K/10K refresh、JR1系数及feature/approx R1均有对照；DiffAugment/ADA不能取代refresh。主要完整消融在SDXL，缺多seed误差与更广任务；PFUC/margin/fresh-draw probes支持coupling诊断，不能单独确立非线性退化唯一原因。",
+    "insightZh": "贡献在投影GAN critic与现代semantic tokens的匹配，以及持续随机测量和dense-logit正则的组合，让纯GAN fine-tuning在UNet和MMDiT上可用；不是首个adversarial distillation，也不是Hutchinson估计器本身的新发明。JR1明确揭示pooled梯度相消遗漏，refresh有受控干预和诊断支持，较普通FID小提升更有方法接口价值。",
+    "evidenceZh": "student只从teacher取初始化，随后用真实数据训练，无online score network或重复teacher queries；critic有JR1正则。 (Sec.2 pp.4-5; Sec.3.3-3.4 pp.9-10; Fig.2 p.6; 单GAN objective描述generator学习目标，不能省略critic正则或说不依赖pretrained模型。) ; controlled ViT、refresh和JR1各自改善；naive Transformer collapse，增加conv容量反而更差。 (Table1 p.6; Table4 p.12; 同SDXL设置的主要方法归因证据。) ; COCO-10K FID优于teacher，但SD3.5-M的GenEval及多项preference并非最优。 (Tables2-3 p.11; ROAD SD3.5-M FID13.73/GE.66，teacher18.01/.69；不能由FID推导语义保真全面提升。) ; Lipschitz bound只在query/key norm floor等条件下对fixed-prompt head成立，非完整图像GAN收敛保证。 (Appendix A LemmaA.1 pp.18-20, Scope of the bound p.20; 架构未强制norm floor，spectral normalization数值近似，trainable scales改变bound。) ; refresh机制解释的严格部分是linear surrogate，nonlinear co-adaptation是联合诊断支持的机制读法。 (Appendix B.2-B.5 pp.22-24; 保留right-isotropy理想化与理论适用边界。) ; 每500steps选最低FID，再在同checkpoint计算其它指标。 (Appendix E.2 p.31; 报告best-checkpoint COCO-10K，而非独立held-out选择或多seed平均。)",
+    "caveatZh": "Sec.5 p.14承认SD3.5-M preference落后few-step competitors、没有显式text-image alignment项，以及encoder更大不自动改善GAN平衡。 Appendix A p.20承认Lipschitz证明依赖未强制的query/key norm floor，spectral normalization是近似，且只对fixed-prompt head。 Appendix B.5 p.24区分linear surrogate证明与nonlinear co-adaptation机制假说。 Appendix E.2 p.31披露每500steps选择最低FID checkpoint，同checkpoint报告其它指标。 FID优化与teacher能力保持不同：SD3.5 GenEval.66低于teacher.69，preferred aesthetics也非全面最优，未验证编辑、multi-view或structured design。 只验证两个base models和COCO-10K主协议；没有多seed置信区间，best-FID选择会偏向该指标。 Fig.1 GPU-hour比例依赖指定runs和FID阈值，未给清晰可移植硬件口径；Table3把teacher列40 NFE而Fig.12列40steps/80NFE，不能直接当一致的wall-clock比较。 理论正则推导清楚，但refresh的线性模型不等于完整GAN训练收敛保证；单目标训练仍需多组件critic和真实500K高分辨数据。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "这是Image Generation广域雷达中具有实质训练接口变化的工作：不用score-distillation辅助的one-stage GAN recipe跨UNet/MMDiT并有机制消融，达到major方法推进门槛。其critic/Jacobian设计或可供主线生成研究参考，但论文未对LEGO、embroidery、structured2D/3D直接实验。"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.38518",
+  "slug": "self-consistency-geometry-injection-for-multi-view-consistent-image-generation",
+  "title": "Self-Consistency Geometry Injection for Multi-view Consistent Image Generation",
+  "authors": [
+    "Yupeng Xiao",
+    "Yankai Wu",
+    "Jianjie Luo",
+    "Jiajie Lin",
+    "Yi Yu",
+    "Zhenguo Yang"
+  ],
+  "publishedAt": "2026-10-28",
+  "updatedAt": "2026-10-28",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.38518"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Image Generation",
+    "Self-Consistency",
+    "Geometry",
+    "Injection",
+    "Multi-view",
+    "Consistent",
+    "Image",
+    "Generation"
+  ],
+  "abstract": "Recent diffusion models have achieved impressive progress in single image to multi-view generation by synthesizing consistent novel views efficiently. Existing methods usually explicitly or implicitly couple geometry inference and texture synthesis, making generation vulnerable to inaccurate geometry prediction. Although several geometry-guided methods have explored decoupling, they usually treat predicted geometry as a fixed condition and do not explicitly model whether the geometry is reliable. We therefore propose Reliability-Guided Multi-View Generation (RGMV), which comprises a parameter-free Self-Consistency Geometry Gate (SCG) and a Reliability-aware Geometry Injection (RGI) module. Specifically, a geometry proposal generator produces multiple geometry predictions for the same reference image and target viewpoints under different stochastic sampling configurations. SCG measures their spatial agreement to derive a reliability map, which RGI uses to modulate the injection strength of geometry-conditioned residuals in the RGB synthesis model. Moreover, RGMV can adapt to different geometry proposal generators. As a result, RGMV preserves stronger geometric guidance in stable regions while attenuating unreliable geometry cues before they propagate into multi-view RGB generation. Extensive experiments show that reliability-aware geometry injection improves the geometric quality of multi-view generation. Code: https://github.com/WISLab-GDUT/RGMV.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.38518v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.38518v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.38518v1 的 17 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "RGMV先用3次随机normal predictions的角度一致性估计空间可靠性，再选择性注入ControlNet几何residual，避免错误几何统一污染多视角RGB生成。作者在100个GSO对象上报告MV-Adapter组合的下游Trellis CD由0.036降至0.026、IoU由0.54升至0.62；适合skim其3D生成prior接口，但一致性并非正确性保证，额外proposal将推理由8.85s增至16.65s。",
+    "motivationZh": "预测geometry不可靠时，怎样在多视角RGB生成中选择性使用其指导，避免错误几何传播？",
+    "methodZh": "问题是单图多视角生成中的normal条件在遮挡、薄结构和边界处不可靠，固定全局注入强度会传播错误。SCG对同一图像与六个目标视角的K组normal predictions计算平均角偏差，经exp(-γd)形成可靠性map；RGI缩放并仿射校准map，在各denoising block调制normal-conditioned ControlNet residual。训练仅更新MV-Adapter，使用GT normals且gate空间常量，推理才以stochastic proposals建立空间gate；它不修复anchor normals本身。证据覆盖Objaverse消融和100-object GSO图像/下游重建，未验证任意连续相机轨迹。",
+    "methodFlow": [
+      "单图与目标camera poses输入geometry proposal generator，K=3随机normal sets；第一组作为anchor",
+      "SCG逐视点计算归一化normal的平均方向与角偏差，以exp(-γd)估计agreement reliability",
+      "normal-conditioned ControlNet由anchor normals产生多层geometry residual",
+      "RGI resize及affine-calibrate reliability map，空间调制residual后注入MV-Adapter diffusion",
+      "只训练MV-Adapter以适应GT normal注入；推理生成六视角RGB并交给Trellis评估下游3D"
+    ],
+    "experimentsZh": "约100K curated Objaverse objects，60K以上用于训练；固定100-object验证集做消融，GSO固定100-object测试。SD2.1-base+MV-Adapter+frozen normal ControlNet，120K steps、batch3，仅优化MV-Adapter；六个固定方位角。图像PSNR/SSIM/LPIPS及Trellis CD/Volume IoU。 作者报告RGMV(MV-Adapter)的CD为0.026、IoU0.62，对应MV-Adapter为0.036/0.54；RGMV(Era3D)图像PSNR21.94、LPIPS0.1139。 (Table1, p.9) 作者报告冻结uniform注入→SCG注入：PSNR24.43→24.63、SSIM.8498→.8545、LPIPS.2073→.1935；完整adapted RGMV为25.31/.8621/.1823。 (Table3, p.13) 作者报告disagreement与GT angular error的pooled Spearmanρ=.299；K=3总耗时16.65s，对K=1为8.85s。 (Table2 p.12; Table5 p.14) 比较Zero-1-to-3、SyncDreamer、Wonder3D++、MV-Adapter、Era3D；后3者分别提供normal proposals。uniform scales sweep及matched-mean constant/Sobel controls提供较具体机制对照；测试规模与六固定视角限制了跨场景、任意pose推广。 Table3拆分几何条件、SCG空间gate及RGB adaptation；Table4扫描γ、base scale、K和校准区间。K3对K2结构指标略好但LPIPS略差；K4收益很小而成本再加约23%。",
+    "insightZh": "新增的是把多次geometry预测的一致性用于控制条件影响，而非对normal做平均替换或再训练uncertainty模型。受控uniform-vs-SCG与constant/edge controls有助于隔离空间gate价值；完整pipeline改善同时含MV-Adapter adaptation，不能把总增益都归于parameter-free SCG。",
+    "evidenceZh": "SCG测量geometry agreement并非监督校准的error概率，RGI仅调整条件影响不修复normal。 (Sec.3.1-3.3, Fig.2, pp.5-7; 方法定义与作者明确的proxy边界。) ; 作者报告GSO上的图像和Trellis下游几何同时改善。 (Table1, Sec.4.3, p.9; MV-Adapter与其RGMV组合的CD/IoU可直接对照，但完整pipeline含adaptation。) ; 冻结RGB模型下SCG比uniform注入PSNR高0.20dB，LPIPS低0.0138；adapted条件下仍有0.17dB/0.0125收益。 (Table3, pp.12-13; 提供同backbone、相同geometry proposals下的gate消融。) ; self-consistency与normal error仅中等相关，额外采样是主要成本。 (Table2, p.12; Table5, p.14; ρ=.299、K=3 16.65s，不能说稳定预测即真实几何。)",
+    "caveatZh": "Sec.3.2 p.6明确agreement只是stability proxy，不假设等同geometry accuracy。 Sec.4.2 p.8明确任意/连续pose评估超出范围。 Sec.4.4 pp.13-14承认重复geometry proposals主导额外推理成本。 多次采样可能一致地产生错误几何，不能把ρ=.299的proxy称为校准置信度。 真实图像50例audit无GT novel views，14/18失败缓解与新增1/50 artifact主要是作者定性审计。 六视角100对象评估及训练使用GT normals/推理使用预测normal的分布差异，不足以证明可直接泛化到任意3D asset生成器。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体可迁移点是3D generation所用multi-view prior的几何条件接口：在生成RGB前削弱不一致几何的影响，且Trellis下游结果提供了初步直接证据。它没有验证LEGO、Embroidery或制造约束，不能扩张为这些任务的已证实收益。"
+  }
+}

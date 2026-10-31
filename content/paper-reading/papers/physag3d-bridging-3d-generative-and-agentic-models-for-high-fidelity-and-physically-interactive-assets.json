@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2610.39924",
+  "slug": "physag3d-bridging-3d-generative-and-agentic-models-for-high-fidelity-and-physically-interactive-assets",
+  "title": "PhysAg3D: Bridging 3D Generative and Agentic Models for High-Fidelity and Physically-Interactive Assets",
+  "authors": [
+    "Bi'an Du",
+    "Fanpeng Meng",
+    "Jiemin Fang",
+    "Chen Yang",
+    "Pufan Li",
+    "Daizong Liu",
+    "Qi Tian",
+    "Wei Hu"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39924"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "Visual Design Agents",
+    "PhysAg3D",
+    "Bridging",
+    "Generative",
+    "Agentic",
+    "Models",
+    "High-Fidelity",
+    "Physically-Interactive",
+    "Assets"
+  ],
+  "abstract": "Generating interactive 3D assets from a single image requires realistic appearance, fidelity to the depicted object, and plausible physical behavior. Yet detailed geometry alone does not determine how an object should move or deform. We introduce PhysAg3D, which couples 3D generative models with agentic reasoning and tool use. A vision-language agent first infers semantic parts, candidate interactions, and physical priors from the image; a 3D generator then produces a textured whole-object mesh from the same image. A hierarchical interaction representation links these revisable priors to mechanisms and the generated surfaces they control, organizing interaction construction and refinement. Guided by this representation and observations of the mesh, the agent uses geometric and physical tools to construct parts, joints, deformable regions, and surface bindings while retaining useful generated geometry and materials. Rendered interactions and execution measurements guide targeted revisions within a fixed budget. The framework accommodates both rigid articulation and compliant deformation. Quantitative and qualitative evaluations on real photographs and external benchmarks demonstrate detailed, image-aligned assets with plausible interactions. Ablations support bounded refinement and source-surface preservation. Project Page: supra-3d.github.io/PhysAg3D.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39924v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39924v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://supra-3d.github.io/PhysAg3D"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39924v1 的 17 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "PhysAg3D把interaction intent、physical mechanism和surface bindings连为可追溯层级，让agent在TRELLIS.2资产上构建关节/局部compliance，并按render与执行证据限次修正。值得精读“意图—机制—可见表面”一致性接口；作者报告50对象ACR91.3%、FVSP88%，但后者仅video-visible稳定，joint playback与隐藏材质估计不构成真实动力学保证。",
+    "motivationZh": "详细mesh和外观并不决定物体应如何运动或形变，怎样把交互意图落实为可执行且可修订的机制？",
+    "methodZh": "单图3D可有精细外观却缺少交互，构建的机制也可能未绑定到正确表面。PhysAg3D独立取得image priors和TRELLIS.2 mesh，以S/K/X及correspondence/source maps连接交互要求、mechanism、可执行实体与visible skin，借Blender和MuJoCo构建并记录candidate-specific evidence。最多初始构建+2次Builder repairs，以固定规则选eligible candidate，并保留失败或静态fallback。核心贡献是design agent如何构建、验证和修订，非新generator训练。",
+    "methodFlow": [
+      "VLM从单图推测可修订semantic/physical priors，TRELLIS.2独立生成mesh/PBR",
+      "建立requirements S、mechanisms K、realizations X及跨层/源表面correspondences",
+      "agent调用Blender/physical tools构建parts、joints、compliant regions和surface bindings",
+      "render与execution分开检查外观、动作、范围、绑定和支持状态",
+      "将缺失或失败证据定位到相关实体，在Builder/validation/replan预算内局部修正",
+      "按固定evidence规则返回eligible candidate、preview及未解决要求，保留fallback边界"
+    ],
+    "experimentsZh": "照片库>200，主评测固定50对象/110预定义semantic actions；外部PhysXVerse/PhysX-Mobility reference assets和PhysX-Bench；102 valid human evaluations。TRELLIS.2-4B1024cascade、24steps/2048texture、gpt-6-astra high、Blender/MuJoCo。输入视角camera-grid alignment；failed/inconclusive保持分母。 作者报告50对象宏平均ACR91.3%、MMR22.8%、RAR91.3%、对象FVSP88.0%；aDSL的ACR66.8%、FVSP42.0%。 (Table1,p.5;Sec.4.2,p.6) 作者报告PhysXVerse PSNR24.26dB、CD2.08×10^-3，PhysX-Mobility PSNR21.14；PhysX-Bench RQS95.18排名第二，并非所有指标最优。 (Tables2–3,p.7) 作者报告102 valid evaluations中input-consistency4.63、motion-plausibility4.38，为排名赋分而非动力学成功率。 (Table4,p.8) 主任务比Particulate、PAct、ArtiCraft、PhysX-Omni、aDSL，外部表另含Articulate-Anything、MonoArt、PhysXGen/Anything。输入/输出support不同，mesh-conditioned方法有重建或auxiliary conditioning；属性judge/kinematics/playback分数不证明dynamic contact稳定。主表未提供逐方法完整总算力/模型调用成本。 共享cached TRELLIS2、priors、tools和selection，比较Full、One-shot、w/o surface preservation。Full比One-shot KPS/MPS增19.68/17.26pp。surface消融仍保留native-retention ranking，所以是固定selection下construction约束干预；one-shot同时改变repair和candidate selection机会，不隔离feedback组件因果。",
+    "insightZh": "相对Articulate-Anything、ArtiCraft和aDSL，重点是显式连接requirements、mechanisms、exported bindings及source-surface lineage，组织targeted revision与appearance preservation。Representation辅助定位但不保证causal diagnosis；底层TRELLIS.2、Blender/MuJoCo和VLM是已有组件。",
+    "evidenceZh": "R=(S,K,X,Γ,ρ)分开action/response test、mechanism及realization，记录源表面修改和bindings。 (Sec.3.2,Fig.2,p.4; 关节存在不等于目标表面响应；topology变化需更新correspondence。) ; 修改build使旧dynamic evidence失效；preview可无valid trajectory；最多initial+2 Builder repairs。 (Sec.3.4,p.5;Sec.4.1,p.6;Appendix A.4–A.6,p.14; candidate accounting和预算明确区分静态fallback、playback与物理通过。) ; 作者报告固定50对象/110 actions上ACR91.3%、FVSP88%，FVSP依据rendered video而非simulator-log稳定。 (Table1,p.5;Sec.4.2,p.6;Appendix B.1,p.15; 可见行为指标不等于真实contact或动力学正确。) ; 作者报告去surface preservation使CLIP0.84→0.68、RQS95.18→77.50；one-shot KPS68.50而Full88.18。 (Table5,Sec.4.5,p.8;Appendix B.3,p.15; 修订消融测整个repair/selection机会，未隔离单个feedback signal。) ; ear-pad compliance为近似；单图不能唯一恢复hidden mechanism、scale或material参数。 (Fig.1,p.1;Sec.3.1,p.3;Conclusion,p.8;Appendix A.2,p.13; 输出是合理物理假设的实现，不是从照片标定真实机械材质。)",
+    "caveatZh": "单图对hidden structure、scale及material欠定，compliance可为approximate而非标定（Sec.3.1,p.3;Appendix A.2,p.13）。 FVSP仅video-visible稳定，PhysX-Bench articulation是joint playback，不建立dynamic contact稳定（Secs.4.2–4.3,pp.6–7）。 correspondences仅定位相关结构，不保证cause；静态fallback不表示交互/dynamic validation成功（Sec.3.4,p.5;Appendix A.6,pp.14–15）。 固定50对象及有限动作，缺真实force/material校准、长期操作和一般contact benchmark；91.3%ACR不能外推真实物理正确率。 host validation最多2次但construction-tool内部simulator calls另计，不是统一aggregate compute budget。 公开实现为agent-assisted workflow，依赖外部TRELLIS2、Codex模型与环境；未实际复现，不能称独立确定性生成同等结果。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中Visual Design Agents：agent调用geometry/simulation工具构建视觉资产，以render/execution反馈迭代；同时服务part/assembly-aware3D generation。虚拟物理交互不自动等于manufacturability，未归Fabrication。"
+  }
+}

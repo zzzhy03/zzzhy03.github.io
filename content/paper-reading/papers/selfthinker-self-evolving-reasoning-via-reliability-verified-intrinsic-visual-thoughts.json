@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.40115",
+  "slug": "selfthinker-self-evolving-reasoning-via-reliability-verified-intrinsic-visual-thoughts",
+  "title": "SelfThinker: Self-Evolving Reasoning via Reliability-Verified Intrinsic Visual Thoughts",
+  "authors": [
+    "Zhangquan Chen",
+    "Ruqi Huang"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.40115"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VLM / MLLM",
+    "SelfThinker",
+    "Self-Evolving",
+    "Reasoning",
+    "Reliability-Verified",
+    "Intrinsic",
+    "Visual",
+    "Thoughts"
+  ],
+  "abstract": "Unified multimodal models can both generate and understand images within a single set of weights, offering an opportunity to use image synthesis as training supervision for visual comprehension. However, existing visual chain-of-thought methods rely on human-annotated helper images during training and require slow image generation at test time. We present SelfThinker, the first self-evolving framework that turns a unified model's self-generated visual thoughts into stronger understanding without human image annotations. Given a visual problem, SelfThinker samples candidate helper images from its generation pathway and uses its frozen understanding pathway to score each candidate via conditional pointwise mutual information. High-utility visual thoughts then refine the generator via flow matching and serve as privileged teacher context for on-policy self-distillation. At inference, SelfThinker reasons directly from the original image in text without generating intermediate images. Although trained only on small synthetic visual-search and navigation datasets, SelfThinker transfers broadly to natural-image and spatial benchmarks, raising the seven-benchmark average of ThinkMorph-7B from 52.7 to 64.0 (+11.3 points). Controlled image-perturbation probes further show that SelfThinker surpasses ThinkMorph-7B by up to 40.4 points and its pretrained BAGEL-7B backbone by up to 23.2 points across fine-grained and spatial perception tasks. Our code is available at https://github.com/zhangquanchen/SelfThinker.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.40115v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.40115v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/zhangquanchen/SelfThinker"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.40115v1 的 25 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "SelfThinker用冻结理解模型的conditional PMI及错配thought校准筛选自生成helper images，再以privileged on-policy JSD蒸馏到只读原图的学生。可借鉴的是生成可验证训练上下文再内部化的接口；作者的64.0七项均分是13 seeds最高值（平均62.4±1.0），Noise-OPSD已达61.8，不能把相对52.7的全部收益归给visual thoughts。",
+    "motivationZh": "如何把自生成helper images转为可靠训练监督，并让模型在推理时无需再生成中间视觉thought？",
+    "methodZh": "为减少新增helper图标注与测试时画图，模型每题生成6个thought，以正确答案或majority vote为direction计算条件log-likelihood增量，并用其他题thought校准item-wise阈值。选中的图像供EMA teacher读取，student仅读原图并沿自身采样token做JSD蒸馏，另以flow matching改善generator。小规模synthetic navigation/visual search训练迁移到自然图与空间benchmark，证据限ThinkMorph/BAGEL7B家族，尚无设计agent闭环或多模型族验证。",
+    "methodFlow": [
+      "统一模型每题采样6个interleaved visual thoughts及答案",
+      "冻结understanding路径，以答案或majority vote计算conditional PMI utility",
+      "用其他题thought校准item-wise阈值，保留最佳且超过阈值者",
+      "verified thoughts供flow-matching及answer-loss辅助微调generator",
+      "EMA teacher读原图加thought，student仅读原图，on-policy tokens上JSD蒸馏",
+      "部署仅以原图和文字reasoning作答，不生成helper image"
+    ],
+    "experimentsZh": "两个fresh synthetic pools各1500 train+500 diagnostic，6 thoughts/题；主understanding模型1092 verified visual-search items（vote1074），Nav1179。起点ThinkMorph7B由BAGEL7B经annotated helper数据微调。主表VSP、ChartQA bars、V*、MMVP、SAT circular、BLINK、CV-Bench七项，用Qwen3-30B-A3B judge、greedy text-only至1024 thinking tokens；256/512-token probes用规则判分。 作者报告七项均分52.7→64.0，Vote63.4；VSP仍仅15.8%，BLINK58.2低于Nav60.3。 (Table2,p.8) 作者报告Prompt-OPSD60.7、Noise-OPSD61.8，最佳SelfThinker多3.3/2.2pp；13 seeds平均62.4±1.0。 (Table4,p.11;Sec.4.5,p.10) 作者报告visual-search diagnostic Top-1 AUC0.660、paired win rate54.1%、margin0.20nats；vote AUC0.647。 (Table3,p.11) 主表限同7B家族和task-pool variants，无当前strong VLM或多模型族全面比较。ThinkMorph在禁画图时常提前停止，52.7有协议适配负担；completed-answer subset及BAGEL corruption probes缓解但不消除所有公平性问题。Prompt/Noise同日程teacher contexts是更直接的归因对照。 Table4比较teacher context、task pools及answer/vote方向，Table5比verified与random-thought generator更新；13/11 seeds和paired bootstrap给出稳定性信息。bootstrap最佳run增量不代替seed配对比较。训练阈值取6个mismatched scores第5 order statistic，diagnostic yield用线性95th percentile，定义不同（Appendix A）。",
+    "insightZh": "贡献是以calibrated intrinsic visual utility连接统一模型generation与understanding，再把verified imagery作为privileged context内化；PMI、EMA和on-policy distillation均有先例。训练接口值得关注，但未证明持续多轮自演化或领域级能力跃迁，也不是从完全无人工helper监督的模型起步。",
+    "evidenceZh": "utility是目标答案加入thought前后的条件log-likelihood差；verifier固定为base ThinkMorph，阈值用其他题thought。 (Sec.3.2,Eq.2–3,pp.5–6;Appendix A,p.13; answer模式仍用正确文字答案，vote不需答案label但不是独立视觉真值。) ; EMA teacher读verified visual context，student读原图，在student rollout tokens上优化JSD。 (Sec.3.4,Eq.5–6,p.6;Fig.1,p.2; 结构上解释测试时无需image generation。) ; 作者报告主表均分52.7→64.0，同训练teacher-context Prompt/Noise controls为60.7/61.8。 (Tables2/4,pp.8/11; 需要相对context-distillation controls估计visual imagery额外贡献。) ; 作者报告13个answer-direction seeds均分62.4±1.0，范围60.7–64.0；11个vote seeds均分61.9±0.8。 (Sec.4.5,p.10; 64.0及63.4为各分布最高结果，不能当平均复现性能。) ; 512-token corruption probes另比BAGEL7B，用规则提取答案；主表用1024 tokens和LLM judge。 (Appendix F,Tables10–12,pp.18–20; probes支持视觉敏感度变化，但与主表分数不能混算。)",
+    "caveatZh": "新增训练不需人工helper图标注，但ThinkMorph起点已用human-annotated helper templates微调（Sec.2.2,p.4;Sec.4.1,p.7）。 单ThinkMorph/BAGEL7B家族、两类synthetic pools，主表与probe预算和判分不同（Sec.4.1,p.7;Appendix F,p.18）。 主表64.0是13 seeds最高而非62.4均值，多数相对52.7增益已由Prompt/Noise取得，不能全部归因verified imagery。 intrinsic utility来自同模型答案概率，不是独立视觉真值；Top-1 AUC比较6候选最佳与mismatched均值，带selection效应。 未验证多模型族、持续多代自演化或设计agent/3D闭环，跨任务设计迁移仍是假设。 未设独立Limitations节；作者边界来自实际方法和协议，不虚构限制页。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "统一VLM generation→understanding训练接口有具体参考：生成内容经下游任务utility验证，再蒸馏成无需额外绘图的perception能力；设计agent/3D迁移尚未实证。"
+  }
+}

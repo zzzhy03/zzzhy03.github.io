@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2610.39293",
+  "slug": "unlocking-any-order-generation-in-pretrained-autoregressive-image-models",
+  "title": "Unlocking Any-Order Generation in Pretrained Autoregressive Image Models",
+  "authors": [
+    "Rishav Pramanik",
+    "Marco Pedersoli",
+    "Zhaozheng Yin"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39293"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Image Generation",
+    "Unlocking",
+    "Any-Order",
+    "Generation",
+    "Pretrained",
+    "Autoregressive",
+    "Image",
+    "Models"
+  ],
+  "abstract": "Autoregressive (AR) image generators are powerful in principle but inflexible in practice: training with a fixed raster-scan order hardcodes a single factorization of the image distribution into the model, leaving it unable to inpaint, outpaint, or edit at inference time. Existing solutions, including the modern discrete-diffusion family, train from scratch on a mixture of token orderings, paying roughly 3x the compute of standard raster-scan training; discrete diffusion further sacrifices compatibility with the AR inference ecosystem (KV caching, vLLM) by construction. We argue that this cost is unnecessary. A pretrained raster-scan AR model has already learned the joint distribution over image tokens; what it lacks is not knowledge but the ability to express that knowledge through non-sequential conditional pathways. We propose a recipe for adapting pretrained raster-scan models into any-order generators using two components: future-aware positional embeddings that resolve a target-position identifiability problem at negligible overhead, and an ordering curriculum that traces a stable optimization path from the pretrained solution to a good any-order basin. Applied to four base models across two architectures and two scales (LlamaGen-L/XL, RAR-L/XL), the recipe substantially outperforms MaskGIT on ImageNet inpainting (FID 6.21 vs. 10.44) and outpainting, is competitive with MAR-L, trades a 1.2-1.9 increase in class-conditional FID for this flexibility, and costs 13-33% additional compute beyond pretraining, while leaving the standard AR inference stack untouched. Inpainting, outpainting, and editing, our results suggest, need not be added to autoregressive image models. They can be unlocked from the ones that exist. Code is available at https://github.com/Ordered-AR/unlockedadaptation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39293v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39293v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Ordered-AR/unlockedadaptation"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39293v1 的 17 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "把既有raster AR图像checkpoint适配成any-order模型：给输入加下一空间目标embedding，并逐步混入随机order，保留单流causal/KV-cache接口。作者报告ImageNet inpainting FID6.21，但class生成FID退化1.17–1.93；值得skim这一能力转换训练接口，不能外推为已支持高分辨率T2I或指令编辑。",
+    "motivationZh": "能否把现有raster AR checkpoint适配为any-order条件生成，而不从零重训或放弃causal/KV-cache接口？",
+    "methodZh": "论文把任意observed-token子集置于生成order前部，用spatial position encoding保留图像几何，再通过future-aware target embedding消除下一位置歧义、raster/random混合curriculum稳定适配。四个LlamaGen/RAR checkpoint展示由已有权重获得in/outpainting和region completion的能力变化，使用原tokenizer与单流causal transformer。实验全部来自ImageNet；参考图completion指标不等于instruction following，原有class-conditional质量需付代价。",
+    "methodFlow": [
+      "读取已有raster checkpoint及其VQ tokenizer，保留backbone结构",
+      "以原spatial index而非序列位置作RoPE/absolute position处理",
+      "每个输入加入下一目标位置的future-aware embedding",
+      "每example从raster/random混合分布采样order，curriculum逐步增大random概率",
+      "继续AR CE训练，target embedding用10倍学习率",
+      "推理把observed tokens置前，其余按选定order生成并复用KV cache"
+    ],
+    "experimentsZh": "ImageNet-1k 1.28M train，50k class生成及center-mask in/outpainting，5k random-region completion；LlamaGen-L/XL和RAR-L/XL，原tokenizer不变。LlamaGen-XL原生384px后resize256，其它256，FID/IS/precision/recall与区域LPIPS/PSNR/SSIM。 作者报告inpainting/outpainting FID6.21/5.84；MAR-L为6.63/6.86，但MAR-L outpainting precision0.736、recall0.649，高于本方法0.720/0.637。 (Table 3, p. 8) 作者报告LlamaGen-L无curriculum FID5.86，有curriculum4.24；class FID相对原raster3.07仍有退让。 (Table 5, p. 9; Table 1, p. 6) 作者报告LlamaGen-XL由576步到64步，FID3.91→5.03；native吞吐35.6ms/image并非同FID比较。 (Table 7, p. 9; Sec. 4.5, p. 10) completion比较MaskGIT两scheduler与MAR-L，掩码相同；class生成表含原论文reported指标及不同原生分辨率，不是所有方法同训练/采样预算。RandAR主要用于epoch成本对照，缺少同预算完整completion正面对照；原始raster对图1任务是结构能力基线。 去future embedding导致loss无法下降；直接alpha=1使FID从4.24变5.86，10倍embedding LR优于base LR，teacher KL反而FID9.62。matched-epoch random-init较差支持预训练价值，但schedule未匹配，不能独立证明路径原因。",
+    "insightZh": "价值在将any-order能力获取从from-scratch重训改为已有causal checkpoint的定向适配，解耦target identifiability与优化路径两类问题。两架构/两尺度证据支持可复用训练接口的能力扩展；不把chain-rule恒等式当有限模型天然掌握所有conditional的证明，也不声称替代diffusion。",
+    "evidenceZh": "输入层future-aware embedding、spatial positional indexing与raster/random curriculum是主要改动。 (Secs. 3.1–3.4, Eqs. 2–4, pp. 4–5; Algorithms 1–2, pp. 16–17; 保持单流causal结构，vLLM仍需custom model registration提供空间索引和embedding。) ; 作者报告inpainting FID6.21、outpainting5.84，MaskGIT cosine为10.44/12.17，Halton为7.82/7.91。 (Table 3, p. 8; 相对MaskGIT的一部分幅度来自scheduler；MAR-L在outpainting precision/recall更好。) ; 作者报告四base model的class FID代价为1.17–1.93，LlamaGen-XL由2.63到3.91。 (Table 1, p. 6; 这是质量/条件灵活性折衷，不是lossless conversion。) ; 公开补充限制只在ImageNet class-conditional与region completion；compute control匹配epochs而非schedule。 (Limitations, p. 10; Appendices B–C, pp. 14–15; 13–33%额外预算主要按epoch比率；仅XL记录约64 H200-GPU-hours。)",
+    "caveatZh": "仅ImageNet class-conditional256px，T2I和高分辨率泛化待测；只适配token-based AR。 editing只评region completion，不测指令遵循与identity preservation；random-init control匹配compute但不匹配schedule。 budget比例以epochs/pretraining参照估算，除LlamaGen-XL外未记录逐run GPU-hours；不同hardware/batch和schedule不能读成严格同口径12倍省算力。 没有run-level uncertainty；MAR比较应表述competitive，不应以较低FID推断所有生成质量维度领先。 target embedding/空间索引依赖模型实现，保留causal结构不等于任意现有服务直接零修改可用。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "以条件化路径和训练目标改变已有视觉生成模型能力，属于广域Image Generation中值得跟踪的可复用训练接口；对设计tool构造的潜在价值需另行验证，本文未产生structured 2D或3D资产。"
+  }
+}

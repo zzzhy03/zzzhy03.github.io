@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.39232",
+  "slug": "seeing-and-imagining-as-one-unified-video-generation-and-4d-perception-for-embodied-world-modeling",
+  "title": "Seeing and Imagining as One: Unified Video Generation and 4D Perception for Embodied World Modeling",
+  "authors": [
+    "Haitang Feng",
+    "Zhuoman Liu",
+    "Zhennan Wang",
+    "Sheng Wang",
+    "Juelin Li",
+    "Chengzhi Zhao",
+    "Hexiang Wei",
+    "Lin Shao"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39232"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Video Generation",
+    "Seeing",
+    "Imagining",
+    "Unified",
+    "Video",
+    "Generation",
+    "Perception",
+    "Embodied",
+    "World",
+    "Modeling"
+  ],
+  "abstract": "Embodied world models should not only imagine plausible futures, but also perceive the geometric, semantic, and motion structure of the evolving world. We present GenSight, a unified embodied world model that brings future video generation and dense perception into a single pretrained video diffusion transformer. GenSight uses a unified spatiotemporal representation for video, depth, embodiment segmentation, and first-frame-relative 2D flow. Built on a shared DiT backbone, GenSight uses lightweight task modulation to predict all modalities within the same architecture. All tasks are jointly optimized within a unified velocity prediction space. At inference, GenSight supports two complementary modes: multi-step future video generation with aligned dense predictions and single-step dense perception from an observed video. By unifying modality representation, model architecture, and prediction space, GenSight avoids separate modality-specific pipelines and couples appearance, geometry, semantics, and motion in a shared representation. It promotes cross-modal consistency and allows dense perception to benefit from the spatiotemporal priors learned through video generation. Trained on embodied manipulation data spanning multiple robot embodiments and human-hand interactions, GenSight demonstrates strong performance in both video generation and dense 4D perception, highlighting the effectiveness of unifying seeing and imagining for embodied world modeling.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39232v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39232v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39232v1 的 22 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "GenSight把RGB、depth、embodiment masks和首帧相对2D flow编码到同一VAE，并以共享DiT和velocity目标同时支持视频生成与单步dense readout。作者报告RoboMIND task-OOD上FVD 14.55、depth RMSE 4.76cm；可skim其跨模态训练接口，但3D flow反投影假定静态相机，未形成可编辑3D资产或action-control闭环。",
+    "motivationZh": "怎样在同一预训练video DiT中联合学习生成与dense perception，减少先生成再分别估计的接口误差？",
+    "methodZh": "如何避免先生成RGB再单独估计几何/运动的误差传递？GenSight把depth用log-depth thermometer RGB编码、mask复制为三通道、flow用HSV色轮编码，共享冻结Wan2.2 VAE和Cosmos3-Nano DiT；前16个blocks计算task-agnostic特征，后续共享权重以task-adaptive RMSNorm区分任务。所有velocity target共用noise，差值形成noise-free跨模态residual；可从生成denoising轨迹中读dense modality，或对观测视频各模态做一次forward。正文及附录A-G已检查，联合输出不等于显式3D scene representation。",
+    "methodFlow": [
+      "将RGB、log-depth、binary embodiment mask和首帧相对2D flow变换为三通道序列，使用同一冻结video VAE。",
+      "以shared prefix及task-adaptive RMSNorm驱动同一DiT的四个任务stream，保持Transformer权重共享。",
+      "用同一noisy RGB input和同一noise构造各模态velocity target，联合velocity与dense spatial-gradient loss训练。",
+      "生成时沿视频denoising轨迹在各模态指定noise level读取velocity residual并解码dense readout。",
+      "感知时对观测视频直接构造指定noise level输入，每个请求模态单次forward，静态相机下可由depth与2D flow反投影3D flow。"
+    ],
+    "experimentsZh": "用221044 episodes、1049.58h RoboMIND2.0四类robot embodiment和EgoTable训练，按任务保留5%作OOD；RoboMIND测试600 episodes/24 unseen tasks，RoboTwin测试300/50模拟任务。主评49-frame TI2V、depth、embodiment mask与2D/3D flow。训练64xA800、8000steps约5400 GPU-hours；dense labels由sensor completion及off-the-shelf estimators生成。 作者报告RoboMIND FVD由Cosmos3-Nano44.97到GenSight14.55；但RynnWorld4D的PSNR18.07略高于18.01。 (Table1, p.8) 作者报告perception mask IoU88.7%，SAM3为73.5%；depth RMSE4.76cm，VGGT-Ω13.11cm；2D flow EPE5.2px，Track4World6.8px。 (Table2, p.8) 作者报告generated flow raw EPE在RoboMIND为7.089，高于RynnWorld4D4.936；RoboTwin为16.45，高于7.11，nEPE/AAE则改善。 (Table1, p.8) 作者报告GenSight3D absolute ADE/FDE为7.39/9.51cm；使用GT depth的RAFT为7.04/7.49，displacement指标也非全面领先。 (Table2(c), p.8) 生成对比Wan2.2、RynnWorld4D、Cosmos3-Nano；RynnWorld4D基于Wan、GenSight基于Cosmos，训练数据/适配预算不匹配。感知对比task-specific models，但dense labels依赖预训练估计器，不能将与pseudo ground truth的一致性解释为独立物理真值。 UR5 held-out200episodes/8tasks、3000step checkpoints比较prefix长度和readout noise。k过长会劣化；depth约σ0.8、mask0.4、flow0.9较优。没有充分matched ablation将所有增益独立归因于unified velocity或联合任务，也无闭环控制成功率。",
+    "insightZh": "贡献是representation、shared architecture与velocity parameterization三层统一，重点在同一noisy RGB输入的跨模态velocity residual与两种inference regime。它继承预训练video model，未提出新3D资产表示或直接action policy；消融未独立拆解三层统一的全部因果贡献。",
+    "evidenceZh": "dense modality只作为supervision target，不作为额外input；同noise使velocity差值等于clean cross-modal residual。 (Sec.3.3, Eqs.(6)-(9), pp.6-7; 不应描述为每个dense modality独立diffusion trajectory或独立输出head。) ; 3D scene flow通过depth与首帧相对2D flow反投影，假设静态相机和恒定已知intrinsics。 (Sec.3.1, Eq.(1), pp.4-5; 相机运动与metric calibration误差会限制直接迁移到自由移动场景。) ; 作者报告RoboMIND生成FVD 14.55、perception depth RMSE 4.76cm和mask IoU88.7%。 (Tables1-2, p.8; mask仅robot arm/gripper/human hand；模型经任务数据训练，baselines并非同训练预算。) ; 动态3D生成可参考其联合appearance/geometry/motion监督接口。 (Reviewer inference from Sec.3, pp.4-7; Appendix A, pp.15-16; 论文没有可编辑3D资产、LEGO或fabrication验证；flow可反投影不等于完成3D生成。)",
+    "caveatZh": "作者承认dense supervision依赖sensor completion和off-the-shelf estimators，可能有噪声与bias（Limitations, p.11）。 当前没有与action prediction/control闭环结合（p.11）。 3D flow依赖静态相机、constant intrinsics与depth质量；场景生成或自由移动相机适用性未证实。 segmentation是embodiment foreground而非任意对象/部件，不应交叉标为3D Segmentation贡献。 主表不是同训练预算比较，flow指标存在明确取舍，未复现实验。 GitHub公开仓库当前只有README和assets，尚无实现；不提供Code链接。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可作为dynamic 3D generation的联合appearance、depth、motion监督接口参考，尤其noise-cancelled跨模态residual。但研究实证是embodied video与dense perception，不是editable 3D assets，迁移仍需验证。"
+  }
+}

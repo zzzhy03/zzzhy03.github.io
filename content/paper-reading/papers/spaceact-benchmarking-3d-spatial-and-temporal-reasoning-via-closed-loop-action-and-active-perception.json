@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2610.38405",
+  "slug": "spaceact-benchmarking-3d-spatial-and-temporal-reasoning-via-closed-loop-action-and-active-perception",
+  "title": "SpaceAct: Benchmarking 3D Spatial and Temporal Reasoning via Closed-Loop Action and Active Perception",
+  "authors": [
+    "Chenglong Shi",
+    "Zekai Yuan",
+    "Yue Song",
+    "Jon Pu",
+    "Will Wu"
+  ],
+  "publishedAt": "2026-10-28",
+  "updatedAt": "2026-10-28",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.38405"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "lego",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "lego",
+  "keywords": [
+    "LEGO",
+    "SpaceAct",
+    "Benchmarking",
+    "Spatial",
+    "Temporal",
+    "Reasoning",
+    "Closed-Loop",
+    "Action",
+    "Active",
+    "Perception"
+  ],
+  "abstract": "To solve problems in 3D space rather than merely describe images, multimodal large language models (MLLMs) need 3D spatiotemporal reasoning: reconstructing 3D geometry from occluded 2D views, anticipating physical dynamics, and executing precise, closed-loop actions. Prior studies test passive VQA on static images or symbolic planning, requiring no execution or supplying privileged coordinates while ignoring collision, statics, and timing. We introduce SpaceAct, an interactive benchmark evaluating 3D spatiotemporal reasoning via closed-loop physical action and active perception, with SAPA, a Spatiotemporal Active-Probing Agent framework. Built on interlocking bricks and mechanical puzzles, it has 108 verified instances across 36 task families in six categories, without privileged coordinates, and diagnostic modes (+plan, +state, no-camera, blind, L7 levers). In brick-bridging or aperture-threading, models rotate the camera to resolve occlusion, read in-scene rulers, output 6-DoF poses under swept-collision and statics checks, and self-correct via split-screen rollback feedback (dynamic tasks freeze time during deliberation and give five strobe frames). Across 10 frontier MLLMs on the 44 hardest instances, scores span 4.8-79.1 (seven solve at most 27.3% of 6-DoF tasks); for the top three, a reference plan (+plan) closes 44% of the gap while leaving collisions at 5.2 per episode, whereas adding exact 3D state (+state) closes 90% and cuts collisions to 0.5; for four others, +plan lifts the mean score from 10.9 to 35.3 and +state to 81.8; and 46% of failures are collision or observation loops. SpaceAct and SAPA advance evaluation to closed-loop physical interaction, showing that even with a valid plan, MLLMs remain bottlenecked by 3D visual grounding and action refinement, while offering a testbed for active multi-view exploration and explicit 3D grounding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.38405v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.38405v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.38405v1 的 27 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "SpaceAct把互锁积木构建和机械puzzle放进SAPA视觉闭环：从尺标RGB读坐标、主动换视角、发出6-DoF/搭建动作，并在碰撞或失稳后读取rollback反馈。作者在top3模型22个配对episodes报告+plan将65.1分升至80.3但碰撞仍5.2次，进一步加exact state才达96.6分/0.5次；值得精读LEGO agent的grounding诊断，不能当真实机器人或新模型能力提升的证明。",
+    "motivationZh": "如何在LEGO与机械puzzle中测量MLLM从RGB主动观察、精确定位到碰撞反馈修正的实际闭环能力？",
+    "methodZh": "问题是静态VQA、语义宏动作与预置motion planner掩盖从像素到连续3D操作的失败。SpaceAct提供6类36任务族108个可程序验证实例，包含承重积木、临时jig、遮挡重建、assembly和timed mechanisms；SAPA每turn读取RGB/五帧strobe与bounded history加note，统一产生1至5个tool calls。动作按不超过0.05 stud/0.5度sweep执行并受collision/topology与rigid-body statics约束，首个违规截断并返回split-screen rollback。主评测取44 hardest instances、10 API模型、每项seed100一次；diagnostics未训练新模型或验证real-robot transfer。",
+    "methodFlow": [
+      "构造互锁积木与机械任务，deterministic solvers验证108实例及reference action counts",
+      "带尺标RGB观察；动态任务提供同相机0.25s间隔五帧，思考与camera移动时冻结world time",
+      "SAPA读取goal/rules、最近10 text turns和2 images及persistent note，一次MLLM call输出reason/note/1至5 actions",
+      "执行metric move/rotate/place/probe，细粒度swept collision及statics检查，不调用motion planner",
+      "首次违规截断batch并rollback，返回contact/valid-state split view供下一turn修正",
+      "同实例分别注入reference plan、再加入exact 3D state，及blind/no-camera等配对诊断"
+    ],
+    "experimentsZh": "10 frontier API MLLMs按各自reasoning配置运行；44 hardest main instances、100turn cap、默认最多5actions/turn、seed100。tiered score平均41 graded instances，SR平均44；随机valid、myopic greedy覆盖29/44和reference覆盖38/44。diagnostics在top3及rank5至8共7模型进行，少数4个完整L5 families做3seed。 作者报告main tiered score为4.8至79.1；top3为79.1/65.0/42.1，SR93.2%/84.1%/65.9%。分数同时惩罚actions、turns和collisions。 (Table3, p.14) 作者报告top3在22pairs上的main/+plan/+state分数65.1/80.3/96.6，碰撞5.2/5.2/0.5；其余4模型32pairs为10.9/35.3/81.8。 (Table4 p.16; Sec.6.4 p.17) 作者报告no-camera让19complete pairs均分58.3到37.8；nosplit让38pairs碰撞14.6到23.2、总分31.8到30.3；227unsolved batched episodes中collision与observation loops合计46%。 (Table4 p.16; Sec.6.4-6.6 pp.18-19) 各模型共享任务/action-feedback规则，但reasoning budgets、default sampling与endpoint失败不同；random/greedy/reference覆盖不同。SAPA自身note/split/cap1消融提供架构边界，没有与独立learned grounding模块或real机器人policy公平端到端对照。 嵌套+plan到+state展示plan已知后的空间state价值；blind/no-camera与L7 single factors支持视觉与坐标变换困难。nonote/nosplit总分变化小且model effects混合，不能宣称普遍提升成功率。cap1分数65到67但SR84.2%到78.9%，是反馈与成本权衡。",
+    "insightZh": "价值是把连续几何约束、主动观察、暂停推理时间的动态反馈、统一action loop与nested plan/state诊断组合成可审计testbed，LEGO是直接技术对象。SAPA采用已有reason-act/memory模式，没有证明新agent算法优越性；贡献主要是任务与诊断接口。",
+    "evidenceZh": "任务直接包括stud-and-tube bricks、桥、起重机、temporary jig及遮挡积木构建。 (Sec.4.1 p.11; Appendix A TableA.1 pp.23-24; LEGO core对象明确，不是教育或玩具消费研究。) ; SAPA是一次call产生memory update与actions的闭环，四类能力只是诊断分解。 (Sec.3.4 pp.9-10, Fig.4 p.10; 不能把四能力写成四个独立agent模块。) ; +state提供plan加exact 3D state，是+plan的嵌套扩展。 (Fig.3 p.9; Table4 pp.16-17; top3的22paired episodes为65.1到80.3再到96.6，碰撞5.2到5.2再到0.5。) ; 主矩阵仅44 hardest instances、41 graded scores、单seed，API中断与abandoned pairs有单独处理。 (Sec.5 p.13; Table3 p.14; Sec.7 p.21; main abandoned计0而paired diagnostics剔除pair，限定rank与scope。) ; 移除split contact view主要增加碰撞；failure loops比例依赖阈值。 (Sec.6.4-6.6 pp.18-19; TableC.3 p.26; nosplit碰撞14.6到23.2，46% loops在其他阈值为26%至62%。)",
+    "caveatZh": "Sec.7 p.21承认主矩阵single seed，仅top3在4个完整families补3seed，其余7模型一次；plan和L7在pair层面结果混合。 Sec.5 p.13公开20个Claude runs因endpoint错误未完成；main abandoned计0，diagnostics剔除未完成pairs。 Sec.6.7 p.20规则扰动和跨seed不能排除memorization。 Sec.7 p.21将rigid-body模拟定位为real-robot transfer研究基础，未报告机器人迁移。 exact-state注入同时减少视觉坐标恢复与控制难度，不能把全部收益唯一归因于perception。 deliberation冻结时间、带尺标相机与partial-distance collision反馈，与真实延迟、噪声和contact dynamics差异显著。 108实例库不等于全部评测；score41/SR44、baseline子集和API可用性均影响rank。 论文是LEGO benchmark和framework，没有新训练模型或制造/生成质量提升实证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可直接用于LEGO/互锁积木agent测试设计：临时support、load-bearing、stud单位metric grounding、主动camera与碰撞修正。SAPA通过visual tools迭代搭建/修改产物，因此交叉归Visual Design Agents；未把通用MLLM评测等同新模型贡献。"
+  }
+}

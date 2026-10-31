@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2610.40599",
+  "slug": "hairdeck-animation-ready-stylized-hair-cards-from-a-single-image",
+  "title": "HairDeck: Animation-Ready Stylized Hair Cards from a Single Image",
+  "authors": [
+    "Yuze He",
+    "Yixiang Wei",
+    "Wang Zhao",
+    "Chuhao Chen",
+    "Yanning Zhou",
+    "Yong-Jin Liu"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.40599"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D Generation",
+    "HairDeck",
+    "Animation-Ready",
+    "Stylized",
+    "Hair",
+    "Cards",
+    "from",
+    "Single",
+    "Image"
+  ],
+  "abstract": "The hair of stylized characters in games and avatars is built from hair cards: artist-placed ribbons whose geometry is the visible hair, animated by spring bones. Existing image-based methods produce realistic hair or a single fused mesh, while CHARM, the only generator of stylized hair cards, decodes a hairstyle autoregressively as a long sequence of control points. Observing that a card hairstyle is an unordered set of artist-defined primitives, we propose HairDeck, which generates it as one: each card is a single token, and a set diffusion transformer denoises all cards together. From a single image, HairDeck generates the cards and the spring-bone chains that drive them, yielding an animatable asset that exports to ready-to-use downstream formats. On CHARM's own test set, it lowers Chamfer distance by 44% and card-orientation error by more than half while running 33 times faster, and from single images it outperforms CHARM, image-to-3D pipelines and strand-based methods. Project page: https://hyzcluster.github.io/HairDeck",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.40599v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.40599v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://hyzcluster.github.io/HairDeck"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.40599v1 的 27 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "HairDeck用“一card一token”的unordered set diffusion联合生成hair cards，再条件生成spring-bone chains，使单图输出带部件结构的可动画资产。作者报告CHARM测试CD由0.0117降至0.0066、33.7秒降至1.01秒；更值得借鉴的是primitive级表示与顺序无关生成，效果仍限VRoid风格且不生成texture、无碰撞模拟保证。",
+    "motivationZh": "如何从单图直接生成有primitive结构、可动画的stylized hair cards，避免长序列控制点解码？",
+    "methodZh": "现有单图3D常输出fused mesh，难以保留artists定义的card与动画结构。HairDeck以root position/normal、cross-section和32-D card VAE latent表示每card，用无positional embedding的set DiT生成192槽及existence flags；单图DINOv3条件配合face-anchored frame和style augmentation，第二个set DiT生成最多48条spring-bone chains，再用fixed geometric skinning导出VRM。完整受控point-cloud基准及单图实验支持表示/采样优势，但其他primitive类任务的迁移是方法启发，尚未实测。",
+    "methodFlow": [
+      "将artist hair-card控制点相对root编码为card VAE latent，保留root normal与cross-section",
+      "Dora point-cloud或DINOv3 image encoder提供条件；单图在face-anchored head frame预测",
+      "无序set DiT以flow matching联合去噪card tokens及existence flags",
+      "arc-length decoder恢复各card控制点并以Bishop frame扫掠mesh",
+      "chain DiT以card tokens为条件生成spring-bone路径、joint count和stiffness",
+      "fixed geometric skinning绑定cards到chains，导出带UV的可动画VRM资产"
+    ],
+    "experimentsZh": "36,440 VRoid training hairstyles，CHARM的100 test point clouds；单图76个可用test characters和40张stratified in-the-wild illustrations；58个含chains的test hairstyles。RTX A6000 batch1统计输入到cards、meshing前耗时。 作者报告point-cloud CD0.0117→0.0066（约44%下降），orientation40.0°→16.8°，33.7秒→1.01秒（约33×），比较CHARM。 (Table1,p.7) 作者报告单图aligned CD0.0089、test失败3.5%、in-the-wild失败10.0%、1.33秒/图；对CHARM为0.0186、34.2%、50.0%、67.7秒。 (Table2,p.7) 作者报告artist-card条件下chain motion correlation0.702，对retrieval0.622、procedural0.538；generated single-image cards的chain recall0.390，未报告同项motion score。 (Table4,p.8) 含CHARM、retrieval、约同参数card-level AR、MeshAnythingV2/DeepMesh/BPT、TRELLIS2/Hunyuan3D2.1、DiffLocks→cards及image-to-3D→point-cloud cascades。不同输出拓扑和训练域不完全匹配；AR同token对照最直接。单图aligned CD先GT bbox归一并24方向起点scale-ICP，时间不含最终meshing，不能直接等同完整engine-ready延迟。 Tables3/6/8/9/10分解VAE、arc-length decoding、root normal、existence、encoder、模型大小、原artist data对orientation影响；root normal移除使orientation16.8°→26.4°。Table7 head frame改善未对齐位置但aligned CD同为0.0089；style augmentation与restyled data改善部分style/root precision。",
+    "insightZh": "set生成本身承接3DTopia-XL/StrokeFusion等先例，贡献是把hair-card作为结构完整的token（含root normal、cross-section与arc-length VAE）并与第二级chain生成接合。Card-level AR对照表明表示改变已贡献大量收益，set generation进一步改善CD和速度。",
+    "evidenceZh": "每card是40-D token，192槽的无序DiT由existence flags决定card数量。 (Sec.3.1–3.2, Figs.2–3, pp.3–4; 明确生成单位和permutation-equivariant建模，不将整个hairstyle压为单mesh。) ; 作者报告card-level AR CD0.0078、6.91秒，而set版0.0066、1.01秒，二者使用同card tokens。 (Table1, Sec.4.2, p.7; Appendix D,p.21; 同表示、近似同参数/训练对照比直接对CHARM更能归因set生成收益。) ; 作者报告单图76 test characters上aligned CD0.0089、IoU0.725；40 in-the-wild图的失败率10%。 (Table2, p.7; aligned shape指标使用GT bbox与ICP，不能当绝对放置准确度。) ; spring-bone使用fixed skinning及VRM update，作者明确无colliders，generated chains drag0.4、无gravity。 (Sec.3.4,p.5; Appendix A,p.14; Table4,p.8; 动画ready意味着可被模拟驱动，未证明真实物理或碰撞处理。)",
+    "caveatZh": "很短发及realistic alpha-textured hair cards超出VRoid训练域；只输出geometry/UV，不生成texture（Sec.5,p.9）。 bow/hat等训练物件可被当hair cards输出，异常chain layout会少生成chains（Sec.5,p.9;Fig.23,p.27）。 对LEGO、embroidery或一般panels/strokes的迁移尚未实验；可借鉴token粒度与set接口，不直接外推数值收益。 无colliders、fixed skinning和限定VRM参数不能保证通用碰撞或物理真实。 GT-assisted alignment隔离了shape与placement；单图失败率仍10%，发色示例取自输入而非texture生成。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接属于structured 3D asset generation。与主线相关的具体机制是artist primitive作为可解码token、无序并行生成、geometry与secondary motion结构分离；不是因为对象是avatar就扩大泛human建模范围。"
+  }
+}

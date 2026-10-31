@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2610.39306",
+  "slug": "cad-wam-anticipating-geometry-for-text-to-cad-generation",
+  "title": "CAD-WAM: Anticipating Geometry for Text-to-CAD Generation",
+  "authors": [
+    "Zhengyang Li",
+    "Weijie Zheng",
+    "Yuxin Cui",
+    "Sijie Wang",
+    "Wenjie Feng",
+    "Qiyu Kang"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39306"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D Generation",
+    "CAD-WAM",
+    "Anticipating",
+    "Geometry",
+    "Text-to-CAD",
+    "Generation"
+  ],
+  "abstract": "Generating editable computer-aided design (CAD) models from text requires selecting operations that produce the intended changes to the geometry constructed so far. An incorrect operation can compromise subsequent steps, making reliable multi-step generation challenging. Existing methods based on large language models (LLMs) primarily learn to predict commands, without explicit supervision of the geometric states those commands should produce. Inspired by world-action models, we introduce CAD-WAM, which couples geometry-conditioned action generation with next-state prediction. We define complete modeling operations as actions in a CAD domain-specific language (DSL) and encode surface point clouds of intermediate solids into compact latent states using a pretrained variational autoencoder. An LLM backbone generates the next action from the target description and current geometric state, while an auxiliary head on the same backbone predicts the next state to provide geometric supervision during training. We construct step-wise training trajectories from parametric CAD models in the DeepCAD dataset, pairing each trajectory with an expert-level textual description. At inference, each generated action is executed by a CAD kernel, and the resulting solid is re-encoded to inform the next decision. On the DeepCAD test set, CAD-WAM outperforms the task-specific baselines in geometric accuracy and output validity, with larger gains on models requiring more operations, and produces more accurate geometry than general-purpose LLMs prompted with the same DSL. Ablations further show that next-state supervision reduces mean Chamfer distance by 13.2\\% relative to an otherwise identical model trained only to predict actions. Code is available at https://github.com/Lzy-1037/CAD-WAM.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39306v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39306v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Lzy-1037/CAD-WAM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39306v1 的 23 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "CAD-WAM让小LLM依据当前solid的latent生成完整CAD operation，同时用next-state regression训练共享表示；推理每步执行CAD kernel再编码真实几何。作者报告辅助state监督将mean CD从1.316降至1.142，主要改善错误长尾；值得精读状态接口，但这不是用预测几何做look-ahead search，证据限DeepCAD sketch-and-extrude。",
+    "motivationZh": "Text-to-CAD逐步生成时，如何让command选择受到已执行几何状态及下一状态训练监督约束？",
+    "methodZh": "为避免text-to-CAD只会预测可执行命令却逐步偏离目标，CAD-WAM把sketch/extrude/Boolean合成每步可产生solid的JSON action。冻结SetVAE将2,048点surface编码成1,024维latent，16个geometry tokens连同专家描述输入Qwen2.5-1.5B；action head预测命令，辅助head从几何位置隐状态预测下一latent。训练双loss塑造共享表示，推理仅用kernel实际执行反馈继续生成，不用预测latent选择候选；7,962个DeepCAD测试模型支持该范围内几何可靠性收益。",
+    "methodFlow": [
+      "将DeepCAD序列转为每步可验证solid的sketch/extrude/Boolean DSL action",
+      "执行训练轨迹并采样surface，预训练/冻结SetVAE编码当前与下一几何",
+      "将当前1,024维latent映射为16 geometry tokens，与目标描述送入共享LLM",
+      "action CE与next-state MSE联合训练共享表示",
+      "推理贪心产生action，执行CAD kernel并将真实solid重新编码",
+      "end、验证失败或20步预算终止，返回已构造solid"
+    ],
+    "experimentsZh": "DeepCAD官方split，157,945训练models/475,656 records，测试所有带expert description的7,962 models；Qwen2.5-1.5B全量finetune，11.4M新增参数，lambda=0.03。normalized surface CD/HD/NC、edge CD、volume IoU和Euler match评价，IR单列。 作者报告mean/median CD为1.142/0.166，IoU 0.964、Euler match95.850%；IR0.666%，并非低于GPT-6 Astra的0.025%。 (Table 1, p. 8) 作者报告无state head的mean CD1.316、IR0.779%；有head为1.142、0.666%，median几乎不变。 (Table 3, p. 9) 作者报告text-state variant mean CD1.405、IR1.482%，latent-state为1.142、0.666%。 (Table 2, p. 9) 重跑公开Text2CAD/CAD-Coder/cadrille及使用CADFS released outputs，Pointer-CAD只引用published CD/IR；各系统attempted集合7,212–7,962不同。通用LLM获三视图/12步，本模型latent/20步，不能读为同模型规模、同观测、同预算全面优势。 去state head保持其它训练条件，支持辅助几何监督的mean长尾收益。lambda sweep正值均改善部分几何metric，但IR在0.05/0.1并未改善，0.03不是每指标最优；text-state对照还改变input/target token化与预测loss。",
+    "insightZh": "相对仅条件化中间B-rep的Pointer-CAD，额外引入可固定监督的latent下一状态与operation-level action，使几何演化参与训练。不是新world-model rollout或推理搜索；受控去head消融支持辅助监督，text-state比较同时改变表示和预测格式，不能单独归因压缩。",
+    "evidenceZh": "辅助head与action共享backbone，但下一步输入来自kernel实际执行solid，预测state不参与推理决策。 (Secs. 3.3–3.5, Figs. 2–3, pp. 4–6; Appendix J, p. 23; 区分auxiliary learning与尚未实现的look-ahead用途。) ; 作者报告state head使mean CD由1.316降至1.142，median约0.167/0.166接近。 (Table 3 and Sec. 5.4, p. 9; 13.2%是按所用normalized/scaled CD的mean相对下降，改善集中错误长尾。) ; 作者报告完整模型IR 0.666%、IoU 0.964；GPT-6 Astra的IR更低为0.025%。 (Table 1, p. 8; 不能声称所有metric全面第一；多数几何指标条件于有效且可评分输出。) ; 几何指标及attempted样本数因系统而异，Pointer-CAD仅使用published numbers。 (Appendices E–F, Tables 7, pp. 17–20; 除报告口径外，CADFS只有7,212 attempted，不能将所有系统都当同样7,962输入。)",
+    "caveatZh": "Appendix J明确只评DeepCAD的sketch-and-extrude，rich operations与更长sequence尚待检验。 state head当前仅供训练监督，look-ahead候选比较是后续用途。 expert-level descriptions包含详细建模步骤，不能外推到模糊自然语言创意设计、跨数据集/OOD或真实工程装配。 SetVAE surface压缩会圆化细edge；bbox补回size/center，不能保证对拓扑细节和制造约束的完整状态。 官方split不去duplicate programs；多指标仅有效输出可评分子集，和IR及不同attempted分母必须一起阅读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接研究可编辑3D/CAD生成，且用kernel工具动作与几何反馈形成多步闭环。operation-level可验证state和auxiliary next-state接口值得迁移到其它结构生成；本文没有制造可行性或LEGO任务实证。"
+  }
+}

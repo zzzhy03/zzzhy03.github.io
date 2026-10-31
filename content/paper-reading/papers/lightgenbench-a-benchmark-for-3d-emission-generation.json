@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2610.39038",
+  "slug": "lightgenbench-a-benchmark-for-3d-emission-generation",
+  "title": "LightGenBench: A Benchmark for 3D Emission Generation",
+  "authors": [
+    "Dongchen Yang",
+    "Xingguang Yan",
+    "Manolis Savva"
+  ],
+  "publishedAt": "2026-10-28",
+  "updatedAt": "2026-10-28",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39038"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D Generation",
+    "LightGenBench",
+    "Benchmark",
+    "Emission",
+    "Generation"
+  ],
+  "abstract": "Recent generation methods produce 3D assets with detailed geometry and rich textures. However, these assets are non-emissive: they reflect light but emit none. We study a new task, emission generation: predicting spatially varying RGB emission over a 3D asset's surface from its geometry, non-emissive materials, and a rendered view. To support this task, we introduce LightGenBench. Our benchmark makes three contributions. First, we curate a dataset of 37k artist-authored emissive assets in UV, voxel, and multi-view form. Second, we establish baselines across four method families: UV-domain, sparse-voxel, multi-view, and segmentation-based generation. Third, we design an evaluation protocol that measures where an asset emits and how, complemented by user-study comparisons on renderings with varying emission strength. Across the four families, the sparse-voxel baseline TRELLIS.2-Emission performs best because generating emission natively in 3D avoids the failure modes of the other representations, such as the fracturing artifacts of UV space and the occluded emitters that multi-view generation cannot see. However, TRELLIS.2-Emission only reaches an IoU of 0.271, leaving the task far from solved. We hope LightGenBench establishes emission generation as a benchmarkable problem for 3D generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39038v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39038v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://3dlg-hcvc.github.io/lightgenbench/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39038v1 的 20 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "LightGenBench把3D资产的emission color生成做成跨UV、voxel、多视图和segmentation的可比较任务，整理36,826个artist-authored资产。作者报告TRELLIS.2-Emission最佳IoU仅0.271，发光区域PSNR11.07dB；值得精读稀疏材质、表示与评估接口，但LDR颜色不含真实光功率，基线配置差异也不能归因于表示本身。",
+    "motivationZh": "现有3D资产生成器通常只预测反射材质，如何定义、生成和评估表面发光区域与颜色？",
+    "methodZh": "输入已知geometry、非发光PBR材质及thumbnail，预测surface上的RGB emission，而非从观测反演唯一物理光源。数据从TexVerse经metadata/heuristic/VLM筛选，保留UV/o-voxel/multiview三种对齐表示；改造TEXGen、TRELLIS.2、Hunyuan3D和SegviGen，后者预测mask再乘albedo。统一在原mesh采50k点测位置与颜色，并用0–8强度变化视频做53资产/14人偏好评价。贡献是数据、跨表示适配及协议，非首次提出发光纹理或已解决自动灯光生成。",
+    "methodFlow": [
+      "从TexVerse筛选带emissive metadata资产，剔除零发光、albedo复制和重复",
+      "用渲染/贴图及经人工校验的VLM过滤，生成三种对齐表示",
+      "输入geometry、PBR材质和thumbnail，以四family模型预测emission或mask×albedo",
+      "TRELLIS.2增加专用emission VAE/DiT，条件化冻结shape/PBR latents",
+      "在同一mesh的50k surface points lookup预测，比较mask IoU与颜色误差",
+      "转回原资产并用动态emission-strength暗室视频评估可感知合理性"
+    ],
+    "experimentsZh": "四基线同训练split和输入，测试200资产、每模型5个sampling seeds；统一在mesh按surface area固定采50k点，1/255 threshold生成mask，颜色MAE/PSNR测全点及GT发光区。用户研究14人各排53资产四方法，以GT及暗室强度0–8视频作参考。 作者报告TRELLIS.2-Emission IoU0.271/MAE0.021/PSNR26.81，TEXGen0.092/0.025/25.10、Hunyuan0.117/0.022/26.46、SegviGen0.147/0.041/24.50。 (Table 2, p. 7) 作者报告TRELLIS.2 GT发光区MAE0.264/PSNR11.07；最佳mask F1仅0.415。 (Tables S3–S4, pp. 16–17) 作者报告TRELLIS.2用户研究mean rank1.46±0.76、top1 67.2%，但仍经常错置emissive surfaces或颜色。 (Table 3 and Fig. 6, p. 8) 覆盖UV、native voxel、多视图及mask generation四family，但TEXGen从零训练256UV且删render loss，其它多用预训练；Hunyuan在遮挡未观测texel填零、不做inpainting，SegviGen为12步而其它30/50步。可比较发布系统表现，不能证明voxel表示独立造成优势。没有与未公开数据的EmissionGen原完整系统直接对照。 Table S2仅检验emission VAE重建，优于PBR VAE；mask-only与continuous-emission基线有启发，但初始化/decoder/step count均不同。缺matched-compute表示消融及输入thumbnail/材质条件消融。",
+    "insightZh": "已有3D Lighter和EmissionGen研究发光纹理，本文不应被写成首创emission generation。实质推进是36,826对齐跨表示资产、四种生成/分割基线和位置/颜色/动态渲染协议，明确暴露稀疏exact-zero、UV邻接错误及遮挡发光体等失败模式；这属于3D资产材质能力与数据接口贡献。",
+    "evidenceZh": "数据只存LDR emission color且丢弃glTF strength，最终36,826资产，train/val/test为36,426/200/200。 (Sec. 3, Table 1, pp. 3–4; Appendix A.3, pp. 12–13; 不是有物理单位的HDR光强或完整灯具发光模型。) ; TRELLIS.2增加emission VAE/DiT，条件化冻结shape/PBR latents；SegviGen mask×albedo是不同target。 (Fig. 4 and Secs. 4.3–4.5, pp. 5–6; Appendix B, pp. 14–15; 比较的是实际适配系统，不是把所有训练/初始化因素固定后的纯表示对照。) ; 作者报告TRELLIS.2-Emission IoU0.271、all-point PSNR26.81，但GT emissive-region PSNR仅11.07。 (Table 2, p. 7; Table S4, p. 17; 大量零背景会掩盖发光区域颜色误差；最佳也远未解决任务。) ; 作者报告14人对53资产的742次排名中，TRELLIS.2 mean rank1.46、top1 67.2%。 (Table 3, p. 8; Appendix C, p. 16; 提供GT渲染/video参考的相对排序，不是无参考绝对物理正确性。) ; emission VAE重建优于预训练PBR VAE，mask IoU0.694→0.746。 (Table S2, p. 14; 这是GT emission编码重建消融，不是最终生成IoU从0.694开始。)",
+    "caveatZh": "Appendix E指出单artist reference会惩罚其它合理emission；thumbnail是否已显示发光决定任务是转移观察还是欠定生成。 只评geometry+完整PBR+thumbnail条件，未评仅geometry、text或image生成；数据只来自TexVerse。 VLM filtering在404 heldout shapes与人工约86.9%一致，不代表全部36,826标签同样可靠；只保留emissive资产，不能据此证明对本应不发光资产的false-positive控制。 LDR归一化并舍弃emission-strength，不提供真实radiometric/HDR或照明功率估计；UV texel占比也不能当精确surface area比例。 小测试集/用户样本及缺完整run-level uncertainty限制广泛结论；不同训练初始化、分辨率与遮挡填充混杂表示比较。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接补充可生成3D资产的材质/外观维度，稀疏emission和对齐条件接口与3D Generation相关。可研究surface signal及mask/continuous hybrid，但不等同新geometry生成、3D segmentation或制造实证。"
+  }
+}

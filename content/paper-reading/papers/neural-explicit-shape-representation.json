@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2610.38441",
+  "slug": "neural-explicit-shape-representation",
+  "title": "Neural Explicit Shape Representation",
+  "authors": [
+    "Jun-Hao Wang",
+    "Changan Lu",
+    "Baoquan Chen",
+    "Peng-Shuai Wang"
+  ],
+  "publishedAt": "2026-10-28",
+  "updatedAt": "2026-10-28",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.38441"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3D Reconstruction",
+    "Neural",
+    "Explicit",
+    "Shape",
+    "Representation"
+  ],
+  "abstract": "Existing neural 3D representations separately address continuous surface modeling, efficient image synthesis, or object-specific compression. They do not jointly provide the explicit surface queries required by ray tracing and a structured output space that can be predicted across objects. We introduce NeuOctree, a neural explicit representation that directly predicts whether and where a ray intersects a surface, together with its normal and albedo. NeuOctree stores shared features at the corners of sparse octree voxels and interpolates them into a continuous local field. A lightweight decoder with recurrent intersection-guided sampling refines each query near the predicted surface, enabling direct surface rendering without mesh extraction or texture baking and accommodating open, non-watertight geometry. The same octree structure supports both compact per-object optimization and a shared octree CNN that constructs renderable assets from colored point clouds without per-object fitting. Across seven meshes and four storage budgets, NeuOctree achieves the lowest positional error in 24 of 28 comparisons while retaining competitive normal accuracy, and substantially improves joint geometry--appearance reconstruction over N-BVH and VQAD. The feedforward model constructs a representation in 0.05 seconds and transfers from Objaverse to ShapeNet without retraining. We further demonstrate ray-traced rendering and image-conditioned generation, showing that NeuOctree provides a common output space for neural inference and direct surface rendering. Code is available at https://github.com/octree-nn/neural-octree.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.38441v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.38441v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.38441v1 的 17 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "NeuOctree把稀疏octree共享角点特征直接解码为ray hit、交点、normal和albedo，再用预测交点迭代选取feature，连接可学习资产与surface ray tracing。作者报告7 meshes×4预算中24/28项position error最优；值得精读其生成输出表示，但50ms只计构建，附录feed-forward输入含mesh occupancy，image-conditioned生成仅proof of concept。",
+    "motivationZh": "如何用同一可学习输出表示同时支持跨对象推断、显式surface queries与直接ray tracing？",
+    "methodZh": "问题是implicit density/occupancy与ray tracer需要的显式surface queries之间存在接口成本，且现有neural compression依赖逐物体拟合。NeuOctree共享相邻voxel角点feature并trilinear interpolation，轻量geometry/material MLP预测hit、ray-local intersection、normal与albedo，recurrent intersection refinement把后续query靠近表面；可逐物体优化或由octree U-Net预测。实证主要是surface/appearance recovery、七mesh压缩和Objaverse→ShapeNet迁移；生成用sparse-octree VAE+flow DiT直接输出该表示，但仅5000 ShapeNet objects的定性演示，没有外部生成指标。",
+    "methodFlow": [
+      "由几何/colored point数据构建occupied sparse octree；feed-forward报告配置使用mesh occupancy与200K cloud的union",
+      "相邻voxel共享corner features并trilinear-interpolate为连续局部feature field",
+      "共享geometry/material MLP预测ray hit、交点、normal和albedo",
+      "将预测交点投回ray并recurrently查询表面附近features，refine intersection",
+      "octree前向遍历取首个hit，直接交给surface ray tracer；U-Net可免逐物体拟合预测同一表示",
+      "生成演示用sparse-octree VAE+image-conditioned flow DiT预测occupancy/latents并解码为可render资产"
+    ],
+    "experimentsZh": "几何压缩：Stanford/Thingi10K七mesh、81/122/244/823KiB预算、16个512²固定相机，position error按10³缩放、normal degrees。Joint geometry/appearance与feedforward：32K Objaverse训练，30 unseen Objaverse及30 ShapeNet测试。生成：5000 ShapeNet objects/10类，sparse-octree VAE与约0.7B flow DiT。 作者报告24/28项position error最优；81–244KiB全21项最优，823KiB仅3/7项最优，normal仅12项最优。 (Table1 p.6; Sec.4.1 p.7) 作者报告Ours-F在ShapeNet上dpm5.969、dnorm5.229、PSNR27.834；VQAD为39.126/11.969/25.548。Objaverse上的normal/PSNR仍弱于VQAD。 (Table2 p.6; Sec.4.2 pp.8-9) 作者报告五读取recurrent对uniform的dpm3.036→2.797、dnorm7.102→6.475。 (Table4 p.8) 作者报告表示构建50ms，计时不含加载、rendering或evaluation；实际4×3090训练50.6h，另有5.2h/91GB occupancy cache，19.5h为8GPU等效估算。 (Sec.4.2 p.9; Appendix A.2 p.14) per-object比较NGF、QNDF、VQAD、N-BVH；joint comparison仅N-BVH/VQAD。VQAD经适配预测位置/normal，不同方法训练预算、GPU数不同；表格披露实际payload和QNDF remesh例外，feedforward shared36.888M weights排除于逐物体存储。无外部image-conditioned generation quantitative baseline。 sampling对照在相同五次读取下比较uniform与recurrent，支持adaptive query价值；open glass pane验证单例无inside/outside标签的surface能力。没有广泛的real-scan noise、sparse-input或材质复杂性消融。",
+    "insightZh": "实质贡献是结构化共享surface-query输出空间与可amortize的表示构建，再由recurrent feature查询改善定位；既不同于density level set，也不同于只能逐物体拟合的N-BVH。直接ray-query不是首次概念，生成优越性也未被量化证明，价值在表面表示/学习/renderer之间可复用的接口。",
+    "evidenceZh": "共享octree角点field、ray-local intersection decoder与recurrent sampling共同形成直接surface-query接口。 (Sec.3.1-3.4, Fig.2, pp.3-5; 位置/normal/albedo可直接供ray tracer，不需mesh extraction或texture baking。) ; 作者报告七mesh四预算中24/28项position error最优，normal优势仅12项，823KiB部分由QNDF更优。 (Table1 p.6; Sec.4.1 p.7; 几何压缩有边界，不能写全面胜出。) ; recurrent五次feature读取比同次数uniform改善position与normal error。 (Table4, p.8; 可定位对照2.797/6.475 vs3.036/7.102。) ; feed-forward配置的输入与成本比摘要colored-point-cloud/50ms概括更复杂。 (Appendix A.2 pp.13-14; A.4-A.6 p.16; 包括d9 mesh occupancy union、cached preproc、shared weights排除和construction-only计时。) ; 图像条件生成是5000对象、10类的proof-of-concept，没有外部生成系统量化比较。 (Sec.4.3 Fig.8 p.9; Appendix A.5 p.16; 证明输出空间可用，未证明生成质量领先。)",
+    "caveatZh": "Sec.5 p.10承认high-fidelity per-object fitting昂贵、只有albedo而非view-dependent materials、generation只是proof of concept。 Appendix A.2 pp.13-14：报告feed-forward输入为d9 mesh occupancy（八albedo views取色）与200K point cloud union；构建计时不含data loading/render/evaluation。 Appendix A.4-A.6 pp.15-16：各方法自身training budgets、Ours 2GPU/baseline1GPU，非equal-GPU throughput；generation未做外部quantitative比较。 只有七mesh和60个colored assets的主测试；完整几何/mesh-occupancy输入与真实稀疏带噪观测差异大，不能当作通用单图重建50ms。 training/inference/preprocessing/storage口径需分清：共享36.888M参数不计逐物体payload，feedforward存储可超过823KiB；不能由压缩表推出端到端效率全面领先。 生成proof-of-concept可借鉴表示，不支持3D生成质量或泛化SOTA结论。公开Code URL当前404，复用需等待来源可用。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对3D Generation的具体价值是可由generator预测且无需mesh extraction即可surface-render的structured output domain，Appendix A.5给出occupancy+latent flow生成机制。主要实证仍是faithful recovery，故主归3D Reconstruction；不把示例生成或rendering扩张为独立生成能力进步。"
+  }
+}

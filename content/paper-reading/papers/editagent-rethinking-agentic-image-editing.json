@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.39664",
+  "slug": "editagent-rethinking-agentic-image-editing",
+  "title": "EditAgent: Rethinking Agentic Image Editing",
+  "authors": [
+    "Haiyang Xu",
+    "Tianyu Wang",
+    "Jialu Li",
+    "Jiteng Mu",
+    "Yuanjun Xiong",
+    "Jianming Zhang",
+    "Zhuowen Tu",
+    "Mingze Xu"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39664"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "Visual Design Agents",
+    "EditAgent",
+    "Rethinking",
+    "Agentic",
+    "Image",
+    "Editing"
+  ],
+  "abstract": "Agentic image editors decompose complex requests into steps, but when a step fails, they mostly retry with the same narrow set of tools and a judge that scores each output by eye directly. We argue that such agents are bounded by two spaces: the action space of what the agent can do, and the observation space of what its judge can see. On our expert-annotated benchmark, a general-purpose editor yields no usable result in over 40% of the cases, and no judge is reliable across edit types. We present EditAgent, which expands both spaces. It routes each step to general editors and specialized methods, and attaches to each candidate a verification record. With these records, off-the-shelf VLM judges outperform finetuned reward models. Candidates are generated in parallel and judged in one listwise call: experts prefer this to sequential refinement in 78.5% of decided comparisons, at no more than half the judge calls. EditAgent improves two open-weight editors on three benchmarks and serves as a data engine for training stronger editors.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39664v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39664v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39664v1 的 28 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "EditAgent让异构工具从同一步source并行产生编辑候选，再把change map、局部前后对照、像素统计及代码已验证/待判断事项交给一次listwise VLM选择。作者报告Qwen编辑器的EdiVal第三轮47.64→55.46；值得精读的是可审计工具/观察接口，但约10倍推理成本、候选池和judge误判仍限制收益。",
+    "motivationZh": "复杂image editing失败后，agent怎样扩大可选工具与可见证据，使judge能够可靠选择修复结果？",
+    "methodZh": "针对复杂多轮编辑中重复同一editor、judge只凭整图打分的失败，EditAgent规划依赖步骤，路由general editor与mask/removal/photometric/geometry等specialists，从同一步source并行产生最多3个候选。统一verification record区分代码确定检查与视觉语义判断，VLM listwise选择，失败触发有限retry/replan；跨turn history check修复被覆盖要求。两种backbone、3个benchmark和过滤训练pairs支持价值，不证明任意工具或judge都可靠。",
+    "methodFlow": [
+      "输入原图、用户请求与历史约束；planner分解依赖步骤",
+      "analyzer明确目标、保护区域、验收条件；router选择general editor与specialists",
+      "同一步source并行生成候选；代码剔除违反确定性保证者",
+      "附加change map、局部before/after、统计与VERIFIED/TO JUDGE记录",
+      "VLM一次listwise选择；有限retry/replan并跨turn检查修复",
+      "保留session状态；全turn通过及质量过滤后生成训练pair"
+    ],
+    "experimentsZh": "600 sets/30 edit types/1,995 candidates，5名专业Photoshop编辑共同形成单一consensus标签；judge评估515 sets。主实验EdiVal 572三轮sessions、Complex-Edit 8,496 requests、ComplexBench-Edit 763例；Qwen-Image-Edit-2511和FLUX.2-klein-9B两backbone，多数VLM角色Qwen3.8-27B。 作者报告Qwen EdiVal-O第三轮47.64→55.46，FLUX第三轮53.20→59.45。 (Table 3, p. 6) 作者报告FLUX第三轮59.45，RISE-Agent 58.42；Qwen总推理成本12.9 H100 GPU-hours，单editor为1.1。 (Table 5, p. 7) 作者报告25,753过滤pairs训练后，Qwen第三轮49.66→51.61；直接FLUX数据训练为48.51。此组EdiVal使用rewritten prompts。 (Table 6, p. 8; supplement Sec. H, PDF p. 20) 比较standalone、7种agent及专门reward models；agent统一backbone/VLM，但部分未发布policy由training-free重实现，不等于各论文完整原配置。Complex-Edit/ComplexBench改用Qwen外部评分，附录Gemma内部judge对照缓解但未消除评估偏好。 Table 7的standalone/vanilla/action pool/parallel/verification为47.64/49.43/52.37/53.18/55.46；K=2/4/8未追平。Table 2中listwise单独使photometric/enhancement退步，record恢复；未穷尽工具质量和record噪声的跨域因果分解。",
+    "insightZh": "贡献是action-space多样性与observation-space证据接口的分离诊断及闭环结合，并非新image backbone。600组专业修图师共识标签、更多同editor采样对照、verification消融和匹配训练输入的数据引擎对照提供直接证据。",
+    "evidenceZh": "异构候选来自同一步source，verification record区分代码保证与视觉待判断内容。 (Sec. 4.1–4.3, Fig. 3, pp. 4–6; supplement Tables S4–S6, PDF pp. 16–18; 图示与表格明确路由、candidate检查和judge接口，VLM验收不是确定性证明。) ; 作者报告verification将Qwen3.8-27B的Winner-Set Hit@1从listwise 73.6%升至81.3%。 (Table 2 and Fig. 5, p. 5; 只在515个存在可用候选且record完整的sets上计算，不是所有请求成功率。) ; 作者报告512px Qwen的EdiVal第三轮47.64→55.46，K=8同editor采样仅49.01。 (Table 3, p. 6; Table 7, p. 8; 该协议下异构工具及record价值不能由更多相同采样独立解释。) ; 作者报告最多4张生成预算下，parallel获102/130个非tie偏好，judge至多2次调用。 (Sec. 3.3, p. 3; supplement Sec. B, PDF pp. 13–14; 总计144请求、14 ties；78.5%是有决定比较的比例，不是整体系统成本减半。)",
+    "caveatZh": "主文Limitations明确约10倍standalone推理时间，能力受底层editing methods限制。 诊断排除81个无可用候选与4个缺record sets；Winner-Set Hit@1测选择能力，5人共同标签没有独立一致性估计。 retry耗尽后算法可保留needs-review的best attempt；仅过滤后的训练session要求全turn获judge接受，接受也不等于人工真值。 部分端到端收益较小且依赖VLM评分；没有本方法公开code链接，复现需重建工具服务、judge和提示协议。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中Visual Design Agents的planning、tool action、rendered observation和iterative correction；适合学习确定的像素/几何检查如何与VLM语义判断分工。"
+  }
+}

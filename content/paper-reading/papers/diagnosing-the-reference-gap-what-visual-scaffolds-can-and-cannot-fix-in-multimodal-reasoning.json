@@ -1,0 +1,71 @@
+{
+  "id": "arxiv:2610.39419",
+  "slug": "diagnosing-the-reference-gap-what-visual-scaffolds-can-and-cannot-fix-in-multimodal-reasoning",
+  "title": "Diagnosing the Reference Gap: What Visual Scaffolds Can and Cannot Fix in Multimodal Reasoning",
+  "authors": [
+    "Guizhen Chen",
+    "Weiwen Xu",
+    "Wotao Yin",
+    "Anh Tuan Luu",
+    "Hou Pong Chan"
+  ],
+  "publishedAt": "2026-10-29",
+  "updatedAt": "2026-10-29",
+  "collectedAt": "2026-10-31",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2610.39419"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VLM / MLLM",
+    "Diagnosing",
+    "Reference",
+    "What",
+    "Visual",
+    "Scaffolds",
+    "Cannot",
+    "Multimodal",
+    "Reasoning"
+  ],
+  "abstract": "Multimodal large language models can recognize visual content yet struggle to reason reliably over it across multiple steps. In counting, a model may see all objects but lose track of which ones it has counted. We argue that such failures, commonly attributed to perception, reveal a reference gap: the failure to bind language to the relevant visual entities, regions, or locations. Motivated by the theory of visual routines, we test whether external references such as numbering can narrow this gap. We introduce ReGap-Bench, a paired benchmark of five visual reasoning tasks in which the scene, question, and answer are fixed and only the reference varies. Results show that task-matched references improve accuracy by up to 25\\%, while mismatched references provide little benefit or even hurt performance. These findings identify the reference gap as a bottleneck distinct from visual perception and show that constructing task-appropriate visual references can serve as a training-free visual skill for improving multimodal reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2610.39419v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2610.39419v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2610.39419v1 的 20 页全文及关键页面视觉核验。实验数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "ReGap用保持scene、问题和答案不变的paired intervention区分视觉识别与reference binding：编号、shading和grid只有匹配任务所需visual routine时才有效。作者报告计数中编号平均+11.3个百分点，而grid为−4.1；可skim其给设计agent添加可寻址视觉标记的接口，但agent实证仅100道地图题，不能当作设计闭环或通用推理提升。",
+    "motivationZh": "MLLM能够识别视觉实体时，为什么仍会在多步推理中遗漏、重复或无法稳定引用它们？",
+    "methodZh": "问题是MLLM跨多步推理时不能稳定重访和区分实体。论文建立5类任务、1000个合成scene/3800 images的ReGap-Bench，在不变scene下分别加编号、区域填充和网格，使用完全相同prompt做paired accuracy比较。Sec.5把任务到visual routine到overlay的选择规则、示例和绘图脚本封装为training-free skill，在CartoMapQA中允许agent自行选标记。正文和附录已检查；它不训练新模型，设计agent迁移属于审阅推断。",
+    "methodFlow": [
+      "从同一scene specification生成plain及不同reference条件，保持几何、问题和gold answer不变。",
+      "按indexing/marking、bounded activation、空间测量分别构造numbering、shading与grid。",
+      "对同一冻结MLLM使用相同prompt，以paired exact match与有效ranking的pairwise accuracy度量效果。",
+      "比较matched/mismatched、不完整编号与模型规模，检查收益是否来自任务匹配。",
+      "将选标记规则、前后示例和绘图脚本封装为skill，由agent按任务在图像副本上添加overlay。"
+    ],
+    "experimentsZh": "5个任务各200合成scene：shape counting、angle/size/clock ranking、transformation prediction，共3800 images。主测5个MLLM，另测6个Qwen3-VL Thinking规模2B到235B；map skill用分层采样的100道CartoMapQA和同一Codex GPT-5.5 agent。 作者报告编号对shape counting提升6.0到17.5个百分点，对clock ranking提升8.5到25.0个百分点。 (Sec.4.1, Fig.3, p.5) 作者报告clock numbering完整度从0、2、4到12个刻度数字时平均准确率23.9、25.3、31.8、38.0%。 (Sec.4.3, Fig.7, p.8) 作者报告map skill的numbering组41题63.7到70.1%；grid组13题92.5到96.7%；shading仅3题33.3到66.7%。 (Table2, p.9) 同模型paired比较是主要证据，覆盖多种模型与标记失配条件；没有在设计工具agent上同预算对比，也没有大规模真实图像全任务验证。Appendix A仅用Claude做单形状识别/所有形状计数的感知探针。 matched/mismatched参考、clock刻度完整度及2B到235B规模变化支持任务匹配解释。参考策略标注和wrong-side分析提供关联证据；angle pairwise仅统计有效ranking。Map overlay组大小极不平衡，未提供多seed置信区间。",
+    "insightZh": "不是首次提出Set-of-Mark或视觉标记；贡献在控制scene/question/answer及prompt的paired设计，分离匹配reference与一般视觉增量，并用小规模agent测试说明可按visual routine选scaffold。",
+    "evidenceZh": "paired条件固定内容、答案和文字prompt，只改变外部reference。 (Sec.2.3, Eq.(1), pp.3-4; Appendix C.1, pp.16-17; 编号与颜色对所有对象独立分配；这加强reference解释，但不是证明模型内部认知机制。) ; 作者报告shape counting编号平均+11.3个百分点、shading+1.7、grid−4.1。 (Sec.4.2, Fig.6, pp.7-8; 收益依赖任务匹配，不能把任何overlay都称为提高感知。) ; 作者在100道CartoMapQA上测试自主skill，57题使用overlay；numbering组41题，准确率63.7到70.1%。 (Sec.5, Table2, p.9; 各组由agent选择，shading只有3题；+33.3个百分点不是大规模稳定效应。) ; 可寻址实体标记可作为视觉设计agent的rendered-feedback接口参考。 (Reviewer inference from Sec.2.2, p.3 and Sec.5, pp.8-9; 论文没有SVG、CAD或image editing闭环实验，迁移尚需独立验证。)",
+    "caveatZh": "作者指出增加marks可能引入额外视觉信息，因而设计matched/mismatched条件；scaffold不匹配时可中性或有害（Sec.2.3, p.4; Sec.4.2, pp.7-8）。 作者指出参考是否有效还取决于模型是否将其纳入reasoning（Sec.4.1, p.7）。 主要为合成几何任务；reference gap是行为层面的操作化解释，不能排除标记改变视觉可读性等因素。 CartoMapQA只有100题、shading组3题；agent选择overlay后的分组比较不足以证明通用自主策略。 论文无单独limitations section；未在视觉设计/制造任务上验证。 PDF声称code/data available，但已访问项目页的Code入口为#，未找到实际公开实现，故不提供Code链接。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "具体可借鉴的是让视觉设计agent对rendered observation中的实体/区域建立稳定address，并按计数、区域比较或测量任务选择overlay。实证仅地图与合成任务，尚未证明设计闭环收益。"
+  }
+}
