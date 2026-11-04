@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2611.03533",
+  "slug": "cola3d-composable-latent-3d-decomposition",
+  "title": "CoLa3D: Composable Latent 3D Decomposition",
+  "authors": [
+    "Xudong Cai",
+    "Yongcai Wang",
+    "Deying Li",
+    "Chuanxia Zheng"
+  ],
+  "publishedAt": "2026-11-02",
+  "updatedAt": "2026-11-02",
+  "collectedAt": "2026-11-04",
+  "venue": "NeurIPS 2026 · arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.03533"
+  },
+  "venueIds": [
+    "neurips"
+  ],
+  "publicationType": "peer-reviewed",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "composable scene generation",
+    "shared latent",
+    "object query",
+    "multi-hot assignment",
+    "mesh decomposition"
+  ],
+  "abstract": "We introduce CoLa3D, a simple and effective model for composable 3D scene decomposition that, given a single whole-scene latent from either a single image or an existing scene mesh as input, directly outputs a set of object meshes with consistent spatial layout that can be assembled back into a coherent scene. CoLa3D introduces a novel paradigm for 3D scene decomposition within a shared whole-scene latent, unlike alternatives that perform per-object generation in canonical spaces and then glue the objects back together with fragile pose and scale estimation. The network is a lightweight, flexible, and scalable query-based transformer that accepts various types of queries, including 2D masks, 3D points, and learnable queries, and learns to decompose the scene into objects in a compact latent space. On both synthetic and real-world datasets, CoLa3D achieves state-of-the-art performance on composable 3D scene decomposition, substantially improving global scene-level consistency and object-level quality while running 2 times faster and using less than 1% of SAM 3D's training data. Visible depth on par with MoGe2 further confirms that latent decomposition preserves accurate visible scene geometry while producing physically complete, decomposable object meshes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.03533v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.03533v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2611.03533v1 的 23 页全文与已验证的关键页面审阅记录。数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "CoLa3D 在同一场景 latent 中按对象拆出可重新组装的完整网格，绕开独立生成后重新估计位姿和尺度的步骤。对室内场景的对象级编辑有直接参考价值，细薄物体和密集堆叠仍受 latent 分辨率限制。",
+    "motivationZh": "如何从同一个完整场景 latent 拆出共享坐标系中的独立对象网格，避免逐对象生成后重新拼接位姿和尺度？",
+    "methodZh": "从单图生成或从整体网格编码 TRELLIS.2 场景 latent，融合 Utonia 与可用图像特征，通过 query transformer 将 latent cell 分配给对象，再用共享 decoder 解出同坐标系下的对象网格。作者在合成数据和真实室内扫描上比较了整场与对象重组质量。",
+    "methodFlow": [
+      "输入单图或完整场景网格并获得稀疏 3D latent",
+      "用掩码、三维点或可学习槽位生成对象 query",
+      "交替更新场景 token 和 query，计算 multi-hot 分配",
+      "共享解码器并行输出对齐的独立网格"
+    ],
+    "experimentsZh": "3D-FRONT InstPIFu split、MetaScenes 的合成评价及 Replica、ScanNet++ 的零样本实景验证；区分无提示、掩码和三维点提示。 作者报告在 MetaScenes 上，点提示版本的场景 Chamfer Distance 较最佳对照低 57.1%，对象 F-score 高 26.9%。（Table 1 and Sec. 4.2, p. 7） 作者报告 Replica 上点提示版本较最佳对照的场景 Chamfer Distance 低 53.6%，对象 Recall 高 20.9%。（Table 2 and Sec. 4.3, p. 8） 比较 Gen3DSR、MIDI、SceneGen、SAM 3D 等及 Point-SAM 分割场景 latent 的对照；提示来源和模式随方法而异。 Table 4 对比 query、Utonia、DINOv3 与损失设计。作者报告单标签替代多标签后对象 IoU 下降。",
+    "insightZh": "主要贡献是共享场景 latent 中允许重叠的对象分配与并行解码，使全局布局约束贯穿对象生成。TRELLIS.2 的场景级适配是支撑组件。",
+    "evidenceZh": "对象网格由共享空间中的 latent 分组直接解码。（Fig. 2 and Sec. 3.2, pp. 4–5；流程图和 soft assignment 给出对象坐标如何继承整场表示。）；作者报告在两个合成场景集上，联合分解改善多项场景及对象指标。（Table 1 and Sec. 4.2, p. 7；作者先归一化并用 FilterReg 对齐，分数反映对齐后的形状和布局差异。）；真实扫描的参考物体网格仅覆盖可观测部分。（Table 2 and Sec. 4.3, p. 8；真实数据用单向距离和 Recall，不能直接验证遮挡部分的真实几何。）",
+    "caveatZh": "粗 latent grid 会将细薄或紧邻物体吸收到同一格。 可用训练场景数量和质量有限，且对象密度偏低。 真实扫描的局部参考只支持可见区域比较，不能据此声称恢复了真实的遮挡几何。 拆出的网格便于编辑，实验不支持物理装配或接触约束保证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "可将全局构形约束与对象级编辑结合，直接对应 scene generation 中的可组合结构表示。"
+  }
+}

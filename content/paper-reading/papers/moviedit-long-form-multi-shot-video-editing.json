@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2611.02737",
+  "slug": "moviedit-long-form-multi-shot-video-editing",
+  "title": "MoviEdit: Long-form Multi-Shot Video Editing Made Easy",
+  "authors": [
+    "Suhyeon Lee",
+    "Zhengang Li",
+    "Soo Ye Kim",
+    "Peihao Zhu",
+    "Jong Chul Ye",
+    "Chun-Hao Paul Huang",
+    "Duygu Ceylan",
+    "Yan Kang",
+    "Hyeonho Jeong"
+  ],
+  "publishedAt": "2026-11-02",
+  "updatedAt": "2026-11-02",
+  "collectedAt": "2026-11-04",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.02737"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "multi-shot video editing",
+    "global draft",
+    "causal refinement",
+    "shared denoiser",
+    "cross-shot consistency"
+  ],
+  "abstract": "Long-form multi-shot video editing requires an intended edit to remain coherent across abrupt changes in scene, viewpoint, and subject appearance, while processing substantially longer visual context than conventional single-shot editors. We introduce MoviEdit, an end-to-end framework for scalable long-form multi-shot video editing that jointly addresses the challenges of data, modeling, and evaluation. To provide cross-shot supervision data at scale, we develop automatic data-generation pipelines spanning synchronized multi-view footage, real-world multi-shot videos, and generated multi-shot content, yielding 87K paired editing videos without manual annotation. Architecturally, MoviEdit employs a cascaded bidirectional-autoregressive design: a lightweight bidirectional stage first establishes a globally coherent editing draft over a spatiotemporally compressed representation, which is then autoregressively propagated and refined over the full video. We further introduce MoviEdit-Bench, a dedicated benchmark for systematic evaluation of long-form multi-shot video editing. Extensive experiments show that MoviEdit substantially outperforms existing open-source models and performs on par with industry frontier models across text-guided and image-guided editing. Visit our project page for complete results and to access the benchmark: https://multi-shot-edit.github.io/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.02737v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.02737v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2611.02737v1 的 26 页全文与关键页面视觉核验。数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "MoviEdit 先用共享 denoiser 在低分辨率、低帧率整片上生成双向 edit draft，再将全局草稿作为锚点逐 chunk 自回归细化，把跨镜头绑定与长程漂移分开处理。配套 86,619 对训练数据和 64 个视频、128 次编辑评测，值得深读；长视频量化范围主要为 15 秒，25 秒扩展仅展示样例。",
+    "motivationZh": "跨镜头长视频编辑如何同时绑定目标、保留源内容，并避免逐 chunk 处理造成长程漂移？",
+    "methodZh": "通过多视角、电影片段和耦合生成三条 pipeline 构造跨镜头 pixel-aligned、localization、semi-pixel-aligned 监督；共享参数 Draft/Render Editor 分别以双向和 causal attention 处理全片草稿与局部细化。MoviEdit-Bench 在 64 个合成多镜头视频构造 128 次编辑，区分目标定位、内容保留和跨镜头一致性。",
+    "methodFlow": [
+      "整理多镜头源片并生成跨镜头一致编辑监督",
+      "共享 denoiser 对整片时空下采样表示进行双向 draft editing",
+      "Render Editor 读取草稿、源 chunk 和近期生成 KV 历史",
+      "以 causal diffusion 逐 chunk 细化至全分辨率",
+      "12-step draft 与 4-step render 蒸馏并复用 KV cache"
+    ],
+    "experimentsZh": "86,619 对多镜头训练数据，另加专有单镜头数据；64 H200，V2V 17K steps、IV2V 8K steps。主评测 64 合成源视频、128 场景、15 秒/4–6 镜头；补充 FiVE-Bench 和 VPBench。 作者报告 V2V overall edit success 0.790，Aleph 2.0 为 0.764；跨镜头一致性 0.904，低于 Aleph 的 0.981。（Table 1, p. 10） 作者报告 arbitrary-frame IV2V success 0.786，Aleph 为 0.781；first-frame 子集则 0.803 略低于 Aleph 的 0.806。（Table 2, p. 10） 作者报告 540p/361 帧在 8 H100 上 denoising 从 364.1 秒降至 11.8 秒，为 sliding attention、KV cache、distillation 的组合收益。（Table 4, p. 12） 覆盖 Lucy Edit、Memory-V2V、SANA-Streaming、Wan-Edit、SDEdit、GenProp 与多个私有系统。主 benchmark 为作者合成、VLM 采样评估；外部单镜头验证不保证任意真实长视频性能。 Fig. 4 比较有无 draft 的漂移，Fig. 10 扩训练时长/数据量，Fig. 11 展示 localization/semi-aligned 监督的定性增益；各机制尚无完整同预算定量隔离。",
+    "insightZh": "重点是共享权重的全局草稿到局部因果细化，与跨镜头监督和评价配套的端到端框架；不把现有 diffusion forcing、VMM、KV cache 单独称为新范式。跨镜头编辑相对短片编辑有实质能力扩展。",
+    "evidenceZh": "Draft 与 Render 共享权重，attention pattern 和时空分辨率不同。（Sec. 3.2, Fig. 5, Eqs. 5–6, p. 7；双向全片草稿提供远距离镜头的外观锚点，因果阶段读取草稿与源 chunk。）；三条 pipeline 构成独立训练监督。（Sec. 3.1, Fig. 2, pp. 4–6; Table 3, p. 12; Table 5, p. 20；首帧联合编辑后逐镜头传播、mask localization、coupled generation 分别覆盖不同编辑难点。）；作者报告 15 秒 benchmark 的 V2V overall edit success 为 0.790。（Table 1, p. 10; Appendix B.4, pp. 21–23；Aleph 2.0 为 0.764；分数为 sampled frame 上所有适用 VLM 判据联合通过率，不是人类满意度。）；相似身份与局部可见导致目标绑定失败。（Limitations and Failure Cases, Fig. 12, pp. 13–14；错误主体被编辑，或马的局部身体未完全变为斑马，限定跨镜头泛化。）",
+    "caveatZh": "相似主体或局部可见造成跨镜头目标绑定错误。 关注保留源运动和叙事结构的编辑，未解决自由运动/叙事改写。 主 benchmark 仅 64 合成视频、128 场景，指标以采样帧和 VLM 为主。 25 秒、17 镜头超训练 horizon 为定性演示，不能外推为任意长度保证。 专有单镜头数据和未公开具体模型权重限制复现；PDF 给项目/benchmark 页面，没有实现代码 URL。 本轮未确认可用的 public implementation。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "以全局草稿约束局部编辑，推进跨镜头可控视频创作；跨视角联合编辑和目标定位监督值得参考，但不声称已验证 structured 2D/3D 迁移。"
+  }
+}

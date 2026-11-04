@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2611.01543",
+  "slug": "gsexplorer-persistent-gaussian-world-state",
+  "title": "GSExplorer: Interactive World Generation with a Persistent 3D Gaussian World State",
+  "authors": [
+    "Sicheng Yu",
+    "Liu Liu",
+    "Xinjie Wang",
+    "Xinjiang Wang",
+    "Taojun Ding",
+    "Wenhao Hu",
+    "Beizhen Zhao",
+    "Puxin Yan",
+    "Zhizhong Su",
+    "Hao Wang"
+  ],
+  "publishedAt": "2026-11-01",
+  "updatedAt": "2026-11-01",
+  "collectedAt": "2026-11-04",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.01543"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "persistent 3D state",
+    "3D Gaussian Splatting",
+    "conflict filtering",
+    "bundle adjustment",
+    "world generation"
+  ],
+  "abstract": "Interactive world generation requires both accurate local control and stable scene consistency over long rollouts. Existing methods improve local generation through camera or geometry conditioning and extend historical context with memory mechanisms. However, long-horizon exploration remains challenging as target-view guidance becomes incomplete and inconsistencies accumulate across repeated scene updates. We present \\textbf{GSExplorer}, a generation--reconstruction framework built around a persistent 3D Gaussian world state. At each step, the current 3DGS scene provides multimodal rendering conditions for a condition-driven video generator, while camera geometry is injected through a separate Relative Ray Encoding branch. Generated videos are then fed back to a SLAM-based reconstruction backend, where inconsistency filtering prevents conflicting content from corrupting the scene and cross-chunk bundle adjustment improves spatial alignment across generation steps. We further design a data-construction pipeline that reproduces realistic 3DGS degradation during scene extrapolation, yielding 293K training pairs of degraded multimodal renderings and real target videos. GSExplorer achieves the best overall performance among the compared methods on both single-step and three-step WorldScore evaluation, with strong camera control and consistency across both settings, including a Camera Control score of 99.07 in single-step extrapolation. On 481-frame leave-and-return rollouts, it also shows strong revisit consistency, demonstrating the value of maintaining a reliable 3D world state for continued exploration.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.01543v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.01543v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2611.01543v1 的 17 页全文与关键页面视觉核验。数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "GSExplorer 把长程空间记忆存入持续更新的 3DGS，而让视频模型只负责局部补全；冲突过滤和跨段 bundle adjustment 决定新生成内容能否写回世界。481 帧回访实验支持更稳定的场景记忆，但仍是以静态场景为主的生成闭环，不能据此当作真实几何或动态物理模拟器。",
+    "motivationZh": "长程生成如何记住已经见过的场景，决定新内容何时写回，并在离开后返回时维持同一个可查询三维世界？",
+    "methodZh": "沿规划轨迹渲染当前 3DGS 的 RGB、depth、opacity 与 hole mask，用多模态 adapter 引导 Wan2.2-TI2V-5B；独立 RRE attention 分支注入 camera geometry。新视频经 SLAM 重建，历史覆盖区用颜色一致性和几何 validity 过滤，跨 chunk 匹配与 loop matches 做 BA，更新同一个 3DGS scene。训练用完整片段重建后只保留在 context frames 出生的 Gaussians，构造退化条件。",
+    "methodFlow": [
+      "从初图初始化持久 3DGS world state",
+      "按规划 camera trajectory 渲染 RGB/depth/opacity/hole conditions",
+      "条件驱动 Wan 视频生成，独立 RRE 分支控制 camera geometry",
+      "比较历史渲染并过滤冲突像素，扩展新区域、精化一致区域",
+      "跨段 bundle adjustment 后更新共享世界状态，继续生成与回访"
+    ],
+    "experimentsZh": "由 RealEstate10K、DL3DV、ACID、ScanNet 构建 293,943 个视频对；57 帧中 8 context、49 target。WorldScore photorealistic static subset 测单步/三步外推；R2M-Bench 50 例 leave-and-return trajectories 测 10-step、481-frame rollout。 作者报告 WorldScore 单步平均 82.85，Camera Control 99.07；三步平均 71.56，对照 UniWorld-View 为 64.08。（Tables 1–2, pp. 6–7） 作者报告 481 帧回访 PSNR/SSIM/LPIPS/Match Ratio 为 19.85/0.623/0.369/0.481；Spatia 对应 17.86/0.565/0.415/0.423。（Table 3, p. 8） 作者报告去掉 filtering 后三步平均从 71.56 降到 65.14、回访 PSNR 从 19.85 降到 17.15；去掉 BA 为 68.91 和 17.41。（Table 5, p. 9） WorldScore 比较 WonderWorld、AETHER、Uni3C、Voyager、FantasyWorld、NeoVerse、Spatia、DreamWorld、DreamX-World、UniWorld-View 和 camera-control Wan baseline；回访只有其中四类方法。没有把下游三维物理或 mesh 准确性纳入评价。 去掉 RRE、pose、depth、opacity，以及 filtering 和 BA，支持条件与状态更新的互补性。部分单项 photometric/subjective quality 不是本方法最佳，不能写为所有指标领先。",
+    "insightZh": "贡献在可查询、可选择性更新的显式世界状态维护，以及模拟场景外推退化的训练数据构建；RRE 继承已有编码，不能单独宣称为全新 camera representation。",
+    "evidenceZh": "冲突像素不参与 Gaussian 初始化或重建优化，新区域则可写入。（Fig. 1, Sec. 3.1, pp. 3–4；需要历史覆盖阈值、颜色差和几何有效性共同判定，并不保证错误从未进入状态。）；camera geometry 与 RGB/depth/opacity/mask 条件使用独立分支。（Fig. 2, Sec. 3.2, pp. 4–6；内容条件承担 scene completion，RRE 提供补充几何控制。）；去掉 filtering 或 cross-chunk BA 均降低多步与回访成绩。（Table 5, p. 9；为持久状态维护提供直接消融证据。）；训练 context Gaussians 保留完整序列优化后的参数。（Appendix A.2.3, p. 16；出生帧过滤限制覆盖范围，但不能认为训练条件完全没有未来帧优化影响。）",
+    "caveatZh": "每段视频后都要 camera estimation 与 3DGS refinement，运行比纯 feed-forward 视频生成更重。 主要针对静态或大体静态环境，动态对象的显式世界状态尚未解决。 反复生成和重建会模糊细纹理及小型室内细节。 训练用 full-sequence optimized context Gaussians，训练退化与真正纯历史在线重建之间仍有差距。 回访评价比较起点和终帧，不能完整证明中间整个世界的几何正确性。 正文把相对最佳对照的 PSNR 提升写为 3.99 dB，但 Table 3 的 19.85 与 17.86 相差 1.99 dB；本review只引用表中原值。 官方项目页 Code/weights 均标 Coming soon，无法核验实际实现。 官方仅承诺后续发布实现，目前未确认可用代码。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接对应可探索 3D scene generation：显式状态、选择性写回与几何对齐提供长程生成控制机制，可关注过滤错误累积和重访一致性。"
+  }
+}

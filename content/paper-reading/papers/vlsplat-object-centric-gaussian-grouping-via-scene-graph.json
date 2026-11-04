@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.01939",
+  "slug": "vlsplat-object-centric-gaussian-grouping-via-scene-graph",
+  "title": "VLSplat: Vision-Language Guided Object-Centric 3D Gaussian Splatting via Scene Graph",
+  "authors": [
+    "Yuntae Jeon",
+    "Younho Jeon",
+    "Sujin Jin",
+    "Sungho Jo",
+    "Seunghee Park"
+  ],
+  "publishedAt": "2026-11-01",
+  "updatedAt": "2026-11-01",
+  "collectedAt": "2026-11-04",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.01939"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3D Gaussian segmentation",
+    "scene graph",
+    "object grouping",
+    "CLIP gating",
+    "semantic lifting"
+  ],
+  "abstract": "Learning semantic representations for 3D Gaussian Splatting has recently emerged as a promising direction for 3D scene understanding. However, existing 2D-to-3D semantic lifting approaches rely primarily on 2D segmentation supervision and lack object-level priors, causing the learned representation to be driven by local mask evidence rather than holistic object structure. In this paper, we present VLSplat, a vision-language guided approach for object-centric semantic lifting in 3D Gaussian Splatting. Our method augments mask-based lifting with object-level semantic priors derived from vision-language models and refines Gaussian representations using an object-group scene graph. The refinement is performed through two language-guided modules: intra-group refinement suppresses semantic noise within object groups, while inter-group acquisition expands object support regions by incorporating structurally relevant candidates from neighboring groups. Extensive experiments on indoor scene datasets demonstrate that VLSplat improves the semantic consistency and structural completeness of object-level categories. Our code and models are available at https://vlsplat.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.01939v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.01939v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://vlsplat.github.io/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2611.01939v1 的 21 页全文与关键页面视觉核验。数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "VLSplat 把 3DGS 的粗对象组变成带语言描述的 scene graph，用合成对象视图的 CLIP 增益筛选 Gaussian，分别清除组内噪声和找回邻近背景中的物体部分。适合研究对象完整性与可编辑分组，但 ROI 内高分不能替代全场比较，且不会生成缺失几何。",
+    "motivationZh": "如何清除 3DGS 对象组中的误分 Gaussian，并从邻近背景找回属于同一对象的现有几何支撑？",
+    "methodZh": "从 posed RGB 和 SAM3/SAM2 混合 mask 开始，先以 Unified-Lift codebook 得到 Gaussian 对象组，再结合特征置信度与各向异性连通性构建对象 ROI 和 scene graph。VLM 生成对象级描述，CLIP 对可靠核心与加入候选后的多视图渲染进行相对打分，门控结果只更新语义特征方向，不改位置和尺度。",
+    "methodFlow": [
+      "posed RGB 与 SAM3/SAM2 mask 监督 codebook Gaussian lifting",
+      "由特征置信度、各向异性连通性和重叠 ROI 建立对象 scene graph",
+      "用 VLM 对象描述比较核心和候选 Gaussian 的合成多视图 CLIP 分数",
+      "通过组内 refinement 与组间 acquisition 更新语义特征，输出对象分组"
+    ],
+    "experimentsZh": "逐场景优化：ScanNet++ 10 场与 Replica 8 场做 render-level 分割；ScanNetV2 7 场与 Replica 8 场做固定点级语义及实例评测。每场景单次运行，单 RTX 3090。 作者报告 ScanNet++ Thing mIoU 为 69.81，同监督的 Unified-Lift + Ours 为 64.42；Replica 分别为 68.59 与 65.93。（Table 2, p. 8） 作者报告 ScanNetV2 全场 mIoU 为 40.49，低于 PanoGS 的 54.50；ROI 内为 61.89，但其评测区域不同。（Table 3, p. 8） 作者报告约 300 图像、10 个目标节点时耗时 146-162 分钟，约基线的 1.5-1.6 倍，额外峰值显存约 4GB。（Appendix C and Table 6, p. 17） 含 OpenGaussian、LangSplatV2、PanoGS 及同 mask、类别关联和训练计划的 Unified-Lift 对照；限制在室内六类 Thing，不支持任意类别泛化。 Table 5：单独 intra/inter 均提高 Thing 指标，组合最好，但相比任一模块的额外收益较小。Table 4 的 ROI 比较同时改变评测支撑，需谨慎解释。",
+    "insightZh": "贡献集中在将 scene graph 用作语义优化支架，以相对 CLIP 渲染增益筛选组内和背景候选，而非仅向 Gaussian 附加语言特征。混合 mask、codebook lifting 和基础模型本身沿用现有组件。",
+    "evidenceZh": "组间 acquisition 只重分配已有 Gaussian 的语义支撑，不补全新几何。（Sec. 3.3, Eqs. 3-6, pp. 5-6；候选来自 ROI 内已有背景或非目标组，位置和尺度保持不变。）；同 mask 和训练计划的对照显示 refinement 能改善前景类别渲染分割。（Table 2 and Sec. 4.1, p. 8；Unified-Lift + Ours 共享类别关联和 mask，省略迭代 refinement。）；全场与 ROI 评测需分别解释，ScanNetV2 全场不优于 PanoGS。（Table 3 and Sec. 4.2, pp. 8-9；Ours dagger 仅测 scene graph ROI，不能与全场基线直接排名。）；方法依赖初始对象节点和可观察支撑。（Limitations, p. 10；稀少观测和基础模型选择敏感性仍未解决。）",
+    "caveatZh": "初始 lifting 若未形成可靠对象节点，语言 gating 无法恢复弱观测对象。 SAM3、VLM、CLIP 选择的敏感性尚未系统评估。 局限于室内 Thing 类，离线优化成本随节点数增长。 ROI 内指标不能与全场指标直接比较；背景 Stuff 及 ScanNetV2 全场仍有明显弱项。 所谓完整性是已有 Gaussian 的语义回收，不是遮挡几何生成；尚未验证细粒度 part 或 LEGO 分割。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "对象级 Gaussian 分组和细薄部件支撑回收直接对应 3D Segmentation 的结构完整性问题，也便于后续对象提取；论文未实测生成或制造任务。"
+  }
+}

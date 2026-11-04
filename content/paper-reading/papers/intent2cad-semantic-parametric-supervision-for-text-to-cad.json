@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.03449",
+  "slug": "intent2cad-semantic-parametric-supervision-for-text-to-cad",
+  "title": "Intent2CAD: How Semantic-Parametric Supervision Shapes Text-to-CAD Generation",
+  "authors": [
+    "Jinbo Yang",
+    "Mingyue Yuan",
+    "Shikai Jing"
+  ],
+  "publishedAt": "2026-11-02",
+  "updatedAt": "2026-11-02",
+  "collectedAt": "2026-11-04",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.03449"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "text-to-CAD",
+    "semantic-parametric supervision",
+    "design intent",
+    "CadQuery",
+    "lift-and-validate"
+  ],
+  "abstract": "Text-to-CAD generation aims to make CAD modeling more accessible by generating executable CAD programs from natural-language descriptions. However, practical CAD workflows require more than executable geometry: generated programs should also expose reusable structure that supports later modification. We introduce intent-oriented text-to-CAD generation, where design intent is expressed as recoverable code-level signals: semantic features, reusable parameters, and lightweight parametric relations. Rather than changing the model architecture or decoding procedure, we investigate how supervision representation granularity affects both CAD generation and zero-shot intent-preserving editing. To enable this study, we construct IntentCAD-100K, a 100K paired text--code dataset built by converting low-level CAD construction traces into executable CadQuery programs. We further construct IntentCAD-Edit-1K to evaluate zero-shot intent-preserving editing from the same representation perspective. Intent2CAD uses a two-stage conservative lifting pipeline: semantic lifting rewrites reliable primitive groups into feature-level operations, while parametric lifting exposes lightweight parametric relations. Under controlled fine-tuning, semantic lifting mainly improves generation reliability and feature recovery, reducing IR from 2.39% to 0.22% and achieving 99.96% API Recovery, while parametric lifting makes reusable relation structure explicit and further improves relation-aware zero-shot editing. Datasets and code are available at https://github.com/JinboYang94/Intent2CAD.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.03449v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.03449v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/JinboYang94/Intent2CAD"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2611.03449v1 的 25 页全文与关键页面视觉核验。数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "Intent2CAD 把同一 CAD 的监督从低层曲线提升为 semantic features、共享参数和简单关系，研究可编辑性究竟来自哪种表示。受控实验支持 semantic lifting 改善执行与几何、parametric lifting 改善关系保持；这比再换一个生成 backbone 更值得借鉴，但“design intent”仅限代码可恢复结构。",
+    "motivationZh": "同一个 CAD 的监督表示究竟如何影响几何生成与关系保持，能否从低层 primitive 保守地恢复可编辑的语义与共享参数？",
+    "methodZh": "以 DeepCAD 构建轨迹和约束为输入，先保留 tag 重建 CadQuery，再通过几何与约束共同支持的模板进行 semantic lifting。第二阶段用受限 LLM 局部改写参数定义，只有执行、几何不变量与 AST locality 均通过才接受，否则保留原表示。三套对齐监督在相同文本、backbone 和训练设置下比较，并以零样本局部编辑验证可重用关系。",
+    "methodFlow": [
+      "重建带 primitive tags 的可执行 CadQuery 与 source constraint graph",
+      "匹配可靠 feature template，失败部分保留 primitive fallback",
+      "受限 LLM 提议共享变量及简单 derived parameter expressions",
+      "执行、几何不变量和 AST locality 校验后生成对齐文本监督",
+      "分别 SFT 三种表示并比较生成与 intent-preserving editing"
+    ],
+    "experimentsZh": "IntentCAD-100K 从 178,238 条 DeepCAD 原始轨迹筛选并按 construction signature 去重，80/10/10 split；Qwen3.5-9B 为主要受控 backbone，另有 Qwen2.5-7B。IntentCAD-Edit-1K 含 414 feature、311 consistency、275 derived-relation edits；另有 GPT-5.4 视觉定位 200 例。 作者报告 semantic supervision 的 IR 由 primitive 的 2.39% 降至 0.22%，Mean CD 由 1.44 降至 0.46；S.+P. 为 0.20% 和 0.57。CD 按表中 ×10³ 尺度报告，IR 为百分比。（Table 2, p. 8） 作者报告从 semantic 到 semantic-parametric 监督，CE edit success 从 91.00% 到 95.82%，DE 从 77.09% 到 88.73%；FE 则由 95.17% 到 92.51%。（Table 3, p. 9） 作者报告 paired bootstrap 中 CE、DE 的额外收益区间不含 0，FE 的差值区间包含 0。（Table 13, p. 21） 诊断比较包括 GPT-5.4 系列、Qwen3.5、CAD-Coder 与 cadrille，但训练分布不同，不能视为公平架构排名；主要证据来自同 backbone 的表示对照。 控制三套表示，并以 semantic comments 和 anonymous APIs 作补充对照；后者提示收益不只来自代码缩短，但语义、API familiarity 与结构仍未完全解耦。",
+    "insightZh": "贡献在监督表示及保守 lift-and-validate 数据构建，而非新模型架构。通过对齐 primitive、semantic、semantic-parametric 三套目标并保留相同输入，较清楚地区分 feature abstraction 与 parameter relations 的作用。",
+    "evidenceZh": "只有几何模板和源约束共同支持的 primitive group 才提升；不确定部分原样保留。（Sec. 3.2, Fig. 3, pp. 5–6；第二阶段也限制为参数局部改写，不允许改变拓扑或操作序列。）；semantic lifting 改善生成执行可靠性，parametric lifting 的主要收益在关系保持。（Tables 2–3, pp. 8–9；不能把 S.+P. 描述为显著进一步改善 Chamfer Distance。）；主编辑评测显式指定 loop；视觉定位仅为 200 例补充实验。（Secs. 4.4–4.5, Tables 3–4, pp. 9–10；主结果隔离了目标定位，不等于自由语言 CAD 编辑能力。）；几何一致性校验实际采用体积、包围盒与质心标量，而非完整实体等价证明。（Appendix A.4, p. 16；这些确定性检查配合 AST locality，但不能独立保证任意形状完全等价。）",
+    "caveatZh": "只支持保守的常见 feature templates，长尾工程特征保留为 primitive。 输入主要为专家式描述，未证明口语或欠指定指令泛化。 未恢复完整设计历史或执行完整 constraint solving；保守提升会漏掉真实关系。 ERS/PRS 只在显式关系存在的样本上定义，不能直接用于所有表示的同列胜负。 去重是 construction-level signature，并非完整几何等价去重；不同构造历史仍可能保留。 几何校验不变量和所支持的局部编辑模板限定了证据边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接对应可编辑 CAD/program generation，可借鉴把语义操作与显式约束写入监督、失败保留原表示的构建方式；不需要把它额外归为 fabrication 或 agent。"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.03228",
+  "slug": "anchorcomplete-scene-mesh-completion-from-partial-points",
+  "title": "AnchorComplete: Recovering Complete Scene Meshes from Partial Point Clouds",
+  "authors": [
+    "Weirong Chen",
+    "Ismail El-Yamany",
+    "Ganlin Zhang",
+    "Chuanxia Zheng",
+    "Andrea Vedaldi",
+    "Daniel Cremers"
+  ],
+  "publishedAt": "2026-11-02",
+  "updatedAt": "2026-11-02",
+  "collectedAt": "2026-11-04",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.03228"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "scene completion",
+    "point anchors",
+    "metric-scale windows",
+    "coarse-to-fine",
+    "TRELLIS.2"
+  ],
+  "abstract": "Most image-based 3D reconstructors primarily recover visible surfaces, producing partial point clouds with large holes and leaving unobserved geometry unresolved. To address this limitation, we introduce AnchorComplete, a framework that reconstructs complete scene meshes from partial point clouds while preserving observed geometry and supporting scenes of varying scales. Building on TRELLIS.2, our method combines partial-point conditioning, which integrates global scene tokens with local spatial evidence to anchor generation to the input, and metric-scale coarse-to-fine generation, which progressively refines scene geometry within fixed-size windows while maintaining global structural consistency. Experiments on Replica and SCRREAM demonstrate that AnchorComplete consistently outperforms strong baselines in complete-scene reconstruction, particularly under sparse-view settings.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.03228v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.03228v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2611.03228v1 的 20 页全文与关键页面视觉核验。数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "AnchorComplete 用 partial points 锚定 TRELLIS.2 的场景补全，再以固定物理尺度窗口由粗到细生成完整 mesh。核心价值是保留已见结构并补出未见区域；评测的 precision 只计视锥内预测，因此“更完整”不能解释为已验证全部隐藏几何正确。",
+    "motivationZh": "如何在保留可见点云结构的同时补出完整室内场景，并避免全场统一缩放吞掉细小几何？",
+    "methodZh": "点云经冻结 Utonia 与 Q-Former 形成 global anchor tokens；可见体素的 latent warm start 和 visibility mask 提供局部几何约束。场景先生成全局粗布局，再对固定物理大小、继承父级 occupancy 的重叠窗口逐级细化；最细层的 shape latents 合并到共享网格，一次提取 scene mesh。",
+    "methodFlow": [
+      "输入带颜色的 partial scene points，编码 global anchor tokens",
+      "可见点体素化并注入 latent warm start 和 visibility mask",
+      "全局粗结构后逐级生成固定物理尺度窗口，继承父级预测",
+      "最细层生成 O-Voxel shape latents 并合并共享网格",
+      "解码生成无纹理的完整场景 mesh"
+    ],
+    "experimentsZh": "用约 16K InternScenes 场景与约 7K SAGE rooms 训练；在 8 个 Replica 室内场景和 12 个 SCRREAM captures 评估，四视图为主要设定，并变化 2–10 views。另以 5 个实景及 1 个 Matterport3D house 测粗到细层级。 作者报告四视图 Replica 的 CDall 为 0.067、F0.05 为 0.684；最接近的 Seen2Scene 为 0.132 和 0.647。SCRREAM 对应为 0.076/0.584，对照 0.167/0.525。（Table 1, p. 7） 作者报告从 coarse level 0 到 level 2，F0.02 从 0.485 到 0.801，而 F0.05 从 0.835 到 0.872，显示精细结构收益更明显。（Table 2(b), p. 10） 覆盖 feed-forward visible-surface reconstructors、image-based generators、SG-NN/NKSR 和 Seen2Scene；不同方法的目标与输出不同，作者转换或 Sim(3) 对齐后比较；TRELLIS scene finetune 对照用于区分仅扩充训练数据的影响。 去除局部注入显著降低 visible fidelity，去除 global tokens 降幅较小；层级细化、点数/噪声及多来源点云实验支持结构设计，但 SLAM/LiDAR 使用全轨迹，非预算匹配比较。",
+    "insightZh": "将 global point conditioning、局部可见证据注入与 metric-scale coarse-to-fine scene completion 结合，解决单一归一化立方体随场景尺寸损失细节的问题；不是单纯将场景点云平滑成表面。",
+    "evidenceZh": "global anchor tokens 和 local spatial injection 共同约束生成，父级 warm start 在未观察区域保持布局。（Fig. 2, Secs. 3.2–3.3, pp. 4–6；global context 与逐体素定位作用不同。）；四视图输入下完整区域指标改善，但可见区域 CD 并非最优。（Table 1, p. 7；DA3 的 visible-only CD 更低；应分别报告 fidelity 与 completion。）；CDall 和 F 的 precision 仅评估输入视锥内预测，而 recall 覆盖整场。（Appendix A.2, p. 16；未见区域额外 hallucinated geometry 不受该 precision 直接惩罚。）；低光、模糊等上游失败会被锚定保留而非修复。（Appendices A.5–A.6, p. 19, Fig. 12, p. 20；对输入随机噪声的鲁棒性不等于对系统性深度错误的鲁棒性。）",
+    "caveatZh": "当前只预测几何，不输出 appearance/texture。 上游漂移、scale error 和系统性 depth bias 会传播到生成 mesh。 训练评测聚焦室内，室外与无界场景泛化仍未验证。 完整区域评分对未见区域额外几何缺少双向惩罚，不能据此宣称恢复真实遮挡布局。 两间新实景没有完整 mesh ground truth，只作定性展示。 固定窗口增强可扩展性，但约三分钟单场景运行且不能保证物理可交互性。 本轮未确认可用的 public implementation。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接命中 scene completion/3D generation：父级布局与固定 metric windows 的组合可借鉴于大尺度条件生成，point anchors 也有助于控制可编辑场景资产。"
+  }
+}

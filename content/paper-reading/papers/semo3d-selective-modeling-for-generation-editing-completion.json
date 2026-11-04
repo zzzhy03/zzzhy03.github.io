@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2611.02568",
+  "slug": "semo3d-selective-modeling-for-generation-editing-completion",
+  "title": "SeMo3D: Unifying 3D Generation, Editing, and Completion via Selective Modeling",
+  "authors": [
+    "Xiaokun Sun",
+    "Jian Yang",
+    "Zhenyu Zhang"
+  ],
+  "publishedAt": "2026-11-02",
+  "updatedAt": "2026-11-02",
+  "collectedAt": "2026-11-04",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.02568"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "selective denoising",
+    "clean context",
+    "3D editing",
+    "flow matching",
+    "condition dropout"
+  ],
+  "abstract": "3D generation, editing, and completion are typically treated as regenerating the complete 3D asset under task-specific constraints, even when only a local region needs modification. This leads to task isolation, inconsistency in content that should remain unchanged, and dependence on task-specific paired data. We address these issues with a key observation: the three tasks all synthesize a designated region while keeping the rest intact---the full region for generation, the target region for editing, and the missing region for completion. We term this paradigm Selective Modeling and build SeMo3D upon it; it naturally unifies the three tasks, preserves unchanged content by construction, and enables training without paired editing or completion data, since any 3D asset can be partitioned into a selected region and its context. For training, we propose region-selective denoising, which randomly selects regions of varying sizes on standard 3D assets and applies noise and loss only to them, jointly learning all three tasks. For architecture, we propose Omni3DiT, a multi-condition 3D diffusion transformer that distinguishes regions to create from those to retain and fuses image, text, and point guidance for fine-grained control. Experiments across three benchmarks show SeMo3D surpasses state-of-the-art methods on all tasks, delivering multimodal controllability in generation and strong consistency and accuracy in editing and completion. SeMo3D further serves as a unified modeling tool for agents, enabling efficient 3D creation through natural-language interaction. Project page: https://xiaokunsun.github.io/SeMo3D.github.io/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.02568v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.02568v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 exact version 2611.02568v1 的 21 页全文与关键页面视觉核验。数字均为作者报告，本项目未独立复现。",
+    "ideaZh": "SeMo3D 只对选中区域的 3D latents 加噪和计算损失，把生成、局部编辑与补全统一为同一问题，不需要专门的编辑/补全配对训练集。最值得看的是干净 context 与待生成 token 的分工及多条件 dropout；保留保证严格发生在 token 层，额外 GT points 的收益不能等同图像单条件能力。",
+    "motivationZh": "能否只用普通完整 3D 资产训练一个模型，同时完成生成、保留上下文的局部编辑与补全，而不收集专门配对样本？",
+    "methodZh": "基于 TRELLIS.2 的 sparse structure、shape 和 texture 三阶段表示，随机在普通完整资产中选择整场或局部 box，只对 selected tokens 做 flow matching，始终复用 clean context。Omni3DiT 以 role embedding 区分两类 tokens，使用 image/text cross-attention 和结构阶段的 point self-attention，并通过 compositional condition dropout 防止图像条件压制文字与点条件。",
+    "methodFlow": [
+      "把完整资产编码为 spatially structured SS、shape、texture tokens",
+      "整区域或随机局部 box 定义 selected/context partition",
+      "仅 selected tokens 加噪与监督，context 始终保持干净",
+      "Omni3DiT 融合图像及可选文字、稀疏点条件",
+      "按生成/编辑/补全的目标区域逐阶段采样并复用 context"
+    ],
+    "experimentsZh": "TRELLIS-500K 的训练 split 上 fine-tune，普通完整资产，无编辑/补全成对样本。Toys4K 3,180 个带文本对象、Edit3D-Bench 300 例、Omni-Comp 180 个 partial inputs；输出统一到 512 resolution。 作者报告 Edit3D-Bench 未编辑区域 PSNR 为 37.39，对照 VoxHammer-I 为 31.21；CLIP 为 0.286，对照 0.281。（Table 2, p. 7） 作者报告无额外 points 的补全 F-score 为 0.468、CD 为 0.0208；增加 GT missing-region points 后为 0.541 与 0.0133。（Table 3, p. 7） 作者报告 generation 的 image-only CD 为 0.0334、image+points 为 0.0116，三模态为 0.0118；不能宣称三模态几何分数处处最优。（Table 4, p. 8） 覆盖 TRELLIS/TRELLIS.2、HY3D、Pixal3D、TIGON 生成，VoxHammer/Nano3D/3DEditFormer/PartFlow 编辑，以及 LaS-Comp/HY3D-Omni 补全；各方法收到自身支持的条件，输入能力和 mask 支持不同。 对照 image/text/point combinations、role embedding、point cross-attention 替代与标准 CFG dropout。未单独报告去掉 selective denoising 的同等训练对照，统一任务与 token 保留主要由构造及跨任务结果支持。",
+    "insightZh": "方法贡献是 region-selective denoising 将三个任务统一、消除专门配对数据依赖，并用 role embedding 与 compositional condition dropout 支撑多条件控制；agent 演示是扩展用途，主要方法仍属原生 3D 生成/编辑。",
+    "evidenceZh": "只对 selected tokens 加噪与计算 loss，推断时 context tokens 原样复用。（Fig. 3, Secs. 3.2–3.3, pp. 4–5；p. 3 脚注明确保留保证在 token 层，不能改写为任意 mesh 的逐顶点不变。）；编辑评测不使用 point condition，补全同时给出有/无额外 points 两种设定。（Tables 2–3, p. 7；应区分条件预算，不能把完整三模态提升归给单条件架构。）；生成用 GT occupancy 的 FPS points，补全额外 points 来自 GT missing region。（Supplement Sec. 8.1, p. 13；这验证具有稀疏几何提示时的能力，并非真实场景自动获得隐藏几何。）；role embedding、point self-attention 和 compositional dropout 各有受控比较。（Table 4, p. 8；最显著的几何收益来自 point condition；三模态并非每项指标都胜 image+points。）",
+    "caveatZh": "TRELLIS.2 latent 分辨率限制细薄结构，图中 palm fronds 仍较粗。 CLIP text encoder 难处理复杂组合指令，橙子可能退化成橙色纹理而非独立物体。 context token 不变不等于 decoder 耦合下 mesh/texture 数值严格不变。 GT-derived point conditions 提供额外几何信息，应单独保留无点结果和条件预算。 agent 集成主要为示例，速度/费用图不是规模化用户任务成功率评估。 官方仓库当前仅 README/展示资产，inference/training/evaluation code 与 model weights 尚未发布。 官方仅承诺后续发布实现，目前未确认可用代码。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed",
+    "whyRelevantZh": "直接服务可控 3D creation 与局部编辑；随机区域训练、clean context 与显式角色信息可用于结构资产的增量修改，而不必建立昂贵的专门编辑配对数据。"
+  }
+}
