@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.06048",
+  "slug": "svgfaith-text-to-svg-faithfulness",
+  "title": "SVGFaith: A Two-Layer Meta-Evaluation of Faithfulness Metrics for Text-to-SVG Generation",
+  "authors": [
+    "Guotao Liang",
+    "Haitao Zhou",
+    "Biao Liu",
+    "Huanxuan Liao",
+    "Lingfeng Qiao",
+    "Qian-Wen Zhang",
+    "Qian Yu",
+    "Di Yin",
+    "Xing Sun"
+  ],
+  "publishedAt": "2026-11-04",
+  "updatedAt": "2026-11-04",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.06048"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "SVG",
+    "faithfulness",
+    "meta-evaluation",
+    "atomic requirements"
+  ],
+  "abstract": "Text-to-SVG systems are commonly evaluated by applying raster-image metrics to rasterised outputs, yet whether these scores capture fine-grained prompt faithfulness remains unclear. We introduce SVGFaith, a two-layer meta-evaluation framework in which the more faithful candidate of each pair is determined by construction or by human judgment. SVGFaith-Diagnostic contains 1,842 controlled contrastive pairs across eight capability axes, split evenly between two directions: two renderings compared against one prompt, and two descriptions compared against one rendering. SVGFaith-Arena contains 1,327 human-annotated comparisons of real generator outputs. On SVGFaith-Diagnostic, CLIP and three other image--text embedding metrics reach at least 0.789 pairwise accuracy on object identity but at most 0.672 on spatial relations and attribute binding, where chance is 0.5. We further introduce SVGFaith-Score, an interpretable pointwise metric. A domain-tuned decomposer turns each prompt into a dependency graph of atomic visual requirements, a visual question answering model scores whether each requirement is satisfied, and a requirement's score is discounted when its prerequisites score low. In addition to the overall score, the per-requirement scores show which requirements are judged unsatisfied and which inherit discounts from their prerequisites. SVGFaith-Score significantly outperforms all nine baselines, including a Qwen3.5-122B-A10B judge, on Arena and in both Diagnostic directions. Code and data: https://github.com/Yukinonooo/SVGFaith.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.06048v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.06048v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.06048v1, 27 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. Implementation is promised; no working public implementation was confirmed.",
+    "ideaZh": "SVGFaith用controlled SVG对和真实生成器对分开诊断faithfulness，再把prompt拆成带前提依赖的VQA节点。作者报告Arena strict accuracy 0.880，但非tie时122B judge反而更准；值得深读coverage、标签复核和生成器偏移，而非直接认定为通用SVG reward。",
+    "motivationZh": "常见raster metrics能否发现SVG的计数、属性绑定、空间关系等细粒度prompt违反？",
+    "methodZh": "prompt-only decomposer构造atomic fact DAG；独立9B VQA以Yes/No logits打分，每个distinct ancestor用(1+q)/2折扣，再平均。Diagnostic含1842对、Arena含1327个人工对，raster语义与native SVG结构分开看。",
+    "methodFlow": [
+      "prompt分解atomic requirement DAG",
+      "每条requirement对rendering作Yes/No VQA",
+      "按distinct ancestors软折扣",
+      "输出总分、节点分和依赖失败",
+      "在controlled与real-output pairs分别评测"
+    ],
+    "experimentsZh": "921 image-direction与921 text-direction controlled pairs；Arena来自六generator，challenge-set分层抽样，3 annotators、pair bootstrap；主报告τ0/0.01。 作者报告τ0.01 Arena/image/text accuracy为0.880/0.941/0.953。 (Table 2, p.8) 作者报告non-tie judge accuracy0.918、coverage0.821；SVGFaith0.905/0.972，半tie计分Arena差距从0.127收窄至0.051。 (Sec.4.2, pp.7–8) 作者报告Claude被判较差的31对上SVGFaith仅0.516。 (Table 11, p.25) 九种embedding、preference reward与VQA/judge；同backend holistic0.850是较强control，未验证native SVG结构质量。 domain decomposer0.880对base decomposer0.073的主要失败是未输出graph；同backend holistic差0.030，397B teacher替代0.876无显著差；无独立soft-gating α sweep。",
+    "insightZh": "两层meta-evaluation与可解释prerequisite聚合；decomposer fine-tuning解决40k-token预算下schema/终止失败，不能把该ablation都解释为语义能力。",
+    "evidenceZh": "graph只读prompt，candidate独立打分；parent每条路径只算一次。 (Sec.3, pp.5–7); strict accuracy ties计0，judge非tie accuracy与coverage需要分开。 (Sec.4.2, pp.7–8); 最终标注在运行metrics后有针对性复核，12对改label、25对移除。 (Sec.C.3, p.21)",
+    "caveatZh": "inherits decomposition errors及uncalibrated VQA readout；generator-conditioned robustness不足。 native SVG structure与作为on-policy reward都未测试。 Arena是challenge sampling且620 majority ties排除，0.880不是任意生成输出的准确率。 运行metrics后仅复核disagreement可能引入评价依赖；去掉expert adjudicated不等于去掉post-metric corrections。 strict margin对不同metric数值尺度不等价；per-requirement可解释不保证错误定位真值。",
+    "whyRelevantZh": "直接服务SVG/structured2D评价与可检查设计要求；可借鉴agent verifier但RL收益未验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

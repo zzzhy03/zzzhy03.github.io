@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2611.04492",
+  "slug": "hybrid-particle-voxel-3d-world-simulator",
+  "title": "Hybrid Particle-Voxel Dynamics for Multimodal 3D World Simulation",
+  "authors": [
+    "Jimmy Wang",
+    "Yifan Chou",
+    "Kaifeng Zhang",
+    "Yixuan Wang",
+    "Binghao Huang",
+    "Tao Yu",
+    "Saleh Nabi",
+    "Yunzhu Li"
+  ],
+  "publishedAt": "2026-11-03",
+  "updatedAt": "2026-11-03",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.04492"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "3D dynamics",
+    "particle-voxel",
+    "visuo-tactile",
+    "world simulation"
+  ],
+  "abstract": "Predicting how the world evolves in response to robot actions is central to policy learning, evaluation, and planning. However, many action-conditioned world models predict future observations in 2D image or video space without explicitly modeling the underlying 3D scene, making spatial consistency across viewpoints and over long-horizon interactions challenging. We introduce 3D World Simulator, an action-conditioned multimodal world modeling framework that jointly predicts appearance, geometry, and tactile observations from a unified 3D representation. Our approach combines a hybrid particle-voxel autoencoder that compresses point clouds into compact 3D voxel latents with an action-conditioned latent dynamics model that predicts their evolution. The shared 3D representation supports geometrically consistent rendering from arbitrary viewpoints and flexible integration of spatially aligned tactile signals. Our experiments demonstrate interactive, long-horizon, multimodal prediction at 50 Hz. We then show how our model enables scalable data generation for policy training and evaluation using tactile and multi-view visual observations, including wrist-mounted and novel camera views. Furthermore, we scale our method to large datasets containing diverse objects and demonstrate model-based planning with unseen objects and robot configurations. Together, these results highlight the potential of hybrid particle-voxel dynamics as a foundation for multimodal 3D world simulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.04492v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.04492v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://jwang771.github.io/3dworldsimulator/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.04492v1, 25 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. Public implementation entry was checked.",
+    "ideaZh": "3D World Simulator把RGB-D和touch统一为particle/voxel latent，再以动作条件3D U-Net生成动态状态和任意视图。作者报告200-step ALOHA平均PSNR23.24、CD7.72；值得深读显式3D多模态接口，但held-out物体外观不及particle baselines，且workspace仍需裁剪和任务适配。",
+    "motivationZh": "如何在共同3D表示中预测动作后的几何、外观和触觉，而不是分别生成可能互相矛盾的2D视图？",
+    "methodZh": "稀疏体素encoder将点云压成8通道grid，coarse-to-fine decoder生成Gaussian visual particles与tactile particles；直接latent dynamics用5帧history、动作和rollout curriculum预测，无需point tracks或每对象状态。",
+    "methodFlow": [
+      "RGB-D/kinematics组成共同坐标点云与touch",
+      "sparse voxel encoder压缩3D latent",
+      "3D U-Net按动作和history预测next latent",
+      "voxel/particle decoder生成几何、appearance与touch",
+      "Gaussian渲染及外部assets组合供policy训练/规划"
+    ],
+    "experimentsZh": "六个ALOHA任务每任务约200episodes/2h；Deform360198物体/1980sequence；ALOHA200步、Deform360150步open-loop。 作者报告ALOHA平均PSNR23.24/LPIPS0.240/CD7.72/Obj.CD11.52/tactileL1 0.081，优于列出baselines。 (Table1,p.8) 作者报告Deform360 held-out CD12.1mm优于ParticleFormer13.4mm，但PSNR14.8/LPIPS0.43差于15.6/0.31。 (Table2,p.16) 作者图示20次评估/每policy的sim-real成功率相关r=0.958/0.965/0.859；相关性不等于所有新policy的校准保证。 (Fig.7,p.9) 2D Cosmos/Robot4DGen/IWS和3D PGND/PointWorld/ParticleFormer；2D被扩展为multi-view/depth而3D依赖point tracks，先验条件不同。 主稿未给autoencoder、rollout curriculum或history noise组件消融；跨task和held-out数据支持组合模型，不隔离每项贡献。",
+    "insightZh": "在同一显式3D latent预测外观、几何与触觉，用particle decoder兼顾geometry与rendering；不依赖显式point tracks，但不是物理方程求解器或通用大场景world model。",
+    "evidenceZh": "点云压缩为8通道voxel，连续particle Gaussian解码支持多视图与touch。 (Sec.3.2–3.3,pp.4–5;Fig.2); 模型限定workspace，可用已知asset/kinematic robot组合并需label head适配。 (Sec.3.4,p.5;App.B,pp.16–19); held-out object geometry更好而appearance更差。 (Table2,p.16)",
+    "caveatZh": "模型限定特定workspace；为组成大场景使用外部Gaussian assets和kinematic robot。 held-out物体geometry保持较好，但appearance prediction不如预拟合particle方法。 手工workspace crop和多RGB-D/kinematics输入不是单RGB的开放世界推演。 50Hz为作者宣称，正文未提供完整计时协议以区分latent预测、decode、render和capture。 unseen-object planning仅四对象演示，没有大量成功率统计；不外推精密装配或材料物理准确性。",
+    "whyRelevantZh": "对dynamic 3D generation和可组合显式空间latent有直接表示价值；part assembly只是机器人验证任务，未证明生成可制造结构。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

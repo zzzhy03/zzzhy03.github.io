@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.06123",
+  "slug": "alexicons-rlvr-stroke-crowding",
+  "title": "From Handcrafted to Generative: RLVR-Optimized Icon Generation for Alexa+",
+  "authors": [
+    "Rohan Sequeira",
+    "Matthew Rosenberg",
+    "Amin Mahmoudabadbozchelou",
+    "Oleg Poliannikov",
+    "Jonathan Rubin"
+  ],
+  "publishedAt": "2026-11-04",
+  "updatedAt": "2026-11-04",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.06123"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation",
+    "2d-design"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "line art",
+    "stroke crowding",
+    "verifiable rewards",
+    "vectorization pipeline"
+  ],
+  "abstract": "Alexa+ devices with screens display animated icons during conversations to visually reinforce what is being said. The original set of these icons was hand-drawn by designers one at a time, a process that produces polished results but is time-consuming and cannot scale to the range of topics encountered in open-ended conversation. We describe an automated pipeline, deployed in production, that generates these vectorised animated icons from a text description alone and surfaces relevant animations to customers based on their ongoing conversation. The pipeline decomposes icon creation into a sequence of stages (image generation, semantic decomposition, vectorisation, styling, and animation). Its quality is determined at the very first of these, image generation, on which every downstream stage depends. We therefore focus on improving this first and most critical stage. Because the icons are rendered on small display canvases under strict design guidelines, generations are often unsuitable for production. Supervised fine-tuning is not viable, as no dataset of line-art icons exists under these constraints. Instead, we design objective verifiers that automatically flag generations violating the design guidelines, and use them to fine-tune a flow matching image generation model via reinforcement learning from verifiable rewards (RLVR). The fine-tuned model raises the pass rate from 15.7% to 58.7% (3.7x) under a VLM judge that is independent of the reward model. Both the trained model and the verifier are deployed in the production pipeline, where the verifier also serves as the automated quality gate before final design review.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.06123v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.06123v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.06123v1, 15 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. No public implementation was confirmed.",
+    "ideaZh": "Alexa+把生产显示时的stroke crowding变为形态学测量加语义例外分类，再用Flow-GRPO训练line-art生成器。方法值得借鉴到vector/stitch约束；作者报告15.7%→58.7%通过率，但配对表推得19.7%→68.7%，数值口径须先澄清。",
+    "motivationZh": "高分辨率线稿在小画布以较粗stroke显示时为何粘连，如何把实际显示约束变成可优化reward？",
+    "methodZh": "先生成线稿，再semantic decomposition、centreline SVG、gradient/Lottie动画。技术重点是按stroke width归一的narrow/fused/hole检测、boosted-tree verifier及防空白/错概念的组合reward，而非新vectorization算法。",
+    "methodFlow": [
+      "按目标stroke width重渲染生成线稿",
+      "形态学测量crowding并以classifier区分by-design",
+      "组合defect count、退化guard与concept fidelity reward",
+      "Flow-GRPO训练FLUX.2 klein LoRA",
+      "合格图进入分解、SVG和Lottie生产流程"
+    ],
+    "experimentsZh": "474训练concepts/118选择集；1000 disjoint eval concepts每模型每concept一次generation，由独立Claude Opus 4.6判断；8×H200、5000updates。 作者报告verifier macro-F1 0.685、defect precision 0.697、recall 0.646。 (Table 1 and Results, p.6) 作者报告Table2通过率15.7%→58.7%；Table3的157/40/530/273相加则为19.7%→68.7%，本项目只核对算术，不认定修正口径。 (Tables 2–3, p.7) base与LoRA使用相同template/sampler/judge；含prompt spacing变体，但不是跨模型或最终SVG/动画有效性比较。 无spacing prompt的训练模型优于prompted base；rank64/128曲线与ratio/count失败诊断提供经验支持，完整reward组件独立消融有限。",
+    "insightZh": "把输出实际显示约束纳入non-differentiable reward，并允许合理junction例外；与一般漂亮图像reward相比更接近structured图形的可执行限制。",
+    "evidenceZh": "verifier数据按icon而非violation拆分，682 icons/3836 flags，以九个geometry/context特征分类。 (Method, pp.3–5; Table B.1, p.11); raw defect count替代ratio以避免GRPO组零方差，并以density/concept guards限制reward hacking。 (Reward model, p.5); headline通过率和paired counts不自洽，不能据此验证其效应量或显著性。 (Tables 2–3, p.7)",
+    "caveatZh": "verifier label noise与subjective junction边界；高复杂度concept超出固定画布stroke容量。 仅训练单套render scale/stroke width，variable constraints仍是未来工作。 生产中deploy为作者描述，未独立验收；没有public实现证据。 pass rate只测stroke-crowding，不等于concept、SVG拓扑、最终动画或embroidery可制造率。 Table2/3绝对率不一致，因此不引用该p-value为已核验证据。",
+    "whyRelevantZh": "约束随实际输出尺度定义、几何测量加语义例外和反reward-hacking设计可迁移到structured 2D与Embroidery奖励，但刺绣迁移尚未验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

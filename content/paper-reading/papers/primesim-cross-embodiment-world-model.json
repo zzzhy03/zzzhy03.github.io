@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2611.04870",
+  "slug": "primesim-cross-embodiment-world-model",
+  "title": "PrimeSim: A Generalist World Model Simulator from Large-Scale Cross-Embodiment Demonstrations",
+  "authors": [
+    "Travis Davies",
+    "Wentao Ma",
+    "Lihao Guo",
+    "Tengfei Ma",
+    "Xiaowen Chang",
+    "Jiafeng Xu",
+    "Shilong Wang",
+    "Yiqi Deng",
+    "Shaowen He",
+    "Xiaoqi Li",
+    "Qian Zhu",
+    "Ran Cheng",
+    "Hao Dong"
+  ],
+  "publishedAt": "2026-11-03",
+  "updatedAt": "2026-11-03",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.04870"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.RO"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "world model",
+    "cross-embodiment",
+    "hierarchical memory",
+    "self-rollout"
+  ],
+  "abstract": "A robot world model that serves as a simulator must do more than generate plausible videos: it must faithfully follow commanded actions, maintain consistency across camera views, and sustain coherent long-horizon rollouts. We present PrimeSim, an action-conditioned, multiview world model simulator that addresses these challenges through progressive midtraining and posttraining. Starting from a pretrained video generator, we midtrain on 30,110 hours of robot demonstrations spanning 22 platforms. To improve action following, we introduce a unified cross-embodiment action representation and frame-aligned dual-path conditioning to strengthen action-frame correspondence. To maintain multiview consistency, we develop view-aware interleaved attention with explicit camera identities, enabling cross-view information exchange while preserving view-specific representations. We further introduce a fast-video, slow-memory posttraining framework that transforms the bidirectional video generator into an efficient autoregressive simulator. By combining fast causal generation, self-rollout training, and hierarchical temporal memory, PrimeSim mitigates error accumulation from self-generated histories and supports coherent long-horizon simulation. PrimeSim runs at 10.1 FPS, remains stable over long-horizon rollouts on rigid and deformable manipulation tasks, and transfers to held-out platforms within 100 to 200 gradient steps where the pretrained backbone does not. Against five open-source action-conditioned world models it leads four of the five WorldSimProbe suites and posts the best overall EWMBench score, while fine-grained local calibration still trails the field; its rollouts are faithful enough to support GRPO-based policy optimization. We release the model weights, inference code, and training code.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.04870v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.04870v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.04870v1, 42 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. Implementation is promised; no working public implementation was confirmed.",
+    "ideaZh": "PrimeSim用统一动作、多视角attention和自生成history训练把Wan变成机器人视频simulator。作者报告LIBERO内RL成功率61.7%→73.2%；适合skim训练/记忆接口，但EWMBench6.09来自50步设置，10.1FPS来自另一4步设置，且尚无真机policy闭环证据。",
+    "motivationZh": "如何将固定窗口视频模型变为跟随机器人动作、跨view一致并能以自身history长期续写的simulator？",
+    "methodZh": "30,110小时22平台midtraining增加31维相对动作与camera tokens；posttraining依次causal adaptation、consistency distillation、asymmetric DMD和episode self-rollout，以global/slow/local KV保存初始场景、远期历史和近期运动。",
+    "methodFlow": [
+      "机器人轨迹统一31维相对动作与三camera输入",
+      "Wan midtraining学习frame-action binding与跨view信息",
+      "causal adaptation和四步consistency distillation",
+      "asymmetric DMD匹配bidirectional teacher",
+      "episode self-rollout与3+9+9层级KV续写",
+      "生成video供受限policy评估与RL"
+    ],
+    "experimentsZh": "WorldSimProbe LIBERO；EWMBench21个in-domain episodes/7tasks；long rollout10个RoboTwin held-out episodes610–1046frames；8个OpenVLA-OFT policies×300LIBERO initialstates。 作者报告WorldSimProbe mean66.6，赢4/5suite，local calibration70.2落后LingBot77.0。 (Table1,p.15) 作者报告EWMBench6.09为50-step、192×256；4-step288×384单A100 short-window10.12TempFPS/30.35ViewFPS，长continuous-KV7.63TempFPS。 (Tables2–3,pp.16–17;App.B,p.41) 作者报告LIBERO200步GRPO后61.7%→73.2%，八policy评估Pearson0.99且mean gap2.8分。 (Fig.9,Sec.4.4,p.22) WorldSimProbe五个actionworld模型；EWMBench含不同conditioning协议的已发表值；latency rows未匹配steps/resolution/horizon，只比较released recipe。 relative action、dual-path与camera conditioning多为单embodiment；21-slot hierarchical相对rolling平均PSNR18.709→19.519，但仍首尾下降6.008dB。",
+    "insightZh": "把多源机器人动作接口、三视图条件与学生自身history下的层级memory系统联训；主要是大规模适配与训练recipe整合，不是显式物理3D状态模型。",
+    "evidenceZh": "Episode continuation只用student自己产生history，teacher局部监督的re-encoded frame不反馈给student。 (Sec.3.3.4,pp.12–14); 质量、速度、long-horizon和policy实验的采样/分辨率不同，应分开阅读。 (Secs.4.1.2–4.1.3,pp.15–17;App.B,pp.40–42); policy transfer在LIBERO模拟器而非真实hardware，success由外部binary classifier提供。 (Sec.4.4,pp.21–23;Sec.6,p.27)",
+    "caveatZh": "大部分定量及全部closed-loop证据来自simulation，不证明真实hardware上的policy优化。 新平台需100–200gradientsteps自己的数据，不是zero-shot。 生成低分辨率，不能与高分辨率视频模型作like-for-like视觉比较。 EWMBench in-domain且finetuned，不能当泛化或与instruction-only模型等价比。 转移baseline同时缺action模块和robot corpus，无法隔离scale与interface的因果贡献。 binary success任意一帧通过即给reward，长期优化存在classifier exploitation风险；仅200steps不排除此问题。 公开repo当前只有README/LICENSE；摘要声称release不代表已取得可运行实现或weights。",
+    "whyRelevantZh": "作为重要action-conditioned world model保留；history分布匹配和camera状态接口可供动态生成参考，但尚未实证迁移到设计内容。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

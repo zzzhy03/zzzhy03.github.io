@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.04244",
+  "slug": "countersketch-physics-grounded-counterfactual-animation",
+  "title": "CounterSketch: Physics-Grounded Counterfactual Reasoning for Sketch-to-Video Generation",
+  "authors": [
+    "Hien Trinh",
+    "Tan-Hiep To",
+    "Dinh-Khoi Vo",
+    "Tam V. Nguyen",
+    "Minh-Triet Tran",
+    "Trung-Nghia Le"
+  ],
+  "publishedAt": "2026-11-03",
+  "updatedAt": "2026-11-03",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.04244"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "sketch animation",
+    "counterfactual reasoning",
+    "physical constraints",
+    "trajectory verification"
+  ],
+  "abstract": "Counterfactual sketch animation explores how a static sketch evolves under a hypothetical intervention. We present CounterSketch, a physics-grounded framework that transforms natural-language ``What if...?'' queries into physically plausible sketch animations. The framework integrates VLM-guided scene grounding, causal event-chain reasoning, constraint-based trajectory generation, and verification. It models physical transitions to update the scene graph, computes continuous object trajectories, and validates them against physical, geometric, and semantic constraints. The verified trajectories are then projected into object-level motion bounding boxes to guide downstream sketch-video synthesis. Experiments on CounterSketchBench (80 questions) demonstrate that physics-grounded trajectories provide stronger motion guidance than direct VLM predictions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.04244v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.04244v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.04244v1, 11 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. No public implementation was confirmed.",
+    "ideaZh": "CounterSketch把“What if”先变成vector scene graph和物理约束，再验证、修复轨迹后交给MoSketch。作者报告80题中T2V alignment由0.1729到0.2011；适合skim显式验证接口，但这些视频指标不能证明物理约束满足率。",
+    "motivationZh": "对草图提出What if干预后，如何把因果后果转换为可检查的对象运动，再交给视频合成？",
+    "methodZh": "VLM把stroke归属、对象几何和support/contact等关系ground到显式状态；干预更新事件链，以KKT约束动力学rollout，数值违规修参数、语义违规局部重规划，再投影成逐帧bbox引导sketch动画。",
+    "methodFlow": [
+      "vector sketch与反事实指令",
+      "ground objects/strokes和关系scene graph",
+      "干预传播为event chain和active constraints",
+      "约束动力学rollout并验证/局部repair",
+      "bbox trajectories指导MoSketch"
+    ],
+    "experimentsZh": "20个vector场景、80个反事实问题；Gemini 3.8 Flash基线在相同prompt、labels、frame budget与bbox格式下比较。 作者报告完整方法T2V=0.2011、S2V=0.9580、smoothness=0.9834、dynamic degree=0.7750。 (Table 3, p.8) 固定structured intervention但用VLM trajectory时T2V=0.1729、dynamic degree=0.7250。 (Table 3, p.8) 只给两个上游VLM消融；没有与多种完整counterfactual方法或物理模拟ground truth的量化对比。 支持scene干预和physics rollout在当前renderer下改善alignment/motion；未隔离verifier、repair预算或constraint各项。",
+    "insightZh": "将反事实引起的约束集合变化放在视觉合成之前，并以可检查轨迹连接因果推理和renderer；不是新的video backbone。",
+    "evidenceZh": "物理层使用对象关系与向量stroke支持干预。 (Sec.4.1–4.2, pp.5–6; Fig.3); 几何/物理违规局部修复，语义违规replan，只有违规减少才接受更新。 (Sec.4.3–4.4, pp.6–7; Fig.5); 三配置固定MoSketch renderer，只改变scene modification和trajectory来源。 (Sec.5.2, Table 3, p.8)",
+    "caveatZh": "依赖可靠sketch grounding；mass/friction/elasticity难从草图估计。 复杂交互增加reasoning成本，实际结果受video generator conditioning限制。 VBench alignment和dynamic degree不是物理正确率；80题中初速度类仅2题。 无runtime、失败率、repair迭代统计或非刚体证据；不外推普适物理设计。",
+    "whyRelevantZh": "对设计agent的显式状态、constraint verification和局部重规划接口有直接价值。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

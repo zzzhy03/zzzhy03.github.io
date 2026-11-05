@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.05874",
+  "slug": "feature-puzzles-single-image-multiview-segmentation",
+  "title": "Feature Puzzles: Single-Image Supervision for Multi-View 3D-Aware Segmentation",
+  "authors": [
+    "Jiahao Ma",
+    "Qiang Zhang",
+    "Miaomiao Liu",
+    "David Ahmedt-Aristizabal",
+    "Chuong Nguyen"
+  ],
+  "publishedAt": "2026-11-04",
+  "updatedAt": "2026-11-04",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.05874"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "keywords": [
+    "3D segmentation",
+    "single-image supervision",
+    "cross-view consistency",
+    "promptable masks"
+  ],
+  "abstract": "Humans can easily recognize the same objects across different viewpoints of a 3D scene, whereas teaching models such multi-view-consistent perception typically requires videos or calibrated multi-view captures, which are considerably more expensive and less diverse than large-scale monocular data.~In this paper, we introduce Feature Puzzles, a novel framework for learning multi-view-consistent segmentation using only single-image semantic segmentation supervision. Specifically, we propose a simple yet effective pipeline that constructs multi-view-consistent segmentation pseudo-labels through image cropping and geometric transformations. We further introduce a lightweight, plug-and-play network that leverages the multi-view-consistent image features learned by existing pretrained 3D foundation models and the generated pseudo-labels to perform multi-view-consistent segmentation. Importantly, our flexible framework supports various types of prompts provided from one or multiple views and can be readily extended to open-vocabulary 3D segmentation. Under this single-image supervision, our feed-forward model achieves the best mIoU on NVOS, remains competitive on SPIn-NeRF and ScanNet++ against baselines using per-scene optimization or in-domain multi-view training, and demonstrates zero-shot transfer to open-vocabulary 3D segmentation. Visual comparisons are available on our project page: https://featurepuzzles.github.io/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.05874v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.05874v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.05874v1, 21 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. Implementation is promised; no working public implementation was confirmed.",
+    "ideaZh": "Feature Puzzles把同一parent的mask/DINO field用已知crop映射传到多视图，再借预训练3D backbone传播语义。作者报告NVOS mIoU93.2%，但open-vocab主表用了GT geometry，248-view precision降到22.8%；要深读单图监督的边界，而非声称单图学出了3D。",
+    "motivationZh": "能否用已有单图mask和teacher features，为预训练3D表示补上跨view一致语义，而不收集多view语义标注？",
+    "methodZh": "overlapping crops共享parent labels，late-block LoRA和多层features为promptable mask与dense feature两head提供输入；真实多视图3D先验来自VGGT-Ω，semantic finetuning不需真实多视图标注。",
+    "methodFlow": [
+      "parent image一次生成mask/DINO teacher field",
+      "overlap crops pull-back一致监督",
+      "冻结早期3D backbone并适配late-block LoRA",
+      "cross-view prompt mask与dense feature heads",
+      "geometry lifting与Talk2DINO分类或输出多view masks"
+    ],
+    "experimentsZh": "SA-1B task-specific mask/DINO supervision；NVOS、SPIn-NeRF、ScanNet++、nuScenes-mini；OV benchmark 11 ScanNet/4ScanNet++ scenes，0.02m voxel。 作者报告NVOS93.2mIoU，SPIn88.5落后MV-SAM92.9；ScanNet++63.60落后in-domain IGGT73.02。 (Tables 1–2, pp.7–8) 作者报告zero-shot ScanNet20070class mIoU13.79；in-domain闭集finetune47.79不能作为zero-shot。 (Table 3, p.8) 作者报告40→248views precision78.3→22.8；248frames32.11GB/16.68s。 (Fig.4, pp.8–9) 含per-scene3DGS/NeRF、SAM2/MV-SAM、IGGT与EmbodiedSplat；训练域和几何输入不完全同口径，不能只比总体最佳。 2500step短预算下LoRA和overlap curriculum影响较大，warp/consistency损失影响较小；No-Puzzles同时关跨view模块，有组合混杂，另给independent-view control。",
+    "insightZh": "已知shared-parent映射让语义监督一致，而非逐view独立teacher；N-view joint prediction区别于pairwise匹配。对照显示LoRA、featurefusion更重要，辅助consistency loss增益很小。",
+    "evidenceZh": "3D consistency继承预训练backbone；affine crops无parallax/disocclusion。 (Secs.1/3.2, pp.2–4; App.A.3, p.16); open-vocabulary精度在GT geometry下lift；speed为模型自身重建加semantics，两个口径不同。 (Sec.4.3, pp.7–8); 长view memory可承受不代表perception可靠，precision随view大幅下降。 (Fig.4, pp.8–9)",
+    "caveatZh": "长view absent-object false positives导致perceptual scalability受限。 affine crop exactness仅是合成监督一致，非真实3D correspondence；closed-set需与zero-shot分开。 GT geometry semantic结果不能当端到端reconstruction+segmentation精度。 point/box/mask已知prompt与long-range visibility评测不同；nuScenes低mIoU不能只用高SR宣传。 repo目前只有README，公开实现尚未提供。",
+    "whyRelevantZh": "直接命中promptable/open-vocabulary 3D segmentation；shared-parent field构造对part representation训练有具体参考价值。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

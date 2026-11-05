@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2611.05280",
+  "slug": "yanami-stateful-multimodal-interaction",
+  "title": "YANAMI: A Large-Scale Multimodal Dataset and Benchmark for Multiturn Stateful Interaction",
+  "authors": [
+    "Shengyu Wang",
+    "Tengyue Nong",
+    "Junming Liu",
+    "Haosong Peng",
+    "Siyu Li",
+    "Ruiqi Lei",
+    "Fushuo Huo",
+    "Yuhao Pan",
+    "Yunfeng Fan",
+    "Ding Wang",
+    "Nan Cheng",
+    "Haozhao Wang",
+    "Wenchao Xu"
+  ],
+  "publishedAt": "2026-11-03",
+  "updatedAt": "2026-11-03",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.05280"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "multimodal dialogue",
+    "stateful interaction",
+    "constraint keeping",
+    "visual realization"
+  ],
+  "abstract": "Unified Multimodal Models (UMMs) integrate visual understanding, generation, and editing within a single unified framework. However, existing unified multimodal datasets and benchmarks remain dominated by single-turn tasks. Even in recent multi-turn datasets, many turns can be solved independently without tracking information across turns. Consequently, they provide limited supervision and evaluation for multimodal stateful interaction, which requires models to understand, maintain, update, and faithfully realize evolving dialogue states across turns. To address this gap, we introduce YANAMI, the first large-scale multimodal dialogue dataset and benchmark for stateful interaction, comprising YANAMI-400K and YANAMI-Bench. YANAMI-400K contains 400K multi-turn multimodal dialogues, with more than 2M images and 2.6M dialogue turns. The dialogues span four representative scenarios: Multi-Image Fusion, Image Editing, World Modeling, and Visual Reasoning, and require models to continuously track, preserve, and revise evolving multimodal dialogue states across turns. YANAMI-Bench comprises 400 multi-turn dialogues for systematically evaluating multimodal stateful interaction. It jointly evaluates Dialogue State Understanding and Visual Realization, characterizing the gap between models' ability to understand evolving dialogue states and their ability to faithfully realize them in visual outputs. Experiments show that fine-tuning BAGEL on YANAMI-400K improves image editing, generation, and multimodal stateful interaction by 10.3%, 2.0%, and 13.23%, respectively, while preserving its general visual understanding capabilities. Evaluations on YANAMI-Bench further reveal that existing UMMs still struggle to maintain, update, and visually realize evolving multimodal dialogue states.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.05280v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.05280v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.05280v1, 35 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. Implementation is promised; no working public implementation was confirmed.",
+    "ideaZh": "YANAMI把“理解当前设计状态”和“图像真正实现该状态”分开，提供400K多轮监督与atomic checks。作者报告BAGEL主表65.02→78.25（+13.23分），但主协议用GT-History、不同模型类别聚合权重不同，不能当作真实self-rollout的统一总榜。",
+    "motivationZh": "如何区分多轮视觉交互中当前状态理解正确与图像真正落实了历史约束及用户更正？",
+    "methodZh": "从公开视觉材料构造fusion/editing/world/reasoning对话，显式加入reference、history、constraints和corrections；自动repair后形成训练集，400条benchmark逐项人工核对，以DSU、state consistency和visual quality诊断。",
+    "methodFlow": [
+      "筛选公开视觉材料与四类scenario pools",
+      "生成带跨轮依赖的对话和图像",
+      "逻辑/图文自动校验并repair",
+      "人工核对benchmark及atomic requirements",
+      "SFT BAGEL并分开评估state理解与visual实现"
+    ],
+    "experimentsZh": "402639dialogues/2047236images；400 benchmark dialogues、1600理解题、8467atomicchecks；fine-tune一个BAGEL-7B-MoT，VAE冻结，joint CE/MSE。 作者报告BAGEL总分65.02→78.25、DSU81.44→95.69，均为0–100分的绝对提升。 (Tables2–3, pp.7–8) 作者报告GenEval0.73→0.75，GEdit6.52→7.19；理解MME-P1647.9→1616.9并非所有能力提升。 (Tables4–5,p.9) 作者报告Self-History使base BAGEL/Qwen-Edit相对GT-History下降5.16/3.77分。 (Sec.4.1,Fig.6c,p.8) 15个模型按能力和input格式比较；有image-grid/native multiinput差异，缺失outputs不计0；proprietary与UMMaggregate不同权重。 主要是单BAGEL数据finetune和GT/Self-history诊断，未隔离六能力/四scenario规模；claim数据质量与训练收益不构成因果组件消融。",
+    "insightZh": "提供明确状态失效/更正、持久constraints的规模化监督，并用理解正确的共同子集测realization gap；不是新UMM架构或设计工具agent。",
+    "evidenceZh": "主协议以正确历史图替换先前模型输出来隔离上下文理解。 (Sec.4.1, p.7; App.B.4, p.20); UMM用DSU/SC/VQ 4:4:2，无理解模型用SC/VQ 6:4，aggregate不可直接等价。 (App.B.3, p.20); 共同理解正确子集仅77 constraint/66 correction对话；比较条件gap而非全量成功率。 (App.B.6, pp.21–22; Table21,p.28)",
+    "caveatZh": "当前四scenario/六capability有限，更长互动、语言/模态、不同UMM和interactive studies仍待扩展。 只用image SHA排除exact duplicates，不排除近重复与语义重叠。 主分数GT-History，不能声称减少真实长链累积错误；文本history保持固定。 跨类别weighted totals不同，且policy-rejected/缺失输出被排除，跨模型排名须看分项。 用judge与human相关性>0.80不等于所有atomicchecks准确；公开数据/code仅承诺发布。",
+    "whyRelevantZh": "数据与状态检查可直接迁移视觉设计agent的跨轮约束管理；实际tool-use和agent闭环迁移仍需单独实验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "id": "arxiv:2611.04916",
+  "slug": "kling-multimodal-understanding-behind-video-generation",
+  "title": "Behind Video Generation: Observations and Insights on Multimodal Understanding from Kling",
+  "authors": [
+    "Kling Team",
+    "Dong Chen",
+    "Jialu Chen",
+    "Xinlong Chen",
+    "Yifan Dai",
+    "Haotian Dong",
+    "Binzong Geng",
+    "Yushuo Guan",
+    "Minghui Guo",
+    "Guanlin He",
+    "Guanxiao He",
+    "Jingyun Hua",
+    "Yanwei Huang",
+    "Yiyan Ji",
+    "Xueping Jia",
+    "Yizhuo Jia",
+    "Bozhou Li",
+    "Jiaze Li",
+    "Min Li",
+    "Shihao Li",
+    "Shujie Li",
+    "Shengyi Liao",
+    "Weihong Lin",
+    "Shiyuan Liu",
+    "Xinyu Liu",
+    "Siyang Mao",
+    "Xiaoru Qu",
+    "Dianmo Sheng",
+    "Yang Shi",
+    "Jiafu Tang",
+    "Longxiang Tang",
+    "Yuqi Tang",
+    "Chengzhuo Tong",
+    "Kuo Wang",
+    "Qixun Wang",
+    "Rui Wang",
+    "Tianduo Wang",
+    "Yuran Wang",
+    "Zekun Wang",
+    "Zihao Wang",
+    "Boyang Xia",
+    "Yifan Xu",
+    "Liu Yang",
+    "Zhenlong Yuan",
+    "Bohan Zeng",
+    "Mujin Zhang",
+    "Yuanxing Zhang",
+    "Zhicheng Zhang",
+    "Zhuoran Zhang",
+    "Yuanhong Zheng",
+    "Kun Gai",
+    "Chengru Song",
+    "Pengfei Wan"
+  ],
+  "publishedAt": "2026-11-03",
+  "updatedAt": "2026-11-03",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.04916"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Kling",
+    "reference grounding",
+    "captioning",
+    "reward models"
+  ],
+  "abstract": "Video generation has progressed from isolated clips to coherent short-form audiovisual sequences, and the bottleneck is shifting from rendering to semantic control. This report summarizes the observations and insights on multimodal understanding gained from successive generations of Kling. We argue that generation quality is the projection of multimodal understanding through the entire data--conditioning--alignment--evaluation chain, and we examine this chain module by module. Kling-MLLM, a shared multimodal foundation model that unifies image, video, audio, synchronized audio--video, and interleaved inputs, is specialized for each downstream module. Because a DiT is trained on far fewer training samples than a language model, we treat captioning as a semantic contract that maximizes description density, and extend it to reference-grounded captioning that makes reference bindings explicit. Prompt enhancement translates user intent into this caption distribution: basic PE is derived from captions of compelling videos and refined with text-level and generator-in-the-loop reinforcement learning, while agentic PE refines the story and retrieves compelling examples. We show that a reliable text encoder comes from perceptual training rather than from stronger language ability, and that candidates can be screened from text alone before end-to-end training. Reward modeling pairs a general reward model for explainable, localized critiques with a decision reward model for fast multidimensional scoring, treating perceptual bandwidth as a first-class design parameter. Finally, we review task-specific automatic evaluation, focusing on protocols that expose scoring shortcuts and help trace failures to their upstream source. We hope these lessons offer practical guidance for building the understanding stack behind controllable video generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.04916v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.04916v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.04916v1, 38 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. No public implementation was confirmed.",
+    "ideaZh": "Kling报告把caption、reference authority、prompt enhancement、text encoder与reward连接成可检查的语义链。适合skim其“哪些属性由哪个reference决定”和低延迟judge接口；作者表中DRM并未赢遍所有public benchmark，内部累计实验也不能当作完整生产系统的可复现因果证明。",
+    "motivationZh": "视频生成中的语义控制失败如何从caption、reference绑定、condition、reward和evaluation逐层定位？",
+    "methodZh": "共享Kling-MLLM支持多模态输入与显式时间戳，再专门训练captioner/RGC；basic PE写caption dialect，agentic PE修故事和检索；perception-tuned多层TE与GRM/DRM承担生成条件和优化信号。",
+    "methodFlow": [
+      "多模态数据与timestamps进入共享Kling-MLLM",
+      "caption/RGC明确实体、属性、时段和reference authority",
+      "PE分离story decisions与caption表达",
+      "感知适配TE形成稳定多层condition",
+      "GRM定位问题、DRM批量prefill评分并按task独立验收"
+    ],
+    "experimentsZh": "Kling-MLLM27B/35B-A3B/397B-A17B；公开与内部understanding/caption/RGC评测；PE用固定generator/sampler/seed policy的累计配置，TE用内部GSB对比。 作者报告PE text-RL后StoryEval75.58，DiT-loop76.46；Top5 retrieval后77.72，但faithfulness avg4.41→4.36、T2AV76.03→75.68。 (Table13,p.24) 作者报告DRM内部macro77.86、VideoScore52.00；VideoPhy2=44.23低于Gemini47.80，VideoGenReward57.33低于VideoReward59.69。 (Tables17–18,p.31) 作者报告TE最终GSB比率overall1.27，此为(G+S)/(S+B)，不是win rate或27%绝对质量提升。 (Table14,p.27) 组件各有不同benchmarks与内部数据；有些公开model分数为内部评估/官方报告成对，需分清；无全pipeline matched end-to-end ablation。 PE与TE多行为累计配置且对同一baseline；没有将caption密度、reference格式、data量、reward各项完全正交隔离。",
+    "insightZh": "价值是大系统中semantic interfaces的明确分工、scope binding和prefill decision readout；这是技术经验报告与组件证据，不是新DiT生成架构。",
+    "evidenceZh": "reference应明确entity、attribute和time scope，text仅补reference不能提供的residual facts。 (Secs.4.1–4.5,pp.15–18); PE累计消融显示检索提高vividness同时可降低faithfulness和部分video分数。 (Table13,p.24); DRM把答案槽固定在prefix并随机选项/field次序，以single prefill支持多维pointwise/pairwise。 (Sec.7.2,Fig.7,pp.29–30); Table18不支持正文所有public benchmark均领先的概括。 (Table18 and Sec7.3,p.31)",
+    "caveatZh": "longvideo context预算、referential consistency、audio alignment仍开放。 DiT-loop reward偏保守会降低创造性上限；agent工具/previsualization/闭环revision为ongoing而非已验证模块。 大部分production data和protocol未公开，不能独立确认全部收益或训练规模。 Table18与泛化SOTA表述不一致，必须按具体列报告。 DRM无漏检不等于prefill独立机制自动保证；论文未完整量化latency/low-margingate开销。",
+    "whyRelevantZh": "reference绑定和独立atomic verification可借鉴visual design agent条件接口；本记录不把ongoing 3D previsualization当成已验证设计系统。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

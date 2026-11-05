@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2611.06849",
+  "slug": "trainspotting-found-photos-object-centric-reconstruction",
+  "title": "Trainspotting: Learning Object-Centric 3D Reconstruction from Found Photos",
+  "authors": [
+    "Hanyu Chen",
+    "Noah Snavely"
+  ],
+  "publishedAt": "2026-11-04",
+  "updatedAt": "2026-11-04",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.06849"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "found photos",
+    "object-centric reconstruction",
+    "capture variation",
+    "pseudo-ground truth"
+  ],
+  "abstract": "State-of-the-art feedforward reconstruction models perform poorly on in-the-wild object-centric photo collections. They are trained largely on single-session object captures whose images vary in viewpoint while the object and its environment remain nearly fixed. Public photo archives contain a different form of multi-view data. They hold found photos of the same object or design: photos taken independently by many people across years, environments, cameras, and sometimes physical units. In this work, we introduce Trainspotting, a dataset of 12,068 objects and 311,886 photos from Wikimedia Commons. We reconstruct each object to recover camera poses, multi-view stereo depth, and object masks. We categorize the objects into three regimes: objects fixed at one site, objects that move between sites, and designs shared by many physical units. Evaluating recent feedforward reconstruction models on Trainspotting shows that they fail most severely in the last two regimes. Fine-tuning VGGT-$Ω$ on Trainspotting significantly improves camera pose, depth, and 3D geometry on held-out objects. We observe similar improvements on the independent NAVI in-the-wild benchmark, which contains photos of each object in different environments. Performance on conventional benchmarks remains largely unchanged.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.06849v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.06849v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.06849v1, 19 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. No public implementation was confirmed.",
+    "ideaZh": "Trainspotting把多年、跨环境乃至同设计不同实例的网络照片变成对象级重建监督。作者报告SPOTTER在独立NAVI-wild上pose AUC@30由18.8到76.0；重点是capture variation而非新架构，pseudo-GT与实例混合不能当作单件物体的精密真值。",
+    "motivationZh": "现有重建模型为什么无法把跨环境、跨年代和同设计不同实例的网络照片注册成一致对象？",
+    "methodZh": "SAM3先gate对象照片，RoMa v2匹配经cycle/epipolar检查形成COLMAP tracks，再用CasDiffMVS和MoGe-2校核depth及mask；以12,068对象/311,886图fine-tune VGGT-Ω，并15% replay旧数据。",
+    "methodFlow": [
+      "Commons类别归并与SAM3对象gate",
+      "retrieval + RoMa v2 + 几何验证",
+      "COLMAP与MVS/monocular depth检查",
+      "按对象划分训练/测试并微调VGGT-Ω",
+      "输出camera、depth、point maps和可选object masks"
+    ],
+    "experimentsZh": "11068训练对象、1000 held-out对象；1635组4/16-view本域样本，外域每scene同8 views，NAVI-wild 35 objects；相似对齐加ICP。 作者报告本域AUC@30 25.0→81.2，depth AbsRel 0.201→0.071。 (Table 3, p.7) 作者报告NAVI-wild AUC@30 18.8→76.0，completeness 20.4→1.9mm，但accuracy 3.1→3.2mm。 (Tables 5–6, p.8) 比较VGGT、π3、DA3、MapAnything、VGGT-Ω；外部NAVI是独立scan truth，其他常规benchmark仅小幅变化。 固定训练recipe的regime子集显示roaming/pooled较fixed泛化更强；20%随机子集接近全量，支持数据类型比纯规模更关键。",
+    "insightZh": "新意在跨环境与跨实例对象数据的系统构造及训练分布；保留现有VGGT backbone，独立NAVI与regime消融给出超过同源pseudo-GT的支持。",
+    "evidenceZh": "分类区分fixed、roaming、instance-pooled；pool允许共享形状但paint/trim不同的物理单元。 (Sec.3, pp.4–5); 置信度/cycle/epipolar匹配、MVS加monocular检查固定pseudo-GT生产流程。 (Sec.4, Fig.4, pp.4–5); NAVI-wild独立几何显示pose和completeness提升，而accuracy没有同步领先。 (Tables 5–6, p.8)",
+    "caveatZh": "长焦深度/焦距歧义、close-up定位、对称doppelganger和OOD对象仍失败。 本域GT来自自动重建pipeline，筛选掉难以注册照片后仍有选择偏差。 instance-pooled的对象不是特定物理实例，不能保证尺寸、细节或装配准确。 相似对齐可能把失败预测缩小而掩盖accuracy错误，应连同completeness与camera读。 未确认公开实现；发布数据和实现须区分。",
+    "whyRelevantZh": "可借鉴对象资产获取与3D生成先验数据构造；没有直接验证3D generation指标。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

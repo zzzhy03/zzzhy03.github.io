@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.06796",
+  "slug": "va-tdm-velocity-adversarial-distillation",
+  "title": "VA-TDM: A Unified View for Improving Few-Step Diffusion Models by Velocity Adversarial Distillation",
+  "authors": [
+    "Yihong Luo",
+    "Tianyu Pang",
+    "Tianyang Hu"
+  ],
+  "publishedAt": "2026-11-04",
+  "updatedAt": "2026-11-04",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.06796"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "velocity distillation",
+    "few-step diffusion",
+    "conditional moments",
+    "transition-aware field"
+  ],
+  "abstract": "Few-step distillation offers efficient generation with diffusion and flow models, but preserving quality with only a few sampling steps remains challenging. Distribution-matching methods via score distillation provide a strong foundation, yet they rely on accurately tracking the student's changing distribution. At intermediate generation steps in few-step sampling, student-score estimation can be difficult, and commonly used estimators may describe a different distribution from the one used to update the student. Flow matching allows a more flexible approach to supervision through velocity fields constructed from the student's sampling process. Building on this perspective, we introduce Velocity Adversarial Distillation (VAD), which uses a learned critic to compare student and teacher fields and turn their disagreement into feedback for learning. VAD unifies score distillation, Fisher-based matching, and moment matching, also explaining existing heuristic MMD updates and delivering new training objectives. We further develop VA-TDM, which follows trajectory distribution matching: providing supervision for partial denoising along the student trajectory. Beyond this, VA-TDM combines transition-aware online velocity learning and dual-form VAD supervision across intermediate student transitions. Extensive results show that VA-TDM is powerful for learning few-step generators, achieving state-of-the-art four-step performance in both text-to-image and text-to-video generation across various backbones and scaling effectively to 33B MiniMax-H3. In particular, our VA-TDM-H3 notably outperforms the few-step Fast-H3 and is closer to the original many-step H3 according to human preference.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.06796v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.06796v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Luo-Yihong/VA-TDM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.06796v1, 24 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. Public implementation entry was checked.",
+    "ideaZh": "VA-TDM用A-form conditional moment和B-form distribution velocity双监督蒸馏四步模型，值得skim其“匹配什么field、如何回传gradient”的拆分。作者报告SD3.5 GenEval0.61→0.67；精确梯度理论有exact-field条件，实用算法detach critic，视频偏好只采10个prompt。",
+    "motivationZh": "few-step学生中间transition的实际分布与online score估计不匹配时，怎样定义更正确且可学习的蒸馏信号？",
+    "methodZh": "从学生实际中间transition再扰动的分布构造两类velocity，shared auxiliary backbone估计fields并以transition id区分；ODE warm-up后混合path/flow-product更新及regularization-corrected critic。",
+    "methodFlow": [
+      "student rollout产生intermediate transition",
+      "构造A/B conditional velocity targets",
+      "transition-aware共享online fields拟合",
+      "teacher residual critic提供双form更新",
+      "四步student完成图像/视频采样"
+    ],
+    "experimentsZh": "SD3.5-Medium、FLUX.2 klein4B、MiniMax-H3 33B；图像GenEval/OCR/DrawBench质量偏好与LPIPS；匿名音视频pairwise study随机10prompts。 作者报告SD3.5对TDM GenEval0.61→0.67，OCR0.57→0.59，LPIPS0.57→0.58。 (Table 1, p.10) 作者报告FLUX对官方4step GenEval0.78→0.80、OCR0.64→0.69，但PickScore0.8746→0.8694。 (Table 1, p.10) 作者报告对Fast-H3偏好61.33%，对100NFE teacher偏好45.53%；样本为10prompt且未列参与者数/CI。 (Fig.2, p.2; App.C.2, p.21) 多种few-step baselines且teacher CFG两设置；视频仅human preference与选帧，没有大规模统一视频benchmark。 SD3.5的A/B、shared backbone、transition-aware及累加mix/regularization/correction消融；最后几行是cumulative设置，未完全正交隔离。",
+    "insightZh": "统一moment、reverse-KL、Fisher等更新约定，指出clean-anchor和path-marginal score可不相同；实践使用detached/learned critics，不能等同理论exact local gradient。",
+    "evidenceZh": "A-form只匹配条件一阶矩；B-form在exact teacher等条件下等价扰动分布匹配。 (Theorem 5, p.7; App.A.4, pp.18–20); 非detached critic实验不稳定，因此实际mix停止critic整个output梯度。 (Sec.3.3, Fig.3, pp.7–9); 同4NFE比较跨SD3.5与FLUX，部分指标存在trade-off。 (Table 1, p.10)",
+    "caveatZh": "Nash存在性依赖realizability和unrestricted L2 critic，不证明训练收敛。 exact FP gradient保留input derivatives；practical detached critic不享有同一精确保证。 4NFE不是实测端到端25倍速度；视频10prompt样本和未报告人次限制偏好推断。",
+    "whyRelevantZh": "广域生成雷达的训练目标统一与可扩展few-step distillation值得保留为方法参考；不声称已验证主线设计收益。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

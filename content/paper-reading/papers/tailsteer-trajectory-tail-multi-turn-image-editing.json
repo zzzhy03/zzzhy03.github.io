@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.06741",
+  "slug": "tailsteer-trajectory-tail-multi-turn-image-editing",
+  "title": "TailSteer: Trajectory-Tail Steering for Drift-Resistant Multi-turn Image Editing",
+  "authors": [
+    "Ruikang Li",
+    "Zixuan Chen",
+    "Jiarui Wu",
+    "Mingde Yao",
+    "Yiyuan Zhang",
+    "Yujin Wang",
+    "Hanming Deng",
+    "Lewei Lu",
+    "Tianfan Xue"
+  ],
+  "publishedAt": "2026-11-04",
+  "updatedAt": "2026-11-04",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.06741"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "multi-turn editing",
+    "preservation",
+    "on-policy rollout",
+    "trajectory tail"
+  ],
+  "abstract": "Strong single-turn editing performance does not guarantee reliable multi-turn interaction: as edited outputs are repeatedly reused, small unintended changes can accumulate into severe visual drift. This long-term drift is often mitigated through training on multi-turn data or cross-turn rollouts, potentially altering pretrained priors, or through specialized inference-time mechanisms that are difficult to scale to foundation models. We introduce TailSteer, a final-stage training framework that improves multi-turn robustness while retaining the generative and editing capabilities acquired through earlier training. TailSteer follows a simple principle: keep early denoising dynamics close to those of the base model and concentrate preservation corrections near the trajectory tail, where fine-grained deviations can be suppressed. These corrections are learned from the editor's own on-policy denoising rollouts, using unchanged source content as a preservation reference without requiring curated ground-truth editing pairs. Experiments across the FLUX, SenseNova, and Qwen families show that TailSteer substantially reduces cumulative drift over 15-20 editing turns while largely preserving base-model performance on extensive text-to-image and single-image editing benchmarks. These results demonstrate that long-horizon editing robustness can be unlocked in foundation models after TailSteer, rather than by relearning their existing capabilities.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.06741v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.06741v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.06741v1, 16 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. No public implementation was confirmed.",
+    "ideaZh": "TailSteer在模型自身rollout上保留早期velocity、只在去噪尾段逐渐拉向源图preservation target。作者报告Klein的10轮outside-box PSNR 13.85→19.96，但COA仅31.84%、5轮编辑成功率40→33；适合深读漂移与改图能力的显式权衡。",
+    "motivationZh": "同一编辑器不断复用上一轮输出时，如何抑制非目标区域漂移，同时保留真正执行修改的能力？",
+    "methodZh": "用identity/local-edit rollout构造源图保留区与base edit拼接endpoint；从cache anchor进行on-policy短rollout，早期匹配base，尾部blend endpoint-directed velocity。训练后单一refined模型执行全trajectory，无推理mask或模型切换。",
+    "methodFlow": [
+      "生成并过滤identity/local-edit trajectories",
+      "source与base edit拼接preservation-aware endpoint",
+      "从cache anchor采样当前模型rollout状态",
+      "早期match base、尾段blend preservation velocity",
+      "单一refined editor执行多轮编辑"
+    ],
+    "experimentsZh": "四个backbone跨FLUX、SenseNova、Qwen；11947候选sourceimages，2000updates；Add & Preserve为100自然图的10轮固定框add/remove。 作者报告Klein onset46的PSNR@10 13.85→19.96、COA 31.02→31.84；MSE SR@5 40→33，EdiVal IF 32.69→30.24。 (Table 2, p.10) 作者报告SenseNova onset42的COA94.93→94.78且PSNR11.23→18.22，展示不同base的trade-off差异。 (Table 2, p.10) 比较MTC、VINCIE、FreqEdit、VAE-LFA、ConsLoRA和商业API；proprietary高COA不能被单独outside-box PSNR超越解读为整体胜出。 相同cached data对比SFT、tail-only、last-step和off-policy；on-policy主要保编辑能力，数据规模/类型及latent-feedback为补充控制。",
+    "insightZh": "不是跨轮memory或额外推理约束，而是在保留base dynamics的训练目标下对trajectory tail做on-policy校正。",
+    "evidenceZh": "mask来自source/base变化，目标保留base选中的edit realization。 (Sec.3.1, Eq.1, p.5); prior/transition区使用不同anchor并在当前state重新计算velocity target。 (Sec.3.3, Fig.5, pp.6–7); 更好的outside-box preservation未对应所有多轮instruction-following提升。 (Tables 1–2, p.10)",
+    "caveatZh": "残留VAE反复reconstruction漂移可由latent feedback进一步缓解。 100图框内增删是受控preservation测试，不代表15–20轮自由语义编辑的全面成功。 onset影响edit/preservation权衡；headline qualitative的设置未必是MSE最佳。 缺少随机seed置信区间和明确独立limitations节，不将largely preserve写成无损。",
+    "whyRelevantZh": "直接针对视觉设计agent反复修改时非目标内容漂移；作为模型训练机制借鉴，不将其视为已经验证agent端到端收益。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

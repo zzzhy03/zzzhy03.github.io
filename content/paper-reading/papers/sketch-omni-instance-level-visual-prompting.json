@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.04262",
+  "slug": "sketch-omni-instance-level-visual-prompting",
+  "title": "Sketch-Omni: Instance-Level Sketch-Based Visual Prompting for Perception MLLMs",
+  "authors": [
+    "Dongyu Wang",
+    "Dar-Yen Chen",
+    "Zhiming Hong",
+    "Arkaprabha Basu",
+    "Yi-Zhe Song"
+  ],
+  "publishedAt": "2026-11-03",
+  "updatedAt": "2026-11-03",
+  "collectedAt": "2026-11-06",
+  "venue": "arXiv v1",
+  "identifiers": {
+    "arxiv": "2611.04262"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "keywords": [
+    "sketch prompting",
+    "instance grounding",
+    "relation alignment",
+    "coordinate tokens"
+  ],
+  "abstract": "Promptable perception, from GroundingDINO to Rex-Omni, puts one model behind one prompt interface and returns coordinates for any localisation task. Every model in that line was built for photographs; none has been given a sketch. We present Sketch-Omni, to our knowledge the first perception MLLM built to work on sketches and from them. On a sketch, the sketch is the image, and text prompts detect, point, resolve object and spatial referring expressions, and ground affordances in it. From a sketch, the sketch is the prompt, and a drawing of one object localises that object in a photograph, even among several of the same category, a query that neither a category name nor a photo exemplar can pose. Two obstacles stand in the way. A photo-trained model's attention is tuned to colour and texture, which a sketch does not have, and no dataset pairs a drawing with the one instance it depicts among others of its kind. We build the training data instead of collecting it. An edge detector turns every labelled photograph into a sketch-like drawing that keeps the photograph's labels, and two constructions produce sketch-to-photo instance pairs from existing data. On top of this, photo-guided relation alignment passes each photograph and its edge sketch through the same model and trains the sketch pass to reproduce how the photograph pass relates phrases to patches and patches to each other. Not one training label is drawn by hand. Sketch-Omni reaches 91.4 F1 on sketch-prompted localisation against 81.8 for the strongest general-purpose MLLM, with a lead that doubles when the photograph holds several instances of the queried category, and it is best in 39 of 40 evaluation cells across six tasks. Code, model, and a hand-annotated benchmark of 2754 sketch-to-photo links will be released.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.04262v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.04262v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Full-text review of exact version 2611.04262v1, 19 pages, with visual inspection of key pages. All numerical results are author-reported and were not reproduced here. Implementation is promised; no working public implementation was confirmed.",
+    "ideaZh": "Sketch-Omni把photo与edge sketch的token关系对齐，并用合成同类干扰canvas训练“用一张草图指认这个实例”。作者报告FS-COCO F1@0.5为91.4；适合skim草图作为design query的接口，但输出是boxes/points，不是stroke分解或可编辑矢量结构。",
+    "motivationZh": "如何让感知MLLM理解稀疏草图，并用一张草图在照片的同类物体中指认特定实例？",
+    "methodZh": "在冻结Rex-Omni/Qwen2.5-VL-3B上交替训练sketch-native感知与两图instance prompting，photo path关闭LoRA、sketch path适配；NTP配合cross/intra relation losses后再统一GRPO。",
+    "methodFlow": [
+      "labelled photo经HED产生pixel-aligned sketch",
+      "photo frozen path提供token relation targets",
+      "合成同类干扰canvas和edge crop instance queries",
+      "交替NTP/alignment与GRPO训练LoRA",
+      "以统一coordinate tokens输出sketch定位"
+    ],
+    "experimentsZh": "2754 FS-COCO queries、1340 SketchyCOCO；实例区分hard subset为302 FS-COCO和651 SketchyCOCO queries；32H100一天SFT加8hGRPO。 作者报告FS-COCO91.4F1对Qwen3-VL81.8；Hard80.3对63.1。 (Tables1–2,p.7) 作者报告不加alignment的FS-COCO F1为88.6，表明大部分收益来自监督与训练recipe。 (Table1,p.7) 作者报告free-hand detection F1@0.9为65.7，但HED-COCO pointing44.5低于Qwen3-VL47.9。 (Table3,p.8) 包含多种general MLLM与GroundingDINO+SBIR；base Rex不支持相同instance interface，接近floor并非纯架构优劣对照。 full/w-o align共享final GRPO；未分开cross/intra损失或两个data constructions，未评估no-GRPO和photo能力遗忘。",
+    "insightZh": "构造instance sketch query监督并保留token关系而非强迫feature相同；新增人工instance links用于评测而非训练。",
+    "evidenceZh": "对齐phrase-to-image QK和foreground QQ relations，每层每head比较。 (Sec.3.1, Eqs1–3,pp.4–5); 无align训练已建立instance VP能力，alignment只增加约1–3 F1。 (Table1,p.7;Sec4.3,p.8); free-hand与HED评测不同，affordance为point-in-region而非原heatmap指标。 (Sec4.1,p.7;App.D,p.17)",
+    "caveatZh": "三维、SVG拓扑、stroke ownership与设计修改没有验证。 部分tasks只在synthetic HED而非真实free-hand上测试。 free-hand instance links只保留唯一可辨认query，hard subset较小且类别long-tail；无CI。 code/model/benchmark仅承诺发布。",
+    "whyRelevantZh": "草图作为实例指代和结构关系提示可服务structured2D设计输入；此处只接受sketch接口研究，不外推完整design agent能力。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
