@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2611.07961",
+  "slug": "bri3d-scene-anchor-generation",
+  "title": "Bri3D: Bridging the Object-Scene Gap in Single-Image 3D Generation via Scene-Anchor",
+  "authors": [
+    "Hongye Hou",
+    "Shuai Zhang",
+    "Hongjie Li",
+    "Zhuoxiao Li",
+    "Haiping Wang",
+    "Yuan Liu",
+    "Wufan Zhao"
+  ],
+  "venue": "arXiv preprint",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07961"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Scene scaffold",
+    "Voxel anchor",
+    "Single-image scene generation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "scene",
+      "object"
+    ],
+    "representation": [
+      "voxel-triplane",
+      "mesh"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "output-property": [
+      "part-aware"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07961v1"
+    }
+  ],
+  "abstract": "Generating compositional 3D scenes from a single image requires recovering detailed object geometry and coherent spatial arrangements. Existing object-to-scene methods, including SAM3D and MIDI, extend object generation through image-context reasoning or inter-instance modeling. Coordinating objects remains challenging with limited scene-level supervision. Directly extending object-centric generators to entire scenes can degrade geometry and fail to preserve instance scale, orientation, and pose. We propose Bri3D, a framework bridging scene-level structural reasoning and object-level generative priors through instance-aware voxel scene anchors. Bri3D predicts a color-coded scene scaffold encoding coarse object geometry and spatial arrangements. Each instance is extracted as a scene anchor and refined into a pose-preserving, prior-compatible voxel support, enabling a frozen object generator to synthesize detailed textured geometry in the anchor-defined spatial reference. This coarse-to-fine design separates scene organization from object-scale detail synthesis, focusing scene-level training on spatial organization and anchor refinement while reusing pretrained object priors. Experiments demonstrate improvements in scene layout, object geometry, visual quality, and generalization. Bri3D predicts scene layouts efficiently; full scene generation is faster than SceneGen and SAM3D.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07961v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07961v1, 22 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. No public implementation was confirmed during review.",
+    "ideaZh": "Bri3D 先在共享坐标中生成带实例颜色的粗场景，再以每个 voxel anchor 固定对象布局，让冻结对象模型补齐细节。值得读如何保布局，但主表使用现成实例掩码，拥挤场景仍漏物体。",
+    "motivationZh": "单图生成室内 3D 时，单物体模型给出的纹理与几何不错，独立拼接却容易破坏大小、朝向和间距。",
+    "methodZh": "Scene Scaffold Generator 编码 occupancy 与 instance color，以颜色门控从 RGB 和掩码取特征。对象 voxel anchor 经局部归一化及细化后，交给冻结 TRELLIS 等 detail stage 并映射回场景。",
+    "methodFlow": [
+      "输入单图与实例 label map",
+      "生成颜色编码场景 scaffold",
+      "按实例切出 voxel anchor",
+      "在保持姿态和尺度的坐标中细化",
+      "冻结对象生成器补细节并回填场景"
+    ],
+    "experimentsZh": "3D-FRONT 标准测试及 300 个 ScanNet/BlendSwap 场景的跨数据集评估。定量协议以已有实例掩码作为输入。 作者报告 3D-FRONT 的 BBox IoU 为 0.7540，SAM3D 为 0.6271（Table 1, p.8）。 作者报告 1–10 件物体场景 scaffold 约 5.1 s，完整资产约 42.6 s（Table 3, p.8）。 与 MIDI、SceneGen、SAM3D 等比较，scaffold 与完整生成耗时分开。 颜色表示、渲染约束、颜色门控和分辨率逐项累加。固定 anchor 时，细节阶段明显降低 CD，而 BBox IoU 保持不变。",
+    "insightZh": "场景模型只负责共享布局和粗形状，物体先验负责局部高频细节，实例颜色防止相邻对象只能靠连通性分组。",
+    "evidenceZh": "Scene scaffold 以 occupancy 和颜色共享 latent（Fig. 2, Sec. 3.2, p.4）。颜色代表实例身份，细节纹理由对象阶段生成。 对象细化保留 scaffold 给定的尺度与布局（Sec. 3.3, pp.5–7）。先在局部对象坐标中细化，然后映射回统一坐标。 拥挤场景中出现合并和缺失实例（Fig. 5, Sec. 4.3, p.10）。遮挡、模糊和 30 件以上场景限制精度。",
+    "caveatZh": "主体工作聚焦前景物体，墙地结构只给初步演示。 现成实例掩码降低入口难度，严重遮挡下的形状是生成推测。",
+    "whyRelevantZh": "对 part/assembly 生成可借鉴固定空间 anchor 后复用对象级先验。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

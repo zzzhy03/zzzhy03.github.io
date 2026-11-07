@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2611.07979",
+  "slug": "p-mgs-perceptual-mesh-gaussian-splatting",
+  "title": "Perception Over Geometry: Rethinking Gaussian Allocation in Mesh-based Splatting",
+  "authors": [
+    "Yuting Wang",
+    "Yang Zhao",
+    "Shanding Diao",
+    "Penglin Wang",
+    "Yuan Chen",
+    "Wei Jia",
+    "Ronggang Wang"
+  ],
+  "venue": "arXiv preprint",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07979"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Mesh editing",
+    "Gaussian splatting",
+    "Post-hoc binding"
+  ],
+  "facets": {
+    "task": [
+      "editing"
+    ],
+    "representation": [
+      "mesh",
+      "3d-gaussian"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "output-property": [
+      "editable",
+      "efficient"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07979v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yuting01234/P-MGS"
+    }
+  ],
+  "abstract": "3D Gaussian Splatting (3DGS) enables photorealistic novel-view synthesis but lacks explicit topology for geometric editing. Existing mesh-based methods enable geometric manipulation by associating Gaussians with triangular mesh faces, typically assigning a fixed number of Gaussians to each face. However, the representation capacity required for appearance reconstruction depends on local appearance complexity rather than merely on mesh tessellation density. To address these limitations, we propose P-MGS, a framework that separates appearance modeling from geometric control to achieve high quality rendering, compact representation, and flexible mesh editing. P-MGS introduces a perceptual complexity guided allocation strategy that distributes Gaussians according to surface appearance demand estimated from multiview observations. To preserve reconstruction flexibility, Gaussians are optimized without mesh constraints and subsequently associated with the original mesh through post hoc binding, retaining adaptive refinement while preserving mesh topology. During mesh editing, local affine deformation transfer updates Gaussian centers and covariances under mesh deformation, reducing misalignment and floating artifacts. Experiments demonstrate superior average novel view synthesis quality with fewer Gaussians and coherent mesh editing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07979v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07979v1, 13 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. A public implementation was confirmed at the linked URL.",
+    "ideaZh": "P-MGS 让多视图外观决定 Gaussian 放在哪里，等无约束拟合完成再绑回原 mesh。静态渲染改善且编辑后更少浮点，编辑优势来自定性对照，适合读资产的外观与控制解耦。",
+    "motivationZh": "固定每个 mesh face 分配同样多的 Gaussians，会把网格细分误当成纹理复杂度。",
+    "methodZh": "多视图投影的外观梯度聚合成每面需求，固定预算初始化后自由优化。拟合完做最近三角面绑定，用 barycentric 坐标、法向偏移及局部仿射传播中心与 covariance。",
+    "methodFlow": [
+      "输入多视图与参考 mesh",
+      "估计逐面外观复杂度",
+      "分配预算并优化 3DGS",
+      "事后绑定到三角面",
+      "将局部仿射传给 Gaussian 中心与 covariance"
+    ],
+    "experimentsZh": "NeRF-Synthetic 与 DTU 的静态新视角，加 Blender 人工 mesh 编辑比较。 作者报告 NeRF-Synthetic 34.00 dB / 545K，对比 vanilla 3DGS 33.48 dB / 631K（Table 1, p.6）。 作者报告 DTU 的 32.36 dB / 191K，对比 GaMeS Triangle Soup 的 30.91 dB / 603K（Table 2, p.7）。 含 GaMeS、Mani-GS、SuGaR、MeshSplatting；不同 baselines 的 mesh 和表示预算需分读。 同预算早绑定时，外观分配由作者报告的 30.10 提至 31.36 dB；事后绑定本身带来的静态指标增量更大。",
+    "insightZh": "固定可编辑拓扑与自适应外观容量的解耦发生在训练与绑定两个时点，且可以在不动原 mesh 的情况下修改 Gaussian 预算。",
+    "evidenceZh": "面需求由多视图而非三角形数量决定（Fig. 3, Sec. 3.2, pp.4–5）。在相同总初始化预算中改变每面的分配。 局部仿射更新处理拉伸与剪切（Sec. 3.3, Eqs. 8–10, p.6）。同时传播 Gaussian 中心和协方差。 手工形变案例的渲染对齐更好（Figs. 4, 7, pp.7–8）。对照图展示浮点或尖刺，形变状态无对应真值。",
+    "caveatZh": "依赖多视图及参考 mesh；单图资产生成留待后续。 形变优势无像素真值，绑定后未形变误差只按同一个已筛选 Gaussian 集合比较。",
+    "whyRelevantZh": "可用于保留 mesh 控制的 Gaussian 资产，特别是外观细节复杂而网格需要低密度时。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

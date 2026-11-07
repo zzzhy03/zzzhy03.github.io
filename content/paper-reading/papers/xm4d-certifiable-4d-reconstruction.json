@@ -1,0 +1,85 @@
+{
+  "id": "arxiv:2611.07902",
+  "slug": "xm4d-certifiable-4d-reconstruction",
+  "title": "XM4D: 4D Reconstruction through Certifiable Geometric Optimization",
+  "authors": [
+    "Haoyu Han",
+    "Jack Benarroch Jedlicki",
+    "Jiahui Lei",
+    "Heng Yang"
+  ],
+  "venue": "arXiv preprint",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07902"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO",
+    "math.OC"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "4D reconstruction",
+    "Embedded deformation graph",
+    "Semidefinite relaxation"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene",
+      "part-assembly"
+    ],
+    "representation": [
+      "3d-gaussian",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "output-property": [
+      "part-aware",
+      "animation-ready"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07902v1"
+    }
+  ],
+  "abstract": "Accurate 4D reconstruction remains challenging: jointly estimating camera motion, scene geometry, and non-rigid deformation entails highly nonconvex optimization, making global optimality difficult to guarantee. We present XM4D, a framework for accurate and efficient 4D reconstruction built upon certifiably globally optimal geometric optimization. By separating the estimation of camera motion from non-rigid deformation, we formulate both stages as structured quadratically constrained quadratic programs (QCQP) that admit semidefinite programming (SDP) relaxations and verifiable global optimality certificates. For camera motion estimation, we lift static point tracks into 3D using foundational depth prediction models and formulate a scaled bundle adjustment problem that jointly estimates camera poses, depth scales, and static landmarks. By analytically eliminating translations and landmarks, we reduce the problem to a QCQP over scaled rotations. For non-rigid reconstruction, we represent dynamic motion using an embedded deformation graph (EDG) and show that its tracking, rigidity, and temporal regularization objectives similarly reduce to a rotation-only QCQP. Both problems admit SDP relaxations that we solve efficiently with a GPU-accelerated Burer-Monteiro solver based on Riemannian optimization. The recovered geometry further initializes dynamic Gaussian splatting for photometric refinement. Extensive experiments across seven benchmarks demonstrate accurate camera motion estimation on both static and dynamic scenes, efficient optimization that scales to thousands of frames, and state-of-the-art novel-view rendering quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07902v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07902v1, 32 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. No public implementation was confirmed during review.",
+    "ideaZh": "XM4D 把相机估计和局部形变写成两个可认证优化，显式形变图再驱动动态 Gaussian。冰箱门演示给出可读关节轨迹，证书覆盖固定输入下的目标函数，输入错误仍会传递。",
+    "motivationZh": "从单目视频同时恢复相机和非刚性运动时，局部最优会造成跟踪断裂与错误形变。",
+    "methodZh": "把静态点轨迹和单目深度提升成 3D 后消去线性变量，得到缩放旋转 QCQP。动态阶段用固定 EDG 与 skinning，分段求解旋转 QCQP，经 SDP 松弛、对偶检查与低秩优化后初始化 4DGS。",
+    "methodFlow": [
+      "估计深度和 2D tracks",
+      "认证求解相机及静态形状",
+      "构建动态轨迹图和 EDG",
+      "分段认证求解并融合",
+      "初始化动态 Gaussian 渲染"
+    ],
+    "experimentsZh": "相机姿态在 7 个静态和动态 benchmarks；新视角主要在 DyCheck、NVIDIA、Syn4D。 作者报告 DyCheck 不用真值相机时 mPSNR 19.51，MoSca 18.91（Table 4, p.15）。 作者报告 Syn4D 的场景平均总耗时 16.9 分钟，对比 MoSca 44.5 分钟（Table 5, p.15）。 相机对照含 COLMAP、VGGT、MegaSAM、MoSca；部分 NVS 方法接收 GT poses，需保留差异。 Table 1 比较静态求解配置，Fig. 3 示意认证求解相对局部求解的错误旋转减少。",
+    "insightZh": "两个几何子问题都能通过同一低秩 SDP 框架求解和检查，输出显式节点运动，而渲染是后续光度步骤。",
+    "evidenceZh": "相机与非刚性节点被分成两个约束问题（Fig. 1, Secs. 3–4, pp.1, 4–10）。证书对应给定相机观测或给定图的求解目标。 时间窗口的图求解后有融合和局部补全（Sec. 5.3, p.13）。不能把整条后处理链统称为已认证。 重建的 EDG 能读出冰箱门级刚体运动（Fig. 8, p.19）。这是单个示例，没有关节误差 benchmark。",
+    "caveatZh": "单目深度或 tracks 偏差可进入认证解；固定 EDG 和稠密矩阵的显存随帧数二次增长。 冰箱关节仅定性示范，证书也不覆盖分段融合及渲染细化。",
+    "whyRelevantZh": "显式 EDG 和相机分离适合研究 captured 4D assets 的可控初始化。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

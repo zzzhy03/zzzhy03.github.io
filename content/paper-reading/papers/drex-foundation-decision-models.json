@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2611.07854",
+  "slug": "drex-foundation-decision-models",
+  "title": "Towards Foundation Decision Models: Drex",
+  "authors": [
+    "Nischay Dhankhar",
+    "Alisher Amantay",
+    "Zhanibek Datbayev",
+    "Darkhan Akhmetov",
+    "Yash Shah",
+    "Nurmukhamed Ubaidullayev",
+    "Raman Saparkhan",
+    "Dos Baha",
+    "Abulhair Saparov"
+  ],
+  "venue": "arXiv technical report",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07854"
+  },
+  "venueIds": [],
+  "publicationType": "technical-report",
+  "categories": [
+    "cs.CL"
+  ],
+  "topicIds": [
+    "llm"
+  ],
+  "primaryTopicId": "llm",
+  "keywords": [
+    "Decision models",
+    "Non-autoregressive decisions",
+    "Calibration",
+    "Option order"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "reinforcement-learning"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07854v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/nace-ai/drex-decision-models"
+    }
+  ],
+  "abstract": "Autoregressive approaches with large language models, such as long chain-of-thought reasoning, have become the default for new AI applications because they reach higher accuracy on a wide range of tasks. In production, however, they give inconsistent answers, require parsing of outputs, and add cost and latency. Decision models address this: given a question and a set of options supplied by the user, they return a probability distribution over the options without autoregressive decoding. We present Drex, a family of four open decision models with 8B (DLM), 9B (v1.5), 35B with 3B active (v2.0), and 27B (Max) parameters. Each request consists of a state (a document, record, or agent context, optionally with images) and questions about it, each asking for a choice among options, a yes/no judgment, or a score on an ordered scale. Training combines supervised fine-tuning with reinforcement learning from adjusted feedback (RLAF), plus vision tuning for Max. Ablations show that RLAF improves accuracy and that consistency losses improve robustness to option order. On Decision Index 0.4.1, Max sets a new state of the art among the decision models we compare (67.52 on the public suite vs. 60.70 for Jev 1.14.0). On Decision Bench v4, it is statistically tied with d3-turbo and GPT-6 Sol and trails Claude Opus 5.5 by 1.6 points, and it has the highest accuracy among decision models on DecideBench. Max answers a typical request in 183 ms, against about 2.0 s for GPT-6 Sol and 3.5 s for Claude Opus 5.5, and its outputs are stable under option reordering. All four models are open source: https://github.com/nace-ai/drex-decision-models",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07854v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07854v1, 51 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. A public implementation was confirmed at the linked URL.",
+    "ideaZh": "Drex 将多项选择、判断与等级问题统一为单次前向的选项概率。适合参考低延迟的候选排序和校准设计，困难知识题、多选项翻转与长输入依然受限。",
+    "motivationZh": "用长 CoT 的通用语言模型为固定选项做评分，存在输出解析、延迟和跨选项校准成本。",
+    "methodZh": "三款 pointer 模型可共享同一 state prefill，再从 option token 打分。多模态 Max 改用每题独立重编码和线性 readout，配合 SFT、adjusted-feedback RL 和选项置换一致性训练。",
+    "methodFlow": [
+      "输入 state 和用户给定选项",
+      "用 pointer 或 readout 计算 logits",
+      "在选项集合内校准概率",
+      "按概率消费或交给下游审查"
+    ],
+    "experimentsZh": "Decision Index、Decision Bench v4、DecideBench、独立的校准与顺序扰动分析。 作者报告 Max 在 Decision Bench v4 达 94.0%、0.66 s；GPT-6 Sol 94.7%、2.05 s（Table 2, p.16）。 作者报告另一请求延迟协议为 Max 183 ms，包含网络时间，不能与 0.66 s 视为同一口径（Table 8, p.25）。 比较决策系统和通用推理模型，部分视觉题对 text-only 版本提供文本替代，榜单训练和推理设置异构。 Max 加 RLAF 提高 Decision Index，置换一致性降翻转。Max 与 pointer 系列缺同骨干同数据的直接结构消融。",
+    "insightZh": "不是新的通用聊天模型，重要性在于开放的原生受限决策接口与不同模型规模的系统校准实验。",
+    "evidenceZh": "较小模型共享 state，Max 的每题读出需要重编码（Secs. 4–5, Figs. 1–2, pp.7–9）。最大模型的准确率和轻量模型的多题缓存特性不能合并。 RLAF 和一致性 loss 对准确率、翻转率贡献不同（Sec. 8.7, Table 7, p.24）。一致性训练降低翻转，背骨与训练集的贡献不能从家族表隔离。 多选项下域内 ECE 和翻转率比总平均高（Sec. 10, p.27; App. I, p.44）。六个以上选项对 Max 仍是难例。",
+    "caveatZh": "闭卷知识与困难推理仍落后，长输入及多选项退化。 校准依赖领域与选项数，已有图像独立题只有 60 道。",
+    "whyRelevantZh": "固定候选的筛选和置信度可借鉴到设计工具的选择阶段，实际设计未验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

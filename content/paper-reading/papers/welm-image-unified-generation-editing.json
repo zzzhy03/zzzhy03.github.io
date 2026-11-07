@@ -1,0 +1,97 @@
+{
+  "id": "arxiv:2611.07392",
+  "slug": "welm-image-unified-generation-editing",
+  "title": "WeLM-Image: A Unified Image Generation Model towards Visual Intelligence",
+  "authors": [
+    "Canmiao Fu",
+    "Chen Li",
+    "Guohui Zhang",
+    "Hao Lu",
+    "Hongyang Wei",
+    "Huadong Wu",
+    "Huaisong Zhang",
+    "Hubery Yin",
+    "Liyuan Cui",
+    "Qixin Yan",
+    "Tong Shao",
+    "Xiaoqiang Zhou",
+    "Xinhang Leng",
+    "Ying Zhang",
+    "Zhenhai Liu",
+    "Zhipeng Huang"
+  ],
+  "venue": "arXiv technical report",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07392"
+  },
+  "venueIds": [],
+  "publicationType": "technical-report",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "MoT–MoE",
+    "Multi-reference synthesis",
+    "Noise-aware distillation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing",
+      "composition"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "flow-matching",
+      "reinforcement-learning"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07392v1"
+    }
+  ],
+  "abstract": "We present \\textbf{WeLM-Image}, a unified image foundation model that integrates multimodal understanding into text-to-image generation, instruction-guided editing, and multi-reference synthesis. Designed for single-GPU deployment in WeChat's large-scale consumer applications, the model processes text, reference images, and target latents as one interleaved sequence. A Mixture-of-Transformers (MoT) backbone combines shared attention with independent understanding and generation parameters to limit optimization interference. Equipping each path with Mixture-of-Experts (MoE) modules provides sparse capacity, with 31.7B stored parameters and approximately 5.4B generation parameters activated per target latent token. A generation-oriented data engine combines a knowledge-grounded visual vocabulary with large-scale visual clustering to balance semantic coverage and editing tasks, while training-time evaluation guides iterative data refinement. Bilingual annotations and verified editing supervision support progressive training up to native 1.5K resolution. We optimize generation and editing separately with rubric- and checklist-based rewards, then consolidate the specialized policies through noise-aware on-policy distillation. In the reported overall comparisons, the 1536-resolution model ranks first among the evaluated open-source models on PRISM-Bench, Qwen-Image-Bench, and UnicBench. MeanFlow-based few-step distillation yields WeLM-Image-Turbo, which generates a $1024\\times1024$ image in 4.98\\,s on a single NVIDIA H20 GPU using eight guidance-free steps.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07392v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07392v1, 44 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. No public implementation was confirmed during review.",
+    "ideaZh": "WeLM-Image 将文本、参考图与目标 latent 放进同一序列，用共享 attention 接通理解和生成两路，并将不同任务的 RL teacher 合回同一 checkpoint。值得读多参考条件与蒸馏，速度须按步数和配置看。",
+    "motivationZh": "一套模型要同时支持文生图、指令编辑和多参考合成，还要满足单卡推理。",
+    "methodZh": "MoT 分离理解和生成参数、共享 attention，每路用 MoE。双语数据与可核验编辑对支持渐进训练，然后分任务 RL、按噪声阶段做 on-policy distillation，最后 MeanFlow 压缩为少步版本。",
+    "methodFlow": [
+      "交织编码文本、参考图与 latent",
+      "共享 attention 分路 MoT–MoE",
+      "渐进预训练和 SFT",
+      "独立优化生成和编辑奖励",
+      "noise-aware OPD 合并能力",
+      "MeanFlow 生成少步版本"
+    ],
+    "experimentsZh": "公开文生图和编辑基准及内部双语 WeGenBench/WeGenEditBench，另评估原版和 8-step Turbo。 作者报告 1024² 文生图在 H20 上 8 步 4.98 s、50 步 56.99 s；Qwen 4-step 为 3.21 s（Table 4, PDF p.25）。 作者报告 UnicBench Overall 8.992，Turbo 8.664，闭源 GPT-Image-2 9.079（Table 18, PDF p.34）。 比较开源与闭源多个配置，主张的开源排名适用选定基准和口径。不同采样步数、CFG 和卡数需区分。 报告覆盖 VAE 及分辨率、任务训练和蒸馏，主表不足以逐一归因数据、稀疏架构和 teacher 分工。",
+    "insightZh": "训练和推理接口统一到输入顺序，低噪声保持编辑或生成 teacher，高噪声用 prompt-enhanced supervision 提供布局引导。",
+    "evidenceZh": "两路分别拥有参数，但在同一个 attention 空间交互（Sec. 2, Fig. 2, PDF pp.6–11）。图像理解 token、文本和目标生成 token 在同一序列。 高噪声引入布局语义条件，低噪声保留任务 teacher（Sec. 4.3.3, PDF p.24）。任务类别确定 T2I 或 Edit teacher。 速度表对 1 至 4 张参考图使用固定分辨率，步数不同（Table 4, PDF p.25）。H20 wall time 排除加载，不能孤立归因于 MoE。",
+    "caveatZh": "复杂指令可靠控制、视觉 reasoning 和效率仍留给后续。 未确认公开实现。内部评测和评委口径无法外推到所有编辑；理解分支不等于独立通用 VLM 能力。",
+    "whyRelevantZh": "适合参考多参考图与结构保留的训练接口，以及不同任务和去噪阶段的奖励分工。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

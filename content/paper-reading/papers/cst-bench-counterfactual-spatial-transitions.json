@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2611.07541",
+  "slug": "cst-bench-counterfactual-spatial-transitions",
+  "title": "CST-Bench: Benchmarking Counterfactual Spatial Transition Reasoning with Causal Transition On-Policy Self-Distillation",
+  "authors": [
+    "Ying Li",
+    "Yongle Cheng",
+    "Jing Li",
+    "Xingquan Cai",
+    "Yawei Luo"
+  ],
+  "venue": "arXiv preprint",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07541"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Counterfactual reasoning",
+    "State transition",
+    "On-policy distillation"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "discrete-program"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07541v1"
+    }
+  ],
+  "abstract": "Spatial reasoning is a fundamental capability of multimodal large language models (MLLMs), yet existing benchmarks mainly focus on static scene understanding. When objects are moved or swapped, models must infer not only spatial relations but also how interventions change the scene state. To address this problem, we introduce CST-Bench, a benchmark for counterfactual spatial reasoning. CST-Bench contains 7,082 examples covering 6 intervention types and 12 transformation operators, with dense causal annotations including intervention sources, affected relations, expected effects, invariant relations, and metric changes. We benchmark general-purpose MLLMs on CST-Bench and further compare post-training strategies on CST-Bench and standard spatial benchmarks. Results show that methods effective for ordinary spatial reasoning can still fail under counterfactual interventions. We further formulate counterfactual spatial reasoning as causal state-transition modeling and propose CT-OPSD, which uses CST-Bench annotations to guide a teacher model in learning counterfactual state transitions and causal reasoning chains. These chains are then distilled into a student model that reasons only from real observations. Overall, experiment results establish CST-Bench as a challenging benchmark and reusable supervision resource for counterfactual spatial reasoning. CT-OPSD further provides an initial demonstration of how its annotations can support model improvement.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07541v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07541v1, 18 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. No public implementation was confirmed during review.",
+    "ideaZh": "CST-Bench 把物体移动、交换后的关系变化与应保留关系拆开测，并把因果转移标注只提供给蒸馏 teacher。模型能在小规模评测中学会更多变更，但后状态是符号，尚不能评估成品图。",
+    "motivationZh": "静态图像空间题只问当前关系，难以判定模型是否理解一个局部操作对其他关系的连锁影响。",
+    "methodZh": "从真实图像构造六族干预的符号状态变更，结合独立 VLM 复核和人工审计。Teacher 用 privileged annotation 生成转移理由，student 在自己 rollout 上以 forward KL 对齐且推理时只接收图与题。",
+    "methodFlow": [
+      "获取真实图及源状态",
+      "定义干预和受影响及不变量",
+      "独立审查并筛样",
+      "训练带标注 teacher",
+      "沿 observation-only student rollout 蒸馏"
+    ],
+    "experimentsZh": "480 题 answer-only 平衡评测，另测 3DSRBench、CV-Bench、BLINK。后训练共用 Qwen2.5-VL-3B。 作者报告 CST Micro Acc 从 base 17.0% 到 OPSD 53.3% 和 CT-OPSD 55.2%（Table 2, p.8）。 作者报告 3DSRBench 为 49.5%，低于 GRPO 52.9%（Table 2, p.8）。 比较十种公开 MLLM、同 backbone SFT、GRPO 和普通 OPSD。 去掉转移桥接、锚点和 metric 组件，诊断各项得分变化不一致。报告中最佳综合分也只有 25.9。",
+    "insightZh": "同一编辑操作显式绑定应变化和应保留的条件，监督粒度比只给答案或把终态视为另一个静态场景更细。",
+    "evidenceZh": "7,082 条样例覆盖六种干预族和十二个 operator（Fig. 2, Sec. 3, p.4）。其中平衡评测是 480 题，按 operator 分层。 特权标注只用于 teacher，student 推理只接收图与题（Fig. 4, Sec. 4, pp.6–8）。共享 student-generated prefix 对齐分布。 多选精度与因果诊断是不同口径（Tables 1–3, pp.7–9; App. D, p.18）。3DSRBench 的绝对准确率并不随 CT-OPSD 一起最优。",
+    "caveatZh": "终态是符号状态，非成像结果。2D boxes 与规范化关系不是米制 3D，English 多选覆盖有限。 用作设计验证需要另接编辑后图像、实际制品状态及可能的碰撞检查。",
+    "whyRelevantZh": "干预源、应变条件与不变量可直接借鉴到视觉设计 agent 的局部编辑检查。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

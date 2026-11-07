@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2611.07301",
+  "slug": "artividrm-artifact-rubric-video-reward",
+  "title": "ArtiVidRM: Verifiable Artifact-as-Rubric Reward Modeling for Explicit Quality Articulation in Video Generation",
+  "authors": [
+    "Caorui Li",
+    "Yangguang Ji",
+    "Shuxia Lin",
+    "Yu Chen",
+    "YiCheng Xiao",
+    "Yongliang Wu",
+    "Zhenxiang Jiang",
+    "Licheng Tang",
+    "Deng Li",
+    "Zhuxuanzi Wang",
+    "Jiahao Sun",
+    "Chonghan Liu",
+    "Lirian Su",
+    "Jay Wu",
+    "Xu Yang"
+  ],
+  "venue": "arXiv preprint",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07301"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Video reward modeling",
+    "Artifact rubric",
+    "Closed-source refinement"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing",
+      "reasoning"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "reinforcement-learning",
+      "llm-vlm-guided"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07301v1"
+    }
+  ],
+  "abstract": "Reinforcement learning has become an effective approach for improving video generation, but its success depends heavily on reliable reward models. Existing methods either map videos directly to opaque scalar scores or generate free-form rationales that are not explicitly optimized as the basis of the final judgment. We propose ArtiVidRM, a verifiable, artifact-as-rubrics video reward model that follows an observe-then-score paradigm. It first identifies visible generation artifacts and organizes them into a structured artifact list, then uses these artifacts as explicit rubrics for quality assessment. This intermediate representation grounds each score in concrete video-level evidence, making the reward more interpretable and informative for optimization. We further introduce a multi-reward reinforcement learning strategy to jointly optimize artifact prediction and quality assessment. The reward decomposes into complementary objectives that evaluate artifact prediction quality, including semantic coverage and prediction efficiency, together with a pairwise preference objective that supervises quality ranking through score differences. By jointly optimizing the intermediate artifact representation and the downstream preference prediction, the model learns to produce informative artifact lists while improving the accuracy of video quality assessment. Experiments show that ArtiVidRM achieves state-of-the-art performance on video preference benchmarks, provides effective signals for video diffusion optimization, and enables artifact-guided refinement of closed-source video generators.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07301v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07301v1, 18 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. No public implementation was confirmed during review.",
+    "ideaZh": "ArtiVidRM 先写可检查的瑕疵清单，再给视频打分，既能训练 Wan，也能把反馈追加到 Veo 的提示词做一次重生成。优先读缺陷标注和 recall 奖励，重采样比较不能保证逐项修复。",
+    "motivationZh": "标量视频 reward 不说明为什么不好，自由文本解释又可能和最终评分脱节。",
+    "methodZh": "从偏好对提取、聚合并复核 artifact 清单，先 SFT 学带严重程度的结构输出，再以语义覆盖、长度和偏好差分做多奖励强化学习。",
+    "methodFlow": [
+      "构建带瑕疵清单的视频偏好对",
+      "监督训练结构化瑕疵输出",
+      "用覆盖、简洁度和分差做 GRPO",
+      "用评分优化 Wan 或重写闭源模型 prompt"
+    ],
+    "experimentsZh": "三个域外视频偏好基准，另有 Wan-2.1-1.3B Flow-GRPO 和 Veo-3.1 单轮重生成对比。 作者报告 GenAI-Bench 非平局配对准确率 0.753、VBench-2.0 0.524（Table 1, p.6）。 作者报告盲评对中 Wan 优化版获选 60%、14% 平局，Veo refinement 获选 71%、18% 平局（Secs. 4.2–4.3, pp.8–9）。 比较 VideoScore、VideoAlign 与 generative reward models。MonetBench 不是所有指标都领先。 移除 SFT、语义 recall 或长度惩罚，分别影响清单长度和偏好预测。视频重生成没有逐瑕疵消融。",
+    "insightZh": "中间清单既给训练 reward 约束，又是闭源生成器可消费的反馈，从可读解释走向可执行复核。",
+    "evidenceZh": "标注先聚合多个检查结果再通过视觉复核（Sec. 3.1, Fig. 2, pp.3–4）。过滤后有 22,640 个视频偏好对。 两阶段训练分别学习 artifact list 和评分（Sec. 3.2, Fig. 3, pp.4–5）。recall 奖励鼓励覆盖，长度项控制堆砌。 闭源模式将反馈追加给原 prompt 后完整重生成（Sec. 4.3, pp.8–9; Fig. 7, p.17）。观察到整体偏好改善，但也会引入新瑕疵。",
+    "caveatZh": "训练标签部分来自模型生成及复核，人工仅抽查。整体偏好不验证瑕疵定位真值或多轮收敛。",
+    "whyRelevantZh": "清单能够直接驱动视觉 agent 的下一轮 prompt 修改，提供可查看的修复依据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

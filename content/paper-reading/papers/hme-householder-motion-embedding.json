@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2611.07294",
+  "slug": "hme-householder-motion-embedding",
+  "title": "Householder Motion Embedding: Noise Modulation for Motion-Controllable Video Generation",
+  "authors": [
+    "Tao Jun Lin",
+    "Jinhong Ni",
+    "Ruyi Zha",
+    "Yifu Wang",
+    "Xibin Song",
+    "Pan Ji",
+    "Hongdong Li"
+  ],
+  "venue": "arXiv preprint",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07294"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "Householder reflections",
+    "Motion control",
+    "Noise modulation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07294v1"
+    }
+  ],
+  "abstract": "Diffusion models for video generation have achieved remarkable success, yet precise motion control under explicit user guidance remains challenging. Recent noise-warping methods introduce temporal correlations by warping the noise according to the user-provided motion signal. However, standard spatial warping generally disrupts the noise's i.i.d. Gaussian structure, requiring distribution correction, such as Jacobian-based correction, but at a substantial computational overhead. We propose Householder Motion Embedding (HME), which encodes the motion signal into the noise through a sequence of Householder reflections that together form an orthogonal transformation applied to each location's channel vector. HME exactly preserves the spatial Gaussian structure within each frame while introducing cross-frame correlations that promote temporally consistent video. HME is agnostic to the network architecture and integrates directly into standard video diffusion fine-tuning pipelines. Experiments on different scenarios show that HME matches or outperforms the state of the art, while achieving a 2.7x speedup over noise warping. These results demonstrate that channel-space Householder transformations offer a principled and efficient alternative to noise warping for motion-controllable video generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07294v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07294v1, 23 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. No public implementation was confirmed during review.",
+    "ideaZh": "HME 用逐位置的 Householder 正交变换把光流写进跨帧噪声相关性，同时保留单帧 Gaussian 分布。噪声构造比空间 warp 轻，但视频模型仍需微调，复杂非刚体跟随有失败。",
+    "motivationZh": "空间 warp 注入动作时会扰动噪声的单帧独立分布，方差补偿也增加运行开销。",
+    "methodZh": "把像素光流重采样到 latent，投影为反射方向，用若干反射对通道做正交变换。重复利用共享噪声分量建立跨帧协方差，并在该噪声上微调 I2V。",
+    "methodFlow": [
+      "取光流或用户运动约束",
+      "对齐至视频 latent 格点",
+      "构造逐位置反射并混合噪声",
+      "以条件噪声微调视频生成器",
+      "按参考运动或轨迹生成"
+    ],
+    "experimentsZh": "DAVIS 运动转移、MC-Bench 局部对象控制和 DL3DV 相机运动控制。 作者报告 K=2 噪声构造约 2.80 ms/latent，对比 GWTF 7.53 ms，约 2.7 倍（Table 6, p.10）。 作者报告 DL3DV 的 ATE 0.421，GWTF 0.473（Table 3, p.9）。 比较噪声 warp、training-free 和显式监督控制器，训练数据及光流并未全部统一。 K、噪声退化与光流估计器消融，切换 UniMatch 只在评估时统一流。",
+    "insightZh": "在通道空间建立时间结构而非搬运空间噪声，单帧标准 Gaussian 由正交性质保持。",
+    "evidenceZh": "运动通过通道变换进入相关噪声（Fig. 2, Secs. 3.1–3.2, pp.4–6）。空间 Gaussian 保留是构造性质，不等于运动自动准确。 训练和推理都使用 motion-embedded noise（Sec. 3.3, p.7; Sec. 5, p.10）。噪声模块无训练参数，视频 backbone 需微调。 K 与噪声退化程度控制效率及轨迹忠实度（Tables 5–6, p.10）。更多反射通常更慢，局部 motion 指标改善会饱和。",
+    "caveatZh": "光流噪声与复杂非刚体运动降低效果，K 需要按任务调参。 2.7 倍为噪声构造速度，不能当完整视频生成加速。",
+    "whyRelevantZh": "已知对象轨迹投影可成为可控视频先验的条件，3D/4D 资产的几何一致性仍待验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2611.06255",
+  "slug": "leno-learning-noise-optimization",
+  "title": "Learning Noise Optimization for Reward Alignment in Few-Step Generative Models",
+  "authors": [
+    "Hongeun Kim",
+    "Jeongsol Kim",
+    "Jong Chul Ye"
+  ],
+  "venue": "arXiv preprint",
+  "publishedAt": "2026-11-04",
+  "updatedAt": "2026-11-04",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.06255"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "Initial noise",
+    "Black-box reward",
+    "Local GRPO"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "method": [
+      "flow-matching",
+      "reinforcement-learning"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.06255v1"
+    }
+  ],
+  "abstract": "Reward alignment for diffusion- and flow-based generative models is often formulated over stochastic trajectories, making it less suitable for few-step deterministic generators. Initial noise optimization provides a trajectory-free alternative, but existing gradient-free methods require costly per-sample search at inference. We introduce LeNO (Learning Noise Optimization), which amortizes reward-guided initial noise optimization into a learned residual transport while keeping the pretrained generator frozen. LeNO learns an anchor-conditioned distribution over noise corrections using Local GRPO and scalar rewards, eliminating iterative test-time optimization. For Gaussian initial noise with norm-preserving projection, we derive a tractable upper bound on the KL divergence between the corrected noise distribution and the original prior, providing a principled regularization objective. We evaluate LeNO on few-step text-to-image and protein structure generation, including expensive black-box designability rewards. Across both domains, LeNO improves target rewards with a single noise correction at inference while largely preserving generation quality and diversity.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.06255v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.06255v1, 25 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. No public implementation was confirmed during review.",
+    "ideaZh": "LeNO 把少步生成器的黑盒 reward 搜索前移到训练阶段，在推理时一次修正初始噪声。适合查看不可微约束的采样控制，训练仍要大量调用奖励，而且并非所有分数都领先。",
+    "motivationZh": "少步确定性生成没有足够随机轨迹用于传统 RL，逐样本优化初始噪声在部署时又贵。",
+    "methodZh": "冻结生成器，从当前初始噪声附近采样修正量，以 Local GRPO 利用相对标量 reward，并以 KL 上界和范数投影限制偏移。",
+    "methodFlow": [
+      "冻结少步生成器",
+      "以当前噪声为锚点预测修正分布",
+      "对本地候选用黑盒 reward 打分",
+      "以 Local GRPO 和 KL 训练",
+      "推理一次修正后生成"
+    ],
+    "experimentsZh": "SDXL-Turbo 单奖励、SANA-Sprint 多奖励和冻结 RMF 蛋白骨架生成。 作者报告 SANA-Sprint GenEval mean 从 0.67 到 0.70，HyperNoise 为 0.71（Table 2, p.8）。 作者报告 RMF-M 在 scRMSD <2Å 的占比从 0.15 到 0.31，ZeNO 为 0.28；推理奖励查询 0 对 480（Table 3, p.9）。 含梯度型 HyperNoise 和逐样本 ZeNO、BoN，对照需同时看训练成本和推理成本。 state-dependent 修正优于共享修正，搜索尺度和 KL 系数过大时收益下降。",
+    "insightZh": "学习依赖于初始噪声的局部 residual，而不是对每个样本重新做搜索。",
+    "evidenceZh": "高斯噪声投影给出可计算 KL 上界（Sec. 3.2, p.4; App. B, pp.13–15）。正则限制可探索的分布变化。 采样在同一 anchor 附近组内比较（Sec. 3.3, pp.4–5; Fig. 2, p.6）。示例中不同初始位置学习不同修正。 附录 LPIPS/DINO 多样性在提示内比较（App. E.1, Table 7, p.19）。与全分布 FID 是不同测量。",
+    "caveatZh": "训练时每个 anchor 需要重复生成和评分，昂贵 reward 的前置成本仍在。 蛋白自一致性是计算代理，论文未测试装配或物理约束。",
+    "whyRelevantZh": "带标量反馈的噪声适配可以用于测试不可微的 3D 装配或几何规则。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

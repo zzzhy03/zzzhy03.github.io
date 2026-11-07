@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2611.07658",
+  "slug": "artcrafter-analytic-articulated-asset-generation",
+  "title": "ArtCrafter: Feed-Forward Generation of Articulated 3D Object with Analytic Joint Derivation",
+  "authors": [
+    "Minh Canh Tu",
+    "Quang-Binh Nguyen",
+    "Khoi Nguyen"
+  ],
+  "venue": "arXiv preprint",
+  "publishedAt": "2026-11-05",
+  "updatedAt": "2026-11-05",
+  "collectedAt": "2026-11-07",
+  "identifiers": {
+    "arxiv": "2611.07658"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Articulated assets",
+    "Triplet Attention",
+    "URDF",
+    "Joint derivation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "decomposition"
+    ],
+    "content-scope": [
+      "part-assembly"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "output-property": [
+      "part-aware",
+      "controllable",
+      "animation-ready"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.07658v1"
+    }
+  ],
+  "abstract": "Articulated 3D assets are essential for robotic simulation and training, yet their generation from casual images poses a key challenge: recovering part geometry and kinematics that remain mutually consistent. We present ArtCrafter, a novel feed-forward generative model for controllable generation of articulated 3D objects from a pair of images, one depicting the object in the rest state and the other in the open state. At the core of ArtCrafter is a DiT-based generative model that jointly produces part-level meshes for both articulation states in a single forward pass. Inspired by Slot Attention, its denoising process operates on a $1+2N$ slot layout comprising one shared base slot and $N$ paired rest/open slots, encouraging each pair to bind to the same kinematic part. To ensure geometrically consistent and disjoint part generation, we introduce Triplet Attention to enforce cross-state geometric consistency between paired rest/open slots anchored through the shared base slot, and a repulsion loss $\\mathcal{L}_{\\mathrm{rep}}$ on decoded part point clouds to prevent inter-part penetration throughout denoising. Given the resulting paired meshes, URDF joint parameters---type, axis, origin, and range---are derived analytically from the rigid transformation between each rest/open pair, providing an interpretable alternative to learned joint-parameter regression. Extensive experiments on both in-distribution and out-of-distribution datasets demonstrate that ArtCrafter outperforms existing method under the same dual-state setting in geometry quality and articulation precision, while remaining competitive with methods operating under different input settings and paradigms.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.07658v1",
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "Exact-version full-text review of 2611.07658v1, 25 PDF pages, with visual inspection of key pages. Experimental numbers are author-reported. The paper promises a code release.",
+    "ideaZh": "ArtCrafter 从静止和打开两张图联合生成成对零件 mesh，再通过配准反推关节并输出 URDF。零件几何比同输入的 DIPO 好，关节类型和轴误差并非同样改善，读时分开看。",
+    "motivationZh": "可动资产要求不同状态的几何能一一对应，且各零件的运动和基座关系可用。",
+    "methodZh": "共享 base 与两组零件 slot 在 TripoSG DiT 中做 Triplet Attention，点云排斥减少交叠。冻结 VAE 解码后使用 FPFH/RANSAC/ICP 配准每对网格，由刚体变换解析轴与行程。",
+    "methodFlow": [
+      "编码 rest/open 两张图",
+      "共享基座并配对状态 slots",
+      "用 Triplet Attention 和排斥正则生成 mesh",
+      "配准两状态零件",
+      "解析关节并导出 URDF"
+    ],
+    "experimentsZh": "URDF-Anything+ 180 个测试对象、Artiverse OOD。把 geometry 与关节参数分开，另外评估漏件和多件。 作者报告 VLM 估零件数时 whole/part CD 0.004/0.007，DIPO 0.016/0.018；类型准确率 0.890 对 0.986（Table 2, p.8）。 作者报告解析配准的轴误差 0.181，learned head 1.049，但类型准确率 0.903 对 1.000（Table 5, p.10）。 主要同输入对照是 DIPO；单图方法只是不同输入的参考。 Triplet Attention 和 repulsion 提高几何指标；解析配准改善轴、原点和范围，但不能保证类型分类。",
+    "insightZh": "关节从同一个生成过程产出的两状态几何求出，避免独立 mesh、分类 head 和运动轴彼此不一致。",
+    "evidenceZh": "共享基座在注意力中锚定 rest/open slot（Fig. 1, Sec. 3.4, pp.4–5）。部件在去噪时保持状态对应和共同基准。 旋转阈值区分 revolute 与 prismatic，配准矩阵导出轴、原点和范围（Sec. 3.6, p.7）。显式刚体假设决定 URDF 类型。 同双图的 DIPO 仍赢部分关节指标（Table 2, p.8）。几何、关节类型、轴及范围需要单独评估。",
+    "caveatZh": "只生成无纹理刚体零件，需要有清晰打开状态，对复杂多关节泛化有限。 OOD 的 VLM 计数方案部分关节列缺值，不能解释为完整可动率。",
+    "whyRelevantZh": "成对状态的部件一致性、干涉正则与显式关节直接对应可动零件生成。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
