@@ -274,7 +274,11 @@ export function validatePolicyDescriptor(policy) {
   return policy;
 }
 
-export function buildRunPolicyDescriptor(discoveryManifest, screeningManifest) {
+export function buildRunPolicyDescriptor(
+  discoveryManifest,
+  screeningManifest,
+  { fulltextSchemaVersion = DECISION_LEDGER_FULLTEXT_SCHEMA_VERSION } = {},
+) {
   return buildPolicyDescriptor({
     researchConfigSha256: screeningManifest?.sourceInputs?.researchConfig?.sha256,
     researchConfigStatus:
@@ -286,6 +290,7 @@ export function buildRunPolicyDescriptor(discoveryManifest, screeningManifest) {
       discoveryManifest?.configuration?.venueRegistryStatus,
     selectedTopicIds: discoveryManifest?.configuration?.selectedTopicIds ?? [],
     reviewContract: screeningManifest?.reviewContract,
+    fulltextSchemaVersion,
   });
 }
 
@@ -600,7 +605,37 @@ function revisitPolicy(outcome) {
   return { triggers: ["new-version", "evidence-change", "policy-change", "manual"] };
 }
 
-export function buildDecisionLedgerDelta({ root, runDirectory }) {
+function receiptVerifiedHistoricalSchema(root, runId, receipt) {
+  if (!receipt) return DECISION_LEDGER_FULLTEXT_SCHEMA_VERSION;
+  if (!LEGACY_DECISION_LEDGER_RUN_IDS.has(runId) || receipt.runId !== runId ||
+      receipt.kind !== "paper-reading-run-receipt" || receipt.status !== "content-verified") {
+    throw new Error("Historical policy requires a recognized, verified legacy receipt.");
+  }
+  const reviews = receipt.fulltext?.reviews;
+  // An empty run has no evidence of an older full-text schema. Never infer schema 2.
+  if (!Array.isArray(reviews) || reviews.length === 0) return DECISION_LEDGER_FULLTEXT_SCHEMA_VERSION;
+  const expectedDirectory = path.resolve(root, "local-assets/paper-reading/runs", runId, "fulltext/reviews");
+  const seen = new Set();
+  for (const pin of reviews) {
+    const errors = [];
+    const file = resolveArtifactInsideRoot(root, pin, "Legacy schema evidence", errors);
+    if (!file || errors.length || path.dirname(file) !== expectedDirectory || seen.has(file)) {
+      throw new Error("Legacy full-text evidence is missing, changed, duplicated or outside its run.");
+    }
+    seen.add(file);
+    const review = JSON.parse(readFileSync(file, "utf8"));
+    if (review.schemaVersion !== 2 || review.runId !== runId) {
+      throw new Error("Legacy full-text schema is not supported by the receipt-pinned reviews.");
+    }
+  }
+  const actual = listJsonFiles(expectedDirectory, (name) => name !== "summary.json");
+  if (actual.length !== seen.size || actual.some((file) => !seen.has(file))) {
+    throw new Error("Legacy full-text review set differs from the receipt.");
+  }
+  return 2;
+}
+
+export function buildDecisionLedgerDelta({ root, runDirectory, historicalReceipt = null }) {
   const candidateFile = path.join(runDirectory, "candidates.json");
   const discoveryManifestFile = path.join(runDirectory, "manifest.json");
   const screeningManifestFile = path.join(
@@ -613,7 +648,9 @@ export function buildDecisionLedgerDelta({ root, runDirectory }) {
   const screeningManifest = JSON.parse(readFileSync(screeningManifestFile, "utf8"));
   const policy = screeningManifest.accounting?.policyDescriptor
     ? validatePolicyDescriptor(screeningManifest.accounting.policyDescriptor)
-    : buildRunPolicyDescriptor(discoveryManifest, screeningManifest);
+    : buildRunPolicyDescriptor(discoveryManifest, screeningManifest, {
+        fulltextSchemaVersion: receiptVerifiedHistoricalSchema(root, candidatePayload.runId, historicalReceipt),
+      });
   const screeningByCandidate = new Map();
   for (const file of listJsonFiles(
     path.join(runDirectory, "screening", "reviews"),
@@ -982,7 +1019,7 @@ function verifyWithdrawalNotices(receipt, root, errors) {
   }
 }
 
-function verifyLegacyDeltaAgainstRun({ delta, root, label, errors }) {
+function verifyLegacyDeltaAgainstRun({ delta, receipt, root, label, errors }) {
   const candidateRecord = delta?.sourceArtifacts?.candidates;
   const candidateFile = resolveArtifactInsideRoot(
     root,
@@ -999,6 +1036,7 @@ function verifyLegacyDeltaAgainstRun({ delta, root, label, errors }) {
     const expected = buildDecisionLedgerDelta({
       root,
       runDirectory: path.dirname(candidateFile),
+      historicalReceipt: receipt,
     });
     if (canonicalJson(expected) !== canonicalJson(delta)) {
       errors.push(`${label} differs from receipt-verified legacy run artifacts.`);
@@ -1065,6 +1103,7 @@ export function verifyDecisionLedgerImports({ ledger, root, runIds = null }) {
         if (!pinned && LEGACY_DECISION_LEDGER_RUN_IDS.has(imported.runId) && delta) {
           verifyLegacyDeltaAgainstRun({
             delta,
+            receipt,
             root,
             label: `Import '${imported.runId}' delta`,
             errors,
@@ -1151,6 +1190,7 @@ export function verifyLedgerSnapshotMatch({ entry, root }) {
           delta: validateDecisionLedgerDelta(
             JSON.parse(readFileSync(deltaFile, "utf8")),
           ),
+          receipt,
           root,
           label: `Ledger skip '${entry?.candidateId}' delta`,
           errors,
