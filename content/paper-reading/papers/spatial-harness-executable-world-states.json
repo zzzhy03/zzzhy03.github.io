@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.11344",
+  "slug": "spatial-harness-executable-world-states",
+  "title": "Spatial Harness: Grounding Spatial Reasoning in Executable World States with Physics Engines",
+  "authors": [
+    "Chentao Cao",
+    "Zhanke Zhou",
+    "Sangni Duan",
+    "Bo Han",
+    "Hang Li"
+  ],
+  "publishedAt": "2026-11-08",
+  "updatedAt": "2026-11-08",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11344"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "Spatial Harness",
+    "executable world state",
+    "MuJoCo",
+    "spatial reasoning"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "tool-use"
+    ]
+  },
+  "abstract": "Spatial reasoning requires understanding how objects and observers are arranged in a scene and how their relations change with viewpoint or movement. Vision-language models (VLMs) typically perform both steps through model-internal reasoning, forming an implicit scene interpretation from partial views and imagining the consequences of spatial transformations. A misread scene can lead to a wrong answer, while even a correct interpretation does not ensure that imagined transformations satisfy spatial constraints. We introduce Spatial Harness, which represents scenes as explicit and executable world states to ground spatial reasoning in physics-engine feedback. A Perceiver integrates scene constraints extracted from the question with specialized visual estimates to place objects and cameras in a shared coordinate frame. The resulting state is instantiated in a physics engine, where a Reasoner executes viewpoint changes and uses computed measurements and rendered views to guide reasoning. We evaluate on MindCube, SAT, MMSI-Bench, and SpatialRGPT-Bench with open- and closed-weight VLMs. On MindCube, Spatial Harness improves Qwen3.5-27B from 52.70% to 71.14%, surpassing pySpatial by 7.52 percentage points. Given identical annotated object and camera poses, it reaches 98.25% versus 71.81% for model-internal reasoning. Code is publicly available at: https://github.com/tmlr-group/Spatial-Harness",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11344v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11344v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11344v1 精确版本全文，PDF 共 40 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "Spatial Harness 把物体与相机放入可执行的 MuJoCo 世界状态，由 Reasoner 调用变换、测量与渲染来核对空间关系。真值地图实验显示推理增益，端到端的主要瓶颈仍是地图估计。",
+    "methodFlow": [
+      "抽取图像实体、相机位姿和文字约束",
+      "对齐至一个世界坐标系并实例化 MuJoCo 场景",
+      "执行视角变换和度量以生成数值与渲染",
+      "让 Reasoner 结合工具证据回答问题"
+    ],
+    "whyRelevantZh": "可将设计验收中的位置、相机、距离和遮挡约束交给可重复的渲染与度量。",
+    "evidenceZh": "状态保留全局布局、逐图观察及问题约束。（Fig. 4, §3.1, PDF p. 4） 同真值地图上数值和渲染反馈互补。（Table 5, PDF p. 10） 作者报告，Qwen3.5-27B 的 MindCube 端到端为 71.14%，直接答 52.70%；同真值地图对照为 98.25% 对 71.81%。（Tables 1–2, PDF pp. 7–8）",
+    "caveatZh": "单时刻静态场景，未支持时序变化；小物体与远距离相机估计会影响执行。 引擎执行正确也可能只是精确验证了错误估计的场景，设计 agent 应先验证几何输入。",
+    "motivationZh": "VLM 同时从多视图推断场景并想象视点变化，感知误差和空间推理误差会相互混淆。",
+    "methodZh": "Perceiver 将题目约束与专业视觉估计结合为每视图 observations、统一布局及文本约束；Reasoner 用有限工具调用查询相机和物体关系，并读数值与渲染。",
+    "experimentsZh": "MindCube、SAT、MMSI-Bench、SpatialRGPT-Bench，比较四个 VLM 和有/无真值地图条件。 作者报告，Qwen3.5-27B 的 MindCube 端到端为 71.14%，直接答 52.70%；同真值地图对照为 98.25% 对 71.81%。（Tables 1–2, PDF pp. 7–8） 直接 VLM、MindJourney 和 pySpatial，后两种提供其他视角或执行辅助。 拆世界状态来源、视觉与文本通道、数值与渲染工具，并测试 GT map 字段扰动。",
+    "insightZh": "以可执行状态隔离感知和推理，独立测试场景准确度、数值反馈、渲染反馈和额外自审轮次。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

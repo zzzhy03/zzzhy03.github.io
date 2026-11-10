@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2611.12716",
+  "slug": "spaghetti-splatting-curvilinear-dirac-masses",
+  "title": "Spaghetti Splatting: Differentiating Curvilinear Dirac Masses via Convolution",
+  "authors": [
+    "George Shramko",
+    "Shrisudhan Govindarajan",
+    "Rudy Lam",
+    "Yizheng Xie",
+    "Daniel Rebain",
+    "David B. Lindell",
+    "Andrea Tagliasacchi"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.12716"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Spaghetti Splatting",
+    "curvilinear primitives",
+    "differentiable rendering",
+    "polyline"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "output-property": [
+      "editable"
+    ]
+  },
+  "abstract": "In production systems, 3D geometry is represented by primitives such as points, lines, and triangles, as rendering hardware is optimized to generate images from them very efficiently. Learning such primitives from images by volume rendering is challenging, as they are Dirac masses defined at infinitesimal locations in space. EWA splatting, Poisson reconstruction, and 3D Gaussian Splatting overcome this by convolving Dirac masses with a low-frequency kernel, a recipe that generalizes along two axes: the kernel and the primitive. As points and triangles have already received significant attention, we investigate this recipe for curvilinear primitives, and introduce Spaghetti Splatting. We approximate curves by polylines whose convolution converges to that of the continuous curve, and volume render each segment so that connected segments composite without overcounting at their joints. For fast training and inference, we linearize the camera projection per segment, which also accommodates kernels beyond Gaussians, such as Beta kernels. As a point is a curve of zero length, our representation is a strict superset of 3D Gaussian Splatting. It remains competitive with the state-of-the-art on general scenes, outperforms methods specialized to line-like geometry, natively supports anti-aliasing, and produces long connected strands that are directly amenable to physics simulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.12716v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.12716v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.12716v1 精确版本全文，PDF 共 10 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "Spaghetti Splatting 把 Gaussian 的点 Dirac 换成可学习曲线上的测度，并从同一卷积导出逐段光学厚度。长而连通的 strand 可直接作为编辑或模拟资产，图像质量与几何连通性应分开看。",
+    "methodFlow": [
+      "用带核参数的点和 polyline 初始化场景",
+      "计算线段与 Gaussian/Beta 核的卷积",
+      "以逐段线性投影和光学厚度渲染",
+      "联合优化外观、段位置和端点连接"
+    ],
+    "whyRelevantZh": "对发丝、线材或细枝等目标，显式连接信息可保留到模拟和后续编辑阶段。",
+    "evidenceZh": "曲线表示卷积与光学厚度有明确数学定义。（§§3.1–3.4, Fig. 4, PDF pp. 4–5） 端点合并主要改变连通性。（§3.6, Table 1, PDF pp. 6, 8） 作者报告，与 Gaussian Haircut 比较，平均 PSNR 高 2.7 dB，2 mm 阈值的 strand F1 高 14.3 个百分点。（Fig. 8, §4.2, PDF pp. 7–8）",
+    "caveatZh": "表现高频颜色需较多短段，实拍发丝仍难，文章未验证多种 surface primitive 或推断真实力学参数。 每场景优化的曲线可迁移为生成表示，尚需另外验证 feed-forward 生成和仿真稳定性。",
+    "motivationZh": "点 Gaussian 能重建外观，但细长几何常被分解成缺少连通结构的点状基元。",
+    "methodZh": "在每段上对 anisotropic Gaussian 或 Beta kernel 作卷积。Gaussian 路径可闭式求射线积分，按局部相机线性化 rasterize，再以 optical-depth 合成避免连接点重复贡献。端点合并和 densification 维持连续曲线。",
+    "experimentsZh": "Mip-NeRF 360、Shelly、Fuzzy 的新视角合成和合成发型的几何重建。 作者报告，与 Gaussian Haircut 比较，平均 PSNR 高 2.7 dB，2 mm 阈值的 strand F1 高 14.3 个百分点。（Fig. 8, §4.2, PDF pp. 7–8） 新视角对比 Line Primitives、Gaussian Splatting 和混合基元；hair 对照使用同一测试设置的 Gaussian Haircut。 段克隆影响 PSNR，端点合并和 attraction loss 对曲线结构更重要。",
+    "insightZh": "通过积分一致的线段卷积将 3DGS 作为零长度特例，连接曲线天然导出结构化几何。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

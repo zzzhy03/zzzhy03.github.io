@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2611.12011",
+  "slug": "hist3r-history-for-streaming-3d-reconstruction",
+  "title": "HIST3R: Decomposing and Rectifying State Updates with History for Streaming 3D Reconstruction",
+  "authors": [
+    "Kenneth Yang",
+    "Yu-Chiang Frank Wang"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.12011"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "HIST3R",
+    "CUT3R",
+    "recurrent state",
+    "long sequences"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Streaming 3D reconstruction with recurrent states enables long-video scene understanding under bounded memory, but turns reconstruction into a state-evolution problem: each incoming frame updates a compact scene memory on which all subsequent predictions depend, so unreliable updates overwrite historical context and accumulate into long-horizon geometric drift. We analyze CUT3R-style recurrent updates through a direction--magnitude decomposition, in which the magnitude sets the update gain, i.e., how strongly an observation is written into the state, and the direction encodes the geometric intent, i.e., where the update drives the state. This decomposition provides a unified view of CUT3R and its variants, revealing that existing training-free extensions perform magnitude-only control: they can attenuate an unreliable update but cannot correct its direction. We propose HIST3R, a training-free framework built on CUT3R that controls both components using history. HIST3R rectifies the update direction using locally consistent historical states, and modulates the update magnitude according to the visual discrepancy between the current observation and its history, suppressing redundant updates while preserving complementary evidence. Across camera pose estimation, 3D reconstruction, and video depth estimation, HIST3R consistently improves long-horizon performance while retaining the memory footprint and inference speed of CUT3R. With 1000 input frames, it reduces ATE by 23.87% on ScanNet and 33.65% on TUM-Dynamics relative to the strongest competing method; with 500 frames, it improves median reconstruction accuracy over the strongest CUT3R-based variant by 56.52% on 7-Scenes and 33.96% on NRGBD.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.12011v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.12011v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.12011v1 精确版本全文，PDF 共 31 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "HIST3R 将 CUT3R 的 recurrent update 拆成方向和幅度，以短历史校正几何方向，再按新观测与历史的差异调节写入。无需重训，在长视频上可减少漂移，但修不回骨干未编码的信息。",
+    "methodFlow": [
+      "读入下一帧并计算 CUT3R 候选更新",
+      "检索窗口中与当前候选最一致的状态",
+      "用历史端点及 gate 校正更新方向",
+      "按当前观测的增量证据调节写入幅度"
+    ],
+    "whyRelevantZh": "为递推式三维场景生成提供方向与步长分别控制的漂移缓解思路。",
+    "evidenceZh": "滑动缓存同时提供几何历史与视觉摘要。（§3, Fig. 2, PDF p. 4） 方向校正与幅度调节有独立对照。（Table 2, PDF p. 9） 作者报告，1,000 帧时相对 TTSA3R 的 ATE 在 ScanNet 和 TUM-Dynamics 分别降低 23.87% 和 33.65%。（Fig. 3 and §4.1, PDF pp. 7–8）",
+    "caveatZh": "受限于预训练 CUT3R 的信息和候选更新，难纠正严重预测错误。 迁移到生成状态前，需验证历史 latent 相似度是否对应几何一致。",
+    "motivationZh": "逐帧写入紧凑重建状态时，错误更新的方向无法靠调小 update gain 完全修复。",
+    "methodZh": "保存滑动窗口内状态与视觉摘要，按局部相似度形成历史候选方向，alignment gate 控制是否采纳。按 patch 相关的视觉 discrepancy 调整 token 写入幅度。",
+    "experimentsZh": "ScanNet、TUM-Dynamics 位姿，7-Scenes、NRGBD 重建以及 KITTI/Bonn 深度。 作者报告，1,000 帧时相对 TTSA3R 的 ATE 在 ScanNet 和 TUM-Dynamics 分别降低 23.87% 和 33.65%。（Fig. 3 and §4.1, PDF pp. 7–8） CUT3R、TTT3R、TTSA3R 和显式记忆方法；显式记忆方法仍在部分几何指标占优。 去 alignment gate 的退化表明历史不能无条件应用；历史过长会纳入无关状态。",
+    "insightZh": "将历史信息用于修改 latent 更新方向，扩展以往只改变步长的 training-free 方法。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

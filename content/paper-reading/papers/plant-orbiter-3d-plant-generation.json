@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2611.12739",
+  "slug": "plant-orbiter-3d-plant-generation",
+  "title": "Plant Orbiter: 3D Plant Reconstruction and Generation with Video Diffusion Orbit Cameras and 3D Gaussian Splatting",
+  "authors": [
+    "Zane K. J. Hartley",
+    "Yong En Kok",
+    "Lewis A. G. Stuart",
+    "Andrew P. French",
+    "Michael P. Pound"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.12739"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "Plant Orbiter",
+    "plant assets",
+    "video diffusion",
+    "3D Gaussian Splatting"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "3d-gaussian"
+    ],
+    "conditioning": [
+      "text",
+      "single-image"
+    ],
+    "prior-data": [
+      "video-prior"
+    ]
+  },
+  "abstract": "Modern digital phenotyping pipelines require the precise measurement of a range of 3D morphological plant traits. The accurate, high throughput acquisition of these traits helps breeders and researchers accelerate the development of new varieties, techniques and products. Recent advances in 3D technologies have enabled a rapid transition from 2D to 3D pipelines, but high throughput acquisition of digital 3D twins of plants remains a significant challenge due to complex morphology, thin structures and occlusions. In this paper we present Plant Orbiter, a new approach to generating 3D plants that leverages recent advances in video diffusion to produce high quality 3D Gaussian Splats of plants from a single image. We show that our method more accurately recreates plant morphology than other state-of-the-art methods, achieving the highest 3D F-score against all baselines, while being more practical for high throughput pipelines due to easier alignment and reduced cost of camera placement. Combined with a 2D diffusion model, we show that our method also achieves state-of-the-art results in the generation of 3D plant models from a text prompt.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.12739v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.12739v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.12739v1 精确版本全文，PDF 共 16 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "Plant Orbiter 先用视频 LoRA 生成 73 帧已知轨道绕拍，再以 silhouette visual hull 初始化 3DGS，省去对合成帧跑 SfM。文生图可接到同一管线，背面细节与果实数仍受生成先验影响。",
+    "methodFlow": [
+      "拍摄植物照片或以文本生成起始图",
+      "视频 diffusion LoRA 生成约束为圆轨迹的 73 帧",
+      "按已知轨道恢复相机并由 silhouette carve visual hull",
+      "拟合 3DGS 后按新视角渲染"
+    ],
+    "whyRelevantZh": "在细长且易遮挡的资产上，固定视频轨迹和视觉外壳是可复用的 3D 生成条件。",
+    "evidenceZh": "轨迹先验决定相机相对 pose，mask 交集提供初始化。（Fig. 1, §§3.1–3.3, PDF pp. 2–3） 果实计数实验让 Ours 和 TRELLIS.2 共用 Qwen 起始图。（§5.3, Table 5, PDF pp. 9–10） 作者报告，oracle alignment 下 PlantDreamer 的 F-score 为 0.443，TRELLIS.2 为 0.367；在三组其他几何设置也取得最高 F-score。（Table 2, PDF p. 8） 作者报告，文本生成的 MMD-F 为 0.539，TRELLIS-text 为 0.514，但覆盖率 0.288 低于对方 0.504。（Table 4, PDF p. 9）",
+    "caveatZh": "遮挡面需要模型补全，绕拍只有一个高度，顶视和底视可能出现伪影。 oracle alignment 与部署时自动定尺度不同；重建结果对植物以外的细结构不直接成立。",
+    "motivationZh": "植物的细枝叶、重复纹理和自遮挡让单图重建难以稳定恢复相机与几何，文生植物资产也缺少 3D 训练数据。",
+    "methodZh": "让图像条件视频遵循固定 5° 步长的环绕轨迹，按圆周几何赋 pose、估计焦距并以多帧 mask 做 visual hull，优化抗锯齿 Gaussian。文本路径先用 Qwen-Image-2.1 生成起始植物图。",
+    "experimentsZh": "四组植物几何数据的单图重建，三物种文本生成，以及番茄/柠檬的提示果实计数。 作者报告，oracle alignment 下 PlantDreamer 的 F-score 为 0.443，TRELLIS.2 为 0.367；在三组其他几何设置也取得最高 F-score。（Table 2, PDF p. 8） 作者报告，文本生成的 MMD-F 为 0.539，TRELLIS-text 为 0.514，但覆盖率 0.288 低于对方 0.504。（Table 4, PDF p. 9） 重建对比 TRELLIS 系列、SV3D 等；文生图路径对比 DiffSplat、GaussianDreamer、TRELLIS-text 和 MVDream。 独立比较 oracle 和 input-view alignment，果实计数对照固定起始图。缺少对所有初始化选择的独立消融。",
+    "insightZh": "受控视频轨迹代替对复杂植物做 SfM，结合 silhouette 初始化把单图与文本两种入口接到同一植株 lifting。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

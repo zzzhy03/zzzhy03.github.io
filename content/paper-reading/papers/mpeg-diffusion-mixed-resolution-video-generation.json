@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2611.12069",
+  "slug": "mpeg-diffusion-mixed-resolution-video-generation",
+  "title": "MPEG-Diffusion: Mixed-Resolution Video Generation",
+  "authors": [
+    "Dennis Menn",
+    "Tianpei Gu",
+    "Guande He",
+    "Aryan V S",
+    "Yanke Song",
+    "Nan Liu",
+    "Desai Xie",
+    "Xun Huang",
+    "Chenfeng Xu",
+    "Diana Marculescu"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.12069"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "MPEG-Diffusion",
+    "mixed resolution",
+    "video diffusion",
+    "latent mixer"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Video diffusion transformers (DiTs) generate realistic videos, but their heavy computational cost limits broader real-world applications. Mixed-resolution generation reduces this cost by generating the visually important region at high resolution (HR) and the rest at low resolution (LR), yet existing methods suffer a severe quality drop on videos and require knowing the HR region in advance. We show that these failures are not inherent to mixed resolution, and propose $\\textbf{MPEG-Diffusion}$ to address their three root causes: (1) dual-resolution attention to mitigate the curse of mixed resolution, where each query reads the K/V of its own resolution, (2) a mixed-resolution decoder to blend the HR and LR latents before decoding and resolve distortion, and (3) a self-selected HR region using the DiT's knowledge to find the visually important region without requiring it in advance. Processing only $30\\%$ of full-resolution tokens, MPEG-Diffusion speeds up denoising by $4.8\\times$ on Wan2.1 14B ($3.8\\times$ on 1.3B), outperforming prior methods on nearly every metric. In the user study, we demonstrate the high quality of MPEG-Diffusion, with raters preferring it over prior mixed-resolution methods in over $90\\%$ of pairs and rating it close to full resolution.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.12069v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.12069v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.12069v1 精确版本全文，PDF 共 16 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "MPEG-Diffusion 先低分辨率去噪，再由 DiT 自选关键区域升分。分辨率内 K/V 读写和 latent mixer 分别处理注意力失配与解码接缝，作者报告在 Wan2.1 14B 的 30% token 设置下去噪提速 4.8 倍。",
+    "methodFlow": [
+      "全画幅在低分辨率去噪前若干步",
+      "从 DiT 中间特征预测高分区掩膜",
+      "只升分关键区域并采用两路分辨率内 attention",
+      "在 latent 空间混合，再用原 VAE 解码"
+    ],
+    "whyRelevantZh": "视频生成中可将计算放在视觉关键区域，适合关注可控效率和混分辨率边界。",
+    "evidenceZh": "高分区域由 DiT 自选并在初始低分阶段之后升分。（Fig. 2, §4, PDF pp. 2, 5） 两路 attention 和 latent mixer 分别改善边界错位与感知接缝。（Figs. 12–13, PDF p. 8） 作者报告，30% token 时 14B 去噪速度为全分的 4.8 倍，盲评对全分版本的偏好率为 45.2%。（Table 1, Fig. 9, PDF p. 7）",
+    "caveatZh": "线性跨分辨率假设仍可能损失质量，局部清晰度差异有时可见。 方法取决于显著主体可被较小高分区域覆盖，多主体和均匀细节场景可能降低节省。",
+    "motivationZh": "均匀高分辨率视频 diffusion 成本高，传统混合 token 在跨分辨率注意力和 VAE 解码接缝上引入伪影。",
+    "methodZh": "低分阶段由中层线性 head 识别高分区域；后续 HR 与 LR query 分别使用同分辨率 K/V，其他位置用学到的线性变换补齐；低分 latent 上采样后交给轻量 3D mixer，再用原 VAE。",
+    "experimentsZh": "Wan2.1 1.3B/14B 在相同 token budget 比较 mixed-resolution 基线，另做 960p 和 FLUX.2 image 迁移。 作者报告，30% token 时 14B 去噪速度为全分的 4.8 倍，盲评对全分版本的偏好率为 45.2%。（Table 1, Fig. 9, PDF p. 7） 与纯 HR/LR、Foveated Diffusion、Phase-Aligned RoPE 等比较，含固定 token budget。 逐项检查双分 attention、mixer、选择 head 和运行时开销，报告 seam 附近的变化。",
+    "insightZh": "把显著区域选择、分辨率适配和 seam 修复分开解决，减少了高分 token 又保留同一视频中的关键主体。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

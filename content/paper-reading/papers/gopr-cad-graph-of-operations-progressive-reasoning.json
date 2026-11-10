@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2611.11470",
+  "slug": "gopr-cad-graph-of-operations-progressive-reasoning",
+  "title": "GOPR-CAD: Graph-of-Operations Progressive Reasoning for CAD Generation",
+  "authors": [
+    "Yitian Pang",
+    "Yifan Li",
+    "Xiaowei Yue",
+    "Li Zheng"
+  ],
+  "publishedAt": "2026-11-08",
+  "updatedAt": "2026-11-08",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11470"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "GOPR-CAD",
+    "operation graph",
+    "STEP",
+    "B-rep",
+    "Structural Yield"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "tool-use"
+    ],
+    "representation": [
+      "cad-brep-parametric",
+      "discrete-program"
+    ],
+    "output-property": [
+      "editable"
+    ]
+  },
+  "abstract": "Generating accurate CAD models requires substantial engineering expertise and careful control of geometry, topology, and mechanical constraints. Text-to-CAD aims to simplify this process, but current LLM-based methods often generate CAD programs directly. Language models remain unreliable when producing long code while coordinating coupled geometric, topological, and dimensional constraints. Consequently, executable programs may still produce structurally incorrect models, which execution rate and rendered appearance may fail to reveal. To address these limitations, we propose GOPR-CAD, an agentic Text-to-CAD pipeline based on Graph-of-Operations Progressive Reasoning. A language model acts as a decision agent over encapsulated CAD operations and progressively constructs an executable operation graph, which a deterministic compiler converts into the final CAD model. This separation requires no additional training and supports different language models. To evaluate structural fidelity, we construct MHCAD, a benchmark of 300 standard mechanical part requirements derived from Machinery's Handbook. Their explicit structures enable reference-free STEP/B-rep evaluation. GOPR-CAD achieves 82.7% Structural Yield on MHCAD, and 87.2% Structural Yield on an external CADPrompt subset.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11470v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11470v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11470v1 精确版本全文，PDF 共 14 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "GOPR-CAD 让 LLM 逐步构造带类型的 operation graph，再由确定性 compiler 生成 STEP。将可执行覆盖与机械结构正确率合在 Structural Yield，能区分有文件和有用模型。",
+    "methodFlow": [
+      "把自然语言机械要求写进 construction intent ledger",
+      "召回封装的可执行 CAD 操作",
+      "绑定类型化机械关系与参数",
+      "编译 STEP 并对可适用的 B-rep 结构做检查"
+    ],
+    "whyRelevantZh": "可直接借鉴到需要离散零件、连接关系和机械约束的 CAD/积木设计 agent。",
+    "evidenceZh": "操作图保留意图、操作、关系与参数之间的明确契约。（Fig. 2, §3, PDF p. 4） 自由文本阶段加直接代码执行显著降低有效交付。（Fig. 4, PDF p. 7） 作者报告，MHCAD 的 Structural Yield 为 82.7%，CADPrompt 子集为 87.2%。（Table 1, Fig. 3, PDF p. 6）",
+    "caveatZh": "评价只覆盖六种可自动验证的结构；复杂装配与曲面约束仍需扩展操作图。 结构 yield 不等同公差可制造、碰撞验证或任务语义完整。",
+    "motivationZh": "长 CAD 程序可以编译，却因遗漏装配、拓扑或尺寸关系而不满足机械规范。",
+    "methodZh": "持久 intent ledger 记录需求证据，依次从操作库召回操作、绑定机械关系及参数；typed contracts 限定可选操作，图完成后确定性编译并评估 B-rep。",
+    "experimentsZh": "MHCAD 含 300 个机械零件提示、342 个可适用检查，另用 CADPrompt 子集，比较多骨干。 作者报告，MHCAD 的 Structural Yield 为 82.7%，CADPrompt 子集为 87.2%。（Table 1, Fig. 3, PDF p. 6） Text2CAD、Text-to-CadQuery、CADFusion、NURBGen 与同语言模型直接生成。 检验操作默认值、关系覆盖、候选召回及自由文本替代。",
+    "insightZh": "把语言决策、确定性几何操作与结构核验拆开，并在缺失或无效模型上计零避免幸存者偏差。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

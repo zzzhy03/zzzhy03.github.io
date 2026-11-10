@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2611.11421",
+  "slug": "genrm-flow-generators-as-reward-models",
+  "title": "GenRM-Flow: Generators are Process-aware Reward Models in Flow Matching",
+  "authors": [
+    "Siming Fu",
+    "Ruizhe He",
+    "Zheming Fu",
+    "Zeyue Xue",
+    "Fengkai Liu",
+    "Yufei Jiao",
+    "Jie Huang",
+    "Xiaoxiao Ma",
+    "Xuan Yang",
+    "Lihui Luo"
+  ],
+  "publishedAt": "2026-11-08",
+  "updatedAt": "2026-11-08",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11421"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "GenRM-Flow",
+    "preference learning",
+    "velocity prediction",
+    "FlowAWR"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "method": [
+      "flow-matching"
+    ]
+  },
+  "abstract": "Aligning video generation models with human preference depends critically on the quality of the reward model that scores generated videos. Current video reward models, however, source their reward signal from a model's representational rather than generative capacity: they either repurpose vision-language models as pixel-space scorers, or train auxiliary scoring heads on top of frozen generator features. The generator's actual ability to predict velocities, denoise latents, and produce videos plays no role in scoring its own generations. We argue that this overlooks a structural property of offline preference learning. Any preference optimization objective that approximates an offline preference dataset mathematically targets a strictly defined KL-constrained optimal policy. By isolating the reward term from this analytical solution and mapping the exact generation log-likelihood to its flow-matching surrogate, the empirical reward emerges deterministically as the relative difference in continuous-time velocity-prediction errors. We formalize this equivalence into GenRM-Flow, a framework where a preference-tuned video generator inherently operates as a process-aware reward model directly in the noisy latent space. We further show theoretically that distinct fine-tuning objectives, whether contrastive like DPO and IPO or non-contrastive like RWR, are alternative optimization pathways toward the same optimal policy, each inducing a reward readout from the generator's velocity-prediction errors. Furthermore, the extracted process reward seamlessly substitutes external VLM scorers in FlowAWR. Operating purely on native latent outputs without auxiliary reward networks, this generative reward drives measurable improvements in downstream video generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11421v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11421v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11421v1 精确版本全文，PDF 共 14 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "GenRM-Flow 从偏好微调的 flow generator 与参考模型的速度预测误差差值读出 latent reward，用来驱动 FlowAWR。作者给出了噪声层级上的证据，但当前评分来自对成片加噪。",
+    "methodFlow": [
+      "用成对视频偏好微调 flow generator",
+      "对成片 latent 在各噪声水平加噪",
+      "用微调模型和参考模型的速度误差读出分数",
+      "在 FlowAWR 中归一化组内奖励并更新生成器"
+    ],
+    "whyRelevantZh": "为视觉生成 agent 的候选选择或后训练提供可在 latent 内计算的替代评分。",
+    "evidenceZh": "相对 velocity error 是基于 flow 近似的 reward readout。（§§3.2–3.4, Fig. 2, PDF pp. 4–6） 评分使用 final sample 再加噪得到的状态。（§5, PDF p. 9） 作者报告，14B 平均 pairwise preference accuracy 为 88.96%，PAVRM 为 82.64%。（Table 2, PDF p. 8）",
+    "caveatZh": "未验证对采样真实访问的中间状态做 reward；高质量偏好数据是重要前提。 内部偏好数据和同一模型家族会限制跨领域与跨架构外推。",
+    "motivationZh": "视频偏好模型常需要额外 RGB 解码、VLM 或 scorer，且不直接观察生成器的速度预测。",
+    "methodZh": "由 KL 约束的最优策略导出 reward readout，把生成 log-likelihood 用 flow matching 的速度误差替代。偏好调过的 LoRA 与冻结参考在同一 noisy latent 比较，不需独立 score head。",
+    "experimentsZh": "Wan2.1-T2V 1.3B/14B；作者内部偏好数据、4,800 对 held-out、VBench 与 FlowAWR 奖励对照。 作者报告，14B 平均 pairwise preference accuracy 为 88.96%，PAVRM 为 82.64%。（Table 2, PDF p. 8） 与 VideoAlign、PAVRM 在两规模及统一 FlowAWR 设置比较。 去组内归一化会训练崩溃；比较 softmax 和 z-score 显示 normalization 影响最终分数。",
+    "insightZh": "将已有偏好目标学到的生成策略转换成可直接读取的过程评分，降低对额外像素 scorer 的依赖。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

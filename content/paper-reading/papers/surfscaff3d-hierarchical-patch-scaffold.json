@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2611.11678",
+  "slug": "surfscaff3d-hierarchical-patch-scaffold",
+  "title": "SurfScaff3D: Bridging Geometric and Semantic Representations for LLM-based 3D Object Generation",
+  "authors": [
+    "Anay Loya",
+    "Rishi Gupta",
+    "Arnav Samal",
+    "Anirban Chakraborty"
+  ],
+  "publishedAt": "2026-11-08",
+  "updatedAt": "2026-11-08",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11678"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "SurfScaff3D",
+    "hierarchical patch scaffold",
+    "B-spline",
+    "part editing"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing"
+    ],
+    "content-scope": [
+      "part-assembly"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "output-property": [
+      "part-aware",
+      "editable"
+    ]
+  },
+  "abstract": "Creating high-quality 3D content has traditionally required specialist expertise and experience with complex tools. The growing ecosystem of AI-assisted creativity demands accessible and intuitive 3D generation systems. Recent advances in Large Language Models (LLMs) offer promising directions, yet extending their generative capabilities to 3D remains fundamentally challenging because existing 3D representations are not naturally compatible with language-based reasoning. Current approaches either depend on expensive fine-tuning or impose restrictive structural priors that sacrifice expressiveness and exclude organic shapes. We argue that the mismatch between LLM-native reasoning and conventional 3D parameterizations is a core bottleneck of LLM-driven 3D generation. To address this, we introduce the Hierarchical Patch Scaffold (HPS), a representation designed around semantically meaningful, interpretable part-level abstractions that are naturally understood by both humans and LLMs, enabling expressive, editable, and open-domain 3D generation without imposing restrictive geometric priors or expensive fine-tuning. Building upon HPS, we introduce SurfScaff3D, an interactive framework for text and image-to-3D generation. HPS inherits the flexibility of B-spline patches, while exposing an interface that leverages open-world capabilities of foundation models to reliably generate 3D. Its hierarchical part-level semantic labels enable targeted, natural-language edits at any level of granularity without re-running generation. Further, HPS offers explicit per-patch control over surface detail, enabling more expressive geometry capable of representing arbitrary objects. Extensive experiments against state-of-the-art LLM-based 3D generation methods demonstrate strong geometric fidelity, semantic alignment, and flexible editing across diverse object categories.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11678v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11678v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://vcl-iisc.github.io/SurfScaff3D/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11678v1 精确版本全文，PDF 共 19 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "SurfScaff3D 把显式 B-spline patches 挂到语义部件树，generator 生成曲面代码，critic 根据多视图反馈给局部修改。这个中间表示让对象可按部件重写，仍需独立检查 watertightness 和连接。",
+    "methodFlow": [
+      "把输入拆成层级部件与初始曲面草案",
+      "生成 surface points 并拟合 B-spline patches",
+      "渲染若干视图由 critic 指出局部问题",
+      "只重写目标节点并保留其余部件"
+    ],
+    "whyRelevantZh": "显式语义部件、曲面与局部更新可直接借鉴到结构化三维设计或资产编辑。",
+    "evidenceZh": "语义树中的每个节点映射到一个或多个 patch。（Fig. 3, §§3–4, PDF p. 5） 视觉检查不能保证曲面准确拼接。（Appendix C, PDF p. 14） 作者报告，在 OmniObject3D 上 SurfScaff3D-K 的 Chamfer 为 0.084、F@0.05 为 0.709，Articraft 为 0.096 和 0.596。（Table 2, PDF p. 7）",
+    "caveatZh": "没有显式保证水密、自相交或连接；某些任务依赖 prompt 细节和较强空间推理。 要用于加工、布尔操作或装配，仍需拓扑修复和可制造性检查。",
+    "motivationZh": "语言模型容易描述部件，却难直接操纵连续 3D 参数；简单的固定 primitive 容易限制有机形态。",
+    "methodZh": "LLM 生成 surface point grid，再拟合 B-spline，允许按 patch 加频率和幅度控制的变化。语义节点可映射到多 patch，反馈描述要修的部件、问题与操作。",
+    "experimentsZh": "ShapeNetCore、Toys4K、OmniObject3D 的文本生成，OmniObject3D 与 50 个 DeepCAD 实拍例的图像条件生成，以及 ShapeTalk 编辑。 作者报告，在 OmniObject3D 上 SurfScaff3D-K 的 Chamfer 为 0.084、F@0.05 为 0.709，Articraft 为 0.096 和 0.596。（Table 2, PDF p. 7） 与 LLM 型 CAD/生成基线比较，部分方法因没有可用代码无法做同一 image-to-3D 实验。 固定 backbone 对比点集、无树控制点、HPS；另测局部 surface variation 与 critic 迭代的边际收益。",
+    "insightZh": "将可语义寻址的层级与连续曲面解耦，在同一表示支持有机形态和局部重写。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

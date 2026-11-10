@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2611.11692",
+  "slug": "locateanymesh-grounding-mesh-queries",
+  "title": "LocateAnyMesh: Grounding 3D Mesh Queries in 2D Images with Vision-Language Models",
+  "authors": [
+    "Chris Choy",
+    "Zhiding Yu",
+    "Jan Kautz"
+  ],
+  "publishedAt": "2026-11-08",
+  "updatedAt": "2026-11-08",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11692"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "LocateAnyMesh",
+    "mesh tokens",
+    "asset grounding",
+    "PPAT"
+  ],
+  "facets": {
+    "task": [
+      "reasoning"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "conditioning": [
+      "multimodal"
+    ]
+  },
+  "abstract": "Textured 3D meshes specify object geometry and appearance, making them a natural query for finding a particular asset in an image. We introduce LocateAnyMesh, a vision-language model that uses the mesh itself as part of its prompt. A frozen 3D encoder maps colored surface points to a compact token sequence, which a learned connector places alongside image and instruction tokens. We evaluate two grounding models with PPAT mesh tokens: LAM-Select selects image-region proposals, while LAM-Direct predicts coordinates directly. Neither requires rendered query views or view-template matching. New objects require a single encoder pass and no object-specific fine-tuning. LAM-Select improves localization on the reported real-image suites and the official BOP YCB-V evaluation. Secondary experiments compare mesh encoders, and a LAM-Direct study isolates surface color. A single-seed LAM-Select continuation supplies pointing and mesh-only description evidence without replacing the reported localization model. The results support mesh tokens as a query representation, with remaining limitations in presence decisions, identity binding, proposal coverage, and descriptive fidelity.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11692v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11692v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11692v1 精确版本全文，PDF 共 36 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "LocateAnyMesh 直接把纹理 mesh 的有色表面压成 65 个 token 输入 VLM，支持选候选框或直接预测坐标。定位 AP 支持这种查询接口，mesh 替换实验则显示模型仍经常选错相似对象。",
+    "methodFlow": [
+      "从纹理 mesh 采样有色表面点并归一化",
+      "由冻结 PPAT 编码并投影到语言模型",
+      "将 mesh 与图片、指令及可选候选框同输入",
+      "输出对应框或坐标并记录无目标判断"
+    ],
+    "whyRelevantZh": "把已有资产直接用作渲染反馈中的定位 query，减少手写外观描述和模板图的需求。",
+    "evidenceZh": "冻结编码器产生 65 个带颜色的几何 token。（Fig. 3, §3, PDF p. 3） proposal 覆盖后仍会拒绝、选错或误报。（§5.4, Table 4, PDF p. 11） 作者报告，900 个 YCB-V 目标图上，LAM-Select amodal AP 为 0.7152，LAM-Direct 为 0.6284。（Table 3, PDF p. 6）",
+    "caveatZh": "缺物误报、相似物体身份绑定和遮挡定位都未充分解决。 给设计 agent 做自动验收时，mesh query 可作为辅助证据，需另加对应约束。",
+    "motivationZh": "文本不能总是区分相似资产，而在渲染图里找指定资产通常要先生成并匹配多个模板视角。",
+    "methodZh": "在 mesh 表面采样有色点，用冻结 PPAT 编码并以训练的 connector 对齐 VLM。LAM-Select 读取检测框及区域 token，LAM-Direct 输出坐标。推理中新资产仅需一次编码。",
+    "experimentsZh": "在 HOPE、LM-O、HB 的 held-out 实物和 seen YCB-V 上测框定位，并做颜色和身份诊断。 作者报告，900 个 YCB-V 目标图上，LAM-Select amodal AP 为 0.7152，LAM-Direct 为 0.6284。（Table 3, PDF p. 6） 两个完整定位系统及 BOP 上下文，不是同骨干同训练的 selector 单变量实验。 保持初始化和数据的 LAM-Direct 消融表明灰色 mesh 退化，不能推出 LAM-Select 对颜色的同等依赖。",
+    "insightZh": "将 3D 资产本身作为 grounding query，无需制作模板图，另用同图换 mesh 测身份绑定。",
+    "relevance": "high",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

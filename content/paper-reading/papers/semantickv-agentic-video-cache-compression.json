@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2611.11452",
+  "slug": "semantickv-agentic-video-cache-compression",
+  "title": "Semantically Aligned KV Cache Compression for Efficient Agentic Autoregressive Video Generation",
+  "authors": [
+    "Weizhong Huang",
+    "Huaijia Kou",
+    "Tianyu Xie",
+    "Xiawu Zheng",
+    "Liujuan Cao"
+  ],
+  "publishedAt": "2026-11-08",
+  "updatedAt": "2026-11-08",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11452"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "SemanticKV",
+    "KV cache",
+    "agentic video",
+    "constraint-conditioned queries"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "method": [
+      "autoregressive"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "abstract": "Agentic autoregressive video generation combines semantic planning, sequential generation, and visual verification for controllable synthesis. Growing visual histories enlarge the key-value (KV) cache, increasing memory use and attention costs across candidate rollouts. Existing compression methods primarily optimize individual generators without the planner's semantic constraints, risking low priority for states supporting requested attributes or actions. We introduce SemanticKV, a training-free method for semantically aligned KV cache compression. To our knowledge, SemanticKV is the first KV cache compression method for agentic autoregressive video generation that explicitly uses planner-extracted semantic constraints to guide retention. Text cross-attention identifies constraint-related video positions, whose self-attention queries are collected into separate groups. Attention weights are averaged within each group and maximized across groups, giving each cached entry a high score when strongly used by any represented constraint. A single top-k selection retains high-scoring entries under the memory budget, leaving their keys, values, and positions unchanged. For fixed query groups and equal entry costs, this selection minimizes an additive upper bound on worst-group discarded attention. The method operates independently within each candidate without retraining or additional video generations. We evaluate four AR video backbones on three benchmarks for 5-, 30-, and 60-second generation. On Causal Forcing at a compression ratio of 0.7, SemanticKV obtains a VBench Total Score of 84.10, compared with 84.05 for the strongest compressed baseline and 83.99 for Full KV. It achieves a 1.22x speedup over Full KV and reduces KV-cache memory from 6.04 GB to 1.81 GB, a 3.35x reduction.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11452v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11452v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11452v1 精确版本全文，PDF 共 32 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "SemanticKV 用 planner 抽取的约束来选择视觉 query，再按每个缓存条目在各组的最高组内注意力保留历史。在 Causal Forcing 的短片设置显著减小 KV 显存，长视频质量仍有损失。",
+    "methodFlow": [
+      "规划器提取主体、动作及排除约束",
+      "为每条约束找出对应视觉 query",
+      "组内均值与组间最大值为 KV 打分",
+      "保留必需项与高分缓存，继续各自独立 rollout"
+    ],
+    "whyRelevantZh": "提供一个将设计规范转成生成器资源分配信号的具体接口。",
+    "evidenceZh": "规划候选与原 prompt 候选有独立缓存，压缩只作用候选内部。（Figs. 1–2, §§3–4, PDF pp. 4, 7） 理论界只约束一次更新中的注意力质量。（Table 5 and Appendix E.3, PDF p. 25） 作者报告，Causal Forcing 在 0.7 压缩设置下，KV 缓存从 6.04 降至 1.81 GB，DiT 吞吐为 1.22 倍，VBench 总分 84.10 对 Full KV 的 83.99。（Table 1, PDF p. 8）",
+    "caveatZh": "attention 上界假定等成本且固定 query 组，不保证逐块累积误差或长视频质量。 planner 漏掉的需求无法通过分组优先保留，依赖任务约束提取质量。",
+    "motivationZh": "带 planner 和 verifier 的长视频自回归生成会维持多个缓存，通用压缩容易丢掉只服务一个设计约束的 token。",
+    "methodZh": "对语义约束和 prompt token 做 span matching，经 cross-attention 选出 query；组内平均、组间最大化得到分数；保留 mandatory state 后按字节预算裁剪并保持 K/V 和原始位置。",
+    "experimentsZh": "四个 AR backbone，5 秒 VBench、30/60 秒 VBenchLong 与 VisionReward，报告质量、缓存及吞吐。 作者报告，Causal Forcing 在 0.7 压缩设置下，KV 缓存从 6.04 降至 1.81 GB，DiT 吞吐为 1.22 倍，VBench 总分 84.10 对 Full KV 的 83.99。（Table 1, PDF p. 8） Full KV、R-KV、Dummy Forcing 和 Forcing-KV，同预算比较。 在 LongLive 固定种子和约束，分别改为均匀 query 或汇聚约束，隔离语义分组贡献。",
+    "insightZh": "用设计约束而非全局平均指导缓存保留，在固定等成本组条件下给出丢失质量上界。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

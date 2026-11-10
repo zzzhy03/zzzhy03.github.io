@@ -1,0 +1,75 @@
+{
+  "id": "arxiv:2611.11964",
+  "slug": "3r-adapter-relational-adaptation-for-3d-reconstruction",
+  "title": "3R-Adapter: Retrieval, Rewiring, and Refinement for Efficient Adaptation of 3D Reconstruction Model",
+  "authors": [
+    "Zixiang Ai",
+    "Zhenyu Cui",
+    "Xu Zou",
+    "Jiahuan Zhou"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11964"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "3R-Adapter",
+    "PEFT",
+    "deformable sampling",
+    "cross-view correspondence"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "conditioning": [
+      "multi-view"
+    ]
+  },
+  "abstract": "Feed-forward 3D reconstruction models have demonstrated strong generalization under large-scale pre-training, yet they struggle in long-tail scenarios such as low-light reconstruction, joint human-scene reconstruction, and test-time adaptation. We observe relational attention structure collapse, manifested as the failure of cross-view correspondences, as a primary cause of these limitations. While adaptation offers a practical way to bridge this gap, existing parameter-efficient fine-tuning (PEFT) approaches mainly perform channel-wise feature adjustment and lack mechanisms to explicitly adapt relational structures, leaving correspondence failures unresolved. In this work, we formulate adaptation of 3D reconstruction models as a problem of correspondence recovery under domain shift and propose 3R-Adapter, a PEFT paradigm for long-tail 3D reconstruction scenarios. Our method consists of three components: Deformable Retrieval for task-adaptive relation candidate retrieval, Relational Rewiring for reconstructing cross-view relational structures, and Consistency Refinement for injecting the rewired relations into stable predictions. Extensive experiments on low-light reconstruction, joint human-scene reconstruction, and test-time adaptation demonstrate that our approach significantly improves robustness over existing PEFT methods while maintaining efficient lightweight adaptation. Our code is released at https://github.com/PKU-OV3-LAB/3R-Adapter.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11964v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11964v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/PKU-OV3-LAB/3R-Adapter"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11964v1 精确版本全文，PDF 共 17 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "3R-Adapter 用可变形采样找跨图候选，再显式重连和 gated 融合关系，让冻结重建骨干适应低光和人物场景。诊断表显示中间对应率确有改善，超长序列仍受滑窗限制。",
+    "methodFlow": [
+      "从预训练骨干获取跨图特征",
+      "对局部视图锚点预测变形采样和路由",
+      "重连候选关系并汇聚跨图信息",
+      "门控注回预训练 attention 流"
+    ],
+    "whyRelevantZh": "可把显式跨视图关系作为多视图生成条件的校正接口。",
+    "evidenceZh": "变形检索、重连、精炼是三步显式关系适配。（§4, Fig. 3, PDF p. 5） 相同容忍窗口检查冻结和适配后的 Match@1。（Table 4, PDF p. 10） 作者报告，π3 夜间重建 Chamfer 为 0.633，原骨干为 0.936。（Table 1, PDF p. 8）",
+    "caveatZh": "深域外输入仍受预训练特征上限，滑动视图窗可能丢失远距离关系。 对生成模型的迁移需保留可定位的跨视图 token 并重新校准关系诊断。",
+    "motivationZh": "低光和域外输入会破坏前馈 3D 模型的跨视角对应，通道级 PEFT 难以显式修复关系。",
+    "methodZh": "对邻近视图抽取低维锚点，预测 offset/routing weight 采样候选位置，汇聚跨视角关联后通过 residual gate 注回骨干。",
+    "experimentsZh": "Oxford Day&Night，7-Scenes/NRGBD 测试时适配和 BEDLAM 人物场景。 作者报告，π3 夜间重建 Chamfer 为 0.633，原骨干为 0.936。（Table 1, PDF p. 8） 与 LoRA、其他 PEFT、专用 TTA 及人体重建方法比较；只有部分方法同骨干。 附录拆分三个模块，主文 Table 4 检查候选 offset 覆盖及四层的 Match@1。",
+    "insightZh": "PEFT 操作对象由通道统计变成可诊断的跨视图空间对应。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2611.12875",
+  "slug": "click3r-interactive-stereo-reconstruction",
+  "title": "Click3R: Interactive Stereo 3D Reconstruction with Sparse Correspondence Clicks",
+  "authors": [
+    "Hao Gu",
+    "Jin Yao",
+    "Zezhou Cheng"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.12875"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Click3R",
+    "DUSt3R",
+    "correspondence prompts",
+    "interactive stereo"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "abstract": "Despite impressive progress, existing feed-forward large 3D reconstruction models produce a single, irrevocable prediction. When these models fail, there is no mechanism to correct their mistakes. To address this limitation, we introduce Click3R, a framework for interactive geometric correction of feed-forward models using sparse human correspondence clicks. Given an image pair and a small set of cross-view point correspondences provided by a user, Click3R injects geometric constraints into the 3D reconstruction networks through a lightweight point correspondence adapter, enabling the model to resolve ambiguities in challenging scenarios such as repetitive textures, symmetric structures, large viewpoint changes, or textureless regions. To evaluate interactive reconstruction, we curate a challenging benchmark specifically designed to expose failure modes of existing feed-forward 3D reconstruction methods. Experiments show that Click3R reduces reconstruction error with as few as a single correspondence click, improving performance on both standard and our curated benchmarks. Our results highlight that sparse human interaction provides an effective and practical mechanism for correcting geometric reconstruction errors.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.12875v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.12875v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://uva-computer-vision-lab.github.io/click3r"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.12875v1 精确版本全文，PDF 共 27 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "Click3R 把跨图同一点的点击编码为 correspondence token，在 DUSt3R 解码前双向调节图像特征。一到数个可靠点击能修正大尺度相对位姿歧义，适合作为交互式几何条件的起点。",
+    "methodFlow": [
+      "在两视图标注可共同看到的对应点",
+      "将坐标、视图和配对 ID 编成 correspondence token",
+      "在解码前用双向 attention 注入几何提示",
+      "输出修正的点图和置信度"
+    ],
+    "whyRelevantZh": "在图像到 3D 的交互流程中，用户可先修正容易混淆的跨视图部件匹配。",
+    "evidenceZh": "提示以 token 条件进入双向 attention。（§3.2–3.3, Fig. 2, PDF p. 4） 端到端微调与共同可见区域是当前设计的重要条件。（Appendix J, PDF p. 24） 作者报告，人工提示的 mAA@30° 为 56.2，重训 DUSt3R 为 35.7。（Table 3, PDF p. 9）",
+    "caveatZh": "需要可见重叠，严重错误的点击会劣化。训练主要用 224×224 stereo，5 视图走外部 global alignment。 校正主要改善全局位姿，像素级表面细节的收益较小。",
+    "motivationZh": "前馈 stereo 网络遇到对称、重复纹理或宽基线时会给出不可交互纠正的点图。",
+    "methodZh": "共享 tokenizer 将归一化亚像素坐标、图像 ID 与配对 ID 组合为 token。对称的两路 adapter 在每幅图内用两向 attention 交换点击和 ViT 特征，再由原 DUSt3R 解码点图与置信度。",
+    "experimentsZh": "CO3D、ScanNet++、ARKitScenes 的标准 held-out，Hard3DBench 2/5 视图分组，另有 100 对人工点标注。 作者报告，人工提示的 mAA@30° 为 56.2，重训 DUSt3R 为 35.7。（Table 3, PDF p. 9） 同尺寸重训 DUSt3R 作主对照，MASt3R、Pi3、VGGT 等为参考。自动/GT 点与人工点协议分开。 附录的训练方式与错误点击实验显示只训 adapter 的收益较弱，大幅偏移可损害结果。",
+    "insightZh": "把用户对应点作为可选的网络输入，保留单次前向的用法，并用 Hard3DBench 单独测原模型困难样本。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

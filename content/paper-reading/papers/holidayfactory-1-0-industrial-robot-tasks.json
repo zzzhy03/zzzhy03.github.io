@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2611.11789",
+  "slug": "holidayfactory-1-0-industrial-robot-tasks",
+  "title": "HolidayFactory 1.0: Simulating, Generating, and Evaluating Industrial Robot Tasks",
+  "authors": [
+    "Holiday Robotics",
+    ":",
+    "Jeongmin Lee",
+    "Taehyeon Kim",
+    "Dohyun Jang",
+    "Minji Lee",
+    "Seonghun Oh",
+    "Dongwoo Park",
+    "Geonhyup Lee",
+    "Jaehyung Kim",
+    "Jaemin Yoon",
+    "Jinseop Bok",
+    "Jungwoo Kim",
+    "Minseok Yang",
+    "Philsik Chang",
+    "Soomin Lee"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11789"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "HolidayFactory",
+    "simulation-ready scenes",
+    "verification-guided generation",
+    "task plan"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "tool-use"
+    ],
+    "content-scope": [
+      "scene",
+      "part-assembly"
+    ],
+    "output-property": [
+      "physically-plausible"
+    ]
+  },
+  "abstract": "Robots are typically evaluated in episodes that begin from a reset, while industrial work consists of repeated jobs whose outcomes affect subsequent operations. Evaluating such work at scale requires simulation of task-critical physical interactions, construction of industrial environments, and measurements of performance as scene state persists. We present HOLIDAYFACTORY 1.0, a framework for simulating, generating, and evaluating industrial robot work. Given a human-specified workplace and task, the framework defines a world pairing a scenario of scene variants and process logic with an evaluation defining a job, metrics, and a rubric. HOLIDAYFACTORY 1.0 comprises three components. HOLIDAY-SIM extends Newton's SDF-based hydroelastic contact with additional constitutive laws and a semi-implicit primal-dual solver, couples stateful actuator dynamics to articulated motion, and derives tactile and joint observations from simulated states. Agentic world construction generates simulation-ready assets and scene variants using geometric and interaction checks, and proposes task-conditioned evaluations for human confirmation and executable checks. 24/7-BENCH introduces seven industrial tasks in which jobs are evaluated without resetting the scene, measuring completed, failed, and unfinished jobs, throughput, latency, and motor energy. Controlled studies characterize the proposed contact, actuator, and tactile models and examine the effectiveness of verification-guided world construction. Experiments on scene and evaluation generation further reveal the limitations of model critics and the difficulty of ensuring that generated evaluations faithfully capture task requirements. We examine job-level evaluations with scripted trajectories (e.g., code-as-policy) but have not yet compared policies over persistent runs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11789v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11789v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11789v1 精确版本全文，PDF 共 72 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "HolidayFactory 将工作场景与任务编译为可连续运行的模拟资产、过程逻辑和评分规则，先用确定性检查再让 critic 提出修正。它适合研究如何约束生成出来的交互场景，当前验证仍主要在模拟与脚本层。",
+    "methodFlow": [
+      "将工作位和任务拆成要求、前后置条件与过程图",
+      "合成或选取带 affordance 的资产并摆放",
+      "运行确定性检查与 critic，按失败反馈迭代",
+      "把确认过的 job rubric 编译进持久模拟场景"
+    ],
+    "whyRelevantZh": "对可制造或可装配场景，先声明可执行约束、再生成和复核是可直接借用的 agent 结构。",
+    "evidenceZh": "任务图在资产存在前即检查目标可达和 invariant。（Fig. 2, Algorithm 1, PDF pp. 6, 24） 评价提案需要人确认并由确定性 compiler 落地。（§4.3, PDF p. 29） 作者报告，共同 critic 的对照中，两种 planner 分别有 3/10 和 3/10 场景最终接受，少于通过确定性检查的 4/10 和 9/10。（Table 17, PDF p. 26）",
+    "caveatZh": "物理模型未充分对照真实硬件；长期任务还未做持久策略间的公平比较。 有限谓词探索与静态碰撞检查不能证明所有实际 affordance 和场景都合格。",
+    "motivationZh": "连续工业任务会继承上一次的物理状态，重置式模拟难检验场景、交互及 job 级评价。",
+    "methodZh": "agent 从需求构造谓词任务图并探索可达状态，生成带物理属性的资产和布局。schema、resolve、物理和场景变体检查反馈给 agent，评价提案经人确认后确定性编译。",
+    "experimentsZh": "十项任务的场景生成对照，七项 24/7-Bench 工业任务，模拟器接触、触觉、驱动对照。 作者报告，共同 critic 的对照中，两种 planner 分别有 3/10 和 3/10 场景最终接受，少于通过确定性检查的 4/10 和 9/10。（Table 17, PDF p. 26） 场景生成对比 scene-only 与 staged verification，critic 对照与模拟接触求解器对照分开。 共享 critic 与 critic-swap 试验显示接受率同时受生成器及评价器影响。",
+    "insightZh": "把生成、程序验证、持久执行和人与 evaluator 的契约串起来，能区分场景通过与策略通过。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

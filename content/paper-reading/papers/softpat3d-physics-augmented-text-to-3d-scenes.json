@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2611.11087",
+  "slug": "softpat3d-physics-augmented-text-to-3d-scenes",
+  "title": "SoftPAT3D: Physics-Augmented Text-to-3D Scene Generation with Deformables",
+  "authors": [
+    "Lei Shu",
+    "Alberta Longhini",
+    "Leonidas Guibas",
+    "Gordon Wetzstein",
+    "Jeannette Bohg"
+  ],
+  "publishedAt": "2026-11-08",
+  "updatedAt": "2026-11-08",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11087"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "3d-generation",
+  "keywords": [
+    "SoftPAT3D",
+    "deformable objects",
+    "rest shape",
+    "contact simulation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "output-property": [
+      "physically-plausible",
+      "editable"
+    ]
+  },
+  "abstract": "We present SoftPAT3D, a physics-augmented framework for text-to-3D scene generation in which deformable objects, such as cloth, stuffed toys and ropes, are generated as physically valid, simulation-ready bodies and placed in intersection-free contact with the furniture that supports them, with one another and with themselves. Existing physics-augmented pipelines simulate rigid bodies only and cannot accommodate a generated deformable object, which text-to-3D generation returns as a geometrically invalid mesh, sometimes self-intersecting, that has no rest shape, no material model and no admissible initial state. These are the inputs a deformable simulation requires, and we construct each from information already in the pipeline. The rest shape comes from how the object is manufactured rather than from the generated physically inconsistent deformed configuration, and a material library assigns each deformable object its initial elastic parameters, which can then be optimized. The occluded support is regenerated and converted into a watertight collision mesh, each object is released from an optimizable placement above the supporting part that the prompt specifies, and the complete scene is driven to static equilibrium under one unified contact model, with completion verified by geometric checks and a vision-language model. When a scene fails the prompt, a grid search over placements corrects it, and the adjoint of a differentiable simulation of the same contact energy reaches the targets the grid does not, places several bodies jointly and recovers and optimizes material parameters. Multi-body scenes equilibrate in a single simulation, and the pipeline also runs from the text prompt alone. On all sixty-five prompts, SoftPAT3D produces no undesired interpenetration of any kind, whereas every other system does, and its scenes directly support scene editing and robotic manipulation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11087v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11087v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11087v1 精确版本全文，PDF 共 33 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "SoftPAT3D 用缝制、填充等制造先验重建可变形体的 rest shape，将其放入修复后的 watertight 支撑上，再在同一接触模型下求静态平衡并复核文本。无穿透与符合摆放要求是两道独立门禁。",
+    "methodFlow": [
+      "生成参考图和刚性支撑并修复遮挡区域",
+      "为每件软物体重建 rest shape、材料和初始姿态",
+      "在统一接触能量下求静态平衡",
+      "独立核验几何和文本摆放并优化不合格位置"
+    ],
+    "whyRelevantZh": "把软材形态、材料和接触明确写进 3D 生成过程，可迁移到布面或柔性零件设计。",
+    "evidenceZh": "用缝制/填充先验和材料库构造可仿真输入。（Fig. 2, §§3.2–3.4, PDF p. 4） 静态几何检查、摆放语义和放置修正分开评估。（§§4.3–4.5, PDF pp. 7–8） 作者报告，65 个场景均无报告的穿透，57 个通过全部几何检查，32 个 held-out 中 17 个同时通过几何和 prompt 检查。（Table 2, §4.3, PDF pp. 6–7, 9）",
+    "caveatZh": "精确数量及局部排列不稳定；材料为类别级估计，plasticity 未建模。 适合可仿真内容生成，不能把静态接触率当成真实材料、制造或动力学精度。",
+    "motivationZh": "文生 3D 的布、绳和玩具通常输出已变形的 mesh，缺少材料、rest shape 和无穿透初始状态。",
+    "methodZh": "从文本图及场景生成初始化刚体布局，补全支撑并做碰撞网格；按类型生成薄壳、体积 soft 或 rod 的材料与 rest geometry。统一能量最小化后做接触和 VLM 检查，必要时用 grid 或 adjoint 调位置。",
+    "experimentsZh": "33 个开发与 32 个 held-out 文本提示，另有多体编辑、机器人操纵和同 solver 消融。 作者报告，65 个场景均无报告的穿透，57 个通过全部几何检查，32 个 held-out 中 17 个同时通过几何和 prompt 检查。（Table 2, §4.3, PDF pp. 6–7, 9） 刚体版本及 PAT3D、GraphDreamer、Blender-MCP、MIDI 等，另固定求解器更换 rest shape 和支撑。 同一求解器中分别去除制造 rest shape、修复支撑或摆放优化，并比较 grid 与 adjoint。",
+    "insightZh": "把制造形态与当前变形形态分离，再用统一仿真把布、填充体与刚体接触作为生成约束。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

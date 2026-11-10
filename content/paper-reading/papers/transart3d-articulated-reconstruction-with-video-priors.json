@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2611.11304",
+  "slug": "transart3d-articulated-reconstruction-with-video-priors",
+  "title": "TransArt3D: From Two States to Articulated 3D Reconstruction with Video Transition Priors",
+  "authors": [
+    "Chenhao Guan",
+    "Liying Yang",
+    "Xinxing Yu",
+    "Hao Mo",
+    "Tianshun Han",
+    "Renjun Gao",
+    "Yanyan Liang"
+  ],
+  "publishedAt": "2026-11-08",
+  "updatedAt": "2026-11-08",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.11304"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "TransArt3D",
+    "articulated objects",
+    "joint reconstruction",
+    "video prior"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "part-assembly"
+    ],
+    "representation": [
+      "hybrid-representation"
+    ],
+    "prior-data": [
+      "video-prior"
+    ],
+    "output-property": [
+      "part-aware",
+      "editable"
+    ]
+  },
+  "abstract": "Reconstructing interactable articulated assets from a few images is key to robotics and simulation, yet highly underconstrained. Existing optimization-based methods fit an articulated asset under a static 3D prior that scores each state independently, so per-state reconstruction errors leak into the estimated moving part and joint as false motion. Video diffusion models capture how objects move between states, but only implicitly in 2D. To this end, we present TransArt3D, an optimization-based framework that reconstructs an articulated 3D asset from two endpoint images by translating this video transition prior into explicit part structure and joint kinematics. It first lifts frames generated between the endpoints with a transition-coupled 3D consensus that applies the static 3D prior jointly across frames, stabilizing unchanging regions and initializing the parts and joint. A rectified-flow kinematic refinement then lets the video prior supervise a 3D motion field over the whole transition, while part assignment and a shared joint constrain the field throughout optimization, keeping per-state errors out of the articulation. Finally, a motion-aware canonical appearance fusion uses the recovered articulation to map both endpoint images onto one canonical surface, texturing regions that only one state reveals. On PartNet-Mobility, TransArt3D outperforms methods given the same two endpoints in geometry and joint accuracy, and surpasses methods given six observed states in articulated-state geometry, joint localization and appearance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.11304v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.11304v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.11304v1 精确版本全文，PDF 共 10 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "TransArt3D 先用视频先验补中间状态，再让跨状态的三维共识、共享关节和整段运动场共同解释变化，最后把两端可见纹理融合到 canonical surface。它输出能动的显式部件，主要验证仍为单关节合成数据。",
+    "methodFlow": [
+      "以两端点图和运动文字生成过渡视频",
+      "跨状态耦合 3D prior 并初始化部件与共享关节",
+      "用视频流场监督受关节约束的运动场",
+      "把端点纹理转回同一可动画表面"
+    ],
+    "whyRelevantZh": "可编辑资产的关键是将形状、部件和关节拆成显式可控元素，这里有直接的两图重建路径。",
+    "evidenceZh": "跨状态占用共识与 joint refinement 共同估计可动部件。（Fig. 3, §§3.2–3.4, PDF pp. 3–4） 两端点外观融合主要补运动后才露出的区域。（Table 3, Fig. 6, PDF p. 8） 作者报告，两端点协议的 pivot error 为 0.077，同输入 FreeArt3D 为 0.352，六状态 FreeArt3D 为 0.134。（Table 1, PDF p. 6）",
+    "caveatZh": "主要协议为单关节；真实拍摄和多关节仅定性。视频先验可能给出很弱或错误的运动。 仍需逐实例优化，物理关节和可制造性没有独立验证。",
+    "motivationZh": "两张端点图不足以区分实际关节运动与逐状态独立生成的几何误差。",
+    "methodZh": "冻结视频模型生成端点间过渡；TRELLIS 共享噪声并跨状态耦合初始化占用、部件和关节，rectified-flow kinematic refinement 再以视频指导运动，最后融合 canonical 外观。",
+    "experimentsZh": "12 类 PartNet-Mobility 的 48 件物体，比较两端点和六观测状态协议，另有实拍与多关节示例。 作者报告，两端点协议的 pivot error 为 0.077，同输入 FreeArt3D 为 0.352，六状态 FreeArt3D 为 0.134。（Table 1, PDF p. 6） 前馈、检索与逐物体优化方法，区分 dual-state 和 multi-state 输入。 去跨状态耦合、改用静态 3D guidance、去 motion gate 及不同 canonical appearance 路径。",
+    "insightZh": "用整段合成 transition 约束共享运动，避免将每个静态状态的形状误差独立拟合为假运动。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2611.12426",
+  "slug": "dnavit-discrete-visual-representations",
+  "title": "dNaViT: Discrete Codes are General-Purpose Visual Representations",
+  "authors": [
+    "Xiaotong Li",
+    "Zhengrong Yue",
+    "Xu Huang",
+    "Jialv Zou",
+    "Minhao Jing",
+    "Wenhao Yan",
+    "Haodong Li",
+    "Hai Huang",
+    "Bo Zhao",
+    "Yan Feng",
+    "Peng Pei",
+    "Xunliang Cai"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.12426"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "dNaViT",
+    "discrete visual tokenizer",
+    "product quantization",
+    "native resolution"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning",
+      "generation"
+    ],
+    "representation": [
+      "discrete-program"
+    ],
+    "method": [
+      "autoregressive"
+    ]
+  },
+  "abstract": "Discrete autoregressive modeling, notably through next-token prediction, has become a cornerstone of modern language models. Extending this paradigm to vision allows visual and language models to converge on a unified framework, thereby fostering shared methodology and infrastructure. This work investigates a central question: how far can a finite discrete vocabulary go in representing the richness of the visual world? We present dNaViT, a Discrete Native-resolution Vision Transformer that produces discrete visual primitives analogous to language tokens. Built upon a frozen pretrained encoder, dNaViT applies lightweight residual modulation with a dual-branch objective to inject reconstruction-aware cues into semantic features. By leveraging grouped product quantization, it scales discrete capacity without inflating spatial sequence lengths, while a balanced training recipe maintains both semantic and pixel-level information. Consequently, dNaViT functions as a versatile discrete visual tokenizer, enabling unified encoding across downstream tasks alongside high-fidelity image decoding. Extensive evaluations show that dNaViT matches or exceeds task-specific baselines across 12 visual understanding benchmarks, 4 generation benchmarks, and an image editing benchmark. These findings demonstrate that a compact discrete vocabulary can serve as a universal visual currency and unlock the full potential of fully unified, native multimodal methodology.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.12426v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.12426v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/meituan-longcat/LongCat-Next"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.12426v1 精确版本全文，PDF 共 32 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "dNaViT 在冻结的原生分辨率视觉 encoder 上用 ResMod 注入多层细节，再用分组 product quantization 和双分支重建训练共享离散 code。理解、生成、编辑可共用一套表示，但要区分 code 本身、下游训练与额外 refiner 的贡献。",
+    "methodFlow": [
+      "以冻结原生分辨率 encoder 提取多层特征",
+      "ResMod 为语义特征加入空间细节",
+      "对通道分组量化成多 codebook 离散索引",
+      "以特征和像素双目标训练并按任务接 LM 或 decoder"
+    ],
+    "whyRelevantZh": "离散视觉表示可作为视觉设计模型的共享输入输出接口，尤其适合拆分空间网格与 token bit budget。",
+    "evidenceZh": "ResMod、分组量化、特征与像素重建共用 code。（§§2.2–2.5, PDF pp. 6–8） 固定同一离散表示对照直接 decoder 和 flow Refiner。（§5.3, PDF pp. 19–20） 作者报告，dNaViT-8B 的 GenEval2 GM 为 49.5，SpatialGenEval 为 0.68，英文 GEdit-Bench 为 7.30。（Tables 7–8, PDF pp. 17–18）",
+    "caveatZh": "直接 decoder 仍可能抹平小字、细边界和高频纹理，refiner 需要生成式解码。 整体模型训练数据和下游生成管线不同，跨模型成绩不能孤立归因给量化策略。",
+    "motivationZh": "离散视觉 token 容易在压缩中牺牲像素细节或语义，使理解和生成各自依赖不同视觉表示。",
+    "methodZh": "冻结的多层特征经 Residual Modulator 产生相对语义基线的 affine 修正，按通道分组 VQ。同一组 code 同时重建连续表征与像素，生成用 code-conditioned flow Refiner 恢复细节。",
+    "experimentsZh": "ImageNet/TokBench 重建、理解与 OCR、四套文生图 benchmark 和 GEdit-Bench，含连续与离散表示比较。 作者报告，dNaViT-8B 的 GenEval2 GM 为 49.5，SpatialGenEval 为 0.68，英文 GEdit-Bench 为 7.30。（Tables 7–8, PDF pp. 17–18） 连续视觉 tokenizer、离散 tokenizer 及 AR、diffusion、闭源系统，重建表注明不同协议和 bit rate。 ResMod 对 SelfDistill 的比较和冻结特征与离散分支对照揭示了语义与像素之间的取舍；G16/G64 训练配置不同。",
+    "insightZh": "同一空间网格内增加 group codebook 容量，而不增加位置数；双目标让离散 token 同时承载语义和细粒度重建信息。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

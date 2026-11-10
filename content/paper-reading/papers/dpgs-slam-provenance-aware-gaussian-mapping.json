@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2611.12038",
+  "slug": "dpgs-slam-provenance-aware-gaussian-mapping",
+  "title": "DPGS-SLAM: Diffusion-Prior and Provenance-Aware Monocular Gaussian Splatting SLAM for Dynamic Visual Sensing",
+  "authors": [
+    "Yifan Luo",
+    "Takafumi Matsumaru",
+    "Vibekananda Dutta",
+    "Xin He"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.12038"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "DPGS-SLAM",
+    "provenance",
+    "background completion",
+    "3DGS"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "completion"
+    ],
+    "representation": [
+      "3d-gaussian"
+    ],
+    "conditioning": [
+      "video"
+    ]
+  },
+  "abstract": "This paper presents DPGS-SLAM (Diffusion-Prior and Provenance-Aware Monocular Gaussian Splatting SLAM) for dense mapping in environments containing dynamic objects. Dynamic observations can contaminate camera tracking and scene reconstruction in visual SLAM (simultaneous localization and mapping). Although 3DGS (3D Gaussian splatting) enables efficient dense mapping, existing 3DGS-SLAM systems may exhibit instability when dynamic objects violate their underlying static-scene assumption. Excluding dynamic observations can reduce their influence on tracking and mapping, but may leave occluded static backgrounds missing or weakly constrained. Our proposed DPGS-SLAM is a monocular RGB SLAM framework that supports provisional representations of insufficiently observed static backgrounds through asynchronous diffusion-based background completion and provenance-aware Gaussian mapping. Dynamic regions are identified through optical-flow-based motion discovery and temporally consistent mask propagation by SAM2 (segment anything model 2). For selected keyframes, a fine-tuned diffusion inpainting model generates plausible background appearance in occluded regions, while Metric3D v2 predicts metric depth from the completed images to initialize provisional Gaussian primitives. Provenance labels distinguish generated primitives from observation-supported primitives, excluding generated content from camera-pose estimation and observed-map optimization. When previously occluded backgrounds become visible, eligible generated primitives are removed, and observation-supported primitives are independently initialized from real RGB observations and predicted depth. Experimental results demonstrated competitive camera tracking, with average ATE RMSE values of 1.2 cm on TUM RGB-D and 2.7 cm on BONN RGB-D. On StaDy4D, DPGS-SLAM improved average PSNR by 4.60 dB over WildGS-SLAM using only monocular RGB input.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.12038v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.12038v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.12038v1 精确版本全文，PDF 共 15 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "DPGS-SLAM 把 diffusion 补出的背景 Gaussian 单独标为 provisional，不参与位姿与观测地图优化。后续真实观测出现后独立初始化并替换它们，为可迭代场景补全提供了可逆的来源管理。",
+    "methodFlow": [
+      "以光流与 SAM2 获得运动遮罩",
+      "用可见静态像素跟踪和更新观测地图",
+      "异步补出遮挡区域并标注生成来源",
+      "真实像素重新出现时删除冲突临时 Gaussian 并插入实测几何"
+    ],
+    "whyRelevantZh": "让可编辑三维场景分清推测、实测和后续确认，避免把补全当成事实。",
+    "evidenceZh": "相机和观测地图损失不消费生成图元。（Fig. 1, §III-C, PDF pp. 4, 7–8） 长期未观测区域仍可能保留不正确的生成几何。（§IV-E, PDF p. 13） 作者报告，在 StaDy4D T1024 car 场景，静态背景 PSNR 为 24.5 dB，WildGS 为 19.9 dB。（Table II, PDF p. 11）",
+    "caveatZh": "周期性运动发现有延迟；永久遮挡处的几何可能错；异步运行不保证实时。 可复用的是 provenance 数据结构和替换策略，生成质量依赖 inpainting 和单目深度。",
+    "motivationZh": "动态物体挡住静态背景，硬遮罩留下几何空洞，直接融入生成像素又会污染观测地图。",
+    "methodZh": "用光流发现运动并用 SAM2 传播 mask，对关键帧遮挡区异步 inpaint，再以 Metric3D v2 深度 back-project。生成和观测 Gaussian 分图管理，以深度与投影可见性判断替换。",
+    "experimentsZh": "TUM/BONN 动态 RGB-D 的 RGB-only 位姿测试及 StaDy4D 配对静态真值测试。 作者报告，在 StaDy4D T1024 car 场景，静态背景 PSNR 为 24.5 dB，WildGS 为 19.9 dB。（Table II, PDF p. 11） MonoGS、WildGS-SLAM、DROID-W，另有硬遮罩与去替换机制对照。 Table VI 的覆盖惩罚 AbsRel 分解显示，生成和替换的几何收益主要集中于 mask 内。",
+    "insightZh": "生成内容只为暂时可视化填洞，geometry evidence 的来源标签决定哪些图元可进入优化和何时删除。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

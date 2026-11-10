@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2611.12411",
+  "slug": "physopsd-code-as-privilege",
+  "title": "PhysOPSD: Code as Privilege for Physically Plausible Video Generation",
+  "authors": [
+    "Harold Haodong Chen",
+    "Rui Peng",
+    "Lingteng Qiu",
+    "Kejie Qiu",
+    "Chao Xu",
+    "Zilong Dong"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-11",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.12411"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "PhysOPSD",
+    "on-policy self-distillation",
+    "physics simulation",
+    "counterfactual"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ],
+    "output-property": [
+      "physically-plausible"
+    ]
+  },
+  "abstract": "While modern video generative models achieve remarkable visual fidelity, they remain noticeably brittle when generating physically plausible dynamics and complex interactions. Targeted post-training is crucial, yet supervised fine-tuning suffers from offline state mismatch, and reinforcement learning is hindered by sparse, ill-defined physical reward functions. On-Policy (Self-)Distillation (OPSD) reconciles on-policy rollouts with dense corrective feedback, shifting the core challenge to designing effective privileged context. However, conventional modalities fall short: text prompts are inherently declarative, whereas real reference videos heavily entangle physical laws with visual appearance without parametric control. To this end, we propose PhysOPSD, introducing executable code as privileged physical context for video generation. Unlike static visual observations, executable code instantiates an editable physical world with intrinsic abstraction and controllability. Powered by PhysOPSD-Engine, we translate real-world physical scenarios into verifiable simulation programs. PhysOPSD then incorporates (i) dual-level physical privilege to bridge the information gap via an intermediate bottleneck, alongside (ii) controlled physical variations under shared rollout noise to expose causal dynamic shifts. Extensive experiments demonstrate that PhysOPSD substantially improves physical plausibility across diverse backbones, outperforming SFT and RL baselines with only $3$K samples, while preserving general video generation quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.12411v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.12411v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.12411v1 精确版本全文，PDF 共 20 页。作者报告的实验结果均未独立复现。",
+    "ideaZh": "PhysOPSD 把真实参考译成可执行模拟，通过 dense→abstract→text 的两级 on-policy self-distillation 和同噪声物理反事实对训练。部署只需文本，可信范围取决于模拟器能否表达所需动力学。",
+    "methodFlow": [
+      "将参考场景写成可参数化模拟并执行校验",
+      "渲染 dense 和 abstract 两种物理提示",
+      "在相同初始噪声下配对单物理参数扰动",
+      "逐级蒸馏到 text-only 视频生成"
+    ],
+    "whyRelevantZh": "可用参数化模拟为物理可控的 3D/4D 生成构造同场景、单因素的训练对。",
+    "evidenceZh": "执行校验筛掉硬编码运动与不可见的干预。（§4.2, Fig. 3, PDF p. 4） 相邻 privilege 层级和配对 rollout 共同塑造监督。（§§4.3.1–4.3.2, PDF pp. 5–6） 作者报告，8.3B 配置 PhyGround Overall 为 68.3，PhysHPO 为 67.0；VideoPhy-2 All 为 67.0，PhysHPO 为 66.0。（Table 1, PDF p. 6）",
+    "caveatZh": "模拟范围主要覆盖刚体/接触、弹性与流体；多物理耦合和热相变等被排除。 评估分数不等价于动力学参数数值正确，也未直接验证迁移到 4D 几何。",
+    "motivationZh": "视频 post-training 很难在文本难以描述、实拍视频外观因素混杂时教模型学习特定物理变化。",
+    "methodZh": "coding agent 根据参考图像与物理描述生成程序，执行后按可运行、物理成立、可见、可调四项校验。用同一程序渲染粗/细条件，teacher 在 student 已走到的状态上做 velocity matching。",
+    "experimentsZh": "3K 模拟场景 post-training，在 UniVideo 和 OmniWeaving 上对比 base、SFT、RL 和现有物理增强方法。 作者报告，8.3B 配置 PhyGround Overall 为 68.3，PhysHPO 为 67.0；VideoPhy-2 All 为 67.0，PhysHPO 为 66.0。（Table 1, PDF p. 6） 同骨干比较 SFT、RL、PhyT2V 和 PhysHPO，同时以 VBench 检查一般视频质量。 同 3K budget 比较文本、真实参考视频、可执行草稿，并分别拆解 dual-level 与受控配对。",
+    "insightZh": "把程序用于生成两级特权监督与受控反事实，而非让最终生成器依赖一个模拟器。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
