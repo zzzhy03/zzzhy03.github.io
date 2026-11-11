@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.13150",
+  "slug": "vigor-visual-rationale-correctness",
+  "title": "VIGOR: Benchmarking Visual Rationale Correctness in Multimodal Large Language Models",
+  "authors": [
+    "Yanlin Chen",
+    "Tang Li",
+    "Xi Peng"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-12",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.13150"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "VIGOR",
+    "visual rationale",
+    "pixel grounding",
+    "concept masks"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) are typically evaluated by whether they produce correct answers, but correctness alone does not reveal whether their outputs are supported by the right visual evidence. We introduce VIGOR, a benchmark for evaluating VIsually GrOunded Rationales in MLLMs. VIGOR represents visual rationales as explicit concepts paired with pixel-level groundings, covering multiple abstraction levels including low-level visual properties, intermediate structures, objects, parts and high-level motion, relations. To construct VIGOR at scale, we develop an automatic annotation framework that reuses existing dense supervision when available and generates missing concept groundings through proposal-based annotation followed by conservative multimodal verification. Using VIGOR, we evaluate whether MLLMs \"look at what they say\" by comparing model-derived visual evidence for each expressed concept against annotated ground-truth rationales. Our results show that current MLLMs exhibit limited visual rationale correctness and reveal distinct grounding failures across concept levels. VIGOR provides a benchmark and scalable data construction pipeline for studying whether MLLM outputs are supported by appropriate visual evidence. Code is available at https://github.com/deep-real/VIGOR",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.13150v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.13150v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/deep-real/VIGOR"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.13150v1 精确版本全文及关键页面，PDF 共 38 页。实验数字均为作者报告。",
+    "ideaZh": "VIGOR 为每个概念配像素区域，通过固定 caption 和内部热图比较模型证据。低 AP 显示热点命中不足以证明证据覆盖完整，适合借鉴为渲染验收的部件证据诊断。",
+    "methodFlow": [
+      "收集图像及分层概念",
+      "复用已有掩码并补生成候选",
+      "验证概念与区域匹配",
+      "对比模型热图与像素真值"
+    ],
+    "whyRelevantZh": "可为视觉设计 agent 的输出检查准备按部件标注的像素级证据。",
+    "evidenceZh": "已有密集监督与经验证的 proposals 共同形成概念区域。（Fig. 2, §§3.1–3.2, PDF pp. 3–4） 错误分为误定位、局部覆盖和注意力扩散。（Fig. 8, §4.6, PDF p. 9） 作者报告，主表的最高 overall AP 为 31.2，最高 Pointing Accuracy 为 38.7。（Table 2, §4.2, PDF pp. 6–7）",
+    "caveatZh": "attention 是模型证据代理，无法证明模型依靠该区域得出判断。标签词汇与图像分布有限。 编辑验收需要额外加入显式的任务成功对照。",
+    "motivationZh": "模型描述看似正确时，仍可能把具体部件、材质或关系归因到错误的像素区域。",
+    "methodZh": "用已有 dense 标注及候选分割掩码建立分层概念表，经 MLLM 保守核验后组合。固定 caption 测 concept-token attention 与真值区域的 AP 和 Pointing。",
+    "experimentsZh": "主集含 1,000 张图及 3,011 个唯一概念，固定 caption 比较多种开源 MLLM 与随机热图。 作者报告，主表的最高 overall AP 为 31.2，最高 Pointing Accuracy 为 38.7。（Table 2, §4.2, PDF pp. 6–7） 对比模型家族、尺寸和 grounding 微调，主要协议统一输入以控制文本覆盖。 另比较不同解释代理和现成 grounding 微调。后者在论文设置中未显著改善 rationale 对齐。",
+    "insightZh": "把证据诊断从单一对象框扩展到材质、部件和关系等多种视觉概念。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

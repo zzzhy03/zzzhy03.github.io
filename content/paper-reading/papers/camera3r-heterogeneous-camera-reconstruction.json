@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2611.13453",
+  "slug": "camera3r-heterogeneous-camera-reconstruction",
+  "title": "Camera3R: Feed-Forward 3D Reconstruction from Heterogeneous Camera Models",
+  "authors": [
+    "Ruxiao Duan",
+    "Yunwen Zhou",
+    "Erin Hong",
+    "Dongxu Zhao",
+    "Eric Turner",
+    "Federico Tombari",
+    "Alex Wong"
+  ],
+  "publishedAt": "2026-11-10",
+  "updatedAt": "2026-11-10",
+  "collectedAt": "2026-11-12",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.13453"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "keywords": [
+    "Camera3R",
+    "camera routing",
+    "LoRA",
+    "feed-forward reconstruction"
+  ],
+  "abstract": "Feed-forward 3D reconstruction (3R) from unconstrained multi-view images has recently emerged as a prominent research direction in 3D computer vision. Various foundational reconstruction models have been proposed with different architectures and reconstruction paradigms. Despite being trained on large-scale perspective datasets with substantial computational resources, these models generally struggle to generalize to non-perspective images. This limitation hinders their deployment in applications involving arbitrary, unknown, and potentially heterogeneous camera models. To build on the capabilities of existing reconstruction models with minimal retraining, we propose Camera3R, a low-rank adaptation framework that efficiently extends perspective-pretrained 3R networks to any other camera models. Extensive experiments demonstrate that, with only 0.5% additional parameters and less than a day of training, Camera3R adapts a foundational 3D reconstruction model to non-perspective cameras while fully preserving its original performance on perspective inputs. Code is available at https://github.com/android-xr/camera3r.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.13453v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.13453v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.13453v1 精确版本全文及关键页面，PDF 共 17 页。实验数字均为作者报告。 PDF 提供的 android-xr/camera3r 链接在查验时返回 404，未确认公开可用。",
+    "ideaZh": "Camera3R 冻结前馈 3D 重建骨干，为鱼眼和全景镜头学习 LoRA 专家，并按帧路由。保留透视直通路径让原有能力继续可用，适合评估混合采集设备下的几何先验。",
+    "methodFlow": [
+      "准备不同镜头与增强后的多视图训练序列",
+      "冻结透视预训练骨干",
+      "训练鱼眼和全景 LoRA 及镜头预测器",
+      "逐帧选专家并输出姿态、射线与几何"
+    ],
+    "whyRelevantZh": "可将混合镜头重建用于获取资产几何条件，设计时可以把镜头路由和形状主干分开评估。",
+    "evidenceZh": "透视帧走冻结骨干，其余帧按类别施加对应的 LoRA 更新。（Fig. 2, §§3.1–3.2, PDF pp. 4–5） 训练增强可对鱼眼再畸变，并从全景投影不同相机几何。（Fig. 3, §3.2, PDF p. 6） 作者报告，在 π³ 的全景 360Loc 测试中，压缩版 2FP 将 Chamfer 距离从 3.598 降至 0.393，透视 ADT 的 CD 和 NC 保持 0.036 与 0.790。（Table 4, PDF p. 9）",
+    "caveatZh": "推理镜头仍须属于预定义集合，新镜头需增训专家。合成畸变未涵盖全部真实传感器效应。 Table 4 不能外推到任意未见相机模型。",
+    "motivationZh": "透视数据预训练的前馈 3D 重建模型遇到鱼眼、全景或混合镜头时会发生明显域偏移。",
+    "methodZh": "用真实非透视数据和可变形投影增强训练镜头专家，推理中预测逐帧镜头类别并选择专家。按 LoRA 更新的奇异值进行预算约束的后压缩。",
+    "experimentsZh": "透视、鱼眼和全景序列及混合镜头评估。报告在 VGGT、MapAnything 和 π³ 上的适配效果。 作者报告，在 π³ 的全景 360Loc 测试中，压缩版 2FP 将 Chamfer 距离从 3.598 降至 0.393，透视 ADT 的 CD 和 NC 保持 0.036 与 0.790。（Table 4, PDF p. 9） 和原始骨干、仅相机变换方案及面向全景的变体比较。附录列出真实与合成数据。 比较 3PFP、1FP、2FP 和压缩 2FP。保留透视直通比小数据重学透视更稳。",
+    "insightZh": "把镜头域适配做成同一个重建网络内的逐帧专家路由，容许一个序列混合镜头。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

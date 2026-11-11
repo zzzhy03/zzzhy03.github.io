@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.14420",
+  "slug": "onlyact-action-representations-world-models",
+  "title": "OnlyAct: Extracting Action Representations from Foundation Models for World Models",
+  "authors": [
+    "Runjia Li",
+    "Minghao Chen",
+    "Junyu Xie",
+    "Philip Torr",
+    "Andrea Vedaldi",
+    "Tomas Jakab"
+  ],
+  "publishedAt": "2026-11-10",
+  "updatedAt": "2026-11-10",
+  "collectedAt": "2026-11-12",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.14420"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "keywords": [
+    "OnlyAct",
+    "latent action",
+    "V-JEPA 2",
+    "video world model"
+  ],
+  "abstract": "Video world models promise general-purpose interactive simulators, but their training is limited by action supervision: action labels are scarce, fragmented across incompatible specifications, and do not scale with the unlabeled video pretraining corpus. A common workaround jointly trains an action encoder to compress consecutive frames into a latent action and a decoder to reconstruct the next frame from the previous frame and that latent, forcing the latent to capture only new information. This has two limitations: learning the action space from scratch can limit generalization to unseen domains, and the bottleneck trades expressiveness for separation, with tighter settings losing nuance and looser ones risking scene leakage under domain shifts. We argue for a different starting point: rather than learning actions from scratch, we start from a pretrained foundation model (V-JEPA 2), whose embeddings of a frame pair already carry substantial action information after large-scale, diverse video pretraining. The remaining challenge is to extract the action while discarding the scene. We propose a label-free contrastive adaptation framework that pulls together frame pairs sharing the same motion under a different scene and pushes apart pairs from the same scene with different motion, reshaping the geometry of the pretrained space without imposing a reconstruction bottleneck. We introduce a unified evaluation protocol along three axes (action expressiveness, scene invariance, and action-conditioned video generation quality) across robot manipulation, camera navigation, game, and driving benchmarks, most of which are unseen during adaptation. Compared with annotation-free latent-action methods, our representations are substantially more expressive while matching their scene invariance, and they yield world models that transfer demonstrated actions to new scenes more faithfully.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.14420v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.14420v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/runjiali-rl/onlyact"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.14420v1 精确版本全文及关键页面，PDF 共 29 页。实验数字均为作者报告。",
+    "ideaZh": "OnlyAct 从 V-JEPA 2 的帧对提取 latent action，再用同动作、异背景的对比样本消减场景信息。在同一视频生成骨干上，跨场景动作方向更可靠，适合研究把参考运动独立于目标资产外观的条件接口。",
+    "methodFlow": [
+      "提取预训练视频帧对特征",
+      "构造动作保持的换景正对与难负对",
+      "对比适配后冻结编码器",
+      "用 latent action 条件训练和测试视频模型"
+    ],
+    "whyRelevantZh": "为跨场景运动复用及动态资产控制提供可迁移的动作条件训练思路。",
+    "evidenceZh": "同动作异背景样本拉近，防止特征把背景当成动作。（Fig. 2, §§3.1–3.3, PDF pp. 4–6） 从参考帧对抽取动作，条件生成在其他场景进行。（Fig. 5, §4.4, PDF p. 9） 作者报告，在同一 AdaWorld 骨干和训练设置下，LIBERO 的 Transfer Dir 为 0.917，AdaWorld 原生动作表征为 0.162。（Table 3, PDF p. 10）",
+    "caveatZh": "换景正对依赖静止相机与光流质量。移动镜头和遮挡会削弱解耦。直接控制仍需少量动作标签。 视频生成指标未验证 3D 几何或物理动力学准确性。",
+    "motivationZh": "跨域视频没有统一动作标注，从零学习的动作瓶颈容易把场景纹理误带进条件。",
+    "methodZh": "光流定位运动区域并把它合成到其他场景，构造不改动作的正对与同场景不同动作负对。冻结适配后的编码器，在同一 AdaWorld 骨干上训练动作条件生成。",
+    "experimentsZh": "分别测动作线性探测、场景泄漏、动作条件视频与少量标签对齐的真实动作控制。 作者报告，在同一 AdaWorld 骨干和训练设置下，LIBERO 的 Transfer Dir 为 0.917，AdaWorld 原生动作表征为 0.162。（Table 3, PDF p. 10） 在相同生成骨干比较 AdaWorld 和 DreamDojo 的原生 latent action。附录控制 whitening 的影响。 先比较预训练帧特征和适配后特征，再使用同样 whitening 规则重复 baseline。",
+    "insightZh": "把动作表示学习从联合下一帧压缩改成在预训练时序特征上做有针对性的去场景适配。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

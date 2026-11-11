@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2611.13530",
+  "slug": "uniweaver-interleaved-text-image-generation",
+  "title": "UniWeaver: Harnessing Unified Multimodal Models for Interleaved Text-Image Generation",
+  "authors": [
+    "Hongxu Chen",
+    "Zixuan Zhong",
+    "Donghao Zhou",
+    "Haodong Li",
+    "Xiaomin Yu",
+    "Tianhao Li",
+    "Shiyao Yu",
+    "Zhongwei Wan",
+    "Pheng-Ann Heng"
+  ],
+  "publishedAt": "2026-11-10",
+  "updatedAt": "2026-11-10",
+  "collectedAt": "2026-11-12",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.13530"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "keywords": [
+    "UniWeaver",
+    "interleaved generation",
+    "visual verification",
+    "harness"
+  ],
+  "abstract": "Unified multimodal models (UMMs) have opened up new possibilities for generating rich interleaved text-image content. However, they generally lack native support for coordinating the two modalities, and translating coarse user requests into coherent multimodal compositions also requires explicit planning. We propose UniWeaver, a structured, model-agnostic harness framework that integrates multimodal planning, generation, and visual feedback to produce coherent interleaved outputs. To train UMMs for this task, we construct UniWeaver-10K, a dataset of 10,000 tasks across 20 task families, paired with execution trajectories guided by UniWeaver. We also introduce UniWeaver-Bench, a task-oriented benchmark systematically assessing text coverage, writing quality, visual coverage, and image-text alignment. Experiments show that UniWeaver achieves state-of-the-art performance and improves interleaved text-image generation across multiple UMM backbones.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.13530v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.13530v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://poscape.github.io/UniWeaver"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.13530v1 精确版本全文及关键页面，PDF 共 17 页。实验数字均为作者报告。 PDF 首页项目页可通往已确认公开的 github.com/Poscape/UniWeaver，仓库含 harness 与 scoring。",
+    "ideaZh": "UniWeaver 先拆出每个单元的任务和视觉要求，再选取必要的跨图参考，并按单元检查表重试失败图像。它给图文设计 agent 一个可拆分验证的执行过程，成品仍受底层模型能力和评审协议限制。",
+    "methodFlow": [
+      "拆解需求为全局目标与单元目标",
+      "分别生成读者文本和图像指令",
+      "按对象一致性选择参考图",
+      "按单元检查图像并重试失败单元"
+    ],
+    "whyRelevantZh": "与需要多步渲染、逐项检查和局部修复的视觉设计 agent 直接相关。",
+    "evidenceZh": "四类计划控制全局内容、文图分工、引用和检查。（Fig. 3, §§3.1–3.2, PDF pp. 4–5） 去掉共享视觉风格使 BAGEL 配置的 overall 从 58.89 降至 48.21。（Table 2, §4.3, PDF p. 8） 作者报告，UniWeaver-Bench 上 BAGEL 从 27.7 提升到 58.9，加入轨迹监督后的 UniWeaver-SFT 达 87.1。（Table 1, §4.2, PDF p. 7）",
+    "caveatZh": "结果受底层模型的图文质量限制，评估范围是论文定义的交错图文任务。 高分并不证明生成图片具备现实可执行性或文本事实全部正确。",
+    "motivationZh": "图文交错生成中，同一段用户请求往往同时缺少全局范围、步骤划分和图像承接关系。",
+    "methodZh": "分开制定内容范围、读者文本和图像指令，构造可选择的视觉引用。用具体可见条件检查局部图像，失败时只重生成对应单元。训练数据提供结构化执行轨迹。",
+    "experimentsZh": "10,000 条训练任务覆盖 20 个类别，120 条 held-out 请求用于图文成品评估。 作者报告，UniWeaver-Bench 上 BAGEL 从 27.7 提升到 58.9，加入轨迹监督后的 UniWeaver-SFT 达 87.1。（Table 1, §4.2, PDF p. 7） 同一项目基准比较 BAGEL 等 UMM 的直接生成、harness 和监督微调。分数依赖模型评审。 去掉任务目标、视觉风格和引用选择，分开看作用。去掉风格造成所测变体中最大的总体下降。",
+    "insightZh": "将输出单元、跨图参考和可见检查项一起规划，错误可以定位到单个图文单元。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

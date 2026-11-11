@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.13334",
+  "slug": "disentangling-multimodal-rotary-position",
+  "title": "Disentangling Multimodal Rotary Positional Embedding in Vision-Language Models",
+  "authors": [
+    "Zhaoyi Liu",
+    "Haichuan Zhang",
+    "Xiaochuan Gong",
+    "Yancheng Zhu",
+    "Bowei Tian",
+    "Wanghao Ye",
+    "Yufan Zhang",
+    "Ang Li"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-12",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.13334"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.AI"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "keywords": [
+    "MRoPE",
+    "spatial grounding",
+    "position encoding",
+    "Qwen3-VL"
+  ],
+  "abstract": "Vision-language models widely adopt Multimodal Rotary Position Embedding (MRoPE), an extension of Rotary Position Embedding (RoPE) that incorporates temporal, height, and width axes to encode the spatial structure of visual tokens. However, MRoPE also assigns height and width coordinates to text tokens that lack inherent spatial structure, introducing spatial positional effects into text-vision attention. Existing MRoPE variants explore different frequency allocations and coordinate layouts, with their designs suggesting different intuitions about these cross-modal effects: they may provide useful spatial references for associating language with visual regions, or introduce unnecessary positional preferences that hinder text-vision interactions. In this work, we disentangle intra-visual spatial structure from cross-modal spatial effects to investigate this question. We identify a constraint of shared coordinate layouts that prevents eliminating cross-modal spatial effects while preserving intra-visual spatial encoding, and develop controlled experiments to isolate their respective contributions. Our results across multiple model scales, MRoPE variants, and benchmarks show that cross-modal spatial effects provide little additional benefit as spatial references and can even impair model performance, while intra-visual spatial encoding remains useful for fine-grained grounding.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.13334v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.13334v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.13334v1 精确版本全文及关键页面，PDF 共 18 页。实验数字均为作者报告。",
+    "ideaZh": "论文用按注意力类型分配的坐标拆开两种位置效应。受控训练中，保留图内坐标并中和文本到视觉的空间项，细粒度 grounding 略有改善，为编辑指令中的部件对齐提供一个可检验的诊断方向。",
+    "methodFlow": [
+      "区分图内与跨模态相对旋转",
+      "按 attention 类型选择坐标分配",
+      "在匹配条件下训练四种对照",
+      "评估指代表达 grounding 和一般视觉理解"
+    ],
+    "whyRelevantZh": "做指令驱动的部件编辑时，可以先用这套对照检查 grounding 错误是否来自位置偏差。",
+    "evidenceZh": "对图内 attention 保留二维位置变化，对文本查询使用中和后的坐标。（Fig. 2, §§3.2–3.3, PDF pp. 3–5） 跨多种 MRoPE 变体的方向总体一致。（Fig. 3, §4.4, PDF pp. 7–8） 作者报告，Qwen3-VL-4B 的 MRoPE-I 在移除文本到视觉空间项后，ACC@0.9 从 28.0 提升到 29.2，去掉两类空间项后为 26.2。（Table 4, PDF p. 8）",
+    "caveatZh": "大规模预训练与多模型家族的泛化仍不确定。 没有在生成或编辑闭环中测部件对齐率。",
+    "motivationZh": "共享 MRoPE 坐标让图内几何和文本到视觉的相对位置偏好耦合，难以定位 grounding 收益来源。",
+    "methodZh": "构造原始、仅去文本到视觉、仅去视觉到视觉和两者均去四种配置，在相同训练协议下分别测视觉和空间能力。",
+    "experimentsZh": "受控训练用 Qwen3-VL 2B 与 4B，对比 MRoPE-I、VideoRoPE、HoPE 等配置。 作者报告，Qwen3-VL-4B 的 MRoPE-I 在移除文本到视觉空间项后，ACC@0.9 从 28.0 提升到 29.2，去掉两类空间项后为 26.2。（Table 4, PDF p. 8） 原始坐标和分项禁用是直接对照，另有官方模型探查。 四种坐标设置分离视觉内部和跨模态效应，多个随机种子报告方差。",
+    "insightZh": "给出共享坐标无法同时满足两种独立操作的约束，并用 attention-specific 分配提供干预实验。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

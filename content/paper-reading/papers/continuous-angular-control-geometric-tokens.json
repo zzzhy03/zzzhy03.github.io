@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.13172",
+  "slug": "continuous-angular-control-geometric-tokens",
+  "title": "Continuous Angular Control in Text-to-Image Generation via Geometric Token Encoding",
+  "authors": [
+    "Furkan Güzelant",
+    "Basavaraj Sunagad",
+    "Aysegul Dundar",
+    "Adam Kortylewski"
+  ],
+  "publishedAt": "2026-11-09",
+  "updatedAt": "2026-11-09",
+  "collectedAt": "2026-11-12",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.13172"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "image-generation"
+  ],
+  "primaryTopicId": "image-generation",
+  "keywords": [
+    "geometric token",
+    "angular control",
+    "Stochastic Localization Relaxation",
+    "diffusion"
+  ],
+  "abstract": "Text-to-image diffusion models can render a photorealistic analog clock but cannot control the time it displays. Across four pretrained models, fewer than 1% of generated clocks place both hands within 6 degrees of the requested time; the models instead collapse onto visually dominant configurations such as the canonical 10:10 pose. The same failure appears when a specific fraction of a circular object is requested, where models return complete or conventionally sliced objects. We observe that these two failures share a geometric structure: both target quantities can be parameterized by angular variables. We introduce a geometric token encoding framework that conditions generation directly on these angles. Each angular component is encoded as a periodic sine-cosine feature and projected into a role-specific token embedding that is injected into the prompt before a frozen text encoder. To spatially ground these tokens without requiring localization input at inference, we introduce Stochastic Localization Relaxation (SLR), which stochastically relaxes attention supervision from component-level to object-level to unconstrained localization during training. For clocks, we additionally introduce a hand-swap preference objective that discourages assigning the correct angles to the wrong hand roles. On analog clocks our method reaches 63-78% Acc@6 degrees across evaluation methods, compared with below 1% for the baselines. On circular-fraction generation, it achieves 89.5% Acc@0.10, while maintaining 88.8% on unseen object categories and 84.9% on unseen target values, compared with roughly 20% for pretrained baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.13172v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.13172v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://furkanguzelant.github.io/angular_control/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.13172v1 精确版本全文及关键页面，PDF 共 17 页。实验数字均为作者报告。 项目页的 Code 按钮处于禁用状态，未确认公开仓库。",
+    "ideaZh": "把角度编码成周期 sin/cos 特征并映射为有角色的 token，结合逐步放宽的定位监督，模型能把角度绑到正确的指针或扇区。思路适合研究布局中的连续几何控制，训练仍依赖专用标注。",
+    "methodFlow": [
+      "把连续目标换算为周期角度",
+      "映射成指针或边界角色 token",
+      "混合不同粒度的定位监督训练",
+      "在推理用文本和数值条件生成"
+    ],
+    "whyRelevantZh": "几何 token 是二维结构化生成中可直接借鉴的数值条件接口。",
+    "evidenceZh": "角度 token 保留各部件角色且在文本编码前注入。（Fig. 2, §§3.1–3.2, PDF pp. 4–5） 固定同一 SD 2.1 骨干比较 prompt、普通 LoRA、几何 token 和监督方式。（Tables 3–4, PDF p. 8） 作者报告，圆形比例在训练对象上 Acc@0.10 为 89.5%，未见对象为 88.8%，未见比例为 84.9%。（Table 2, PDF p. 8）",
+    "caveatZh": "方法和标注适用于可用显式圆形几何表达的任务。复杂遮挡和边界模糊仍会降低可控性。 迁移到 SVG 需要换成直接输出 primitive 参数的训练方式。",
+    "motivationZh": "文生图模型常生成视觉上像钟表或扇形的物体，但对角度和连续比例的控制不可靠。",
+    "methodZh": "将指针方向或扇区边界映射为角色专属 embedding，插入冻结文本编码器前。训练时混合 component、object 和 unconstrained 监督，钟表另加交换指针角色的偏好约束。",
+    "experimentsZh": "程序化钟表和圆形分数标注，钟表用多位读数评审和人工比较，分数另外检查未见类别与目标值。 作者报告，圆形比例在训练对象上 Acc@0.10 为 89.5%，未见对象为 88.8%，未见比例为 84.9%。（Table 2, PDF p. 8） 比较多种预训练扩散模型并做同骨干对照。几何精度和外观偏好分开报告。 移除定位放松、角色交换偏好或替换周期表示，分别量化角度误差。",
+    "insightZh": "用角度的连续周期结构直接控制语义部件，并在推理时移除定位输入。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
