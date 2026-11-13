@@ -1,0 +1,78 @@
+{
+  "id": "arxiv:2611.16469",
+  "slug": "tarang-microcomb-fabrication-workflow",
+  "title": "TARANG: an open-source, cost-controlled design workflow for silicon nitride microcomb chips",
+  "authors": [
+    "Divyanshu Tiwari",
+    "Esraaj Sarkar Gupta",
+    "Anshuman Kumar"
+  ],
+  "publishedAt": "2026-11-12",
+  "updatedAt": "2026-11-12",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.16469"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "physics.comp-ph",
+    "physics.optics"
+  ],
+  "topicIds": [
+    "fabrication"
+  ],
+  "primaryTopicId": "fabrication",
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "fabricatable-object"
+    ],
+    "output-property": [
+      "fabrication-aware"
+    ]
+  },
+  "keywords": [
+    "nanophotonics",
+    "computational fabrication",
+    "GDSII",
+    "design constraints"
+  ],
+  "abstract": "Designing a microresonator frequency comb chip means solving a chain of coupled problems: a waveguide with anomalous dispersion that survives fabrication errors, a ring with the right free spectral range and quality factor, a bus gap that sets the coupling regime, and grating couplers, all made in one lithography step. We present TARANG, an open-source Python package that takes a silicon nitride platform from tabulated refractive indices to a GDSII mask in fourteen stages, built on the Tidy3D mode, FDTD and eigenmode-expansion solvers. Every cloud simulation is priced before it runs and capped, every result is cached by a fingerprint of the full simulation, and every quoted number carries a numerical check. We show that snapping the grid onto the core's faces, a common way to steady dispersion calculations, leaves the field samples on the faces to floating-point rounding, and that averaging solves with the grid just inside and just outside the faces makes the group-velocity dispersion $D$ independent of the computer and steady to about 1 ps/(nm km) from mesh to mesh. Two complete air-clad designs are presented, at 1550 nm ($700\\times1000$ nm core, $D = 372.9 \\pm 0.6$ ps/(nm km)) and at 780 nm ($350\\times500$ nm, $D = 196.4 \\pm 0.9$ ps/(nm km)), each with a 200 GHz ring, critical and over-coupled gaps, grating couplers, and a fibre-to-fibre budget. The predicted dispersion agrees with two measured devices from the literature to within 1 and 4%, and an independent Lugiato-Lefever solver forms stable single solitons from the exported parameters of both designs, which are ready for fabrication.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.16469v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.16469v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/loqm/tarang"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.16469v1 精确版本与关键图表，PDF 共 39 页。实验数字均为作者报告。已检查公开代码仓库。",
+    "ideaZh": "TARANG 将硅氮化物微梳的色散、环、coupler 和 grating 设计串联到 GDSII，并让每次求解可追溯。工艺特化较强，价值主要是带校验和预算的生成流程。",
+    "whyRelevantZh": "可借鉴 solver audit 和 DFM 检查在生成式制造中的位置。",
+    "evidenceZh": "14 阶段以同一设计配置串联，从模态求解到 GDSII 与复现记录。（Fig. 1; §2, PDF pp. 4–6） 在核心面两侧分别求解后平均，避免 FDTD 格点贴界时的舍入敏感性。（Fig. 3; §3, PDF p. 9） 作者报告，对照文献中的两种平面器件，D₂/2π 的偏差约为 +4.1% 和 +0.9%；两套新设计的 soliton 形成仅经模拟。（Table 2; Fig. 7, PDF pp. 16–17）",
+    "caveatZh": "§2 的默认参数与验证限于特定 stack，云端求解需账号，个别 grating 的三维检查另计。 两套示例的版图和仿真结果不能替代实际加工与测量。",
+    "motivationZh": "硅氮化物微梳需要把色散、耦合、工艺容差与掩膜版图放进同一可重现流程。",
+    "methodZh": "配置材料、工艺与目标频率。Tidy3D 求 waveguide 及 ring 参数。校验耦合、实际 mesh 与设计公差。生成 GDSII 和仿真报告。",
+    "methodFlow": [
+      "配置材料、工艺与目标频率",
+      "Tidy3D 求 waveguide 及 ring 参数",
+      "校验耦合、实际 mesh 与设计公差",
+      "生成 GDSII 和仿真报告"
+    ],
+    "experimentsZh": "两套 air-clad、全刻蚀 Si₃N₄ 平台，回算已发表器件并用 pyLLE 检查 soliton。 与文献测量、不同 mesh 和求解设置对照。 mesh ladder 和两侧采样检查将数值稳定性与设计参数变动区分开。",
+    "insightZh": "把 mesh、预算、参数和数值验证整合进可断点恢复的计算制造流程，可审计每个掩膜的来源。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "early"
+  }
+}

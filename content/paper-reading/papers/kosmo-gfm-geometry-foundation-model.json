@@ -1,0 +1,110 @@
+{
+  "id": "arxiv:2611.16840",
+  "slug": "kosmo-gfm-geometry-foundation-model",
+  "title": "Kosmo-GFM: A Production-Ready Geometry Foundation Model",
+  "authors": [
+    "Sheng Tang",
+    "Shengzhe Wei",
+    "Tiancheng Chen",
+    "Wenhua Jin",
+    "Xinyang Lu",
+    "Tinghao Jiang",
+    "Shuoxuan Feng",
+    "Yupeng Liu",
+    "Yu Zhang",
+    "Xingshuo Chang",
+    "Keren Zhou",
+    "Yuhan Xiong",
+    "Jiahao Li",
+    "Haoming Liu",
+    "Jituo Tian",
+    "Hui Liang",
+    "Chaoqun Tang",
+    "Feng Tian",
+    "Wentao Ouyang",
+    "Kaojin Zhu",
+    "Xiaolin Chai",
+    "Peihuang Fu",
+    "Miao Zheng",
+    "Yunbo Hu",
+    "Feixue Cai",
+    "Zizhen Zou",
+    "Weigang Wang",
+    "Yexuan Yang",
+    "Haoyu Feng",
+    "Weiqi Zhang",
+    "Juntong Fang",
+    "Zesong Li"
+  ],
+  "publishedAt": "2026-11-12",
+  "updatedAt": "2026-11-12",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.16840"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud",
+      "3d-gaussian"
+    ],
+    "conditioning": [
+      "multi-view",
+      "video"
+    ],
+    "method": [
+      "hybrid-method"
+    ]
+  },
+  "keywords": [
+    "geometry foundation model",
+    "bundle adjustment",
+    "3D point tracking",
+    "4DGS"
+  ],
+  "abstract": "We present Kosmo-GFM, a scene reconstruction system that integrates a geometry foundation model (GFM), a pose optimization engine (PoseEngine), and reconstruction-derived supervision from KosmoWorld. GFM predicts camera parameters, depth, cross-view correspondences, and dynamic 3D points from images and videos. PoseEngine combines these predictions with geometric optimization to recover scene-level camera poses and geometry for downstream 3D and 4D Gaussian Splatting. KosmoWorld generates images and geometric supervision from reconstructed real-world scenes to improve GFM's geometric predictions. On the Sparse and Medium subsets of SpatialBench, GFM achieves the lowest absolute relative depth error and the highest relative-pose AUC at 5 degrees among the compared methods. It also achieves the lowest mean endpoint errors for dynamic points and scene flow across the five evaluated datasets. Across 34 scenes completed by all compared reconstruction systems, PoseEngine achieves the highest scene-averaged pose AUC at thresholds of 1, 3, and 5 degrees, with a cumulative runtime of 14.07 hours, approximately 20% of GLUEMAP's 69.67 hours. PoseEngine Flash provides a further accuracy-efficiency trade-off, with a measured mixed-precision runtime of 2.62 hours, approximately 4% of GLUEMAP's runtime. Separate scaling experiments show generally favorable trends with increased data, model computation, and training budgets. These results support the use of learned geometric priors within a scene-level reconstruction pipeline.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.16840v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.16840v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.16840v1 精确版本与关键图表，PDF 共 45 页。实验数字均为作者报告。未从已核对来源确认公开代码。",
+    "ideaZh": "Kosmo-GFM 把前馈深度、位姿、matching 和动态点预测接入 PoseEngine 的场景优化。34 个共同完成的场景上，相机精度与总耗时同时改善，Flash 模式则牺牲部分位姿精度进一步提速。",
+    "whyRelevantZh": "为动态资产获取提供可拆分的几何先验与相机优化对照。",
+    "evidenceZh": "PoseEngine 在视图图上组局部约束，再用 GFM 匹配和几何优化求全局场景。（Fig. 2; §3, PDF p. 7） 真实重建派生的 KosmoWorld 监督用有无数据对照检查，改善一些深度与姿态结果。（Table 1; §3.3.3, PDF p. 17） 作者报告，34 个共同场景中 PoseEngine 的 AUC@1 为 78.45、总耗时 14.07 h，GLUEMAP 为 69.13、69.67 h。Flash 为 2.62 h、AUC@1 62.50。（Table 10, PDF p. 23）",
+    "caveatZh": "§7 指出低纹理、竖屏视图和被遮挡点的轨迹 jitter，静动态数据配比仍待控制实验。 系统比较只保留共同完成场景，不能据此推断失败率或任意采集路径下的实时性。",
+    "motivationZh": "跨视图重建同时依赖单张图预测、全局相机一致性与动态点的时序恢复。",
+    "methodZh": "GFM 编码多视图与相机 token。分支预测 depth、matches 和 dynamic points。建 SALAD view graph 与 local star graphs。bundle adjustment 和 motion averaging。",
+    "methodFlow": [
+      "GFM 编码多视图与相机 token",
+      "分支预测 depth、matches 和 dynamic points",
+      "建 SALAD view graph 与 local star graphs",
+      "bundle adjustment 和 motion averaging"
+    ],
+    "experimentsZh": "SpatialBench Sparse 和 Medium、五组动态评估集，以及 34 个公共重建场景。 对照 COLMAP、GLUEMAP、VidMap 等系统及多种深度与动态重建模型。 §5 检查数据、模型及训练计算量扩展；结果针对所测尺寸和运行预算。",
+    "insightZh": "让共享几何先验和显式重建后端并行承担可学习预测与多视角硬一致性。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2611.16126",
+  "slug": "split-and-scale-latent-3d-representations",
+  "title": "Split-and-scale Latent 3D Representations",
+  "authors": [
+    "Dorian Chan",
+    "Muhammed Kocabas",
+    "Xiaoming Zhao",
+    "Oncel Tuzel",
+    "Jen-Hao Rick Chang"
+  ],
+  "publishedAt": "2026-11-12",
+  "updatedAt": "2026-11-12",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.16126"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "facets": {
+    "task": [
+      "representation-learning",
+      "generation"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "autoregressive"
+    ]
+  },
+  "keywords": [
+    "3D tokenization",
+    "spatial partition",
+    "autoregressive generation",
+    "latent scaling"
+  ],
+  "abstract": "Latent 3D representations have significantly expanded the capabilities of modern shape modeling, enabling compact encoding of 3D scenes and supporting powerful 3D generative models. Despite this progress, current representations struggle to capture the fine details of complex objects, fundamentally limited by the capacity of their latents. However, scaling latent capacity at training time is computationally expensive and often infeasible under memory limits, and naively increasing the number of latents at inference fails to make effective use of the added capacity. In this paper, we address both challenges with \\textit{split-and-scale}, a method that effectively expands latent capacity at inference while keeping training cost tractable. Our key observation is that by representing 3D scenes as continuous functions of 3D coordinates, a single pretrained tokenizer can be applied at inference to arbitrarily small sub-regions of a scene, allocating the same latent capacity to a smaller spatial extent and thus capturing far higher detail. We validate this insight by conducting extensive ablations to study the trade-offs between compute, memory, latent capacity, and reconstruction quality, demonstrating our inference-time scaling method achieves quality competitive with much larger models that exceed single-GPU memory limits. We further demonstrate that split-and-scale supports high-quality generative modeling, training an autoregressive 3D generator that performs competitively with state-of-the-art baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.16126v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.16126v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.16126v1 精确版本与关键图表，PDF 共 20 页。实验数字均为作者报告。未从已核对来源确认公开代码。",
+    "ideaZh": "Split-and-scale 让同一 tokenizer 在场景的更小子区重复编码，把细节容量扩展放到推理时。自回归子区生成验证了这套表示，边界接缝和跨块全局形状仍需处理。",
+    "whyRelevantZh": "对大场景层级表示、局部补细节和 patch-conditioned 生成有直接参考价值。",
+    "evidenceZh": "把同一 tokenizer/decoder 作用在尺度不同的子区，而非训练同一整场模型用更多 query。（Fig. 2; §3.2, PDF pp. 4–5） 按子区顺序预测局部 latent，条件包括输入图像、voxel embedding 和前面生成的 tokens。（Fig. 4; §3.3, PDF pp. 6–7） 作者报告，Split-and-scale 从 8192×32 增至 32768×32 时 LPIPS 从 0.124 降至 0.091；生成 input-view FID 为 17.98，优于两组 TRELLIS 对比但略逊于 LiTo-8192 的 16.78。（Tables 2–3, PDF p. 9）",
+    "caveatZh": "§5 和 Fig. 7 显示独立解码可能出现接缝，早期自回归错误会留下浮空或结构异常。 性能取决于分区与数据分布，不能由场景重建指标推出组件级可编辑性。",
+    "motivationZh": "增大整场 3D latent 通常同时抬高训练显存，直接增加测试 token 又可能没有足够利用。",
+    "methodZh": "把 3D 表示为连续坐标函数。训练共享 tokenizer 实现全局和局部编码。推理分区重用 tokenizer 并合成子区。用自回归 voxel-conditioned generator 生成 latents。",
+    "methodFlow": [
+      "把 3D 表示为连续坐标函数",
+      "训练共享 tokenizer 实现全局和局部编码",
+      "推理分区重用 tokenizer 并合成子区",
+      "用自回归 voxel-conditioned generator 生成 latents"
+    ],
+    "experimentsZh": "在持出 scene 集合测试重建与单图生成，报告几何 Chamfer 和多视图渲染指标。 对照 LiTo、TRELLIS 与 TRELLIS-2，论文提醒持出数据属于部分 baseline 的训练数据。 比较直接增加 token、等计算预算与 tokenizer/generator 组件，并报告分割数影响。",
+    "insightZh": "利用连续坐标把局部几何的编码难度与整个场景的 token 数解耦。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

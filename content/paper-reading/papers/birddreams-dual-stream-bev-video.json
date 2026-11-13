@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2611.14815",
+  "slug": "birddreams-dual-stream-bev-video",
+  "title": "BirdDreams: Joint Perspective and BEV Video Generation for a Plausible, Reactive Driving World Model",
+  "authors": [
+    "Junyoung Seo",
+    "Jaewoo Seo",
+    "Seungryong Kim",
+    "Laura Leal-Taixé",
+    "Xiuming Zhang",
+    "Seung Wook Kim"
+  ],
+  "publishedAt": "2026-11-10",
+  "updatedAt": "2026-11-10",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.14815"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "facets": {
+    "task": [
+      "generation",
+      "editing"
+    ],
+    "content-scope": [
+      "environment-world"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "keywords": [
+    "BEV",
+    "causal video diffusion",
+    "structured control",
+    "world models"
+  ],
+  "abstract": "Driving world models aim to simulate how a scene unfolds under different ego actions. This requires plausible motion of surrounding vehicles as well as precise ego-trajectory control. Learning vehicle motion from perspective video alone is challenging because motion is entangled with appearance and vehicles can be occluded. Prior work therefore conditions video generation on layouts that specify vehicle motion, providing control over surrounding vehicles but requiring their future trajectories as inputs. We introduce BirdDreams, an autoregressive driving world model that jointly generates perspective video and a schematic bird's-eye-view (BEV) video, making scene layout part of the predicted future. The BEV, rendered from scene annotations for training, depicts roads and vehicles as simple shapes at a fixed metric scale, providing a top-down view of their positions and motion with reduced occlusion between vehicles. Perspective video, by contrast, retains scene details that the BEV omits, such as traffic signals and object appearance. Joint attention between two video diffusion transformers, one per stream, lets each stream inform the other during generation. The predicted BEV also provides a geometric interface for ego control: we translate and rotate its latest frame along an input ego trajectory and use the resulting frames as a soft condition that shows how the scene would appear to move if only the ego vehicle moved. At inference, BirdDreams generates both videos from a single camera image without requiring an HD map or vehicle-state inputs. On PhysicalAI-AV and nuScenes, BirdDreams follows input ego trajectories more faithfully than prior driving world models and generates more plausible ego motion without ego-action conditioning. Human evaluation shows that BirdDreams outperforms a perspective-only baseline in generating realistic surrounding-vehicle behavior.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.14815v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.14815v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.14815v1 精确版本与关键图表，PDF 共 19 页。实验数字均为作者报告。未从已核对来源确认公开代码。",
+    "ideaZh": "BirdDreams 让两个 causal video DiT 同步预测透视帧和 metric BEV，借预测的 BEV 做自车路径条件和修改初始布局。适合观察结构化状态控制，实验范围仍是驾驶道路。",
+    "whyRelevantZh": "预测布局可作为场景视频与可编辑资产之间的中间层，迁移前要明确度量状态和遮挡监督。",
+    "evidenceZh": "自车位姿改写 BEV 参考时，只编码自车运动导致的变换；周车仍由模型预测。（Fig. 2; §§3.1–3.2, PDF pp. 4–6） 在简化 BEV 添加车辆或改朝向可引导后续透视视频，论文展示定性干预例。（Fig. 11; §4.4.3, PDF pp. 14–15） 作者报告，带自车控制时 BirdDreams 在 PhysicalAI-AV 和 nuScenes 的 ego ADE 为 3.83 和 3.42，OmniDreams Plücker 为 5.88 和 5.38。（Tables 1–2, PDF p. 8）",
+    "caveatZh": "道路训练需已有地图和 3D box 监督，输出是平面车辆状态代理，无法据此确认任意三维拓扑或真实反应。",
+    "motivationZh": "驾驶视频从投影视图推断遮挡中的物体、尺度和自车运动很难，外部给未来布局又限制使用。",
+    "methodZh": "用道路图与实例标注构造 paired BEV–RGB。两个 causal DiT 以 joint attention 同步去噪。以路径变换上一张 BEV 作软条件。rollout 双流并检查可控性。",
+    "methodFlow": [
+      "用道路图与实例标注构造 paired BEV–RGB",
+      "两个 causal DiT 以 joint attention 同步去噪",
+      "以路径变换上一张 BEV 作软条件",
+      "rollout 双流并检查可控性"
+    ],
+    "experimentsZh": "使用 PhysicalAI-AV 与 nuScenes，比较有无 ego action、路径误差、视频质量，并做人评周车行为。 含 Vista、UniFuture、GEM、DrivingDojo 与同族 OmniDreams；基线接收路径的输入方式不同。 独立与共享噪声的对照及输入布局编辑，验证两个 stream 可协作但未覆盖一般 3D。",
+    "insightZh": "使布局成为模型预测对象，保留可干预显式坐标，且两支共享运动和外观线索。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

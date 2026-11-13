@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2611.17321",
+  "slug": "brickflow-connectivity-guided-brick-reconstruction",
+  "title": "BrickFlow: Connectivity-Guided Brick Reconstruction",
+  "authors": [
+    "Peter Kulits",
+    "Cordelia Schmid"
+  ],
+  "publishedAt": "2026-11-12",
+  "updatedAt": "2026-11-12",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.17321"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "lego",
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "lego",
+  "facets": {
+    "task": [
+      "reconstruction",
+      "assembly-planning"
+    ],
+    "content-scope": [
+      "part-assembly"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ],
+    "output-property": [
+      "part-aware"
+    ]
+  },
+  "keywords": [
+    "part-aware",
+    "LEGO",
+    "SE(3) flow matching",
+    "connectivity guidance"
+  ],
+  "abstract": "Given a set of LEGO parts and an image of an assembled object, our task is to infer the pose of each part to assemble the object. In contrast with traditional 3D reconstruction, doing so requires satisfying discrete physical constraints, which provide structure but render the problem combinatorial and highly sensitive to small pose errors. To learn a prior over how parts fit together, we train a set-conditioned SE(3) flow model on procedurally generated assemblies. We then finetune this model to inject image conditioning, using 1% as much data. However, while the learned flow captures global structure, it does not enforce connectivity. To address this, we introduce an analytic connectivity-field guidance to pull predictions toward connected assemblies at test time. Through this, we demonstrate improved build quality with model size, pretraining, and guidance. We make our models and data available for research purposes at https://kulits.github.io/BrickFlow/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.17321v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.17321v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.17321v1 精确版本与关键图表，PDF 共 16 页。实验数字均为作者报告。代码仍待发布。",
+    "ideaZh": "BrickFlow 用照片与已知零件清单恢复每块积木的 SE(3) 位姿，并在采样时用 connector 能量拉回连接可行域。BrickNet 的有效装配率有所提高，仍须单独做碰撞与整体连接检查。",
+    "whyRelevantZh": "可直接借鉴先生成后引导的积木装配方法，将位姿误差和实际可搭建性分开监测。",
+    "evidenceZh": "结构预训练只看 part type，图像阶段用 Perceiver Resampler 注入冻结视觉特征。（Fig. 3; §3.5, PDF p. 5） 连接图能量偏好有合法邻接的连通网络，通过梯度引导预测姿态。（Fig. 4; §§3.6–3.7, PDF pp. 5–6） 作者报告，BrickNet 上 image-conditioned DiT-L 有效率由 30.5% 升至 35.1%，匹配位姿误差由 31.0 降至 30.9 LDU。（Table 1, PDF p. 7）",
+    "caveatZh": "§5 指出连接引导没有显式碰撞项，需要精确零件清单，细长结构和大套件更难。 能量提供 soft guidance，工程使用还需要独立的可构建性检查与连接顺序。",
+    "motivationZh": "LEGO 单图重建的难点是多件零件既要对准参考图，也须满足离散连接。",
+    "methodZh": "ProcBrick 库存条件装配预训练。以 DINOv3 图像特征微调 flow。由噪声预测零件位姿。用 connector energy 做 DPS guidance。",
+    "methodFlow": [
+      "ProcBrick 库存条件装配预训练",
+      "以 DINOv3 图像特征微调 flow",
+      "由噪声预测零件位姿",
+      "用 connector energy 做 DPS guidance"
+    ],
+    "experimentsZh": "ProcBrick 与 512 个 BrickNet 验证造型，每个造型采样 100 次并报告位姿、碰撞与连通。 对照不同 DiT 尺寸、库存条件和图像条件，也展示真实照片案例。 去预训练大幅削弱 BrickNet 有效率，增大模型与 DPS 的收益可分别观察。",
+    "insightZh": "把离散 connector 约束写成可微的装配图能量，采样时可调用，无需为能量重新训练 flow。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

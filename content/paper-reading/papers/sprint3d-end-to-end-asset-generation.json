@@ -1,0 +1,100 @@
+{
+  "id": "arxiv:2611.16701",
+  "slug": "sprint3d-end-to-end-asset-generation",
+  "title": "Sprint3D: Accelerating End-to-End 3D Asset Generation through Pipeline Optimization",
+  "authors": [
+    "Sho Kuno",
+    "Ruihan Yu",
+    "Yonghao Yu",
+    "Guixu Lin",
+    "Lian Fu",
+    "Muyao Niu",
+    "Yu-Ju Tsai",
+    "Zheng-Hui Huang",
+    "Yi-Chuan Huang",
+    "Siqi Yang",
+    "Fengbo Lan",
+    "Erwin Wu",
+    "Kaipeng Zhang",
+    "Zhixiang Wang"
+  ],
+  "publishedAt": "2026-11-12",
+  "updatedAt": "2026-11-12",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.16701"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "topicIds": [
+    "3d-generation"
+  ],
+  "primaryTopicId": "3d-generation",
+  "facets": {
+    "task": [
+      "generation",
+      "texture-material"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "output-property": [
+      "asset-ready",
+      "efficient"
+    ]
+  },
+  "keywords": [
+    "3D assets",
+    "UV atlas",
+    "flow distillation",
+    "GLB"
+  ],
+  "abstract": "Image-to-3D generative models now produce asset-quality textured meshes, but at minutes per asset they remain slow to iterate with and costly to deploy. Prior work has mostly accelerated the sampling of the networks, and where it also optimizes the mesh processing, it trains its own generators. We instead start from a publicly released pipeline and ask how much of its end-to-end time can be saved. Profiling the public Pixal3D pipeline shows that its latency is dominated by what happens after the networks: the four rectified flows take 14% of the wall-clock time and mesh post-processing takes 85%, most of it in CPU-based UV unwrapping. We therefore first rebuild the mesh post-processing on the GPU and take it off the critical path, then cut the per-evaluation overhead of the flows and distill them from 76 to 8 network evaluations. The resulting pipeline, Sprint3D, reduces the median time per asset from 133 s to 4.05 s on one H200 GPU at the same export settings (33$\\times$). At the same time, on 2,653 held-out Toys4K objects it improves every input-view normal metric of the Pixal3D protocol, with a slightly lower mean silhouette IoU, lower point-cloud alignment scores and less fine texture detail. The rebuilt post-processing alone also speeds up TRELLIS.2, which uses the same export code, by 6.7$\\times$ without a detectable change in the evaluated metrics.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.16701v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.16701v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AlayaLab/sprint3d"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.16701v1 精确版本与关键图表，PDF 共 36 页。实验数字均为作者报告。已检查公开代码仓库。",
+    "ideaZh": "Sprint3D 把 UV 与 texture 处理移到 GPU 并蒸馏四段 Rectified Flow。作者在一张 H200 上把 Pixal3D 的 asset 中位耗时从 133 s 降到 4.05 s，较难样本的轮廓和细纹理仍会退步。",
+    "whyRelevantZh": "直接关联快速 3D 设计迭代，复用导出优化前可先 profile UV 与贴图的真实占比。",
+    "evidenceZh": "分开优化四段 flow，并将 GPU mesh 后处理分为可并行的早期几何工作与纹理步骤。（Fig. 2; §§3.1–3.4, PDF pp. 4–8） GPU chart segmentation 替代 CPU UV；单独迁移这一条路径到共享导出代码的 TRELLIS.2 也见收益。（Fig. 3; Table 3, PDF pp. 6,12） 作者报告 133.0→4.05 s（H200，同导出设置），TRELLIS.2 迁移后约 6.7×，Toys4K 上法线指标上升而平均剪影 IoU 略降。（Tables 2–4, PDF pp. 11–12）",
+    "caveatZh": "§5 指出结构阶段仍主导某些错误，蒸馏损失细纹理，部分分析仅为开发集。 运行时间依赖单张 H200、特定导出参数和实现，换硬件或资产分布需重测。",
+    "motivationZh": "单图生成纹理 mesh 的时间可能主要花在 CPU UV 与导出，单看网络采样会误判。",
+    "methodZh": "以 Pixal3D 编码输入图像。蒸馏 structure、coarse/fine shape 和 texture flows。并行 GPU remesh 与 UV 展开。烘焙并导出纹理 GLB。",
+    "methodFlow": [
+      "以 Pixal3D 编码输入图像",
+      "蒸馏 structure、coarse/fine shape 和 texture flows",
+      "并行 GPU remesh 与 UV 展开",
+      "烘焙并导出纹理 GLB"
+    ],
+    "experimentsZh": "以 2,653 个 held-out Toys4K 对象评估输入视图法线、轮廓和端到端时间，补充 asset 外观及 3D 对齐。 对照释放版 Pixal3D、开放生成器，并单测 TRELLIS.2 同类导出路径。 逐步加入 mesh、flow 及 student 优化，后两类中蒸馏将约 15 s 再压到约 4 s。",
+    "insightZh": "把输出改变的优化和可复用的 pipeline engineering 分开审计，验证真正瓶颈位于资产末端。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

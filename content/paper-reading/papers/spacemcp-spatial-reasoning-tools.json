@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2611.15680",
+  "slug": "spacemcp-spatial-reasoning-tools",
+  "title": "SpaceMCP: Vision Language Model Spatial Reasoning via Model Context Protocol",
+  "authors": [
+    "Ameen Izhac",
+    "Nobuko Yoshida",
+    "Ronald Clark"
+  ],
+  "publishedAt": "2026-11-11",
+  "updatedAt": "2026-11-11",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.15680"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.LG"
+  ],
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "facets": {
+    "task": [
+      "reasoning",
+      "tool-use"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ]
+  },
+  "keywords": [
+    "scene graphs",
+    "MCP",
+    "spatial reasoning",
+    "metric geometry"
+  ],
+  "abstract": "Despite impressive advances in large language models (LLM), vision-language models (VLM) still exhibit limited spatial reasoning capabilities. Recent progress in feed-forward 3D reconstruction has enabled precise, real-time geometric understanding from visual inputs. In this work, we propose SpaceMCP, a framework that leverages these advances to introduce an MCP-style paradigm for spatial reasoning. Our approach augments a VLM with structured function calls, allowing it to query a scene graph for spatial information such as distances, object positioning, and camera properties. The scene graph is constructed in real time using feed-forward 3D reconstruction to recover metric geometry, combined with open-vocabulary segmentation to identify and localize relevant objects within the scene. Paired with the VLM's strong reasoning capabilities, the VLM is able to combine this primitive information to solve more complex spatial tasks. Without any training, SpaceMCP achieves state-of-the-art results on VSI-Bench, MMSI-Bench and VSTI-Bench, outperforming recent spatially post-trained VLMs and improving its base VLM by 15-22 points per benchmark. We argue that, given the contrast between the relatively slow progress in native VLM spatial reasoning and the rapid advances in feed-forward 3D computer vision, this paradigm offers a promising path forward for enabling robust spatial reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.15680v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.15680v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.15680v1 精确版本与关键图表，PDF 共 13 页。实验数字均为作者报告。未从已核对来源确认公开代码。",
+    "ideaZh": "SpaceMCP 把视频的几何与分割缓存成可查询 scene graph，让 VLM 按需调用位置、间距和相机工具，便于将物理量纳入 3D 设计检查。它会继承 depth 与实例关联的误差。",
+    "whyRelevantZh": "设计 agent 可将 tool schema 改接到自己的几何或渲染器，作为尺寸与视点验收入口。",
+    "evidenceZh": "以低帧率生成静态度量几何和相机，避免每问重新推理整个视频。（Fig. 2; §3.1, PDF p. 4） scene graph 工具返回相机、物体间距、尺寸等数值，并保留选择观测实体的能力。（§3.3; Table 5, PDF pp. 5,12） 作者报告，同一 Gemini 骨干接入后，VSI-Bench 从 55.8 到 71.8，MMSI 从 34.3 到 49.2，VSTI 从 52.3 到 67.6。（Table 4, PDF p. 8）",
+    "caveatZh": "§4.4 指出高反光、透明或低纹理会影响 DA3，SAM 3 跨视角关联和短窗时效也有限。 距离等几何值需要保留上游误差，尤其不能拿来直接决定制造间隙。",
+    "motivationZh": "VLM 根据视频直接猜几何距离或相机运动常缺少可校验的尺度。",
+    "methodZh": "以 DA3 恢复点、位姿和地平面。按问题使用 SAM 3 增量标定实例。建立定向 3D box 与相机查询。VLM 调函数并整合答案。",
+    "methodFlow": [
+      "以 DA3 恢复点、位姿和地平面",
+      "按问题使用 SAM 3 增量标定实例",
+      "建立定向 3D box 与相机查询",
+      "VLM 调函数并整合答案"
+    ],
+    "experimentsZh": "测试三套空间问答基准，并以同骨干比较几何输出的多种表达方式。 与直接 VLM、新空间微调模型和串行化 3D 感知结果比较。 冻结相同感知输出对比 flat 与 callable 格式，完整串行化在 VSTI 追回大部分增益。",
+    "insightZh": "把几何查询从一次性注入改为按需增点和工具执行，无需视觉模型再训练。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

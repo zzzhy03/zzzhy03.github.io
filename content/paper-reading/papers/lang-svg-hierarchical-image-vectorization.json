@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2611.15941",
+  "slug": "lang-svg-hierarchical-image-vectorization",
+  "title": "Lang-SVG: Hierarchical Image Vectorization with Language Priors",
+  "authors": [
+    "Xi Liu",
+    "Chaoyi Zhou",
+    "Run Wang",
+    "Jiaang Li",
+    "Feng Luo",
+    "Junxiang Huang",
+    "Siyu Huang"
+  ],
+  "publishedAt": "2026-11-11",
+  "updatedAt": "2026-11-11",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.15941"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "2d-design"
+  ],
+  "primaryTopicId": "2d-design",
+  "facets": {
+    "task": [
+      "vectorization",
+      "decomposition"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "svg-vector"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "editable",
+      "part-aware"
+    ]
+  },
+  "keywords": [
+    "SVG",
+    "vectorization",
+    "hierarchical segmentation",
+    "semantic editing"
+  ],
+  "abstract": "Image vectorization reconstructs raster images as compact scalable vector graph- ics (SVG), providing a structured and editable code representation of images. However, most existing vectorization methods optimize for pixel-level render- ing fidelity, often producing SVGs that lack alignment with human-perceived object-part hierarchies, making them difficult to manipulate. To address this, we propose Lang-SVG, which introduces an explicit tree structure to organize SVG primitives with semantic labels and parent-child relationships. Lang-SVG incorporates granularity-controllable and open-vocabulary segmentation priors to initialize object-part hierarchies and leverages multimodal large language models (MLLMs) with SVG tree context to assign semantic labels to unlabeled nodes. To reduce redundancy, we introduce depth-adaptive simplification to reduce shape complexity and Tree-Guided Pruning and Merging to eliminate redundant SVG nodes. L1-SAM-Prompting further recovers missing regions to improve recon- struction fidelity and structural completeness. Beyond reconstruction fidelity, we introduce a new evaluation protocol that measures structural quality and semantic part alignment. Experiments demonstrate that Lang-SVG achieves state-of-the-art performance in both rendering fidelity and structural quality. Project website: https://xiliu8006.github.io/Lang-SVG/.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.15941v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.15941v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.15941v1 精确版本与关键图表，PDF 共 19 页。实验数字均为作者报告。未从已核对来源确认公开代码。",
+    "ideaZh": "Lang-SVG 从多粒度 masks 建可编辑的 object–part tree，再用语言模型补标签和树感知优化减少冗余。层级质量与画面质量可分别测试，分割漏项仍会传到最终结构。",
+    "whyRelevantZh": "部件树、语义路径和可追溯区域能直接用于后续分层编辑与刺绣路径准备。",
+    "evidenceZh": "通过多尺度空间 containment 建层级，按深度与节点冗余调整路径复杂度。（Fig. 2; §§3.1–3.2, PDF pp. 4–5） 将 ancestor、siblings 和局部视觉信息用于给未标注 subpart 分配 semantic tag。（§3.3; Fig. 4, PDF pp. 5,9） 作者报告，在 ADE20K 的 2,304 点 Same points 设置下，SSIM 为 0.746，PSNR 为 25.90 dB；ADE20K-Part234 同预算下严格 IoU 0.75 档部件 mask 召回为 31.8%。（Tables 1–2, PDF p. 7）",
+    "caveatZh": "§5 提及 open-vocabulary segmenter 漏检、语义碎片和较稠密层级仍影响可编辑性。 像素与 part recall 只提供 proxy，复杂 SVG 交互效率还需测用户实际编辑。",
+    "motivationZh": "高像素相似的 SVG 可能缺少可查找和可替换的对象与子部件。",
+    "methodZh": "生成多粒度 open-vocabulary masks。按包含关系建 SVG tree。简化并裁剪合并 paths、提示补漏。结合树上下文给节点分配标签。",
+    "methodFlow": [
+      "生成多粒度 open-vocabulary masks",
+      "按包含关系建 SVG tree",
+      "简化并裁剪合并 paths、提示补漏",
+      "结合树上下文给节点分配标签"
+    ],
+    "experimentsZh": "在 ADE20K、ADE20K-Part234 和 COCO-AOKVQA 上分别看渲染、part alignment 与语义性。 对照 DiffVG、LIVE、LIVEv3S 与多种路径控制点预算；额外比较了 Same paths。 Tables 5–8 分别检查树上下文、树剪枝、分割 prior 和 L1-SAM 补漏的影响。",
+    "insightZh": "把父子关系作为优化与语义标注的共同输入，并以部件召回和 tree 可用性补足重绘指标。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

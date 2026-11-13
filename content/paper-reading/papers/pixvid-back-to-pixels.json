@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2611.17336",
+  "slug": "pixvid-back-to-pixels",
+  "title": "Back to Pixels: Lifting Latent Video Diffusion into Pixel Space",
+  "authors": [
+    "Yanke Song",
+    "Shuo Chen",
+    "Chris Rockwell",
+    "Guande He",
+    "Nan Liu",
+    "Desai Xie",
+    "Tianpei Gu",
+    "Yong-Hyun Park",
+    "Aryan V S",
+    "Dennis Yuren Menn",
+    "Ming-Hsuan Yang",
+    "Xun Huang"
+  ],
+  "publishedAt": "2026-11-12",
+  "updatedAt": "2026-11-12",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.17336"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "video-generation"
+  ],
+  "primaryTopicId": "video-generation",
+  "facets": {
+    "task": [
+      "generation",
+      "editing"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "keywords": [
+    "pixel-space diffusion",
+    "framewise editing",
+    "Wan",
+    "causal generation"
+  ],
+  "abstract": "Frontier video generation models work in a VAE latent space that compresses video in both space and time. This compression made training tractable, but now limits high-resolution, controllable, and interactive generation -- doubling resolution quadruples token count, conditions apply to groups of frames rather than individual ones, and each response must wait for the rest of its multi-frame block. We present PixVid, a simple yet effective method that lifts a pretrained latent video model to directly generate every frame in pixel space. PixVid keeps the diffusion transformer and replaces the VAE decoder with a convolutional head that renders its outputs into pixels. We find that predicting clean video rather than velocity, together with a larger noise shift, is key to quality. Finetuned from Wan2.1-14B, PixVid is competitive with the latent baseline within $\\sim 1.3$M training clips. Working framewise in pixels, it generates at $2\\times$ higher resolution with the same per-frame token count, keeps depth-conditioned video editing aligned under fast motion, and responds to each action at the next frame. Project page: https://chenshuo20.github.io/PixVid/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.17336v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.17336v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.17336v1 精确版本与关键图表，PDF 共 23 页。实验数字均为作者报告。未从已核对来源确认公开代码。",
+    "ideaZh": "PixVid 把 Wan 的 latent DiT 改到逐帧像素空间，能在下一帧体现控制，且可用更大的 patch 提高分辨率。取舍是短低分辨率视频 token 更多，长 rollout 仍会漂移。",
+    "whyRelevantZh": "逐帧 depth 与 camera control 接口可作为设计预览管线的定时参考。",
+    "evidenceZh": "线性对齐初始化 patch embed，卷积 detailer 预测 clean pixels，并承接更高分辨率输出。（Fig. 2; §§3.1–3.3, PDF pp. 3–4） 逐帧输出没有 latent block 的额外等待，论文同时报告控制响应和计算吞吐。（Fig. 6; Table 3, PDF p. 7） 作者报告，PixVid 的最大控制等待为 0 帧，median measured latency 为 34 ms，速度为 29.4 fps，测试设定见附录。（Table 3, PDF p. 7）",
+    "caveatZh": "§5 指出低分辨率每秒处理 token 数约为 Wan 的 3.9 倍，长时相机控制仍有 drift。 高速反馈收益取决于硬件和解码设置，快速运动编辑的 FVD 仍有退步。",
+    "motivationZh": "视频 VAE 的时间压缩把控制绑定到多帧块，抬高交互等待和高分辨率计算成本。",
+    "methodZh": "对齐像素 patch 与 pretrained latent patch。复用 Wan DiT 并训练卷积 detailer。用 x-prediction 与 calibrated noise shift 微调。逐帧编辑、生成或流式控制。",
+    "methodFlow": [
+      "对齐像素 patch 与 pretrained latent patch",
+      "复用 Wan DiT 并训练卷积 detailer",
+      "用 x-prediction 与 calibrated noise shift 微调",
+      "逐帧编辑、生成或流式控制"
+    ],
+    "experimentsZh": "分别在 text-to-video、depth-conditioned editing 和 camera-control autoregressive 设置测试。 对照 Wan 原始 latent baseline、PixelUMM 和控制任务上的 SolarWM，模型大小和任务不同。 线性头出现块边，卷积 detailer 和 clean-pixel 目标改善接缝及闪烁，附录按设置给出 FLOPs。",
+    "insightZh": "保留大模型先验而替换时空 latent 的输入输出，并以独立尺寸运行 detailer。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

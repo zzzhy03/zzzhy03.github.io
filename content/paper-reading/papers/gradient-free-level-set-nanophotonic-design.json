@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2611.15656",
+  "slug": "gradient-free-level-set-nanophotonic-design",
+  "title": "Gradient-Free Inverse Design of 3D Nanophotonic Devices Using the Level-Set-Method",
+  "authors": [
+    "Oliver Kuster",
+    "Carsten Rockstuhl",
+    "Thomas Jebb Sturges"
+  ],
+  "publishedAt": "2026-11-11",
+  "updatedAt": "2026-11-11",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.15656"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "physics.optics"
+  ],
+  "topicIds": [
+    "fabrication"
+  ],
+  "primaryTopicId": "fabrication",
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "fabricatable-object"
+    ],
+    "representation": [
+      "implicit-sdf"
+    ],
+    "output-property": [
+      "fabrication-aware"
+    ]
+  },
+  "keywords": [
+    "level set",
+    "gradient-free optimization",
+    "connected components",
+    "fabrication constraints"
+  ],
+  "abstract": "Advances in 3D nanophotonic additive manufacturing enable increasingly complex, almost free-form devices for manipulating light at sub-wavelength scales. Extending nanophotonic designs into three dimensions introduces additional degrees of freedom. Exploiting this freedom requires inverse-design methods that can efficiently navigate this large design space while accommodating fabrication constraints. Here, we combine gradient-free optimization with the level-set method (LSM) to provide such an approach for 3D additive manufacturing. Representing the 3D geometry as a level set constructed from Gaussian radial basis functions retains substantial geometric freedom with only a few hundred design variables. This compact representation makes gradient-free optimization practical for fully 3D nanophotonic devices, eliminating the need for adjoint calculations. This unlocks the use of any Maxwell solver or auxiliary algorithms that should express fabrication constraints for which the required derivatives are unavailable or impractical to obtain, and enables embarrassingly parallel workflows. Consequently, binary fabrication requirements, such as structural connectivity, can be rigorously enforced, avoiding the differentiable approximations commonly used in gradient-based optimization. Here, we demonstrate the combination of the gradient-free LSM with a connected-component analysis algorithm to enforce the structural integrity of the design. We demonstrate the applicability of the gradient-free LSM by optimizing a Y-splitter while strictly enforcing the structural integrity of the material and the void in the design.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.15656v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.15656v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/OlloKuster/gradient_free_LSM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.15656v1 精确版本与关键图表，PDF 共 7 页。实验数字均为作者报告。已检查公开代码仓库。",
+    "ideaZh": "用 Gaussian RBF level set 将三维形状压到数百变量，再先检查 material/void 连通性、后投入 Maxwell 求解。连通约束能严格筛造型，代价是无梯度仿真的运行预算。",
+    "whyRelevantZh": "连接与空腔检查可借鉴到有二值拓扑约束的 generative fabrication。",
+    "evidenceZh": "连续 RBF 构成 level set，经阈值形成二值材料表面，几何参数可与仿真器分离。（Fig. 1; §II, PDF pp. 2–3） connected-component check 严格筛查材料和空域，优化器据此避免模拟不可制造的解。（§II; Fig. 1, PDF pp. 2–3） 作者报告 Y-splitter 两个输出波导各超过 45% 的模拟通量，附图展示最终分布和传播过程。（§III; Figs. 2–3, PDF pp. 4–5）",
+    "caveatZh": "§IV 讨论随机无梯度搜索通常比有可用梯度的方案更贵，依赖低维平滑参数化。 证据集中于一个模拟器件，真实制造、公差和设计迁移仍需验证。",
+    "motivationZh": "三维纳米光刻允许自由几何，但 hard connectivity、材料连通和 void 的拓扑要求不易用光滑惩罚保证。",
+    "methodZh": "设定 RBF 权重和 fabrication 域。以 level set 形成离散材料几何。检查材料与空腔连通。用 Meep 评估可行候选并迭代。",
+    "methodFlow": [
+      "设定 RBF 权重和 fabrication 域",
+      "以 level set 形成离散材料几何",
+      "检查材料与空腔连通",
+      "用 Meep 评估可行候选并迭代"
+    ],
+    "experimentsZh": "以附带结构约束的 3D 光学 Y-splitter 为单例，使用 Nevergrad 和 Meep FDTD。 比较给定不受约束示例与受限区域设计的几何及数值结果，未在统一预算下系统比较其他优化算法。 运行曲线与连接检查用于展示可行搜索过程，缺少跨器件的大规模 ablation。",
+    "insightZh": "把不可微的制造检查作为 feasibility gate 接入自由形状逆向设计。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "early"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2611.16517",
+  "slug": "unispark-hybrid-multimodal-model",
+  "title": "UniSpark: Exploring Hybrid Attention for Multimodal Understanding and Generation",
+  "authors": [
+    "Jiancheng Pan",
+    "Yuzheng Liu",
+    "Hengyuan Cao",
+    "Qiyuan Zhang",
+    "Yangyan Li",
+    "Biao Gong",
+    "Zheng Zhang",
+    "Ka Long Cheng",
+    "Xinyang Wang",
+    "Yujun Shen"
+  ],
+  "publishedAt": "2026-11-12",
+  "updatedAt": "2026-11-12",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.16517"
+  },
+  "venueIds": [],
+  "publicationType": "technical-report",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "facets": {
+    "task": [
+      "generation",
+      "editing",
+      "reasoning"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "autoregressive",
+      "flow-matching"
+    ]
+  },
+  "keywords": [
+    "multimodal generation",
+    "hybrid attention",
+    "flow matching",
+    "interleaved context"
+  ],
+  "abstract": "We present UniSpark-9B, a unified multimodal model that investigates hybrid attention for visual understanding and generation. Built on a Mixture-of-Transformer-Experts backbone with approximately 9B parameters in each branch, UniSpark combines full attention for explicit token interactions with GatedDeltaNet linear attention for compact context propagation. Autoregressive text prediction and visual flow matching jointly support visual question answering, text-to-image generation, instruction-guided editing, and interleaved text-image prediction. In interleaved generation, noisy visual targets are isolated from subsequent predictions, while clean visual representations provide context for later outputs. A blockwise protocol enforces this distinction through attention masks in full-attention layers and recurrent-state retention rules in linear-attention layers. The selected training sources contain 159.7M generation samples, 213.4M understanding samples, and 624.8K interleaved sequences. A four-stage curriculum jointly trains multimodal understanding and visual generation, refining answer accuracy and instruction following while extending image synthesis to 2K. UniSpark scores 2470.3 on MME-S and 0.83 on GenEval. Qualitative examples further illustrate its capabilities in interleaved image generation, video synthesis, and video editing. Together, these results demonstrate that hybrid attention provides an effective backbone for unified multimodal understanding and generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.16517v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.16517v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.16517v1 精确版本与关键图表，PDF 共 31 页。实验数字均为作者报告。未从已核对来源确认公开代码。",
+    "ideaZh": "UniSpark 在两个约 9B 的专家分支间共享 full attention 和 GatedDeltaNet，用 mask 与递归状态管住交错上下文。理解结果较强，影像编辑和视频证据仍有限。",
+    "whyRelevantZh": "交错生成中隔离 noisy latent 的办法可用于保留已完成的图像设计迭代状态。",
+    "evidenceZh": "MoT 按 token 类型路由，专用参数在共享上下文中交换文本和视觉信息。（Fig. 4; §3.2, PDF pp. 7–8） noisy target 可参与自己块内 denoising，但块后只保留 clean context，避免把未去噪状态写入历史。（Fig. 5; §3.4, PDF pp. 9–10） 作者报告 MME-S 2470.3、GenEval 0.83。参考图编辑 ImgEdit overall 3.13，报告中的 Qwen-Image-Edit 为 4.35。（Tables 5,6,8, PDF pp. 20–24）",
+    "caveatZh": "视频能力主要是定性展示，图像编辑的判分协议不可与全部发表结果直接对比。",
+    "motivationZh": "统一图文生成要让理解与生成共享上下文，同时防止 noisy target 在交错序列中污染后续输出。",
+    "methodZh": "共享多模态输入表示。按 token 路由至理解和生成专家。交替 full 与 recurrent attention。分别以文本 AR 与视觉 flow matching 输出。",
+    "methodFlow": [
+      "共享多模态输入表示",
+      "按 token 路由至理解和生成专家",
+      "交替 full 与 recurrent attention",
+      "分别以文本 AR 与视觉 flow matching 输出"
+    ],
+    "experimentsZh": "用 VQA 理解测试、GenEval 与 DPG-Bench、ImgEdit，并展示视频和交错图文样例。 表格并列不同参数与架构；ImgEdit 比较有模型采用不同来源或 judge 设置。 训练分阶段与系统吞吐对照有说明，尚缺同体量、同数据的架构因果对照。",
+    "insightZh": "同一 public/private context 边界同时实现在 full-attention mask 和 linear-attention recurrent state 中。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

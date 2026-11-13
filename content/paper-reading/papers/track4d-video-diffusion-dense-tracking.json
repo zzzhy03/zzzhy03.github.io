@@ -1,0 +1,86 @@
+{
+  "id": "arxiv:2611.15287",
+  "slug": "track4d-video-diffusion-dense-tracking",
+  "title": "Track4D: Representing Dense 3D Tracking for Video Diffusion Models",
+  "authors": [
+    "Yushi Lan",
+    "Zeren Jiang",
+    "Kelvin Li",
+    "Xingang Pan",
+    "Chuanxia Zheng",
+    "Andrea Vedaldi"
+  ],
+  "publishedAt": "2026-11-11",
+  "updatedAt": "2026-11-11",
+  "collectedAt": "2026-11-14",
+  "venue": "arXiv preprint",
+  "identifiers": {
+    "arxiv": "2611.15287"
+  },
+  "venueIds": [],
+  "publicationType": "preprint",
+  "categories": [
+    "cs.CV"
+  ],
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "facets": {
+    "task": [
+      "representation-learning",
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "prior-data": [
+      "video-prior"
+    ]
+  },
+  "keywords": [
+    "dense 3D tracking",
+    "video diffusion",
+    "canonical coordinates",
+    "point maps"
+  ],
+  "abstract": "We study how to repurpose video diffusion models (VDMs), pretrained on millions of videos, for dense 3D point tracking, where training data is scarce. Doing so is non-trivial, as it requires representing 3D tracks as video-like signals that may lie outside the natural-video distribution on which the VDM was trained. We thus systematically assess the effectiveness of two such video representations. The first, Residual 3D Tracking Video (RTV), encodes per-pixel 3D offsets relative to a query frame and allows recovery of 3D trajectories directly from the generated video. The second, Normalized Coordinate Map Video (NCMV), labels each pixel with a canonical coordinate invariant through time. This is closer to a natural video and easier for the VDM to learn, but requires additional post-processing with an off-the-shelf 2D tracker to recover 3D tracks. RTV tracks more accurately, while NCMV shows that a VDM can generate dense correspondence as a video. We instantiate both representations with LoRA adaptation of a frozen Wan backbone, conditioned on point maps from an off-the-shelf 3D reconstructor as a geometric scaffold. Trained with a single dynamic 3D tracking dataset, Track4D achieves competitive zero-shot tracking on four real and synthetic benchmarks. A regression readout that bypasses the video VAE and uses additional training data brings further improvement, demonstrating the potential of this direction for dense 3D tracking. We hope our analysis will inspire future work that leverages VDM priors for dense 3D tracking and 4D reconstruction. Project page: https://nirvanalan.github.io/projects/track4d",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.15287v1",
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.15287v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据 arXiv 2611.15287v1 精确版本与关键图表，PDF 共 38 页。实验数字均为作者报告。代码仍待发布。",
+    "ideaZh": "Track4D 用同一 Wan 骨干比较逐像素相对位移与标准化 canonical 坐标两种视频表示。相对位移追踪更准，无输出 VAE 的回归头还有提升，但误差也受外部几何 scaffold 限制。",
+    "whyRelevantZh": "相对位移和 canonical match 可用于拆分 4D 资产的轨迹控制量与对应结构。",
+    "evidenceZh": "RTV 直接编码相对 query frame 的 XYZ 残差，NCMV 使用时间不变坐标再结合 2D tracker。（Fig. 2; §§3.1–3.4, PDF pp. 3–6） 消除输出 VAE 并加入 geometry/motion 监督的模型用真实误差检查几何回归，不能把全部增益归给单一因素。（Table 8, PDF p. 21） 作者报告，在 PointOdyssey 的动态点对照中，RTV 的 APD 为 0.690，NCMV 为 0.480。生成读出不估 visibility，ADT 的动态点 EPE 则是 NCMV 更低。（Table 1; §4.3, PDF p. 8）",
+    "caveatZh": "§5 和 Appendix A 讨论 dense label 限于合成，遮挡、大相机运动及长时静态可漂移。 Sim(3) 对齐后的追踪成绩不能证明真实尺度，也未展示对新动态资产的直接编辑效果。",
+    "motivationZh": "用视频扩散先验做 3D correspondence 的困难在于几何场偏离自然视频分布，并会被 VAE 隐空间损伤。",
+    "methodZh": "用单目重建器提供 pointmaps 与 query-frame anchors。LoRA 将 Wan 适配为两类几何输出。恢复密集时间轨迹。比较直接回归输出与 generative readout。",
+    "methodFlow": [
+      "用单目重建器提供 pointmaps 与 query-frame anchors",
+      "LoRA 将 Wan 适配为两类几何输出",
+      "恢复密集时间轨迹",
+      "比较直接回归输出与 generative readout"
+    ],
+    "experimentsZh": "以 Kubric 合成轨迹训练生成 readouts，在真实与合成四套基准测零样本并展示 DAVIS。 对比组使用不同几何后端，正文分别提供 native 和控制后端协议。 逐项替换视频骨干、几何 scaffold、输出头和采样步数并给出诊断。",
+    "insightZh": "用可控实验区分易生成的 canonical matches 与可直接还原精确位移的表示，另检验输出 VAE。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
