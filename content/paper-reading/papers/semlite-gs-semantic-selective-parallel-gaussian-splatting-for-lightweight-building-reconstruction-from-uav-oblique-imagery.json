@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2611.19773",
+  "slug": "semlite-gs-semantic-selective-parallel-gaussian-splatting-for-lightweight-building-reconstruction-from-uav-oblique-imagery",
+  "title": "SemLite-GS: Semantic-Selective Parallel Gaussian Splatting for Lightweight Building Reconstruction from UAV Oblique Imagery",
+  "authors": [
+    "Tengfei Wang",
+    "Xin Wang",
+    "Zihan Li",
+    "Quanjian Ji",
+    "Yifei Yu",
+    "Dong Lin",
+    "Zongqian Zhan"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-15",
+  "updatedAt": "2026-11-15",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.19773"
+  },
+  "abstract": "Lightweight 3D building models support urban spatial analysis, but their production often requires dense scene reconstruction, building extraction, and mesh simplification. Although 3D Gaussian Splatting (3DGS) is more efficient than conventional multi-view stereo, existing large-scale methods lack semantic selection and parallel instance-level training. We present SemLite-GS, a building-centric framework that reconstructs lightweight building meshes from large-scale UAV oblique imagery. First, an orthographic reference map establishes globally consistent building identities, which are propagated to oblique views to form camera-instance pairs and regions of interest. Second, semantic-selective parallel PGSR training jointly processes multiple pairs within relevant image regions while updating only target Gaussians; contextual Gaussians remain fixed to preserve visibility. Third, architectural planes extracted from rendered depth, opacity, and normal maps guide signed distance field optimization, producing meshes with adaptive polygon allocation and well-defined structural boundaries. Experiments on multiple large-scale UAV datasets demonstrate that our SemLite-GS substantially reduces building reconstruction time compared with representative full-scene 3DGS methods. With comparable polygon budgets, SemLite-GS achieves superior preservation of dominant planar structures and sharp architectural transitions compared with conventional dense reconstruction followed by mesh decimation. The source code is available at https://github.com/IRIS-LAB-whu/SemLite-GS.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.19773v1",
+  "keywords": [
+    "instance-selective reconstruction",
+    "3D Gaussian Splatting",
+    "plane-constrained SDF",
+    "lightweight mesh",
+    "multi-view visibility"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.19773v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/IRIS-LAB-whu/SemLite-GS"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.19773v1 的 24 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "SemLite-GS 先把共享场景中的实例身份从正射图传到斜视图，再把渲染可见性与参数更新分开：目标 Gaussians 可训练，遮挡上下文留在前向。最后用有限平面约束 SDF 直接抽低面数 mesh，适合借鉴到重建后的建筑或硬表面部件提取。",
+    "motivationZh": "全场景高密度重建会浪费非目标区域的计算，后处理减面可能破坏屋脊、墙面交线和独立构件边界。",
+    "methodZh": "由 FastGS 的正射渲染与 SAM3 建全局建筑 ID，用遮挡感知传播生成相机－实例掩码/ROI 图。PGSR 在同一 GPU 队列只扫描相关 tiles，冻结背景但保留其 forward 合成；对目标反传。根据多视 depth/normal 拟合有限平面并局部修正 Gaussian 初始化的 SDF，最终在 polygon budget 内统一切分平面与残余曲面。",
+    "methodFlow": [
+      "以已配准 UAV 视图与相机参数初始化共享 FastGS 场景。",
+      "对正射图做 SAM3 分割，利用 Gaussian 可见性将同一建筑 ID 传播至原斜视图。",
+      "构建相机－实例对、核验掩码及 ROI，按 pair–tile 并行渲染。",
+      "上下文 splats 参与可见性计算，只有目标 splats 接收梯度，保护损失抑制边缘外泄。",
+      "用多视深度、透明度和法线拟合有限平面，修正局部 SDF。",
+      "合并共边的平面和残余曲面，在面数预算内直接三角化逐实例网格。"
+    ],
+    "experimentsZh": "在 GauScene、Skylume 和 Tianjin_Xiqing 共六个场景，定性比较带结构的低面数网格；五个 LiDAR 场景中 101 栋建筑测 Chamfer distance 和顶点/面数。运行时间为 4090 上五个场景的累计值。 作者报告 101 栋建筑平均 Chamfer distance 0.914 m、平均 880 面；PG-SAG 使用 SemLite 掩码后的结果为 1.077 m 和 935 面，Metashape+QEM 为 1.117 m 和 935 面（Table 2, PDF p. 16）。 作者报告五个场景端到端用时 3.48 h，PG-SAG+QEM 为 11.00 h，Metashape+QEM 为 3.57 h；后者未计手工目标选择（Table 4, PDF p. 17）。 作者报告两个场景的保护损失使轻量网格 CD 由 0.703 m 降至 0.675 m，TSDF dense mesh CD 由 0.526 m 降至 0.470 m（Table 7, PDF p. 21）。 端到端比较通用 3DGS 管线、依掩码的 PG-SAG、TSDF+QEM 和商业摄影测量，另比较以同一变换所得 Gaussian 点云输入的 PolyFit、KSR 和 Compod。后者的成功重建子集不同，整体 Chamfer 不适合直接做无条件同样本排序。 PG-SAG 换掩码使均值改善，隔离部分身份传播贡献；共享 Gaussian 的 TSDF+QEM 和直接 mesh 比较隔离 mesh extraction。Table 7 验证保护项，Table 8–9 比较并行 pair 规模和显存开销。",
+    "insightZh": "最可迁移的是早期确定目标实例后，仍通过共享 splat 场景保留遮挡，并让计算与更新按目标限定。有限平面既参与 SDF refinement，又参与连接和三角化，在同一阶段完成轻量网格提取。",
+    "evidenceZh": "用全局正射 ID 和共享 Gaussians 向斜视观察传播跨视角一致的实例（§4.2, Figs. 2–3, PDF pp. 6–8）。可见性渲染用于建立核验的相机－实例观察边、掩码和 ROI。 冻结上下文参加 rasterization，但每个 camera–instance pair 只将更新写回目标（§4.3, Fig. 4, PDF pp. 8–10）。模块图标明 pair-local 渲染和基于 target ID 的梯度写回。 支持有限范围的平面拟合为局部 SDF 提供约束，并在网格阶段保护共边（§4.4, Fig. 5, PDF pp. 10–12）。可靠平面只在自身 footprint 附近约束曲面，无可靠平面处保留自适应三角化。 冻结上下文保护降低两个场景 35 栋建筑的轻量网格误差（§5.2.3, Fig. 10 and Table 7, PDF p. 21）。这部分测的是额外保护损失，而不是是否保留任何背景 Gaussian 的直接比较。",
+    "caveatZh": "FastGS 初始化和正射图漏掉的建筑不会在后续训练中自动恢复，缺失或不稳定的掩码可沿实例标签传播。 LiDAR Chamfer distance 不直接衡量平面一致性、屋脊定位和墙面交线完整性，需要更有针对性的结构基准。 平面约束与航拍场景先验对建筑这种硬表面对象有效，曲面主导或无遮挡正射视角缺失的资产未验证。 结论针对实例级轻量 mesh；没有证明拓扑可用于制造或能输出可编辑的 CAD 参数。 核实作者提供的公开实现。",
+    "whyRelevantZh": "可把目标独立重建、背景参与可见性、局部平面保形这三个机制用于生成/重建后的硬表面部件提取，减少为非目标区域重新优化和后处理的成本。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2611.20533",
+  "slug": "remeshingagent-an-iterative-agent-for-repair-based-decimation-of-generated-building-meshes",
+  "title": "RemeshingAgent: An Iterative Agent for Repair-Based Decimation of Generated Building Meshes",
+  "authors": [
+    "Haipeng Wang"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.GR"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20533"
+  },
+  "abstract": "Aggressively simplifying a generated high-poly building mesh to 0.5-1% of its faces confronts a hard limit. The surface looks complete, yet the mesh is topologically shattered: 10^3-10^4 connected components and non-manifold thin walls. Below a certain budget, every practical decimator \"melts\": it deletes parts, welds thin walls, or breaks the error tolerance. We attribute this to instance-specific pathology: which components are significant and where the cliff sits vary from mesh to mesh, so no single fixed algorithm suffices, and decimation becomes an iterative loop of cleaning, simplifying, and verifying. We present RemeshingAgent, an agent that turns this loop into a validated process. The melting follows from a triangle-budget decomposition into curvature, crease, component, and genus terms: below the component floor, no output satisfies the repair contract, and cleaning first is the theory-mandated response. At a 0.5% budget the agent stays topology-clean where QEM and vertex clustering melt, matches a commercial remesher on 20 unseen city buildings, and on the 24 training buildings a nine-participant single-workstation blind study prefers our outputs 168:48 (p = 0.0195, subject-level sign test). The trained skill deploys as retrieval replay: 11.7 seconds per mesh on CPU, with no LLM calls.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20533v1",
+  "keywords": [
+    "mesh decimation",
+    "topology repair",
+    "triangle budget",
+    "validation-gated skill evolution",
+    "retrieval replay"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20533v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20533v1 的 11 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "RemeshingAgent 把生成楼宇的激进网格简化拆成修复后再减面，用显著连通组件的面数下限解释为何高碎片网格的 QEM 会失手。离线由 LLM 提案、保留集闸门筛选和经验检索改进流程，部署则回放记录。结果最适用于碎片化建筑资产，迁移时面预算需重新校准。",
+    "motivationZh": "传统 decimator 在连通且几何清晰的表面有效，但面对显著组件数量大的生成网格，单个固定清理阈值要么保留过多碎片，要么侵入原始结构。",
+    "methodZh": "用焊接后的显著组件与几何指标估计修复契约下的最低预算，据此选 weld/dust cleanup 与 QEM 配置。离线检索已有处理经验、生成并评估候选，把成功和失败参数归纳为 skill 修改；固定验证集评分严格改善才接受，部署检索回放几何管线。",
+    "methodFlow": [
+      "测量输入网格的碎片、边界、非流形与形状误差",
+      "用修复契约和组件下限诊断减面预算",
+      "检索相似处理经验，选择清理和 QEM 组合",
+      "运行几何流水线并测预算和拓扑",
+      "离线反思修改技能，严格闸门择优",
+      "部署时检索并回放冻结流程"
+    ],
+    "experimentsZh": "含 24 个 Hunyuan3D 高模训练楼宇、19 个技能闸门评估楼宇、20 个独立德国城市测试楼宇，和 9 个跨领域网格。度量面数、非流形边、几何误差与综合评分。 作者报告在高碎片训练分布的目标预算上，回放系统 24/24 通过预算及非流形检查，固定激进清理 + QEM 19/24、裸 QEM 1/24；在较简单的独立测试集，回放和裸 QEM 同为 20/20（Table 1, p. 6）。 作者报告独立城市楼宇的综合均分为 8.82 对商业版本 7.83；强偏好目测只覆盖更复杂的训练楼宇（Sec. 4.8–4.9, p. 8）。 覆盖保拓扑 QEM、聚类、固定清理、重建代表、商业简化与 stats-only 自适应。面数差异和训练分布偏向会影响组合评分解释。 作者单随机种子消融中，常开闸门的最终分比初始低 0.086，关掉检索零更新；三次 canonical seed 的结果不能为全体单次消融提供稳定性证据。",
+    "insightZh": "把显著组件数的下限用于区分先修复与直接减面的场景，再用实际网格指标约束离线技能改写。最重要的区分是反思发生在训练调参环路，已部署流程使用检索回放。",
+    "evidenceZh": "作者给出保拓扑契约下的四项面数下限，显著闭合组件带来 4nsig 项（Sec. 3.1, Theorem 3.1, Fig. 3, pp. 3–5）。下限以约定的修复参考面与显著组件为条件，不能用来认证任意实际几何。 离线 LLM 可以提出受限文本修改，保留集得分严格增长才写入（Sec. 3.2, Fig. 4, pp. 4–5）。图示分离固定几何执行、经验检索、门控反思和工具 tier。 作者报告优势集中在碎片严重的输入分布（Sec. 4.4, Table 1, p. 6）。在匹配相对预算下给出预算与非流形验收同时成功的计数，也展示简单测试集 QEM 已经足够的情况。 跨域复跑保留部分清理优势，但绝对预算回放会失准（Sec. 4.10, Table 2, pp. 7–9）。九种非建筑网格能区分数值预算经验和清理优先策略的迁移。",
+    "caveatZh": "修复参考面是声明的 closure，并非观测到的真值。 去除非流形边和保留一个主要组件不足以认证结构。跨域数值预算会失准，消融多为单次。 主要结果来自建筑，薄壁和拓扑标准未必适用于有意保留开边界的模型。 人偏好使用九人评价训练样本；同一固定验证集反复闸门选择，不能视作独立复验。 作者承诺发布或项目页标记待发布。",
+    "whyRelevantZh": "适合有结构化 3D 产物、且可用确定性指标检查编辑质量的设计代理。组件下限与预算选择对生成资产后处理直接相关。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "early"
+  }
+}

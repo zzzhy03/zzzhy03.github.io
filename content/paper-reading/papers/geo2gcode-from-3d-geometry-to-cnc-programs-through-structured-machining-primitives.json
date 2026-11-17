@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.20092",
+  "slug": "geo2gcode-from-3d-geometry-to-cnc-programs-through-structured-machining-primitives",
+  "title": "Geo2Gcode: From 3D Geometry to CNC Programs through Structured Machining Primitives",
+  "authors": [
+    "Sangmin Hong",
+    "Dohee Cho",
+    "Mohsen Yavartanoo",
+    "Kyoung Mu Lee"
+  ],
+  "primaryTopicId": "fabrication",
+  "topicIds": [
+    "fabrication"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-15",
+  "updatedAt": "2026-11-15",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20092"
+  },
+  "abstract": "Turning a 3D shape into a Computer Numerical Control (CNC) program is still largely manual. For every part, a machinist chooses setups, tools, step-downs, and toolpath patterns. We present Geo2Gcode, which converts a target mesh directly into standard G-code through structured machining primitives. Each primitive couples an indexed machining direction, a closed per-view reconstruction of the target, and explicit tool-radius, layer-height, and clearing-pattern parameters, and compiles deterministically into layerwise toolpaths via signed-distance queries. Most of the fidelity comes from this compiler. A lightweight selector trained with a voxel stock simulator fills in primitive parameters without per-part manual settings, approaching the finest fixed setting at about a quarter of its toolpath length. In simulation on ABC parts, Geo2Gcode reaches roughing fidelity comparable to an expert-tuned commercial CAM setup with a moderately longer toolpath, and clearly improves on a default CAM configuration. Generated programs run in a commercial G-code simulator, and one part is machined on a physical CNC mill. These results demonstrate that roughing programs can be generated directly from geometry without per-part CAM tuning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20092v1",
+  "keywords": [
+    "CNC",
+    "G-code",
+    "toolpath generation",
+    "machining primitives",
+    "DQN"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20092v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20092v1 的 19 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "Geo2Gcode 从目标 mesh 直接构造固定方向的结构化加工原语，几何编译器承担大部分形状保真，小型策略选择加工参数以缩短路径。作者报告在 50 个 ABC 形状上模拟保真可接近专家 MeshCAM；单件 CNC 试做证明该案例的程序可由控制器执行。",
+    "motivationZh": "目标几何还需转换为方向、加工步与路径顺序，一般 CAD 重建方法不直接解决 CNC 程序生成。",
+    "methodZh": "从各可见方向建立加工原语，几何编译器产生分层刀路，DQN 用体素库存反馈选定少量参数。",
+    "methodFlow": [
+      "从输入 mesh 选择少量固定加工视角",
+      "为每个视角形成闭合目标体并设定 contour pass",
+      "由 DQN 选取各视角的切削参数与清除模板",
+      "确定性编译分层刀路与 G-code",
+      "用体素库存和独立 G-code 模拟检查"
+    ],
+    "experimentsZh": "在 ABC、ShapeNet 与 20 个域外对象报告几何指标；50 个 ABC 对照相同仿真环境下的 MeshCAM 默认和专家设置，另有 1,000 ABC 的未调参结果。一份程序在 FANUC 铝件上进行示例性制造。 作者报告 50 个 ABC 上专家调校的 MeshCAM 与无调参的 Geo2Gcode 的 IoU 分别为 0.833、0.837，切削时间代理分别为 375.7、451.3，不能解释为实测工时（Table 4, PDF p. 7）。 作者报告未调参策略相对最细固定参数保留 97.8% 的 IoU，切削时间代理约四分之一；五轮自动适配进一步提高精度（§4.4, Table 3, PDF p. 7）。 作者报告全 1,000 个 ABC 测试形状无调参 IoU 0.827，CNC-Net 为 0.772（Table 2, PDF p. 7）。 与 CAD 重建程序、CNC-Net、固定和随机参数以及 MeshCAM 比较。重建模型不直接输出刀路，不能把其结果当作对照 CAM 产品；作者另设同几何与模拟器的 MeshCAM 对照。 去掉 contour 对几何影响最大，作者报告 IoU 从 0.848 到 0.756；同 simulator 的默认策略、公平参数对比和奖励分析分开评价。",
+    "insightZh": "用可检查的加工原语作中间契约，将路径编译的几何保真与策略的参数选择拆开；可与无需学习和专家 CAM 对比。",
+    "evidenceZh": "每个 machining primitive 将方向、视角目标体与参数绑定再编译为标准 G-code（§§3.1–3.3, Figs. 2–3, PDF pp. 3–4）。方向属于索引式加工，几何可见并不意味着刀具和夹具通过校验。 固定几何编译路径承担大量保真，学习参数提高时间和保真权衡（§4.4, Tables 2–3, PDF p. 7）。同一方向和编译器比较随机、固定和学习参数。 只对一个实物执行，量化表来自仿真（§4.5, Physical machining, PDF p. 8; Appendix S10, PDF p. 17）。实物演示由操作员处理装夹和离线 clearance，未报告机械测量或碰撞认证。",
+    "caveatZh": "只覆盖 indexed 3+2-axis 粗加工；模拟器不建模刀柄、夹具、负载或完整机床行程，不保证碰撞安全。 若干选择器与消融仅在 50 个 ABC 单次运行；未验证精加工和多轴机床。 模型的路径和库存仿真指标并不等于现场几何公差、换刀、装夹与切削验证。 实物样本只有一件且需操作员处理，不能视为通用生产部署证据。 本轮未确认该论文的公开实现。",
+    "whyRelevantZh": "可制造几何输出比通用形状生成多了可操作路径与工艺参数；该工作的结构化生成到编译边界适合制造设计研究。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

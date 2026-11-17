@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.21302",
+  "slug": "deja-events-multi-view-3d-geometry-with-event-cameras-via-sparsity-aware-adaptive-gating",
+  "title": "Déjà-Events: Multi-view 3D Geometry with Event Cameras via Sparsity-Aware Adaptive Gating",
+  "authors": [
+    "Arda Cinar Demirtas",
+    "Pablo Varela Bernal",
+    "Marc Pollefeys",
+    "Sunghwan Hong"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.21302"
+  },
+  "abstract": "Event cameras keep capturing structure where conventional cameras blur or saturate, which makes them attractive for 3D perception in fast or poorly lit scenes. Event datasets with dense 3D ground truth, however, are far smaller and less diverse than the image collections behind feed-forward 3D reconstruction models. We present Déjà-Events, an event-only model that predicts depth, camera pose and pointmaps from multiple views in a single forward pass. Rather than relying on scarce 3D labels, we distil it from Déjà View, a feed-forward RGB model that refines its tokens by repeatedly applying one shared transformer block. On paired RGB and event recordings, the event student learns to reproduce the frozen teacher's final tokens, which requires no depth or pose ground truth and trains only about 1% of its parameters. Because events are dense at edges and moving texture but nearly absent in textureless regions, we further introduce sparsity-aware adaptive gating, which adapts the shared block's gates to events and adjusts them per patch by event density, so that accuracy holds as refinement steps are added. Trained only on simulated data, Déjà-Events achieves the lowest pointmap error among the event-based methods we evaluate, on EventScape and zero-shot on the real MVSEC and DSEC datasets. On DSEC it halves the error of the strongest baseline (0.15 vs. 0.30 AbsRel) with about a tenth of its parameters. It also has the lowest depth error on EventScape and DSEC and the lowest trajectory error on EventScape.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.21302v1",
+  "keywords": [
+    "Déjà-Events",
+    "event camera",
+    "3D reconstruction",
+    "pointmap",
+    "cross-modal distillation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.21302v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.21302v1 的 8 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "Déjà-Events 从 RGB teacher 蒸馏共享块最终 tokens，用 patch 事件密度调 gate；无需目标深度与位姿标注即可用事件输入预测点图、深度和相机。作者报告 DSEC 点图 AbsRel 为 .148，EventVGGT A 为 .301，但真实集的位姿仍弱于专门 event odometry，迁移价值主要在低标注的多模态几何建模。",
+    "motivationZh": "事件相机可在运动和极端光照下补充几何信息，但缺乏与 RGB 大模型规模相当的深度及相机标注。",
+    "methodZh": "将对齐的事件窗口编码成三通道累积栅格，在同架构上以方向与幅值匹配方式拟合 RGB DVLT 递归块的终态 token；冻结视觉骨干与三个解码头，用少量适配器和 gate 调参。每 patch event density 随展开步数调节局部更新。",
+    "methodFlow": [
+      "配对 RGB 帧和事件窗口，将正负事件累积编码至视觉输入。",
+      "冻结 RGB DVLT 教师，随机采样共享块迭代深度并生成终态 token。",
+      "蒸馏事件学生的终态 token，训练少量 adapter 和密度条件步长。",
+      "推理只输入事件，通过共享块与冻结解码头得到相机、深度和点图。"
+    ],
+    "experimentsZh": "EventScape 仿真训练；EventScape、MVSEC、DSEC 上按 18 帧窗口测量，MVSEC/DSEC 零样本。另在 MVSEC night 区分纯零样本与额外 day1 蒸馏。 作者报告 DSEC 点图 AbsRel .148，对 EventVGGT A .301；DSEC 深度 AbsRel .145，对 .282（Tables I,III, PDF p.5）。 作者报告 DSEC ATE .105，对专门里程计 DEVO .027（Table II, PDF p.5）。 事件 RGB teacher、event networks 和 DEVO 加预测深度的 modular 对照覆盖若干实现，外部依赖和任务目标有差异。 深度指标比较事件密度、步长学习及固定展开；还分析将 GT 内参交换后贡献如何变化。",
+    "insightZh": "跨传感器迁移在 latent token 层与共享迭代块配合，密度门控使同一参数集的 inference depth 能超出默认训练步设置。",
+    "evidenceZh": "终态 token 蒸馏保留冻结相机、ray 与 depth decoder（§III-B, Fig. 2, PDF p.3）。没有回归外部 GT 深度或轨迹，但需要同步的 RGB–event 存档。 事件密度只加到门控路径，迭代更深时减轻 DSEC 深度退化（§III-C, Fig. 3 and §V-F, Fig. 6, PDF pp.4,6–7）。比较固定 schedule、可调 schedule 与 patch density gate。 真实数据上的点图与姿态结论不同（Tables II–III, PDF p.5）。相对点图误差更低，DEVO 的实景 ATE 更低。",
+    "caveatZh": "相机内参误差影响点图，实景位姿未超过专用 VO。 RGB 教师只能在帧时刻给约束，事件窗口内的时间顺序被压缩，仍缺少中间时刻的几何监督。 主要是自动驾驶式数据和较短窗口，不能外推为任意物体或长时动态场景的建模系统。 本轮未确认该论文的公开实现。",
+    "whyRelevantZh": "值得参考跨传感器蒸馏的冻结解码及空间密度调步策略，尤其在快速运动和低照几何需要额外监督时。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

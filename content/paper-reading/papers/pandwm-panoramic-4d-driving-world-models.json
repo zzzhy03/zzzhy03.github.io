@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2611.19857",
+  "slug": "pandwm-panoramic-4d-driving-world-models",
+  "title": "PanDWM: Panoramic 4D Driving World Models",
+  "authors": [
+    "Jiajun Sun",
+    "Zeyu Zhang",
+    "Zeyu Ren",
+    "Guangfeng Jiang",
+    "Yang Zhao",
+    "Hao Tang"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-15",
+  "updatedAt": "2026-11-15",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.19857"
+  },
+  "abstract": "Driving world models usually generate videos from six pinhole cameras with separate optical centres and small overlaps, and must learn to keep these views consistent. We present PanDWM, which stitches them into one $360^\\circ$ panoramic band. Camera boundaries then fall inside one image, so keeping the views consistent means keeping the image continuous, and each pixel still records its camera ray. Conditioned on layouts, a causal student generates the band window by window in four steps; it is distilled from a causal teacher and trained on its own rollouts. A feed-forward decoder lifts each frame along these rays into 3D Gaussians, and static Gaussians from neighbouring frames complete them into 4D scenes. On nuScenes, scored in one stitched $360^\\circ$ view, PanDWM has lower FID and FVD than the multi-camera baselines at $8$-$46\\times$ their speed, and keeps its 50-step teacher's FID while lowering FVD by 22-25%.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.19857v1",
+  "keywords": [
+    "4D scene generation",
+    "panoramic video",
+    "causal diffusion",
+    "Plücker rays",
+    "3D Gaussian Splatting"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.19857v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AIGeeksGroup/PanDWM"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.19857v1 的 29 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "PanDWM 将六相机的接缝放进同一条环形画带，用四步因果 diffusion 推进视频，再沿每像素实际源相机射线解码 Gaussians。最值得迁移的是统一环形生成和多光心几何的解耦。现有 4D 补全只补静态背景，且速度收益主要由少步学生带来。",
+    "motivationZh": "独立生成的六路透视视频难以保持相机接缝和长序列一致性，直接拼接又不能假定整幅全景来自同一个光心。",
+    "methodZh": "把画带在各个单相机区域内分成重叠的两半，使用行方向跨半幅 attention 与逐帧因果 mask。学生从教师蒸馏，每个窗口以自己的三帧历史预测十六帧。几何 decoder 取全景 latent 和真实相机的 Plücker 射线，逐像素预测 Gaussian 深度与偏移，之后把邻帧的静态部分变换到当前坐标并只用于填洞。",
+    "methodFlow": [
+      "将六个已标定相机的 RGB、3D boxes 和 HD map 投影到环形画带，保存逐像素的源相机射线。",
+      "把画带拆成重叠两半，VAE 编码；布局、文字和半幅条件射线进入 block-causal DiT。",
+      "用四步蒸馏学生滚动生成 16 帧，每个窗口的末 3 帧作为下一窗口条件。",
+      "沿逐像素实际源相机射线解码 Gaussian 外观、深度和偏移。",
+      "对齐邻帧静态 Gaussians，只填当前视图的空洞并保留当前帧动态内容。"
+    ],
+    "experimentsZh": "在 nuScenes 条件生成视频。Val-150 比较短期全景，以及自身教师；Dev-78 做两种种子的短训练消融；Test-L 看长序列，在 Test-S 比较录制和生成序列的 Gaussian 新视角结果。 作者报告 Val-150 全景生成 1.96 s/frame，FID 10.1，FVD-1/2 为 37.4/62.1；50 步教师为 33.7 s/frame、9.93 和 47.7/82.5（Table 1, PDF p. 6）。 作者报告 Test-S 的 280×518 设定下，3D 到 4D 静态补全使 PSNR 从 18.14 增至 19.18 dB，静态深度 AbsRel 从 0.334 降至 0.298（Table 3, PDF p. 8）。 作者报告合成序列静态深度 AbsRel 为 0.316，对比 DiST-4D 的 0.467；在 ±4 m 偏移时，原始 4D 渲染 FID 50.5，高于 DiST-4D 的 48.4，经额外 diffusion 修复后为 34.9（Table 4, PDF p. 8）。 视频比较 UniMLVG、OpenDWM、DreamForge、DiST-4D 和 OmniNWM；几何比较 Omni-Scene、MCSplat、ReconDrive 与 DrivingForward，且不同模型按原生或相应分辨率比较。补充材料用同学生和不同画面分配隔离表示成本，不能假定所有比较完全同算力或同尺寸。 Table 2 的短训练对照支持对抗监督、时序判别和自生成历史各有作用，效果依指标而异；较长训练模型与短训消融不能等同。Table 3 的 3D/4D 对照识别静态补全贡献。",
+    "insightZh": "重要变化是把跨相机一致性变成画带内部的空间连续性，同时明确区分生成阶段的半幅虚拟射线和几何提升阶段的逐像素真实射线。少步蒸馏和 Gaussian decoding 都承接既有技术，不能把完整加速归因为全景表示本身。",
+    "evidenceZh": "全景相邻像素允许出自不同光心，Gaussian 由源相机光心、射程和局部偏移定位（§3.1, §3.4, Fig. 2–3, PDF pp. 3–4）。Fig. 2 双路图和 Fig. 3 的像素归属说明生成条件映射与真实几何射线的用途不同。 四步学生在自己的历史条件下生成，仍保持接近教师的短期 FID（§3.3, §4.3, Table 1, PDF pp. 4 and 6）。该比较针对 nuScenes Val-150 的原生全景设定；表中时间含视频解码，不含 4D lifting。 静态邻帧填洞改善录制片段上的新视角渲染（§4.6, Tables 3–4, PDF p. 8）。录制序列比较单帧与加邻帧版本，合成序列没有对应新视角 RGB 真值。 在匹配平均角分辨率的同学生试验中，画带本身未体现显著吞吐增益（Supplement §2.5, Table S4, PDF p. 18）。作者报告全景两半 0.495 s/frame，六视图 0.479；比较条件为同权重和 H100。",
+    "caveatZh": "每窗口仅看三帧生成历史，长滚动的末段 FVD 上升。 4D 补全目前只覆盖静态内容，被遮挡运动物体仍然缺失。 合成新视角没有 RGB 真值，FID 和静态 LiDAR 深度不足以验证动态几何、高精度部件或几何编辑。 只在已知多相机标定和 HD 交通地图条件上展示，迁移至一般动态资产需要重新建立投影和训练条件。 核实作者提供的公开实现。",
+    "whyRelevantZh": "可借鉴对多光心连贯生成与显式场景几何分阶段建模的做法，适合需要从重叠多相机图像获得带空间坐标资产的动态场景工作。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

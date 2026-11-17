@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.21383",
+  "slug": "the-mask-is-not-the-object-volumetric-supervision-for-3d-gaussian-segmentation",
+  "title": "The Mask Is Not the Object: Volumetric Supervision for 3D Gaussian Segmentation",
+  "authors": [
+    "Jeonghwan Cho",
+    "Minsu Kim",
+    "Junyoung Hong",
+    "Seon Joo Kim"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.21383"
+  },
+  "abstract": "3D Gaussian Splatting enables object-level operations on Gaussian primitives, yet existing segmentation methods are largely trained and evaluated through rendered views. This mismatch can produce accurate rendered masks from incomplete 3D selections since alpha-blended feature supervision concentrates learning on dominant contributors while leaving occluded or low-contribution Gaussians weakly supervised. We propose VODA, a plug-and-play supervision objective that exploits local depth structure to group per-pixel contributors and directly supervises all Gaussians in selected depth clusters, bypassing contribution-weighted gradient delivery. To evaluate volumetric completeness, we introduce Removal-3D, a synthetic object-removal benchmark, and the Removal Depth Error (RDE), a metric comparing predicted and ground-truth depth changes. Across four rendering-based baselines, VODA consistently improves volumetric segmentation on Removal-3D while maintaining or improving performance on LERF and ScanNet. Further analysis shows that VODA recovers lower-contribution Gaussians, while simple gradient reweighting and spatial propagation fail to reproduce comparable gains.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.21383v1",
+  "keywords": [
+    "VODA",
+    "Gaussian Splatting",
+    "3D object segmentation",
+    "open vocabulary",
+    "object removal"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.21383v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://jhxcho.github.io/voda/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.21383v1 的 27 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "VODA 处理 3DGS 物体编辑中「渲染 mask 正确但体积没选全」的问题。按像素深度分簇后，直接给同簇低贡献 Gaussian 训练特征。作者报告在合成 Removal-3D 上四个基线同时改善 mIoU 和移除深度误差，真实配对场景主要改善 mask IoU，体积 proxy 的改变量较小。",
+    "motivationZh": "以 alpha blending 传递分割监督时，低可见性 Gaussian 梯度偏弱。正确的 2D 轮廓可能掩盖残留在 3D 资产内部的 primitives。",
+    "methodZh": "沿光线把按深度排序的 contributors 按自适应间隙分簇，选择总渲染贡献最大簇。聚合被选像素的全渲染特征成 detached 伪目标，对该簇元素直接更新特征，保留基线的渲染损失；用 pixel-level push 减少邻簇混淆。",
+    "methodFlow": [
+      "依据现有 Gaussian 场为像素生成排序后的 contributors。",
+      "按深度间隔分组，选总可见贡献最大的 cluster。",
+      "跨像素以 alpha 加权聚合 feature pseudo-target，直接监督选中 Gaussian。",
+      "用图像 mask 与移除前后深度变化联合检查 3D selection。"
+    ],
+    "experimentsZh": "LERF 的 select-then-render、ScanNet 文本查询点云分割，另测试三组合成 Removal-3D 场景及 SPIn-NeRF / 360-USID 配对图像。 作者报告合成 Removal-3D 的 OpenGaussian 平均 mIoU 52.87→60.90、mRDE 39.31→27.34；LaGa 的 mRDE 36.93→21.66（Table 3, PDF p.8）。 作者报告真实 SPIn-NeRF 的 OpenGaussian mask IoU 0.339→0.493，proxy RDE 9.22→9.20（Table 18, PDF p.19）。 OpenGaussian、LaGa、Gaussian Grouping、ILGS 共四种接入方式；真实配对评估仅对两种方法和小场景集合。 控制相同 target cluster，比直接损失、渲染交付、alpha 聚合及 contribution reweighting；在多个实现上方向一致。",
+    "insightZh": "把训练信号的传递路径从 contribution-weighted rendering 改成 cluster-level 直接监督；提出 paired object-removal depth 指标来发现单纯 mask 无法暴露的残留。",
+    "evidenceZh": "像素簇的归属与 Gaussian 特征的监督强度分开（§3.2–3.3, Fig. 3, PDF pp.4–5）。先由贡献挑选簇，再对簇内 primitives 直接学习。 RDE 比较移除估计对象与真值对象后的深度差（§4.2 and Appendix A.2, PDF pp.8,14）。RDE 只在目标 mask 内统计，需要 mIoU 补捉越界选择。 真实配对数据的改善主要在 mask，深度 proxy 变动小且一项变差（Appendix A.7, Table 18, PDF p.19）。真实深度参照来自两次独立重建，有别于合成真值。 相邻同深目标可能同簇，稀疏内部可能残留（§5 and Appendix A.8, Fig. 10, PDF pp.10,20）。实景失败例中仍可见明显移除伪影。",
+    "caveatZh": "接触物体和稀疏内部会造成簇过并或碎裂；从未被观测到的 Gaussians 缺直接可验证监督。 复杂验证需要 paired captures，当前真实参考是独立 3DGS 重建的 proxy。 仅凭较好的可见 mask 或选择性合成场景不能推断真实资产完全分割。 项目页的 Code 尚处于 coming soon。 作者承诺发布或项目页标记待发布。",
+    "whyRelevantZh": "将评估从视图轮廓推到对象体积，对 part-aware Gaussian 编辑与删除尤其关键。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

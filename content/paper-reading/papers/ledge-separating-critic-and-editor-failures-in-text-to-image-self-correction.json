@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.20446",
+  "slug": "ledge-separating-critic-and-editor-failures-in-text-to-image-self-correction",
+  "title": "LEDGE: Separating Critic and Editor Failures in Text-to-Image Self-Correction",
+  "authors": [
+    "Vyom Agarwal",
+    "Mokshda Gangrade",
+    "Samet Ayhan",
+    "Giacinto Paolo Saggese"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20446"
+  },
+  "abstract": "Text-to-image (T2I) self-correction combines a vision-language model (VLM) critic that diagnoses errors and proposes instructions with an image editor that executes them. End-to-end evaluation obscures whether failures arise from incorrect diagnoses or an editor unable to execute valid instructions. We introduce LEDGE (Learning Error Diagnosis in Generation and Editing), a framework that separates these bottlenecks. LEDGE compiles oracle edit instructions from GenEval while holding the generated images and the editor fixed, isolating the editor's correction capability from the critic's diagnostic accuracy. On Stable Diffusion 3.5 Large, oracle instructions raise GenEval from 72.0% to 81.2%, versus 74.1% for the baseline VLM critic. Yet 435 of 644 failed images remain unrepaired, exposing a substantial editor gap. We also use oracle labels from disjoint training prompts to supervise the critic. Oracle supervision raises exact diagnosis from 33.3% (the same VLM with our structured output, untrained) to 70.8%. With the same editor, the resulting critic improves GenEval from 42.2% (uncorrected) to 59.4% on Stable Diffusion 1.5, against 50.9% for the baseline critic, and from 72.0% to 76.0% on Stable Diffusion 3.5 Large, despite training only on Stable Diffusion 1.5. Improvements transfer to unseen object classes, a second editor, and independent T2I-CompBench judges and prompts. A small human evaluation confirms the ranking in estimated net corrections but suggests a smaller gain than detector-based evaluation. LEDGE thus distinguishes two limits of self-correction: knowing what to fix and being able to fix it.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20446v1",
+  "keywords": [
+    "visual critique",
+    "oracle instructions",
+    "image editing",
+    "GenEval",
+    "agent evaluation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20446v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20446v1 的 15 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "LEDGE 将生成图像的诊断与执行分开，用 GenEval 的失败详情编译 oracle 编辑指令作为对照，并以同样的结构化标签训练 VLM critic。作者在同一编辑器上的结果表明诊断学得更准，也揭示了正确指令仍无法解决的大量编辑失败。",
+    "motivationZh": "端到端修图得分无法分辨 critic 提错需求还是 editor 执行错。",
+    "methodZh": "由结构化检测理由编译固定编辑指令并训练 critic，再用同图同编辑器和 oracle 参照比较。",
+    "methodFlow": [
+      "生成图像并提取与提示对照的可验证要求",
+      "由 VLM critic 产出结构化故障列表或保持决定",
+      "由固定模板把故障列表转换为编辑指令",
+      "执行编辑并单独记录修复和回退",
+      "用 oracle 参照诊断差距与执行上限"
+    ],
+    "experimentsZh": "使用 GenEval 553 个 prompt 各四张图，SD1.5 和降至 512² 的 SD3.5-Large，同一主编辑器 VAREdit。Qwen3-VL-8B critic 用独立 pilot prompts 训练。另测 Kontext 编辑器、未见类别、人工复核与 T2I-CompBench。 作者报告 SD1.5 的 GenEval macro 从无编辑 42.2% 到基准 critic 50.9%、训练 critic 59.4%、oracle 64.3%（Table 1, PDF p. 4）。 作者报告训练后的 exact diagnosis 为 70.8%，同格式 zero-shot 为 33.3%（Table 3, PDF p. 6）。 作者报告 SD3.5-Large 的 macro 为原图 72.0%、基准 critic 74.1%、训练 critic 76.0%、oracle 81.2%；oracle 留下 435/644 个失败（Table 5, PDF p. 7; Table 13, PDF p. 15）。 作者报告人工抽查修正后的估计净收益为 3.4 个 micro 点，小于 GenEval 的 9.0 点（§6.5, PDF pp. 7–8）。 覆盖同 VLM 的单错/结构化 zero-shot、generic 指令、Molmo 与 rules、第二编辑器和尝试重新采样的附录对照。 结构化 zero-shot 控制输出格式，LoRA 改善 exact diagnosis；oracle 在固定原图和编辑器时为参照。作者也用 prompt-only 与错配图像排查 critic 利用视觉证据的程度。",
+    "insightZh": "同图同编辑器的反事实指令对照把两类失败量化，oracle 标签同时充当 critic 训练监督。",
+    "evidenceZh": "oracle 由提示要求与检测器 failure reasons 编译，对照时不改变图像和编辑器（§§3–4, Fig. 1, PDF p. 3）。oracle 是相对于结构化判据的可操作指令，不是图像真值。 对正确图像保留的比例与对失败图像的诊断分开衡量（§6.3, Table 3, PDF p. 6）。与同格式不训练的 critic 比较，把结构化输出和训练收益区分。 在 SD3.5-Large 下，oracle 指令仍有大量样本无法修复（§6.5, Table 5, PDF p. 7; Table 13, PDF p. 15）。同 VAREdit 下的未修复数用于界定测试范围内执行上限。 人工抽查给出的净改善估计小于 GenEval（§6.5, Human verification, PDF pp. 7–8）。独立人工证据支持排序，但用一个标注者和有限样本。",
+    "caveatZh": "§7 局限于判据能表达的要求与覆盖的编辑类型，未覆盖开放的多步设计工作流。 §6.5 人工复核样本较小，估计置信区间较宽。 GenEval 作为指导与评估的共同判据可能奖励检测器偏好的修改，且图外区域、风格或视觉伪影未完整进入分数。 本轮未确认该论文的公开实现。",
+    "whyRelevantZh": "对生成后自动检查并修正图像的 agent，诊断精度、编辑器执行率和已满足要求的回退应该独立记录。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2611.21539",
+  "slug": "seen-but-unsaid-locating-and-repairing-cross-image-comparison-in-vision-language-models",
+  "title": "Seen but Unsaid: Locating and Repairing Cross-Image Comparison in Vision-Language Models",
+  "authors": [
+    "Zhaoning Zhang"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.21539"
+  },
+  "abstract": "Vision-language models (VLMs) often fail to match a point or an object across two images, even when the answer can be decoded from their own hidden states. We trace this failure from the visual tokens to the answer letter, in Qwen3-VL (2B-32B), InternVL3.5-8B, and Gemma-3-12B, on synthetic shape matching, same-instance point correspondence (HPatches), and semantic correspondence (SPair-71k), and find two distinct failure points, a small set of attention heads that carries the comparison, and a repair that touches 0.02% of the parameters. Two failure points: exact copies are compared but not read out. An answer-position probe exceeds the calibrated output by 15 to 25 points in every family, for nameable and unnameable shapes alike, and steering along the probe's direction moves no more answers than random directions. Semantic correspondences are present in the visual tokens but never reach the answer. One pathway: redistributing the cross-image attention of 16-32 heads, with its mass preserved, removes 17-22 points of synthetic and 15-32 points of HPatches accuracy, against at most 7 for random or attention-matched heads. A lever that training finds on its own: training only these heads' query and key projections raises SPair-71k accuracy by 28.3 points (Qwen3-VL-8B) and 25.1 points (InternVL3.5-8B), beats both layer-matched and attention-matched heads, and transfers to HPatches and BLINK. An unconstrained all-layer adapter routes 21-51% of its gain through the attention of the same heads, against at most 7% for random heads, and does so by changing what they read (83-86% of the effect) rather than their weights. Every decision rule was frozen before its run, and every reported number is recomputed by independent verification scripts.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.21539v1",
+  "keywords": [
+    "cross-image correspondence",
+    "mechanistic interpretability",
+    "VLM",
+    "attention head",
+    "parameter-efficient adaptation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.21539v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.21539v1 的 18 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "跨图匹配失败有两个位置。VLM 在复制形状题里形成了可解码答案却没输出，而真实语义对应停在视觉 token。作者定位到少量跨图 attention heads，只训练其 Q/K 即在 SPair-71k 上报告约 25–28 个百分点提升。全层 adapter 仍更强，同一组 heads 更适合用作可检验的诊断靶点。",
+    "motivationZh": "设计复核常需在参考与当前渲染之间定位同一局部。看不出答案来自视觉表示不足、跨图比较不足还是读出失败，会使修复选错层。",
+    "methodZh": "把复制形状、同实例点和跨实例语义点统一成四选一，分别测特权 region readout、答案位 probe 和校准字母输出。按开发集定位跨图 heads，保留注意力总量作重分布消融；再比较局部 Q/K adapter、匹配 heads 与全层 adapter，并用 attention-row transplant/restore 分辨路径作用。",
+    "methodFlow": [
+      "构造参考图和带候选位置的第二张图，用四种循环字母顺序评分。",
+      "测区域 token 与答案位的可解码性，并与校准输出对照。",
+      "定位跨图 heads，在层匹配、注意力匹配等对照下重分布比较注意力。",
+      "仅训练选定 heads 的 Q/K，测试 SPair、HPatches、BLINK 及复制题的副作用。"
+    ],
+    "experimentsZh": "Qwen3-VL 2B–32B、InternVL3.5-8B、Gemma-3-12B 的定位测量；定向训练用两个 8B 模型及 2,000 个 SP 训练项、独立 1,000 对测试项，三个种子。 作者报告改约 0.02% 参数，SPair-71k 分别为 .430→.712 与 .354→.605（+28.3/+25.1 pp）（§6.1, Table 6, PDF pp.7–8）。 作者报告针对 heads 的 Q/K 比注意力质量匹配的 controls 再高 3.34/2.48 pp；局部训练仍落后参数相近的全层 adapter（Tables 6,15, PDF pp.8,17）。 校准、layer-matched/random 和 attention-matched、query-only及 broad adapters；匹配对照不能同时完全匹配质量与层。 重分布、匹配对照、attention transplant/restore 和 probe steering 给出跨图和读出阶段的区分；复制题读出路径仍未定位。",
+    "insightZh": "在相同输入和校准条件下，把复制形状的读出损失和跨实例对应的比较损失分别定位，再用保持 attention mass 的干预及定向训练互证。定向 heads 是有效杠杆，论文也量化了全层训练可绕过部分路径。",
+    "evidenceZh": "复制题的答案位 probe 在校准后仍领先，真实语义任务的缺口更早出现（§4 and Table 7, PDF pp.4–5,10）。语义对应的 privileged region 与答案位对照使用去标记图像，避免把标记匹配当成功。 跨图 head 的保持质量重分布使复制与同实例准确率下降（Table 4, PDF p.6）。相较单纯屏蔽，消融更好地控制残差 out-of-distribution，仍需结合 HP 的 in-band 对照。 局部 Q/K 训练与全层 adapter 共享部分比较路径（§6.3, Fig. 3, PDF pp.8–10）。移植和恢复有不对称结果，全层修复可经旁路。",
+    "caveatZh": "机制与 adapter 验证限于两个 8B 家族，Gemma 仅参与部分测量。 人工标点加强显著性，BLINK 子集不到 200 项；InternVL 定向训练在两个合成条件上退化。 目前仅验证四选一点对应，迁移到开放文本的设计反馈或自动局部修订仍需独立测试。 作者承诺发布或项目页标记待发布。",
+    "whyRelevantZh": "图对图的部件定位是 reference-guided design agent 可以独立验证的反馈步骤；可借鉴对表示、比较与读出的分离式诊断。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

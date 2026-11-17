@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2611.20278",
+  "slug": "visual-marking-as-a-native-reasoning-capability-for-multimodal-llms",
+  "title": "Visual Marking as a Native Reasoning Capability for Multimodal LLMs",
+  "authors": [
+    "Jiazhen Liu",
+    "Yanghao Wang",
+    "Chaolei Tan",
+    "Long Chen"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-15",
+  "updatedAt": "2026-11-15",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20278"
+  },
+  "abstract": "Visual reasoning often requires maintaining intermediate spatial states that are difficult to express in text. Existing approaches either rely on external drawing tools or image generators, or encode these states in latent tokens without explicit spatial correspondence to the input image. We introduce SelfMark, which enables MLLMs to construct and use visual marks directly in their native visual feature space. By treating the visual token grid as a canvas, SelfMark establishes explicit spatial correspondence between marks and images. This is achieved through a locate-mark-read procedure, where the model identifies relevant locations, constructs task-dependent mark features, and reads the resulting visual features to guide its reasoning. We jointly train a single model on spatial planning, dense counting, high-resolution VQA, and line tracing. Across six benchmarks, SelfMark outperforms state-of-the-art MLLM-based methods specialized for individual tasks. These improvements also persist with a stronger backbone, demonstrating the effectiveness of visual marking across different model capabilities. Overall, SelfMark provides a unified approach to visual reasoning by integrating spatially grounded marks directly into the visual feature space of MLLMs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20278v1",
+  "keywords": [
+    "visual reasoning",
+    "visual marks",
+    "spatial grounding",
+    "multimodal LLM",
+    "feature-space editor"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20278v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20278v1 的 18 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "SelfMark 让 MLLM 在视觉 token 网格上维护可定位的点、路径、框和线，并把原图和标记一起送回同一模型回答。作者通过移除、镜像和真值标记区分了标记作用与定位误差，表明对于这几种空间推理任务，显式空间中间状态有实际价值。",
+    "motivationZh": "语言式推理难以连续跟踪密集对象、细长路径和可读的空间状态。",
+    "methodZh": "用同一 MLLM 依次定位和作答，中间以轻量 editor 将位置条件写入对齐视觉特征。",
+    "methodFlow": [
+      "编码图像和问题并选择标记类型",
+      "逐 patch 并行预测定位条件",
+      "将定位写入视觉特征网格或裁剪框内图像",
+      "同一 MLLM 读取原图和标记回答"
+    ],
+    "experimentsZh": "以 Qwen2.5-VL-7B 和 Qwen3.5-9B 验证。在 VSP 空间规划、FSC-147 计数、V* 与 HR-Bench 多分辨率问答、Tangled Lines 上评估，并与同训练数据的答案监督 LoRA 比较。 作者报告 Qwen2.5-VL-7B 在 VSP 从 78.0% 到 92.9%，Tangled Lines 从 13.9% 到 50.3%；对应的强模型线追踪从 71.8% 到 82.2%（Table 4, PDF p. 7）。 作者报告移除定位标记后 VSP 与线追踪分别降低 16.1 和 37.3 个点；计数测试 MAE 14.44，真值定位时为 6.35（Table 5, §4.3, PDF pp. 7–8）。 同数据 LoRA、零样本 MLLM、为各族任务训练的方法，并分别重跑 DeepEyes/Pixel-Reasoner。Table S6 展示协议差异。 去除标记、镜像标记、不用标记的定位监督对照和去特征对齐区分多种失败。镜像对计数总量影响弱，进一步说明不同任务依赖的特征不同。",
+    "insightZh": "将可诊断的视觉草稿绑定到输入 token 网格，从无空间对齐的通用潜变量跨到能通过镜像、移除干预验证的中间状态。对大多数标记无需在推理中生成并重编码像素图。",
+    "evidenceZh": "标记位置和类型由原 MLLM 预测，轻量 editor 仅接收位置条件（§§3.1–3.3, Fig. 2 and Table 2, PDF pp. 4–5）。避免把标记当成独立黑箱外部视觉工具，框分支则读取裁剪。 同样数据下的 LoRA 对照与更强模型对照保留标记增益（§4.2, Tables 3–4, PDF p. 7）。单模型联合任务；专门方法以各自协议比较。 移除/镜像标记、移除监督和真值定位是三种不同诊断（§4.3, Table 5 and Fig. 3, PDF pp. 7–8; Fig. S4, PDF p. 15）。同模型干预锁定标记作用，真值定位仅界定上限。",
+    "caveatZh": "观察到定位为主要瓶颈，真值定位显著提高规划、计数和线追踪。 §4.3 一次定位与标记较直接 LoRA 解码多约 0.6 秒，成本比较基于单 B200 batch 1。 目前定位监督和标记类型面向定义明确的任务，不能据此推断开放式设计推理能力。 高分辨率 VQA 用裁剪重编码，和原网格标记的因果解释需要分开。 本轮未确认该论文的公开实现。",
+    "whyRelevantZh": "空间标记可用作图形推理时的可查看中间表示，例如规划路径或检查笔画邻接，并支持通过干预检验是否真的用到了对应位置。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

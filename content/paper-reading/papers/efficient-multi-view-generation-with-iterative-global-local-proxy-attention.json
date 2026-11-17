@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.20703",
+  "slug": "efficient-multi-view-generation-with-iterative-global-local-proxy-attention",
+  "title": "Efficient Multi-View Generation with Iterative Global-Local Proxy Attention",
+  "authors": [
+    "Wei Tan",
+    "Kunming Luo",
+    "Hongyu Yan",
+    "Yu Zhang",
+    "Zihao Zhang",
+    "Xiatian Zhu",
+    "Lei Xie"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20703"
+  },
+  "abstract": "Generating consistent multi-view RGB images and normal maps from a single input image provides complementary appearance and geometric cues for 3D reconstruction. However, maintaining cross-view consistency requires information exchange across viewpoints, and dense cross-view attention becomes computationally expensive as the number of views and spatial resolution increase. In this paper, we propose Global-Local Proxy Attention (GLPA) to reduce cross-view communication costs while preserving fine-grained within-view processing. Specifically, GLPA retains full-resolution interactions within each view and uses compact global proxies for cross-view communication. To further leverage the exchanged information, GLPA incorporates iterative proxy refinement, which rebuilds the proxies from updated features and reuses the same attention parameters for subsequent interactions within a single denoising step. We evaluate GLPA on two structurally different diffusion backbones, FLUX and Stable Diffusion. Experiments on FLUX show that GLPA achieves a $2.65\\times$ speedup in attention computation per denoising step over dense attention, while improving reconstruction IoU from 0.6849 to 0.7019 and reducing NVS LPIPS from 0.086 to 0.076. Results on Stable Diffusion further demonstrate the effectiveness of GLPA, with a $1.80\\times$ attention speedup and improvements across all five quality metrics.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20703v1",
+  "keywords": [
+    "multi-view diffusion",
+    "proxy attention",
+    "iterative refinement",
+    "normal maps",
+    "single-image 3D reconstruction"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20703v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20703v1 的 10 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "GLPA 让每张图保留原分辨率的视内 attention，跨视角只交换池化代理，并在同一次 diffusion 去噪中重建一次代理。作者报告在 FLUX 上 attention 耗时约为 dense 的 38%，NeuS 重建的 IoU 也上升。适合借鉴为单图 3D 生成增加相容的 RGB 与 normals 条件，速度数据只覆盖 attention。",
+    "motivationZh": "dense 跨视角 attention 在高分辨率、多视角时成本高，而把所有特征先下采样再交互又可能丢失细节。",
+    "methodZh": "各视图与域内保留全分辨率局部 token，用空间 mean pooling 构建代理；代理之间先全局自注意力，各局部 query 再联合读取本地 tokens 和这些代理。同一去噪步用有界 residual 更新 working state、重新池化，以共享参数运行第二轮。",
+    "methodFlow": [
+      "将单图条件输入 2D diffusion backbone",
+      "为各视图和输出域池化跨视角代理",
+      "用全局代理交换视角和 RGB-normal 信息",
+      "保留全分辨率局部注意力并读取代理",
+      "残差更新特征后重建代理，以同一组参数再交互",
+      "输出多视图 RGB 与法线，交给 NeuS 重建"
+    ],
+    "experimentsZh": "用 LVIS-Objaverse 约 32,000 资产训练，在 Google Scanned Objects 上评估新视角与重建。FLUX 生成 8 个 RGB-normal 视图，SD 生成 12 个；两者为 512 分辨率。 作者报告 FLUX 的 attention 每步耗时从 dense 1.637 秒变为 0.617 秒，约 2.65×；IoU 0.6849→0.7019，LPIPS 0.086→0.076，PSNR 28.03→27.80（Table II, p. 7）。 作者报告 SD 的 attention 每步耗时从 0.730 秒变为 0.405 秒，约 1.80×；IoU 0.5505→0.6641（Table II, p. 7）。 含同骨干的 dense attention 对照和 Wonder3D、Era3D、CTR3D 等跨方法比较。Table IV 的轻训练、短数据设置与 Table II 的完整设置不同。 不 refinement、复用代理、重建代理，外加 pooling stride 与轮次的对照，说明代理需适量且更新有价值。FLUX 单轮配置在 Table IV 并不全面优于 dense。",
+    "insightZh": "辨识度在于只压缩跨视角信息，且第二轮建立在更新后的 proxy 而非重用旧压缩状态。该机制在 transformer 和 U-Net 上分别实现。",
+    "evidenceZh": "视内分辨率完整，跨视交流经 compact pooled proxies（Sec. III-A/B, Fig. 2, pp. 3–5）。架构图把同视图全分辨率与跨视图池化通道明确分开，同时显示 RGB 和 normals 输出。 同一去噪步刷新低分辨率代理，不增加去噪步或轮次专属权重（Sec. III-C, Alg. 1, Eqs. 6–8, pp. 5–6）。第二轮从残差修正的 full-resolution state 重新池化并重算注意力。 作者报告更新代理比直接复用代理在 GSO 上同时改善重建和 NVS 指标（Sec. IV-E, Table II, pp. 7–8）。FLUX 复用到更新时 IoU 为 0.6246 到 0.7019，attention 每步从 0.598 秒增加至 0.617 秒。 更多交互轮和更稀代理均不保证质量增加（Table III, p. 9）。在当前设定中，两轮、stride 2 比第三轮或更大的 pooling stride 表现好。",
+    "caveatZh": "实证主轴是一个对象重建 benchmark，两种骨干的视图数也不同。真实图像主要是定性。 2.65× 是去噪步内 attention 计算的速度变化，未计入所有去噪、NeuS 和纹理精修，不能用作端到端 3D 资产生成加速。 本轮未确认该论文的公开实现。",
+    "whyRelevantZh": "可把多视 RGB 和法线作为 3D Generation 的外观及几何条件。参考视角数增加时，proxy 机制提供一条保留局部细节的可控计算路径。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

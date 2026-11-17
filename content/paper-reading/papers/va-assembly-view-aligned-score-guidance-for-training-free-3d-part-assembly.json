@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.20788",
+  "slug": "va-assembly-view-aligned-score-guidance-for-training-free-3d-part-assembly",
+  "title": "VA-Assembly: View-Aligned Score Guidance for Training-Free 3D Part Assembly",
+  "authors": [
+    "Yeon-Jae Kim",
+    "Sangwon Kang",
+    "Byung-Kwon Min"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20788"
+  },
+  "abstract": "Image-to-3D foundation models have improved 3D reconstruction, but typically produce monolithic representations without explicit part-level structure. Part-aware generation and learning-based assembly methods often require part-level supervision, category-specific priors, or paired part-layout training data. We instead consider a practical but underexplored setting in which independently prepared or generated 3D parts have no predefined inter-part relationships, shared coordinate frames, or consistent scales, and must be assembled into a reference-consistent object from a single image. We present VA-Assembly, a training-free framework for 3D part assembly through part-level transformation estimation using view-aligned diffusion guidance. Given a reference image and fixed 3D part geometries, VA-Assembly optimizes each part's translation, rotation, and scale. We condition a frozen view-conditioned diffusion model on same-view renderings of a reference-derived monolithic 3D representation, producing score gradients geometrically aligned with the part configuration. This guidance provides multi-view structural cues under large initial misalignment. By repurposing pretrained visual-structural priors as transformation-level supervision, VA-Assembly requires no annotated part layouts, predefined part taxonomies, category-specific assembly training, or bounding-box-based layout initialization. Experiments compare VA-Assembly with geometric registration and compositional layout baselines using each baseline's supported transformation components, showing improved part-wise transformation estimation. Ablation studies show that view-aligned conditioning, rather than diffusion guidance alone, is critical for reliable transformation gradients. Updating only part transformations preserves explicit component separability and supports component-level editing, replacement, and reconfiguration.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20788v1",
+  "keywords": [
+    "3D part assembly",
+    "view-aligned SDS",
+    "Zero-1-to-3",
+    "3D Gaussian splatting",
+    "similarity transforms"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20788v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20788v1 的 16 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "VA-Assembly 把参考图生成的整体 3D 当作可旋转的装配草图，用与当前零件组合相同的视角条件化 Zero-1-to-3，直接更新零件的平移、旋转和尺度。大错位时同视角 SDS 比像素损失更能把部件拉回正确位置，输出仍可按件更换。单图缺失的内部结构及碰撞、接触约束仍需另外解决。",
+    "motivationZh": "单图 3D 生成通常只给一个整体资产。异源零件的朝向、原点与尺度不统一，初始偏差较大时，基于 3D 对应或像素残差的局部优化容易陷入错误排列。",
+    "methodZh": "从同一相机渲染当前零件组合和整体参考。整体参考的渲染输入冻结的 Zero-1-to-3 作为条件，当前组合的加噪 latent 提供 SDS 梯度。经可微 Gaussian 渲染累计多视图梯度，前 40 步粗排，后 10 步加入可见点 Chamfer 与 RGB 一致性。",
+    "methodFlow": [
+      "准备独立的 3D Gaussian 零件与参考图的整体重建",
+      "从同一相机渲染参考结构和当前组合",
+      "以参考渲染为条件计算冻结 Zero-1-to-3 的 SDS 梯度",
+      "通过可微渲染聚合多视角梯度并更新各件变换",
+      "末段加入可见表面 Chamfer 与 RGB 约束",
+      "保留独立部件及变换，输出可重组布局"
+    ],
+    "experimentsZh": "从 GSO 随机组合资产、从 Breaking Bad 获取已知部件变换，构造 80 个目标组合，在平移、旋转、尺度上扰动初值。另用 20 张 GPT-4o 生成的参考图比较渲染一致性。 作者报告在完整平移、旋转和尺度设置，Chamfer 由 TEASER++ 的 0.063 降至 0.021，平均旋转误差由 50.843° 降至 18.015°；尺度误差为 0.019 对 0.017，未改善（Table 2, p. 10）。 作者报告全局初始化下，只用同视角 SDS 比只用 RGB 损失将平均旋转误差由 44.543° 降至 13.763°（Table 4, p. 13）。 与 Go-ICP、Assembler、REPARO、TEASER++ 分别在相同可估自由度比较，并与 OmniPart、Part123 对比合成图条件下的渲染。图像相似度不能充分衡量部件接触或功能。 已对照固定参考单视图、传统 Zero-1-to-3 多视图及同视角 SDS，也比较不同扰动下的 RGB loss。实验支持同视角条件在全局对齐中的价值。",
+    "insightZh": "把 novel-view diffusion 改作变换监督，关键在于让条件视点和当前优化视点重合，避免依赖按目标相对位姿生成的近似参考图。优化变量仅是独立资产变换，所得部件因此可直接复用。",
+    "evidenceZh": "参考结构和当前组合由同一相机渲染后进入冻结 score 网络（Sec. 4.1–4.2, Fig. 4, pp. 5–6）。图中参考条件和当前加噪 latent 是两条路径，梯度只更新零件变换。 多视图聚合补足单视角投影对沿视线运动的约束（Sec. 4.3, pp. 6–7）。推导与方法写明相机方向和遮挡互补，几何与光度只在末段加入。 作者报告同视角 SDS 在大初始偏差下明显降低平移和旋转误差（Tables 4–5, Fig. 8, p. 13）。对照保留同一个扩散先验，改变视角条件；另与局部有效的 RGB 损失对比。 单一外观参考不能约束遮挡零件，子装配参考可补足观察（Sec. 5.6, Fig. 9, p. 14）。咖啡磨示例先局部组合再整体布局，新增参考来自使用者。",
+    "caveatZh": "近对称或弱视点线索会留下较大的旋转方差。 单张外观图不提供全部遮挡部件位置。作者把接触推理、碰撞处理与物理约束列为后续工作。 评估以合成布局和生成参考图为主，结果不能直接外推到真实生产或带离散连接规则的积木。 整体参考和零件几何若有系统偏差，固定几何难以补偿。 本轮未确认该论文的公开实现。",
+    "whyRelevantZh": "直接命中可拆分 3D 部件组合。视觉 score 给出粗排信号，可用于模块化设计中的候选布局，连接和制造可行性需要单独验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

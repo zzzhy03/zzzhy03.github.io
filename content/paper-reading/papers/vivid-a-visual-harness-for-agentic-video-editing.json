@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2611.20688",
+  "slug": "vivid-a-visual-harness-for-agentic-video-editing",
+  "title": "VIVID: A Visual Harness for Agentic Video Editing",
+  "authors": [
+    "Wenhan Yu",
+    "Zhaoxi Zhang",
+    "Zhilong Tan",
+    "Weikang Li",
+    "Lei Sha"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.MM"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20688"
+  },
+  "abstract": "Video editing requires agents to make editing decisions grounded in audiovisual observations and precise temporal localization, and to evaluate their effects in rendered outputs. General-purpose coding agents possess strong comprehension, reasoning, and code execution capabilities, while media interaction and evidence management mechanisms tailored to video tasks can further unlock their editing potential. We introduce VIVID, a visual harness that supports multiple native coding agents in video post-production without additional model training. VIVID provides tools for on-demand video inspection, audio analysis, and transcription, and preserves observations alongside their corresponding media versions and temporal coordinates. Agents can actively retrieve these observations as they reason, perform edits using their native coding and shell tools, and inspect rendered outputs to guide subsequent revisions. On AgenticVBench, comprising 100 tasks across Assembly, Repair, Sequencing, and Repurpose, Codex with VIVID achieves an average score of 58.6%, an improvement of 20.2 percentage points over native Codex. The same harness also integrates with Claude Code and OpenCode, achieving average scores of 55.1% and 37.1%, respectively, both substantially exceeding their native baselines. These results highlight VIVID's potential as a reusable visual harness for extending the capabilities of general-purpose coding agents to video editing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20688v1",
+  "keywords": [
+    "video editing",
+    "agent harness",
+    "evidence memory",
+    "temporal localization",
+    "render feedback"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20688v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yuwenhan07/VIVID"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20688v1 的 15 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "VIVID 给现有 coding agent 增加按需视听观察、绑定版本与时间的证据库，以及渲染后定位问题并返工的工具。作者报告 AgenticVBench 上 Codex 平均分从 38.4% 到 58.6%，去掉任何一个环节都降分。最值得迁移的是可追溯的观察与修订循环，复杂叙事、影音协调和修复仍有缺口。",
+    "motivationZh": "编码代理可以执行媒体处理，但现有文件和命令界面缺少时间定位、跨媒体版本的观察记忆和对实际成片的回看。",
+    "methodZh": "先使用 catalog、inspect 与 transcribe 按需拉取带时间及版本的观察；后续用 retrieve 按证据 ID 找回记录。代理以原生执行工具或声明式 edit 生成结果，用 verify 的文件检查和指定时间窗回看修订。",
+    "methodFlow": [
+      "用分层时间窗采样视频图像、音频与转录",
+      "保存含文件版本、时间范围、证据 ID 的观察",
+      "结合任务约束规划并执行编辑",
+      "渲染文件后检查解码、格式和相关时间窗",
+      "按源片段和渲染证据修订剪辑，再次渲染复查"
+    ],
+    "experimentsZh": "AgenticVBench 的 100 项 Assembly、Repair、Sequencing 与 Repurpose 任务，按基准任务协议评分；每任务配置 3 次独立运行，给定 1,800 秒与 200 次迭代限制。 作者报告平均 Codex 38.4%→58.6%，Claude Code 32.4%→55.1%，OpenCode 27.4%→37.1%。人类专家参考均分为 88.5%（Table 1, p. 5）。 作者报告 GPT-5.6-sol 完整配置 58.6%，移除按需观察为 42.6%，移除证据记忆为 47.8%，移除输出回看为 44.0%（Table 2, p. 5）。 主要因果对照为三个模型各自的 native harness；表中也含 Crayotter 同模型结果及其他基准配置。得分基于按任务设计的程序指标和 rubric，不能理解为真实创作者的偏好。 分别移除观察、记忆、review；作者还在第 5 节对照 token 使用，表明三组的分数收益均伴随额外 token，收益/成本随 harness 变化。",
+    "insightZh": "把视频观察、轨迹记录及修订接到已有代理工作区中，特别是用版本身份和时间坐标保留可检索证据；不改底层模型，也不强制特定剪辑工具。",
+    "evidenceZh": "版本、时刻与 evidence ID 构成跨编辑步骤可复用的观察记录（Sec. 3.1, Fig. 2(b), pp. 3–4; App. A.3, pp. 11–12）。可按文本或 ID 复查进入上一版本决策的原观测，文件同路径覆写也有独立版本。 声明式编辑可回查源媒体时刻并投影字幕（Sec. 3.1, Fig. 2(c–d), pp. 3–4; App. A.6, Eq. 2, p. 13）。源输出映射针对已声明编辑，native shell 任意变换仍由 agent 负责核验。 作者报告三组模型和原生 harness 在接入后均有平均分增益（Table 1, p. 5）。对应组使用相同底层模型与工作预算，单项的增益并不均匀。 作者展示在演讲缩编案例中回看局部输出后修改字幕、宽高比与过渡（Sec. 6.2, Fig. 5, p. 8）。这是一个完整轨迹例，展示观测如何引发新的编辑而非泛化频率。",
+    "caveatZh": "采样帧不能覆盖整段视频，转录或技术检查只能提供部分证据。 全局叙事、视听配合和修复质量仍需改进。 视频工具集的受益不等于已有验证的 SVG/CAD 收益，自定义编辑需要适配记录与渲染验收。 三组结果分别绑定底层模型和 harness，不能从跨组差异估计普遍成本收益。 核实作者提供的公开实现。",
+    "whyRelevantZh": "版本化证据和时间索引是视觉设计代理可借鉴的结构，尤其适合资产反复导出、需要定位修改错误的工具闭环。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "solid"
+  }
+}

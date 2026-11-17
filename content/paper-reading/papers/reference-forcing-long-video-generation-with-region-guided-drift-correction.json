@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.21559",
+  "slug": "reference-forcing-long-video-generation-with-region-guided-drift-correction",
+  "title": "Reference Forcing: Long Video Generation with Region-Guided Drift Correction",
+  "authors": [
+    "Sheng Zhao",
+    "Haitian Zheng",
+    "Weikai Lin",
+    "Junjie Zhao",
+    "Yuhao Zhu"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.21559"
+  },
+  "abstract": "Long video generation should keep the subject and background consistent while supporting rich, natural motion. However, autoregressive models are often distilled with distribution matching distillation (DMD) over short windows, which does not train them to keep this consistency over long ranges. As a result, the subject and background can drift over time. Methods that manage the key-value (KV) cache retain or retrieve history to reduce drift. Yet this history may itself have drifted. We propose Reference Forcing, which uses the initial frames as an appearance reference. We first build a teacher that uses attention masks to force each region of a new frame to attend to the same region in the initial frames. The teacher finds these regions with off-the-shelf segmentation models. We then distill this behavior into a separate attention path of the student, which needs no external models at inference. We further introduce value correction, which corrects drifted values in the KV cache toward the matching values of drift-free initial frames. Experiments show that Reference Forcing achieves state-of-the-art subject and background consistency among long-video methods on different base models, and its advantage grows with video length. Ablations show both components are needed to gain consistency without losing motion. More visualizations and code are available at https://zhaosheng-thu.github.io/reference-force/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.21559v1",
+  "keywords": [
+    "Reference Forcing",
+    "long video generation",
+    "anchor attention",
+    "KV cache",
+    "distillation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.21559v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://zhaosheng-thu.github.io/reference-force/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.21559v1 的 17 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "Reference Forcing 把视频的运动上下文与首段外观锚分开。用区域对应蒸馏独立 attention，再修正较早缓存的 value；作者报告在 LongLive 的 30–120 秒比较中平均排名第一，组合在保持 tracking strength 时提升 L-Consistency。小时级样片验证的是展示可行性，首段未出现的对象仍缺乏锚点。",
+    "motivationZh": "自回归视频的短窗口蒸馏难以约束长时外观，复用最近 KV 也会继承已经发生的漂移。",
+    "methodZh": "冻结 LongLive 或 Self-Forcing 主干，另设无 RoPE 的 anchor attention，按内容匹配首个 chunk，并以学习 gate 控制残差。教师用 Grounding DINO/SAM 2 对齐主体、用双向 RAFT flow 对齐背景，学生将此约束蒸馏到 LoRA Q/K 和 gate。推理时用初始 chunk 的近邻 value 校正倒数第二块缓存，最近块留给运动连续性。",
+    "methodFlow": [
+      "生成并保留首个 chunk 作为外观锚点，近期 KV 窗口提供运动上下文。",
+      "训练教师用检测分割和光流生成区域匹配 mask，隔离新增或无匹配内容。",
+      "将教师蒸馏到独立 softmax 的 anchor 路径，学习每 token 的门控强度。",
+      "生成时根据缓存键对应修正较早 chunk 的 value，保留最新 chunk 以减轻闪烁。"
+    ],
+    "experimentsZh": "MovieGenBench 共 128 个提示，LongLive 固定初始噪声及 12 latent-frame 缓存，比较 30/60/120 秒；Self-Forcing 比较 30 秒。另以 2AFC 做用户与 VLM 评价。 作者报告 LongLive 上三个时长的六指标平均排名均为 1；120 秒主体/背景分数 97.27/96.56，对原模型 97.06/96.30（Table 1, PDF p.5）。 作者报告 7 名参与者对 LongLive 的一致性偏好率 76%（95% CI 68–83）（Table 2 and §4, PDF pp.6–7）。 同初始噪声/缓存比较 MemRoPE、LongLive-RAG、∞-RoPE、Deep Forcing；长窗口扩展和受控时长的结果应分别理解。 分别变化 mask、独立 softmax、anchor gain 和 cache 校正位置；边界闪烁及运动抑制给出各选择的代价。",
+    "insightZh": "外观约束走独立 softmax，避免直接抢占近期 token 的注意力预算；先缓存可复用 gate，再仅校正 value，将即时外观锚和漂移传播拆成两处可检验的干预。",
+    "evidenceZh": "首段外观分支独立归一化并经 gate 相加（§3.2–3.3, Fig. 2, PDF pp.3–4）。原模型注意力路径继续读取首段及最近缓存，新增分支不重新归一化原路径。 值校正跳过最近 chunk；调动它会产生边界闪烁（§3.4 and §5.2, Fig. 6, PDF pp.5,8）。文中有修正位置对边界帧差的比较。 作者报告两项结合比单项更能改善长程外观一致性（§5.2, Fig. 5, PDF pp.7–8）。组合的 +0.097 L-Consistency 对于两单项 +0.044 和 +0.034，且组合保持 LongLive 跟踪强度。 超长展示不构成同规模长时定量对照（Fig. 12 and §4, PDF pp.5–6,17）。小时级为样片，统一指标比较在 30/60/120 秒。",
+    "caveatZh": "首段没有出现的对象无法获得参照，动态更新参照仍是后续工作。 主体检测遇到多个相似对象或无明显主体的场景时受限，初段浅纹理也可能被过度平滑。 定量对照主要覆盖 30–120 秒，双小时及十二小时样例不能外推其整体稳定性。 项目页标注 Code (coming soon)，实现尚未公开验证。 作者承诺发布或项目页标记待发布。",
+    "whyRelevantZh": "长时视频生成的外观与运动可分开施加约束，对依赖多帧主体一致性的 4D prior 尤其值得精读。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

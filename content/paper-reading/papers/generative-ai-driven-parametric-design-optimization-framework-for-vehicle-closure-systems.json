@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.20451",
+  "slug": "generative-ai-driven-parametric-design-optimization-framework-for-vehicle-closure-systems",
+  "title": "Generative AI-Driven Parametric Design Optimization Framework for Vehicle Closure Systems",
+  "authors": [
+    "Dongeon Lee",
+    "Yurim Lee",
+    "Jiyong Kim",
+    "Sanghyeon Kim",
+    "Sanghyun Lee",
+    "Seungyeon Shin",
+    "Jeahong Kim",
+    "Namwoo Kang"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation",
+    "fabrication"
+  ],
+  "categories": [
+    "cs.LG"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20451"
+  },
+  "abstract": "This study presents a generative AI-driven parametric design optimization framework integrating performance-oriented generation with editable computer-aided design (CAD) and downstream computer-aided engineering (CAE) analysis for industrial vehicle closure systems. The framework is demonstrated on an automotive tailgate assembly with complex geometry, coupled components, and competing performance and feasibility requirements. A production-oriented CATIA model is restructured into a reference-based parametric template with a 13-dimensional design representation. An automated CAD/CAE workflow generates parametric models, performs structural analysis, and constructs a database of mass, maximum displacement, and maximum von Mises stress. Gaussian process regression surrogates predict performance, while diffusion and flow matching models generate design candidates. The design problem minimizes mass and maximum displacement, with stress assessed as an engineering feasibility constraint. Performance-guided generation using surrogate guidance and performance-aware training using a performance-aware loss incorporate engineering objectives, with sensitivity to guidance scale and loss weight evaluated. Generative search is compared with NSGA-II under matched evaluation budgets using a common surrogate model. Selected Pareto-region candidates are reconstructed in CATIA and re-evaluated through native CAE; all verified candidates are successfully regenerated and analyzed. Relative to the baseline, the knee-point design reduces mass by 7.1% and maximum displacement by 29.4%, while extreme verified solutions achieve maximum reductions of 10.3% and 37.3%, respectively. The results demonstrate performance-oriented multi-objective design exploration compatible with editable industrial CAD and native engineering verification.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20451v1",
+  "keywords": [
+    "CAD",
+    "CATIA",
+    "surrogate-guided generation",
+    "flow matching",
+    "Pareto search"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20451v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20451v1 的 26 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "把汽车尾门的特征树压成 13 个可回写参数，用结构代理引导扩散/flow matching 生成候选，再用原生 CATIA/CAE 检查再生、性能与应力。作者报告扩散在低代理评估预算下优于 NSGA-II，但高预算下优势反转，适合参考工业 CAD 生成闭环。",
+    "motivationZh": "工业几何变化要保留原始设计约束和可编辑性，候选还要通过组件级仿真。",
+    "methodZh": "以引用尺寸搭建可回写 CATIA 模板，联合 GPR、性能引导扩散或 flow matching 和原生 CAD/CAE 复验。",
+    "methodFlow": [
+      "重构 CATIA 特征依赖并筛出 13 个几何参数",
+      "采样设计向量并用批量 CAD/CAE 获取性能",
+      "训练质量和最大位移的 GPR",
+      "在生成训练和采样中加入代理性能",
+      "重建 Pareto 候选并检查最大应力"
+    ],
+    "experimentsZh": "一个工业 CATIA V5 尾门和一种扭转载荷。200 个 LHS 候选中 189 个成为有效设计性能对，其中 151 训练、38 留出。Pareto 比较采用同一个 GPR 与 50–2,000 次评估预算，生成搜索以多个随机种子评估。 作者报告 N=100 时组合引导扩散的归一化 hypervolume 1.345，NSGA-II 为 1.157，约 N=700 后优势反转（Table 6, Fig. 14, PDF pp. 20–21）。 作者报告原生 CAE 中膝点相对基准质量下降 7.1%，最大位移下降 29.4%，且应力过关。另有两个接近最小质量的候选轻微超限（§6.8, Table 7, Fig. 15, PDF pp. 21–22）。 包含同一代理上的 NSGA-II、LHS 和两个生成架构；匹配的是代理评估次数，未包含训练和 CAD/CAE 前置成本，且代表性生成候选才回到原生 CAE。 五个种子比较无引导、仅引导、仅性能损失和组合；作者报告扩散 N=500 的 HV 由 1.188 提高到 1.401，引导贡献更大，见 Table 5（p.17）。",
+    "insightZh": "把参考尺寸驱动的可编辑工业特征树与可做消融的生成性能注入、原生 CAD/CAE 复验放在同一个比较框架。",
+    "evidenceZh": "相对参考尺寸和预留曲面边界让重构几何依赖随上游变更传播（§4.1, Figs. 2–3, PDF pp. 5–7）。论文给出重构前后的示意和案例模型。 同一 GPR 的质量和位移预测用于训练损失和采样引导，应力约束在原生流程复验（§§5.2–5.4, PDF pp. 8–10）。生成模型处理归一化参数，CATIA 保留原生特征树。 生成优势随共享代理预算提高而消失（§6.7, Table 6, Fig. 14, PDF pp. 18–21）。与 NSGA-II 和 LHS 比较，且训练及 CAE 数据构建成本不包含在在线比较预算。 成功再生与分析的候选仍存在超限应力（§6.8, Table 7, Fig. 15, PDF pp. 20–22）。复验是防止把代理性能等同于工程可行性的必要证据。",
+    "caveatZh": "§7 只覆盖单个工业组件、固定拓扑和约束载荷；扩大组件类型、强耦合变量或多工况仍需验证。 p.24 工业几何、原始参数、详细 CAE 与完整数据因保密不公开，衍生数据提供需审批。 筛掉 CAD/CAE 失败点使生成器主要学习成功分布，不能推断生成候选均可制造。 原生 CAE 降低代理误差风险，证据仍限于仿真和预选候选。 本轮未确认该论文的公开实现。",
+    "whyRelevantZh": "对已有工业 CAD 产品，比起生成静态几何，保留可编辑依赖和验证生成候选能更直接接入工程流程。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2611.19803",
+  "slug": "pros4d-modeling-evolving-4d-worlds-in-latent-space-for-dynamic-spatial-reasoning",
+  "title": "Pros4D: Modeling Evolving 4D Worlds in Latent Space for Dynamic Spatial Reasoning",
+  "authors": [
+    "Rongxin Gao",
+    "Dongxuan Liu",
+    "Chu Li",
+    "Chengyang Ji",
+    "Jialing Huang",
+    "Runyu Chen",
+    "Kairun Wen",
+    "Chenxin Li",
+    "Jingrui Ye",
+    "Haosong Zhen",
+    "Xinghao Ding",
+    "Yue Huang",
+    "Yuzhi Huang",
+    "Xiaodong Tu",
+    "Jingyan Jiang"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-15",
+  "updatedAt": "2026-11-15",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.19803"
+  },
+  "abstract": "Dynamic spatial reasoning from monocular video enables vision-language models (VLMs) to understand how 3D environments evolve over time, supporting physical world understanding and embodied intelligence. Existing efforts primarily address observed-dynamics understanding, whereas agents in dynamic environments also require future-dynamics prediction beyond the observation boundary. Moreover, external geometric processing and textual descriptions can increase inference complexity or lose information when representing continuous dynamics. These limitations motivate a shared internal state that preserves observed dynamics and remains predictive beyond the input video. Accordingly, we present Pros4D, a framework for modeling evolving 4D worlds in latent space that unifies retrospective understanding of observed-dynamics with prospective reasoning for future-dynamics prediction. Specifically, Pros4D-Engine derives geometry-grounded supervision and constructs paired examples for both tasks, while Pros4D-Bench evaluates them across eight spatial task categories spanning dynamic cameras, objects, and scenes. At the model level, Pros4D compresses observed dynamics into latent observed states and autoregressively rolls them forward into latent future states. 4D Latent Alignment (4DLA) grounds these states through complementary visual-semantic and geometric supervision, while joint language supervision connects them to task reasoning. Experiments across benchmarks show consistent improvements over strong baselines in both capabilities.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.19803v1",
+  "keywords": [
+    "dynamic spatial reasoning",
+    "latent rollout",
+    "geometry supervision",
+    "4D latent alignment",
+    "video VLM"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.19803v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.19803v1 的 27 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "Pros4D 在单目视频 VLM 的文字推理中插入连续状态 token，用实体视觉特征和几何教师共同监督，再仅凭观测前缀滚动推断未来。配对监督与状态换序消融为动态表征提供了实证，但论文只验证时间问答和特征对齐，尚未验证可渲染的 4D 资产。",
+    "motivationZh": "动态空间推理既要记住实际观测中的实体与运动，又要推断随后发生的变化。只有文字线索的推理可能丢失连续运动和空间位置。",
+    "methodZh": "Pros4D-Engine 由 Qwen3.8、WAFT 与 SAM3 建立跨帧实体覆盖图，再用 Depth Anything 3 和几何规则构建 QA，训练时每段状态由 16 个连续向量承载。4DLA 在 VLM 末层令预测状态对齐视觉特征，在中间层经可训练投影头对齐 Pi3X 几何特征，结合语言损失。",
+    "methodFlow": [
+      "切分单目视频为同一个观测前缀和监督使用的未来片段。",
+      "通过文本实体、光流和 SAM3 跟踪生成有序实体覆盖图，过滤错配。",
+      "由估计几何、相机姿态和实体轨迹构造八类空间题及对应时序 latent 监督。",
+      "在推理文本中交织 16-token 连续状态块，对齐冻结的视觉与几何特征。",
+      "测试时仅输入观测和问题，自回归展开后续状态并解码文字答案。"
+    ],
+    "experimentsZh": "两种 Qwen-VL 底座训练。Pros4D-Bench 含 3,000 题、2,496 视频，以相同观测前缀测 retrospective 和 prospective。作者还比较六个外部评测，覆盖动态空间问答、机器人任务和驾驶场景。 作者报告 Pros4D-8B 的 overall/retrospective/prospective 准确率为 62.9%/64.9%/59.5%，Qwen3-VL-8B 为 46.4%/49.7%/40.7%（Table 1, PDF p. 5）。 作者报告未来状态使用跨视频替换时，准确率下降 10.2 个百分点，打乱时序下降 6.7 点，直接绕过所有 latent 下降 4.6 点（Fig. 5(c), PDF p. 8）。 作者报告对 500 条分层抽取的问题进行人工核查，几何自动标签与裁定结果总体一致率 96.6%，未来任务为 95.6%（Table 16, PDF p. 14）。 包括通用 Video VLM、空间专用模型、免训练方案、两种底座和同数据 Raw-QA 与 Textual-CoT 训练；外部任务结果不能直接换成视频生成或几何重建指标。 Table 7 用共同数据将文字 trace 与额外状态监督分开，作者报告 58.1% 至 62.9%。Fig. 5 区分单一对齐、去除状态、打乱和跨视频替换。Table 8 中仅用监督目标而不喂未来状态的 variant 正常测试是 58.6%，相对 teacher forcing 的 59.5%。",
+    "insightZh": "与只用文字推理或外部重建工具回答问题相比，论文把历史和未来状态用同一潜在协议交织在 VLM 中，且用同数据训练、预测前移/打乱和跨视频替换检验 latent 的时间和场景信息。已有几何与视觉教师被用作训练监督。",
+    "evidenceZh": "数据引擎构造与实体对齐的几何 QA，观察任务和未来任务使用同一观测前缀（§3.1, Fig. 2, PDF pp. 3–4; Supp. A–C, pp. 13–15）。未来画面用于训练目标和评测标签；Pros4D-Bench 按视频标识与训练拆分。 4DLA 双重监督在训练中使用视觉语义和几何特征，测试 rollout 不输入未来帧（§3.2, Fig. 3, PDF pp. 4–6; Supp. A, p. 13）。图和附录区分可训练语言 decoder/对齐头，以及保持冻结的视觉与几何编码器。 匹配、顺序正确的未来状态能解释一部分预测收益（§4.3, Fig. 5, Table 8, PDF p. 8; Supp. D, p. 16）。作者控制了训练数据和模型权重，分别干预匹配监督和推理状态；效应指标为问答准确率与未来特征对应。 几何约束的 future latent 可作为研究 4D 生成条件的表示参考（§3.2, PDF pp. 5–6; §5, p. 9）。论文以答案而非显式几何或视频作为输出，未证明这种状态能直接驱动生成。",
+    "caveatZh": "目前依赖估计几何，复杂动态场景上的几何准确性和长预测时域仍需后续改善。 自建数据和标签依赖深度估计、实例 mask 与启发式几何规则；人工审计能校对答案标签，未提供完整动态三维真值。 未来状态是问答导向的隐变量，能否驱动可控视频或显式动态资产生成仍需独立评估。 作者承诺发布或项目页标记待发布。",
+    "whyRelevantZh": "为设计 agent 与 4D 生成中的动态空间表征提供有针对性的监督和消融方法，尤其适合核对多对象关系与未来状态在同一潜空间的可辨识性。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

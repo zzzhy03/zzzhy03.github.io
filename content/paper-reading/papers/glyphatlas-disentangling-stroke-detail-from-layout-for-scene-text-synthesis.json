@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.20192",
+  "slug": "glyphatlas-disentangling-stroke-detail-from-layout-for-scene-text-synthesis",
+  "title": "GlyphAtlas: Disentangling Stroke Detail from Layout for Scene Text Synthesis",
+  "authors": [
+    "Luozheng Qin",
+    "Changhai Zhou",
+    "Yiyi Zhou"
+  ],
+  "primaryTopicId": "image-generation",
+  "topicIds": [
+    "image-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-15",
+  "updatedAt": "2026-11-15",
+  "collectedAt": "2026-11-18",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.20192"
+  },
+  "abstract": "Scene text synthesis requires stroke-accurate characters rendered in a specified layout, as well as visual coherence with the surrounding scene. To achieve this, existing methods commonly pre-render the target text at its intended locations to form a glyph image that jointly specifies layout and glyph structure. However, this representation ties the resolution of each glyph to its target region, limiting fine-grained stroke guidance for small, densely packed, or structurally complex text. To tackle this, we propose GlyphAtlas, a scene text synthesis framework that retains the glyph image as a spatial anchor and supplies fine-grained stroke references through a dedicated glyph atlas. The atlas renders and encodes each character or word in a separate cell, decoupling reference resolution from target-region size. We further introduce atlas-anchored attention, which lets each text region retrieve stroke detail only from its corresponding atlas cells to refine the coarse glyph structure provided by the glyph image. This coarse-to-fine conditioning simplifies stroke rendering while preserving explicit layout correspondence. We optimize GlyphAtlas with a mask-weighted flow matching objective and a timestep-weighted text perceptual loss for writing accuracy and background consistency. Random resolution augmentation of atlas cells supports adjustable atlas budgets at inference. Extensive experiments demonstrate that GlyphAtlas achieves stroke-accurate synthesis of small, dense, and structurally complex text, zero-shot transfer to languages unseen during task-specific training, and leading performance in scenes with many text regions. project page: https://fr0zencrane.github.io/project-glyphatlas/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20192v1",
+  "keywords": [
+    "glyph atlas",
+    "scene text editing",
+    "region attention",
+    "flow matching",
+    "stroke conditioning"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.20192v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://fr0zencrane.github.io/project-glyphatlas/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.20192v1 的 22 页全文及关键图表整理。实验数字为作者报告。",
+    "ideaZh": "GlyphAtlas 将场景文字的空间布局和高分辨率笔画参考分开，以 region-anchored attention 让每个目标区只读取对应字形。作者报告密集、小尺寸和未见文字体系识别改善；可借鉴的是独立局部模板与空间锚的连接方式。",
+    "motivationZh": "全局场景字形图过小或拥挤时难以提供足够的局部笔画信息。",
+    "methodZh": "使用全图对齐粗字形及独立分辨率 atlas，由区域掩码 attention 在 FLUX DiT 联合读取。",
+    "methodFlow": [
+      "给定文本、空间区域和待编辑图像",
+      "渲染全局对齐粗字形与独立高分辨率 atlas cells",
+      "VAE 编码各局部字形模板",
+      "让场景文本区通过 attention 只访问对应模板",
+      "通过 DiT 生成或替换区域内文字"
+    ],
+    "experimentsZh": "主模型在约 154 万图像训练，GlyphAtlas-Bi 的 10 万张中英图像用于消融及多语 zero-shot。AnyText 测生成，TextOCR、Total-Text、ReCTS 测编辑，STIPLAR 测未见文字体系段，报告 OCR 识别与图像质量指标。 作者报告 AnyText 英文/中文句准确率分别为 88.68%/77.92%，FLUX-Text 相应 84.19%/71.32%（Table 1, PDF p. 6）。 作者报告 Total-Text 的 small 子集中，GlyphAtlas-Bi 的双参考加区域 attention 为 27.21%，粗字形基线为 17.65%，双参考不加区域约束为 21.69%（Table 4, PDF p. 8）。 作者报告 GlyphAtlas-Bi 的 STIPLAR 韩语和阿拉伯语准确率为 66.96% 和 39.55%，在不针对这些语言微调的方法中领先（Table 3, PDF p. 6）。 包含 AnyText/AnyText2、FLUX-Text 等公开检查点。附录补齐其他指标，语言专门训练模型和 zero-shot 组应分开看。 同一中英训练方案对照 glyph image-only、atlas-only、双参考 full attention 和 anchored attention。Anchored 对小字及密集子集更有利，日本语使用全注意力的该消融变体更高。",
+    "insightZh": "将既有粗字形引导扩展为分辨率与目标框独立的区域模板，结构信息仍绑定到原位置，尤其改善低采样目标区。",
+    "evidenceZh": "双参考分别承载布局和笔画，区域注意力掩码显式建立对应（§3.2, Figs. 2–3, PDF p. 4）。atlas 模板采用逐字或逐词的独立 cell，不随目标位置缩放。 比较中双参考通常优于单一粗字形；anchored 对小字的收益高于全连接（§4.3, Table 4, PDF pp. 7–8; Table S2, p. 15）。局部和语言子集不一致，说明 attention 限制不是总能提升。 日、韩、阿拉伯语编辑评估采用独立中英训练的 GlyphAtlas-Bi（§§4.1–4.2, Table 3, PDF pp. 6–7）。zero-shot 仅指任务特定训练，不能排除基座先验和文字间共享字形。",
+    "caveatZh": "统一字体提供笔画形状，但字体粗细与色彩仍会偏离；atlas tokens 增加推理成本。 OCR 正确并不意味着输出可编辑或可矢量化，方法迁移到一般结构图形仍需独立评估。 核实作者提供的公开实现。",
+    "whyRelevantZh": "在已有结构化图层的局部合成时，可将每块的位置和边界保留在版面通道，另用高分辨率 stroke 模板指导渲染。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "solid"
+  }
+}
