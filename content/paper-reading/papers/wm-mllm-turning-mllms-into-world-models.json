@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2611.24193",
+  "slug": "wm-mllm-turning-mllms-into-world-models",
+  "title": "WM^MLLM: Turning MLLMs into World Models",
+  "authors": [
+    "Baiang Li",
+    "Enze Xie",
+    "Jincheng Yu",
+    "Jin Wang",
+    "Haozhe Liu",
+    "Yitong Li",
+    "Juanxi Tian",
+    "Felix Heide"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.24193"
+  },
+  "abstract": "Video world models keep the world in the context of a generator, so a revisit is synthesized again and earlier edits can drift or disappear. We present WM^MLLM, the first interactive world model built on multimodal large language models (MLLMs), for persistent, editable world generation from a single image. WM^MLLM keeps the world state outside every generator, as a panorama with a revision history, and lets the MLLMs write it: they turn each request into operations on this state, select where a local edit is written, and check every candidate before it becomes the next state. Image generators only propose views, and video only presents them. Users can walk to new places and return, edit objects through text or a box, place subjects, and change lighting, weather or season. By construction, a revisit at the same revision reproduces the earlier view exactly, a local edit leaves every panorama pixel outside its region unchanged, and each request starts from the result of the previous one. Against six world model baselines on MBench-A, WM^MLLM has the highest mean on all four environment-recovery metrics (Epipolar 91.5 versus 0.1 to 74.0) and completes the most camera round trips (85.3% versus at most 50.9%). It has the best value in all 15 CompBench columns against 15 baselines. On 112 local edits judged blind, selecting the region to write after generation raises completion from 34.8% to 83.0%. On 258 WBench and MBench-A items, all 46 revisits recover their earlier views, and all 97 local edits that pass the check leave panorama pixels outside their region unchanged.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24193v1",
+  "keywords": [
+    "WM^MLLM",
+    "visual-design-agents"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24193v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24193v1 的 25 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "WMMLLM 把可编辑世界保存为带 revision 的 panorama 与 native patches，让 MLLM 规划、筛选生成 proposal、选 edit support 并提交状态，视频仅展示变化。它用确定性渲染保证相同 revision 的返回与区域外像素不变；作者报告后选 support 将局部编辑完成率从 34.8% 提至 83.0%，但多轮 session 仅 1/20 完成，不能把状态保证等同于可靠动作执行。",
+    "motivationZh": "每次重新生成世界视图会让历史编辑与重访漂移；设计系统需要可持久读取、可局部修改并可回退的显式状态。",
+    "methodZh": "世界状态包含 scene graph、panorama base/composite、camera-indexed patch list、对象与事实 memory。旋转和 revisit 读确定性状态，局部编辑只写 proposal 经注册和 support blending 后的 patch，全局变化替换 panorama，walking 新建 scene。失败 proposal 最多重试一次，Uncertain 可提交，只有 endpoint 和 observation 写入 memory。",
+    "methodFlow": [
+      "把输入扩展为 panorama 并保留原图 native patch",
+      "MLLM 将请求路由为 rotate/revisit/local/global/walk",
+      "图像模型生成候选 endpoint，生成后选择旧/新 footprint support",
+      "注册、羽化并合成局部 patch，检查区域外像素不变",
+      "验证后提交 revision 与事实，确定性渲染或视频模型仅展示"
+    ],
+    "experimentsZh": "MBench-A 224 个公共 environment items 对六个 action-conditioned world models；CompBench 2,709 fixed GPT-Image proposals；258 WBench/MBench causal items 的状态审计；112 edit support 对照、150 proposal blind composition、20 个八轮脚本组件研究。 作者报告 MBench-A Epipolar 91.5 [89.6,93.1]，最佳 baseline 74.0；pose return 85.3%，最佳 baseline 50.9%（Table 3, p. 11）。 作者报告 112 局部编辑后选 support completion 83.0%，预选 34.8%；all 97 verifier-passed local edits 均保持 support 外 panorama pixels（Fig. 7 and Sec. 4.4, p. 13）。 作者报告多轮主要实验 full 1/20 sessions、minimal planner 与 video-frame-next-state 均 0/20；差异区间含零（Table A2, p. 21）。 六个视频 world models 和十五个 image-edit baselines，但状态复用与重新生成有结构性区别；CompBench fixed-proposal 对照更直接隔离合成操作。缺少人类校准 judge。 fixed proposals 支撑 post-generation support 与 compositing；去 observation memory 对 return 保存无优势，多轮 planner/next-state 组件未得到显著改善证据。",
+    "insightZh": "有价值的是将生成 proposal 与可审计的状态写入分离，并将 support 选择放在生成之后；return/locality/persistence 是存储与提交协议的性质。它没有训练新的 MLLM，也不是连续可平移的显式 3D world model。",
+    "evidenceZh": "确定性 panorama/patch renderer 与五种操作路由给出精确返回和局部保持（Sec. 3.2–3.7, Eqs. 2–7, pp. 6–9; Table 2, p. 7）。同 revision/camera/profile 复用状态，区域外值直接拷贝；translation 到新场景仍依赖生成。 作者报告：生成后选 support 显著减少预先区域截断 edit 的问题（Sec. 4.3, Fig. 7, pp. 11–13）。固定 112 first proposals，blind completion 34.8%→83.0%，差值 48.2pp [37.9,58.3]；并非更换生成器。 作者报告高 scene recovery，但 benchmark 包含 hold 和较弱相机位移（Table 3, p. 11; Sec. 5, p. 14）。pose-return 85.3%，joint success 77.5% 来自 40-case frame judgment；hold 可提高外观分数却缺少动作。 作者报告：端点 verifier 与完整多轮能力尚不足（Table A2 and App. A4, p. 21; Sec. 5, p. 14）。full system 67/160 instructions、1/20 sessions；309 pass endpoints 只有 190 被 blind judge 判 complete，组件差异 CI 含零。",
+    "caveatZh": "大部分 failure holds 来自 endpoint rejection，hold 可抬高外观分数；verifier 有误收与误拒。 panorama 仅代表一个相机中心，translation 与 unseen regions 需生成，227 environment items 中 208 的 log 标记 seam。 约十分钟到首次播放；frame judge 无 human calibration；组件研究置信区间宽，benchmark 混有 debugging 后 reruns。 不能将精确像素返回/区域外保持描述为学得的物理世界一致性。 强 MLLM/图像模型的私有依赖与长 latency 限制复现和实时设计；support 内仍可能有额外变化。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "明确的 plan→propose→observe→verify→commit 闭环直接推进视觉设计 agent 的状态管理；post-generation support 与 revision lookup 可以迁移到可编辑图像和分层设计工具。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

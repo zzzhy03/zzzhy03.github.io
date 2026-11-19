@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.22673",
+  "slug": "fvscore-specification-driven-neuro-symbolic-video-evaluation",
+  "title": "FVScore: Specification-Driven Neuro-Symbolic Video Evaluation",
+  "authors": [
+    "Do Xuan Long",
+    "Long T. Le",
+    "Yiwen Song",
+    "Min-Yen Kan",
+    "Tomas Pfister",
+    "Yale Song"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22673"
+  },
+  "abstract": "We introduce Faithfulness Video Score (FVSCORE), a neuro-symbolic framework for specification-driven video generation evaluation. Existing evaluators rely on holistic MLLM judgments or vision-language metrics, yet aligning their scores with human judgments and tracing them to specific temporal violations remain open challenges. FVSCORE addresses these limitations by compiling each video into explicit propositions capturing prompt requirements and implicit propositions capturing unstated physical, temporal, and cross-modal constraints. It grounds each proposition using specialized perceptual tools and evaluates the resulting confidence traces with soft temporal operators inspired by Linear Temporal Logic. A Significance-Aware Calibration step then aligns verification with human perception by retaining only perceptually significant violations before producing a timestamp- and evidence-grounded report. We conduct extensive experiments across public and complex multi-event benchmarks with the strongest video models to date, demonstrating that FVSCORE outperforms holistic and agent-based evaluators in human correlation while providing highly accurate and interpretable feedback.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22673v1",
+  "keywords": [
+    "FVScore",
+    "video-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22673v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22673v1 的 32 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：FVScore把视频需求拆成显式prompt与隐式物理、时序、音画propositions，用工具ground confidence traces，再以soft temporal operators和PAC输出时间戳诊断。作者在复杂FVBench报告alignment Pearson0.579对VQQA0.408，commonsense0.558对VISTA0.294。适合作为设计agent的可定位反馈；soft Always取平均，不能充当严格物理或时序约束证明。",
+    "motivationZh": "整体VLM视频打分难定位具体时间段的prompt、物理与时序违规，也难向局部编辑提供可操作证据。",
+    "methodZh": "MLLM编译prompt，构造固定实体状态vocabulary、keyframe scene graphs和sound events，再产生invariant、causality、liveness等隐式要求。predicate路由neural tools或graph query，以Always、Eventually、Until的soft版本汇总；many-shot Perception-Aware Calibration筛去人类感知不显著的违反，生成维度得分和可追踪报告。实际PDF名称为PAC，非摘要screening记录中的Significance-Aware Calibration。",
+    "methodFlow": [
+      "将prompt分解为explicit propositions和实体集合。",
+      "从video keyframes/segments/audio建立状态词表、scene graph和sound events。",
+      "编译implicit physics/consistency/synchronization propositions并路由验证器。",
+      "ground confidence traces，使用soft temporal operators、PAC过滤和维度聚合，输出带时间戳报告。"
+    ],
+    "experimentsZh": "FVBench200复杂prompts/400高品质视频；三个publicbenchmarks各300 prompts；VBench2.0 320 prompts只评价feedback。Gemini3Flash为默认，另四backbones；七类suite/holistic/agentic/neurosymbolic基线。 作者报告FVBench alignment P/S0.579/0.566，VQQA0.408/0.423；commonsense0.558/0.528，VISTA0.294/0.303；audio-sync0.678/0.752（Table1, PDF p.8）。 作者报告public EvalCrafter alignment Pearson0.734对最佳baseline0.700，但其consistency0.578低于VISTA0.594（Table2, PDF p.9）。 作者报告PAC F1=85.7%、recall90.0%；平均23MLLM calls/video（Sec.5.3, Appendix C.5, PDF pp.12,20）。 涵盖VBench、NeuS-V、VQQA、VISTA、self-refine/debate并补VideoScore2/PEAVS；复杂自建benchmark优势更大，public单事件有基线领先。未验证把诊断接回真实videoeditagent是否改善生成。 neural-only/graph-only、originalLTL/no-temporal、隐式类别、frame density、PAC和backbones；4倍采样反而掉质，反映grounding噪声。report长度匹配仍领先但幅度缩小。",
+    "insightZh": "结合可审查的proposition decomposition、混合工具grounding和perceptual calibration，价值在复杂约束诊断而非单一全局分数；不是严格形式化verification，依赖MLLM生成规则与感知准确性。",
+    "evidenceZh": "统一proposition包含predicate、temporal operator与verification route（Sec.3.2, Fig.2, PDF pp.4-7）。symbolic layer操作已grounded的confidence，不验证真实世界物理模型。 作者报告：soft temporal operators改善人类相关性，PAC进一步过滤不显著违反（Tables1,4, PDF pp.8,11）。Always平均而非严格all；以鲁棒性交换对局部灾难性违反的敏感性。 作者报告：implicit proposition比explicit更不可靠，且其完整性评价一致性较低（Table9, Appendix C.4, PDF p.20）。implicit faithfulness82.6-88.9%，completeness Krippendorff alpha0.36，不能声称完全可靠。 作者报告：反馈报告有额外人类judge agreement与长度匹配检查（Appendix C.3, Tables7-8,11, PDF pp.19-21）。150pairwise样本，Gemini judge对human majority agreement79.0%；主report比较仍是模型judge。",
+    "caveatZh": "soft averages可能低估局部灾难性违反，严格逻辑满足与感知鲁棒性之间有tradeoff。 verification受MLLM和工具状态提取准确性限制。 PAC仅文本层判显著性，视觉上下文对人类判断的影响尚未解决。 PAC使用held-out high/low-rated视频示例，人类分布校准不能当作零监督或严格rulechecker。 主report质量由Gemini3.1Pro判断，尽管有150pairwise人类audit，仍有同模型家族偏好风险。 PDF项目超链接检查HTTP404，未确认可用代码；评分约23次MLLM调用和工具开销，实时编辑循环成本需实测。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "可将visual design agent的视频需求转为可定位的动作、物理与音画反馈，支持有证据的局部修复策略。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

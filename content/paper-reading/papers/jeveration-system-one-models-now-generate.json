@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2611.24738",
+  "slug": "jeveration-system-one-models-now-generate",
+  "title": "Jeveration: System One Models Now Generate",
+  "authors": [
+    "Yuhe Liu",
+    "Qi Li",
+    "Shihua Zhang",
+    "Xinchao Wang"
+  ],
+  "primaryTopicId": "image-generation",
+  "topicIds": [
+    "image-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.24738"
+  },
+  "abstract": "System One models such as Jev return decisions through fast, parallel prediction. In this paper, we introduce Jeveration, showing that the same decision paradigm can also generate high-quality images in a single forward pass. Jeveration builds on a frozen vision-language model, repurposing its visual-semantic knowledge for holistic image generation. The key challenge is to maintain global consistency. A single prompt admits many valid images, yet parallel predictions must converge on a coherent whole. We therefore condition all positions on a shared random state to coordinate parallel predictions, so that each draw yields a different but coherent image. Since the model tends to ignore this state under direct image supervision, we first learn a distribution over discrete image codes to guide single-pass generation. Beyond text-to-image generation, we further unify image-to-image generation and dense prediction within the same architecture, so that one checkpoint supports all three tasks, each in one forward pass. Experiments show that Jeveration generates a 512x512 image in 78 ms, up to 122x faster than existing unified models, while maintaining competitive image quality and dense prediction performance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24738v1",
+  "keywords": [
+    "Jeveration",
+    "image-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24738v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24738v1 的 15 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：Jeveration 让冻结 VLM 在共享随机状态下并行决定128个图像code，再用训练好的 decoder 出图，同时支持dense prediction。单次前向的统一输出值得跟踪，但122×是对最慢Janus-Pro；同512分辨率Show-o Turbo只由94.1降到77.8 ms。",
+    "motivationZh": "逐token或多轮去噪限制图像输出延迟；直接并行预测各位置又会产生彼此不一致的局部图像code。",
+    "methodZh": "Qwen3.5-4B保持冻结，共享rank256 LoRA与task heads。先训练masked code model学图像条件分布，再用其和跟随当前样本的auxiliary model做distribution matching，末期以低置信位置多轮修正作target。推理仅保留单pass decision model与TA-TiTok decoder，image-to-image额外向decoder输入源图。",
+    "methodFlow": [
+      "文本/图像输入 + 共享随机决策tokens",
+      "冻结VLM及共享LoRA一次前向交互",
+      "task heads并行预测TA-TiTok codes或dense scores",
+      "image decoder恢复像素；训练时另用masked conditional teacher和correction"
+    ],
+    "experimentsZh": "FLUX-Reason-6M加Qwen-Image synthetic renderings；NYUv2 dense监督；H200 batch1端到端延迟；GenEval/DPG/HPS及341个每类图像条件测试。 作者报告512px单图77.8ms、GenEval .74；同分辨率Show-o Turbo为94.1ms/.63，Janus-Pro7B为9508.4ms/.80但384px（Table 1, p. 6）。 作者报告共享checkpoint的NYUv2 mIoU 67.7，对应单task dense-only 67.8；normal误差24.2°高于21.2°（Table 3, p. 7）。 包括one/few-step及AR模型但部分分辨率与分数来源不同；一张checkpoint统一输出有实证，不能用最慢对照宣称普遍百倍。 固定共享state使GenEval .73→.70；correction主要微调HPS，source/code交换表明两者对image-to-image均有作用；不同消融block不是同一基线。",
+    "insightZh": "将single-pass discrete distribution matching扩展到冻结VLM的typed spatial decisions，并让同一checkpoint兼做生成与dense输出；不是首次出现one-step图像生成。",
+    "evidenceZh": "共享随机state使并行code在边缘上有依赖（Sec. 3.1, Eqs. 2–3, pp. 3–4）。依据精确版本全文；数字为作者报告，未独立复现。 masked teacher/auxiliary conditional matching和低confidence correction仅在训练用（Sec. 3.3, Eqs. 5–7, pp. 4–6）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：同硬件延迟及质量权衡需要保留分辨率边界（Table 1, p. 6）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：源图与code交换确认结构从code传递，不能只用输入copy解释（Supplement Sec. 4, Table 2, p. 15）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "dense depth/normal存在multi-task capacity代价；现有测试以512px和有限结构条件任务为主。 未提供独立设计/制造结果；仅证明raster结构遵循与dense map能力。 论文未给可核验代码链接；训练约1B可训练参数，不能把frozen backbone描述成几乎无需训练。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "共享随机状态协调并行图像 code，并用离散分布蒸馏实现单次前向统一生成与密集预测，可能构成显著生成范式推进。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.22565",
+  "slug": "millbill-a-machining-agent-with-geometric-feedback",
+  "title": "MillBill: A Machining Agent with Geometric Feedback",
+  "authors": [
+    "Gennadii Savrasov",
+    "Artem Slavin",
+    "Soslan Kabisov",
+    "Andrey Kuznetsov",
+    "Anton Konushin",
+    "Dmitrii Zhemchuzhnikov"
+  ],
+  "primaryTopicId": "fabrication",
+  "topicIds": [
+    "fabrication",
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22565"
+  },
+  "abstract": "Turning a CAD model into a machining program requires both process knowledge and geometric precision. Language models can generate such workflows by writing geometry and toolpath code for each part, but this makes numerical execution part of the model's task. We introduce MillBill, an agent that separates machining decisions from their geometric execution and verification. Given a boundary-representation part, stock, and material, a locally hosted, mid-sized open model proposes operations and cutting parameters for indexed three-axis machining. A geometric harness generates toolpaths, simulates material removal, and returns feedback for plan refinement. Setup planning accounts for what the available cutters can physically reach, rather than visibility alone. We evaluate the resulting programs by the fraction of the target surface area within the specified tolerance after simulated machining. With Qwen3.8-27B, MillBill outperforms frontier-model approaches that construct their own geometry and toolpath workflows on the evaluated machining tasks. Code: https://github.com/kulibinai/millbill",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22565v2",
+  "keywords": [
+    "MillBill",
+    "fabrication"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22565v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kulibinai/millbill"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22565v2 的 19 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：MillBill 将加工决策留给 LLM，把坐标、刀路、材料移除及误差归因交给几何 harness。100 件模拟里完整系统仅比无 LLM reference plan 多约 0.35 个百分点；值得精读的是可执行验收和工具可达性，而非“LLM 会加工”的叙事。",
+    "motivationZh": "从CAD到加工程序同时需要工艺知识和精确几何；把坐标和刀路交给LLM直接生成会产生可执行但切错零件的代码。",
+    "methodZh": "输入 B-Rep、stock、材料和可选图纸 notes。AAGNet 提取 machining features，harness 按 cutter/holder 可达性从六轴向选择 setups；agent 修订标准工艺、工具及切削参数，FreeCAD 与高度图算法生成 G-code，解析 swept cutter 模拟并将残留/过切反馈到最多三轮修复。",
+    "methodFlow": [
+      "STEP/stock/material → machining feature 与尺寸",
+      "按工具 reachability 选择六主方向 setups",
+      "LLM 修订 operations/tools/cutting parameters，harness 生成 G-code",
+      "解析材料移除并测 surface deviation；归因缺陷、rest finishing 和 bounded repair"
+    ],
+    "experimentsZh": "4,294 GrabCAD 件配 stock 的集合中，按材质/stock 分层选 100 件；所有 G-code 经同一模拟器评分，0.1 mm target-surface tolerance，90 件多 setup。 作者报告完整系统 Acc0.1=97.4%、gouge=0.54%；GPT-6 Astra code-writing baseline 为 94.3%/1.50%，后者成功评分 99/100（Table 1, p. 7）。 作者报告无 LLM 的 reference plan 为 97.0%；LLM 配对差异 0.35 pp，95% CI [0.09,0.68]；固定 +z setup 仅 66.4%（Table 2, p. 8）。 作者报告更严格 0.05 mm 下 Astra 为 90.2%，MillBill 为 89.3%，并非所有容差均领先（Table S4, p. 17）。 frontier agents 没有同等几何反馈；CNC-Net 使用自己的 bbox stock 且逐件训练。评分失败单列不填零，均值分母不同，不能混作一致成功率。 reference plan + harness 已解释绝大多数收益；三轮 refinement 从95.6→97.2→97.4；多 setup 的 gouge 未因 LLM 改善。",
+    "insightZh": "贡献在 B-Rep 到可模拟 G-code 的完整分工与验收链，特别是依真实 cutter reach 而非 visibility 选 setup；LLM 增量需由 reference-plan 消融单独看。",
+    "evidenceZh": "harness 而非模型生成全部数值刀路并模拟归因缺陷（Secs. 3.4–3.6, pp. 5–6）。依据精确版本全文；数字为作者报告，未独立复现。 holder-aware reach test 是必要条件，不是完整碰撞验证（Sec. 3.2, Eq. 2, p. 4; Sec. 5, p. 9）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：reference-plan 消融表明 LLM 的独立增益很小（Table 2, Sec. 4.3, p. 8）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：更严格容差下相对顺序反转，限定“领先”范围（Table S4, p. 17）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "仅六主方向 indexed 3-axis；不建模 workholding、travel、fixture/holder 完整碰撞、挠曲、振动或磨损。 线程规划但 taps/thread mills 不参与几何模拟；仿真合格不等于真实切削合格。 只在一个公开来源的100件、每件每法单次评测；集合无统一开源数据许可。 报告本地实验使用4×H100；不能将小模型参数量等同廉价单 GPU 加工系统。 已确认所列公开代码入口。",
+    "whyRelevantZh": "加工决策与刀路执行、材料移除验证分离，工具可达性进入 setup planning，直接输出制造程序。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

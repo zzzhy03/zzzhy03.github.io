@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2611.23996",
+  "slug": "resynth-constructing-synthetic-supervision-for-multi-image-understanding",
+  "title": "ReSynth: Constructing Synthetic Supervision for Multi-Image Understanding",
+  "authors": [
+    "Yilin Wang",
+    "Xin Yu",
+    "Xinyi Guo",
+    "Xiangxi Zheng",
+    "Dongxing Mao",
+    "Linjie Li",
+    "Zhengyuan Yang",
+    "Alex Jinpeng Wang"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23996"
+  },
+  "abstract": "People often understand the world by comparing different views of it. Vision-language models (VLMs), however, receive these views as separate images and still struggle to relate them. One problem is data. Training on these tasks requires groups of images with a known relationship: the same object from different viewpoints, or the same scene before and after a change. Such examples are hard to collect at scale from existing photo collections. We introduce ReSynth, which turns single-image perception and controllable image generation into cross-image relational supervision. Localized editing produces before-and-after pairs, viewpoint generation produces multiple views of the same instance, and verified scene contents support comparisons of counts and attributes. ReSynth combines Qwen3-VL-8B's captioning, grounding, and counting capabilities with Qwen-Image-2.1's generation and editing capabilities. It verifies single-image facts such as object counts and attributes, then combines these facts to construct multi-image QA. Using GRPO on approximately 440K ReSynth questions, with no real images during training, Qwen2.5-VL-7B and Qwen3-VL-8B improve by 17.73 and 6.10 average points on BLINK, MUIRBench, and VLM2-Bench, while single-image performance is broadly preserved on Qwen2.5-VL-7B and improves across all four evaluated benchmarks on Qwen3-VL-8B. Notably, this supervision enables the 8B perception model itself to outperform Qwen3-VL-235B on BLINK and MUIRBench.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23996v1",
+  "keywords": [
+    "ReSynth",
+    "vlm-mllm"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23996v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23996v1 的 13 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：ReSynth 把可控图像生成/局部编辑产生的 before-after、同实例与视角关系转为多图监督：先验证单图 facts 和构造关系，再组合可验答案的 QA，而非把 prompt 当事实。作者用全合成440k数据加 GRPO 使两个Qwen模型三基准均值提高17.7与6.1点；可借鉴为 visual-design critic 的比较数据，但尚未评测真实设计工具闭环。",
+    "motivationZh": "同一实例多视图及编辑前后等有确定关系的图像组难以规模采集，限制VLM跨图比较与一致性训练。",
+    "methodZh": "结构化计划覆盖 object/scene/action，Qwen-Image 生成并编辑，Qwen3-VL-8B 用多次标注一致性检查 counts/attributes；局部编辑、实例重绘、几何投影与视频/程序化时序构建关系。已验证图像池复用为 identity/change/quantity/composition/correspondence/viewpoint/temporal 七类 QA，GRPO reward 为0.9正确性+0.1格式。",
+    "methodFlow": [
+      "覆盖式采样场景计划并生成 source images",
+      "多次单图 perception 验证 observed facts",
+      "编辑、重绘、投影与时间元数据构造关联",
+      "按关系组合 QA、反向变化与困难 distractors 并核验答案",
+      "用 answer/format reward GRPO 更新多图 VLM"
+    ],
+    "experimentsZh": "440k全合成图像QA，七类十五种 operations，两个Qwen-VL generations全参GRPO；BLINK1901例、MUIRBench、VLM2八个image tasks，另MMIU/DiCo及四个单图benchmark。Qwen3选训练reward平台的half-scale checkpoint。 作者报告Qwen2.5-VL7B BLINK53.3→68.6、MUIR56.3→70.5、VLM2 52.0→75.6（Table 2, p. 7）。 作者报告Qwen3-VL8B MMIU57.8→62.9、DiCo40.8→47.2；Qwen2.5 MMMU53.4→52.0有退步（Table 3, p. 8）。 作者报告SFT在VLM2为0，原因是输出格式过拟合；不能解读为完全失去视觉理解（Table 4 and discussion, p. 10）。 与base和既有数据方法比较，既有结果取原论文且训练数据量24k–87k对本方法440k，未严格匹配数据/compute。没有SVG、CAD或真实tool-use evaluation。 有data scale、QA recipe、SFT/RL对比；强模型half-scale即饱和。SFT输出format失败混入能力比较，不能将所有差距解释为推理算法优势。",
+    "insightZh": "不是新 backbone，贡献是利用生成过程控制并复用跨图关系、把已验证单图能力转成多图训练数据。其 before-after方向和缺失块 distractor 对照提供具体 recipe；直接迁移到设计变化检查仍是研究者推断。",
+    "evidenceZh": "标签来自观察到的事实与 checked associations，而非最初生成计划（Sec. 3.1–3.3, pp. 4–6; Fig. 2, p. 3）。counts 八次 annotation 不一致则丢弃；编辑比较验证 target change 与 surrounding consistency。 作者报告：两个模型在真实多图基准有较大增益（Table 2, p. 7）。Qwen2.5平均53.9→71.6；Qwen3平均72.6→78.7，后者BLINK74.8/MUIR80.1，均为作者报告。 作者报告：监督题目结构会显著影响迁移，不能只归于更多图片（Sec. 4.3, p. 9; Table 4, p. 10）。约10k recipe comparisons：reverse-direction negatives44.75→72.15；替换missing-patch distractors40.00→84.67；SFT出现格式失败。 验证编辑前后和跨视角关系可用作设计 critic 数据构造，但本文未验证agent闭环（Sec. 3.2, p. 5; Tables 2–3, pp. 7–8）。机制具体涉及局部变化、identity、geometry metadata；实验指标仍为多选/判断/计数QA。",
+    "caveatZh": "强模型更早饱和，现有关系难度可能不足。 cluttered scenes 的 viewpoint generation 仍困难，未来需更难关系与更一致生成视角。 同一个Qwen既作synthesis perception又作student，自动一致性不能保证标签无共享偏差，未见系统人工error audit。 多图QA增益不等于metric 3D或视觉设计agent成功率；transfer限数据构造机制。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "checked local-edit before/after 与跨视角identity关系可构造设计agent比较critic的监督；此为明确机制迁移，不因普通VQA指标或单纯大数据量收录。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

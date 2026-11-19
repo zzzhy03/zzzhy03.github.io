@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2611.23890",
+  "slug": "eva-rsi-recursive-self-improvement-of-video-evaluators-for-judging-temporal-quality",
+  "title": "EVA-RSI: Recursive Self-Improvement of Video Evaluators for Judging Temporal Quality",
+  "authors": [
+    "Yu Yuan",
+    "Ruizhou Ding",
+    "Shaoheng Fang",
+    "Stanley H. Chan",
+    "Zhuo Chen"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.AI"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23890"
+  },
+  "abstract": "Video evaluators play an important role in video generation, yet they miss motion defects, limiting the quality of generated videos. Recursive self-improvement (RSI) has made strong progress in mathematics and coding, where explicit verifiers provide reliable feedback on a single goal. Video evaluation poses two difficulties for RSI: it has no verifier, and it must judge many dimensions at once, such as physics, smoothness and dynamics, where a gain on one can cost another. We introduce EVA-RSI, a multi-agent framework for exploring RSI under these two constraints. We build a fixed proxy exam with construction-defined targets by applying controlled changes to videos, such as temporal reversal and frame dropping. These edits supply supervision without human annotation. A small set of human-labeled real videos anchors the exam to human judgment. Each dimension has an LLM agent that proposes improvements. A leader agent coordinates the proposals, and a Nash bargaining rule selects updates that balance progress across dimensions. Humans design the exam, review candidate changes and revise the curriculum between stages. Starting from Qwen3-VL-8B, EVA-RSI improves motion evaluation, with the largest gain on smoothness, and the gains carry over to defect types never seen during the run. On the dynamics subsets of public benchmarks, our evaluator achieves the highest observed scores among 21 tested models. As an RL reward, it increases generated motion and earns human preference. A data-selection pipeline incorporating it also increases motion.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23890v1",
+  "keywords": [
+    "EVA-RSI",
+    "video-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23890v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23890v1 的 24 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：EVA-RSI 用受控缺陷和少量真实人类标签建立冻结exam，让多个维度agent提出evaluator训练方案，再以floors与Nash rule平衡接受。作者隐藏测试均值0.706→0.906，并在Wan1.3B reward训练中提升运动与50-step人类偏好；过程仍依赖人类重设计curriculum，搜索预算不匹配对照，不能称无人工或已证明递归算法独立优势。",
+    "motivationZh": "视频judge缺少可靠verifier且需同时判断多种时序质量，自改进可能优化某一维度却损害其他维度。",
+    "methodZh": "exam覆盖physics/consistency/smoothness/dynamics/real与guard dimensions；受控reversal、freeze、drop、颜色/背景等编辑提供construction targets，真实generated videos的人类标签锚定感知。agents改变数据、recipe、vision tower与inference，frozen verifier评分、reviewer可veto。八个champions经weight soups、direction-sensitive vision、real-data finetuning与arrow-of-time teacher累积。",
+    "methodFlow": [
+      "受控视频缺陷、flow差异与human labels构建固定exam",
+      "分维度proposers分析errors、leader选实验、engineers训练",
+      "冻结scorer计算多维scores，floors/family guards/Nash product接受",
+      "review code后替换champion并记录memory；人类在stage间扩exam",
+      "最终evaluator用于视频RL reward或data-selection pipeline"
+    ],
+    "experimentsZh": "Qwen3-VL8B起点，170 candidates/88 rounds/8champions，两stage944B200 GPUh；3450-question hidden bank、440 unseen-family questions，12 publicbenchmarks。Wan2.1 T2V1.3B在两seeds、50/100 updates、630+300prompts检验reward；六raters评48/24paired videos。 作者报告hidden main .706→.906，smoothness .461→.888、real .684→.863；unseen-family gain .159 [ .116,.200 ]（Table 2, p. 5; Table S4, p. 15）。 作者报告VideoScore dynamics correlation .611、VBench preference .906为21models中最高观察值；子集仅80videos/16pairs，不代表整体最强（Table 4, p. 6）。 作者报告update50 seed1人类overall share .73 [.65,.80]对Qwen3 reward，visual .71 [.63,.79]；较长训练adherence下降（Table 7, p. 7; Sec. 5.1, p. 8）。 有同backbone同54frames、VideoReward fair penalties、raw flow reward、Union SFT、anchors和nonrecursive controls；搜索总预算与停止条件不同，无法完全隔离recursion/Nash/agents。最高public dynamics值仅小子集的point estimate。 hidden-test replay诊断Nash排除局部tradeoffs，但不是新rule的独立完整search。recipe从base重训不继承chain较差支持累积能力；人类stage2 curriculum为重要组成。",
+    "insightZh": "将有干预targets的固定proxy verifier与多维受约束搜索结合，为难直接判分的视频质量critic提供可复用研究流程。最终模型改善与下游价值可信，但多agent、递归与Nash各自的因果优势受预算不等与curriculum人工调整影响。",
+    "evidenceZh": "exam与接受规则在stage内固定，人类可在stage间调整并reviewchampion（Sec. 3.1–3.4, Fig. 2, pp. 3–4）。不是纯autonomous self-reward；human real-video标签加入stage2后public收益才明显。 作者报告：隐藏测试和未见defect family有增益，但各champion增益并非都显著（Table 2, p. 5; Tables S2–S4, pp. 14–15）。main .706→.906，unseen-family .754→.913；八步仅三步Holm后显著，stage tests共享1,254题，排除仍增.194。 作者报告：匹配reward设置的下游视频运动和人类偏好支持实用性（Tables 6–7, p. 7; Sec. 5.1, pp. 7–8）。update50两seed dynamic .848/.892对base-reward .790/.749；seed1 human overall .73，ties half credit。 作者报告：搜索与非递归控制compute不等，数据filter也改变source pool（Sec. 4.4, p. 7; Table S6, p. 16; Sec. 5.2, p. 8）。944 GPUh对nonrecursive212和Union384，filter selected/random来自不同pool且仅约1/5重合，不能单独归因evaluator。",
+    "caveatZh": "controlled edits与真实复合缺陷有distribution gap，需更丰富exam、人类验证targets与跨generator测试。 固定exam饱和后收益递减；第三stage100候选无新acceptedchampion。 stage1 state file丢失，拟release保留champions但完整搜索状态不全。 只有部分step改进显著，人类重设curriculum且controls预算不匹配，勿称已证明通用recursive self-improvement。 motion增加不自动等于物理正确，longer RL adherence会下降；人评仅一个training seed、较少paired cases。 data-selection实验同时改变source composition，不能单独把收益归于EVA ranking。 作者承诺发布实现，目前不提供Code链接。",
+    "whyRelevantZh": "可把有明确干预标签的缺陷exam用于影片设计agent的critic与reward；本文已实际用evaluator优化video generation，达到Video Generation向visual-creation闭环的直接迁移门槛。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

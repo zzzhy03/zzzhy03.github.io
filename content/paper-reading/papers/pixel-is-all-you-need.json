@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.22820",
+  "slug": "pixel-is-all-you-need",
+  "title": "Pixel is All You Need",
+  "authors": [
+    "Jie Chu",
+    "Haoting Shi",
+    "Fucheng Zhang",
+    "Jiawei Liu",
+    "Junwei Liao",
+    "Ying Wen",
+    "Muning Wen"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22820"
+  },
+  "abstract": "Text, images, audio, touch, and even robot actions can, in principle, all be rendered onto a single canvas, suggesting an ambitious goal of unifying all modalities within vision. Language provides the natural first test. To subsume it, a visual model must reason directly over text in pixels. Across a wide range of image, video, and unified multimodal generators, however, we find that their visual generation modules cannot perform symbolic reasoning over text on the canvas. They succeed only when an underlying text module or prompt rewriter already supplies the answer, effectively reducing the generator to a mere renderer, a limitation that post-training does little to resolve. To test whether this failure stems from pixels themselves or from current training paradigms, we train a family of purely pixel-space generative models from scratch without any text pathway. With images as their sole input and output, these models read questions, write intermediate steps, and produce answers directly on the canvas. Remarkably, they exhibit hallmark behaviors of large language models. Performance improves predictably with scale following a power law. Writing intermediate steps frame by frame substantially outperforms single-frame answering, echoing chain-of-thought, while reinforcement-learning post-training further strengthens reasoning. Moreover, sharing one canvas allows the same model to reason across modalities, a capability that text-only language models lack. To the best of our knowledge, this is the first systematic study of these phenomena in purely pixel-space generative models free of text tokens.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22820v1",
+  "keywords": [
+    "Pixel is All You Need",
+    "vlm-mllm"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22820v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/bxzzcj/pixel-is-all-you-need"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22820v1 的 20 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "纯pixel flow transformer可在固定字体画布上逐帧读写推理，无tokenizer、VAE或text encoder。作者报告130M Word Problems逐帧78.6%对单帧1.2%，GRPO由23.7%到84.6%；五规模呈per-step power law。这是有价值的视觉推理substrate实验，尚未展示开放域语言、多字体或音频动作统一；四类跨模态后训练用RFT而非GRPO。",
+    "motivationZh": "现有图像生成器可能只是渲染文本模块已经算出的答案，尚不清楚纯像素模型能否直接学习符号推理与中间步骤。",
+    "methodZh": "先用Default、Rewrite/Delete、Render/Think对照拆解现有视觉生成模块与文本模块的推理来源；再从零训练7.6M到458M pixel模型，以当前canvas加noisy目标预测下一canvas。中间算式、路径、计数成为可见memory，用逐帧监督与reward-based rollouts比较single-frame回答。实验覆盖合成算术、word problems、事实图、maze、curve tracing、count/compute then paint。",
+    "methodFlow": [
+      "将问题和视觉元素渲染到固定font/grid canvas，只向模型提供pixels。",
+      "flow transformer将当前canvas和noisy target映射为clean下一帧。",
+      "重复生成并反馈canvas，以画面记录中间步骤与最终回答。",
+      "text任务用GRPO，cross-modal任务用成功最短rollout的RFT后训练。"
+    ],
+    "experimentsZh": "十类合成任务，192方形canvas，Word Problems256；5模型规模、scaling每规模5seeds；主accuracy每测试集1024问题，per-step4096transitions。 作者报告text per-step error7.6M为0.174、458M为0.0374，130M以下拟合外推误差为-2%；cross-modal curve tracing误差+8%（Fig.5, Table7, PDF pp.9,20）。 作者报告130M Word Problems逐帧78.6%，direct1.2%；Compute Then Paint逐帧98.1%，direct29.2%，四倍direct训练31.1%（Sec.6, Fig.6a, PDF pp.9-10）。 作者报告130M Word Problems GRPO从23.7%到84.6%，optimal SFT39.0%；Trace Then Sum RFT43.7%对optimal SFT35.7%（Sec.7, Fig.6b, PDF pp.10-11）。 现有image/video/unifiedgenerator多个诊断条件与LoRA；封闭系统无法关闭rewriter则Default缺失，不能将其说成已证实零推理。pixel范式未与同参数同计算textLM或VLM做全面能力比较。 direct/frame-by-frame、四倍训练、模型scale、optimal/non-optimalSFT与GRPO/RFT、rewriter删除答案；scale外推只一个holdout规模，置信区间仍宽。",
+    "insightZh": "系统比较pixel-only reasoning的scale、逐帧中间计算与reward learning，支持pixels本身不是符号推理障碍；不是已训练成通用多模态foundation model，音频/触觉/动作仍是概念愿景。",
+    "evidenceZh": "无文本路径的模型输入输出都是pixels，memory完全在反馈canvas上（Sec.4.1-4.2, Fig.1, PDF pp.2,7-8）。数据渲染和评价仍使用规则字符网格，不意味着训练系统没有任何符号工具。 作者报告：per-step error随五规模下降并预测held-out458M（Sec.5, Fig.5, Table7, PDF pp.8-9,20）。这是从正确中间canvas预测一步的error，不是无误差累积的长程成功率。 作者报告：逐帧显著优于direct，后训练能超出继续SFT（Sec.6-7, Fig.6, PDF pp.9-11）。逐帧引入更多推理时计算与step supervision，equal training不等于equal inference预算。 跨模态RFT会将成功rollout重绘为clean frames再监督训练（Appendix H, PDF p.19）。应与text GRPO区分，不宣传所有任务均直接policy-gradient自我改进。",
+    "caveatZh": "将该范式扩展规模是后续方向；当前开放生成系统可检查路径有限。 没有独立limitations段；固定monospacedfont、固定布局、合成任务与规则glyph读取器，开放域OCR、视觉噪声和长文语言泛化未经验证。 训练包含中间步骤以及changed-pixel加权31倍；cross-modal RFT依赖成功轨迹解析和clean重绘，属于强任务结构。 per-step scaling与两条曲线不能证明通用语言能力或多模态统一scaling；audio/touch/actions未实验。 已确认所列公开代码入口。",
+    "whyRelevantZh": "提出视觉空间直接承载中间推理与可修改状态的路线，可启发生成和设计agent的canvas memory；领域边界实验值得跟踪。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

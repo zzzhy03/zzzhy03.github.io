@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2611.22495",
+  "slug": "motion-aware-reward-modeling-for-instruction-guided-video-editing",
+  "title": "Motion-Aware Reward Modeling for Instruction-Guided Video Editing",
+  "authors": [
+    "Li Li",
+    "Xiangbo Gao",
+    "Bo Ni",
+    "Samyadeep Basu",
+    "Viet Dac Lai",
+    "Jing Shi",
+    "Seunghyun Yoon",
+    "Gang Wu",
+    "Yu Wang",
+    "Thien Huu Nguyen",
+    "Tyler Derr",
+    "Franck Dernoncourt",
+    "Zhengzhong Tu",
+    "Yue Zhao"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22495"
+  },
+  "abstract": "Reward models for instruction-guided video editing can favor temporal consistency at the expense of motion. We study this failure, termed \\emph{motion collapse}, using controlled motion-suppression variants of real edits. On VE-Bench, the evaluated composite reward prefers a motion-suppressed candidate in $97\\%$ of cases. Learned video rewards and a VLM judge also struggle with mild suppression, while latent optimization and reward-guided fine-tuning exploit this weakness to increase reward as motion declines. A linear probe of our base reward backbone performs near chance on mild suppression, motivating an explicit inter-frame dynamics input. We propose a motion-aware reward model that combines an RGB frame-difference stream with preference training against motion-suppressed and fabricated-motion negatives. A distillation anchor preserves alignment with human quality judgments. On the VE-Bench motion ladder, our model reduces the rate of selecting motion-suppressed candidates to $0\\%$ while achieving a Spearman correlation of $0.57$ with human quality ratings. It also detects unseen suppression variants and preserves motion during reward-guided fine-tuning on two editing pipelines. These results support explicitly modeling motion in rewards for video editing.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22495v1",
+  "keywords": [
+    "video editing",
+    "motion collapse",
+    "reward model",
+    "frame difference"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22495v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22495v1 的 15 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "视频编辑 reward 会把静止误认作时间一致性；本文把 RGB 帧差直接送入 reward backbone，用真实运动对抗 suppression/jitter negatives，再蒸馏保留质量偏好。作者报告 VE-Bench ladder capture 从所测 composite 的 97% 降至 0%，但只覆盖受控攻击集，内部训练数据及有限优化管线限制泛化结论。",
+    "motivationZh": "相邻帧更相似可能来自运动被抹掉；自然输出上的偏好相关性不足以保证 reward 优化可靠。",
+    "methodZh": "显式帧差 dynamics stream、两类运动反例偏好训练和保留质量排序的蒸馏 anchor 联合建模。",
+    "methodFlow": [
+      "从真实编辑制作保持时长的 motion ladder 和独立仿射 jitter negatives。",
+      "源视频/编辑视频 pixel tokens 与编辑视频帧差在 backbone block4 融合。",
+      "以 suppression/fake-motion pairwise loss 与 base reward correlation anchor 训练 LoRA。",
+      "检验未见 suppression、人类质量相关性和 reward-guided fine-tuning 的运动变化。"
+    ],
+    "experimentsZh": "作者报告 VE-Bench 120 sources、八编辑模型，与内部 reward 训练分离；held-out 编辑模型另有 30 sources；人类研究为 25 raters、100 trials、500 votes。最终 reward 依赖内部训练数据，优化转移包括 UniVideo 与八-source CogVideoX-2b。 作者报告 VE-Bench ladder capture 为 0%，MOS Spearman 为 0.57；未见 segment/burst/flow attenuation 的原编辑偏好为 91%/100%/95%（Table4, PDF p.7）。 作者报告去掉 dynamics input 后 hold-2 detection 为 47%，去掉 fake negatives 后 fake rejection 为 53%，去掉 anchor 后 MOS Spearman 为 0.40（Table5, PDF p.8）。 作者报告最终 reward 在 UniVideo genuine-motion 子集与 CogVideoX-2b 的平均运动变化为 +1%/+9%，对比 composite 的 UniVideo −61%；后者在 CogVideoX 却为 +19%，说明失败并非普遍（Table3, PDF p.6; Appendix C.3, PDF p.15）。 比较 composite、VideoScore、VideoReward、VLM judge 与外部 motion-scalar 变体；作者 composite 不等同完整 VE-Bench 官方 evaluator。没有广泛新一代编辑模型的统一复验。 逐项删除 dynamics、fake negatives、anchor，支持各自作用；区分自然 best-of-N 与直接优化。有限管线/source 与内部训练数据限制结论。",
+    "insightZh": "双流与帧差有先例；贡献在受控 motion-collapse 诊断、显式 dynamics 输入及区分运动量和运动保真的反例/校准配方，不是通用视频生成器。",
+    "evidenceZh": "RGB 帧差直接进入 reward backbone，不依赖外部 flow 模型作为 learned input（§4.2, Fig.1, PDF pp.2,5）。tanh frame difference 与 source/edit pixel tokens 在 block4 融合。 fake negatives 与 anchor 分别限制运动最大化和质量遗忘（§4.3 and Table5, PDF pp.6,8）。单组件删除分离 detection、fake rejection 和 MOS alignment。 作者报告：最终方法和外部 motion scalar 的优化结果必须分开（Table3, PDF p.6; Appendix C.3, PDF p.15）。不同 reward–pipeline 组合并不都发生坍缩。",
+    "caveatZh": "Appendix C.2 明确相关性的点估计差异不是显著性声明；弱 motion correlation 不证明独立。 Appendix C.3 明确外部 motion scalar 和最终 learned reward 结果不能混用。 0% capture 只覆盖所测 ladder，不能宣称消除 reward hacking；合法 motion-changing edits 和相机运动仍需专门评价。 内部偏好数据与有限 held-out/optimizer source 数量限制完全复现和泛化。 Appendix B.4 只明确承诺候选视频与 study-instrument code，不能解读为最终模型实现或权重已经公开。 作者承诺发布实现，目前不提供Code链接。",
+    "whyRelevantZh": "显式运动保真 critic 与受控反例协议可迁移到视频编辑设计 agent，避免用冻结视频换取高分。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

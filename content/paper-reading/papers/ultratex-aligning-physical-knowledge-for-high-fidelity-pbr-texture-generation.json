@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.24941",
+  "slug": "ultratex-aligning-physical-knowledge-for-high-fidelity-pbr-texture-generation",
+  "title": "UltraTex: Aligning Physical Knowledge for High-Fidelity PBR Texture Generation",
+  "authors": [
+    "Jingzhi Bao",
+    "Xiaohe Ma",
+    "Hong Li",
+    "Yuanming Hu",
+    "Xiaoguang Han"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "ACM Trans. Graph. 45, 6, Article 265 (December 2026)",
+  "venueIds": [
+    "tog",
+    "siggraph-asia"
+  ],
+  "publicationType": "peer-reviewed",
+  "identifiers": {
+    "doi": "10.1145/3842583",
+    "arxiv": "2611.24941"
+  },
+  "abstract": "Generating physically based rendering (PBR) texture maps for a 3D mesh from a single reference image is highly ambiguous, as the observed appearance entangles material identity, surface reflectance, and illumination. While current generative methods produce realistic albedo maps, they still struggle to infer accurate metallic and roughness attributes for relighting. We present UltraTex, a cascaded multi-view framework that moves beyond appearance matching by integrating physical knowledge into multi-view diffusion-based PBR generation. UltraTex first jointly predicts albedo and world-space shading normals to generate more detailed albedo maps, and then predicts metallic-roughness (MR) maps conditioned on the generated albedo, reference image, and material semantic priors. To inject material semantics, a lightweight adapter transforms hidden-layer features of a vision-language model (VLM) into intrinsic material representation tokens, providing part-level knowledge anchors for MR estimation. To model material-light interaction, photometric representation alignment guides intermediate diffusion features toward ground-truth material renderings under controlled lighting. This makes metallic and roughness variations observable through highlight intensity, specular sharpness, and local reflectance contrast, providing stronger guidance for fine-grained material prediction without explicit lighting supervision. Extensive experiments show that UltraTex generates high-quality textures and outperforms existing open-source and commercial methods in visual fidelity, material accuracy, and physical plausibility.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24941v1",
+  "keywords": [
+    "UltraTex",
+    "3d-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24941v1"
+    },
+    {
+      "label": "DOI",
+      "href": "https://doi.org/10.1145/3842583"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24941v1 的 14 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "UltraTex 先联合生成 albedo 与世界空间 shading normals，再借 VLM 材质语义和受控光照特征学习 metallic/roughness。价值在于把“看起来像”拆成可重光照的材质参数；透明和非物理风格材质仍超出模型。",
+    "motivationZh": "参考图像把材质、反射与光照混在一起，单靠外观匹配容易给3D资产生成错误的metallic/roughness，导致重光照失真。",
+    "methodZh": "单图外观无法唯一确定 PBR 材质。两阶段 multi-view diffusion 先融合参考图与 mesh normals，随后以 albedo 和 Qwen3.5 中层 material tokens 生成 MR；训练时将 MR 中间特征对齐到共位点光源渲染的 DINOv2 表示。输出映射回 4K UV，未见区域由 LumiTex 补全。",
+    "methodFlow": [
+      "参考图像 + 输入 mesh 的六视图 geometry normals",
+      "联合 diffusion 生成 albedo 与 world-space shading normals",
+      "VLM adapter 提取 part-aware material tokens，条件生成 metallic/roughness",
+      "受控光照特征对齐训练；多视图结果投影到 UV 并补全不可见表面"
+    ],
+    "experimentsZh": "训练筛选 130K Objaverse-XL/TexVerse 对象；在 152 held-out 对象及环境重光照评估，与开源和商业方法比较，31 名专业建模师盲评。 作者报告 Table 1 的 roughness MSE 为 16.57×10^-3，LumiTex 25.96、TRELLIS.2 28.23；albedo LPIPS 为 0.1106（Table 1, p. 6）。 作者报告环境重光照 LPIPS 0.0988，对比 LumiTex 0.1110；专业用户综合评分为 4.31/5（Tables 2–3, p. 6）。 覆盖 Paint-it、DreamMat、Hunyuan3D-2.1、LumiTex、TRELLIS.2；商业系统以专家偏好补充，不能将所有指标视为真实世界物理测量。 去除 VLM 后 metallic/roughness MSE 由 46.77/16.57 升至 54.85/22.50；去除 photometric alignment 为 52.32/18.45。联合 normals 主要改善表面细节。",
+    "insightZh": "把材质语义条件与 photometric representation alignment 结合，而不是只在抽象 MR channel 上做外观匹配；world-space normal 联合预测减少 UV frame 问题。",
+    "evidenceZh": "VLM 中层特征经 adapter 形成材质 token，再以 albedo 为条件生成 MR（Sec. 3.2.1, Fig. 3, pp. 4–5）。依据精确版本全文；数字为作者报告，未独立复现。 训练用共位点光源材质渲染作为 DINOv2 对齐目标（Sec. 3.2.2, Eq. 11, p. 5）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：MR 和重光照结果在受控 held-out 资产上改善（Tables 1–4, pp. 6, 8）。依据精确版本全文；数字为作者报告，未独立复现。 透明及风格化材料超出当前参数化边界（Sec. 4.5, Fig. 16, p. 10; Limitations, p. 13）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "opaque metallic–roughness 模型不能表达透明、半透明、caustics 等；风格化资产的非物理 MR 值存在本质歧义。 定量测试以渲染资产为主；真实输入只给少量定性案例，不能推出所有扫描和真实材质都可靠。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "以材质语义 token 和受控光照表示对齐分阶段生成 PBR 贴图，直接推进可重光照 3D 资产。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.22132",
+  "slug": "dailybrick-language-guided-synthesis-of-brick-assembly-instructions",
+  "title": "DailyBrick: Language-Guided Synthesis of Brick Assembly Instructions",
+  "authors": [
+    "Hang Zhang",
+    "Qijian Tian",
+    "Yuan Xie",
+    "Xuhong Wang",
+    "Xin Tan"
+  ],
+  "primaryTopicId": "lego",
+  "topicIds": [
+    "lego",
+    "fabrication",
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22132"
+  },
+  "abstract": "Generating a LEGO model from a user request is more than a plausible 3D shape generation. LEGO models require physical support per brick, and each brick should be placed unblocked. Current methods address this issue by training an expert large language model. We reduce the problem of generating extremely long context on all brick connections to that of writing a program that builds LEGO models like a human, considering each intermediate step could be executed. We introduce DailyBrick , a multi-stage agentic system that produces a LEGO model together with a brick-by-brick assembly instruction for human building and robot assembly. We design a multi-stage harness with roles to help LLMs generate more effectively. A versioned construction SDK compiles multi-level decisions, from semantic subparts to individual bricks, into canonical operations. An external Meta-Reviewer agent replays and inspects the generated package, verifies the model and its construction process, identifies failures, traces them to the responsible stage, and routes them to bounded repairs or to editable candidates for later skill or tool updates. Extensive experiments demonstrate that DailyBrick generates LEGO models based on simple user requests better than recent agentic systems, and show its utility in downstream applications such as robot manipulations on model assembly from instructions and brick sets (https://SpatialAgent.github.io/DailyBrick/).",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22132v1",
+  "keywords": [
+    "LEGO",
+    "assembly instructions",
+    "construction program",
+    "prefix replay",
+    "design agents"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22132v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22132v1 的 17 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "DailyBrick 把 LEGO 请求写成分阶段构建程序，同一逐砖 trace 同时导出模型、说明书和独立回放证据，再沿依赖定位错误并局部修复。作者报告 Qwen 配置 package acceptance 从单次生成的 0.563 提至 0.834，但物理展示限于模拟，部分表格的 prefix 指标与成本单位不一致，不能据此宣称机器人可直接可靠执行。",
+    "motivationZh": "可看的最终 LEGO 几何不自动给出合法放置顺序；需要让每步构建和最终模型共享同一可追踪表示。",
+    "methodZh": "隔离上下文的分阶段 PDC 将语义结构转为 SDK 程序；确定性编译产生逐砖 trace 与说明图；独立回放及来源依赖驱动有界定向修复。",
+    "methodFlow": [
+      "用户请求与可选库存生成 DesignBrief、结构蓝图和语义子部件。",
+      "各阶段以 Planner–Designer–Critic 产出已提交结构，仅传明确产物与依赖。",
+      "partial assembly skills 与 SDK 把局部程序编译为规范逐砖动作。",
+      "从共享 trace 导出最终 LEGO、每步说明图和验证记录。",
+      "独立 prefix replay 报告首个失败；Meta-Reviewer 沿依赖修订局部产物并完整复验。"
+    ],
+    "experimentsZh": "作者报告自收集 LDraw 数据包含 358,775 模型和固定 18,653-case 测试集；主要 base 为 Qwen3.6-27B，每 stage 允许三轮角色交互，每请求三次尝试；无效生成计入成功率分母。 作者报告同模型 Qwen 对照中，package acceptance 为 0.563→0.834，all-prefix pass 为 0.888→0.960，VQAScore 为 0.567→0.736（Table 6, PDF p.9）。 作者报告 Qwen 与 GPT 配置在 instruction evaluation 的 all-prefix pass 为 0.960 与 0.974，replay exact 均为 100%；replay exact 包含失败 trace 的一致重现，不能写成 100% 装配成功（Table 5, PDF p.8）。 作者报告累计组件消融的 package acceptance 依次为 0.563、0.626、0.676、0.834，支持 SDK 与 reviewer 在 PDC 之上的贡献（Table 4, PDF p.8）。 包含 BrickGPT、BrickNet、直接 GPT 和同 base 的 DailyBrick；Table2 明说混合发表结果与各自协议下的补测，因此不能视为统一训练/计算预算的严格排名。Table6 同模型对照更可信；机器人部分仅模拟示例。 PDC→SDK/skills→Meta-Reviewer 为累计添加，未做完整因子设计；多 base 对照支持一定可迁移性，但没有隔离每个 stage、skill 或跨 run 配置更新的长期收益。",
+    "insightZh": "主要贡献是将 LEGO 设计、构建程序、说明书与失败定位绑定在同一可回放 trace 上的系统表示与闭环验证；PDC 编排、程序生成和回放各有先例，不能表述成新基础模型。",
+    "evidenceZh": "最终模型、逐砖说明图与验证证据来自同一构建序列（§3, Eq.(1)–(2), Fig.3, PDF p.4）。共享 trace 约束模型和说明书的一致性，并记录来源依赖。 独立回放在当前 partial assembly 上核验每步并把首个错误路由回 stage/program（§3.2–3.3, PDF p.5; Appendix A.2, PDF p.15）。当前 run 内配置固定，修订后完整回放；证据不足时 defer。 作者报告：同一 base model 的对照支持系统带来的收益（Table 6, PDF p.9）。比跨模型主表更适合判断 harness 的增益。 已验证的构建约束不覆盖完整机器人执行（Appendix A.2.3, PDF p.15; Figs.6–8, PDF p.9）。抓取、连续运动与力相关行为明确留给下游评价。",
+    "caveatZh": "合法说明书仍可能配色不一致、结构重复和无意不对称。 回放仅覆盖声明的几何与连接约束；机器人抓取、连续运动和力相关行为需额外评价。 Table4 full 的 all-prefix=1.0、failure position=0.960，与 Tables3/5/6 对应 0.960/1.0 的排列不一致，应先核对原始日志，避免宣称全数通过。 Table3 caption 写 token/time per brick，列名和正文却写 per case；成本优势尚需统一计量范围。 独立回放与物理正确性仍依赖同一 SDK/verifier 的规则完整性；没有实体 LEGO 装配成功率。 论文印出的项目页在本次核验返回 HTTP404，未找到可用公开实现，SDK 细节和数据可复现性受限。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "LEGO 是直接研究对象；可追踪程序、逐 prefix 约束和定向修复可直接用于核心 LEGO 生成及 assembly instruction 项目。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.23054",
+  "slug": "retouchgs-ultralight-render-free-aesthetic-color-enhancement-and-transfer-for-3d-gaussian-splatting",
+  "title": "ReTouchGS: Ultralight Render-free Aesthetic Color Enhancement and Transfer for 3D Gaussian Splatting",
+  "authors": [
+    "Chuanzhi Xu",
+    "Boyu Wei",
+    "Chengkun Yue",
+    "Xuanhua Yin",
+    "Yiyang Li",
+    "Haodong Chen",
+    "Qiang Qu",
+    "Weidong Cai"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23054"
+  },
+  "abstract": "3D Gaussian Splatting (3DGS) enables photorealistic scene reconstruction. Existing 3DGS color transfer and interactive editing methods are guided by reference images and user-specified color adjustments. However, in many applications, users simply want aesthetically guided color enhancement that automatically makes the scene more visually appealing while maintaining consistent colors and tones across viewpoints. We present ReTouchGS, to our knowledge the first framework for reference-free aesthetic color enhancement of pretrained 3DGS models. It predicts a scene-level color lookup table (LUT) from the model and its associated camera parameters. ReTouchGS also supports reference-guided color transfer by fitting a scene-level LUT using one edited view of the same scene and its corresponding original render. A shared blend-aware color refinement network with only 44.7K parameters refines an analytic color update to realize either color mapping without rendering. It preserves geometry and delivers standard 3DGS assets in seconds. We also design the ReTouch3D benchmark to support the evaluation of aesthetic color enhancement and reference-guided color transfer across viewpoints. Experiments demonstrate high color accuracy and strong generalization to unseen scenes in both aesthetic color enhancement and reference-guided color transfer.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23054v1",
+  "keywords": [
+    "ReTouchGS",
+    "3d-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23054v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23054v1 的 34 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：ReTouchGS 将 scene-level LUT 落到 Gaussian 颜色参数，解析 Jacobian 更新后用 44.7K blend-aware 网络补偿非线性混合误差，输出几何不变的标准 PLY。作者在 37 场景报告增强/迁移 ∆E76=5.50/4.03，低于 BilaRF 的6.30/5.73。证据是对共同 LUT 合成目标的颜色保真，尚非人类审美提升；项目仓库检查时为空。",
+    "motivationZh": "3DGS的美化通常依赖手调或参考图，逐视图改色难以保持跨视角一致，反复渲染也增加编辑成本。",
+    "methodZh": "reference-free 路径由资产投影特征与颜色分位数预测 PCA LUT；reference-guided 路径从同场景原始/编辑视图拟合17³ LUT。两者共享 coarse blended-color context、解析 SH 变换与两层邻域 residual propagation，固定 geometry/opacity。训练先蒸馏 rendering solver，再 image-space fine-tune，因此 render-free 仅指资产更新推理阶段。",
+    "methodFlow": [
+      "从 pretrained3DGS 与相机投影得到外观特征和色彩统计，预测 LUT，或从编辑视图对拟合 LUT。",
+      "估计每个 Gaussian 的 blended-color context。",
+      "用 LUT Jacobian 更新 DC 与高阶 SH，邻域网络传播 blending residual。",
+      "保存颜色已变、几何与 opacity 固定的标准 Gaussian PLY。"
+    ],
+    "experimentsZh": "ReTouch3D 28个DL3DV加9个Mip-NeRF360测试场景，20 input/16 heldout/16 perturbed off-trajectory views，scene-equal weighting；RTX5090计时。 作者报告增强∆E76/PSNR=5.50/28.08，迁移=4.03/29.49；BilaRF分别6.30/26.97和5.73/27.87（Table1, PDF p.7）。 作者报告reference迁移误差3.81，held-out为3.85，体现跨视图一致（Sec.5.2, PDF p.7）。 作者报告mean delivery22.97s增强/19.32s迁移；preparation-inclusive中位数DL3DV5.6s，Mip-NeRF36032.8s（Tables1,15, PDF pp.7,22–23）。 八类per-scene solving、edit propagation和large3D editing baselines，用各原生流程适配固定颜色目标；很多基线服务更通用任务，不能据此推断更强语义编辑能力。 解析update、context、propagation、blending features、训练策略、LUT来源与VeraRetouch targets；另一retouch prior下重新训练aesthetic predictor，保持refinement固定，支持颜色执行模块迁移而非零样本审美预测。",
+    "insightZh": "将自动 aesthetic operator prediction 与轻量可泛化颜色实现分离，显式处理 transform(mixture)≠mixture(transform)；核心是资产颜色编辑，不推进几何生成。",
+    "evidenceZh": "render-free 更新由解析颜色线性化与 blend-aware residual propagation 组成（Sec.4.1–4.4, Fig.3, PDF pp.4–6）。reference fitting 需原始 render 一次；训练仍使用 rendering solver 与 rendering loss。 benchmark target 由 NamedCurves 增强多视图共同拟合单一 LUT 后施加到原渲染形成（Sec.3, Fig.2, PDF p.3）。体现 shared color-map fidelity，不能用 ∆E76 自动证明普适审美。 作者报告：blend context 与 refinement 对 off-trajectory 颜色误差有增量贡献（Table2, PDF p.7; Appendix E, pp.19–23）。增强6.417→5.911→5.502，迁移5.299→4.649→4.035。",
+    "caveatZh": "未见独立限制段；主评价是单scene RGB LUT目标，只能改变颜色/色调，不能局部语义编辑、材质或几何。 无独立人类审美判断，NamedCurves/VeraRetouch偏好被用作target；自建benchmark表示与本方法一致。 PDF项目超链接指向的GitHub仓库可访问但为空，不能标available；44.7K仅refinement，增强总网络180.2K，另有LUT参数。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "标准3DGS资产的跨视图配色与reference retouch可作为3D设计流程的appearance操作。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

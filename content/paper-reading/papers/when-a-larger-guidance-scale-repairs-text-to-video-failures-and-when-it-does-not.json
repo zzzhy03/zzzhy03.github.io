@@ -1,0 +1,60 @@
+{
+  "id": "arxiv:2611.23025",
+  "slug": "when-a-larger-guidance-scale-repairs-text-to-video-failures-and-when-it-does-not",
+  "title": "When a Larger Guidance Scale Repairs Text-to-Video Failures and When It Does Not",
+  "authors": [
+    "Taewon Kang",
+    "Matthias Zwicker"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23025"
+  },
+  "abstract": "When a text-to-video diffusion model ignores part of a prompt, the usual first fix is to raise the classifier-free guidance scale. This paper is a measurement study of when that fix works. On Mochi, the same increase repairs failures on rare compositions (\"a snowy beach\") beyond what generating again does, does not repair negations (\"a highway with no vehicles\"), where it fixes fewer failures than generating again does, and changes nothing for events that must happen late in a clip (\"a sandcastle that a wave washes flat\"). Which of these happens can be known in advance, from the prompt and one inexpensive score. The score, which we call demand, measures how strongly the denoiser reacts to the part of the prompt that the failed video leaves out, and it is read from the first quarter of denoising, before any video exists. Our main finding is a condition: raising the scale is effective only when the prompt contains no negation and no event tied to a specific time, and when demand is sufficiently high, with recovery clearly higher above a fitted threshold than below it. Published corrections for the three failure types, used as fixed probes, behave as this account predicts. A short decision rule follows: before generating again, a user can tell whether the most common fix is worth trying, and what to use when it is not.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23025v1",
+  "keywords": [
+    "When a Larger Guidance Scale Repairs Text-to-Video Failures and When It Does Not",
+    "video-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23025v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23025v1 的 28 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：提高CFG只在部分失败上有效。本文用首四分之一去噪中full/default prompt的相对denoiser差作为demand，作者在Mochi上发现高demand rare-composition失败更能被scale修复，否定/晚发生事件则无净收益。D*=0.59的区间宽且跨模型条件改变，适合作为视频设计agent的修复策略测量框架，不能照搬阈值。",
+    "motivationZh": "视频遗漏prompt成分时，盲目调高CFG未必比重采样有效，需要在生成前判断常见修复动作的适用条件。",
+    "methodZh": "将遗漏成分从prompt删去形成default prompt，对同一latent计算full、default、unconditional预测，量化困难成分对更新的相对影响。对三种失败类型和NEGATE/DCR/TPD以及scale-up做交叉实验，用recovery、induction和re-seed control区分真实修复与采样运气。它提出决策规则，不训练新生成模型。",
+    "methodFlow": [
+      "识别失败类型并构造删除困难成分的default prompt。",
+      "首四分之一去噪累积full/default差与全text guidance幅度之比。",
+      "对目标模型测量提高CFG在各类型与demand区间的净修复收益。",
+      "否定与时序失败调用对应修复；高demand普通稀有组合可尝试提高CFG。"
+    ],
+    "experimentsZh": "三个已有suite各400prompts、8categories；Mochi/HunyuanVideo/CogVideoX共3600 untreated clips；干预主结果在Mochi，固定原始judge与method配置，补sharedseed、resampling、scale sweep。 作者报告Mochi rare-composition failure47.2%→29.7%，scale-up recovery54.0%、induction15.2%；否定36.5%→40.7%，时序49.5%→52.7%无显著改善（Tables1,3, PDF pp.2,6）。 作者报告高于D*=0.59的rare-composition recovery64.9%，低于阈值38.5%；NEGATE否定修复50.0%，TPD时序50.5%（Sec.6.3, Fig.6, PDF pp.6–7）。 作者报告加入demand对全部text-only predictors的AUROC增益Mochi/Hunyuan/CogVideoX为0.050/0.104/0.011（per-type slopes）（Table2b, PDF p.5）。 与reseed、prompt长度/稀有度/textencoder距离、三个已发表corrections交叉比较；不构成最新视频模型全覆盖或统一repair排行榜。 early/full demand排序、五scale网格、sharedseeds、judge一致性、text-only controls及跨模型transfer。CogVideoX干预规则不同，作者明确重测。",
+    "insightZh": "新意在测量何时plainCFG有效、以跨失败类型probe解释强度/方向/时序差异；NEGATE/DCR/TPD本身为已有方法，rule未建立跨模型统一保证。",
+    "evidenceZh": "demand需比较full/default/unconditional三种denoiser预测，但只用早期四分之一步数（Sec.5.2, Eq.1, PDF p.5）。额外计算约一次视频生成的四分之一denoiser passes加两次text encoding。 作者报告：否定、稀有组合与时序的scale-up净效果不同（Tables1,3, PDF pp.2,6）。统计是配对failure/success转换，非只看被修复比例。 作者报告：re-seed与shared-seed检查限制采样运气解释，但threshold仍为拟合操作点（Appendices K–M, Table17, PDF pp.19–22,28）。D*区间0.486–1.141，不应当作硬因果边界。",
+    "caveatZh": "demand预测收益小，适用于失败后选动作，不是可靠的单prompt失败探测器。 干预结论主要Mochi；每模型需重测，judge来自单模型固定指令。 仅覆盖CFG update内的修复，其他修复是否遵循相同边界未知。 阈值在同套数据拟合且区间宽，缺少新模型独立部署测量；失败suite故意诱发失败，非日常请求基率。 default prompt构造需人工/结构规则，真实混合否定和时序prompt的路由复杂度未量化。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "为视频设计agent决定提高guidance、换修复器或重新生成提供内部信号与可靠对照。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

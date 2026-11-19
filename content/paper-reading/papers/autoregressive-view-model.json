@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.23417",
+  "slug": "autoregressive-view-model",
+  "title": "Autoregressive View Model",
+  "authors": [
+    "Jensen",
+    "Zhou",
+    "Samuel Rota Bulo",
+    "Denis Rozumny",
+    "Duncan Zauss",
+    "Peter Hedman",
+    "Nikhil Keetha",
+    "Philip Torr",
+    "Christian Rupprecht",
+    "Andrea Vedaldi",
+    "Peter Kontschieder"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23417"
+  },
+  "abstract": "We present the Autoregressive View Model (AVM), which generates a scene as a stream of views without constructing an explicit 3D representation. Through a unified in-context interface, AVM conditions on images or videos to generate short clips along a requested camera path. Visual context grounds reconstruction and interpolation, while a learned prior enables extrapolation into unseen regions. AVM retrieves relevant views from inputs and generated history to form a bounded active context. We fine-tune a pretrained bidirectional video diffusion transformer with flow matching in an N-in-1-out formulation. We then tune a causal model on its own rollouts to improve photorealism, reduce denoising steps, and limit long-horizon drift. We scale training to approximately 8M scenes and video clips. We evaluate generation capacity and scene persistence across benchmarks for camera control, text control, visual quality, dynamics, sparse and 4D reconstruction, and long-horizon consistency. The results demonstrate that AVM adapts to diverse input and output settings through one in-context interface.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23417v1",
+  "keywords": [
+    "Autoregressive View Model",
+    "video-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23417v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23417v1 的 27 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：AVM 以有界视图上下文代替显式 3D 场景：检索输入与生成历史，沿给定相机轨迹持续生成。作者在 revisit 测试报告 PSNR 28.04，对比最佳 world model 12.29，去掉 retrieval 降至 11.13；但 text alignment 与动态程度弱于对照。它提供场景浏览与生成统一接口，不能当作精确可编辑的 3D 资产。",
+    "motivationZh": "场景视图生成需同时处理稀疏观测、动态时间和长时历史；不同任务的专门接口难以共享统一上下文。",
+    "methodZh": "在 Wan 14B video DiT 上将多图、视频与同步视频编码成 N-in-1-out slots，使用相机位置 RoPE、射线方向 APE 和时间戳区分静态与动态上下文。先以 flow matching 与 error recycling 训练，再做 teacher/diffusion forcing 和自身 rollout 上 DMD+adversarial causal tuning，四步生成时维护 sink、retrieved、motion KV；spatial+angular retrieval 从约 8M scene/clip 数据中学到的模型历史中选择相关视图。",
+    "methodFlow": [
+      "将有位姿图像或同步视频转换成上下文 latent slots。",
+      "融合相机射线、平移与时间编码，以 N-in-1-out flow matching 训练视图生成。",
+      "在自身 rollout 上 distill 四步 causal model。",
+      "检索 prefill/history 的视域覆盖及方向多样视图，与 sink/motion 组成有界上下文，生成并追加新视图。"
+    ],
+    "experimentsZh": "DL3DV 141 场景；WorldScore 26 静态轨迹/20 text-object/32 dynamic 场景；MultiCam 24 scenes。与 GEN3C、Gen3R、SEVA、ReCamMaster 及三种 world models 比较；评分统一中心裁剪 448×448。 作者报告 camera control Ws=70.67，最佳 world model 3.91；FID D=18.69 对下一个最好 25.04（Table 2, PDF p.7）。 作者报告七图 sparse reconstruction PSNR=24.14，SEVA=23.91；4D video-context PSNR=21.16，ReCamMaster=13.53（Tables 3–4, PDF pp.9–10）。 作者报告 revisit PSNR=28.04，最佳 world model=12.29；无 retrieval=11.13（Tables 5–6, PDF p.10）。 覆盖不同 view synthesis/world-model family，但任务各有不同输入条件与适用能力；相对强的 sparse reconstruction SEVA 差距很小。没有与显式 3D 优化方法同预算资产可编辑性比较。 base/causal init/on-policy、per-sample CFG、retrieval、active window。on-policy 修复 causal init 降质；窗口缩至 15 几乎不影响 revisit；CFG 有质量/控制 tradeoff。",
+    "insightZh": "统一多种 scene context 与自回归视图流，且以 retrieval 缓解长程重访漂移；相关组件分别已有先例，价值在大规模统一模型与任务覆盖，而非显式几何重建精度的新保证。",
+    "evidenceZh": "N-in-1-out 允许静态、多视图与同步视频使用同一模型接口（Sec.3.1–3.3, Fig.3, PDF pp.4–5）。上下文由相机和时间戳确定，仍需有位姿输入。 有界 sink/retrieved/motion context 可使用局部窗口外的旧视图（Sec.4, Fig.4, Appendix E, PDF pp.6–7,21–22）。default spatial+angular coverage 84.4%，greedy nearest 73.0%；同时多取 slots，非纯同计算量比较。 作者报告：retrieval 是 revisit fidelity 的关键，但不保证 3D consistency 全指标领先（Tables 5–6, PDF p.10）。AVM 3D Cons.=53.13，低于 LingBot 57.00，PSNR 改善不能等同全面物理一致。",
+    "caveatZh": "text alignment=39.65，低于所有 world-model baselines；dynamic degree=24.88 是四模型最低。 更强视频 prior、几何 proxies 与 agentic workflows 仍为后续方向。 重访 PSNR 对 generated-history 配对计算，体现自洽，不证明 unseen region 的真实几何；无 mesh/3DGS 等可编辑 3D 输出。 主实验规模小于训练分布且无系统置信区间；约 8M scenes/clips、14B backbone 的训练成本限制独立复现。 PDF 仅印项目页，检查时该页 HTTP 404，未确认代码公开。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "场景生成、camera-driven exploration、动态新视角与重访统一为接口，可供 visual design agent 在相机路径下查看生成场景。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

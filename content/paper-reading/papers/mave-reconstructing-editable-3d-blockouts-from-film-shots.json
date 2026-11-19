@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2611.22464",
+  "slug": "mave-reconstructing-editable-3d-blockouts-from-film-shots",
+  "title": "MAVE: Reconstructing Editable 3D Blockouts from Film Shots",
+  "authors": [
+    "Yifan Chang",
+    "Jian Yang",
+    "Jiangnan Shao",
+    "Xiaofeng Wang",
+    "Zhaoxin Fan",
+    "Renjing Xu",
+    "Ming Lu",
+    "Xingang Wang",
+    "Zheng Zhu"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22464"
+  },
+  "abstract": "Animated 3D blockouts support previsualization and provide structural conditions for video generation, but manually reconstructing them from reference videos is costly. This limits both their use by creators and the production of paired training data. We introduce MAVEBench, a benchmark of 50 film shots and 416 keyframes for evaluating camera motion, spatial layout, and character blocking. We propose MAVE, a video-to-blockout framework combining Metric observation, Agentic modeling, and evidence-based VErification. It first recovers cameras, human motion, and geometric evidence in a shared metric coordinate system. An agent then constructs an editable environment under constraints from these observations, while programmatic checks report inconsistencies to guide refinement. The outputs are editable Blender scenes and frame-aligned blockout videos. On MAVEBench, MAVE improves overall scores by 27.5-41.1 points across three agents over their corresponding vanilla baselines. With DeepSeek-1017, it achieves a score of 73.2 at an average API cost of only USD 0.054 per shot, outperforming the strongest vanilla baseline while reducing total reconstruction time by 53%. We also construct MAVEData-3K, a dataset of 3,000 blockout-video pairs for model training, and will release it publicly. Creators can change viewpoints and character paths, then render the edited scenes to condition video generation. Code is available at https://github.com/yfChang-cv/MAVE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22464v2",
+  "keywords": [
+    "MAVE",
+    "visual-design-agents"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22464v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/yfChang-cv/MAVE"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22464v2 的 12 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "MAVE 用恢复的相机、人体和几何证据约束 Blender agent，把影片镜头变成可编辑 blockout。最值得借鉴的是将观察与验收外置；大部分相机增益来自共享前端，不能全归因于 agent 推理。",
+    "motivationZh": "从影片手工重建镜头、角色走位和可编辑场景成本高；仅靠agent自看render也难以可靠判定几何是否改好。",
+    "methodZh": "先用 DA3、SAM 3 和 SAM 3D Body 恢复统一尺度的相机、人体和场景证据，再由 agent 查询证据、编辑命名 primitives、检查遮挡/覆盖/支撑/穿透。相机与人体 pose 固定，只允许人轨迹整体尺度调整；提交前将未解决问题保留。",
+    "methodFlow": [
+      "视频 → 相机、人体轨迹与 metric scene alignment",
+      "抽取 wall/support/ceiling 和静态点云证据",
+      "agent query–edit–verify 构建 Blender primitives",
+      "核对遮挡、证据覆盖、人体支撑和完整性；渲染对齐 blockout"
+    ],
+    "experimentsZh": "MAVEBench 包含 50 部影片各一镜头、416 keyframes；三个 agent 的 MAVE 与五个 vanilla 后端比较；构建 3,000 对 blockout-video 数据。 作者报告 DeepSeek-1017 总分从 vanilla 37.2 升到 73.2，GPT-6.1 Sol 从 48.6 升到 76.1（Table 1, p. 7）。 作者报告去掉 verification 总分下降 2.2，去掉 human recovery 下降 12.0（Table 3, p. 8）。 同后端 vanilla 对照有价值，但 camera score 前端共享，不能解释为 agent 独立重建能力；对比未统一外部几何工具。 所有消融固定已恢复相机；几何证据、人体恢复和 verification 分别改善不同轴，延长时间预算没有继续增益。",
+    "insightZh": "将 metric observations 与可查询几何验收接入程序化场景构建，并提供从 .blend 直接测量的镜头、布局和人物指标。",
+    "evidenceZh": "相机和人体 scale 对齐，生成可查询 metric evidence（Secs. 3.1–3.2, pp. 3–5）。依据精确版本全文；数字为作者报告，未独立复现。 显式检查遮挡、证据覆盖、穿透和足部支撑（Sec. 3.3, Fig. 3, pp. 4, 6）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：MAVE 提高三个 agent 的总分；相机前端共享（Table 1, p. 7）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：verification 的独立消融增益为 2.2 分（Table 3, p. 8）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "重建依赖视觉几何与人体前端；视频/人体 pose 固定，不能任意纠正其错误。 depth pseudo ground truth 由 DA3/π3/VGGT 融合，方法也使用 DA3；50-shot 数据规模有限。 文中多次引用 supplementary/appendix，但该 exact PDF 不含这些补充实验，不能据此宣称已核验用户研究或 release success rate。 已确认所列公开代码入口。",
+    "whyRelevantZh": "在统一尺度下恢复镜头和运动，再由 agent 构建、检查可编辑 Blender blockout，闭环设计方法直接命中。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

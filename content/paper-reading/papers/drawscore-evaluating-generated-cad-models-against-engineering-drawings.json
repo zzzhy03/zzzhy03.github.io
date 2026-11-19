@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2611.24681",
+  "slug": "drawscore-evaluating-generated-cad-models-against-engineering-drawings",
+  "title": "DrawScore: Evaluating Generated CAD Models against Engineering Drawings",
+  "authors": [
+    "Haorui Chen",
+    "Shiteng Lu",
+    "Zhanyu Guo",
+    "Zaixi Li",
+    "Yunhe Ni",
+    "Yaosong Du",
+    "Yichen Xiang",
+    "Xiande Huang",
+    "Rui Huang"
+  ],
+  "primaryTopicId": "fabrication",
+  "topicIds": [
+    "fabrication",
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.SE"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.24681"
+  },
+  "abstract": "Automatic CAD generation is commonly evaluated with volumetric IoU, Chamfer Distance, and surface F-score, which barely penalize local errors that occupy only a small fraction of a part's volume or surface area, such as a misplaced hole or a slot on the wrong face, even though such errors are critical to manufacturing. We formalize these metrics in a unified integral form and show that the weight of a local error decays as the $(k+q)$-th power of its size, where $k$ is the dimension of the integration domain and $q$ is determined by the penalty function. Guided by this analysis, we propose DrawScore, which projects both models into three orthographic views with visible and hidden lines, as in engineering drawings, and applies a saturating penalty along the projected curves, so that the weight of a local error decays only linearly. Controlled experiments confirm the predicted decay orders, and on outputs of existing CAD generation agents, DrawScore exposes errors in outputs that IoU rates as nearly perfect. DrawScore further improves generation as a reinforcement learning reward and, for CAD generation from engineering drawings, serves as a test-time verifier without 3D ground truth or an additional reward model. Our code is available at https://github.com/UESTC-Simon/DrawScore.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24681v1",
+  "keywords": [
+    "DrawScore",
+    "fabrication"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24681v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/UESTC-Simon/DrawScore"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24681v1 的 10 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：DrawScore 把 CAD 投影为三视图可见/隐藏曲线，用饱和距离惩罚保留孔槽等局部错误的权重，还可直接对输入工程图做候选验收。它补充体积 IoU，不能替代实体、拓扑和内部结构检查；test-time收益目前只在20个理想矢量图案例验证。",
+    "motivationZh": "体积和表面平均指标会稀释孔槽等小特征错误，给制造上关键但占体积很小的错位模型过高分。",
+    "methodZh": "统一积分分析将局部误差权重拆成受影响域比例与平均惩罚。DrawScore用OpenCASCADE hidden-line projection，按可见性分开匹配弧长、Gaussian saturating penalty计算precision/recall，取三视图最低F-score；小角度投影平均吸收残余配准误差。",
+    "methodFlow": [
+      "CAD candidate 与目标工程图/模型共同刚性配准",
+      "投影 front/top/right 的visible及hidden curves，合并重叠曲线",
+      "沿弧长积分Gaussian饱和距离，算各视图precision/recall",
+      "取最低视图F-score；用于训练reward或drawing-conditioned best-of-N"
+    ],
+    "experimentsZh": "53个受控对比/35种模型、六个agent配置1188个有效输出；Qwen3.5-4B训练reward比较；20个BenchCAD PublicT1各8候选的best-of-N。 作者报告1007个IoU≥.95输出中18.9%的DrawScore低于.95；反向只有1.2%低IoU，说明互补但非等价（Sec. 5.2, Fig. 5, pp. 6–7）。 作者报告DrawScore reward使valid由75.2%到89.5%、IoU .338→.445；IoU reward的IoU更高 .484（Table 2, p. 7）。 作者报告test-time选择IoU .524→.534、DrawScore .546→.591，但edge CD由31.79恶化为33.47（Table 3, p. 8）。 reward对照同训练设置；best-of-N只有20个有效案例，目标图由GT投影模拟且vector输入，不是任意扫描工程图。 比较IoU/F-score/EdgeCD/validity reward；sigma变化的排序相关ρ≥.84。三视图不能揭示部分重叠内部曲线，section-view扩展尚未实验。",
+    "insightZh": "从积分维度解释小特征在常用指标中权重消失，并使用含平滑轮廓的投影曲线连接可读工程图与可执行验收。",
+    "evidenceZh": "误差分解与积分维度决定受控缩放下的权重（Sec. 2, Eqs. 1–4, pp. 2–4）。依据精确版本全文；数字为作者报告，未独立复现。 曲线可见性分开积分、三视图取最小（Sec. 3, Eqs. 5–7, pp. 4–5）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：reward与test-time选择带来不同指标权衡（Tables 2–3, pp. 7–8）。依据精确版本全文；数字为作者报告，未独立复现。 内部结构、vector输入与计算成本边界明确（Secs. 7.2–7.3, pp. 8–9）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "raster drawing需先vectorization；多方向hidden-line removal比常规指标慢。 三正交视图不能唯一决定内部结构；section-view扩展留作未来。 局部权重线性是其受控缩放/容差条件下的近似，Gaussian近零区仍需区分误差尺度；不可称所有小错误都会被完整检测。 指标适合作为独立验收补充，不直接验证制造公差或装配可行性。 已确认所列公开代码入口。",
+    "whyRelevantZh": "正交工程图曲线误差使孔槽等局部制造错误获得线性权重，并直接用作 CAD 生成 reward 与 verifier。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

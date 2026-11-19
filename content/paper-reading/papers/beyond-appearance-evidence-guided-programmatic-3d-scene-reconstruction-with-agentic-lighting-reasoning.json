@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2611.24565",
+  "slug": "beyond-appearance-evidence-guided-programmatic-3d-scene-reconstruction-with-agentic-lighting-reasoning",
+  "title": "Beyond Appearance: Evidence-Guided Programmatic 3D Scene Reconstruction with Agentic Lighting Reasoning",
+  "authors": [
+    "Zeting Luo",
+    "Yifan Li",
+    "Shuai Yang"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.24565"
+  },
+  "abstract": "Image-to-code methods for 3D scene reconstruction produce executable code that generates editable digital content and supports visual simulation. However, existing methods primarily rely on appearance similarity, which provides limited guidance for distinguishing errors in geometry, materials, and illumination. Light shapes scene appearance through its interactions with geometry and materials, influencing shading, cast shadows, and reflections. We therefore present LightHarness, a VLM-based agentic framework that incorporates explicit lighting reasoning into iterative scene reconstruction. To be specific, we leverage complementary geometric, intrinsic, and illumination cues to jointly refine scene structure and appearance, and propose Lighting Reasoning Memory to maintain light-source hypotheses, which supports evidence, and revision history throughout iterations. Together, they support reasoning about partially visible and unseen sources, with evidence-guided verification directing subsequent revisions. Our framework reconstructs explicit scenes through coherent reasoning about geometry, materials, and illumination without additional training or differentiable rendering. Extensive experiments demonstrate superior image-to-code reconstruction accuracy under challenging shadows and complex illumination, further supporting downstream scene editing, object insertion, and versatile relighting.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24565v1",
+  "keywords": [
+    "Beyond Appearance",
+    "visual-design-agents"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24565v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24565v1 的 10 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：LightHarness 把光源身份、假设证据和修订历史写进共享 memory，以mask/depth/albedo/shading等分解渲染检查场景程序。价值是定位“几何、材质还是光”该改；32图结果支持外观改善，尚不足以证明真实光照恢复，且每图约两小时。",
+    "motivationZh": "单图场景重建中，同一RGB误差可能来自几何、材质或光照，外观反馈难以判断应修改哪个因素。",
+    "methodZh": "SAM3/VGGT/Marigold/LUMEN提供固定观测。Generator更新Blender场景与具身份的light state；rubric scorer计算六类误差，Verifier结合分解render和history给出有依据的修订。十轮后按最低rubric error选可执行场景，支持重光照、物体插入及材质改写。",
+    "methodFlow": [
+      "单图提取mask、relative depth/normal、albedo/shading和HDR priors",
+      "建立带稳定ID的light hypotheses及diagnostic history",
+      "VLM编写场景 → Blender分解渲染",
+      "rubric误差+VLM诊断更新geometry/material/light与memory，选择最佳valid round"
+    ],
+    "experimentsZh": "32图含17真实/15合成、22室内/10室外；GPT-6-Astra主后端，同10轮与VIGA/SceneRig/3DCodeVerse比较；16图消融与29人偏好。 作者报告PSNR15.03、DreamSim .216，对比VIGA14.28/.242；SSIM .486低于VIGA .525，非所有指标领先（Table 1, p. 7）。 作者报告16图消融去掉LRM时PSNR12.81、完整14.24；整体118.8min API、4.5min evidence、1.1min render（Table 2, p. 7; Inference cost, p. 6）。 同Astra后端和轮数降低部分confound；±15°新视图主要由VLM pairwise判断，缺少真实geometry/lighting的独立量测。 enriched evidence、geometric rubric、lighting rubric和memory分别消融；子集只有16图，BT score重新归一化，不可跨表比较绝对分。",
+    "insightZh": "将source-specific illumination hypotheses、历史证据和分解渲染验收持续绑定，而非只看RGB相似度反复编辑。",
+    "evidenceZh": "LRM绑定稳定light identity、state与diagnostic history（Sec. 3.3, Eq. 1, pp. 3–4）。依据精确版本全文；数字为作者报告，未独立复现。 六类rubric误差与分解render共同指导修订并选最优round（Secs. 3.4–3.5, Eqs. 2–6, pp. 4–5）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：32图外观与16图消融结果支持有限范围的改善（Tables 1–2, p. 7）。依据精确版本全文；数字为作者报告，未独立复现。 不可见对象推断失败及高API latency限制应用（Fig. 11, Sec. 5, p. 8; Inference cost, p. 6）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "稀疏重叠阴影下无法完整推断不可见人物/标牌，导致对应shadow缺失。 固定pseudo-observations有误会持续约束后续迭代；source-view外观一致性不能唯一识别真实inverse-graphics因素。 下游GPT-Image后处理案例多为定性；exact PDF未包含文中多处引用的额外Supplement测试。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "显式保存光源假设和修订证据，用几何、材质与光照线索闭环重建可编辑场景，直接命中设计 agent。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

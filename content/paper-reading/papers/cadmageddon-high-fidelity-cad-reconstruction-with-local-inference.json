@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.22563",
+  "slug": "cadmageddon-high-fidelity-cad-reconstruction-with-local-inference",
+  "title": "CADMAGEDDON: High-Fidelity CAD Reconstruction with Local Inference",
+  "authors": [
+    "Oleg Pavlov",
+    "Nikita Gavrilov",
+    "Soslan Kabisov",
+    "Gennadii Savrasov",
+    "Andrey Kuznetsov",
+    "Anton Konushin",
+    "Dmitrii Zhemchuzhnikov"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22563"
+  },
+  "abstract": "CAD practitioners often work with proprietary parts that they are unwilling to share with external services. For individuals and small companies, bringing this work in-house also requires computational resources they can afford. We introduce CADMAGEDDON, an open-source agent that reconstructs editable CAD from meshes and can run locally on single-GPU systems and current-generation laptops. The method decomposes this complex task into a chain of simple visual decisions about what to construct and what to correct. Geometric tools support precise construction, allowing the agent to focus on visual reasoning. Using the mid-sized Qwen3.8-27B model, CADMAGEDDON outperforms prior approaches, including systems based on frontier models, in reconstruction quality on all the main benchmarks. CADMAGEDDON integrates with FreeCAD, bringing its reconstructions into practitioners' existing CAD workflows. Code: https://github.com/kulibinai/cadmageddon",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22563v2",
+  "keywords": [
+    "CADMAGEDDON",
+    "visual-design-agents"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22563v2"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/kulibinai/cadmageddon"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22563v2 的 18 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "CADMAGEDDON 让 VLM 选择目标 mesh 上已命名的几何实体，由拟合工具给精确参数，逐特征构建并纠错 CAD。表面结构提升比体积 IoU 更有信息量；它恢复的是干净单零件几何，尚未恢复参数化设计意图。",
+    "motivationZh": "mesh缺少CAD特征历史，而让VLM逐项预测精确数值易丢孔、齿和薄壁；现有工具还要兼顾本地处理专有零件。",
+    "methodZh": "几何工具先提取截面层级、线弧、孔、曲面和阵列并命名。Qwen3.8-27B 每轮选择实体与 CAD operation，builder 拟合并执行 CadQuery/FreeCAD；missing/excess residual 引导 undo/drop/replace，最终选最小残差的已保存模型。",
+    "methodFlow": [
+      "单零件 mesh 修复、对齐与几何实体拟合命名",
+      "VLM 查询截面/曲面/孔与 residual",
+      "builder 按实体名生成并执行 CAD feature",
+      "检查差集和局部曲面；纠错后返回最小 residual 的程序"
+    ],
+    "experimentsZh": "五个 benchmark 共 1,960 件加 BenchCAD-2 23 件；DeepCAD/Fusion360/MCB 各 300，BenchCAD 1000，CADENA-Bench 60；统一重评分可取得的 mesh。 作者报告 MCB IoU 0.933、GMS 0.818，对比 CADFather 0.862/0.705；CADENA-Bench 为 0.981/0.909（Table 1, p. 8）。 作者报告同 Qwen 模型在 BenchCAD-2 上 general harness 0.790，专用 CadQuery harness 0.933，FreeCAD 0.925（Table 3, p. 9; Sec. 4.4, p. 10）。 与 CADENA/CADFather/StepCAD 多数同件 mesh 重评分；CADFit 导入指标，frontier leaderboard 模态、子集和 attempt budget 不同，不能直接下模型大小优劣结论。 call-budget 和 tool-use 分析显示机械件需要后续细节修正；没有完整删去 naming/fitting 的因素分离消融。",
+    "insightZh": "核心是 target-grounded action space：名称指向目标上测量的几何，不要求模型逐项预测数值，也没有候选程序 pool。",
+    "evidenceZh": "模型选择目标实体名称，几何拟合提供数值（Secs. 3.2–3.4, Fig. 1, pp. 5–6）。依据精确版本全文；数字为作者报告，未独立复现。 residual 验证与可撤销 feature 形成闭环（Secs. 3.4–3.5, pp. 6–7）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：机械件上的 GMS 改善大于简单形状集（Table 1, p. 8）。依据精确版本全文；数字为作者报告，未独立复现。 干净单零件与不恢复 design intent 是显式限制（Sec. 5, pp. 10–11）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "只处理 CAD 派生的干净单零件 mesh，不支持 noisy/missing scans 和 assemblies。 输出维度是 literal 而非 named parameter；fillet/chamfer 用显式 solid，不恢复 design intent。 报告实验使用四 GPU tensor parallel，摘要的单机/笔记本可运行性不等于该硬件上的定量吞吐验证。 工具未识别或未支持的特征只能近似，薄壁和大量孔仍会漏。 已确认所列公开代码入口。",
+    "whyRelevantZh": "视觉构建与纠错配合几何工具，输出本地可编辑 FreeCAD，需核查几何保真和本地推理证据。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

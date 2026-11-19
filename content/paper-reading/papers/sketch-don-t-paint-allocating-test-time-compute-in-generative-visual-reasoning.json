@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2611.21812",
+  "slug": "sketch-don-t-paint-allocating-test-time-compute-in-generative-visual-reasoning",
+  "title": "Sketch, Don't Paint: Allocating Test-Time Compute in Generative Visual Reasoning",
+  "authors": [
+    "Sheng Lu",
+    "Guangpin Tao",
+    "Tong Lu",
+    "Ying Tai"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.21812"
+  },
+  "abstract": "Multimodal models increasingly reason by synthesizing pixels, sketching maze paths within interleaved chains of thought or rolling out video solutions frame by frame. Each visual thought runs the full diffusion schedule inherited from photorealistic synthesis, so iterative denoising dominates inference cost. We study how to allocate test-time compute along two axes: when to render visual thoughts rather than thinking in text or answering directly, and how many denoising steps each thought requires. Controlled interventions that vary only how the thought is rendered uncover three regimes. Causal thoughts carry the plan and become legible early: an 8-step sketch nearly matches a 50-step render in accuracy, commits to the same plan as often as two independent full renders agree, and in video models mostly fails by stalling short of the goal, so the rollout abstains. Decorative thoughts can be omitted without loss, whereas harmful thoughts lower accuracy. Because the regime depends on both model and task, always drawing is suboptimal. Across 14 model-benchmark pairs of three interleaved reasoners, answering directly, without any thinking, wins 9 pairs, and choosing among direct, text-only, and visual tiers from ten labeled examples per pair raises mean accuracy from 60.7% (always drawing) to 65.1%. Where drawing pays, we propose sketch-and-vote, which samples 8-step sketches (a step count chosen without labels) from independent noises until one answer reaches three votes. With this one setting, sketch-and-vote beats full rendering with fewer denoising steps on an image reasoner and two video reasoners, by 8.6 points on VSP spatial planning and by 9.6 and 22.1 points on mazes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.21812v1",
+  "keywords": [
+    "visual reasoning",
+    "test-time compute",
+    "sketch-and-vote",
+    "causal intervention"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.21812v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.21812v1 的 11 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "本文先测试视觉 thought 是否改变答案，再将必要绘图预算分给多个低步数草图。作者报告十样本选择 direct/text/draw 将平均准确率从 60.7% 提至 65.1%，8-step sketch-and-vote 在若干空间规划任务更准且 denoising steps 更少；默认三票的视频时延却可高于一次 full render，相关错误也会令投票失效。",
+    "motivationZh": "推理用图只需计划可读，不必每次完成 photoreal diffusion；有些任务无需生成视觉 thought。",
+    "methodZh": "受控 thought 干预后先选 direct/text/visual tier，再用 label-free step rule 与多草图投票分配计算。",
+    "methodFlow": [
+      "固定问题和文字 prefix，比较完整绘图、少步草图、删除与替换。",
+      "用少量任务标签选择 direct、text-only 或 visual tier。",
+      "无标签样本上选计划一致性达到独立 full-render 基线的最低步数。",
+      "独立噪声草图读出离散计划，忽略不完整结果。",
+      "达到投票阈值或耗尽草图预算时输出。"
+    ],
+    "experimentsZh": "作者报告三个 interleaved reasoner 的 14 model–benchmark pairs，并评 ThinkMorph/VSP、Wan-R1/VR-Bench 和 VideoRLVR；采用固定 sampler、随机投票顺序与 paired statistics。视频计划最优性由作者轨迹读出和合法性指标定义。 作者报告十标签任务级 tier selection 为平均 65.1%，always draw 为 60.7%；direct 在 14 pairs 中赢 9 个（Table2, PDF p.6）。 作者报告默认 sketch-and-vote 的 ThinkMorph VSP 为 80.3%/39.1 steps，对一次 full 的 71.7%/49 steps；VideoRLVR maze 为 86.8%/46 steps，对 64.7%/50 steps（Table3, PDF p.7）。 作者报告 Wan-R1 maze 默认三票为 234s，对一次 full 的 167s；两票为 176s，说明省 denoising 不等于省时延（Table3, PDF p.7）。 比较 full render、多 full 投票、固定草图投票、adaptive stopping 及 router；报告官方视频 metric 与替代指标的不一致，不能把数值直接接到原榜单。 包括 omission/noise/blank/input、step/vote threshold 扫描及跨 VideoRLVR checkpoint 转移，揭示任务/模型依赖和 correlated error 边界。",
+    "insightZh": "self-consistency、自适应停止与 diffusion coarse-to-fine 已有先例；贡献是把因果 thought 诊断、tier routing、无标签步数选择和便宜草图投票连接，并审计读出与指标。",
+    "evidenceZh": "干预保持输入及之前文字固定，只改变视觉 thought（§3.2 and Fig.2, PDF pp.3–4）。区分生成视觉内容的贡献和已有文字答案；video reasoner 没有删除后的文本分支。 无标签 step rule 与十标签 tier router 是不同步骤（§3.4–3.5, PDF p.4; Table2, PDF p.6）。整体策略不能称为无标签，路由需要任务标签。 作者报告：更少 denoising steps 不保证更短墙钟时延（Table3 and wall-clock analysis, PDF p.7）。多次视频编码解码的固定开销会抵消步数节省。 作者报告：Sokoban 的跨 seed 相关非法计划会让投票饱和（§5, Fig.5, PDF p.8）。额外规则检查的改进属于加入 verifier 的设置。",
+    "caveatZh": "计划与 full 一致不代表正确；跨 seed 错误相关时投票饱和。 视频编码解码固定开销令步数优势不总转成时延优势。 router 仍需少量标签；高度失败的新样式可能使无标签 step rule 低估必要步数。 实验集中于离散空间谜题；审美、几何和制造反馈能否构造可靠 readout/abstention 未经设计任务验证。 替代 route metrics 需随实现审计轨迹提取、终点补全和合法性规则。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "可借鉴为设计 agent 的草图预览和高保真 rendering 分配预算，并先用干预确认视觉反馈是否改善计划，迁移仍需实测。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

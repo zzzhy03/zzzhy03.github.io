@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.22962",
+  "slug": "hierarchical-diffusion-transformer-for-end-to-end-image-generation",
+  "title": "Hierarchical Diffusion Transformer for End-to-End Image Generation",
+  "authors": [
+    "Xiaoyu Wu",
+    "Yifei Wang",
+    "Weihang Guo",
+    "Chen Wei",
+    "Lydia E Kavraki",
+    "Niloofar Mireshghallah",
+    "Steven Wu"
+  ],
+  "primaryTopicId": "image-generation",
+  "topicIds": [
+    "image-generation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22962"
+  },
+  "abstract": "Pixel-space diffusion learns visual representations and image generation jointly in a single end-to-end training stage, without a separately pretrained visual encoder. However, plain pixel-space Transformers still trail leading two-stage latent diffusion models in generation quality and training efficiency. We hypothesize that part of this gap arises from retaining one token per patch throughout the backbone, which does not explicitly encourage a visual hierarchy that summarizes related content at progressively coarser levels. To address this, we introduce Hierarchical Diffusion Transformers (HiT), which progressively group related tokens and represent each group with a single token. The main Transformer bottleneck processes these compact group tokens, and ungrouping restores features to their original image positions. A compression budget regulates the average compression ratio across the batch, allowing group memberships and counts to vary across images and diffusion timesteps during both training and generation. The model exhibits emergent semantic structure, learning to group coherent objects and object parts without segmentation labels. In text-to-image generation, HiT further learns to group caption words with image patches depicting the same concepts, without region annotations. HiT achieves 1.48 FID on ImageNet $256\\times256$ and reaches comparable generation quality to JiT using approximately 40\\% of its cumulative training FLOPs. For text-to-image generation, HiT exceeds UniLiP's average score across five benchmarks with roughly $6\\times$ fewer denoiser parameters and $3\\times$ fewer forward FLOPs. These results suggest that learning a visual hierarchy within the generator breaks down the barrier to stronger image generation without external visual pretraining.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22962v1",
+  "keywords": [
+    "Hierarchical Diffusion Transformer for End-to-End Image Generation",
+    "image-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22962v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/Nicholas0228/HiT-Released"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22962v1 的 30 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "HiT在pixel diffusion内部学习可变语义分组：逐层聚合patch到compact tokens，再soft ungroup回图像，避免独立视觉encoder。作者报告ImageNet256 FID1.48，对比JiT1.86，近似同质量训练FLOPs约40%；T2I平均65.93对MiniT2I64.64。效率是nominal FLOPs，group-guidance与sampler配置参与headline，不等于实测latency按同比下降。",
+    "motivationZh": "纯pixel diffusion保留固定细粒度patch tokens会抬高成本，也缺少鼓励对象与部件层级归纳的结构。",
+    "methodZh": "路由器学习对称token affinity，average-linkage hard partition确定group数，soft assignments提供可微pool/ungroup路径。两级层次压缩的batch-wide budget允许不同图像及噪声步自适应token数，skip保留细节。T2I将有效text tokens与image tokens共同分组，显现词区域关联。",
+    "methodFlow": [
+      "将noisy image patch映射为contextual tokens。",
+      "学习symmetric affinities，average-linkage得到可变hard groups。",
+      "soft pooling逐层压缩，compactTransformer处理后复用权重ungroup并加skip。",
+      "以diffusion+compression loss联合训练，按不同group capacity的group guidance采样。"
+    ],
+    "experimentsZh": "ImageNet256 class-conditioned，50k FID，HiT-XL959.5M；T2I512 CC12M、FLAN-T5-Large frozen，same-training MiniT2I比较；text-to-image100Euler steps。 作者报告HiT-XL280epochs FID1.87，600epochs1.48；JiT-H600epochs1.86（Table1, PDF p.8）。 作者报告T2I平均65.93，MiniT2I64.64、UniLiP65.76；denoiser0.25B/139.4GFLOPs，对MiniT2I0.26B/201.6（Table2, PDF p.8）。 作者报告hard-only poolingFID10.16–10.32、hardreadback7.97、fullsoft6.61（Table3, PDF p.10）。 与JiT、MiniT2I训练阶段和examples控制较清楚；表内其他latent/pixelmodels含不同pretraining、规模与recipes，不能直接由FID说明纯架构因果。 pooling/readback、fixed/learnedgroup、compressionratio/位置、blockallocation、conditioning、position、skip和compressionloss；moderateprogressivecompression有效，过度提前压缩明显掉质。",
+    "insightZh": "将内容自适应层次组织作为生成器内的学习目标，无额外视觉pretraining；不是首个token merging，关键是可变group预算、可微软硬分组与pixel generation联合训练。",
+    "evidenceZh": "hard partition配soft pooling/ungrouping使grouping可训练且保留细粒度输出（Sec.3, Figs2–3, PDF pp.4–6）。不通过discrete partition求导，而通过soft weights更新affinity。 作者报告：learned grouping比fixed spatial grouping有改善，但幅度小于整体架构改进（Table7 discussion, PDF p.11–12）。FID7.11→6.61，参数匹配，nominalFLOPs近似匹配。 headlineFLOPs与sampling需要计入group guidance和timegrid差异（Sec.4.1, Appendix A.6, PDF pp.7,18–19）。FLOPs按targetgroupcount计算，实际输入/时间步不同；600epoch端点使用k1.7 time shift。",
+    "caveatZh": "Sec.4.1明确FLOPs为targetgroupcount nominalcost，实际随图像与diffusion timestep改变。 未见独立limitations段；没有完整wall-clock训练/推理latency分析，动态grouping开销不能被nominalFLOPs覆盖。 emergentparts与word-region对齐主要是选定可视化，不等同有监督segmentation或editable scene表示。 headline同quality FLOPs对比伴随不同guidance；600epoch结果有额外timegridshift，T2I优于UniLiP平均仅0.17点且无重复误差。 已确认所列公开代码入口。",
+    "whyRelevantZh": "直接推进pixel-space视觉生成训练范式，内容自适应parts层次也为结构化视觉表示提供可研究线索。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

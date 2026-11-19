@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.22427",
+  "slug": "do-diffusion-models-learn-to-generalize-basic-visual-skills",
+  "title": "Do Diffusion Models Learn to Generalize Basic Visual Skills?",
+  "authors": [
+    "Amish Sethi",
+    "Boya Zeng",
+    "Wenhao Chai",
+    "Zhuang Liu"
+  ],
+  "primaryTopicId": "image-generation",
+  "topicIds": [
+    "image-generation"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22427"
+  },
+  "abstract": "Diffusion models generate high-quality images, but how well they generalize is hard to measure. Current evaluations rely on human preference and prompt-following benchmarks for text-to-image models and on distribution-level metrics such as Fréchet Inception Distance (FID) and Inception Score (IS) for class-conditional models, but these cannot tell whether models learn basic visual skills or largely match training patterns. To address this gap, we introduce the Visual Generative Lab (VGL), a controlled experimental framework for studying how diffusion models learn and generalize basic visual skills, including size, position, rotation, count, color, shape, and their compositions. By generating synthetic training data for each skill from explicit rules, VGL allows precise measurement of generalization with task-specific, rule-based metrics. Training models from scratch on these data reveals three patterns in this controlled setting: (1) with our default design, extrapolation is limited: size and position degrade within a few pixels of the training range, count reaches only about 50% accuracy on out-of-range counts, and rotation extrapolation accuracy varies widely across seeds; (2) for compositional generalization, the number of distinct basic visual skill combinations matters more than dataset size; (3) skills mostly fail independently, except position. Code and data-generation scripts: https://github.com/AmishSethi/visual-generative-lab.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22427v1",
+  "keywords": [
+    "controlled generation",
+    "visual skills",
+    "compositional generalization",
+    "synthetic data",
+    "VGL"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22427v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/AmishSethi/visual-generative-lab"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22427v1 的 34 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "VGL 用显式合成规则控制形状、颜色、数量、位置等训练支持集，再以规则指标分开插值、外推与未见组合。作者报告默认 DiT 的训练范围准确率接近满分，但位置外推仅29.7%，增加组合覆盖比重复采样更有用。值得借鉴为结构化2D生成的控制实验；不能据此断言所有大型图像模型都不会泛化。",
+    "motivationZh": "FID和偏好不能区分某项视觉技能的真泛化与训练模式重用，需显式控制训练分布。",
+    "methodZh": "规则合成与条件支持集隔离，结合无学习组件的技能度量与覆盖/密度干预。",
+    "methodFlow": [
+      "枚举size/position/rotation/count等技能域和组合。",
+      "分开训练支持、新插值值、外推值及未见组合。",
+      "从头训练条件diffusion并控制架构和数据变量。",
+      "用mask面积、质心、模板和计数器测每项技能。",
+      "比较组合覆盖/重复密度及单项OOD对其他技能的影响。"
+    ],
+    "experimentsZh": "作者报告默认64×64规则图、约22M DiT，单技能多数三seed、rotation十seed；覆盖U-Net、DiT-L、latent/flow及较高分辨率/纹理数据；附录另测八个预训练T2I模型。 作者报告默认DiT单技能外推的size/position/rotation/count准确率为51.5±7.5%、29.7±16.8%、68.0±28.9%、52.5±34.5%，训练范围均100%（Table2, PDF p.4）。 作者报告四技能模型中position OOD令shape准确率从100%降至32.0%，而size OOD不损害另外三项；属于单受控配置（Table4, PDF p.9）。 作者报告扩大到约306M DiT-L改善count/position外推，却未改善size/rotation，说明容量收益依技能而变（Table2, PDF p.4; Appendix C.2, PDF p.24）。 有nearest-training、多个架构/conditioning/算法，能做较干净的局部比较；自然图像和大型模型训练支持未知，附录probe不能替代可控训练实验。 固定预算覆盖/密度、latent token数、分辨率、embedding和模型size等隔离多种混因；大seed方差与不同OOD距离需保留，附录matched-distance可防止技能难度横比失真。",
+    "insightZh": "是可解释的受控生成实验平台与经验分析，不是新生成架构；价值在准确区分训练支持和测试条件，及把数据覆盖从数据量中拆开。可直接复用其规则测量构建structured primitive/SVG生成测试。",
+    "evidenceZh": "外推相对已知训练条件支持定义，规则指标直接测技能（§2 and Table1, PDF pp.2–3; Appendix A.4, PDF pp.18–19）。GT render检查指标通过率，含nearest-training对照。 作者报告：固定总图像预算扩大组合覆盖能改善未见组合，区别于重复密度（§4, Figs.4–5, PDF pp.6–8）。每个属性值至少在训练出现，避免把新值与新组合混淆。 作者报告：跨技能OOD影响并不普遍独立，位置有额外耦合（§5, Table4, PDF p.9）。需分技能观察，不能只报joint平均分。 预训练模型probe与受控从头训练是不同协议（Appendix C.8, Table14, PDF p.26）。范围、阈值和训练分布均不同，不能直接对表2横比或断言外推。",
+    "caveatZh": "主要是合成数据与DiT，向自然图像和大模型迁移结论仍开放。 附录T2I probe的prompt值域、容差与训练分布不同于主表，数值不可直接比较。 规则extractor对拓扑、遮挡和复杂场景可能失效；不能将此实验直接视为SVG结构编辑结果。 rotation、count方差很大；平均分不能掩盖部分seed已能良好外推。 coverage结论应限定所测因子、优化预算及支持格点，不能写成更多数据永远无效。 已确认所列公开代码入口。",
+    "whyRelevantZh": "可将显式规则支持、coverage/density拆分和几何指标迁移到SVG/primitive生成，检验尺寸位置数量与组合泛化，避免只用感知相似度。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

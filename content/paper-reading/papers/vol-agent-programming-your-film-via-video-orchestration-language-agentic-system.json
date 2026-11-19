@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.23950",
+  "slug": "vol-agent-programming-your-film-via-video-orchestration-language-agentic-system",
+  "title": "VOL-Agent: Programming Your Film via Video Orchestration Language Agentic System",
+  "authors": [
+    "Hongji Yang",
+    "Yucheng Zhou",
+    "Lingting Zhu",
+    "Shengju Qian",
+    "Xinye Li",
+    "Huan Zheng",
+    "Dongyue Lu",
+    "Wei Chow",
+    "Xin Wang",
+    "Cheng-zhong Xu",
+    "Jianbing Shen"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23950"
+  },
+  "abstract": "Recent video foundation models generate high-quality and limited-length clips, but orchestrating them into minute-level, story-coherent films remains an open problem. Existing video agents highly rely on natural-language planning or predefined workflows, which make their production hard to program, customize, and extend. Therefore, we introduce VOL-Agent, a programmable video agent built on a Video Orchestration Language (VOL). With static compilation and verification, followed by runtime dynamic loading, VOL-Agent decouples structural reliability from execution flexibility. Through the skill-driven executor, VOL-Agent dynamically resolves tools and skills from an open-world repository and supports user-defined skills in natural language. Moreover, VOL-Agent is capable of crafting new director skills from learned knowledge and improves itself through feedback to accumulate filmmaking knowledge. To overcome the disconnect between different segments, we apply a structural memory mechanism to record and recall world and entity states, sustaining entity and scene consistency across different shots. Critic feedback supports local revision, while reusable filmmaking knowledge and experiences can be retained for subsequent tasks. Experiments on three benchmarks show that VOL-Agent generates minute-scale videos with strong overall quality and limited cost.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23950v1",
+  "keywords": [
+    "VOL-Agent",
+    "visual-design-agents"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23950v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23950v1 的 14 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "VOL-Agent 将剧本编译为 entity/scene/shot 依赖图，先静态检查再由运行时加载 filmmaking skills，并把实际生成镜头的状态、keyframes与可选Blender clay rendering写回memory。作者在相同视频调用预算下报告比CineCrew更高的三基准评分，shot memory与critic消融有收益；所谓self-improvement主要是复用skill/experience，尚非大规模开放任务的持续学习证明。",
+    "motivationZh": "把短视频模型组织成连贯影片时，纯自然语言计划难以静态验证依赖、持续身份和局部重拍。",
+    "methodZh": "CODING声明影片对象和依赖，BUILD验证unique IDs、acyclic dependencies、references并补全执行脚本，RUN动态选择workflow/knowledge skills与模型工具。实体/场景reference提供持续身份，shot memory观察真实输出状态，clay proxy记录几何、camera和motion。critic据任务skill建议prompt revision，已验证的修正存经验。",
+    "methodFlow": [
+      "剧本→VOL entity/scene/shot对象图",
+      "静态验证ID、DAG、references并展开执行steps",
+      "orchestrator动态选择workflow/knowledge skills和tools",
+      "用references与可选Blender clay proxy约束镜头",
+      "观察实际镜头状态/keyframes，critic修改prompt后重生成并保存experience"
+    ],
+    "experimentsZh": "20-script自建benchmark、ViMaxBench与20个MovieBench narratives；统一planner/VLM/image/video backends，MiniMax-H3 720P；独立Gemini-3.8-Flash七维0–5评分并五位专业人员排序。 作者报告自建benchmark VOL3.745、加Blender4.149，CineCrew3.482（Table 1, p. 6）。 作者报告ViMaxBench4.168对CineCrew3.835，MovieBench4.112对3.822；MovieBench scene consistency则4.166低于CineCrew4.290（Table 2, p. 7）。 作者报告full4.149，无experience3.993、无VOL3.903；该无VOL变体同时取消skills，非单独语言设计消融（Table 3 and Sec. 4.3, p. 7）。 多种视频agent共享下游模型和两次video调用；clay/skills还增加其它工具与计算，不代表所有执行总成本完全相等。二十级脚本规模有限，评分缺少CI和跨judge复核。 shot memory、critic、experience、VOL/skills联合变体、best-ofN对refinement、有无Blender均有比较；无VOL混合改变多组件，style round2对round1只有24.0%win/57.3%tie，不能夸大递归自改进。",
+    "insightZh": "相对已有FilmDSL/memory agent，贡献是全局声明与局部技能执行分离、实际输出的多模态state memory及可选3D clay bridge。静态图合法只保证结构，不保证视频实现了动作与空间关系。",
+    "evidenceZh": "全局结构声明不预先锁死执行工具，RUN通过skills决定工作流（Sec. 3.1–3.2, Eqs. 1–4, pp. 3–4; Fig. 2, p. 4）。CODING/BUILD/RUN分离，BUILD检验结构引用而非像素内容。 memory用生成视频的已实现状态而非只保留计划状态（Sec. 3.3, Eqs. 5–8, pp. 4–5; Fig. 3, p. 5）。world/entity state与representative keyframes写回，clay final state可用于下个连续镜头。 作者报告shot memory与critic都有正向消融结果（Table 3, p. 7）。加入shot memory avg3.971→4.105、transition3.252→3.671；full4.149、无critic3.957。 作者报告：视频调用预算匹配且有human ranking，但样本和judge范围有限（Sec. 4.1, p. 6; Sec. 4.4 and Fig. 5, p. 8; App. 7.1, PDF p. 12）。每shot两次video calls，baseline best-of2对一次critic revision；五位专业评者，主要score仍为Gemini-3.8-Flash。",
+    "caveatZh": "未有独立limitations章节；static validation不验证图像物理/语义正确，观察和critic错误可累积。 self-crafting与experience主要在小规模影片流程验证，缺少严格隔离evaluation scripts的跨任务长期学习证据。 论文主要依赖单一VLM评分及小规模专业rankings，且没有公开本系统代码URL。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "直接生成影片，并同时包含规划、视觉tool action、rendered observation、critic revision，符合Visual Design Agents窄任务定义；clay proxy跨镜头状态尤其可迁移到3D设计。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

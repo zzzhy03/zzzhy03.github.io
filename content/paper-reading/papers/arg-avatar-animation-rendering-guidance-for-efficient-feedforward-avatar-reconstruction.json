@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.22207",
+  "slug": "arg-avatar-animation-rendering-guidance-for-efficient-feedforward-avatar-reconstruction",
+  "title": "ARG-Avatar: Animation-Rendering Guidance for Efficient Feedforward Avatar Reconstruction",
+  "authors": [
+    "Jianjin Xu",
+    "Soham Dasgupta",
+    "Fernando De la Torre"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22207"
+  },
+  "abstract": "Reconstructing animatable 3D human avatars from images is important for applications such as gaming and augmented reality. Feedforward methods make avatar reconstruction accessible by reducing inference time to a few seconds, but recent approaches rely heavily on scaling model capacity, training data, and computation. We ask whether such scaling is necessary. To this end, we introduce ARG-Avatar, an efficient feedforward framework with only 68M trainable parameters that achieves SOTA reconstruction quality. Our key insight is that 3D animation and rendering already provide strong geometric correspondences that existing methods largely attempt to learn from data. In light of this, we design the Foreground Avatar Coordinate RoPE attention (FACRoPE) and Intermediate Token Rendering (ITR) pipeline to guide avatar tokens to attend to their corresponding patches. Experiments across multiple datasets show that ARG-Avatar consistently outperforms prior methods when using two or more input images. Compared with LHM++, ARG-Avatar uses approximately 9$\\times$ fewer trainable parameters, 4.8$\\times$ fewer training sequences, and 14$\\times$ less training compute, while running 6$\\times$ faster and achieving a 2.7 dB PSNR improvement on the out-of-distribution NeuMan benchmark.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22207v1",
+  "keywords": [
+    "avatar reconstruction",
+    "geometric attention",
+    "RoPE",
+    "intermediate rendering",
+    "UV Gaussians"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22207v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22207v1 的 22 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "ARG-Avatar 将模板动画和中间渲染用来计算token到图像的对应，以FACRoPE引导少量视图重建可动画Gaussian avatar。作者报告六视图NeuMan PSNR 30.82dB，LHM++为28.09dB；但68M只计可训练参数，整模型约908M，2.3s计时排除离线pose estimation，不能视为从照片到头像的总时延。",
+    "motivationZh": "已知模板、相机和动画已提供大量对应，generic attention仍靠数据学习这些对应，增加训练成本。",
+    "methodZh": "中间avatar动画/渲染产生FAC，利用RoPE与多视图token融合恢复UV Gaussian及pose-dependent deformation。",
+    "methodFlow": [
+      "图像估计pose并提取特征，初始化UV avatar tokens。",
+      "中间tokens解码粗canonical Gaussian及pose residual。",
+      "按输入pose动画并渲染depth，计算投影位置与可见性FAC。",
+      "FACRoPE将UV tokens对应到源patch，多视图融合并重复。",
+      "解码最终canonical Gaussians和可驱动pose deformation。"
+    ],
+    "experimentsZh": "作者报告用公开人体数据约6.8K subjects/64K sequences训练；在held-out subjects与未训练NeuMan评价novel pose/view，比较SIGMAN、IDOL、LHM和LHM++。各方法使用不同模板/pose estimator。 作者报告六视图NeuMan novel-pose PSNR为30.82dB，LHM++为28.09dB；单视图本方法27.02dB低于LHM++27.71dB（Table1, PDF p.7）。 作者报告可训练68M、冻结backbone841M、总908M；H100-equivalent训练小时125来自跨卡理论bf16峰值换算（Appendix F, Table3, PDF p.17）。 作者报告六视图forward reconstruction为2.3s，LHM++14.2s；pose estimates预计算，数据加载、离线pose和外部预处理均排除（Tables4 and Appendix G, PDF pp.17–18）。 含强feedforward avatar基线，多视图数量匹配；pose/template与训练数据/compute不完全相同，未作真实同预算重训；GPU-hour峰值换算不是实测同硬件训练。 全枚举FACRoPE/ITR/deform三组件，替换DINOv2特征与增加层数；特征ablation使用不同step checkpoint，需谨慎看等价性。",
+    "insightZh": "几何RoPE与模板avatar均有先例；具体增量在由动画和中间render闭环更新的FAC，以及将可计算对应注入attention，适合借鉴到已知rig/template的资产生成。未展示任意3D内容的通用优势。",
+    "evidenceZh": "FAC同时编码投影位置和相对渲染depth，ITR更新候选avatar（Algorithm1 and §3.2–3.3, Figs.4–5, PDF pp.4–6）。依赖已知模板、pose和camera，几何替代部分学习对应。 作者报告：六视图结果明显好于单视图，模型不训练不可见区域补全（§4.2 and Table1, PDF p.7）。不能把它视为单图生成prior或开放世界资产补全。 总参数与实测计时边界比abstract中的数字更宽（Appendix F–G, Tables3–4, PDF pp.17–18）。总参数含冻结backbone；计时排除离线poses和外部预处理，只在一个warmup后subject测量。",
+    "caveatZh": "不训练不可见区域inpainting，单视图表现较弱。 运行时排除离线pose estimation与外部预处理，profile只留一个subject。 MHR/LBS模板和pose/camera质量决定可用性，宽松衣物与非人体rig迁移未证明。 68M不是总模型参数；跨设备TFLOPS换算的训练compute仅近似。 几何guided attention可借鉴到生成，但本文实际验证仍是faithful human reconstruction。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "中间render计算可见性与token对应，能为已知模板/rig的3D资产生成提供具体几何引导；需另验证生成与补全目标。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.22244",
+  "slug": "phyvggt-feed-forward-articulated-object-reconstruction-from-monocular-videos",
+  "title": "PhyVGGT: Feed-Forward Articulated Object Reconstruction from Monocular Videos",
+  "authors": [
+    "Qi Shao",
+    "Zhihao Cao",
+    "Shuhao Zhai",
+    "Anh Nguyen",
+    "Hong Liang",
+    "Baoru Huang",
+    "Liang Li"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-segmentation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22244"
+  },
+  "abstract": "Reconstructing an articulated object with its 3D movable parts, joint parameters and unseen articulation states from an uncalibrated monocular video is essential for robot manipulation and interactive digital twins. Existing per-scene optimisation methods require minutes to hours and external depth or camera poses, whereas feed-forward 3D foundation models reconstruct dense point maps in one pass without segmenting movable parts or inferring joints. Even on these monocular point maps, regressing or fitting continuous joints directly fails on casual videos, since cross-frame attention blurs moving part boundaries in deep layers, underestimates motion along the viewing ray and leaves continuous axes ill-conditioned under small opening angles. To address these challenges, we propose PhyVGGT, a single-pass framework on a frozen 3D foundation model that anchors moving-part matching and closed-form joint estimation to the undistorted geometry of the stationary base. First, our Part and Motion Decoder fuses intermediate per-frame tokens with global tokens and references part queries to a static-base query to segment 3D parts, align point maps on the static base and predict learned Bingham priors. Second, our Kinematic Inference Layer fits an orthogonal Manhattan frame to static surface normals, selects the joint axis in closed form under a Bingham posterior combining pairwise motion scatter with the learned priors, and solves a linear system for the hinge pivot to drive unseen states. Trained solely on synthetic data, PhyVGGT achieves state-of-the-art monocular performance across five benchmarks, outperforming FAMOS and monocular ArtiPoint, surpassing posed RGB-D ArtiPoint in median error, and running in 6.8 s per 48-frame video against hours of per-scene optimisation in Articulat3D. Project page: https://phyvggt.github.io.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22244v1",
+  "keywords": [
+    "articulated objects",
+    "VGGT",
+    "part segmentation",
+    "Bingham",
+    "Manhattan frame"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22244v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22244v1 的 10 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "PhyVGGT 从单目视频恢复可动部件与关节：静态基座对齐点图，再在基座 Manhattan frame 上融合 Bingham motion prior 选轴并线性求 pivot。作者报告 Arti4D 中位轴误差 4.79°，但依赖可见静态基座和近正交制造物，不能当作完整物理仿真资产。",
+    "motivationZh": "跨帧重建会平滑移动边界并压缩视线位移，静态基座提供较稳定的几何锚。",
+    "methodZh": "base-relative part/motion decoding，加 Manhattan frame 上的 Bingham 轴选择和线性 pivot 求解。",
+    "methodFlow": [
+      "冻结 VGGT 获取点图、tracking 与多层 tokens。",
+      "base/part queries 输出 masks、对应及 joint priors。",
+      "基座对应对齐点图，静态 normals 拟合正交 frame。",
+      "融合 motion scatter 与 Bingham prior 选轴，线性求 pivot 和状态。",
+      "forward kinematics 驱动观测点图到未见状态。"
+    ],
+    "experimentsZh": "作者报告只用 PartNet-Mobility 合成视频训练，评 Arti4D、D3D-HOI、RBO、Syn-10/38 和 Articulat3D-Sim；对照 continuous regression、FAMOS、motion estimate 和 monocular ArtiPoint，另标注 privileged 输入。 作者报告 Arti4D 10° joint accuracy 60.4%、median error 4.79°，D3D-HOI 为72.4%/2.77°；RGB-D ArtiPoint 在 Arti4D 为61.4%/6.30°（Table I, PDF p.6）。 作者报告 RBO accuracy 为24.1%，RGB-D ArtiPoint 为24.6%；实际困难场景仍有明显失败（Table II, PDF p.6）。 作者报告48帧 Articulat3D-Sim 耗时6.8s，对 privileged optimization 的2.6–11.9h；全关节10° accuracy 为48.6%对52.1%（Table IV, PDF p.7）。 共享 VGGT 点图/mask 的受控比较和跨 backbone 转移均有；privileged depth/pose 输入单独标识。未验证完整 mesh/任意关节树/物理参数。 比较 decoder、motion scatter、Bingham/Manhattan、tracking、中间层、continuous posterior 和 camera/PCA axes，支持基座及离散候选的作用。",
+    "insightZh": "关键不是简单 joint head，而是静态基座锚定对应和几何候选空间，把受深度偏差干扰的连续拟合改为离散轴选择；Manhattan 先验同时限定适用范围。",
+    "evidenceZh": "part query 参考 static-base query，并以基座对应消除相机漂移（§III-A, Fig.2, PDF p.3）。部件分割与刚性运动恢复共用稳定基座。 静态 normals 生成三个正交轴，Bingham 融合运动和先验后线性求 pivot（§III-B, Eqs.(5)–(9), PDF p.4）。离散空间既是鲁棒来源也是边界。 作者报告：部分数据的误差优势不能写成全面超越有深度基线（Tables I–II, PDF p.6; Table IV, PDF p.7）。RBO 和 Articulat3D 的若干 accuracy 仍较低。",
+    "caveatZh": "被动 RGB 无法揭示静止/遮挡部件或 mass、friction、spring、latch，需交互及力传感。 刚性一自由度、直接连接基座及 Manhattan 轴先验限制多级关节树、柔性和非正交机构。 未见状态是驱动观测点图，不等同完整隐藏几何或无碰撞保证。 项目 Code 仅指向组织，公开仓库核验只有网页；PDF 未印实现 repo，记 not-found。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "显式部件、轴/pivot 与未见姿态可为可编辑 3D 资产生成提供结构初始化，仍需补全和物理约束。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

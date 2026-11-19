@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2611.23807",
+  "slug": "sightline-long-window-speculative-decoding-for-fast-svg-generation",
+  "title": "Sightline: Long-Window Speculative Decoding for Fast SVG Generation",
+  "authors": [
+    "Yanchao Li",
+    "Ben Gao",
+    "Jiaqing Xie",
+    "Yusu Zhang",
+    "Beilun Wang",
+    "Yanbo Wang",
+    "Xiaohua Xu",
+    "Nanqing Dong",
+    "Tianfan Fu",
+    "Zhongyu Huang"
+  ],
+  "primaryTopicId": "2d-design",
+  "topicIds": [
+    "2d-design"
+  ],
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23807"
+  },
+  "abstract": "Scalable Vector Graphics (SVG) generation models write a graphic as code with one forward pass per token, so drawing is slow. Speculative decoding speeds them up losslessly, and block drafters guess many tokens per pass. On SVG, many of their rounds accept the whole draft and end only at the verification window. We find that their misses are rare and clumped, and that they stay accurate far deeper into a block than on natural language. A run-length identity and three propositions show that a longer window pays once the candidates are wide, up to the drafter's horizon. We propose Sightline, which pairs a window as long as the drafter's horizon with a draft tree wide enough to fill it. Experiments cover text-to-SVG and image-to-SVG with three models on six benchmarks from MMSVG, MMSVG-2M and SArena. In every setting, Sightline is the fastest of the compared lossless decoders. On SArena, it stays the fastest when every decoder shares one loop control. It also leads in almost every setting of six models from four other families, which write SVG code, compressed SVG tokens or Lottie JSON. Analyses trace the lead to rounds that shorter windows cut off, both in loop-free content and in loops. Speculative decoding also saves time for choosing samples by rendering, which beats choosing by likelihood. These results suggest that speculative decoding on vector graphics should verify as far as the drafter sees. Code and data are available at https://github.com/LiZaiyuan0619/Sightline.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23807v1",
+  "keywords": [
+    "Sightline",
+    "2d-design"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23807v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/LiZaiyuan0619/Sightline"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23807v1 的 45 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：SVG 的命令在坐标决策之后仍高度可预测，短 speculative window 会提前截断本可接受的草稿。Sightline 以 block-32 head 和 127-node 宽树延长验证，作者在 60 种设置报告最快，较原模型快 4.25–13.83 倍；统一 loop control 后，对 DDTree 的额外优势收窄至 1.05–1.19 倍。适合直接加速结构化设计的候选生成与渲染筛选。",
+    "motivationZh": "SVG代码生成长且重复，常规speculative window会在draft仍然正确时提前结束，浪费可用并行预测。",
+    "methodZh": "论文将 SVG 的稀疏且成簇错误与 block drafter 的有效 horizon 联系起来，通过 run-length identity 解释窗口、候选宽度、循环对吞吐的共同作用。Sightline 在每个位置取多个候选，以 drafter 概率构造 prefix-closed tree，由目标模型一次精确验证。它保留目标分布；共享循环控制则定义了新的公共目标分布。节省时间还可用于 render-based best-of-eight。",
+    "methodFlow": [
+      "针对目标 SVG 模型输出训练 block-32 drafting head。",
+      "各位置生成 top-k 候选，以概率保留 127-node prefix-closed draft tree。",
+      "目标模型沿树精确验证最长可接受路径并补一个 token。",
+      "所有 decoder 共享循环控制；可批量生成后按渲染 CLIP/DINO 分数选样。"
+    ],
+    "experimentsZh": "OmniSVG-4B/8B、InternSVG-8B，text/image-to-SVG 共五组，MMSVG、MMSVG-2M、SArena icon/illustration 六测试集，greedy/official sampling 共 60 设置；八类 lossless baselines，并扩到六个 SVG/Lottie 模型。 作者报告 60 个设置比原模型快 4.25–13.83 倍，各 model-task 平均比最快其他 decoder 快 1.13–1.48 倍（Fig.4, Sec.4.2, PDF pp.4,6–8）。 作者报告共享 loop control 下 OmniSVG-8B text-to-SVG SArena-Icon 从 4.46s 降为 0.80s，DDTree 为 0.94s；FID 10.89/10.94/10.99（Table 1, PDF p.5）。 作者报告全 SArena shared-loop-control 的优势为原模型 4.65–7.58 倍，对 DDTree 1.05–1.19 倍（Table 1, Sec.4.3, PDF pp.5,8）。 涵盖 PLD、REST、SpS、EAGLE-3、ViSpec、DFlash、DDTree、DARTree，并以 shared verifier、same-job AR timing 和共享 loop control 控制实现差异；仅一种 GPU，强并发优势不稳定。 同训练预算比较 block16/32/64、chain/tree、节点预算、热启动、epoch、loop policy、temperature 与 serving concurrency。窗口优势在高并发缩小，32→64 的 loop-free token 无收益。",
+    "insightZh": "核心是 SVG 特有预测结构下窗口与宽树的互补，以及可检验的 horizon/loop 分析；并未改变 SVG 表示或生成模型，超越较强短窗口 decoder 的增益远小于对逐 token AR 的 headline。",
+    "evidenceZh": "宽树使窗口 16 之后仍能继续接受 token，block-32 head 让验证达到 drafter horizon（Sec.3.1–3.3, Fig.2, PDF pp.2–5）。目标模型验证所有输出；exact arithmetic 下 lossless，不意味着 bf16 bitwise equality。 作者报告：统一循环控制后仍保持速度优势，且品质指标接近各自目标模型（Table 1, PDF p.5）。区分 lossless 组与 shared-loop-control 组，避免把循环截断贡献全部归于推测解码。 作者报告：window 与 tree 互补，64-token 训练块的增益主要来自循环，loop-free 内容不再改善（Fig.6c–f, Sec.4.3, PDF pp.7–8）。同预算 ablation 支持 block-32 选择，不能无限外推更长窗口。 代码 URL 印于第一页，公开仓库含 sightline、train、eval 与 baselines（PDF p.1; public GitHub repository checked 2026-11-19）。https://github.com/LiZaiyuan0619/Sightline 可公开访问；未运行代码或复现。",
+    "caveatZh": "所有计时只有一种 GPU；每个目标需训练独立 draft head，窗口不能超过训练长度。 只捕获 exact repeat，保留目标模型自身错误与循环；lossless 保证在 exact arithmetic 成立。 高置信且低并发时受益最大，高并发可低于 DFlash。 best-of-N 品质收益来自渲染选择与额外样本，不是 lossless decoder 单样本能力提升；VLM judges 不是人类研究。 SVG/Lottie 支持直接，但迁移到任意 CAD/代码序列仍需检验其稀疏决策与 horizon。 已确认所列公开代码入口。",
+    "whyRelevantZh": "直接加速 text/image-to-SVG 和 Lottie 生成；相同时间内可为设计 agent 提供更多可渲染、可筛选的结构化候选。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

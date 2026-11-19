@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.24253",
+  "slug": "one-shot-any-view-high-fidelity-video-reshooting-with-geometry-guidance-and-visual-references",
+  "title": "One Shot, Any View: High-Fidelity Video Reshooting with Geometry Guidance and Visual References",
+  "authors": [
+    "Kai Huang",
+    "Runze Xu",
+    "Hui Ren",
+    "Taiyi Wu",
+    "Xinyuan Li",
+    "Xun Gao",
+    "Quande Liu",
+    "Dong Tang",
+    "Tongtong Shen",
+    "Xuefeng Su",
+    "Alan Zhao"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.24253"
+  },
+  "abstract": "Filming a scene from an additional angle after production usually requires a costly reshoot. We present One Shot Any View, a system that takes a recorded clip and generates a reshot video of the same performance along a user-specified camera trajectory. As in recent geometry-grounded methods, the system conditions generation on the source video and an explicit 3D prior, namely a point video rendered along the requested trajectory from a feed-forward reconstruction of the source video. We target human-centric cinematic videos, which are often shot with long lenses, shallow depth of field, and low-key lighting, all of which degrade feed-forward reconstruction. Existing geometry-grounded methods tend to inherit the degraded point video, and their output quality drops visibly. Two designs make such point videos usable. First, in addition to rendered videos of 3D assets, we train on real-world multi-camera videos, whose point videos are produced by the same reconstruction pipeline as at inference. This training-inference consistency enables the generator to take only the composition of people and scene elements from the point video, and their appearance from the source video. Second, a geometry-anchored RoPE offset keeps the generated video temporally synchronized with the source while largely preventing the output from copying the degraded appearance of the point video. Meanwhile, since the generator is a pretrained reference-to-video (R2V) model, the system also accepts optional character and scene reference images, which supply the appearance of regions that the source never shows. In both objective and human evaluations, One Shot Any View outperforms existing reshooting methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24253v1",
+  "keywords": [
+    "One Shot, Any View",
+    "video-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24253v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24253v1 的 19 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：One Shot Any View 把单段影片重拍到指定机位，用真实同步多机位数据训练模型从 point video 取布局、从 source/reference 取外观，并用小幅 temporal RoPE offset 保持动作同步且减弱坏几何复制。作者在 50 个新案例报告总体旋转误差 1.895°，低于 Vista4D 的 2.913°；各目标视图独立生成，未见表情和视角间一致性仍不可靠。",
+    "motivationZh": "已有视频换视角方法容易继承低照、长焦和浅景深下退化的点云外观，难以保持同一表演的构图与外观。",
+    "methodZh": "先从原视频逐帧恢复 depth/camera，按目标轨迹渲染 point video，连同 source、结构化 caption 与 optional character/scene references 输入带 LoRA 的 R2V Transformer。先用约 90k render pairs 学习任务，再以 real:render=9:1 混合适配不完美几何。source 与 point tokens 分块，target 紧邻对应 point frame 但不重合。",
+    "methodFlow": [
+      "单视频 feed-forward depth/camera reconstruction",
+      "按目标轨迹逐帧渲染 point video",
+      "加入 source、caption 与可选角色/场景参考",
+      "geometry-anchored temporal RoPE offset 平衡几何对齐与外观复制",
+      "R2V LoRA 生成 native 768P reshoot，可选提升到 1440P"
+    ],
+    "experimentsZh": "50 个未训练同步多机位 cases，按 point coverage 均分 small/large 两组各 25；对比 Vista4D 与 CameraAnything，native resolution、无 SR，本方法无额外 reference。姿态参照来自 feed-forward reconstruction，按 source depth ratio 对齐尺度。 作者报告 RotErr/TransErr 为 1.895°/0.564，Vista4D 为 2.913°/0.730，CameraAnything 为 3.067°/0.925（Table 2, p. 12）。 作者报告 large-view RotErr 2.210° 对 Vista4D 4.751°；small-view 本方法 1.580° 对 Vista4D 1.076°（Table 2, p. 12）。 作者报告对 Vista4D / CameraAnything 的 overall net GSB 为 +38% / +92%，定义为 (G−B)/(G+S+B)，不是胜率（Table 3 and Sec. 5.3, p. 13）。 两类相机控制基线，共享更好的 reconstruction 条件；仅 50 cases，真实数据私有，未明确识别 pretrained R2V backbone，未联合评价跨视角一致性。 render-only vs real+render、三种 temporal RoPE layout、有无 references 的分析主要为少量定性示例，未量化模块平均贡献。",
+    "insightZh": "框架沿用 geometry-grounded reshooting，具体增量在真实多机位 degraded geometry 的训练分布匹配与 0<δ<C/2 的 RoPE 排布。前者提供鲁棒监督，后者同时抑制重影与异步；未证明多目标视图联合 3D 一致。",
+    "evidenceZh": "真实数据用独立 correspondence 与 rendering alignment 筛选，而非只信重建自身一致性（Sec. 3.3, Eqs. 1–6, pp. 5–7; Fig. 4, p. 6）。covis/cycle、RoMa v2 matching、PoseLib pose 与 NCC rendering score 以几何均值聚合。 target 与 point 的时间坐标相差小于半帧且不为零（Sec. 4.3, Eq. 7, pp. 9–11; Fig. 9, p. 11）。邻近保留同一时刻对齐，不重合减弱坏 point appearance 直接复制。 作者报告总体相机指标改善，但小视角时 Vista4D 的旋转误差更低（Table 2, p. 12）。总体 RotErr 1.895 对 2.913；small-view 为 1.580 对 1.076，不能声称所有分组全面获胜。 未观测表情和多视角一致性仍不可确定（Sec. 6, pp. 15–16）。每个 target 独立采样，作者指出不同机位可能产生不同表情，偶有额外人物及小脸身份漂移。",
+    "caveatZh": "未见表情仍需推断，多目标视频独立生成可能出现不同的同时刻表情。 有时额外生成人物，小脸经 SR 可能变得更像另一人。 仅离线 prerecorded clips，streaming 与 long-window 身份/场景衔接仍是未来工作。 相机误差以估计几何为参照，不能视为真实标定 ground truth。 真实数据与完整训练配置不公开，RoPE 证据主要定性，非人类场景与极大视角泛化仍不明确。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "直接服务影片视觉创作中的重构图与镜头规划，以 geometry-conditioned generation 和 stream RoPE addressing 处理退化 3D prior。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -19,7 +19,7 @@
     "cs.LG"
   ],
   "publishedAt": "2026-11-16",
-  "updatedAt": "2026-11-16",
+  "updatedAt": "2026-11-17",
   "collectedAt": "2026-11-18",
   "venue": "arXiv preprint",
   "venueIds": [],
@@ -29,7 +29,7 @@
   },
   "abstract": "Furniture assembly planning requires inferring subassembly hierarchies from individual parts and a target illustration. Existing raster-based methods do not explicitly exploit the geometric and structural information in SVG drawings. We introduce VASR, a framework that fuses features from a dedicated SVG encoder with visual representations from a pretrained vision-language model to predict assembly hierarchies. To avoid penalizing valid alternatives to a reference assembly tree, we propose Repair-Aware Hierarchical Policy Optimization (RHPO) with hierarchy-preserving equivalence rewards. RHPO further uses repair-cost feedback to favor decisions with lower downstream correction costs among candidates with comparable equivalence-aware rewards. VASR achieves the highest Equivalent-Hard F1 among the evaluated methods, outperforming GPT6-Astra by 17.69 percentage points on the IKEA-derived test set while maintaining strong performance on an independent furniture dataset.",
   "abstractIsOriginal": true,
-  "abstractSourceUrl": "https://arxiv.org/abs/2611.20984v1",
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.20984v2",
   "keywords": [
     "VASR",
     "assembly planning",
@@ -40,13 +40,13 @@
   "links": [
     {
       "label": "Paper",
-      "href": "https://arxiv.org/abs/2611.20984v1"
+      "href": "https://arxiv.org/abs/2611.20984v2"
     }
   ],
   "analysis": {
     "sourceScope": "full_text",
-    "sourceNote": "依据精确 arXiv 版本 2611.20984v1 的 9 页全文及关键图表整理。实验数字为作者报告。",
-    "ideaZh": "VASR 把家具部件图和目标图转成子装配树：SVG encoder 提供结构，等价树奖励接受几何可互换的装法，返工代价引导对后续更稳的合并。作者报告 IKEA Equivalent-Hard F1 达 54.81%，但整棵树通过等价性判定仅 33.17%，协议也不检查碰撞、稳定性或工具可达。",
+    "sourceNote": "依据精确 arXiv 版本 2611.20984v2 的 9 页全文及关键页面核验；实验数字均为作者报告，未独立复现。 与归档 2611.20984v1 对比后，本次仅报告实质证据更新。",
+    "ideaZh": "VASR v2 的实质更新是补上 RHPO 的组件消融和机制诊断：作者报告移除 repair-cost preference 后 IKEA Eq.-Hard F1 从 54.81% 降到 41.30%，去掉 quality gate 虽减少测得返工却损害结构质量。主方法和主表成绩沿用 v1；图连通与层级等价仍不保证物理可装配。",
     "motivationZh": "从目标插图和无装配顺序的零件图恢复层级时，像素缺少持久几何语义，单一标注树也会将可互换的子装配误判为错误。",
     "methodZh": "预训练 SVG encoder 表达零件及跨视角等价性，以 gate 融合 Qwen3-VL 和 SVG。ConnectionHead、局部目标头、PairHead 与 MergeNet 逐步合并 frontier。RHPO 将无辅助 rollout 的层级有效性与受控修复代价分开，只有质量可比才比较返工；推理从模型预测图解码。",
     "methodFlow": [
@@ -55,10 +55,10 @@
       "将被选节点合成父节点，重复到得到以零件为叶的二叉树。",
       "训练阶段对等价结构计奖励，仅对质量可比候选按剩余错误的修复负担排序。"
     ],
-    "experimentsZh": "IKEA 102 个来源，五折；另 100 个独立家具对象。以 Equivalent-Simple/Hard F1、覆盖及整树 ECR 比较任务基线、通用 VLM 和训练变体。 作者报告 IKEA 与独立集的 Eq.-Hard F1 为 54.81% 与 53.70%，GPT6.0-Astra 为 37.12% 与 39.15%（Table 1, PDF p.7）。 作者报告完整树 ECR 33.17% 与 31.74%；无 SVG encoder 的 IKEA Eq.-Hard F1 降至 30.31%（Table 1 and Fig. 3, PDF p.7）。 与任务基线有输入可用性差异，独立集缺两项依赖 3D point cloud 的 IKEA 对照。 包括无 SVG、监督初始化、直接 planner 和不同 RL 方法；组件有不同监督策略，先看 Eq.-Hard 与 ECR 的并列变化。",
+    "experimentsZh": "IKEA 102 个来源，五折；另 100 个独立家具对象。以 Equivalent-Simple/Hard F1、覆盖及整树 ECR 比较任务基线、通用 VLM 和训练变体。 作者报告主表沿用 v1：IKEA/独立家具 Eq.-Hard F1 为 54.81%/53.70%，整树 ECR 为 33.17%/31.74%（Table 1, PDF p.7）。 作者报告 v2 新消融中，Full RHPO 的 Eq.-Hard F1 为 54.81±0.72%，无 repair cost 为 41.30±0.91%，无 quality gating 为 48.24±1.05%（Table 3, PDF p.8）。 作者报告去掉 quality gating 将返工 C 从 1.20 降到 0.95，却将无辅助成功 Q 从 0.74 降到 0.64；无 action distillation 的 invalid mass 从 0.08 升到 0.22（Table 4, PDF p.8）。 与任务基线有输入可用性差异，独立集缺两项依赖 3D point cloud 的 IKEA 对照。 v2 新增 repair-cost preference、quality gating、controlled repair、action distillation 的逐项删除，并以五 seed mean±SD 报告 Eq.-Hard/ECR；配套 Q/V/C 与正负未知 action mass 诊断支持设计动机。没有新的数据领域或物理执行实验，机制量仍受同一 verifier 与采样协议约束。",
     "insightZh": "同一几何等价排列需能一致解释整棵树；局部选错是否增加后续修复与该次 rollout 自身的通过率分开计量，适合有多个正确结构的装配搜索。",
-    "evidenceZh": "等价判断要求全局一致的零件置换及参考图连通性（§3.1/Appendix A.1, PDF pp.3,9）。参考树和连接图用于训练与后验评价，推理不使用答案图。 受控修复保留首个候选 action，对后续已验证错误回滚（§3.5 and Fig. 2d, PDF pp.4–5）。返工成本只用于质量可比候选，对验证器的可靠性有依赖。 完整树成功率显著低于节点 F1（Table 1, PDF p.7）。ECR 度量完整等价树，建议与 Eq.-Hard F1 一起报告。",
-    "caveatZh": "等价协议不检查几何碰撞、稳定性、工具可达性；实验仅两套家具图。 接入 LEGO 需再用 studs、碰撞、稳定性与装配路径验证。预测连接图及合法层级无法直接下发机械执行。 本轮未确认该论文的公开实现。",
+    "evidenceZh": "等价树要求一致的可互换零件置换、参考 clade 和连接约束；它不保证物理可执行（§3.1, PDF p.3）。推理只用预测连接图，答案树和标注连接用于训练与评价。 repair cost 仅在无辅助成功和结构质量可比、差异获认证时作为偏好；受控修复不替换初始候选（§3.5–3.6, Fig.2, PDF pp.4–6）。分别测原策略完成质量和后续纠错负担，避免单独最小化返工。 作者报告：v2 新增单组件 RHPO 消融，repair cost 与质量门控各有独立贡献（§4.3, Table 3, PDF p.8; compared with v1 §4.3, PDF pp.7–8）。v1 只有 encoder/planner 的整体消融；v2 新表给五 seed mean±SD。 作者报告：v2 新增机制分析显示最小返工并不等价于最好无辅助成功（Table 4, PDF p.8）。去掉 quality gate 的返工更少，但 Q/V 与 Eq.-Hard F1 均更差。",
+    "caveatZh": "§3.1 明确图连通约束不保证物理可执行；仅评估两套家具数据。 v2 不再包含 v1 Appendix A；§3.2 的预训练细节引用显示为 Appendix ??，影响独立复现。 完整等价树成功率仍远低于节点 F1，不能将结构准确率写成可装配率；LEGO 迁移需另加 studs、碰撞、稳定性和放置路径验证。 新增单组件消融增强机制证据，但不能将训练期标注 verifier 当作部署期自动纠错能力。 本轮未确认可公开使用的作者实现。",
     "whyRelevantZh": "与 LEGO 和工艺规划最相关的是等价子结构监督及返工代价，SVG 和 raster 的跨投影对齐也可迁移到装配说明解析。",
     "relevance": "high",
     "readingAction": "deep",

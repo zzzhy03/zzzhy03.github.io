@@ -1,0 +1,64 @@
+{
+  "id": "arxiv:2611.22180",
+  "slug": "cueclash-frontier-vision-language-models-judge-3-d-relations-close-to-the-picture-plane",
+  "title": "CueClash: Frontier Vision-Language Models Judge 3-D Relations Close to the Picture Plane",
+  "authors": [
+    "Soham Dan"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.RO"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22180"
+  },
+  "abstract": "A vision-language model (VLM) can judge 3-D relations from the picture or from the ground layout. In photographs the two usually agree. We separate them with CueClash, rendered scenes in which the 2-D cue for each of five relations is right on exactly half the statements. The shortcut gap is accuracy when the cue is right minus accuracy when it is wrong. For Claude Opus 5.5, GPT-5.5 and Gemini 3.6 Flash at low reasoning effort it is +18 to +37 percentage points. It is +7 to +29 without two relations whose cue-wrong items are confounded with borderline cases or occlusion. Given ground coordinates and each relation's definition, they answer 99 to 100% correctly. Pixel measurements with camera depths remove most of the gap for objects fitting through openings. The failure lies in the step from the picture to the layout. The maps that the models draw of the scene from above mostly keep the depth order but, like the picture, shorten depth. GPT-5.5's maps stay close to a copy of the picture. Opus 5.5's and Gemini's maps undo about 0.6 of this shortening. Gemini's then shrink all depths by a further uniform factor. Opus 5.5 follows the picture mainly on fits, and its maps correct depth about as much as human observers of real scenes do. The three models also lose accuracy on CV-Bench photographs where a reliable 2-D cue misleads. In two open models the layout information reaches the language model, but their maps lose much of it.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22180v1",
+  "keywords": [
+    "spatial reasoning",
+    "cue conflict",
+    "clearance",
+    "top-down maps",
+    "VLM evaluation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22180v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22180v1 的 51 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "CueClash 把图像平面捷径与真实地面布局刻意冲突，配合像素/深度/俯视图/坐标和solver检查，定位VLM的clearance与空间判断失败。作者报告低reasoning时主模型shortcut gap约18–37个百分点，但between/touching有阈值和遮挡混因，高reasoning也能缩小部分gap；适合设计agent验证协议，不能当作内部3D表征的定论。",
+    "motivationZh": "普通照片中2D cues常正确，整体accuracy掩盖了模型是否真的恢复深度与clearance。",
+    "methodZh": "平衡cue冲突、solver核验输入干预、地图几何诊断及有限open-model probing，区分读图和关系推理失败。",
+    "methodFlow": [
+      "渲染场景，计算真3D关系与命名2D cue，按四格平衡。",
+      "固定True/False任务比较cue-right与cue-wrong accuracy。",
+      "提供像素测量、camera depths、top-down map或ground coordinates，solver核验充分性。",
+      "从模型俯视图测深度压缩并复算关系。",
+      "用真实照片和两个open-model probes检验结论范围。"
+    ],
+    "experimentsZh": "作者报告三难度各600 items、独立medium split，多个API模型以默认采样；主要三个模型low reasoning。另在CV-Bench照片看Depth/Distance cue split，并在Qwen3-VL-4B/8B做scene-CV ridge probes。 作者报告medium pooled gap为Opus5.5 +21.3、GPT-5.5 +35.0、Gemini3.6Flash +24.7 pp；去掉between/touching后为+11.7/+27.2/+20.6 pp（Table2, PDF p.8）。 作者报告ground coordinates无图加numeric definitions时accuracy为99.0%、100.0%、99.5%；这不代表仅图输入的能力（Table6 and §5.3, PDF pp.10–11）。 作者报告CV-Bench低框depth cue的gap为+10/+18/+22 pp；真实照片未调整难度，不能直接量化cue因果作用（Table9, PDF p.14）。 有随机/2D cue、不同形式input、high effort/tool/second view、deterministic readers和open probes；没有同图human实验，probe仅两个同家族模型，closed-model机制不直接观察。 删除confounded relations、difficulty adjustment、独立split/repeats、信息形式/定义/effort等检查增强行为证据；边界包含取样依赖、cue定义与未可解遮挡。",
+    "insightZh": "在已有depth cue-conflict研究上扩展到尺寸、接触、居间和间隙，并加入solver核验的输入形式和地图分析；主要是诊断协议，不是新空间模型。其clearance受控测试可直接迁移到装配/场景设计agent。",
+    "evidenceZh": "cue与truth精确平衡，但部分cue-wrong采样引入额外困难（§3, Table1, PDF pp.4–5）。所有cue-wrong touching均有遮挡，between近阈值；作者因此另报去除两关系的gap。 solver区分输入信息不足与模型没有正确使用信息（§4–5.3, Tables5–7, PDF pp.6–11）。ground coordinates加定义能近乎解决任务，但图像内部机制不能由行为直接推断。 作者报告：地图深度压缩并不逐项解释原答案（§5.4 and §6, PDF pp.12–13,16）。地图与回答可能分别受图像影响；不能把相关诊断当作因果表征结论。",
+    "caveatZh": "headline为low reasoning；high effort缩小fits gap。 between近阈值、touching全遮挡，图像自身不一定决定答案。 未采集这些图片的人类判断；引用的人类constancy来自其他真实场景。 open probes只显示线性可读信息，不等于模型实际计算。 照片cue-wrong子集少且未调难度，gap是影响上界。 clearance判断只基于平面凸体静态关系，不等于真实装配路径、稳定性或机器人执行。 code/data承诺未来公开，当前没有印出可核验实现repo。 作者承诺发布实现，目前不提供Code链接。",
+    "whyRelevantZh": "可用于设计agent的间隙容纳、布局与装配空间核验：先给可测3D坐标/俯视图，再报告cue-conflict失败，而非只看普通截图accuracy。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

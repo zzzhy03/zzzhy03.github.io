@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2611.23933",
+  "slug": "trope-topology-aware-relative-positional-encoding-for-4d-generation",
+  "title": "TRoPE: Topology-aware Relative Positional Encoding for 4D Generation",
+  "authors": [
+    "Chengzhuo Gui",
+    "Zhenglin Zhou",
+    "Fan Ma",
+    "Zongxin Yang",
+    "Yi Yang"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23933"
+  },
+  "abstract": "Video-to-4D mesh generation has made substantial progress in recovering dynamic 3D geometry and motion from monocular videos. However, commonly used feed-forward approaches remain prone to sticking artifacts, where geodesically distant vertices move together incorrectly when they become spatially close. We attribute this failure to cross-part motion leakage: spatially nearby yet structurally distant vertices may retrieve similar motion information when motion decoding fails to distinguish spatial proximity from mesh connectivity. To address this issue, we introduce TRoPE, a topology-aware relative positional encoding that makes mesh connectivity explicit in the interaction between vertex queries and mesh-supported motion sources. TRoPE derives spectral features from the graph Laplacian and constructs pairwise topological relations from distances between multi-scale diffusion features, using these relations to modulate vertex--anchor attention through rotary phases. We further introduce a vertex-wise tail-risk objective that emphasizes persistently high-error vertices to explicitly suppress sticking artifacts. To better characterize and quantify these failures, we introduce MeshSticking-4D, a dedicated benchmark for this failure mode. Experiments on MeshSticking-4D show that TRoPE suppresses sticking artifacts while improving overall motion accuracy. Compared with the baseline, it reduces the worst-vertex error by 39.4% and lowers the separation failure rate from 49.35% to 34.90%. Additional evaluations on Motion-80 and Motion324-Subset show lower tail errors on diverse objects, while transfer to Mesh4D demonstrates applicability across backbones.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23933v1",
+  "keywords": [
+    "TRoPE",
+    "3d-reconstruction"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23933v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23933v1 的 26 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：TRoPE 给motion tokens附上reference-mesh anchors，用多尺度Laplacian diffusion的pairwise距离调制vertex–anchor attention的rotary phase，抑制空间近但拓扑远部位的运动泄漏。作者在专门sticking集上将worst-vertex error降低39.4%，但Motion-80和Motion324上平均重建与分离失败率反而变差；适合作为mesh-motion decoder机制速览。",
+    "motivationZh": "动态mesh恢复中，空间相近但拓扑分离的顶点会混入相同运动信息，导致部件交叉时发生粘连。",
+    "methodZh": "先由mesh-local PLTA增强vertex/anchor features，anchors从host视频tokens读取motion values，再按固定reference connectivity构造query–source relation调制attention。Q/K及拓扑关系跨帧共享，values随视频变化；CVaR对时间均值误差最高1%的vertices加权。输入需要reference mesh与monocular driving video。",
+    "methodFlow": [
+      "reference mesh上FPS采anchors并做local topology aggregation",
+      "anchors从video backbone tokens读出motion",
+      "各connected component求Laplacian diffusion features",
+      "多尺度query-anchor距离变为RoPE phase以路由motion",
+      "共享routing、逐帧motion values输出mesh trajectory，并以vertex-tail CVaR训练"
+    ],
+    "experimentsZh": "MeshSticking-4D用Mixamo articulation/contact clips，10,080 train、256 test；Motion324 subset1,750/128，另Motion80的16-frame reference-conditioned统一协议。比较Motion3-to4、Puppeteer、ActionMesh、R-DMesh与Mesh4D适配器。 作者报告MeshSticking WVE285.420→172.874（39.4%），EETE25 137.872→98.191，SFR49.349%→34.898%（Table 1, p. 8）。 作者报告Motion80 WVE99.833→91.244，但CD11.255→12.238、F@.02 .8891→.8656、SFR50.769%→58.281%（Table 2, p. 9）。 作者报告Mesh4D paired fine-tune迁移SFR99.759%→76.986%，WVE318.117→305.285，平均EucD基本不变（Table 6, p. 24）。 覆盖多个4D host/adapters和合理attention controls；主表部分models使用各自pretrained配置，而额外Mesh4D paired对照更直接。没有实际编辑或fabrication评估。 比较absolute PE、Euclidean/geodesic relative、learned additive distance/kernel、component-only、scales/modes、PLTA和CVaR；结论支持routing机制，但不能推断所有geometry上降低sticking。",
+    "insightZh": "把query–source拓扑关系直接注入attention兼容性而非只给vertex加绝对features是具体贡献；有relative/additive/rotary的匹配消融与Mesh4D迁移。适用于已知连通性的editable mesh motion，但证据不支持通用4D重建全面改善。",
+    "evidenceZh": "motion source经anchors具有mesh位置，可显式使用connectivity关系（Sec. 3.2–3.3, Eqs. 4–11, pp. 5–6; Fig. 2, p. 4）。reference graph relation跨帧固定，invalid/cross-component pairs phase为identity，退回content attention。 作者报告：专门benchmark改善明显，而一般集存在平均精度与分离权衡（Tables 1–2, pp. 8–9）。MeshSticking WVE285.420→172.874，SFR49.349→34.898%；Motion80 CD11.255→12.238、SFR50.769→58.281%。 作者报告：topology-relative rotary的收益超出anchor替换或CVaR本身（Table 3, p. 9; Table 4, p. 10）。同anchors/PLTA且无CVaR时content WVE208.456、geodesic191.074、TRoPE181.599；CVaR再到172.874。 非完整reference connectivity限制可用范围（App. A6.4, p. 24; Table 7, p. 25）。小于16 vertices component无spectral features，Motion80约22.2% events有invalid endpoint。",
+    "caveatZh": "严重self-contact/occlusion或ambiguous motion时仍可能sticking。 保持parts分离不保证正确local trajectory，大位移可能limb deformation。 碎片化mesh和seam duplicates削弱spectral support，小components退回content routing。 专门Mixamo contact分布改善没有全面泛化到Motion80/324，后两者平均EucD及SFR/MSD均可能劣于host。 需要给定reference mesh且拓扑固定，不是从任意视频自动恢复任意拓扑的系统。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "忠实恢复driving video运动故归3D Reconstruction；reference mesh的显式拓扑关系对editable assets动画与mesh-aware generation有可迁移价值。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2611.22287",
+  "slug": "decoding-without-a-decoder-direct-pixel-prediction-from-diffusion-transformers",
+  "title": "Decoding Without a Decoder: Direct Pixel Prediction from Diffusion Transformers",
+  "authors": [
+    "Hansheng Chen",
+    "Shengqu Cai",
+    "Jan Ackermann",
+    "Rayhan Zirvi",
+    "Gordon Wetzstein",
+    "Xinchen Yan",
+    "Leonidas Guibas"
+  ],
+  "primaryTopicId": "image-generation",
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22287"
+  },
+  "abstract": "Latent diffusion models rely on a decoder to map denoised latents to pixels, adding complexity and inference cost. We introduce Decoding Without a Decoder (DWD), which lets a finetuned diffusion transformer produce final pixels directly through a linear head. Unlike previous methods, where the denoising output leads to final pixels, DWD separates the two roles: the original denoising head continues to drive sampling, then the new DWD head predicts the pixels at the final step. We extend pretrained latent models with DWD efficiently by finetuning only the last few transformer blocks, training the DWD head with pixel quality losses while anchoring the denoising head to the pretrained model to preserve the sample trajectory. Across latent image and video generators, DWD removes the decoder while maintaining or even improving pixel quality. On Wan video generation, it visibly reduces detail distortion and flickering, lowering warping error by 23%. Remarkably, the same separation also improves pixel diffusion models that do not even use a decoder: a final-step DWD head produces substantially better texture detail in text-to-image generation, and improves ImageNet FID from 1.55 to 1.43, a new state of the art among pixel flow models.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22287v2",
+  "keywords": [
+    "Decoding Without a Decoder",
+    "image-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22287v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22287v2 的 24 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：DWD 将去噪与最终像素输出拆成两个 head：保留原 head 驱动采样，仅微调末端 blocks，让另一个线性 head 在小非零 timestep 直接输出像素。作者在 latent、pixel、few-step image/video 模型上验证移除 decoder 或恢复纹理的能力，Wan2.1 warping error 从 1.52 降到 1.18（×10⁻³），但动态程度指标略降。",
+    "motivationZh": "latent生成器的去噪head并不一定是最好的像素读出；外部VAE decoder增加成本，也可能放大细节失真。",
+    "methodZh": "已有 DiT 最后层 tokens 含有比去噪 latent 更丰富的像素信息。DWD 用线性回归初始化 patch readout，以 L1、LPIPS、adversarial loss 学习像素质量，同时通过 frozen reference velocity anchoring 保持去噪轨迹。冻结前缀、只训练末端 blocks，最终步绕过 VAE decoder，并跳过该步 CFG pair。",
+    "methodFlow": [
+      "从已训练 DiT 最后一层 tokens 初始化线性像素 head",
+      "冻结前缀并复制末端 timestep modulation",
+      "小 timestep 用像素质量 losses 训练 DWD head",
+      "中间 timesteps 用 reference velocity 约束原去噪 head",
+      "按原 sampler 迭代，最后非零 timestep 直接读出 RGB patches"
+    ],
+    "experimentsZh": "ImageNet 256² 的 REPA/REPA-E/JiT/AnisoFlow，1024² text-to-image 的 FLUX.2 klein Base/4-step 与 AnisoFlow，以及 Wan2.1 14B 的 81 帧 832×480 generation；评估 COCO-10k、OneIG、LongText、VBench、warping error，另做 FP8 和 few-step 实验。 作者报告 AnisoFlow-H/16 ImageNet FID 1.55→1.43；REPA-E 1.12→1.06（Table 1, p. 6）。 作者报告 Wan2.1 BF16 warping error 1.52→1.18（×10⁻³，约 23%）；FP8 1.69→1.20，dynamic degree 同时略降（Table 3, p. 9）。 作者报告 4-step Wan1.3B 全程 latency 4.661→2.757 秒、peak VRAM 19.22→16.15 GB；此结果限定 eager mode 的该设置（Table 6, p. 20）。 既比较原始 latent/pixel 模型，也有同数据同 pixel losses 的 decoder finetune 控制，以及 AsymFlow/L2P；但主要是对各 pretrained model 的增量适配，未独立复现。 合并 head、conv head、最终 timestep、无 adversarial loss、same-data decoder finetuning 支撑双 head 与非零终步；超大 pixel patch 上的 refiner 仍是初步探索。",
+    "insightZh": "区别于把 latent model 全部改造成 pixel diffusion，保留采样轨迹而将最终渲染目标从去噪目标解耦；对无 decoder 的 pixel model 也有效的双 head 消融支持这一设计。证据覆盖多个模型，构成值得关注的生成架构/训练范式改动。",
+    "evidenceZh": "像素读出与去噪输出并行，训练目标和 timestep 分布分开（Sec. 3.2–3.3, Fig. 2, Eqs. 1–4, pp. 3–5）。仅最终 step 使用 DWD，像素 head 可接触 token 特征而不经过原 denoising bottleneck。 作者报告：分离 head 有独立贡献，合并后 AnisoFlow ImageNet FID 反而退化（Table 1, p. 6; Sec. 4.1, p. 7）。作者报告 baseline 1.55、DWD 1.43、without separate head 1.71。 作者报告：Wan 的时序 photometric error 降低幅度超过同数据 decoder finetuning（Table 3, p. 9; Sec. 4.3, p. 10）。作者报告 warping error baseline 1.52、finetuned decoder 1.39、DWD 1.18（×10⁻³）；dynamic degree 从 0.736 降至 0.711。 作者报告：强 decoder 场景中主要收益是替换与成本，而非显著质量提升（Table 2, p. 8; Limitations, p. 10; Table 6, p. 20）。FLUX.2 Base 指标基本持平；4-step FLUX.2 end-to-end latency 0.776→0.695 秒，表中 final-step FLOPs 不能冒充全程加速。",
+    "caveatZh": "强 decoder 如 FLUX.2 上质量增益变小。 尚未证明线性 head 对超过 16×16 spatial patches 足够，可能需要更强 refiner。 未逐模型调优 pixel losses；MiniMax-H3 的结果仍属 preliminary。 部分配置 DWD 参数略增，表中 FLOPs 是 final step 口径；应以 Table 6 的限定全程 latency 判断实用加速。 warping error 与略低 dynamic degree 存在潜在运动/稳定性权衡，不能仅凭一个指标断言全面视频质量提升。 PDF 仅给项目链接，没有清楚列出本方法公开代码地址，本次不认定 code available。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "将生成采样与最终可见细节目标解耦是跨 image/video 的可迁移架构机制；对视觉创作中小字、网格、纹理和低精度推理有具体作用，但未直接验证 SVG 或 3D。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

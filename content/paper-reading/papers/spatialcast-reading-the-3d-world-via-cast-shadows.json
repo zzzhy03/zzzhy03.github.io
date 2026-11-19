@@ -1,0 +1,62 @@
+{
+  "id": "arxiv:2611.22657",
+  "slug": "spatialcast-reading-the-3d-world-via-cast-shadows",
+  "title": "SpatialCast: Reading the 3D World via Cast Shadows",
+  "authors": [
+    "Enhan Li",
+    "Jinghao Zhou",
+    "Jiaze Zhang",
+    "Hongyang Du"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm",
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22657"
+  },
+  "abstract": "As multimodal large language models (MLLMs) advance toward understanding and interacting with the physical world, spatial reasoning becomes essential for understanding scene structure and anticipating the effects of physical changes. Existing spatial benchmarks have made substantial progress in evaluating spatial relations, memory, and viewpoint reasoning, but less systematically assess how models connect physical scene conditions with visual observations. We introduce SpatialCast, a benchmark that uses cast shadows to evaluate this ability. Cast shadows provide observable evidence of a 3D scene. Their image appearance depends on object geometry and pose, illumination, and viewpoint. We examine this relationship through three complementary tasks that assess scene-projection consistency, predict intervention-induced changes, and infer the physical changes behind visual transitions. The benchmark contains 21,000 synthetic questions with separate scene and geometry test partitions, complemented by 200 SpatialCast-Real questions from 20 photographed scenes. Evaluations show that closed-source MLLMs outperform general-purpose open-weight MLLMs and MLLMs designed for spatial reasoning, which remain near chance on the synthetic benchmark, while even strong closed-source models struggle with shadow-length and light-height judgments. We also use SpatialCast training data for GRPO post-training, improving open-weight MLLM performance on the benchmark. Further evaluations show improvements on several external spatial benchmarks, suggesting transfer of the learned capabilities. These experiments support SpatialCast as a controlled resource for diagnosing spatial reasoning capabilities and studying their learning and generalization.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22657v1",
+  "keywords": [
+    "SpatialCast",
+    "vlm-mllm"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22657v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22657v1 的 17 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "SpatialCast以可控阴影构造投影匹配、干预预测、变化归因三任务，诊断光源、几何、视角推理。作者报告8B GRPO synthetic accuracy24.40到38.73%，真实照片34.50到36.50%；外部五指标平均只升1.61点，2B反降2.14点。适合场景设计agent的光照一致性测试，不能当作普遍空间能力或实际重光照生成已提升。",
+    "motivationZh": "常见空间benchmark较少检验三维几何和光照变化如何产生可观察阴影，难揭示模型的物理投影推理弱点。",
+    "methodZh": "16种shape families和三类单/双物体阴影结构由Blender渲染，已知scene state及干预生成正确候选，distractors遗漏、反转或改变参数。21k合成问题以scene及held-out geometry参数分区，另从ReNe20真实scene构造200题。筛选训练集11,186题做四backbone GRPO，以选择题正确性、格式和长度约束奖励。",
+    "methodFlow": [
+      "定义geometry、pose、light、camera scene state并渲染阴影。",
+      "控制light、object rotation和camera干预，生成兼容投影与错误候选。",
+      "分别测试forward/inverse compatibility、intervention propagation及change attribution。",
+      "以筛选的同类问题GRPO训练，评价unseen scene/geometry、真实light-change和外部空间任务。"
+    ],
+    "experimentsZh": "4500 synthetic test含1800T1/1800T2/900T3，scene-test3000与geometry-test1500；200real题由20scenes组成，T2四选一125、T3二选一75，real随机34.375%。四open-weight bases和spatialbaselines，五APIreal、两APIfullsynthetic。 作者报告8B synthetic24.40到38.73%，4B24.91到32.87%；GPT6.1Sol79.42%，Gemini4Argon57.71%（Table2, PDF p.6）。 作者报告8B real34.50到36.50%，4B33.50到38.50%；闭源real58.50%到81.50%（Tables2,4, PDF pp.6-7）。 作者报告外部五指标平均8B37.51到39.12、4B36.10到40.34、3B36.87到37.69，2B37.36到35.22（Table7, PDF p.8）。 对比未训练base和专门spatial models，外部MindCube/MMSI/SPBench/MMMU；没有以等训练token的其他synthetic spatialdata对照，因此收益是否特有于shadow任务尚未隔离。 shadow-only/no-shadow/no-initial、fullshuffle/curriculum/T2-only、scene/geometry分区、五人32题humanpilot；附加VSI与numericalSPBench的改善更混合。",
+    "insightZh": "将阴影作为物理场景变化的可控读出，以同一projection过程组织三推理方向，并提供训练与诊断资源；不是新的生成、重建或relighting方法。",
+    "evidenceZh": "三任务共享物理scene state，选择题候选由控制干预产生（Sec.3, Figs2-3, PDF pp.3-5）。T3已给changed factor，减少inverse ambiguity；比任意自然视频因果归因更受控。 作者报告：开源模型近随机，GRPO主要改善T2，且各subtype收益不均（Table2, Fig.4, PDF pp.6-7）。训练保留所有T2，T2占53.64%，不能把偏向该任务的提升当作全部projection能力。 作者报告：shadow-only与no-shadow对照支持部分模型实际使用阴影证据（Table5, Sec.4.4, PDF p.8）。GPT6.1Sol full81.3、shadow-only81.7、no-shadow25.0；原label在erased输入上只作diagnostic。 geometry-test是同shape families的参数区间holdout，非完全新类别（Appendix A.3-A.4, PDF pp.12-13）。13families，sphere/cube/dodecahedron无geometryholdout参数而排除；scene-test来自相同sampler。",
+    "caveatZh": "真实照片和externaltransfer改善小于synthetic，并且model与task依赖明显。 训练保留全部T2并选择部分T1/T3，learninggain描述的是该训练分布。 未见独立limitations段；四选一受控任务与同family参数holdout不代表开放域physicalreasoning或连续参数估计。 真实20scenes、照片复用，200题非200独立场景；humanpilot仅5人32题。 未显示runseed方差或等算力替代训练对照；2B外部平均降低，部分VSI/numericalSPBench也退化；不能称全面generalization。 PDF未印实现或datasetURL，未确认代码公开。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "可控light/geometry/viewpoint干预提供场景设计agent检验阴影与重光照因果一致性的训练或评价任务。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

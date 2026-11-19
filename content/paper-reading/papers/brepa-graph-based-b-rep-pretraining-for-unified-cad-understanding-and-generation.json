@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2611.22903",
+  "slug": "brepa-graph-based-b-rep-pretraining-for-unified-cad-understanding-and-generation",
+  "title": "BRepA: Graph-Based B-Rep Pretraining for Unified CAD Understanding and Generation",
+  "authors": [
+    "Dekai Zhu",
+    "Zhaiyu Chen",
+    "Stefan Gavranovic",
+    "Slobodan Ilic"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "topicIds": [
+    "3d-segmentation",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.22903"
+  },
+  "abstract": "Boundary representation (B-Rep) of CAD models encodes geometric primitives and their relations as a graph structure, enabling efficient shape modeling within CAD software. Learning on B-Reps for downstream tasks, such as segmentation and novel shape generation, requires specialized neural network designs. Moreover, performance improvements and accelerated training can be achieved with effective pretraining strategies, which is particularly important for tasks with limited labeled B-Rep data. In this paper, we introduce BRepA, a unified self-supervised pretraining framework that explicitly reconstructs both the geometry and topology of B-Rep objects via graph-based modeling. By learning from large-scale unlabeled CAD data only once, BRepA produces representations that generalize across tasks and significantly enhance both discriminative and generative learning. On segmentation tasks, BRepA demonstrates remarkable data efficiency. For instance, with only 1% labeled samples, BRepA pretraining improves mIoU by 32.52% compared to models trained from scratch. On generative tasks, aligning diffusion model representations with pretrained BRepA features substantially accelerates convergence, achieving nearly 2 times faster training while improving generation quality under the same computational budget, despite the diffusion model being roughly 20 times larger than BRepA. Overall, our results show that geometry- and topology-aware B-Rep pretraining provides a powerful foundation for both understanding and generating CAD structures, serving as a versatile representation backbone for diverse downstream applications. We will release the code to facilitate future research.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.22903v1",
+  "keywords": [
+    "BRepA",
+    "3d-segmentation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.22903v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.22903v1 的 13 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "BRepA以几何与拓扑双MAE预训练CAD图表示，同时支持face segmentation和diffusion feature alignment。作者报告MFCAD 1% label mIoU 35.06到67.58，提升32.52个百分点，其中topology相对geometry-only再贡献4.48点；BrepDiff训练曲线约两倍提速。适合少标注CAD表示，训练提速需计入预训练成本且未证明制造有效性。",
+    "motivationZh": "B-Rep的几何与拓扑依赖专门表示，而分割和生成任务各自训练会浪费未标注CAD中的共有结构。",
+    "methodZh": "surface和edge UV-grid由CNN加attention编码，GCN与GAT聚合B-Rep拓扑。随机mask surface重建几何、drop graph edges预测connectivity，形成共享表示；分割时接MLP并全量fine-tune，生成时与BrepDiff前四层表示做REPA cosine alignment。13.5M encoder不直接生成新CAD。",
+    "methodFlow": [
+      "从B-Rep采样surface和edge网格并构建face邻接图。",
+      "CNN与self-attention提取geometry，GCN/GAT聚合topology。",
+      "共同重建masked surface与missing connectivity预训练。",
+      "将face features接segmentation head，或监督diffusion早期层representation alignment。"
+    ],
+    "experimentsZh": "MFCAD 12367/3094、Fusion360 30459/5399 trainval/test，label 0.1%到100%；BrepDiff default training；A6000 48GB预训练1000 epochs，另补BrepGen与ABC。 作者报告MFCAD 1% label mIoU 35.06到67.58，geometry-only为63.10；100% label 99.19到99.20收益几乎消失（Table1, PDF p.6）。 作者报告Fusion360 0.5% label 15.57到29.20 mIoU，提升13.63个百分点（Table2, PDF p.7）。 作者报告MFCAD generation 1-NNA 0.574到0.541、COV 0.469到0.500；Fusion360 1-NNA 0.577到0.542（Table3, PDF p.7）。 UV-Net、参数匹配UV-Net++、SDF SSL、同BRepA无SSL和geometry-only控制明确；生成主要BrepDiff，附录BrepGen和ABC以曲线补充。缺少CAD validity、拓扑闭合和制造可用性指标。 mask强度、graph layers、geometry/topology、模型scale、alignment weight与label subset五次；2倍主要由训练epoch曲线读出，缺少含预训练与feature计算的总成本对照。",
+    "insightZh": "相较仅几何或SDF预训练，将topology reconstruction加入统一B-Rep表示并跨分割与生成复用；架构、MAE与REPA各有先例，贡献是CAD几何拓扑组合和数据效率证据。",
+    "evidenceZh": "dual MAE同时恢复几何与拓扑关系（Sec.3.2-3.3, Figs.2-3, PDF pp.3-4）。surface grids含坐标法线trim mask，edge grids含坐标切向，预训练需要有效native B-Rep。 作者报告：低label收益来自预训练，其中geometry占较大部分，topology继续提升（Tables1-2, PDF pp.6-7）。MFCAD 1%由35.06到63.10再到67.58，不应把32.52点全部归于topology。 生成路径将BRepA表示对齐BrepDiff早期层，收益是训练收敛（Sec.3.4, Fig.4, Table3, PDF pp.5,7）。BrepDiff仍260M，BRepA 13.5M为辅助表示模型。 作者报告：1% subset重复实验保持明显收益（Appendix B.4, Table6, PDF pp.10-11）。五次label subset抽样，BRepA 67.42加减0.71，w/o SSL 35.18加减0.62。",
+    "caveatZh": "统一放大surface、edge和graph encoder较稳定，只增单模块会导致training instability。 未见独立limitations段；原生B-Rep分割benchmark不等同噪声scan或任意部件语义分割。 32.52是mIoU百分点，少label收益大，完整label时几乎无收益。 预训练各数据集约2或6小时，复用跨任务可摊销，但不能把生成曲线2倍提速称总计算减半。 作者承诺发布实现，目前不提供Code链接。",
+    "whyRelevantZh": "B-Rep是可编辑CAD主线表示，face级语义与生成训练复用可支持结构化3D设计。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

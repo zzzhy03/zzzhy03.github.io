@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2611.23056",
+  "slug": "rfw-s-everyday-deformable-objects-with-independent-simulation-verification",
+  "title": "RFW-S: Everyday Deformable Objects with Independent Simulation Verification",
+  "authors": [
+    "Jiarui Guo",
+    "Saining Zhang",
+    "Jiaying Wan",
+    "Jiawei Weng",
+    "Junhao Chen",
+    "Rui Zhang",
+    "Yuanbo Lyu",
+    "Zhiheng Lee",
+    "Peishuo Li",
+    "Jingrun Du",
+    "Weiqing Xiao",
+    "Weiyi Lin",
+    "Zenan Meng",
+    "Hu Wei",
+    "Lin Qu",
+    "Zongzheng Zhang",
+    "Hao Zhao",
+    "Chaojian Li"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23056"
+  },
+  "abstract": "Large-scale robotic simulation requires diverse deformable objects with executable physical properties and realistic interaction behaviors. However, existing 3D asset collections primarily emphasize visual diversity, while scalable physical construction and verification remain challenging. We introduce RFW-S, a large-scale dataset of 83,365 simulation-verified assets spanning 485 everyday categories across five structural families: soft solids, cloth sheets, shells, garments, and bags. We develop an automated pipeline integrating reference-guided 3D generation, structure-aware physical modeling, and LLM-assisted parameter estimation and calibration. To ensure physical reliability, we introduce an independent simulation verification framework that evaluates object behaviors under interactions distinct from those used for parameter calibration. Extensive experiments demonstrate the effectiveness of independent verification and characterize deformable responses under different physical configurations. We further evaluate robotic grasping in terms of both task success and object integrity, and demonstrate the physical realism of our simulated objects through sim-to-real replay of fragile-object manipulation. RFW-S provides a scalable foundation for physically grounded simulation and embodied robotic learning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23056v2",
+  "keywords": [
+    "RFW-S",
+    "3d-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23056v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23056v2 的 34 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：RFW-S 将 reference-guided 3D generation 接到结构适配、有效物理参数、校准与独立 interaction verification，100k 候选中有 83,365 个同时通过物理与运行/行为检查。资源值得关注，但 independent-pass 只说明特定模拟配置通过探针；抓取 damage proxy 对刚体旋转也响应，所有试验 intact success 为零，不能据此主张真实材料或安全抓取已经解决。",
+    "motivationZh": "大规模3D资产多关注可见外观，缺少可执行物理表示和独立于参数校准动作的变形验证。",
+    "methodZh": "对五类 everyday deformables 先平衡类别生成 reference 和 geometry，再按内部体积、薄片、开口及衣物支持方式选择 representation/solver，LLM 提出能实际传递到 solver 的参数。校准后冻结 geometry/parameters/numerics，用不同 stimulus 运行一次独立测试，并用 config identity 关联全量 RC check。",
+    "methodFlow": [
+      "规划 485 categories 并生成 image references 与 3D geometry",
+      "结构适配为 volume、cloth、shell 等可执行代理",
+      "LLM priors 经 adapter 变成有效 solver controls",
+      "按 calibration diagnostics 做有界修正后冻结 revision",
+      "不同 stimulus 的 independent test 加 RC check 决定保留"
+    ],
+    "experimentsZh": "100k assets 全量 census；4 garments×3 profiles×2 probes；30 target×7 methods×4 budgets；300 bags×7×4；1,000 grasp condition instances 来自七个 base geometries，另 190 个单人 expert ratings。 作者报告 physical+RC intersection 为 83,365/100,000，485 类均仍有实例（Fig. 4 and Table 2, pp. 4–6）。 作者报告 300 bags 的 8,400 evaluations 中 325（3.87%）只通过 calibration、不通过独立 probe，涉及 26 bags（Table 6, p. 11）。 作者报告 fixed/slip controllers held-out task success 均为 245/340（72.1%），但所有方法 intact success 均 0/340（Table 7, p. 12）。 比较资源与七种 parameter proposal/search controls；expanded bag study 重复共享初始候选，缺少同初始 failures 的 paired correction efficacy；grasp held-out conditions 共享七个 base geometries。 representation profiles 与 effective controls 的诊断解释 garment、viscosity/yield 等行为；没有外部实物响应 ground truth 或统一受控证明语言 prior 胜过机械规则。",
+    "insightZh": "主要贡献是大规模带执行配置与行为证据的 deformable asset resource，以及 calibration/verification 分离。比普通展示 mesh 更可用；尚未用受控初始失败对照证明 LLM 修正策略的优势。",
+    "evidenceZh": "最终 verification 在冻结配置上使用不同 interaction，不反馈给 proposer（Sec. 4.2–4.4, Fig. 6, pp. 7–9）。减少只对 calibration probe 过拟合；保证只限执行的 solver 和 probe，不是实物材料辨识。 作者报告：全量检查保留 83,365 个资产且 485 类均保留，但 soft-solid retention 明显较低（Table 2, p. 4; Fig. 4, p. 6; Sec. 5.1, p. 9）。physical pass 83.62%、RC 99.59%，intersection 83.37%；soft solid 60.92% 对 cloth 98.46%。 作者报告：独立 interaction 能筛掉已校准候选，但 expanded experiment 不证明 correction policy 优势（Table 6 and Sec. 5.3, p. 11; Sec. 6.2, p. 14）。8,400 bag evaluations 全通过 calibration，325/8400 在 independent stimulus 失败；都用 shared initial candidate。 作者报告：抓取 damage 指标未提供有效 intact-success 比较（Table 7, p. 12; Sec. 6.3, p. 14）。4,000 outcomes 全超过 damage threshold，proxy 使用 ||F−I|| 且对 rigid rotation 敏感；实物 tofu replay 仅少量定性支持。",
+    "caveatZh": "验证只对已执行 solver、representation、parameters 与 probes 有效，需 paired physical measurements 才能量化真实响应。 expert study 每 clip 一次 rating，缺少独立 validation 与多评者一致性。 damage readout 对旋转敏感且所有 outcomes 越阈；grasp 几何范围仅七种，privileged reference 可五次选择。 83k 是 configuration-verified 资产数，不代表互异真实对象或全面物理正确；near-duplicate 与 semantic correctness 审计尚缺。 326 corrected acceptances 是生产 trace 计数，不能当作修正 agent 的因果成功率。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "提供生成新 3D assets 后加入 simulation-ready structure 与验证记录的方法，对物理约束的 3D generation 有直接价值；机器人抓取本身不是收录理由。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.24084",
+  "slug": "from-restoration-to-redrawing-revitalizing-ancient-chinese-characters-by-svg-code-generation-and-editing",
+  "title": "From Restoration to Redrawing: Revitalizing Ancient Chinese Characters by SVG Code Generation and Editing",
+  "authors": [
+    "Weiguang Zhang",
+    "Linhua Dong",
+    "Bin Dong",
+    "Shanshan Jiang",
+    "Maizhen Ning",
+    "Xiaoqiang Kang",
+    "Kun Zhang",
+    "Hao Xu",
+    "Xiaowei Huang",
+    "Wei Wang",
+    "Kaizhu Huang",
+    "Qiufeng Wang"
+  ],
+  "primaryTopicId": "2d-design",
+  "topicIds": [
+    "2d-design"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.24084"
+  },
+  "abstract": "Hanjian manuscripts written on Han Dynasty bamboo and wooden slips are invaluable heritage of ancient Chinese writing but suffer from damaged ink and incomplete strokes. Existing image-to-image restoration methods may alter observed strokes and offer limited control over stroke geometry. Inspired by experts' manual redrawing practices, we address these issues by introducing \\textbf{ReDraw}, a two-stage vision-language model(VLM) that reformulates character restoration as Scalable Vector Graphics(SVG) code generation and editing. Stage one targets faithful vectorization of observed strokes geometry or conservative tracing of mildly degraded strokes. Guided by skeleton chain-of-thought reasoning and reinforcement learning with structure-aware rewards, stage two predicts skeletons before contours to redraw severely incomplete strokes by appending paths while keeping existing SVG paths unchanged. To support training, we develop a multi-layer data synthesis pipeline that disentangles ink, material, and degradation to generate 1.2M samples, and derive up to 6,400 adaptation pairs from 320 annotated real glyphs. Experiments demonstrate synthetic restoration performance and adaptability to real Hanjian glyphs. Code and demo will be available upon acceptance.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24084v1",
+  "keywords": [
+    "From Restoration to Redrawing",
+    "2d-design"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24084v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24084v1 的 11 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：ReDraw 将汉简字符补全改成可编辑 SVG：先 tracing 观察到的笔画，再先预测缺失骨架、后生成轮廓，只追加新 paths。作者的结构奖励 GRPO 在 60k 训练设置使 SSIM 0.9055→0.9225，但 synthetic test 与训练共享原 glyph，真实 few-shot 只测同字符不同 glyph；这更适合作为结构化局部补全机制速览。",
+    "motivationZh": "栅格古文字修复可能重画原有正确笔画，缺少可审查的路径几何与保留已有笔画的编辑约束。",
+    "methodZh": "Qwen2.5-VL-3B 配 SVG tokenizer，统一 O2O faithful vectorization、O2N conservative tracing 与 N2F append-only stroke completion。1.2M ink/material/degradation 合成样本提供 vector 与 skeleton targets，GRPO 用 skeleton/contour IoU、一致性、merge、overlap 与 area rewards 约束缺失路径。真实 adaptation 来自 320 glyphs、80 classes。",
+    "methodFlow": [
+      "合成 ink/material/degradation 图像并以 VTracer 生成 SVG targets",
+      "VLM 预测 faithful 或 conservative partial SVG",
+      "给定字符身份、partial SVG 与 raster，交替预测 skeleton 与 contour",
+      "结构奖励 GRPO 细化 skeleton/contour 与已有路径关系",
+      "仅追加 contour paths，原 SVG paths 代码保持"
+    ],
+    "experimentsZh": "1.2M synthetic samples；600 synthetic test 共享 source glyph。与通用 VLM/默认 SVG 模型对照，另在相同 60k data、10k steps 重训 raster restoration baselines；320 real glyphs 做同 class 内 k-shot adaptation。 作者报告 synthetic O2O SSIM 0.9375、LPIPS 0.0609，N2F SSIM 0.9860；此设置与训练共享 glyph（Table 1, p. 5）。 作者报告 60k 公平重训下 SSIM 0.9225、LPIPS 0.0850，但 MSE 0.02832 不如 StarIR 0.01960（Table 2, p. 6）。 作者报告 stage decomposition SSIM 0.8916→0.9055；追加 GRPO 使 LPIPS 0.1120→0.0850（Table 4 and Fig. 6, p. 8）。 覆盖通用 VLM、SVG model 与多种 restoration networks；默认 SVG models 未 task finetune，主要 synthetic test 不分离原 glyph，跨域与跨字类泛化仍未知。 60k matched two-stage 对照和 1,000 GRPO updates 支撑 stage split 与 RL，both GRPO/SFT retain skeleton CoT，未单独隔离 skeleton CoT 的因果贡献。",
+    "insightZh": "方法可迁移点在 editable SVG 的局部路径追加、skeleton→contour 中间表示与结构 reward；实证对象仍为汉简字符，没有证明通用图形或跨类别设计能力。普通 raster restoration 排除项不适用于这里的显式矢量补全核心。",
+    "evidenceZh": "N2F 是 append-only SVG patch，而不是重画整张 raster（Sec. 3.1–3.3, Fig. 3, pp. 4–5）。skeleton/contour 交替生成，只把 contour 追加到输入 paths；代码不改并不保证第一阶段几何正确。 作者报告：two-stage 与 GRPO 在匹配训练设置下有量化收益（Table 4 and Fig. 6, p. 8）。two-stage SFT SSIM 0.9055 对 single-stage 0.8916；GRPO SSIM 0.9225、LPIPS 0.0850。 作者报告：最强 synthetic N2F 指标不能解释为 unseen-glyph generalization（Table 1, p. 5; Sec. 4.2.1, p. 7）。600 test samples 与 training 共享 source glyph，仅 damage/background 不同，general VLM baselines 无 task-specific training。 作者报告：真实 few-shot 结果只测试同字符内 glyph，shot 越多评估子集也变（Table 3 and Sec. 4.2.2, pp. 7–8）。80 classes 各四 glyphs；1-shot unseen SSIM 0.9721，但不能据不同子集推断追加 shots 的受控增益。",
+    "caveatZh": "8k output context 限制复杂字符。 超过 50% strokes 缺失或更复杂 ink degradation 时不可靠。 仅 foreground characters，不保留有古文字学价值的背景；补全是候选形态，不是真实历史原貌。 已知字符身份是输入，不能称为 decipherment。 路径 append-only 是代码层保证，新增路径位置及第一阶段 tracing error 仍会改变视觉结果。 SVG 局部补全思路可迁移，但通用 2D artwork 或未见字类尚无实验。 作者承诺发布实现，目前不提供Code链接。",
+    "whyRelevantZh": "核心输出是结构化可编辑 SVG，append-only completion、skeleton intermediate 与几何 reward 可启发一般 stroke/vector editing；不归普通 raster restoration。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

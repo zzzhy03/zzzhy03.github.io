@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2611.24793",
+  "slug": "the-elephant-in-the-question-unified-models-picture-the-concepts-behind-their-answers",
+  "title": "The Elephant in the Question: Unified Models Picture the Concepts Behind Their Answers",
+  "authors": [
+    "Tobias Braun",
+    "Marcus Rohrbach",
+    "Lorenzo Cavallaro"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.24793"
+  },
+  "abstract": "Visualizing intermediate representations could help us inspect the reasoning steps underlying a model output. Unified multimodal models offer this opportunity by combining understanding and generation in one architecture. Their image generators can access representations formed while processing text. We introduce the V-lens, which uses this connection to visualize a chosen token's hidden state without training a decoder. Across four diffusion-based and two purely autoregressive unified models, the resulting images reveal key intermediate concepts that connect a question to its answer even when the concepts are never named explicitly. Controlled tests show how this content changes with context, token position, and depth. We then introduce lens tuning, which supervises selected hidden states with pictures through the V-lens. Across BAGEL, SenseNova-U1, and HunyuanImage-3.0, the rate of correct visualizations of pronoun referents rises from 2-11% to 86-94%. Surprisingly, such visual supervision also improves text answers without supervising the answer tokens directly. Code is available at https://github.com/multimodal-ai-lab/V-lens.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24793v1",
+  "keywords": [
+    "The Elephant in the Question",
+    "vlm-mllm"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24793v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/multimodal-ai-lab/V-lens"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24793v1 的 32 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "V-lens 把统一多模态模型中某个 token 的 hidden state 搬到自身图像生成器，既能观察未说出的对象，也能用图像反向监督该状态。可借鉴到目标指代核对；图像可读性不等于忠实读出全部推理，文字收益仍主要测在训练故事上。",
+    "motivationZh": "统一模型可能在回答中使用却不说出某个中间对象；现有文本lens难以把这类隐状态内容以图像形式检查和监督。",
+    "methodZh": "用无关纯文本统计 center/spread，将提取层的 hidden state 校准到固定 insertion layer，替换 a photo of a thing 的 thing；用模型原生 diffusion/AR generator 作图。Lens tuning 只在源文本路径训练小 LoRA，以 frozen generator 自产的目标图监督选定 token，不直接监督答案。",
+    "methodFlow": [
+      "选择 source token 和 extraction layer",
+      "以纯文本统计对齐均值/逐坐标spread/半径",
+      "将校准 hidden state 注入同模型 drawing prompt",
+      "图像 judges 与控制实验评价；可通过 generator loss 对源 token LoRA 做 lens tuning"
+    ],
+    "experimentsZh": "四种 diffusion-based 和两种 AR unified models；成对上下文/同形异义词/两跳问题，三图像judge且人类抽检；三个 training seeds，动词/名词/句式 held-out 的pronoun tests。 作者报告 held-out pronoun pairs 的lens成功率由BAGEL .02→.86、SenseNova .11→.94、HunyuanImage .06→.86（Table 3, Sec. 4.6, p. 7）。 作者报告80个受监督故事上Show-o2文字正确率36.3→49.6%，Hunyuan40.0→50.8%；Hunyuan用错误图片训练也到47.5%（Table 4, p. 8; Table S20, p. 24）。 控制较完整，但限定为少量人工编写文本和简单对象；同架构内部visualization与文字probe并非独立通用推理评测。 无state、直接copy、final norm、Jacobian lens、text/ordinary drawing/word-state训练均有对照；部分word-state监督胜过lens，不宜声称普遍最优。",
+    "insightZh": "复用统一模型内部理解—生成通道作 hidden-state visual lens，不需新decoder；进一步研究图像监督与文字答案之间的干预联系。",
+    "evidenceZh": "以source/target layer纯文本统计校准并注入自身drawing请求（Sec. 3, Eq. 1, Fig. 2, p. 3）。依据精确版本全文；数字为作者报告，未独立复现。 通过frozen image generator的loss只训练源文本LoRA（Sec. 3, Eq. 2, p. 4; Sec. 4.6, p. 7）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：held-out pronoun lens成功率显著改善，但普通word-state也有强结果（Table 3, p. 7; Table S18, p. 23）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：文字纠错与state interchange的因果解释有明确边界（Sec. 4.7, p. 8; Appendix F.4–F.5, pp. 24–25; Limitations, p. 32）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "可视化失败不说明 hidden state 没有相关信息；读取依赖 token/layer/drawing request。 文字状态纠错是在监督故事上测得，whole-state interchange 不隔离图片所显示内容；没有不同目标 donor 对照。 SenseNova 在未训练文字问法上有小幅下降；general capability检查只用一个训练seed，区间仍允许数个百分点损失。 迁移到真实视觉设计agent是方法层推断，论文未验证实际设计工作流。 已确认所列公开代码入口。",
+    "whyRelevantZh": "利用统一模型生成器读取中间 token 概念，并以视觉监督校正指代，可迁移到设计 agent 对请求目标的视觉核对。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

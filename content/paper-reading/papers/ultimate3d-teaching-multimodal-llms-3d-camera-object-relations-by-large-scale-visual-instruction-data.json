@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.24795",
+  "slug": "ultimate3d-teaching-multimodal-llms-3d-camera-object-relations-by-large-scale-visual-instruction-data",
+  "title": "Ultimate3D: Teaching Multimodal LLMs 3D Camera-Object Relations by Large-Scale Visual Instruction Data",
+  "authors": [
+    "Liu He",
+    "Yizhi Song",
+    "Ruiqi Xu",
+    "Baris Sarper Tezcan",
+    "Xiao Zeng",
+    "Albert Y. C. Chen",
+    "Lu Xia",
+    "Shashwat Verma",
+    "Sankalp Dayal",
+    "Min Sun",
+    "Cheng-Hao Kuo",
+    "Daniel Aliaga"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-18",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.24795"
+  },
+  "abstract": "Multimodal Large Language Models (MLLMs) struggle with accurately capturing camera-object relations, especially for object orientation, camera viewpoint, and camera shots. This stems from the fact that existing MLLMs are trained on images with limited diverse camera-object relations and corresponding textual descriptions. To address this, we propose a synthetic generation pipeline to create large-scale 3D visual instruction datasets. Our framework takes 3D assets as input and uses rendering and diffusion-based image generation models to create photorealistic images preserving precise camera-object relations. Additionally, large language models (LLMs) are used to generate text prompts for guiding visual instruction tuning and controlling image generation. We create Ultimate3D, a large-scale 3D-grounded 2D visual instruction dataset. Ultimate3D consists of 240K VQAs with precise camera-object annotations, and corresponding benchmark. MLLMs fine-tuned on our proposed dataset outperform commercial models by a large margin, achieving an average accuracy improvement of 29.7% on camera-object relation recognition tasks. Our code, dataset, and benchmark will contribute to broad MLLM applications.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.24795v1",
+  "keywords": [
+    "Ultimate3D",
+    "vlm-mllm"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.24795v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.24795v1 的 34 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：Ultimate3D 用精确相机/对象姿态渲染的 depth 与 edge 约束扩散合成，再按姿态生成 VQA。可借用的是带真值的视角训练数据流水线；类别判断提升不等于连续 6-DoF 推理，真实远景和边界类别仍很弱。",
+    "motivationZh": "通用MLLM训练数据缺少均衡且可验证的camera-object关系，因而对象朝向、视角和镜头距离识别容易依赖常见拍摄偏见。",
+    "methodZh": "固定 upright 资产、camera roll 和朝向对象中心的相机，以方位/elevation/距离三参数覆盖72种类别组合。Blender depth/Canny 条件引导 SDXL，LLM 多样化背景并根据几何标签生成问答；对多个 VLM family 做全量或 LoRA tuning。",
+    "methodFlow": [
+      "设定对象 canonical facing 与相机三参数",
+      "渲染 pixel-aligned depth/edges 等几何 priors",
+      "Multi-ControlNet SDXL 合成外观，LLM 生成上下文",
+      "由真实几何参数生成分类 VQA，fine-tune 并评估 synthetic/real splits"
+    ],
+    "experimentsZh": "约85K合成图像、18K MEBOW 人物裁剪、240K VQA；synthetic held-out assets、PASCAL3D+/MEBOW 真实集及独立 ImageNet3D；LLaVA/Llama/Gemma/Qwen 多家族。 作者报告 LLaVA-1.6-13B 的 orientation/viewpoint/camera-shot 从16.1/30.7/42.3提升到72.4/72.3/94.8（Table 1, pp. 10–11）。 作者报告独立 ImageNet3D 的真实 long-shot 准确率仍仅14–22%，orientation总体32–34%（Appendix J–K, Table K3, pp. 17, 22）。 同 family base→tuned 比较更可靠；商业模型未接受同任务训练，“超过商业SOTA”应限于这些类别化任务。 depth+Canny 的 combined priors 比只文本或去掉depth更可靠；混合一般VQA能缓解纯任务tuning对VQAv2的下降。",
+    "insightZh": "针对 camera-object relation 的可扩展监督构建，重点是覆盖标签几何而非新 VLM architecture。",
+    "evidenceZh": "三参数设定约束 upright/roll/look-at，非一般几何（Sec. 3.1, pp. 5–6）。依据精确版本全文；数字为作者报告，未独立复现。 SDXL以depth+Canny为条件，问答标签由render参数生成（Fig. 2, Secs. 3.3–3.4, pp. 4, 6–7）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：同模型微调改善关系识别，混合一般数据保留VQAv2（Tables 1–2, pp. 10, 12）。依据精确版本全文；数字为作者报告，未独立复现。 作者报告：外部真实集揭示远景和类别边界的残余问题（Appendix J–K, Tables K3–K4, pp. 17, 22–23）。依据精确版本全文；数字为作者报告，未独立复现。",
+    "caveatZh": "三参数仅描述受约束的 camera-object pose，不能当作任意6-DoF几何。 连续数值预测跨百类别仍困难；真实远景、背斜向、Bottom及人物迁移不充分，分类边界存在视觉歧义。 主文称225对图像质量用户样本，Appendix G称200对，样本数叙述不一致；不复述其精确总体成功率。 “无偏”只指所设类别均衡，不能推出真实世界分布无偏。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "从 3D 资产生成带精确 camera-object 标签的图像问答，可为设计 agent 的视角与对象朝向检查提供训练信号。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

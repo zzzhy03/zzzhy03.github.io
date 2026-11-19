@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.21867",
+  "slug": "faceriff-data-efficient-unified-text-to-3d-face-asset-synthesis-via-geometric-conditioning",
+  "title": "FaceRiff: Data-Efficient Unified Text-to-3D Face Asset Synthesis via Geometric Conditioning",
+  "authors": [
+    "Elly Akhoundi",
+    "Mathieu Lamarre",
+    "Thibault Goyallon",
+    "Patrick Anderson",
+    "Étienne Danvoye"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.GR"
+  ],
+  "publishedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.21867"
+  },
+  "abstract": "High-resolution facial datasets with consistent UV-mapped geometry, albedo, and physically based displacement are scarce, yet such assets are essential for photorealistic digital-human rendering. Existing 3D face generation methods are often slow, single-modality, or require large specialized datasets. Meanwhile, large image diffusion models encode strong facial priors but do not natively produce lighting-independent textures, pore-scale displacement, or UV-aligned geometry. We present FaceRiff, a unified, data- and parameter-efficient framework for generating complete 3D face assets (mesh, albedo, and displacement) directly from text in a shared UV space. FaceRiff adapts a pretrained SDXL backbone with task-specific LoRA adapters and uses UV normal maps as geometric conditioning: per-instance normals guide albedo and displacement synthesis, while a dataset-mean normal provides a canonical spatial anchor for mesh generation. Using only 2,049 scans from approximately 350 identities and training on a single GPU, FaceRiff updates less than 3% of the backbone parameters per task and produces render-ready 3D face assets without per-instance optimization. Compared with FaceG2E and DreamFace, FaceRiff produces greater per-prompt diversity while preserving prompt alignment and fixed-topology UV consistency, and additionally generates lighting-independent albedo suitable for PBR relighting and pore-scale displacement absent from prior text-driven baselines. A blind study with 45 industry professionals shows that FaceRiff achieves substantially higher perceived realism than DreamFace, approaching that of real captures. Overall, FaceRiff demonstrates that pretrained diffusion priors can be adapted to unified 3D face asset synthesis under limited data.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.21867v1",
+  "keywords": [
+    "UV assets",
+    "normal conditioning",
+    "LoRA",
+    "face generation",
+    "albedo"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.21867v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.21867v1 的 11 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "FaceRiff 用共享 UV、平均形状 residual position map 和法线条件，把 SDXL 分别适配为 mesh、albedo、displacement 生成器。作者报告只需2,049 scans 与每任务2.93%可训练参数，但大部分纹理指标及专家研究使用 GT geometry，文本到完整资产的级联主要以视觉示例验证。",
+    "motivationZh": "制作可重光照脸部资产需要拓扑、albedo 与细微几何对齐，而成套扫描数据稀缺。",
+    "methodZh": "平均 UV residual 表达 mesh；平均/实例 normals 的非对称条件引导独立 LoRA 生成对齐资产图。",
+    "methodFlow": [
+      "配准扫描到共享模板，提取 position/albedo/displacement/normals 与 VLM captions。",
+      "以平均 position 的 percentile-normalized residual 训练 mesh LoRA。",
+      "平均 normal 引导 mesh，再渲染实例 normal。",
+      "实例 normal 与同一文本分别引导 albedo、displacement LoRA。",
+      "按共享 UV 组合为可渲染资产，无逐实例优化。"
+    ],
+    "experimentsZh": "作者报告2,049 scans、约350 identities，1,949训练/100验证且无身份重合；每任务单A6000训练LoRA。比较 FaceG2E mesh 和 DreamFace外观，含45名行业专家盲测。数据因同意与许可限制不公开。 作者报告100-prompt UV albedo normal ablation 的 FID 为85.01→80.71，LPIPS为0.338→0.316；属 GT geometry 设置（Table2, PDF p.6）。 作者报告匹配GT geometry的专家研究中 FaceRiff 被判断为真实的平均比例为59.4%，DreamFace为8.9%，GT约90%；不能写成已接近同等真实捕获（§4.3.3, PDF p.7）。 作者报告 mesh normal scale 从0改到1时 mean位置误差12.72→11.47mm；文本不确定唯一身份，作者将它视为分布质量代理（Table1 and §4.2.1, PDF p.5）。 基线集中 FaceG2E/DreamFace，跨方法UV重映射及固定渲染；mesh多样性主要定性，端到端多模态一致性没有等量定量表。 normal scale、normal conditioning 与局部图像指标支持几何引导；无完整独立 modality/训练数据/误差传播因子研究。",
+    "insightZh": "新意在 UV residual、非对称法线 scaffold 与现有图像 diffusion 的系统配合；SDXL、ControlNet、LoRA 本身不是本文创新。固定拓扑和几何条件值得迁移到其他有配准模板的资产，但不代表任意拓扑生成。",
+    "evidenceZh": "mesh 用平均 normal，纹理用实例 normal，三个任务独立适配（§3.3–3.5, Fig.3, PDF pp.3–4）。共享 UV 对齐而非多任务损失或共同随机场。 大部分 albedo/displacement 结果隔离 GT mesh/normal，完整级联另行展示（§4 and §4.4, PDF pp.4,7–8）。不能把 GT geometry 的研究结果写成全生成资产的定量保证。 作者报告：专家研究比较相同 GT geometry 的材质真实感（§4.3.3, PDF pp.6–7）。控制 geometry 有利于隔离纹理，但不能验证生成 mesh 的端到端质量。",
+    "caveatZh": "三条随机分支不保证每个 pore 精确对应；mesh误差会传到纹理阶段。 扫描数据因同意与许可约束不公开；文本不定义唯一GT身份。 脸部固定模板与私有高质量配准数据限制一般3D迁移；跨资产需模板、UV与规范化重做。 专家比较使用GT geometry；不要将其当作纯文本整套资产的真实感成功率。 虽无需逐实例优化，推理仍运行多步diffusion；论文batch时延排除VAE decode与export。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "共享UV、mean-anchored residual和几何条件的配方可迁移到配准模板下的mesh与材质图生成；脸部领域不作为泛化已证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

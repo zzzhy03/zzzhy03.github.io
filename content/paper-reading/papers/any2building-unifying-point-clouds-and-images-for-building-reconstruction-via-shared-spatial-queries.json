@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.23187",
+  "slug": "any2building-unifying-point-clouds-and-images-for-building-reconstruction-via-shared-spatial-queries",
+  "title": "Any2Building: Unifying Point Clouds and Images for Building Reconstruction via Shared Spatial Queries",
+  "authors": [
+    "Hongye Hou",
+    "Zhuoxiao Li",
+    "Liu Xiangyu",
+    "Tengxi Wang",
+    "Jing Ou",
+    "Dongli Wu",
+    "Shuai Zhang",
+    "Tongyan Hua",
+    "Wufan Zhao"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-18",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23187"
+  },
+  "abstract": "Abstracting structured buildings from limited observations is essential for 3D urban modeling and digital twins. Partial point clouds and overhead images of the same building provide incomplete 3D surface measurements and visual cues to its footprint, roof geometry, and rooftop structures, respectively. This motivates a unified framework that aligns geometric and visual cues in 3D and reconstructs buildings from either or both modalities. Building on this connection, we present Any2Building, a unified model for Level of Detail 2 (LoD2) building reconstruction from partial point clouds, overhead images, or both, with optional coarse geometric priors. At its core is an occupancy-grounded shared spatial queries representation that organizes available observations within a common 3D grid. Supervised by complete building surface voxels, these queries connect observational evidence to target geometry, enabling a shared generator to learn structural priors across tasks and providing spatial guidance for recovering missing structure. A trained voxel conditional surface-generation and low-poly remeshing pipeline then converts the predicted structure into compact LoD2 building models. To support this framework, we introduce BuildingWorld-Image, comprising approximately one million paired samples of partial point clouds, overhead images, and LoD2 building models across 18 cities. Experiments on multiple benchmarks demonstrate that Any2Building outperforms existing methods in geometric reconstruction accuracy across unimodal and multimodal point-cloud completion, single-image building generation, and prior-assisted generation, while maintaining detailed and robust recovery when point cloud input modality is degraded.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23187v2",
+  "keywords": [
+    "Any2Building",
+    "3d-reconstruction"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23187v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23187v2 的 24 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "作者报告：Any2Building 用 16³ occupancy-supervised spatial queries 将点云、航拍图与粗几何 prior 对齐，再同时以 query tokens 和对齐 residual prompts 约束同一个 flow DiT，输出可编辑的 LoD2 low-poly 建筑。作者在 2,000 个地域隔离建筑上报告明显改进；相同稀疏点条件下加图像的收益随缺失加大，表明中间几何监督比简单 condition concat 更有效。",
+    "motivationZh": "单一不完整点云或俯视图各缺部分建筑结构，独立模型难以在统一几何空间中互补观测并恢复紧凑网格。",
+    "methodZh": "点云特征与 DINOv3 图像特征被 coarse 3D queries 聚合，缺失模态零读出，optional prior 用 occupancy/boundary/fraction 描述调制 queries。query occupancy loss 将 complete-building surface support 显式化，并通过 read-back cross-attention 和 layer-aligned spatial prompts 注入结构 DiT；64³ voxel 支撑 surface flow generator 和 low-poly remeshing。",
+    "methodFlow": [
+      "编码 partial points、overhead image 与 optional coarse prior",
+      "16³ shared spatial queries 通过 cross-attention 聚合可用模态",
+      "complete-building surface occupancy 监督 queries",
+      "query read-back tokens 与对齐 spatial prompts 双路约束 flow DiT",
+      "64³ voxels→surface latents→mesh→low-poly LoD2"
+    ],
+    "experimentsZh": "BuildingWorld-Image pre-split 1,011,196 image/mesh pairs 来自18 cities；2,000 unique-building geographic test，另 Building-PCC 和500 Skylines-50K priors。比较模型按 corresponding split finetune，每个 stage 200k updates；CD/EMD 指标有 ×10³ scale，F@normalized 0.02。 作者报告 BuildingWorld final LP point-only CDL1 8.65、F-score97.19%；AdaPoinTr11.05、92.00%（Table 2(a), p. 7）。 作者报告 image-only F-score62.82%，TRELLIS49.20%；image+prior78.64%，Hunyuan3D-Omni60.82%（Table 3, p. 7）。 作者报告 41 spatial-cropped points 加 imagery 将 F-score19.43%→46.51%（Table 4(b), p. 8）。 覆盖 point completion、multimodal 和 image/prior 3D 模型，并用统一 low-poly pipeline；建筑外的对象、透视图或通用重建尚未验证。Surface/texture pipeline 结合 pretrained modules，appearance 数值不能纯归于 query conditioner。 occupancy、read-back、spatial prompt、joint vs specialist、matched image contribution、surface conditioning 均有消融；joint 与 specialists 匹配总 updates、非每任务 exposure，时间为 recorded components 之和而非新测全程 latency。",
+    "insightZh": "关键是 occupancy-grounded intermediate 与按相同网格位置注入 DiT，而非一般 multimodal concatenation；一个模型训练四种输入模式并输出 compact assets。建筑领域限制仍在，但这种几何查询条件器对 partial-3D generation 有直接迁移价值。",
+    "evidenceZh": "queries 同时接受完整表面 occupancy 监督并经 token/readout 和 aligned prompts 双路作用于结构生成（Sec. 3.2–3.3, Fig. 2, Eqs. 3–10, pp. 4–5）。中间 query grid 与结构 latent 对齐，不只靠 pooled global features。 作者报告：matched ablations 支撑 query supervision、spatial prompts 和 joint training（Table 4(a), p. 8）。image-only F-score full 62.82%，concat 53.34%、无 occupancy 54.83%；prior setting 无 prompts 57.02% 对 full 78.64%。 作者报告：图像收益在完全相同点云上随缺失程度增加（Table 4(b), p. 8）。2,048 sparse points 增益 3.02pp；41 random points 25.65pp，41 spatial-cropped points 27.08pp。 数据 split 将各输入变体按 building identity 固定到同一分区，并地域排除（App. A4, pp. 13–14）。2,000 test buildings 来自 unseen cities 与 held-out regions，避免把同建筑的 image/point/prior 放进不同分区。",
+    "caveatZh": "论文未列单独 limitations 章；证据限 LoD2 建筑、overhead imagery 与 surface voxel resolution，不能外推细室内结构或通用3D。 单图 texture 由 ControlNet/reference 等生成 plausible facade，不能视为真实未观测外观恢复。 联合训练每任务 exposure 少于 specialists 而总步数相同，能支持该训练预算下的共享收益，不能证明所有预算下均优。 本轮未确认可公开使用的作者实现。",
+    "whyRelevantZh": "目标是忠实恢复特定建筑，主归 Reconstruction；其完整 occupancy 监督的条件器、partial observations 补全和 compact mesh 输出对 editable 3D assets 与生成 prior 有具体迁移价值。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

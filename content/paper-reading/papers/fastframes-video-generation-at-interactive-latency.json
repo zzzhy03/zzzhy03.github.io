@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.23226",
+  "slug": "fastframes-video-generation-at-interactive-latency",
+  "title": "FastFrames: Video Generation at Interactive Latency",
+  "authors": [
+    "Gene Chou",
+    "Guandao Yang",
+    "Fujun Luan",
+    "Lars Mescheder",
+    "Wei Dong",
+    "Stephan Richter",
+    "Vladlen Koltun"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
+  "collectedAt": "2026-11-19",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.23226"
+  },
+  "abstract": "Autoregressive video diffusion models generate frames based on new observations and inputs, making them a promising medium for interactive visual experiences. However, existing models are orders of magnitude too slow for fluid interaction. This paper introduces FastFrames, a family of fast autoregressive video diffusion models that achieves interactive latency without compromising quality. We profile the inference pipeline of state-of-the-art models and find that operations often treated as fixed implementation details, such as VAE decoding and KV cache updates, in fact account for over half of end-to-end inference latency. We challenge the assumption that these components are indispensable and replace them with lightweight alternatives. Our 1.3B variant runs at 36 ms per frame, or 28 responses per second (RPS), on a single B200 GPU while matching the generation quality of a state-of-the-art model that is nearly 8x slower. Our 14B variant runs at 45 ms per frame, or 22 RPS, on an 8x B200 GPU node and yields significantly better visual quality and realism. We show that FastFrames enables real-time interaction in applications such as camera-conditioned and physics-conditioned video generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.23226v1",
+  "keywords": [
+    "FastFrames",
+    "video-generation"
+  ],
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.23226v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://apple-aiml-research.github.io/ml-fastframes/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.23226v1 的 19 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "FastFrames 把低延迟瓶颈从 diffusion sampling 转向 VAE 与 KV 更新：用 ConvNeXt pixel readout 和小型 cache repair 替代完整计算。作者报告 1.3B 在单 B200 达 36ms/response，14B 需八 B200 才达 45ms；VBench 接近基础模型。480p 交互预览有直接价值，720p 和实际 action-conditioned 模型仍明显更慢。",
+    "motivationZh": "交互视频的延迟不只来自DiT去噪，VAE decoding和KV cache更新等环节占据大量端到端时间。",
+    "methodZh": "冻结少步 Wan DiT，从 pre-head features 直接解码像素，并以 VAE target 的空间/时间损失和小规模 real-video adversarial 训练提高锐度。四层共享 trunk 与逐 DiT 层 heads 根据最终 noisy cache 和 clean latent 预测 KV residual，省去 t=0 完整 DiT pass；结合缓存、分片 attention、CUDA graphs 和八卡 context parallel 达到 steady-state 低延迟。",
+    "methodFlow": [
+      "从两步 autoregressive Wan 模型收集 DiT features、VAE pixels、clean-prime KV target。",
+      "冻结 DiT，训练 ConvNeXt 低分辨率 pixel readout 和轻量 KV repair。",
+      "复用预计算条件、持久 KV buffer 与 CUDA graphs 优化 DiT。",
+      "可选八 GPU context parallel，每次生成一个 latent frame 并立刻输出像素。"
+    ],
+    "experimentsZh": "1.3B CF++ warm-start 与 14B Wan causal distillation，各两步、一 latent frame/response；同 VBench prompts/seeds，约 480p，full-cache steady state，B200 为主，并补 H100/720p profile。 作者报告 1.3B 单 B200 36ms、VBench 84.23，CF++ 272ms、84.11；八卡 14ms（Table 1, PDF p.7）。 作者报告 14B 单卡158ms、八卡45ms，VBench84.44；Krea-Realtime单卡1675ms、84.42（Table 1, PDF p.7）。 作者报告 LingBot1.3B 842→52ms（官方2卡 vs FastFrames8卡），RealWonder1141→51ms（官方1卡 vs FastFrames8卡）（Fig.5, PDF p.10）。 多种 bidirectional 与 AR 模型均实测 latency；AR response 与 bidirectional whole-clip 单位不同，不能按同一 per-frame latency 解读。未含网络、输入设备或显示链路的端到端交互延迟。 linear/VAE/ConvNeXt readout 与移除/训练移除 KV prime 的定性对照；各步骤精确 profiling；缺少全量 numerical factorial ablation 与长期误差统计。",
+    "insightZh": "将 VAE 解码看作特定 DiT 的轻量读出、将 cache prime 看作可学习修复，展示 non-denoising components 对响应延迟的重要性；不是通用可替换 VAE，每个模型需重训。",
+    "evidenceZh": "baseline 大量延迟来自 VAE 与 cache write，轻量替换与系统优化共同贡献（Fig.2, Sec.3, PDF pp.3–7）。271.8→35.8ms 包含 DiT 41.6→16.4ms 的系统加速，不能全归于两个网络。 作者报告：KV prime 不能直接移除，训练不 refinement 也产生漂移（Sec.3.3, Appendix D, Fig.6, PDF pp.6–7,18–19）。repair 以未来 attention-output loss 和 KV target 监督。 作者报告：高分辨率、硬件与 action conditioning 仍限制 interactive regime（Appendix A–B, Table 2, PDF p.16; Fig.5, p.10）。720p 小模型 127ms；LingBot 14B 八卡 233ms。",
+    "caveatZh": "主要480p、B200硬件；720p小/大模型为127/116ms，需继续优化。 pixel decoder 必须按各个 DiT checkpoint 训练；action conditioning 使模型更慢。 长期一致性与物理合理性仍待改善。 36ms 对应一个 latent generation response，可含多个 RGB frames，不能称用户操作到屏幕显示的一帧总延迟。 10K internal real videos 用于 adversarial training，复现数据不可直接假设可得；可视品质用 VBench/selected examples，未做人类交互研究。 已确认所列公开代码入口。",
+    "whyRelevantZh": "将相机/物理条件视频的反馈周期压短，可用于 design agent 的交互预览；明确 latency 与 throughput 的区分也适合评估设计工具。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
