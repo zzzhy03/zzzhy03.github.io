@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2611.26040",
+  "slug": "streaming-aaa-streaming-aaa-game-video-generation-at-high-resolution-high-frame-rate-and-low-latency",
+  "title": "Streaming-AAA: Streaming AAA Game Video Generation at High Resolution, High Frame Rate, and Low Latency",
+  "authors": [
+    "Zhihao Hu",
+    "Jianqi Ma",
+    "Jun Zhang",
+    "Jiayang Bai",
+    "Haifeng Shi",
+    "Yanxiang Zhuang",
+    "Zhongqian Sun",
+    "Weidong Zhang",
+    "Wei Yang"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26040"
+  },
+  "abstract": "Controllable streaming video generation offers a promising route toward interactive game simulation, yet existing methods remain far from practical gameplay. They often fail to jointly achieve high visual fidelity, high frame rates, and low interaction latency, resulting in poor responsiveness and degraded user experience. We present Streaming-AAA, a new paradigm for controllable infinite generation of AAA-quality game videos. Our system generates 1080p gameplay videos at 43 FPS with 198 ms end-to-end latency interaction on merely NVIDIA A800 GPUs, while supporting long-horizon play without severe temporal degradation or collapse. Streaming-AAA is built upon three key designs. First, we redesign the VAE architecture for efficient high-resolution decoding, enabling real-time synthesis at 1080p. Second, we pretrain the diffusion model using diffusion forcing and significantly extend the temporal training horizon, allowing the model to capture long-term dependencies and maintain persistent memory. Third, we perform post-training distillation and memory compression to improve inference efficiency while retaining visual quality and temporal consistency. Experiments show that Streaming-AAA substantially improves visual fidelity, frame rate, latency, and long-term stability over prior controllable video generation approaches, enabling a significantly more playable experience for interactive AAA game video generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26040v1",
+  "keywords": [
+    "Streaming-AAA",
+    "video-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "environment-world"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "diffusion"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26040v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26040v1 的 19 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "Streaming-AAA 把低成本 VAE、1.2B factorized UNet、两步 DMD 与稀疏长短期 KV memory 组合成可交互游戏视频系统。作者报告 1080p、43 FPS 和一小时 rollout；但 198 ms 是排除网络与编解码的理论计算延迟，吞吐依赖 diffusion/decoder 分 GPU 流水。值得 skim 系统设计，不宜把游戏内稳定性外推为通用物理世界模型。",
+    "motivationZh": "可交互游戏视频难以同时满足高分辨率、低动作延迟、实时吞吐与长时稳定。",
+    "methodZh": "问题是高分辨率、低延迟和长时稳定难以同时满足。作者用约 22K 个一分钟游戏视频训练 4×16×16 VAE 和由 SD1.5 初始化的 factorized UNet，以 frame-wise diffusion forcing 学习动作条件动态，再用 512-frame DMD 与相同的混合 KV 布局对齐自回归推理。输出可响应方向、天气与时间控制的 raster video，未提供显式几何或可编辑资产。",
+    "methodFlow": [
+      "游戏帧及动作、VLM 估计天气/时间→VAE latents",
+      "1.2B factorized UNet 分离 spatial、condition cross-attention 与 causal temporal blocks",
+      "64→640-frame diffusion-forcing pretraining",
+      "512-frame randomized-noise DMD 对齐两步 clean-history rollout",
+      "22 个稀疏长时+8 个连续近时 KV tokens 统一训练与推理",
+      "批处理 cache write/首步 denoise，diffusion 与 VAE 分 GPU 流水输出视频"
+    ],
+    "experimentsZh": "约22K×1分钟、30fps、1920×1080游戏视频与动作信号，天气和时间由Qwen-VL估计。VAE最终训练分辨率1792×1024；1.2B diffusion由SD1.5初始化，64/640/512-frame三阶段训练；A800上两步推理、torch.compile和TensorRT。 作者报告四项VBench平均0.832，HY-World1.5为0.810；subject/background/imaging quality领先，motion smoothness不领先。（Table 2, p. 14） 作者报告1080p/43 FPS；198ms为理论compute latency，diffusion93ms与decoder58ms分GPU流水执行，未含网络/编解码。（Sec. 5.5, p. 15） 作者展示连续1小时rollout及转回原视角8秒memory例子，未给多次rollout失效率。（Fig. 8, p. 14; Fig. 9, p. 15） 比较HY-World1.5、Lingbot、Matrix Game3.0和YUME；分辨率、训练数据和GPU配置不完全相同，Table2仅Lingbot明确8 GPUs。Sec5.3称two evaluation titles但数据、可视化和限制主要针对Genshin，缺少第二title的清晰分项结果。 Fig9定性比较pretrain、短horizon posttrain、extended horizon，支持静止场景与4/8秒视角记忆改进；未给VAE/随机noise DMD/cache compression逐项数值或统一算力消融。",
+    "insightZh": "贡献主要是把高分辨率解码、训练/推理 memory 布局和蒸馏结合为低延迟长 rollout 系统；Diffusion Forcing、DMD、factorized UNet 和 KV cache 本身均非新范式。联合输出规格有明显系统价值，故保留选择性收录，但缺少模块级定量消融，不把综合速度优势全归于某一个新部件。",
+    "evidenceZh": "方法采用 4×16×16 VAE、Pixel Shuffle 和分离的 spatial/temporal/condition blocks。（Secs. 4.3–4.4, Fig. 3, pp. 6–8）。实际结构为 UNet latent diffusion，不能按标题推断成全 DiT。 训练与推理共用30-token hybrid cache，其中22个稀疏历史、8个连续近时token。（Sec. 4.6, Fig. 4, p. 10）。给出的有效时间跨度约16秒，支持滚动记忆，不证明无限持久状态。 作者报告 VBench 四项均值0.832，对 HY-World1.5 的0.810，motion smoothness则0.982低于0.988。（Table 2, Sec. 5.3, p. 14）。总体平均更高不等于每个质量维度领先，且不测动作语义或物理正确性。 198ms由93×1.5+58计算，43fps由diffusion/decoder分GPU流水得到。（Secs. 5.1 and 5.5, pp. 11, 15）。论文明确排除network/codec，不是完整远程交互端到端实测。 小时级稳定仅由示例和作者压力测试支持，不能证明任意时长或跨游戏泛化。（Fig. 8, p. 14; Limitations, pp. 15–16）。图示间隔快照保留可见稳定性，但不提供多seed失败率。",
+    "caveatZh": "模型按特定游戏数据优化，对未见游戏、画风与机制的泛化有限。 198ms为compute估计且不含网络与codec；43FPS依赖分GPU流水，不能宣称单卡完整部署。 1080p输出宣称与1792×1024训练分辨率并列，未充分解释输出调整细节。 一小时快照不证明无限稳定、精确世界状态或物理一致；四项VBench没有验证动作正确性。 PDF只给project page，未确认公开训练或推理实现。",
+    "whyRelevantZh": "为选择性视频生成雷达提供一个高分辨率低延迟系统参考；可关注统一训练/推理的压缩memory布局，但论文没有验证设计agent或3D资产生成迁移。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

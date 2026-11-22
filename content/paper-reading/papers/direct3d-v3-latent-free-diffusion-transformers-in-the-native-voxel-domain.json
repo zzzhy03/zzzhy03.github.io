@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2611.26511",
+  "slug": "direct3d-v3-latent-free-diffusion-transformers-in-the-native-voxel-domain",
+  "title": "Direct3D-V3: Latent-Free Diffusion Transformers in the Native Voxel Domain",
+  "authors": [
+    "Shuang Wu",
+    "Jiachen Qian",
+    "Youtian Lin",
+    "Feihu Zhang",
+    "Philip Torr",
+    "Yao Yao",
+    "Xun Cao"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "ACM Trans. Graph. 45, 6, Article 244 (December 2026), 18 pages",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26511"
+  },
+  "abstract": "Native 3D generation has largely been built around latent diffusion, with recent advances concentrating on stronger variational autoencoders (VAE) and increasingly elaborate latent representations, from vecset and triplanes to structured sparse voxels. Despite their architectural differences, these methods all share the same premise: geometry is first compressed into a latent space and only then modeled by the generator. We take a different route and propose Direct3D-V3, a latent-free diffusion transformer (DiT) framework that discards the VAE altogether and operates in the native voxel domain, directly modeling raw SDF voxel grids during both training and sampling. To make this direct voxel formulation geometrically reliable, we introduce an implicit manifold regularization over neighboring voxels to suppress non-watertight surfaces, and convert predicted SDF grids into meshes via Marching Cubes so that rendered normal losses can supervise the model directly from its predicted SDF. To improve alignment between the conditioning image and generated geometry, Direct3D-V3 also predicts the camera parameters of the conditioning image as an auxiliary task, encouraging the DiT to learn the mapping from image observations to 3D shape. This latent-free design removes the reconstruction bottleneck, brings training under an objective in the native voxel domain, and yields meshes with substantially richer local detail. The predicted camera and native SDF voxel output further make Direct3D-V3 extensible to generative reconstruction, where diffusion is interleaved with normal-guided refinement to improve alignment with the observed view while the generative prior completes unseen regions. Project page: https://dreamtechai.github.io/Direct3D-V3.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26511v1",
+  "keywords": [
+    "Direct3D-V3",
+    "3d-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "reconstruction"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "implicit-sdf",
+      "voxel-triplane",
+      "mesh"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "diffusion"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26511v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://dreamtechai.github.io/Direct3D-V3"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26511v1 的 18 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "Direct3D-V3 把高分辨率生成放回原生 SDF voxel：patch/voxel 双粒度 DiT、邻接场约束和 rendered-normal supervision 支持作者展示到1536³的细节网格，并可在推理时直接优化SDF。最有价值的是把生成状态与几何监督接通；它仍需粗模型给surface support，IMR减少洞而非保证watertight，公开checkpoint还采用了与论文实验不同的DINOv3/Muon配置。",
+    "motivationZh": "高分辨率3D生成先经VAE压缩会限制几何细节；需要在可承受的token预算下直接约束原生SDF表面。",
+    "methodZh": "论文针对3D VAE压缩丢细节和两阶段目标不一致，提出在surface-adjacent sparse patches上直接对TSDF做flow matching。patch-level transformer建模全局，轻量voxel-level分支恢复局部SDF；离散邻接Lipschitz约束减少不一致zero crossings，以可微Marching Cubes/Nvdiffrast得到normal监督，再用camera head改善图像条件对齐。单图generative reconstruction先根据mask校准相机，再将normal-guided SDF更新与采样交替，未观测区域仍由生成prior补全。去VAE指高分辨率SDF生成阶段，整套流程仍保留独立粗网格/occupied-patch定位阶段。",
+    "methodFlow": [
+      "从参考图提取DINOv2条件；粗生成模型给出surface patch indices",
+      "在sparse patches上初始化高分辨率SDF噪声",
+      "patch-level DiT建模全局形状，voxel-level DiT恢复局部SDF",
+      "联合flow matching、邻接IMR、rendered-normal与camera prediction训练",
+      "Marching Cubes输出mesh；重建模式可先校准camera再交替normal-guided SDF refinement与采样"
+    ],
+    "experimentsZh": "作者以Objaverse-XL高质量子集320K meshes训练，另有加约200K private meshes的扩展模型；每mesh16RGB/normal视图。图像生成主比较102张真实/网络/AI参考图，用Uni3D、ULIP-2语义对齐和1-5分用户评价；GSO评估重建CD/F-score/IoU。训练16张A800，256³逐级到1536³，推理15flow steps；重建使用50camera优化步和早期100-step SDF refinement。 作者报告仅public训练模型Uni3D/ULIP-2为0.4198/0.4535，TRELLIS2为0.4172/0.4405；加入private数据后为0.4224/0.4547。（Table2, PDF p.11） 作者报告GSO CD0.0131、F1@0.99为0.6043，对比TRELLIS2的0.0147/0.5934；但VolumeIoU0.3815低于TRELLIS2的0.3884。（Table3, PDF p.11） 作者报告核心组件Normal-FID从patch-only92.96，依次降至75.80、73.24、完整68.97；1024³开放boundary edge均值由25,353降至898，仍需后处理填洞。（Tables4-5, PDF p.13） 作者报告1536³、patch8单A800平均76,435patch tokens、24,174MB内存、4.64秒每采样步。（Appendix A, Table8, PDF pp.16-17） 覆盖Hunyuan3D2.1、Direct3D-S2、UltraShape、TRELLIS2等高分辨率生成及TRELLIS/CUPID/ReconViaGen重建；102张无GT图像的语义分数不能直接衡量细节几何精度，复杂形状主要靠可视化。multi-view Tanks&Temples仅给定性例子，未形成场景级全面数值比较。 逐项分析voxel branch、IMR、normal监督，camera branch给定性对齐；patch4 Normal-FID57.63优于patch8的68.97但成本增大。默认消融用GT support以隔离粗阶段误差；512³表7换成不同实际first-stage时Normal-FID76.62/80.43/80.61，说明support质量仍影响系统。",
+    "insightZh": "主要贡献是让高分辨率生成器直接暴露可监督、可优化的native SDF状态，并以双粒度架构解决稀疏体素成本，配合不经VAE的surface normal supervision和test-time refinement。原生SDF diffusion并非首次出现，作者明确对比128³ SDF-Diffusion；突破在高分辨率可扩展训练与几何闭环。patch/voxel解耦也借鉴像素空间生成，不能描述为从零发明无latent diffusion。",
+    "evidenceZh": "高分辨率DiT直接生成SDF，但surface support仍由first-stage粗网格/patch predictor提供。（Sec.3.1, Fig.2, PDF pp.4-6; Sec.5.2, PDF p.10）。默认采用vecset DiT定位patch，不等于整个系统单阶段、完全无预训练粗模型。 双粒度DiT和邻接IMR让native TSDF生成可扩展，并以Marching Cubes后normal rendering直接监督表面。（Sec.3.2-3.4, Fig.3-4, Eq.(5)-(9), PDF pp.5-7）。IMR是局部离散Lipschitz penalty，不直接约束mesh topology。 生成重建先根据mask校准相机，再在早期采样窗口对raw SDF做normal-guided更新。（Sec.4, Fig.5, Algorithm1, PDF pp.8-10）。依赖外部mask/normal predictor与可信初始support，输出不可理解为隐藏面真实测量。 作者报告组件逐步将Normal-FID从92.96降低到68.97，并显著减少开放boundary edges。（Tables4-5, PDF p.13）。消融默认用GT surface indices、通常256³，不代表端到端粗模型错误已经消除。 高分辨率成本与failure case明确限制无latent方案的适用条件。（Sec.6, Fig.13, PDF p.15; Appendix A Table8, PDF p.16）。1536³ patch8在单A800的报告成本为24,174MB和每步4.64秒；不是完整pipeline总时延。 PDF打印的官方project page明确链接public Direct3D-V3 repo，已访问确认存在141行infer.py和direct3d实现目录。（PDF p.2 project URL https://dreamtechai.github.io/Direct3D-V3; run/execution/screen001-code-checks.json; repository commit4098ecd09048c3132c9288c32e59f31922c67e2d checked 2026-11-22）。Code链接采用PDF印出的项目页；repo README注明inference/models已发布，但coarse模型和training code待发布，released checkpoint改用DINOv3/Muon而非论文实验配置。",
+    "caveatZh": "不准确或漏掉细结构的first-stage surface indices会让normal guidance扭曲mesh（Sec.6/Fig.13，p.15）。 当前只生成geometry，不统一建模texture/material/PBR；扩展仍需解决稳定性与几何外观一致性（Sec.6，p.15）。 IMR后仍残留少量开放边界，作者使用标准hole filling得到watertight网格（Sec.5.5，p.13）。 去掉高分辨率VAE没有消除粗support瓶颈，normal/相机错误也会传入SDF优化；对薄结构与真实输入须独立检查。 GSO形状较简单，102张图像以语义对齐为主；用户研究正文未给参与人数和统计置信区间，不能据均分断言一般感知优势。 private-data扩展与public模型要区分；公开repo说明checkpoint改用DINOv3与Muon、粗阶段模型和训练代码仍未发布，不能把公开推理结果视为论文配置的直接复现。 1536³仍需要约24GB级单卡内存及多步生成；15×per-step成本不含粗生成、normal预测和重建优化，不能宣称秒级完整重建。",
+    "whyRelevantZh": "直接推进image-to-3D几何生成与可控重建，native geometry作为生成状态和优化变量的设计值得用于高保真资产研究。可借鉴support/细节解耦和几何监督，但论文未验证LEGO部件连接、装配约束或制造可行性，不能把精细mesh直接等同于可制造结构。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

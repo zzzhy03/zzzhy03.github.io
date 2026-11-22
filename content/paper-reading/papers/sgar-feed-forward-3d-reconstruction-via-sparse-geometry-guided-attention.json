@@ -1,0 +1,80 @@
+{
+  "id": "arxiv:2611.26493",
+  "slug": "sgar-feed-forward-3d-reconstruction-via-sparse-geometry-guided-attention",
+  "title": "SGAR: Feed-Forward 3D Reconstruction via Sparse Geometry-Guided Attention",
+  "authors": [
+    "Aoxiang Fan",
+    "Maria Pilligua",
+    "Corentin Dumery",
+    "Oliver Heinimann",
+    "Pascal Fua"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26493"
+  },
+  "abstract": "Feed-forward models have been very successful in 3D reconstruction with ad hoc attention designs that relate all view patches densely. However, the cost of this dense global attention grows quadratically with the number of views, preventing the model from applying to larger-scale reconstruction settings. In this paper, we argue that most dense attention computations are unnecessary from a classical structure-from-motion perspective: 3D structures stem from geometrically matching regions in 2D. We bring this principle to learning-based feed-forward reconstruction with our Sparse Geometric Attention Reconstruction (SGAR) method. In SGAR, each patch token attends to only a small set of patch tokens from other views, chosen by a lightweight learned key selection module trained to predict cross-view 3D proximity of tokens. Thus, dense global attention is replaced by much more efficient geometric-similarity-guided sparse attention. SGAR is a general method that can be applied to different feed-forward models by fine-tuning. In our experiments, we show that SGAR is the fastest among both state-of-the-art dense and sparse methods and the most accurate sparse one. It runs up to 12-times faster than dense attention at 1,000 views with stable pose accuracy where existing sparse methods fail, and shows the best performance in reconstructing more complete geometries on the same time budget.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26493v1",
+  "keywords": [
+    "SGAR",
+    "3d-reconstruction"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26493v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26493v1 的 11 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "SGAR 把跨视图 attention 的 key 选择改成有几何监督的 embedding 聚类，同时保留 reference/global/cluster-summary 通道。作者在一个 1,000-view ScanNet 场景上报告 DejaView 从 319.6 s 降到 26.1 s、pose AUC@30 从 86.5 降到 84.6；值得借鉴的是几何路由与全局上下文的组合，不能把单场景扩展性或“近线性”描述推广为普遍无损加速。",
+    "motivationZh": "Feed-forward重建的全局attention随视图数二次增长，直接稀疏化又会丢失跨视图几何联系。",
+    "methodZh": "多视图 feed-forward reconstruction 的 dense global attention 在视图增加时成本很高。SGAR 对 frame-attention 后的 token 做中心化、归一化线性投影，以 ground-truth depth/camera 对应关系的 multi-positive InfoNCE 学习几何相似性；该监督对 backbone stop-gradient。每层重新做 spherical k-means，每簇读取自身及三个邻簇的全部 patch，并结合所有视图 special tokens、reference-view patches 和其余 cluster summaries，通过 128-token FlexAttention tiles 执行。论文在 DejaView 和 VGGT-Ω 上 fine-tune，给出短、中序列跨数据集、单长序列和固定时间预算重建覆盖率测试。加速伴随精度损失，尤其 DejaView variant 的 LaMAR depth。",
+    "methodFlow": [
+      "输入同一场景多视图 RGB，用 DINOv2 编码并加入 camera/register tokens",
+      "对 frame-attention 后 patches 做 learned geometric projection；训练以深度和相机对应关系进行 contrastive supervision",
+      "每层 spherical k-means 聚为约 sqrt(N) 簇，为每簇选择自身及三个最近簇",
+      "同时读取选中 patches、special tokens、reference view 与其余 cluster summaries，以 128-token tiles 执行 sparse attention",
+      "复用并 fine-tune reconstruction backbone，输出 camera pose、rays、depth 与 point maps"
+    ],
+    "experimentsZh": "在18个真实/合成公开数据集混合上，以2-32 views fine-tune DejaView与VGGT-Ω；4 H100、50k steps。Zero-shot短序列覆盖7-Scenes、ETH3D、LaMAR、NRGBD共200场景；中序列用Mip-NeRF360九场景125-311views；100-1000views扩展和固定预算实验用单个ScanNet test scene0770_00。所有推理在一张A100 80GB、bfloat16；时间排除加载及每输入shape的warm-up。 作者报告1000views下SGAR(DejaView)为26.1s、AUC@30=84.6，原DejaView为319.6s、86.5；SGAR(VGGT-Ω)为40.5s、83.5，原模型303.8s、85.3。（Table 1, p. 6） 作者报告5s预算下ScanNet coverage@5cm：SGAR(VGGT-Ω)93.3%，dense VGGT-Ω86.4%；20s时为95.9%与92.4%。（Table 2, p. 6） 作者报告SGAR(DejaView)三数据集depth δ1.25均分91.3，低于原DejaView94.8，LaMAR由87.3降至76.5；SGAR(VGGT-Ω)均分96.5与原96.4接近。（Table 3, p. 6） 覆盖5个dense模型及10种efficient/streaming/TTT配置，两种SGAR backbone验证了可移植性。不同backbone与released checkpoints并非统一训练数据/预算的受控比较；长尺度只有一个室内序列，OOM/compile failure也依赖此硬件和实现。 Table 4比较top-256、raw-token k-means、移除reference/summary。作者报告raw-token clustering短序列AUC@30为65.3对完整78.2；reference与summary同时去除为65.1。这支持几何projection与全局通道，而非只靠减少keys；未做跨随机seed或多长场景置信区间。",
+    "insightZh": "贡献是把稀疏路由直接监督为几何邻近，并用簇内稠密块及全局通道保留可高效执行的上下文；它区别于近似 attention mass、raw-token 聚类或每 query top-k。不是新的几何表示或免训练插件：依赖有几何真值的额外 fine-tuning。论文给出 attention O(N(V+P+sqrt(N))D) 与 k-means O(N^1.5 C)，不应把有限尺度的慢增长解释成严格线性复杂度。",
+    "evidenceZh": "路由空间有显式几何监督，inference 不需要 ground-truth geometry。（Sec. 3.1, Eqs. (1)-(3), Fig. 3, pp. 4-5）。深度重投影定义对应patch；InfoNCE只训练projection与temperature，每层重新聚类。 特殊、参考视图与summary通道补足稀疏几何邻居之外的全局信息。（Sec. 3.2, Eq. (4), p. 5; Table 4, p. 8）。四组keys分别softmax；移除reference和summary时短序列AUC@30由78.2降到65.1。 作者报告在一个长序列上较dense DejaView约12.3倍加速，但pose精度略降。（Table 1, p. 6; Fig. 5, p. 8）。相同A100 80GB测完整forward，1000views为26.1s/84.6对319.6s/86.5；该长序列只有ScanNet scene0770_00。 固定时间预算可用更多视图提高覆盖率，覆盖率包含后续GT辅助对齐。（Table 2, p. 6; Sec. 4.2, p. 8）。作者报告5s下SGAR(VGGT-Ω) coverage@5cm为93.3%，dense counterpart为86.4%；pipeline用GT cameras similarity与surface ICP，不能等同绝对坐标误差。 适合借鉴为多视图资产获取的路由模块，但未验证LEGO、part或fabrication任务。（Secs. 3.1-3.3, pp. 4-5; Tables 1-3, p. 6）。可迁移部分是geometry-aware token retrieval；论文输出仍是重建而非可编辑/可制造资产。",
+    "caveatZh": "Sec. 5明确承认相较dense attention仍有精度下降，尚需缩小差距。 1000views与固定预算coverage均来自同一个ScanNet场景，不足以证明大规模户外、低重叠或动态场景普遍稳定。 DejaView variant的LaMAR depth明显退化，不能将pose近似保持写成所有几何指标无损。 coverage测试经ground-truth pose/surface辅助对齐，只测相对覆盖，不证明绝对尺度或定位质量。 稀疏模型接受18数据集fine-tuning，而高效baselines用各自released weights；总训练条件存在差异。 有限规模下的近线性runtime图不能替代理论复杂度；所有view special tokens与k-means仍有超线性成本。",
+    "whyRelevantZh": "对多视图3D重建的规模瓶颈有可复用的方法贡献，特别是把geometric correspondence变成token路由监督。它可为后续资产获取提供更快初始化；对LEGO/制造与part分割的收益尚未直接验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

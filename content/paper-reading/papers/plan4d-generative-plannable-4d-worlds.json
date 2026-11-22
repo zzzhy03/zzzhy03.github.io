@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2611.26516",
+  "slug": "plan4d-generative-plannable-4d-worlds",
+  "title": "Plan4D: Generative Plannable 4D Worlds",
+  "authors": [
+    "Hangwei Zhang",
+    "Rujing Dang",
+    "Ruimin Lin",
+    "Jiahong Wu",
+    "Xiangxiang Chu",
+    "Chuanxia Zheng"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation",
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26516"
+  },
+  "abstract": "Most world models for future prediction prioritize aestetic quality of generated videos, but offer only weak physical grounding and limited geometric consistency over time, due to the lack of explicit 4D modeling. In this paper, we introduce plan4d, a possible next milestone towards building a generative plannable 4D world model that predicts future RGB videos together with dense 4D geometry, including depth, cameras, point clouds, and scene flow from an observed scene context and text-specified actions. Since training data with paired actions and dense 4D annotations is inherently scarce, plan4d leverages the complementary priors of foundational video generators and 3D reconstructors. Specifically, we propose a model-stitching architecture that couples Depth Anything 3 with LongCat-Video and augments it with an auxiliary DPT head for scene-flow prediction. The resulting model allows us to plan and generate complex, long-horizon, and fine-grained actions in a dynamic 3D scenes, while substantially improving both visual fidelity and geometric accuracy of the generated future videos. Extensive experiments on both synthetic and real-world datasets demonstrate that plan4d achieves state-of-the-art performance in generative 4D modeling of environmental reactions. Project Page: https://fogradio.github.io/plan4d-project",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26516v1",
+  "keywords": [
+    "Plan4D",
+    "3d-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "environment-world"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "text",
+      "video"
+    ],
+    "method": [
+      "diffusion",
+      "hybrid-method"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26516v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26516v1 的 44 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "Plan4D 把 LongCat-Video latent 接到带 scene-flow head 的 DA3 decoder，让同一未来latent同步解码RGB、depth、camera rays与动态点云，并用冻结几何readout监督video LoRA。值得借鉴的是geometry critic如何约束生成表示；它尚未证明闭环规划或物理可执行性，作者报告每clip需8张H20约15分钟，且图文冲突时可发生跳镜或瞬时变形。",
+    "motivationZh": "只预测RGB的world model缺少显式几何与动作条件，而成对动作和稠密4D标注稀缺，难以生成可规划的未来状态。",
+    "methodZh": "视频模型有外观prior，重建模型有几何prior，而带文本动作与稠密4D标注的数据稀缺。Plan4D先在冻结DA3上训练DPT scene-flow readout，再以线性3D卷积/ridge fitting选取最易到达的DA3早层，把Wan video VAE latent映射为geometry tokens，并结合GT geometry与teacher distillation适配decoder。最后冻结该几何decoder，仅更新LongCat-Video的DiT LoRA，通过latent flow matching与从ground-truth RGB提取的DA3几何目标共同训练。推理完成latent denoising后，RGB与geometry为同一状态的同步readouts；不是一次network call即可实时产生未来，也不是已验证的机器人动作策略。",
+    "methodFlow": [
+      "为冻结DA3增加scene-flow DPT head，监督读取跨帧motion",
+      "以ridge regression选早层接口，训练Wan latent到DA3 token的3D convolution stitch",
+      "用GT geometry与DA3 teacher distillation联合校准stitched decoder",
+      "冻结几何decoder，按action text与初始帧训练video DiT LoRA",
+      "联合flow matching和可微几何loss约束未来latent",
+      "denoising后由Wan VAE和stitched DA3同步读出RGB、depth、rays、scene flow与动态点云"
+    ],
+    "experimentsZh": "三阶段训练：scene-flow readout在11956动态clips上训练；stitched decoder使用122225 GT-capable clips，GT/distill双分支；joint video LoRA用筛选的249422 Action100M clips。81-frame设置，stage3为532×532、rank32，16H100后两阶段64H20。评估scene flow（MOVi-F/DynamicReplica/PointOdyssey）、geometry preservation（ETH3D/ScanNet++等）及action-conditioned generation（RLBench210、HoiGen200、DynamicReplica480、PointOdyssey375、Epic-Kitchens100条5秒片段）。depth per-clip scale-shift对齐、重建Umeyama scale对齐、camera first-frame gauge。 作者报告Epic-Kitchens100条片段SC0.9506、AbsRel0.0766、Chamfer-L10.2321；该组13指标中10项最佳，但camera RPE-R0.1568高于TesserAct0.0946。（Tables3/8, PDF pp.9,32） 作者报告DynamicReplica完整loss相对RGB-only将AbsRel0.0874降为0.0696、camera RPE-R0.2615降为0.1550；HoiGen geometry-only depth反而更优。（Table4, PDF p.10） 作者报告HoiGen对DA3-derived pseudo reference，Plan4D depth AbsRel0.1125、RPE-R0.1240，对比LongCat-Video+DA3的0.2815/0.3450。（Table9, Appendix I.1, PDF p.33） 作者报告68个冲突条件rollouts：34个语义不相容prompt全部cut，34个scene-edit prompt中30个morph、4个保持原场景。（Table10, Appendix I.3, PDF p.36） 作者报告主训练约16960 GPU-hours，另有约34000 GPU-hours消融；inference在8张H20上约15分钟每clip。（Appendix H, PDF p.32） 比较TesserAct/Gen3R/VIST3A，以及Cosmos3-Nano+VGGT-Omega和相同LongCat+DA3 post-hoc pipeline。其他要求额外depth、trajectory或robot-kinematics控制的world models被排除，论文给出原因；因此结论仅覆盖初始RGB+文本动作条件，不能写成所有world models全面SOTA。 包含RGB/geometry/full joint loss、linear/residual/axial stitch、early-block sweep、distillation/GT/feature loss、no-flow-head与LoRA decoder adaptation；full hybrid decoder优于只GT或只distill。冻DA3 token probes显示匹配结构但motion并非低维线性轴。stage2附录部分launcher文字称默认LoRA，而Table7将LoRA单列且显著较差，后续复现需以最终checkpoint/代码核实实际更新范围。",
+    "insightZh": "从已有model stitching/latent alignment继续推进到action-conditioned future的完整4D readout，新增motion head、hybrid decoder finetuning和frozen geometry critic；新意在共享未来latent的训练耦合，而非单独改进静态DA3。多尺度motion cues已有DA3 tokens中存在，作者的token probes支持其readout定位。论文提供跨数据集4D生成与独立post-hoc baseline，足以作为重要4D生成方法读；“plannable/physical”应理解为表征目标，尚非规划成功率或物理模拟保证。",
+    "evidenceZh": "video latent通过3D convolution stitch进入DA3早层，RGB与几何读同一generated latent；joint stage冻结decoder。（Sec.3.1-3.4, Fig.2, Eq.(1)-(5), PDF pp.4-6; Appendix B.5, PDF pp.26-27）。几何readout是可微训练critic，推理仍依赖video diffusion denoising。 stage2用GT+distillation，stage3的Action100M片段只用DA3 teacher提供几何pseudo targets。（Appendix B.1, Table6, PDF pp.21-24; B.4-B.5, PDF pp.25-27）。没有action video的人工4D标注不等于训练完全不需要标注；前两阶段依赖动态GT数据。 RGB-only和geometry-only消融显示两类监督互补，但HoiGen的最佳depth属于geometry-only，完整模型并非所有局部指标最优。（Table4, Sec.4.3, PDF p.10; Appendix C.1, PDF pp.27-28）。完整loss在视觉一致性与相机上更均衡，而非同时支配每个指标。 与相同pretrained backbones的独立生成+重建比较时，Plan4D对DA3-derived reference更一致。（Appendix I.1, Table9, PDF p.33）。该对照明确使用DA3对真实视频产生pseudo ground truth，不是独立物理真值。 图文不匹配诊断中，TypeA 34/34出现cut，TypeB 30/34出现morph，说明几何同步可以伴随物理连续性破坏。（Appendix I.3, Table10/Fig.13, PDF pp.34-37）。实际查看RGB-depth成对图；不能把同步depth当成物理可行的证明。 模型未做closed-loop physical deployment，训练与推理成本很高。（Appendix D, PDF p.31; Appendix H, PDF p.32）。作者明确限制为offline intermediate world representation；报告8H20每clip约15分钟。 PDF称code upon acceptance；已实际访问打印项目页，其Code按钮未给出作者public repository。（NeurIPS Checklist item5, PDF p.40; https://fogradio.github.io/plan4d-project; run/execution/screen001-code-checks.json checked 2026-11-22）。仅记录promised，不将页面模板仓库或disabled按钮当作代码。",
+    "caveatZh": "只是geometry-aware intermediate world model，未输出可执行动作、没有closed-loop physical deployment，累积误差对真实决策影响未知（Appendix D，p.31）。 图文条件不相容时，text-conditioned prior可能产生cut或瞬时morph，几何读出仍同步但physical continuity被破坏（Appendix I.3，pp.36-37）。 GT geometry可能稀疏或局部错误，hybrid training仍依赖数据覆盖和teacher prior（Appendix C.3，pp.30-31）。 至少HoiGen post-hoc对照明确以DA3-derived pseudo ground truth评估，而训练也使用DA3 supervision；一致性提升不等于独立物理真值准确性。depth/重建还使用尺度对齐，不能解释为无歧义metric world。 只有offline81-frame/5秒级测试，尚无闭环规划成功率、接触/动力学守恒或长时rolling stability证据；plannable不是已验证可执行性。 13.58Bvideo backbone及8H20/15分钟推理不支持实时交互；single feed-forward readout表述不能省略前置diffusion denoising成本。 Checklist称多次实验稳定，但关键表未给可解释的误差条/种子方差；stage2 LoRA/full-update叙述存在需代码澄清的细节。",
+    "whyRelevantZh": "直接关联dynamic3D Generation与video prior到显式几何的耦合，最可借鉴的是从native geometry decoder回传生成约束、让多个输出共享latent状态。尚未涉及部件装配、制造约束或LEGO物理结构；其规划意义应限定在未来表征，不能代替主线资产的可执行性验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

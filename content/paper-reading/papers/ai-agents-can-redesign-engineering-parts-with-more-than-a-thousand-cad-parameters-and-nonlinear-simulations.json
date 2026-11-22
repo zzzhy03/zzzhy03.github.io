@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2611.26003",
+  "slug": "ai-agents-can-redesign-engineering-parts-with-more-than-a-thousand-cad-parameters-and-nonlinear-simulations",
+  "title": "AI agents can redesign engineering parts with more than a thousand CAD parameters and nonlinear simulations",
+  "authors": [
+    "Alexandra Starostina",
+    "Alexander Hermann",
+    "Mahish Guru",
+    "Kartik Bali",
+    "Roland Aydin",
+    "Christian C. Cyron"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "fabrication",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.AI"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26003"
+  },
+  "abstract": "Simulation-driven design of real engineering components has to meet three conditions at once. It runs on few solves, since a nonlinear finite-element simulation of a 3D part takes hours; its design space has many values, the hundreds to thousands of values of the part's CAD model; and a better design often needs a redesign, coordinated changes of the part's proportions rather than local polishing of its surface. Automated optimisers meet at most two of these conditions. Classical optimisers, Bayesian or derivative-free, need a person to cut the design down to a few parameters, and on all the values they need far more solves; industrial shape optimisers move every surface node of the mesh in one solve per cycle, but only in small steps that polish rather than redesign. We ask whether a general-purpose large language model (LLM) can meet all three by joining what it knows with what the simulation shows. GPT-6 Astra edits a magnesium stent through a CAD geometry parametrisation of about 1,650 values, with a budget of 15 simulations; every proposal is built in CAD, meshed and simulated with large-deformation plasticity and contact, and the LLM reads the full results of every solve. Within that budget it lowered the objective, a high percentile of the strains in the stent's bends, by 32%; on the same budget, the industrial shape optimiser Tosca improved the original design by a tenth and then stopped improving. An earlier GPT-6 Astra design, 25% lower in the same objective, was checked in an independent, higher-fidelity model of the full deployment with crimping and damage: it was 14% less strained than the original after the full chain, and its most damaged spot began to fail later and carried 63% less damage at full expansion. LLMs can thus join their learned knowledge with simulation data to adjust more than a thousand design values and reach valid designs with real improvements.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26003v1",
+  "keywords": [
+    "AI agents can redesign engineering parts with more than a thousand CAD parameters and nonlinear simulations",
+    "visual-design-agents"
+  ],
+  "facets": {
+    "task": [
+      "editing"
+    ],
+    "representation": [
+      "cad-brep-parametric"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "physically-plausible"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26003v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26003v1 的 42 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "这篇把 CAD 参数名与仿真结果中的部件名对齐，让 LLM 在少量昂贵 solve 内先重设计、后局部修形。作者报告支架15次仿真内应变目标降低32%，但约1650个可写值主要被组合成2–3类、27–40值的共享形状；高保真14%应变降低来自另一份pilot设计，不能与clean-run最优值拼接。值得深读的是表示与反馈接口。",
+    "motivationZh": "昂贵非线性solve预算很小，CAD设计又含大量可写值；需要将物理反馈指向可编辑结构并选择有效的重设计尺度。",
+    "methodZh": "为解决高参数、低预算的非线性设计优化，人工提供几何参数化、仿真setup、按冠部命名的strain digest与约束。LLM用Python读取全场、输出含预测的JSON设计，先经免费几何检查，再按每轮1–3候选调用FreeCAD/Abaqus，最多15 solves。主例是镁合金支架，另用26变量plate和4变量crown比较Tosca/BO，展示agent选择共享结构与局部变化尺度的价值。",
+    "methodFlow": [
+      "人工固定几何参数化、物理setup、objective/limits和solve预算",
+      "按与CAD一致的ring/crown/link名称反馈strain表与全场",
+      "LLM读取/绘图分析结果，写每轮1–3份JSON设计及预测",
+      "免费检查规则、CAD有效性与几何约束",
+      "FreeCAD重新建模→meshing→Abaqus非线性solve→judge",
+      "保留历史结果，先共享形状重设计、后局部冠部修形"
+    ],
+    "experimentsZh": "非线性3D stent约1650可写值、15 solves（含start），GPT-6 Astra clean run与开发pilot；每个candidate重建CAD并网格化，reduced model仅expansion/recoil。另4个LLM各3次plate runs（最多26值/15 solves），6个LLM共20个crown sessions（4值/13 solves）；经典BO用5 seeds。 作者报告clean run Q 0.1604→0.1085（约32%降低），重建最优0.1088，rebuild noise 0.004；LLM调用US$19.44，实际流程35小时。（Sec. 5.1, p. 12; App. B, p. 32） 作者报告Tosca从原始设计降低Q约10%，agent one-shot后再由Tosca合计20%；agent clean run32%。两者目标接口与可编辑空间不同。（Table 3, p. 19; Sec. 5.4） 作者报告另一pilot设计在full-cycle模型strain Q低14%，worst-element porosity 1.24%对3.38%；超过coalescence的金属占比反而8.6%对7.0%。（Sec. 5.2, p. 13; Fig. 7, p. 14） 作者报告plate上9/12 agent runs胜Tosca；四变量crown中BO改进8.6–15.4%，只有Kimi满足预先设定的重复run领先标准。（Table 4, p. 20; Table 7, p. 33; Table 8, p. 37） Tosca同solve预算但stress替代strain目标，不直接看到lumen/shortening限制；形状mesh优化不同于CAD重建。Plate另设fine/coarse judge与mesh check。Stent未跑高维BO，也无同结构27–40维BO对照；只一个LLM、一个clean run，不能据此建立维数缩放规律。 比较无per-crown表、去物理语义及shuffle crown结果的控制，后者仅每variant两次next-round继续、建模不solve；表明局部修改会跟随反馈位置但无统计效力。Plate/crown多run展示预算、约束容差和模型差异的影响。",
+    "insightZh": "实质贡献是高维参数化接口与feature-addressed反馈相结合的低solve设计闭环，并以shuffle control检验使用仿真结果，而非新的LLM训练算法。约1650是可写参数容量；agent自行将其压为2–3类共享冠形，大部分设计可用27–40值表达。这个结构选择本身值得迁移，但不能表述为15点解决任意1650维黑箱优化。",
+    "evidenceZh": "CAD输出与strain输入共享部件名称；agent可访问全场并提出批量带预测设计。（Sec. 3, Fig. 2, pp. 5–7）。保证反馈指向可编辑对象，是可复用的设计agent接口。 作者报告clean run 15 solves将Q从0.1604降至0.1085，重建后0.1088。（Sec. 5.1, Fig. 5(b), pp. 12–13）。32%收益显著大于定义的0.004 rebuild noise；预算包含start solve。 独立full-cycle验证使用pilot设计，Q低14%，最损伤点porosity约1.24%对3.38%。（Sec. 5.2, Figs. 7–8, pp. 13–15）。与clean-run最优不是同一设计；porosity是模型损伤量，不是器械失败概率。 约1650值多数以2–3族共享冠形写入，独立描述约27–40值；shuffle改变局部修改针对位置。（Sec. 5.3, pp. 14–17）。支持agent选择结构并读取反馈，不证明完全独立高维搜索。 Tosca的stress目标与judge的strain目标、约束信息和CAD空间不同。（Secs. 5.4–5.5, Table 3, pp. 17–20）。作者明确允许专家重设Tosca后可能更好，不能宣称战胜所有工业优化器。 代码和session仅reasonable request，仿真依赖Abaqus/Tosca。（Code and data availability, p. 23）。没有公共可复现repo链接，不提供Code按钮。",
+    "caveatZh": "每个新零件仍需人工写参数化与simulation setup，布局拓扑固定。 Stent仅一个LLM、一份clean run；reduced model可靠性只用另一pilot设计的full-cycle检查。 原始是开放研究设计，尚未验证state-of-the-art商业部件。 shuffle control规模小，主要reinforcement并不总跟随置换位置。 1650可写值不等于1650独立有效自由度；多数操作是27–40描述值的共享形状。 高保真检查、clean-run32%与63% worst-point damage属于不同设计或指标，必须分开。 较低worst-point损伤伴随更多金属超过coalescence阈值、约16%更高crimp force，不能概括为全面更安全。 结果是仿真设计方法证据，无物理制造、疲劳或临床验证；代码仅按需索取且需商业solver。",
+    "whyRelevantZh": "直接命中CAD/visual design agents与制造物理约束生成。可迁移的是按可编辑part命名组织反馈、免费buildability gate、先共享结构后局部修正的多尺度设计动作；向LEGO或工艺设计迁移是研究推断，本文未验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

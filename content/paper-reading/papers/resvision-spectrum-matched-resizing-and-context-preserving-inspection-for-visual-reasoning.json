@@ -1,0 +1,76 @@
+{
+  "id": "arxiv:2611.26318",
+  "slug": "resvision-spectrum-matched-resizing-and-context-preserving-inspection-for-visual-reasoning",
+  "title": "ResVision: Spectrum-Matched Resizing and Context-Preserving Inspection for Visual Reasoning",
+  "authors": [
+    "Guojian Zhan",
+    "Jiahao Xu",
+    "Yahui Liu",
+    "Yao Hu",
+    "Chuan Mu"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26318"
+  },
+  "abstract": "Agentic visual reasoning improves vision-language models by selectively enlarging evidence without adding new scene content, but the benefit depends on whether fine structure remains accessible and whether local observations stay grounded in the full scene. We identify three recurring bottlenecks: high-frequency detail can be attenuated during visual-token formation; spatially distributed evidence can remain encoded yet difficult for the language model to retrieve; and isolated crops can weaken whole-detail correspondence through scale and positional mismatch. ResVision addresses these limitations with two complementary components. Spectrum-Matched Resizing (SMR) estimates image complexity and selects an adaptive global sampling scale, avoiding unnecessary enlargement on simple inputs while allocating more visual tokens to detail-rich images. Context-Preserving Inspection (CPI) returns each inspected crop together with the complete working view, preserving local detail and global context across tool turns. We evaluate Direct and Agentic variants on four frontier VLMs and 29 benchmarks spanning six visual-reasoning families. Complete ResVision (Agentic Base plus SMR plus CPI) is best for every model, improving by 3.36 to 4.94 points over Direct Base and 1.87 to 2.94 points over Agentic Base. These results show that adaptive visual sampling and context-preserving inspection address distinct, complementary constraints in multimodal reasoning.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26318v1",
+  "keywords": [
+    "ResVision",
+    "vlm-mllm"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "tool-use"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26318v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26318v1 的 40 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "ResVision 提供一个轻量、training-free 的视觉观察接口：根据active tile频谱选择working-view尺度，每次crop都把完整working view一并返给VLM。作者报告四模型Macro-29平均比VISTA高2.28点；可借鉴到design-agent的rendering feedback，尤其局部细节与整体构图的绑定，但这是迁移推断，论文只验证视觉推理，没有设计生成实验，且资源GitHub链接未能确认论文实现。",
+    "motivationZh": "全局resize会抹去细节，独立crop又会丢失位置与整体上下文；视觉推理的观察接口需要兼顾两种证据。",
+    "methodZh": "局部zoom并不创造新图像信息，却会改变细节如何被visual tokens采样，以及crop能否正确对应到全局位置。SMR从高gradient-energy tiles的radial Fourier spectrum取90%能量频率，在backend stride和token预算约束下求最小可用scale，固定working image与坐标系。CPI在每次工具turn以分离且有label的image blocks同时提供该全图与放大crop，历史crop继续保留。四个VLM、29benchmarks和五任务受控消融支持两个组件互补；机制probe主要基于单一Qwen视觉栈，并不能证明所有backend相同。",
+    "methodFlow": [
+      "从输入灰度gradient energy选择最高25%的active tiles",
+      "聚合non-DC radial Fourier power，估计90%能量频率",
+      "按backend stride与目标0.77 cycles/token计算scale，并约束512–4608 token预算",
+      "固定缩放后working view及工具坐标，由VLM决定需inspect的区域",
+      "CPI把放大crop和同一完整working view作为分离且标记的image blocks共同返回",
+      "在四次tool-call上限内重复观察并回答，保持历史crop与全局参照"
+    ],
+    "experimentsZh": "四个API/模型端点Kimi-K3、Qwen3.8-Flash-Next、GLM-5.3-Flash与DeepSeek-V4.1-Flash-1017；29benchmarks六类，等权Macro-29；temperature0、Max effort、65,536输出token上限、每配置三次run，VISTA和完整方法共享四次tool调用上限。细致component/fixed-token/统计与latency分析在BabyVision、VLMsAreBiased、BLINK、VStarBench、MMVP五任务共1,679问上完成；机制probe主要Qwen。 作者报告完整方法Macro-29为Qwen76.90、Kimi79.02、DeepSeek71.97、GLM75.83；相对VISTA各高2.94、2.42、1.87、1.88点。（Table 1, p. 8） 作者报告单用CPI的Macro-29比VISTA高1.10–1.97点，完整方法比各模型最强单组件高0.40–0.94点。（Table 2 and Sec. 4.2, pp. 8–9） 作者报告50个BabyVision图像的crop grounding中，whole+crop在1–4倍zoom保持72%，孤立crop放大后为40–58%。（Sec. 2.3 and Fig. 5, p. 5） 作者报告五任务端到端latency相对Direct为1.07–1.36倍；相对VISTA，Qwen快2.8%，其余慢3.5–9.7%。（Table 7 and Sec. 4.7, p. 12） 作者报告并非逐任务单调提升：如Qwen CountQA由VISTA74.08降73.50、Kimi SimpleVQA由73.17降70.67。（Table 3, p. 10） 主对照是Direct、Direct+SMR、VISTA Agentic和Agentic+SMR+CPI，共享backend/prompt/tools/call ceiling；另有SMR-only/CPI-only、五种固定token target、reasoning-effort/temperature/output-cap敏感性。没有design agent生成编辑benchmark，也未比较给设计任务量身定制的多尺度reviewer；mechanistic结论主要一个Qwen栈，跨模型诊断覆盖不足。 Macro-29的SMR×CPI组件表和Macro-5四模型2×2设计都显示互补；fixed-token study只覆盖Kimi/Qwen，非精确等实际token成本控制。最高reasoning effort的作用很大，32K增到131K output并不稳定增益。附录按question做bootstrap与McNemar，且人工错误类别由Kimi judge自动判；收益存在任务异质性，不能据聚合分数称普遍可靠。",
+    "insightZh": "这不是新VLM architecture或训练范式；贡献是对presentation-induced bottleneck的诊断，以及把frequency-aware全局采样和稳定whole+detail返回策略组合成可复用agent输入协议。相对VISTA保留相同tool loop和调用上限，组件消融支持互补。主线价值来自渲染观察机制的具体迁移，不来自将普遍VQA提分包装为major；缺乏设计任务和可核实实现使复现与迁移证据仍有限。",
+    "evidenceZh": "SMR以active tiles的频谱能量分位数决定最小budgeted scale，并固定working image和所有tool坐标；所有benchmarks用同一参数。（Sec. 3.1, Eqs. (4)–(9), pp. 6–7; Appendix F and Table 24, PDF p. 32 (supplement p. 16)）。rho=0.25、eta=0.90、tau=0.77，Qwen effective stride32；其他backend需各自processor/token-count接口。 CPI每轮返回完整working view与crop，分别编码且有标签；每次crop都来自同一working image。（Sec. 3.2, Eqs. (10)–(13), p. 7; Fig. 6, p. 6）。全图不是把crop贴回去的composite image，也没有改backbone position编码。 作者报告四模型Macro-29均值为75.93，相比Direct72.05和Agentic73.65分别高3.88/2.28点。（Table 1 and Sec. 4.2, p. 8）。均为29 benchmark等权平均和三次runs，收益不能当作全部任务统一提升。 SMR和CPI分别提升所有测试模型的Macro-29，组合比强单组件再高0.40–0.94点。（Table 2, p. 9）。组件对照比只比较Direct更能定位观察协议收益。 作者报告五任务SMR优于最强固定2048-token allocation约3.31/3.36点，但latency只在这一五任务slice测量。（Tables 5 and 7, p. 12; Appendix D.2, PDF p. 26）。固定budget与adaptive不是严格相同实际token成本；不能把latency倍率外推29任务或设计工作流。 以同一渲染图作为固定全局坐标，把局部笔画或结构crop与全图同turn返回，是可用于design-agent检查器的具体机制迁移。（Fig. 6 and Sec. 3.2, pp. 6–7; Appendix H.1–H.4, PDF pp. 35–39）。论文没有生成或编辑设计产物实验，此处是机制用途判断，不是已验证的设计成功率。 PDF资源区GitHub链接指向github.com/pevek；实际访问该页只见Alexander Schulz及bookbot，未确认论文实现。（PDF p. 1 resource annotation; execution/batch-002-code-checks.json）。不提供Code链接，not-found仅描述本轮可验证资源状态，不断言作者没有私有实现。",
+    "caveatZh": "Sec. 4.2–4.3明确指出收益跨任务不均，General Visual家族接近平，完整方法不支配每个individual benchmark。 Sec. 4.6指出多视图inspection依赖足够reasoning effort；增加output ceiling不稳定改善。 Appendix F说明需要backend-specific processor几何或token-count接口，scale受预算上限截断。 论文未单设Limitation节；所有design-agent用途属于reviewer迁移推断，没有设计生成、CAD、SVG编辑闭环证据。 高频与readout机制probe集中Qwen，不能直接证明所有closed/API backend共享同一bandwidth数值；tau0.77的跨backend解释需谨慎。 CPI不断重复全图会增加context与image-token成本；文中只给五任务client latency，没有完整API token/费用或长轨迹扩展曲线。 资源区GitHub实际链接到无法确认与论文有关的pevek用户页，未核实公开论文代码；不能给Code available或声称复现容易。 统计显著性与错误taxonomy仍受benchmark采样、judge标注与后端版本漂移影响；本项目未复现实验。",
+    "whyRelevantZh": "对Visual Design Agents可迁移的是rendering feedback的观察接口：用结构密度决定初始采样，再每轮同时保留局部线条/形状细节与全局布局坐标。这个用途与2D设计的细节核查机制具体对应，但论文主要贡献仍是通用VLM visual reasoning，因此只归VLM/MLLM，不把它冒称设计agent论文。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2611.26389",
+  "slug": "videcide-teaching-video-diffusion-models-to-reason-and-plan-step-by-step",
+  "title": "ViDecide: Teaching Video Diffusion Models to Reason and Plan Step by Step",
+  "authors": [
+    "Kaiwen Zhang",
+    "Yiming Gao",
+    "Zeqi Xiao",
+    "Xintao Wang",
+    "Pengfei Wan",
+    "Kun Gai",
+    "Xingang Pan"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26389"
+  },
+  "abstract": "Current leading video generation models can synthesize highly realistic videos, while still frequently violating physical and logical constraints in multi-step reasoning and planning, even after training with large-scale reasoning data or existing diffusion RL methods. We attribute these failures to the conventional video training paradigm, which treats a solution as a fixed-length clip rather than a chain of decisions. We present ViDecide, a decision-centric framework that trains video diffusion models to predict state transitions causally and decide when to stop, with a decision-focused training schedule. We further propose Corrective Fine-tuning (CFT), which corrects failed decisions by mapping their noise to the model's own successful continuations, achieving stable improvement without policy-gradient optimization. Across abstract games, planning tasks, and a new benchmark of multi-step robot planning, ViDecide achieves an average strict success rate of 83.8%, far above 23.3% for standard fine-tuning and 67.8% for the strongest prior method, and generalizes to larger puzzles and unseen layouts. Our framework therefore unlocks greater potential for video generation models as reliable reasoners and planners in the visual world. Project page: https://kevin-thu.github.io/ViDecide.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26389v1",
+  "keywords": [
+    "ViDecide",
+    "video-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "reasoning"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "diffusion"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26389v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://kevin-thu.github.io/ViDecide"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26389v1 的 28 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "ViDecide 把视频解题改为带视觉 EOS 的因果决策链：高噪声训练逼模型决定下一状态，再将失败决策的原始噪声重定向到自身采样出的成功续写。作者报告四组任务平均 strict success 从标准 SFT 的 23.3% 到 83.8%；值得读的是决策粒度的训练与纠错机制，不能把模拟机器人视频的成功等同可执行控制，CFT 在新机器人布局上还会因视觉瑕疵退步。",
+    "motivationZh": "视频模型通常按固定片段生成，难以逐步选择操作、判断成功及决定何时停止，生成流畅不等于可验证规划。",
+    "methodZh": "固定长度联合去噪容易直接画出目标，却在中间违反任务规则。论文用 teacher-forced causal attention 逐个 latent segment 生成，追加红边 EOS 帧学会自停，并把 flow-matching 时间分布移向高噪声。CFT 从失败轨迹的错误前历史分支，保留成功续写，将失败噪声与分歧处的成功片段配对监督，同时学习成功后缀并混入 expert trajectories。实验覆盖规则游戏、六项 VBVR 规划与模拟双臂积木任务，另以从零训练 DiT-B 验证机制。结果支持受控视觉解题中的范式变化，但每个 benchmark 单独训练，纠错依赖 verifier，也未打通视频到机器人动作。",
+    "methodFlow": [
+      "输入任务描述、初始图像与 expert video，并追加红边视觉 EOS",
+      "以 clean history teacher forcing 训练 causal video diffusion，按任务选择 K=1 或 K=8 latent frames",
+      "将 flow-matching timestep 向高噪声平移，强调下一状态决策",
+      "rollout 后由规则 verifier 定位失败，在错误前历史分支重采样成功续写",
+      "CFT 将失败决策噪声映射到成功片段，并混合成功后缀与 expert loss",
+      "逐片段生成视频，在检测到 EOS 或长度上限时停止"
+    ],
+    "experimentsZh": "Wan2.2-TI2V-5B全参数微调、冻结text encoder与VAE，384×384/16fps；VideoRLVR各游戏约9.5K训练/1K测试，六项VBVR每项5K训练/100去重布局测试，RoboTwin-Plan共10K训练/700测试。另在132M DiT-B上从零训练两个游戏。SSR要求每个状态转移合法且到达目标，部分任务还要求最短解；Wan2.2使用5步采样、20s上限。 作者报告四组 Wan2.2 任务 CFT SSR 为84.4%、90.8%、82.2%、78.0%；相应SFT model为77.9%、83.0%、74.8%、73.9%，因此CFT本身带来4.1–7.8点，而83.8对23.3的总提升还包含生成范式和训练schedule。（Table 5, p. 8; Fig. 1 and Sec. 4.1, pp. 1, 7） 作者报告将RoboTwin训练shift由默认5移到10，SSR由33.3%至73.9%；同budget的未平移训练只有2.6%。（Table 4, p. 7） 作者报告在149个Sokoban分歧点，失败原噪声纠正率从SFT的1.3%到CFT的57.0%；fresh noise的成功决策率由43.8%到67.9%。（Fig. 6, p. 9; Table S10, p. 22） 作者报告Sokoban四/五箱OOD下CFT为74%/54%，但RoboTwin新布局Blocks/Hanoi由chunk-wise的36%/18%降到32%/14%。（Table 7, p. 10; Tables S14–S15, p. 23） 同backbone/data/update对比bidirectional SFT、HDR、S2PD；从同SFT checkpoint以等更新预算对比continued SFT、Flow-GRPO、DiffusionNFT、sample-level和decision-level RFT。零样本商用模型只用20–30个分层样本且放宽人工判据，不能与训练模型当作完全同协议排名；附录还对比frontier MLLM但输出介质与推理预算不同。 分别检验K=1/K=8、shift=1/5/10、teacher forcing/diffusion forcing、采样步数与shift、noise mapping和额外t=1监督、多轮CFT、self-generated/solver corrections。结果支持causal结构和高噪声训练的收益，self-generated纠错比solver更好；CFT只纠正可找到成功续写的失败，coverage不足且机器人OOD视觉质量会下降。",
+    "insightZh": "因果 video diffusion 本身已有工作；这里的增量组合是把 adaptive termination、decision-focused noise schedule 与复用 failure noise 的显式纠错连成训练流程。与同数据、同更新预算的 bidirectional/HDR/S2PD、sample/decision-level RFT 和 diffusion RL 对照后，收益不只来自延长推理或失败处分支。附录进一步拆开 noise mapping 与 t=1 额外监督，支持 failure-noise 配对的独立贡献；但不是已证明适用于开放视频创作的通用新基础模型。",
+    "evidenceZh": "方法以因果 segment 分解视频，并在生成目标中学习视觉 EOS；frame-wise 在 Wan2.2 中指单个 latent frame，覆盖4个视频帧。（Sec. 3.2, Fig. 2(a), p. 4; Appendix C.1, p. 17）。避免把 frame-wise 误写为每一步只生成一个RGB帧。 CFT 在共享历史下将导致失败的噪声与成功分支的分歧片段配对，前缀只作context，后缀与expert轨迹提供保留能力的监督。（Sec. 3.4, Eqs. (6)–(8), p. 5; Appendix C.4, pp. 17–18）。这是有具体 correction target 的回归，不是整段视频的单个 reward。 作者报告 CFT 后 FlowFree/Sokoban/VBVR-MultiStep/RoboTwin-Plan SSR 为84.4/90.8/82.2/78.0%，平均83.8%。（Table 5, p. 8; Fig. 1, p. 1）。23.3%标准SFT锚点用Wan默认shift=5；Table1主要受控对照默认shift=10，不能混淆。 作者报告使用failure noise的主要独立收益为FlowFree测试集约3.5–3.6点，额外t=1监督约0.7–0.8点；两者组合最好。（Table S11 and Appendix D.6, pp. 20, 22）。此消融支持配对噪声的作用，但只在选定游戏和backbones上成立。 CFT 的 OOD 改善不普遍：RoboTwin新布局与长计划的总体success由26.7%降至21.3%，visual defects由20.7%增至32.0%。（Tables S14–S15, Appendix D.7, p. 23）。摘要中的generalization不能压缩成所有任务都泛化更好。 该视频推理机制可供受约束生成研究参考，但没有真实机器人执行，也不是直接验证LEGO或fabrication的装配生成。（Appendix F, pp. 24–25）。主线迁移属于研究启发，不能当成本论文已验证任务。 PDF 印出的项目入口实际链接到公开 Kevin-thu/ViDecide 仓库，存在src/videcide、scripts、configs、demo.py及训练/推理说明。（PDF p. 1 project URL https://kevin-thu.github.io/ViDecide; execution/batch-002-code-checks.json）。Code链接保留PDF印出的项目入口；repo URL本身未印在PDF，公开实现已于本轮访问核实。",
+    "caveatZh": "Appendix F说明每个benchmark单独训练，未展示统一开放域推理模型。 CFT需要能定位错误的规则verifier；开放任务的learned verifier仍是未来工作。 RoboTwin-Plan只评估模拟视频；视频到动作与真实机器人执行留待未来。 Tables S14–S15显示自生成续写训练增加机器人视觉瑕疵并伤害新布局/长计划success。 SSR依赖状态解析和规则实现；RoboTwin verifier虽报告对140个生成视频与人工一致率超95%，仍会把视觉缺陷与规划失败混合。 摘要83.8%对23.3%是完整三组件相对默认SFT的总差，不是CFT单组件提升。 任务均有明确规则和synthetic/simulator数据，不能据此声称开放视频创作、真实物理或制造装配已经可靠。 模型未复现；仓库已确认含实现，但环境、权重许可和实际训练成本未独立验证。",
+    "whyRelevantZh": "这是Video Generation外围雷达中的重要训练组织变化：以可验证状态转移而非整段外观为监督单位，再显式修正导致规则失败的采样。对受结构与规则约束的视觉生成值得深入阅读；将其用于设计或积木装配仍需新任务、verifier与动作/结构表示，本文未验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

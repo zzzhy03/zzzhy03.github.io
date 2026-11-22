@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2611.26629",
+  "slug": "posterior-matching-distillation",
+  "title": "Posterior Matching Distillation",
+  "authors": [
+    "Hidir Yesiltepe",
+    "Julius Berner",
+    "Arash Vahdat",
+    "Pinar Yanardag"
+  ],
+  "primaryTopicId": "image-generation",
+  "topicIds": [
+    "image-generation",
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26629"
+  },
+  "abstract": "Diffusion distillation accelerates image and video generation by compressing a pretrained teacher's iterative sampling process into a few network evaluations. Distribution-based methods achieve this by matching the student's output distribution to the teacher's. This matching is often driven by reverse-KL objectives, whose mode-seeking bias favors dominant teacher modes at the expense of diversity across samples. We introduce Posterior Matching Distillation (PMD), a new member of the distribution-based distillation family that combines mode-covering posterior sampling with any-step generation. At zero population loss, PMD recovers the teacher's full posterior of clean images at each trained noise level. Its stochastic student supports any-step sampling budgets within the trained timestep grid without further training. To learn these posteriors, PMD matches exponentially reweighted averages of student samples conditioned on a fixed noisy state to corresponding teacher posterior means. Under Gaussian corruption, exponentially tilted posterior mean is a single teacher evaluation at a shifted input. We prove that, matching tilted means over an open neighborhood uniquely identifies the full posterior. PMD thus supervises the entire conditional distribution through a family of mean constraints, without any auxiliary student-score network. Experiments on SDXL and FLUX.2 [klein] 4B demonstrate that PMD achieves the best FID among 4-step methods on both models, while maintaining competitive or leading performance across prompt-alignment and perceptual-quality metrics.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26629v1",
+  "keywords": [
+    "Posterior Matching Distillation",
+    "image-generation"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "efficient"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26629v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26629v1 的 30 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "PMD 用指数倾斜后的条件均值监督 stochastic student：Gaussian corruption 下，目标可由一次 shifted teacher evaluation 得到，避免辅助 student-score network。其价值主要是少步采样的条件多样性；作者在 FLUX.2 四步报告 Vendi 3.3708，而原四步模型为 2.3237。需要同时记住两条边界：完整后验识别依赖理想 unguided teacher 与 population loss，实际视觉质量仍靠额外 GAN loss。",
+    "motivationZh": "Reverse-KL式蒸馏倾向teacher主模态，难以同时保留posterior多样性与灵活的any-step采样预算。",
+    "methodZh": "分布蒸馏可匹配总体边缘分布而丢失固定 noisy state 下的条件模式。PMD 为同一 noisy state 产生多个独立 stochastic predictions，以 exponential weights 汇总后匹配 teacher 在 shifted input 上的 posterior mean；变化 tilt 得到一族分布约束。论文给出理想条件下的 posterior identification 证明，实际以四个 student draws、四个 teacher tilt queries、on-policy rollout、jackknife/cross-fitting 有限样本校正和对抗损失训练。正文验证 SDXL/FLUX.2 图像，附录补充 Wan2.1 视频；any-step 只指已训练 timestep grid 的子采样预算，不是任意未训练时刻的保证。",
+    "methodFlow": [
+      "固定 noisy state，沿 student on-policy rollout 获取训练输入",
+      "采样多个 exponential tilt，并在 shifted input 查询 frozen teacher",
+      "对同一状态注入独立噪声，得到多个 stochastic student clean predictions",
+      "用 tilted weighted means 与 teacher target 构建 PMD loss，并做有限样本校正",
+      "联合 GAN loss 更新 student；推理在已训练噪声网格上反复预测并 re-noise"
+    ],
+    "experimentsZh": "图像以 SDXL Base1.0 与 FLUX.2 [klein] Base4B 为 teacher，1024×1024，主比较四步；作者使用8张L40、2000student updates、batch16、每状态4draw/4tilt queries，额外10000discriminator updates。SDXL用LAION，FLUX用FLUX-Reason-6M且排除其验证集。质量/对齐覆盖GenEval、DPG、OneIG、COCO10k FID/偏好指标；条件多样性用1632 PartiPrompts×8seeds；50人对24prompts的四图grid评分。附录视频用Wan2.1 1.3B。 作者报告 FLUX.2 四步 FID 为24.12，原四步模型24.58；GenEval为0.8163，低于原模型0.8259。（Table1, PDF p.7） 作者报告 FLUX.2 的 Vendi 为3.3708，对比原四步模型2.3237、Moment Matching2.3891；SDXL Vendi为4.4621，对比DMD2的2.5178。（Table2, PDF p.8） 作者报告 PMD-only FID56.13、CLIP-S26.88、Vendi5.112；同stochastic architecture的DMD为28.85、32.86、2.572，说明多样性提升须与质量一起读。（Appendix E.1, Table6, PDF pp.21-22） 作者报告 Wan2.1 四步 VBench Overall85.47，略低于AnyFlow85.51；Semantic82.04为该表最高，VideoMAE-V2 cosine diversity0.02164。（Appendix H, Table7, PDF p.24） 图像包含DMD2、MomentMatching、多种consistency/adversarial distillation；FLUX的RTDMD外部reward监督与主表不完全同口径，视频PDD有明确外部数值脚注。缺少统一wall-clock/training-compute预算下的全面对照，也未验证任何结构化2D或3D任务迁移。 比较4/8/16 student draws、coarse/isotropic tilts及半径，未显示draw越多单调更好；同随机架构下PMD-only/GAN-only/Stochastic-DMD消融表明目标而非单纯噪声输入驱动多样性。jackknife/cross-fitting降低有限样本偏差，但作者明确非零tilt下估计仍非一般无偏。",
+    "insightZh": "实质贡献是把 conditional posterior 作为蒸馏对象，并将可识别的 tilted-mean 约束转成 frozen-denoiser supervision；并非仅修改四步 sampler 或扩大噪声输入。Tilt=Shift identity 本身来自 Gaussian conditioning 的既有性质，新内容在该约束族的蒸馏使用、识别论证及实际估计。完整实现依赖 GAN 与有限样本修正，因此不能把论文解读为只靠理论 posterior loss 就能得到高保真学生。",
+    "evidenceZh": "在 Gaussian corruption、精确 posterior-mean teacher、有限 exponential moments 及开邻域内所有 tilt 均匹配时，约束可唯一识别条件分布。（Sec.4.1-4.2, Eq.(5)-(8), PDF p.4; Appendix A.1-A.2, PDF pp.12-13）。证明限定了 teacher exactness 与 population-level matching；不证明有限四次采样已精确恢复全部模式。 实现以同一 noisy state 的多个 stochastic samples 估计 tilted mean，并加入 auxiliary logistic GAN loss。（Sec.4.3-4.4, Fig.4, Eq.(9)-(11), PDF pp.5-6; Appendix C.1, PDF pp.17-18）。没有 student-score network，不等于没有辅助可训练 discriminator；默认每student update有5次判别器更新。 作者报告四步 FLUX.2 的 Vendi/DreamSim/DINOv2/LPIPS 条件多样性高于所列基线，但 prompt-following 并非全指标领先。（Tables1-2, PDF pp.7-8）。PartiPrompts 1632条、每prompt8seeds的多样性与COCO10k质量指标分开评估。 PMD-only 变体多样性最高，但 FID 与文本对齐明显较差；作者解释其匹配的是 unguided teacher distribution。（Appendix E.1, Table6, PDF pp.21-23）。该消融直接界定多样性与真实性的权衡；GAN使最终模型偏离纯posterior匹配目标。 附录给出四步 Wan2.1 视频实验，PDD数字部分为外部报告而非同一prompt集独立评估。（Appendix H, Table7 and footnote, PDF pp.23-24）。视频指标不能解释为全面超过teacher或所有同预算方法；只采用表中具体指标。 PDF首页打印的项目页链接到 public PMD repository；运行时核查该仓库只有README/assets，并写明代码稍后发布。（PDF p.1, https://pmd-distillation.github.io; run/execution/screen001-code-checks.json; public repo README checked 2026-11-22）。项目与仓库已实际访问；未将README占位仓库记为已开源实现。",
+    "caveatZh": "训练需要多个student draws，实际仍依赖辅助GAN loss改善视觉真实性（Sec.6，p.8）。 无guidance posterior 的保真性与prompt alignment有限；GAN为此补偿并牺牲一部分多样性（Appendix E.1，pp.22-23）。 有限样本ratio估计有偏；jackknife/cross-fitting并不使非零tilt下估计一般无偏（Appendix C.1，pp.17-18）。 识别定理要求精确teacher及开邻域全部tilt匹配；训练使用少量coarse probes与近似teacher，不能把定理当作实测完整posterior恢复。 SDXL FID19.14对DMD2的19.20差距很小，未报告该差异的置信区间；主要稳健卖点是条件多样性而非所有质量指标领先。 主文Eq.(9)为归一化tilted-mean residual，附录B改用未归一化残差解释MMD；二者共享零点但损失权重不同，读理论表述时需区分。 any-step示例集中于已训练网格内2/4步，不能推广为任意noise schedule或无条件可迁移到3D生成。",
+    "whyRelevantZh": "属于图像与视频生成广域雷达中有实质训练目标变化的工作，值得了解如何在few-step distillation中显式保留conditional diversity。尚无LEGO、刺绣、结构化2D或3D实验，故推荐先skim方法、Table2和关键消融，避免把一般生成收益自动视作主线迁移。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

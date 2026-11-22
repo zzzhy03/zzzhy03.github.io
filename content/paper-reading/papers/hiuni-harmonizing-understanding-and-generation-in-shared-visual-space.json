@@ -1,0 +1,93 @@
+{
+  "id": "arxiv:2611.26107",
+  "slug": "hiuni-harmonizing-understanding-and-generation-in-shared-visual-space",
+  "title": "HiUni: Harmonizing Understanding and Generation in Shared Visual Space",
+  "authors": [
+    "Jiahao Hu",
+    "Jingdong Du",
+    "Yichen Zhang",
+    "Yi Song",
+    "Zhenyu Zhang",
+    "Jiaxin Niu",
+    "Ruihang Li",
+    "Xiangzhao Hao",
+    "Yiqian Zhang",
+    "Yong Huang",
+    "Zefeng Zhang",
+    "Zheyuan Gu",
+    "Shuohuan Wang"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm",
+    "image-generation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-19",
+  "updatedAt": "2026-11-19",
+  "collectedAt": "2026-11-22",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.26107"
+  },
+  "abstract": "Unified multimodal models aim to support visual understanding and generation within a single framework. However, prevailing approaches often separate their visual representations or backbone computation to accommodate the different requirements of these two tasks, which limits the degree of unification. In this paper, we present HiUni, which revisits this design choice and explores whether a pretrained vision language model can be directly extended into a unified model with extensive parameter sharing. Specifically, HiUni reuses the same language-aligned ViT and dense Transformer backbone for both capabilities, while confining task-specific computation to the output side. Yet such a design introduces two key challenges. Generation in pixel space is difficult to optimize, and semantic abstraction in pretrained ViT discards fine spatial details required for synthesis. To address these challenges, HiUni introduces a \\emph{Pixel Diffusion Head} tailored to direct pixel-space optimization and a lightweight \\emph{HiGate} pathway that provides fine-grained spatial details near the output stage. Extensive experiments show that HiUni achieves a similar average understanding score to the pretrained VLM while attaining competitive performance on image generation and editing. Controlled comparisons and analyses further demonstrate that a single dense backbone can effectively support both capabilities without task-specific backbone computation, highlighting a simpler path toward unified multimodal modeling.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.26107v1",
+  "keywords": [
+    "HiUni",
+    "vlm-mllm"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "representation": [
+      "raster-image"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.26107v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://ernie-research.github.io/HiUni"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.26107v1 的 24 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "HiUni 从Qwen3-VL-4B出发，让理解、图像生成和编辑共享同一ViT与dense backbone，只在输出侧接pixel diffusion head和HiGate像素残差。作者证明约4B+0.9B模型可以同时保有较强理解与生成，关键价值是架构共享及受控权衡分析；联合训练仍让OneIG从纯生成0.390降到0.314，未证明普遍理解-生成协同。",
+    "motivationZh": "理解侧语义ViT会丢失生成需要的空间细节，拆分视觉表示或backbone又削弱统一建模。",
+    "methodZh": "HiUni把干净条件图像与带噪生成图像都送入同一language-aligned ViT、patch merger和dense Transformer，以causal text与image内双向attention组织序列。语言输出走LM head，图像输出走10-block、2560维pixel diffusion head，每token预测32×32RGB patch。为补偿ViT语义抽象及patch merging丢失的局部信息，HiGate将原始带噪像素线性映射后作token-wise residual fusion；diffusion head移除逐block AdaLN，但保留time token与最终调制。训练含30k生成warmup、310k多任务pretraining与22k含编辑的SFT，分辨率最高2048²。结果支持能力共存，controlled MoT/dense、gate与editing-supervision实验明确呈现共享带来的取舍。",
+    "methodFlow": [
+      "以预训练Qwen3-VL的同一ViT和patch merger编码条件图像及带噪目标图像",
+      "把text、visual tokens与time token送入共享dense Transformer，保留causal text和图像内双向attention",
+      "从原始带噪图像构造32×32RGB patch residual，经HiGate在生成输出侧补充局部细节",
+      "LM head预测语言；10-block Pixel Diffusion Head结合末端time modulation预测clean-image pixels",
+      "先冻结主干做生成warmup，再联合text/understanding/generation pretraining，最后加入editing SFT",
+      "按text或reference-image+instruction条件进行同一pixel-space denoising生成/编辑"
+    ],
+    "experimentsZh": "Qwen3-VL-4B-Instruct初始化，30k warmup+310k joint pretraining+22k SFT，序列8192，生成分辨率256²→2048²；理解/生成pretraining主要为proprietary corpora，约半数pretraining有生成caption，约97% SFT含model-generated reasoning；editing约4M public examples加private pairs。评估8个理解benchmark，Qwen-Image-Bench/OneIG/LongText生成及ImgEdit/GEdit编辑，编辑用GPT-5.2 judge；附录另测WISE-CoT。 作者报告7个higher-is-better理解benchmark平均75.56，接近官方Qwen3-VL-4B-Instruct的75.61，但MMBench为80.7对85.1、OCRBench为74.5对88.1；不能以平均值掩盖单项下降或不同thinking设定。（Table 1; Sec. 4.2, p. 7） 作者报告Qwen-Image-Bench中文overall47.98、英文47.70，OneIG中文/英文0.524/0.538；其优势限于所列UMM和相应benchmarks，不是全模型通用领先。（Table 2, p. 7） 作者报告controlled Dense4B联合OneIG0.314，纯生成同架构0.390；Dense2B/MoT2B为0.291/0.345，说明共享仍有生成代价。（Table 4, p. 9） 作者报告HiGate的NoGate/ViT/Pixel残差OneIG为0.267/0.284/0.314；附录editing监督使理解均值62.64→64.49但OneIG0.538→0.528。（Table 5, p. 10; Table 11, p. 21） 主表包含多种UMM、specialized generation/editing models及原始Qwen；部分分数为official结果、部分为重评估，任务与judge设置需区分。Dense2B与MoT2B共享初始化和recipe，controlled证据较强；Dense4B因初始化更强只能视作相似总参数分配参考。 Table4拆分dense/MoT及single-task，Table5分pixel/ViT/no gate，Table11在fixed-token-budget下加入editing监督。支持共享架构可用和pixel残差的贡献，同时显示负迁移；AdaLN稳定性Fig6不是受控比较，不能写成去AdaLN必然改善稳定性的因果证明。",
+    "insightZh": "核心是复用成熟VLM的整个visual/dense语义路径，在输出侧用pixel head和轻量局部残差补偿细节，避免另设VAE编码器或task-routed backbone。HiGate受Cheers启发、pixel diffusion与Transfusion已有先例，因此新意是具体高共享架构及权衡证据，而非所有组件首创。不同初始化的Dense4B/MoT2B实验不能单独证明dense计算优于MoT；全文支持这是重要架构选项，不支持已经解决跨任务协同。",
+    "evidenceZh": "理解和生成共享ViT、patch merger与dense backbone，生成特有处理在输出侧。（Fig. 2; Sec. 3.1, p. 4; Sec. 3.2, p. 5）。clean/noisy images共用视觉路径；HiGate只更新target visual positions，pixel head直接预测32×32RGB patches。 同初始化/训练下task-routed计算对生成有优势；较大dense模型以更强初始化换取理解优势。（Sec. 4.3, pp. 8-9; Table 4, p. 9）。Dense2B/MoT2B的OneIG为0.291/0.345；Dense4B为0.314但understanding65.04，MoT2B为59.23。4B和2B预训练起点不同，不能作纯architecture因果结论。 pixel残差比ViT残差更能补充生成，understanding平均基本不变。（Sec. 4.4, p. 9; Table 5, p. 10）。作者报告NoGate/ViT/Pixel的OneIG为0.267/0.284/0.314，理解平均约65.0-65.2。 editing supervision带来部分正迁移和部分干扰，非普遍synergy。（Sec. 4.5-4.6, p. 10; Appendix E, Table 11, p. 21）。固定token预算下理解平均62.64→64.49，OneIG0.538→0.528；HallusionBench48.43→43.83，作者也明确synergy仍开放。 去AdaLN的稳定性图不是controlled ablation。（Appendix C, pp. 19-20; Fig. 6, p. 20）。图注明确两条曲线来自不同开发阶段及resolution schedules，只提供qualitative对比。 本文提供官方项目到公开代码的可核查链条，但GitHub URL不是PDF打印的URL。（Project Page, p. 1; official project and GitHub checked 2026-11-22; execution/2611.26107v1-code-verification.json）。PDF打印https://ernie-research.github.io/HiUni，该网页链接public ernie-research/HiUni；已访问并确认model/transfusion/hi_gate.py、diffusion_head.py等非空代码。Code URL保留打印的project URL；未运行。",
+    "caveatZh": "Sec.4.6承认主要探索capability coexistence，持续正向synergy仍是开放问题。 Sec.4.3与Appendix E明确观察到generation代价和task-dependent positive/negative transfer。 Appendix C明确AdaLN训练曲线来自不同开发阶段，只作qualitative comparison。 大规模理解/生成语料为私有，SFT大量使用model-generated traces，完整训练复现与data contamination核验受限。 Dense4B与MoT2B使用不同规模预训练初始化，不能将理解差异全部归因共享方式。 平均理解接近原VLM并不代表各项不退化，OCR/MMBench明显下降；official与重评估、thinking与instruction设定不能混用。 模型提供raster生成/编辑，未验证SVG、CAD、制造或显式3D资产，也未验证对闭环design agents的实际收益。 未报告覆盖全部任务的统计置信区间或统一训练算力对照；没有独立运行或复现代码。",
+    "whyRelevantZh": "这是VLM与visual generation架构如何共享的具体重要方案，适合研究设计系统中的理解/生成是否必须使用分开的表示。可借鉴shared semantic path与output detail path的分工；对structured design/3D/agent的迁移尚未实验验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
