@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2611.32327",
+  "slug": "flowvecfont-scalable-vector-font-generation-via-latent-flow-matching",
+  "title": "FlowVecFont: Scalable Vector Font Generation via Latent Flow Matching",
+  "authors": [
+    "Takumu Fujioka",
+    "Gouhei Tanaka"
+  ],
+  "primaryTopicId": "2d-design",
+  "topicIds": [
+    "2d-design"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32327"
+  },
+  "abstract": "Fonts are natively represented as vector outlines. Many existing studies on vector font generation have relied on specialized generation or refinement mechanisms, bitmap representations, or externally pretrained models to address the challenges of learning vector representations. These approaches often increase system complexity, incur additional computational and implementation costs, and introduce dependencies on external resources. We show that scaling a simple model enables high-quality pure vector font generation without external pretraining. We propose FlowVecFont, a scalable model for vector font generation based on latent flow matching and trained solely on vector outlines. A Transformer-based variational autoencoder maps glyph sequences into fixed-length continuous latent tokens, enabling standard conditional flow matching for vector glyph generation. The model supports conditioning on class labels or reference glyphs, with the latter enabling generalization to unseen characters and fonts. Experiments on 5M glyphs collected across Google Fonts, including non-Latin characters, show that generation quality improves with model scale across conditioning strategies. In a comparison on Latin glyphs, the 800M-parameter FlowVecFont outperforms DeepVecFont-v2 and DesigNet and achieves quality competitive with the pretrained 27B-parameter VecGlypher. We also provide TorchFont, a machine learning library for vector fonts.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32327v1",
+  "keywords": [
+    "vector font",
+    "Bézier outline",
+    "latent flow matching",
+    "TorchFont",
+    "reference conditioning"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "representation-learning"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "svg-vector"
+    ],
+    "conditioning": [
+      "sketch-layout"
+    ],
+    "method": [
+      "flow-matching",
+      "vae-gan"
+    ],
+    "output-property": [
+      "editable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32327v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/torchfont/torchfont"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32327v1 的 20 页全文及关键页面核验；实验数字均为作者报告，未独立复现。Code链接仅为已确认公开的TorchFont数据/outline变换库，未确认FlowVecFont训练脚本或模型权重发布。",
+    "ideaZh": "FlowVecFont用原生vector VAE把变长Bézier命令压为固定latent tokens，再以普通conditional flow matching生成可编辑字形，不用bitmap训练或外部预训练权重。作者报告813M模型在Latin比较中胜过DVF-v2/DesigNet，但仍略低于27B VecGlypher；face-level划分可能共享近重复轮廓，复杂CJK与256命令上限也限制泛化结论。",
+    "motivationZh": "在不依赖bitmap训练、外部预训练或复杂多阶段refinement的条件下，如何从可编辑向量outline学习多文字字体生成，并把flow成本与轮廓长度解耦。",
+    "methodZh": "论文把字体生成视为可扩展的纯向量建模问题：ModernBERT式VAE从离散command与连续坐标学习固定32个latent tokens，再用DiT式flow分别接入字符/字体class、style references或双reference条件。其价值是以简单、无bitmap训练的路线覆盖多语种轮廓与不同条件，而非提出新flow算法。实验展示模型规模与计算量增加带来的质量提升，完整新字形/字体外推与专业排印可用性仍受数据近重复、截断和CJK伪影约束。",
+    "methodFlow": [
+      "从字体文件读取outline，统一em尺度，将quadratic Bézier转为cubic并整理path顺序/方向",
+      "用command embedding加连续六坐标embedding输入从零训练的Transformer VAE，压成32个16维latent tokens",
+      "通过command CE、masked L1坐标和KL损失重建最长256命令的向量序列",
+      "在固定latent上训练conditional rectified flow；class或每类4个reference outlines提供style/content条件",
+      "从高斯噪声以CFG3、32 Euler steps积分，非自回归VAE decoder恢复可编辑vector outline"
+    ],
+    "experimentsZh": "Google Fonts过滤后约4.9M face-codepoint样本，3.8K font faces、109K codepoints；face和codepoint各95/5随机seen/unseen划分，SFSC再98/1/1。VAE训练400K步；各flow模型1M步，CLS/STR/REF batch为256/64/32，4个style及4个content references按策略使用。CD、LPIPS、FID和失败率评估；失败样本被质量指标排除。Latin matched-output比较为74 fonts的3170个UFSC glyphs。 作者报告CLS/S至CLS/XL的SFSC FID23.11至5.86，失败率2.12%至0.55%；不同规模包含更多训练计算。（Table4, PDF p.7） 作者报告813M STR/XL在Latin比较CD0.0134、LPIPS0.0917、FID4.86、失败0；DVF-v2 FID24.99、DesigNet50.03、VecGlypher27B为3.27。（Table6, PDF p.8） 作者报告REF/B从SFSC到UFUC的FID26.87至35.10、失败率2.67%至3.39%；未见情况存在退化。（Table5, PDF p.8） 作者报告L1 VAE重建CD0.0029/LPIPS0.0045，对比MSE0.0039/0.0093；64 latent tokens在400K-step消融改善生成FID但增加每步计算。（TableS1, PDF p.13; TableS3, PDF p.14） 比较边界：DVF-v2/DesigNet/VecGlypher均用公开weights，但DesigNet固定Hamburge refs、DVF-v2从20候选按bitmap选择、VecGlypher用image refs及含部分目标font的额外39K商业字体；不存在严格训练数据/计算/条件输入匹配，不能仅据参数量归因为表征优势。专业字体使用质量、readability、kerning和一般SVG场景未评估。 消融：比较L1/MSE训练尖峰、augmentation及variable-axis sampling、16/32/64 latent tokens、CFG与8/16/32/64 Euler steps。L1对大坐标离群glyph更稳；增强降低失败但未同时最佳所有重建指标。K增加的收益含额外compute，CLS/B的K消融只训练400K步。",
+    "insightZh": "方法组合借鉴TiTok式固定latent、ModernBERT、DiT/rectified flow，而非新生成理论；实质是为原生字体command/坐标建立可扩展纯vector训练栈和大规模多文字实验。固定latent将flow每步成本与outline长度分离，L1和online variable-axis增强有消融支撑；但没有证明所有bitmap辅助机制在同算力下均无价值。",
+    "evidenceZh": "变长原生向量command由VAE映射到固定latent，flow无需直接扩散离散命令或量化坐标。（Sec.3.1-3.5, Fig.1-2, PDF pp.3-5）。默认L256、K32、latent维16；VAE不强制path-order invariance，且过长glyph/subpaths会排除或截断。 作者报告在规模/计算量增大时，三个条件策略内质量一致改善。（Table4, Fig.3-4, PDF p.7; TableS6, PDF p.16）。不同条件策略batch size不同，不能把策略间差距完全归因于条件结构。 作者报告813M STR/XL在Latin共同任务中优于DVF-v2和DesigNet，但VecGlypher仍有更好的几何/感知分数。（Table6, PDF p.8; TableS7, PDF p.20）。813M FID4.86对27B的3.27；对照训练数据、目标font exposure和reference输入不同，不是matched-compute比较。 未见字体/字符测试存在同family faces和相似codepoint轮廓交叉，作者明确没有处理这些split泄漏渠道。（Sec.4.6, PDF p.8; Fig.S9-S10, PDF p.19）。因此不能把held-out face/codepoint直接描述为完全陌生font-family/shape泛化；图中CJK仍有明显伪影。 论文提供的公开代码是TorchFont字体数据/轮廓变换库，已核实源码存在，但没有确认FlowVecFont模型训练与权重发布。（PDF p.2 TorchFont URL; execution/2611.32327v1.code-check.json）。代码链接必须明确支持库范围，不应被描述为完整复现包。",
+    "caveatZh": "作者限制：face-level而非family-level划分，同family/重打包font或相似codepoint可能跨split共享轮廓，作者未去除这些情况（Sec.4.6, p.8）。 复杂CJK仍有伪影；L256覆盖原集合95.9%，装饰字体与长outline会排除或截掉完整subpaths（Sec.3.2/4.6; Appendix A-B）。 quality metrics排除失败glyph，条件策略batch size不同，对照模型训练数据与reference协议不同（Sec.4.2-4.5）。 审阅边界：结果证明字体outline生成的可行性，不代表完整font排印、语义可读性、SVG颜色/层级或刺绣stitch约束已解决。 未见class并非凭Unicode ID直接零样本生成；REF需要目标character在其他font的outline references，可能共享近重复几何。 Code链接仅已确认TorchFont数据与变换库，未确认本文VAE/flow训练脚本及checkpoint可用，不能承诺端到端复现。",
+    "whyRelevantZh": "原生向量序列、固定latent bottleneck与online字体几何增强直接关联structured/editable 2D表示；可借鉴到SVG/path建模。尚未验证复杂多层SVG或embroidery制造约束，因此迁移应限于表示学习与训练设计。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

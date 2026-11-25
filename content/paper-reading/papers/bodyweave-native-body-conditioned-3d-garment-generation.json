@@ -1,0 +1,91 @@
+{
+  "id": "arxiv:2611.32034",
+  "slug": "bodyweave-native-body-conditioned-3d-garment-generation",
+  "title": "BodyWeave: Native Body-Conditioned 3D Garment Generation",
+  "authors": [
+    "Junyi Zhang",
+    "Yuanchuan Wang",
+    "Qichao Wang",
+    "Wenzhe Qian",
+    "Shizhuo Cheng",
+    "Min Zhang"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32034"
+  },
+  "abstract": "Generating 3D garments for digital characters requires preserving a reference design while adapting the garment to the target body's shape and pose. Sewing-pattern methods can struggle to reproduce unfamiliar designs and fine details, while image-to-3D generators offer rich shape priors but typically lack explicit 3D body context. We present \\textbf{BodyWeave}, a framework that unifies garment generation and fitting through native 3D body conditioning. Building on 3D generative priors, BodyWeave uses the body as a spatial reference throughout geometry generation: a \\textbf{Global Body Adapter} guides garment placement and extent in the shared coordinate frame, while \\textbf{Local Body Attention} guides surface refinement using nearby body geometry. A \\textbf{Surface Penetration Loss} supervises decoded surfaces to reduce body intersections, and the resulting geometry conditions material synthesis to produce garments with physically based rendering attributes. To support learning across designs and wearers, we construct \\textbf{GarmentWeave3D} with 293K aligned garment--body observations, including 114K same-design cross-body pairs. Evaluations on out-of-domain \\textbf{Artist-Created Garments} demonstrate high geometric fidelity and low body penetration. Cross-body evaluations demonstrate accurate adaptation to new wearers with consistent garment--body spacing, while appearance comparisons show faithful fabric reproduction. Additional results and resources are available at https://gavin-jy.github.io/bodyweave-page/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32034v1",
+  "keywords": [
+    "body-conditioned generation",
+    "garment",
+    "TRELLIS.2",
+    "local attention",
+    "surface penetration",
+    "PBR"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "texture-material"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "conditioning": [
+      "multi-view",
+      "partial-3d"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "output-property": [
+      "controllable",
+      "asset-ready"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32034v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32034v1 的 24 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "BodyWeave 将目标身体直接注入 TRELLIS.2 的稀疏支撑和细节生成，以全局 adapter 决定衣物位置、局部 KNN attention 控制贴合，再经冻结 decoder 对表面穿透施加监督。作者报告49件域外服装CD16.14mm、穿透0.856%，但跨身体仅8种设计16任务，输入仍为正交三视图，不能推断真实单图或动态穿着能力。",
+    "motivationZh": "图像到3D衣物先验缺少目标身体上下文，生成后再对齐容易产生位置错误和局部穿透。",
+    "methodZh": "论文把衣物生成和身体适配统一到目标身体坐标系，而非先生成后配准。GBA在冻结SS-DiT各block后注入同网格身体特征，LBA在LR/HR形状latent中仅关注32个近邻身体token，并以3D RoPE保留相对位置。预测clean latent经可微冻结decoder得到顶点，由身体SDF计算2.32mm安全边界穿透损失；生成几何再条件化PBR外观。数据过滤前293765条、过滤后287765条观测；实验包括64条域内、49件域外和16项跨身体任务，展示有约束的生成与外观保持。",
+    "methodFlow": [
+      "输入衣物正交前/左/右视图和独立目标3D身体",
+      "冻结SS主干，以GBA融合对齐身体latent，生成身体坐标系的稀疏支撑",
+      "LR/HR形状流加入KNN局部身体attention与3D相对位置编码",
+      "训练时解码clean形状顶点，以身体SDF和安全margin约束穿透",
+      "由生成HR几何和参考图条件化PBR模型，输出衣物mesh与base color/metallic/roughness/alpha"
+    ],
+    "experimentsZh": "GarmentWeave3D由229448条GarmentCodeData、33419条Sewing-Pattern及30898条Detail合成，总293765；剔除6000后287765，design-level/linked-component拆分261277/13254/13234。主评估64条域内、49件域外，跨身体8设计双向16任务；50K表面样本评CD/F@10/normal/penetration，严重度用200K。外观比较共享GT几何、单前视图，左右为held-out。 作者报告域内CD6.36mm/F@10 83.68%/穿透0.080%，域外CD16.14mm/F@10 68.98%/穿透0.856%。（Table1, PDF p.7） 作者报告跨身体CD8.78mm、clearance4.85mm；SewingLDM穿透更低但CD78.66mm，反映穿透率不能单独代表正确贴合。（Table2, PDF p.7） 共享GT几何的held-out左右视图，作者报告LPIPS0.159，TRELLIS.2为0.223；这不是端到端生成mesh外观误差。（Table3 PDF p.7; Supplement C.5 TableS7 PDF p.15） 比较边界：比较Garment Particles、AIpparel、SewingLDM、Design2Cloth、Garment3DGen及外观FabricDiffusion/TRELLIS.2。保留各自native输入，BodyWeave几何有三视图而部分baseline单图/文本；Garment3DGen matched-body用GT辅助对齐，AIpparel附件约束不同，质量指标按可评估成功输出平均。补充提供normalized geometry和fixed-body干预以减弱placement混淆，仍非完全同输入同预算。 消融：同checkpoint关闭GBA后位置CD急剧恶化、关闭LBA后穿透升高，支持全局/局部分工；属于inference mask干预。另以等步数fine-tuning比较penetration loss，作者报告cross-body sampled max depth6.60→4.54mm，CD8.88→8.80mm，支持减少交叉而非单纯外鼓。",
+    "insightZh": "相对sewing-pattern+simulation或通用image-to-3D后对齐，具体推进是把global placement、local fitting和decoded-surface约束分层放进预训练3D生成器。PBR架构继承TRELLIS.2，数据与衣物微调贡献不能等同为新通用材质模型。该表示输出mesh而非可缝制panel/seam或加工指令，故不追加Fabrication分类。",
+    "evidenceZh": "GBA在共享空间网格注入身体特征，SS主干冻结；LR/HR与局部模块共同微调。（Secs.3.2-3.3, Fig.2, Eqs.(2)-(4), PDF pp.3-5）。GBA控制support位置，LBA使用KNN身体邻域和3D RoPE；补充F.1 p.20给K=32。 表面监督通过冻结decoder回传到形状生成器，不是推理后推开所有衣物。（Eq.(5)-(6), Sec.3.3 PDF p.5; Supplement F.2 PDF p.20）。只惩罚SDF小于margin的顶点，margin2.32mm，最多每microbatch采样20000顶点。 作者报告域外49件Artist-Created衣物CD16.14mm、穿透0.856%。（Table1, Secs.4.1-4.2, PDF pp.5-7）。Garment3DGen为21.64mm和27.736%；不同方法native input与成功输出数不同，不能忽略协议差异。 跨身体控制由固定图片和seed、改变身体的干预支持。（Supplement C.1, TablesS2-S3, PDF p.13）。16任务中正确身体CD8.78mm，source18.45mm、wrong16.43mm；correct穿透0.204%，但仅8个独立设计。 GBA/LBA消融为同checkpoint推理mask，而非从头训练移除组件。（Sec.4.5, Table4, PDF p.8; Supplement D, PDF pp.16-17）。说明full model依赖对应条件，不单独证明组件相对所有替代架构更优；penetration loss另有matched-step fine-tuning对照。",
+    "caveatZh": "作者限制：p.8明确假设正交视图和静态衣物，未解决unconstrained images及时间一致衣物运动。 审阅边界：跨身体只有8独立设计，训练数据合成且剔除穿透样本，真实成衣/任意姿态泛化尚未建立。 不同baseline输入和适配流程不一致，success-conditioned平均与单一seed应谨慎解读。 PBR定量以GT几何隔离评估，通道可视化不等于恢复真实物理材质；数据排除透明/alpha纹理，mesh无panel/seam或可制造保证。 方法降低穿透但不保证无碰撞，且未报告真实动态物理或布料力学验证。",
+    "whyRelevantZh": "是具体的有空间几何约束3D生成方法，global support与local attention分工、通过可微decoder监督生成表面的机制可供对象约束生成参考。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

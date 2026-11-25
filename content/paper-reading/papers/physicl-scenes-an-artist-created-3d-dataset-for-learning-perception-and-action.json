@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2611.33137",
+  "slug": "physicl-scenes-an-artist-created-3d-dataset-for-learning-perception-and-action",
+  "title": "Physicl Scenes: An Artist-created 3D Dataset for Learning Perception and Action",
+  "authors": [
+    "Yueh-Cheng Liu",
+    "Snehal Jauhri",
+    "Matthias Nießner",
+    "Angela Dai"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-segmentation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33137"
+  },
+  "abstract": "We present Physicl Scenes, a high-quality artist-created and curated dataset of 6,499 3D scenes spanning household rooms, public interiors, and outdoor spaces. The dataset combines detailed geometry, physically based materials, and carefully composed environments with object- and part-level semantic annotations, providing rich, joint supervision for visual and embodied learning. We demonstrate its value as training data across inverse rendering, 3D reconstruction, scene understanding, and mobile manipulation. Across these tasks, training state-of-the-art methods with our scenes improves performance over alternative synthetic datasets. In addition, we introduce a mobile manipulation benchmark, evaluating vision-language-action models performing physical pick and place in diverse 3D scenes with realistic layouts, and using our part annotations to also score where each object is grasped. Our dataset will be released publicly to facilitate research in visual and embodied AI.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33137v1",
+  "keywords": [
+    "synthetic 3D data",
+    "artist-created scenes",
+    "PBR",
+    "instance segmentation",
+    "sim-to-real"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "segmentation",
+      "representation-learning"
+    ],
+    "content-scope": [
+      "scene",
+      "part-assembly"
+    ],
+    "prior-data": [
+      "synthetic-data",
+      "native-3d"
+    ],
+    "output-property": [
+      "asset-ready"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33137v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33137v1 的 23 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "Physicl Scenes贡献是6,499个人工制作、含PBR/metric geometry/object-part annotations的场景数据，而非新重建网络。作者通过重训既有模型验证真实跨域3D实例分割和重建收益，例如Replica Mask3D AP27.2→33.9；数据仍只承诺公开，parts主要用于grasp affordance，不能声称已验证精细part segmentation。",
+    "motivationZh": "真实扫描缺少干净geometry、材质和part ground truth，已有仿真场景又难兼具规模、视觉质量和物理交互标签。",
+    "methodZh": "艺术家按统一规范制作资产/场景，经技术与人工审核，再由collision hulls、part材质推mass/inertia并转换仿真。渲染生成intrinsics/geometry/instance supervision，分别重训inverse-rendering、Mask3D/PTv3及FineRecon/GenRecon模型，在未见synthetic/real数据测试；另构建移动pick-place和part-aware grasp benchmark。正文及Supplement A-F全部相关部分已读取。",
+    "methodFlow": [
+      "按统一metric/PBR规范人工制作资产与场景，并做技术、建筑与视觉审核。",
+      "提取semantic hierarchy、object/part材料，生成collision hulls及mass/inertia。",
+      "渲染RGB与intrinsics/depth，构造带instance masks的模拟扫描。",
+      "在固定模型上替换或加入训练数据，验证未见真实场景的重建/分割泛化。",
+      "以part标签筛选grasp并生成物理rollout demonstrations和affordance评价。"
+    ],
+    "experimentsZh": "5849/325/325 scene train/val/test。重训三intrinsic模型、两class-agnostic instance模型、两reconstruction模型，对照InteriorVerse/3D-FRONT/SAGE-10k等；3D实例训练将ScanNet200与synthetic等概率混合。实际测试ScanNet++、Replica、MAW等；附录有open-vocabulary proposals迁移和benchmark细节。 作者报告Replica Mask3D AP：ScanNet200单独27.2，+SAGE32.3，+Physicl33.9；PTv3为31.7/30.8/36.7。（Table 4,p.6） 作者报告GenRecon Replica Chamfer6.47cm、F@10cm0.824；ScanNet++8.85cm、0.801。（Table 5,p.7） 作者报告open-vocabulary Replica AP：OpenMask3D baseline11.3→+Physicl16.6，Open-YOLO3D20.8→26.1。（Table A2,p.17） 比较边界：多个固定网络控制方法变量，实测sim-to-real表示价值；但质量、规模、类多样性与材质细度未完全匹配，不能把提升归因某单因素。PTv3 ScanNet++ AP20.8低于+SAGE22.2，数据并非每指标都优。VLM美学/realism评分是辅助主观代理。 消融：有grasp affordance监督消融，但缺场景数量、PBR/part标签、artist layout分别对重建/分割的因果消融；part segmentation未单独评估。与其称完整方法消融，应定位为多训练集数据替换研究。",
+    "insightZh": "新意是高质量artist-made全场景数据的规模、PBR/part/physical属性组合和多任务迁移验证，不是新生成算法。主线价值由实际3D实例分割训练与可材质化重建验证支撑；part labels可供未来part表示学习，但当前part-specific验证是抓取而非part segmentation。",
+    "evidenceZh": "作者提供6,499 scenes、115K assets、1,600类、PBR与part属性，并经审核转为仿真场景。（Sec.3.1-3.2,pp.3-4; Appendix B,p.14）。GLB semantic hierarchy、CoACD hulls和材料推物理属性构成可复用数据机制。 作者报告联合Physicl数据提高真实跨数据集3D实例分割。（Table 4,p.6; Appendix E.2,pp.15-17）。训练仍含ScanNet200，不能说纯合成数据就取得这些AP。 作者报告GenRecon在Replica Chamfer6.47cm，SAGE-10k7.36cm，3D-FRONT7.99cm。（Table 5,p.7）。8个输入views，评价只覆盖GT observed geometry。 真实到仿真mobile picking有迁移，但长距离导航使用expert planner。（Sec.4.4,pp.7-8; Tables 6-8,p.8）。纯端到端长程navigation placement为0%，不能把hybrid结果写全自主。",
+    "caveatZh": "作者限制：人工制作和审核扩充成本高。 静态场景、刚体仿真，不含运动人群或cloth等deformables。 操作只覆盖pick/place，不含抽屉等articulation或抽象任务。 affordance标签与任务无关，实际grasp部位可能随指令变化。 审阅边界：数据尚承诺公开，未核验可下载资产、许可证和训练代码。 评估重建只看observed regions，不证明完整未见空间生成。 可从part标签借鉴监督，但精细part边界/语义质量未直接量化。 真实到仿真不等同真实机器人部署。",
+    "whyRelevantZh": "直接验证新3D数据对实例分割和可材质化重建的训练价值，提供主线数据来源；不因机器人benchmark本身收录。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

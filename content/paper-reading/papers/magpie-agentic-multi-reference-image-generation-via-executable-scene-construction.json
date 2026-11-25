@@ -1,0 +1,101 @@
+{
+  "id": "arxiv:2611.32462",
+  "slug": "magpie-agentic-multi-reference-image-generation-via-executable-scene-construction",
+  "title": "MAGPIE: Agentic Multi-Reference Image Generation via Executable Scene Construction",
+  "authors": [
+    "Yifan Dai",
+    "Daili Hua",
+    "Bohan Zeng",
+    "Yuran Wang",
+    "Jialing Liu",
+    "Bozhou Li",
+    "Chengzhuo Tong",
+    "Yang Shi",
+    "Kai Zeng",
+    "Liu Yang",
+    "Xinyu Liu",
+    "Shujie Li",
+    "Yiyan Ji",
+    "Bingyin Mei",
+    "Yushuo Guan",
+    "Yuanxing Zhang",
+    "Fangcheng Fu",
+    "Wentao Zhang"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32462"
+  },
+  "abstract": "Multi-reference image generation requires a model to preserve the appearance of selected subjects while arranging them according to an instruction. Despite recent progress in reference-based generation and compositional control, reliably organizing selected subjects into the intended scene remains challenging. Although existing methods provide various forms of compositional guidance, the planned relationships are not always explicitly instantiated for inspection and refinement before image synthesis. To address this limitation, we introduce MAGPIE, which represents the intended composition as a simplified 3D scene defined by an executable Blender program. A coding agent links each scene instance to its reference, checks the geometry and rendered view against the instruction, and revises the program to correct discrepancies. The final proxy rendering serves as a visual plan for the image generator. Using MAGPIE-Instruct-3K, we train the generator to follow this plan while drawing each subject's appearance from its reference. MAGPIE improves both Qwen and FLUX on DreamOmni2 and SconeEval. With FLUX, it improves overall success on DreamOmni2 by 28.21 percentage points over the original backbone and achieves the highest overall score among the models evaluated on SconeEval.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32462v1",
+  "keywords": [
+    "executable scene",
+    "multi-reference generation",
+    "Blender",
+    "geometric verification",
+    "agentic refinement"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "tool-use",
+      "reasoning"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "discrete-program"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32462v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32462v1 的 20 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "MAGPIE先把多参考图指令搭成带身份绑定的Blender代理场景，检查可见性、相对位置和接触后改代码，再让LoRA生成器结合代理结构与参考外观。作者报告FLUX的DreamOmni2成功率从38.87%升至67.08%；收益依赖适配训练和数分钟构建，不能当作零样本控制或最终像素关系的硬保证。",
+    "motivationZh": "多参考图生成即使保留主体外观，也常在实例选择、相对布局和物理接触上失误。",
+    "methodZh": "本文把构图外化为可执行简化3D场景，维护实例与参考图的对应，通过几何测量和视觉review最多迭代六轮，再用3,187组代理/参考/目标训练rank-32 LoRA。两种骨干、两个benchmark及同数据SFT、近似时间匹配采样比较支持其闭环价值。主要核验对象是proxy，最终图像仍可能偏离；未复现作者实验。",
+    "methodFlow": [
+      "从参考图与指令建立实例身份、关系、姿态与相机规格。",
+      "调用参数化对象库生成Blender程序，以AST和交互anchor约束构造。",
+      "执行并渲染，结合几何检查和视觉review修改代码并保留最佳候选。",
+      "将代理渲染、参考图及绑定prompt送入经过代理适配的生成器。"
+    ],
+    "experimentsZh": "3,187组MAGPIE-Instruct-3K；Qwen-Image-Edit-2511与FLUX.2-klein-base-9B冻结骨干，rank-32 LoRA五epochs。Qwen3.8 agent执行构造。DreamOmni2共319例、SconeEval共409例，沿用官方多模态judge；另有人类proxy审核。 作者报告DreamOmni2 FLUX总体38.87%到67.08%，Qwen 42.01%到64.26%。（Table 1, p. 6） 作者报告同数据SFT的FLUX为48.90%，低于MAGPIE 18.18个百分点。（Table 3, p. 7） 作者报告SconeEval FLUX为9.05，近似时间匹配best-of-six为8.42；人工审核292/319个proxy正确。（Tables 7 and 9, PDF pp. 17-18） 比较边界：原骨干、DreamOmni2、Scone及多个开放/商业模型；同数据SFT、proxy-only、文本/2D计划、近似时间匹配best-of-six。没有全部几何agent在同骨干/数据/预算下的直接对比；商业版本与judge影响可比性。 消融：适配、表示、0/3/6轮修订分别消融，支持不是单纯加训练对或采样数。未独立定量拆分几何检查与视觉review；不同coding agents仅补充定性比较。",
+    "insightZh": "将多参考身份绑定嵌入可执行3D代理，通过几何/视觉反馈在合成前修正关系，再训练生成器分离代理结构与参考外观；不是新扩散骨干。同数据SFT、文本计划和2D框计划消融支持组合贡献。",
+    "evidenceZh": "代码修订由几何与视觉双通道反馈驱动，最多六轮。（Sec. 3.1, Eq. 1, p. 4; supplementary Sec. 9, Table 5, PDF pp. 14-16）。检测mesh归属、ray visibility、相机顺序与采样表面接触；两路均无失败才验收。 proxy-conditioned adaptation优于同数据SFT，不能只用额外训练对解释收益。（Table 3, p. 7; Sec. 4.3, p. 8）。作者报告FLUX普通SFT 48.90%，MAGPIE 67.08%；Qwen仅推理添加proxy反降到29.47%。 两个骨干在两个多参考benchmark上报告整体改善。（Tables 1-2, p. 6）。作者报告FLUX DreamOmni2总体38.87%到67.08%，SconeEval Overall 8.07到9.05；这是benchmark评分，不是硬几何证明。 构建核验增加明显成本，时间对照仅近似匹配。（Supplementary Sec. 10.1, Tables 6-7, PDF pp. 16-17）。FLUX DreamOmni2阶段总时长356.72秒，对照60.97秒；未计时overhead与人工挑选时间被排除。",
+    "caveatZh": "作者限制：数据选择排除无实质几何要求的纯外观变化（supplement Sec. 7.2, PDF p. 12）。 接触与可见性是近似诊断；预算耗尽仍有失败时返回needs_review，不等于全部通过（Table 5、Sec. 9, PDF pp. 15-16）。 预算比较非严格匹配，排除未计时overhead与人工选择时间（Sec. 10.1, PDF p. 17）。 审阅边界：没有独立Limitations章节；proxy通过不保证最终像素图保留相同接触与数量关系。 代理库、结构数据筛选和LoRA适配限制长尾泛化；关系阈值含启发式。 主结果依赖自动judge，无跨运行置信区间；未独立复现。",
+    "whyRelevantZh": "可执行中间表示、可定位几何核验及局部代码修订直接命中视觉设计agent；归属、anchor与验收规则也值得用于结构约束设计。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

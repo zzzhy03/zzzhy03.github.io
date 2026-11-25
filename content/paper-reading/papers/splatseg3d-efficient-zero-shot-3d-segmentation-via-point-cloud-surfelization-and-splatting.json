@@ -1,0 +1,82 @@
+{
+  "id": "arxiv:2611.32716",
+  "slug": "splatseg3d-efficient-zero-shot-3d-segmentation-via-point-cloud-surfelization-and-splatting",
+  "title": "SplatSeg3D: Efficient Zero-Shot 3D Segmentation via Point Cloud Surfelization and Splatting",
+  "authors": [
+    "Sandeep Inuganti",
+    "Mahdi Chamseddine",
+    "Marcel Rogge",
+    "Martin R. Oswald",
+    "Didier Stricker",
+    "Jason Rambach"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32716"
+  },
+  "abstract": "Open-vocabulary 3D segmentation methods rely on 2D foundation models applied to registered images captured alongside the 3D point clouds. However, such images may not be available in many cases, while direct 3D point cloud segmentation methods require semantic class supervision and are challenging to deploy in a zero-shot manner. To address these issues, we present SplatSeg3D, which segments a bare colored point cloud in an open-vocabulary manner without requiring the accompanying images, camera poses, class supervision, or instance mask proposals. To achieve this, we first surfelize the input point cloud and obtain oriented 2D Gaussians. We then render views of the scene by splatting, with a view selection strategy that maximizes scene coverage with as few views as possible. Next, we apply text-prompted segmentation on the rendered views, giving each 3D point a set of multi-view semantic cues, fused to produce a 3D segmentation of the scene. We evaluate SplatSeg3D on semantic segmentation and novel-class instance segmentation on 4 standard benchmarks: Scannet, Scannet++, Replica, and S3DIS. Our pipeline not only performs better or on-par with the state-of-the-art, but we also achieve these results efficiently across runtime and compute requirements. Code will be published.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32716v1",
+  "keywords": [
+    "open-vocabulary 3D segmentation",
+    "surfelization",
+    "view selection",
+    "SAM3",
+    "point-cloud only"
+  ],
+  "facets": {
+    "task": [
+      "segmentation"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud",
+      "2d-gaussian"
+    ],
+    "conditioning": [
+      "text"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32716v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32716v1 的 14 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "SplatSeg3D仅需彩色点云：局部PCA生成有尺度的2D Gaussian surfels，按可见覆盖与像素分辨率挑虚拟相机，再用SAM3文本分割并投票回3D。作者报告Replica mIoU36.2%、ScanNet++27.3%，无需3D训练/proposals；当前相机和法线假设针对室内，不能直接当通用对象part segmenter。",
+    "motivationZh": "仅有彩色3D点云、没有配套照片或pose时，如何借助2D foundation得到开放词表3D语义和实例。",
+    "methodZh": "方法在已知几何上合成适合2D foundation segmenter的视图，k=2的两层coverage selector先满足覆盖再补清晰度，depth-test抑制错误lift。语义由confidence-weighted votes融合，实例由connected components及基于2D masks的correlation clustering分离。四数据集覆盖semantic和novel-class instance，附录交代rare-class阈值、baseline重跑与timing。",
+    "methodFlow": [
+      "将彩色点云按局部法线和邻点间距闭式surfelize为2D Gaussians。",
+      "从室内free-space grid产生眼高相机候选，按depth-tested coverage与resolution自适应选view。",
+      "Splat渲染RGB/depth，由冻结SAM3按class-name prompts输出masks。",
+      "按可见性将mask confidence投回每点并融合semantic labels。",
+      "以voxel components和跨view mask链接做correlation clustering，得到instances。"
+    ],
+    "experimentsZh": "Replica 51类semantic、ScanNet++验证mesh top-100类，以及S3DIS Area5/ScanNetv2 base-novel instance协议；固定kn12、kr6、512px/FOV70°、眼高约1.6m、grid1m、k2，单RTX A6000；无3D训练。附录A-D读取，SAM3使用cached image features逐类decode。 作者报告Replica mIoU36.2/mAcc47.2%，比较Ov3R31.9/42.3和zero-shot OVI-MAP26.5/32.2。（Table 2,p.6） 作者报告S3DIS novel AP50为42.5/59.6%，ScanNet为23.9/32.5%，并非所有split压过有监督proposal方法。（Table 4,p.7） 作者报告Replica每scene8.7s，含model-load均值14.4s、peak2.3GB；Open-YOLO纯scene8.0s更快，但含load31.5s。（Table 5,p.7; Appendix C,p.12） 比较边界：分清point-only/posed-image、3D训练与无训练，部分基线重跑，部分引用；SAM3与基线foundation不同，整体性能不完全隔离segmenter能力。SceneSplat额外Gaussian reconstruction时间未计入其runtime。 消融：ScanNet++消融覆盖fixed/random/adaptive cameras、tiered pitch及render primitives，支持selector与surfel方案；rare-class阈值利用无标签test-set proposal频率，附录报告去掉时Replica35.8而非36.2。未统一替换所有方法的2D segmenter。",
+    "insightZh": "实质贡献是无需原始posed images或训练3D proposals的完整point-cloud-only流程，特别是surfel渲染质量和coverage-resolution联合选视角。不是新SAM3或全新3D encoder；zero-shot意为不在3D类标注上训练，不意味2D foundation没有先验。",
+    "evidenceZh": "surfel法线来自局部PCA，半径来自邻点距离，闭式构造而非优化Gaussian scene。（Sec.3.1,Eqs.(1)-(3),p.3; Fig.4,p.4）。保留原点颜色，以局部surface disks填补raw projection空洞。 view selector先按宽松resolution满足k覆盖，再补严格resolution，并以0.5%新增gain阈值停止。（Sec.3.2,Eq.(5),p.4; Algorithm 1,p.5）。coverage不是相机数量配额；固定室内相机候选仍限制可观察区域。 作者报告Replica mIoU36.2%，ScanNet++27.3%。（Tables 2-3,p.6）。ScanNet++是在同mesh vertex协议比较，SceneSplat原Gaussian协议28.4%不可直接排名。 作者报告改成raw points/spheres/global-radius surfels会降到22.9/23.7/25.9%，完整27.3%。（Table 6,p.8）。控制相机后支持局部定向尺度surfel的重要性。",
+    "caveatZh": "作者限制：受SAM3可识别类别与细粒度混淆限制。 附近同类instances仍可能label leakage，边界弱于supervised proposals。 法线朝centroid、眼高与floor假设主要适用于室内。 审阅边界：依赖RGB点云；无颜色或噪声/缺失更强的输入未充分验证。 当前scene camera policy不能直接套LEGO或任意外部对象part分割。 rare-class阈值使用test-set无标签统计，零样本陈述需保留这一适配细节。",
+    "whyRelevantZh": "直接推进open-vocabulary 3D segmentation，在仅保留点云的场景提供可部署路径；surfel rendering和按resolution选view也可启发对象part分割，但需重设相机几何。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

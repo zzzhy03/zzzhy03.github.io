@@ -1,0 +1,93 @@
+{
+  "id": "arxiv:2611.30067",
+  "slug": "folioweaver-a-layergraph-grounded-agent-for-layered-image-generation-and-editing",
+  "title": "FolioWeaver: A LayerGraph-Grounded Agent for Layered Image Generation and Editing",
+  "authors": [
+    "Wentao Lu",
+    "Shengzhe Cui",
+    "Xihao Wu",
+    "Dingxin Yan",
+    "Yixuan Qin",
+    "Pengfei Fang"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.30067"
+  },
+  "abstract": "Layered image generation separates images into compositable layers, allowing users to manipulate individual elements independently. However, such asset-level editability does not enable the generation system to interpret successive feedback, perform targeted edits, and preserve unaffected content. We introduce FolioWeaver, a LayerGraph-grounded agent that unifies layered-image generation and iterative editing through a persistent Executable Scene State. FolioWeaver constructs a LayerGraph and generates independent visual assets conditioned on a shared scene reference. An Editing Agent performs feedback-driven modifications and self-repair through scoped actions, selective layer execution, and visual verification, enabling targeted updates while reusing unchanged assets. We also publicly release LayerFolio, a dataset of 100,377 human-reviewed layered scenes spanning six visual domains, together with two evaluation protocols: AtomicQA for measuring requirement satisfaction and CBLP for assessing layer organization. Experiments demonstrate that FolioWeaver achieves superior layer organization and composite fidelity compared with direct layered-generation methods. Analyses validate the contributions of component adaptation, execution-grounded repair, and cross-domain training. FolioWeaver advances layered-image generation toward persistent, controllable, and iterative visual creation. The dataset is available at https://huggingface.co/datasets/FolioWeaver/LayerFolio.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.30067v1",
+  "keywords": [
+    "LayerGraph",
+    "persistent scene state",
+    "layered image",
+    "incremental execution",
+    "visual verification",
+    "GRPO"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing",
+      "tool-use"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "layered-2d"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "reinforcement-learning"
+    ],
+    "output-property": [
+      "editable",
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.30067v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.30067v1 的 10 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "FolioWeaver把可编辑RGBA图层与语义、布局、依赖绑定成持久LayerGraph，让agent仅修改授权字段，复用未变资产，并通过独立视觉核验决定提交或回滚。作者报告CBLP 54.06，比ART+高10.82点；多轮编辑SR 79.92%。值得深读其增量执行和基于真实执行结果训练的修复策略，但自建VLM指标、缺少多轮测试规模及代码限制结论。",
+    "motivationZh": "可编辑图层本身不能保证生成系统能理解后续反馈、局部修改并保留此前修改。",
+    "methodZh": "该方法将一次性分层生成扩展为持续视觉创作。Planner生成可校验图，固定anchor image提供风格参照，局部编辑器产生对象并matting，SVG渲染文字，再按层序合成。Editing Agent以SFT和execution-grounded GRPO学习局部patch，通过依赖缓存和候选工作区保留未编辑资产。100,377例LayerFolio中留5,000例测试，报告层组织、内容符合度与多轮编辑提升；数据链接可访问，但未确认实现代码。",
+    "methodFlow": [
+      "Planner将文本生成含身份、框、层序和关系的LayerGraph，经确定性解码校验。",
+      "生成共享anchor，按目标范围产生独立对象RGBA；背景与SVG文字分别渲染合成。",
+      "agent观察当前图、渲染结果、历史和授权范围，选择inspect、patch或stop。",
+      "executor验证schema、scope和parent version，按依赖只重绘受影响资产。",
+      "独立视觉verifier检查可接受性与完成性，提交候选或保持原状态；用执行结果奖励训练修复policy。"
+    ],
+    "experimentsZh": "95,377例训练、5,000例类别比例采样且全阶段隔离测试。Planner为Qwen3.5-9B，object editor为Qwen-Image-Edit LoRA，editing agent为Qwen3.8-27B。最多三轮、三候选；训练reward、推理verifier和最终评估judge独立。指标含CLIP/FID、AtomicQA与CBLP；多轮编辑对比同起始图像与指令。 作者报告直接图层生成中CBLP54.06，ART+43.24；FID21.24，ART+27.48。（Table 2, p. 7） 作者报告同初始输出，无修复到完整修复CBLP49.87到54.06，FID28.61到21.24。（Table 4, p. 7） 作者报告多轮编辑SR79.92%、CS8.32，对照本地适配GenArtist为71.54%、7.86。（Table 6 and Sec. 5.5, p. 8） 比较边界：直接图层LayerDiffuse/ART+、flat SD3.5/Qwen、Qwen生成再分解；编辑对比Qwen-Image-Edit与有模型替换的本地GenArtist。没有与LayerCraft或全部最新设计agent的同骨干直接比较；多轮GenArtist结果不代表原版系统。 消融：有Planner×editor适配、同初始输出/同预算policy训练与工具开关、同20K预算跨域数据比较。完整数据对照同时增加训练规模；没有单独去掉持久状态、缓存或verifier的对照，也未量化运行成本。",
+    "insightZh": "主要方法贡献是可执行持久图层状态、受限修改/依赖感知增量执行与视觉结果监督的编辑policy组合。层生成、matting、SVG和GRPO本身沿用既有技术；组件交叉消融与同初始输出的修复对照支持系统机制。",
+    "evidenceZh": "持久状态把图层语义与像素资产绑定，修改受授权scope和parent version约束。（Secs. 3.1-3.3, Eq. 1, pp. 3-4; Fig. 2, p. 3）。移动/重排复用RGBA，文字修改只重绘文字，视觉变化才重生成目标；拒绝候选不改已接受状态。 修复policy奖励来自执行前后图像，而非agent自报成功。（Sec. 3.4, Eq. 3, p. 4）。SFT后GRPO采样3条轨迹，按视觉质量变化与退化惩罚奖励；policy loss排除tool observations，训练judge与推理verifier分开。 直接生成图层的对照上，层组织与组合图像指标报告改善。（Table 2, p. 7）。作者报告CBLP 54.06、ART+43.24；AtomicQA-AM75.64/GM70.37，但flat Qwen-Image的AtomicQA更高，不可称所有路线都领先。 修复训练和read-only工具对同初始输出有独立贡献。（Tables 3-4, p. 7）。无修复CBLP49.87，到SFT+GRPO无工具53.03，开工具54.06；Planner schema valid从43.54%到96.86%。",
+    "caveatZh": "作者限制：AtomicQA是judge的Yes支持，明确不是校准后的正确概率；CBLP只测目标类别覆盖及跨类别混合，不直接惩罚额外专属层（Secs. 4.2.1-4.2.2, pp. 5-6）。 复用资产并不保证所有组合像素不变，移动与遮挡会改变它们；预算耗尽返回最后接受状态，未保证完成（Sec. 3.3, p. 4）。 GenArtist为本地模型替换适配；full-data对照也增加训练规模（Tables 5-6, p. 8）。 审阅边界：PDF没有独立limitations节或附录；多轮测试请求数量、轮数分布、SR/CS细节、置信区间及人工一致性验证披露不足。 层纯度依赖冻结VLM识别，评价不等于所有资产都可无损重编辑；固定anchor可能限制大幅风格改变。 数据公开不等于实现公开；未确认agent、executor和GRPO实现代码，未复现实验。",
+    "whyRelevantZh": "直接命中可编辑structured 2D设计和视觉设计agent，受限patch、依赖缓存与执行后奖励可迁移到SVG/图层设计工具。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

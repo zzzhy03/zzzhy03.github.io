@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2611.32443",
+  "slug": "pvwander-3d-memory-guided-panoramic-video-wandering-with-path-facing-canonicalization",
+  "title": "PVWander: 3D Memory-guided Panoramic Video Wandering with Path-Facing Canonicalization",
+  "authors": [
+    "Chuanxin Song",
+    "Xiaodong Wang",
+    "Shijie Chen",
+    "Junliang Xie",
+    "Zhanmi Zhong",
+    "Suiying Wu",
+    "Peixi Peng"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32443"
+  },
+  "abstract": "Long-horizon panoramic video wandering aims to continuously synthesize scene-consistent $360^\\circ$ observations along user-specified camera trajectories from an initial equirectangular projection (ERP) panorama. Existing panoramic video models have achieved promising results in camera-controlled generation, while recent 3D-guided approaches further provide geometric guidance for improving scene consistency. However, stable long-horizon wandering remains challenging due to diverse motion--orientation relationships and imperfect memory guidance induced by accumulated generation artifacts and depth inaccuracies. To address these challenges, we propose \\textbf{PVWander}, a 3D-memory-guided framework that accumulates generated observations into an online point-cloud memory and reprojects it to guide subsequent generation, with two complementary designs: \\textit{Path-Facing canonicalization} for motion--orientation alignment and \\textit{Timestep-aware gating modulation} for adaptive memory guidance. \\textit{Path-Facing canonicalization} exploits the horizontal cyclic symmetry of ERP panoramas to uniformly align each clip's ERP orientation with its principal translation direction, yielding more consistent, forward-like relative motions while preserving the prescribed camera path. \\textit{Timestep-aware gating modulation} exploits the coarse-to-fine nature of diffusion denoising to adaptively regulate reprojected memory guidance through timestep-dependent channel-wise gates, preserving its structural benefits while mitigating visual artifacts from imperfect projections. Extensive experiments demonstrate that PVWander achieves improved long-horizon generation quality, while ablations validate the effectiveness of both designs.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32443v1",
+  "keywords": [
+    "panoramic video",
+    "3D memory",
+    "path-facing canonicalization",
+    "timestep gating",
+    "camera control"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "raster-image",
+      "point-cloud"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "content-scope": [
+      "environment-world"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "prior-data": [
+      "video-prior"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32443v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32443v1 的 27 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "PVWander 为静态全景世界漫游累计彩色point-cloud memory：按轨迹PCA方向循环平移ERP，再用随去噪timestep变化的channel gate调节重投影条件。作者报告1440×720八段641帧SSIM0.6810，高于OmniRoam0.6063，但FID不如后者，深度错误仍会破坏几何；一次rollout需A100约72.76分钟，不能称实时互动世界模型。",
+    "motivationZh": "长程全景漫游中运动方向变化和由估计深度、生成误差累积的3D memory会共同造成视觉及几何漂移。",
+    "methodZh": "框架由初始360度ERP和给定相机轨迹逐段生成。PVMetric估计径向metric depth并将历史帧反投影到共同世界frame，按目标覆盖选择最多4源帧重投影。Path-Facing只改变ERP yaw方向，不改变相机位置；两层MLP由timestep预测(0,2)channel gate，零初始化为1后调制render token。生成新观测继续写入memory，支持静态场景长程一致性。除主数据和RealSee闭环外，作者在SVD/EvoWorld上做匹配训练迁移，提供明确而局部的memory-conditioned生成方法。",
+    "methodFlow": [
+      "输入初始ERP与长相机路径，用PVMetric深度初始化彩色3D点memory",
+      "按每段水平轨迹PCA方向canonicalize ERP yaw并保持原相机位置",
+      "按覆盖选历史源帧，将点memory重投影为带有效mask的未来panorama条件",
+      "编码相机ray和render latent，以timestep channel gate调节memory特征后扩散生成81帧",
+      "恢复原ERP方向用于输出/评估，将新帧depth反投影写入memory并继续下一段"
+    ],
+    "experimentsZh": "InteriorGS-OmniRoam训练876、测试98scenes，81帧clip训练，评首段及八段641帧；主模型Wan1.3B，三阶段640×320/960×480/1440×720。RealSee3D90scenes零样本481帧闭环，只初末有共同视点，无GT roaming video。Unity Curve3666train/200test、SVD25帧segment共73帧以匹配EvoWorld。轨迹由ViPE从生成视频估计后与GT序列作scale alignment，非传感器轨迹真值。 作者报告1440×720八段SSIM0.6810/PSNR16.32/LPIPS0.3983，OmniRoam0.6063/14.59/0.4662；本方法FID23.65不如OmniRoam19.88。（Table1, PDF p.7） RealSee闭环作者报告SSIM-Loop0.7821、TransErr0.0477、RotErr0.6057°；OmniRoam SSIM0.6851，但其LPIPS0.3030略优于本方法0.3064。（Table2, PDF p.8） 作者报告八段runtime72.76min/A10040GB，Wan同主干66.84min；不是interactive帧率。（Table9, PDF p.21） 比较边界：包括Wan camera-only、Matrix-3D、OmniRoam完整preview/refine和preview-only、PanoWorld、EvoWorld。部分发布模型只支持单段，作者用last-frame自回归扩展；PanoWorld未暴露完整memory可能被削弱。Matrix-3D另用同主干/同PVMetric重训对照，EvoWorld做同数据SVD复现；这比直接跨尺寸backbone比较更有解释性。 消融：Table4拆分path-facing、fixed/online memory和TAG，Table5对比静态/标量/逐channel gates，附录比较hard cutoffs、depth源一致性及challenging trajectories。全组件非每项最佳：online-only SSIM0.5806略高于仅加TAG0.5770，full FID23.75逊于PF+online23.09；方法改善多指标平衡。Path-Facing零样本在5配置提高SSIM但部分PSNR/LPIPS微退。",
+    "insightZh": "Online point-cloud memory已有EvoWorld等，论文具体新增ERP cyclic symmetry的path-facing预处理与channel-wise timestep调制，并训练一致depth provider。它未创建显式可编辑scene资产或动态对象交互，不应仅因使用3D memory就归为通用3D资产生成。对主线的直接参考是几何reprojection条件在生成中如何随去噪阶段衰减，以及跨片段记忆误差管理。",
+    "evidenceZh": "Path-Facing以水平路径PCA估计共同yaw，保持相机位置和世界memory一致。（Sec.3.2 Eq.(2), Fig.2, PDF pp.4-5; AppendixA.3 PDF p.17）。ERP水平循环平移只变参考方向，推理可恢复原方向；不是修改用户相机路径。 memory gate由timestep而非图像局部置信度预测。（Sec.3.3 Eq.(3), PDF pp.5-6）。g=1+tanh(MLP(PE(t)))逐channel控制render tokens，零初始化为1；不能写成逐像素错误检测。 作者报告641帧外观和轨迹指标改善，但非所有质量指标领先。（Table1, PDF p.7）。1440×720 PVWander SSIM0.6810、PSNR16.32、LPIPS0.3983；OmniRoam0.6063/14.59/0.4662，但FID19.88优于本方法23.65。 受控迁移实验支持PF+TAG的局部方法效用。（Table3, PDF p.9）。同640×320训练的EvoWorld复现，加入PF+TAG后73帧SSIM0.6905→0.7417、LPIPS0.4205→0.2715；比不同backbone主表更接近机制对照。 长期memory空间和depth计算随历史增长，生成不是实时。（AppendixA.7 Tables8-9, PDF pp.20-21）。history81→561帧depth7.53→50.17秒/段，八段总72.76分钟/A10040GB，主要瓶颈是diffusion而非memory。",
+    "caveatZh": "作者限制：p.11明确反光和深度歧义可严重污染memory，gate不能修复底层结构错误。 p.11当前仅静态场景探索，动态物体运动与交互未建模。 审阅边界：RealSee仅loop closure而无中间GT漫游视频，初末相似不证明整个路径几何正确。 轨迹指标依赖ViPE和序列scale alignment，不应称绝对metric相机控制精度。 memory保存O(NP)观测并重新估depth，超出8段的长期成本与误差未充分建立；数据主要室内。 尚未公开实际实现，只有README承诺；需等待代码确认完整memory/渲染协议。",
+    "whyRelevantZh": "对3D/4D生成先验有具体迁移机制：保持world-frame的持久几何记忆、按目标视角重投影，并在生成中随去噪阶段调制不完美几何条件。当前输出为静态场景漫游视频，非可编辑3D资产。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

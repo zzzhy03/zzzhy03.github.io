@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2611.31048",
+  "slug": "distill-the-correction-not-the-rewrite-hindsight-twins-for-self-improving-text-to-image-models",
+  "title": "Distill the Correction, Not the Rewrite: Hindsight Twins for Self-Improving Text-to-Image Models",
+  "authors": [
+    "Jiaze Li",
+    "Jingyang Chen",
+    "Wenhao Zhao",
+    "Haoran Xu",
+    "Zhenlong Yuan",
+    "Dianmo Sheng",
+    "Yuanxing Zhang"
+  ],
+  "primaryTopicId": "image-generation",
+  "topicIds": [
+    "image-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.31048"
+  },
+  "abstract": "Text-to-image models can learn from their own mistakes by distilling a self-teacher conditioned on a vision-language critic's revised prompt. However, such self-teachers barely improve alignment, and both they and their hindsight-contrast variants absorb the critic's unintended additions to the scene, such as lighting or scenery. We attribute this to two factors: (1) the prompt already specifies the desired fix, so a useful revision must go beyond the failed span, often rewriting the entire scene and adding details that overshadow the fix; (2) although the critic localizes the error to a single span, self-teachers condition on the rewrite, entangling the intended fix with unintended additions. Motivated by these insights, we propose Hindsight Twins (HinT), which fills the critic's revision template once with the intended fix and once with the observed error and distills only their velocity difference, anchored at the user's prompt. Because text encoders spread the edit of a single slot to all other tokens, HinT further aligns the twins' token states outside the slot. Across Qwen-Image-2512, SD3.5-M, and FLUX.2-klein, HinT keeps the rate of critic-induced bias at the base-model level while matching or exceeding the alignment gains of prior self-distillation, and it keeps improving over twelve rounds of self-training where contrastive baselines decay.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.31048v1",
+  "keywords": [
+    "Hindsight Twins",
+    "self-distillation",
+    "critic drift",
+    "token-state alignment",
+    "text-to-image"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.31048v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.31048v1 的 25 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "HinT让VLM critic的“目标修正”和“观察到的错误”共享同一prompt模板，只蒸馏二者velocity差，并对齐非slot的text states，避免生成器学走critic擅加的背景/光照。三种T2I backbone支持该训练机制；对设计agent的纠错训练有启发，但尚未验证图像编辑、视频或全局布局修复，优先略读方法与协议边界。",
+    "motivationZh": "如何把VLM给出的局部纠错用于生成器自蒸馏，同时避免把critic擅自加入的场景、光照和风格学成模型习惯。",
+    "methodZh": "全文将自蒸馏的prompt rewrite拆成局部纠错与scene-style漂移，设计slotted hindsight twins在同一noised sample上求teacher velocity差，再加回原prompt anchor。学生只更新LoRA，接受样本保持anchor，失败样本经slot校验和token alignment后训练，按轮刷新teacher或采用backbone-specific hybrid。该方法是静态T2I post-training机制，不是推理时编辑agent。",
+    "methodFlow": [
+      "从当前generator每prompt采样一张图，由VLM返回实际错误、目标修正和带slot的场景改写模板",
+      "在同一模板填入fix与observed error，丢弃不满足唯一span/slot等字符串检查的失败样本",
+      "编码twins后复制非slot token states，避免文字只改一处但encoder状态扩散到背景",
+      "以原prompt teacher velocity为anchor，加噪声加权的twin velocity差，训练student LoRA；正确样本只保anchor",
+      "每轮重采样/critique并更新teacher与LoRA EMA；FLUX使用刷新anchor、冻结base contrast的hybrid策略"
+    ],
+    "experimentsZh": "Qwen-Image-2512、SD3.5-M、FLUX.2-klein分别训练LoRA，默认Qwen3-VL-32B critic；GenEval2 400训练/400held-out、每测试prompt4图，Qwen4轮其余6轮，另有12轮延长。独立InternVL judge、detector GenEval及OneIG/T2I-CompBench作迁移。Qwen另分800个disjoint grammar prompts与直接训练800 benchmark prompts两协议；seed数随方法2-4不等。 作者报告Qwen held-out EMA GM33.9至45.3，SD19.6至30.7；FLUX为23.5至25.4，低于pair的27.3但current weights更稳。（Table1, PDF p.6） 作者报告Qwen在disjoint grammar训练后GM49.0±1.8，对base31.8和pair44.4±2.1；这是比同benchmark训练更严格的协议。（Table3, PDF p.6; Table15, PDF p.20） 作者报告sunset-biased Qwen的habit yes均值：base1.4%、pair98.6%、HinT1.2%；该Qwen实验采用full800 prompt协议。（Table11, PDF p.17; Appendix C, PDF pp.17-18） 作者报告SD同teacher目标消融中twins与pair均GM25.4，但sunset率2.2%对81.9%；加入EMA等后HinT30.7，说明抗漂移和对齐收益需分别分析。（Table4, PDF p.7） 作者报告相同失败样本HinT与pair均需3次teacher forward，sample+critic占训练65%-78%，整体比positive teacher多不到4%；这些是作者硬件/小数据设置下的训练成本。（Appendix A, Table6, PDF pp.12-13） 比较边界：涵盖positive teacher、cross-author pair、user hindsight、revised-prompt SFT和DiffusionNFT；主比较为single-rollout budget，附录补充4-rollout RL和test-time revision，但不能外推为优于所有RL训练配置。跨family judge降低同家族评分偏差，仍主要是自动评价，缺真实多轮设计任务或人工意图保留测量。 消融：有重加rewrite drift、限制critic改写长度、非slot alignment、evolving/hybrid teacher、noise weighting及EMA消融；部分组件在current/EMA下效果不同，不能将整体增益归给单一技巧。25%/50%随机错配critique测试不是系统性错误critic的充分模拟。",
+    "insightZh": "主要贡献是对critic rewrite漂移的可检验分解、同模板局部contrast和encoder非slot状态对齐，将口头纠错转成trajectory监督。不是新foundation模型，也不是首次self-distillation/hindsight；价值在控制非目标语义的训练副作用。相对推理端设计agent的迁移仍是训练接口启发，不能写为已验证的agent图像编辑能力。",
+    "evidenceZh": "修正与错误填入同一模板后求velocity差，并用原prompt anchor训练LoRA；非slot states需在编码后对齐。（Sec.3, Fig.3, Eq.(3), PDF pp.4-5; Algorithm1, PDF p.13）。text空间相同上下文不意味着feature相同；FLUX的contrast teacher冻结，并非所有backbone都完全evolving。 作者报告400 held-out prompts的Qwen/SD对齐改善，但六轮FLUX EMA仍低于cross-author pair。（Table1, PDF p.6; Table13, PDF p.19）。Qwen EMA45.3对base33.9，SD30.7对19.6；FLUX HinT25.4对pair27.3，不能宣称每backbone每协议均最佳。 论文明确区分disjoint grammar prompts和直接用800个benchmark prompts做无标签自训练的协议。（Appendix A.2, PDF p.13; Table15, PDF p.20）。49.0 GM来自disjoint训练，48.8/full800及其长轮实验含benchmark prompt暴露，不可混写成held-out泛化。 作者通过有意注入sunset/cold/vintage习惯、默认critic背景探针和另一judge核验漂移抑制。（Tables11-12, PDF pp.17-18）。habit百分比是VLM yes概率均值，不是人工逐图标注的绝对发生率；其受控假设应保留。 作者将全局多物体布局、编辑和视频列为限制/未来工作。（Appendix E, PDF p.23）。局部phrase swap给出的几何引导弱于显式空间条件，训练仍需30B级critic。",
+    "caveatZh": "作者限制：全局多物体布局的空间约束仅靠phrase交换较弱；加入bounding boxes等显式条件仍属未来工作（Appendix E, p.23）。 训练每rollout仍调用30B级VLM，图像编辑/视频的扩展尚未验证（Appendix E, p.23）。 审阅边界：full800与12轮Qwen实验直接暴露benchmark prompts，必须与held-out及disjoint grammar结果区分。 habit率由自动VLM yes概率构成，受控人工style注入不覆盖所有真实critic失误或用户偏好。 约22%-31%的first-round failure critiques未通过slot校验而跳过；复杂非局部错误可能难构造有效twins。 向visual-design-agents的迁移限于generator纠错训练思想；本文不提供在线编辑/多工具闭环效果，也未确认公开实现。",
+    "whyRelevantZh": "视觉设计agent的critic容易在修正局部要求时改写无关背景，HinT给出可迁移的目标/非目标语义解耦训练接口。其证据来自T2I post-training，尚未验证实际设计agent、受控图像编辑或SVG/3D产物，故推荐medium/skim。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

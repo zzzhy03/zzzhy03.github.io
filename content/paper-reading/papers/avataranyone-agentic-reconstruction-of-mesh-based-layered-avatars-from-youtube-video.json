@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2611.30777",
+  "slug": "avataranyone-agentic-reconstruction-of-mesh-based-layered-avatars-from-youtube-video",
+  "title": "AvatarAnyone: Agentic Reconstruction of Mesh-Based Layered Avatars from YouTube Video",
+  "authors": [
+    "Aymen Mir",
+    "Peter Wonka",
+    "Stefanos Zafeiriou",
+    "Rıza Alp Güler"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.30777"
+  },
+  "abstract": "We introduce AvatarAnyone, a method for reconstructing avatars from casual YouTube videos as layered meshes, with each garment and footwear as a separate mesh layered on top of the body mesh. In such videos, people differ in garment classes, clothing types, and layers, and each combination needs a different reconstruction. A single fixed layered reconstruction pipeline therefore fails. AvatarAnyone solves this problem with AI agents that plan a custom optimization for each person's reconstruction. The agents predict the garment classes, the clothing type, and the layering. They use these predictions to choose an initialization and stage the optimization. Because the avatars are layered meshes, they support applications such as virtual try-on and cloth simulation. We change the clothing layers of an avatar and render it in different garments and poses. We can also simulate a clothing layer as cloth over the animated body with a standard cloth simulator. Most existing avatars are one fused surface or a set of Gaussians and cannot do this. We load the avatars directly into Blender, Unreal Engine, and robotics simulators such as MuJoCo. As the avatars are meshes, they support contact modeling with other objects. We show results from around 150 YouTube videos. On four datasets, AvatarAnyone outperforms existing mesh-based methods for animatable monocular reconstruction. Our project page is available at https://miraymen.github.io/avataranyone.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.30777v1",
+  "keywords": [
+    "layered avatar",
+    "agentic reconstruction",
+    "garment mesh",
+    "containment constraints",
+    "initialization gate",
+    "editable assets"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "editing"
+    ],
+    "content-scope": [
+      "human-avatar"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "editable",
+      "animation-ready"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.30777v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.30777v1 的 15 页全文及关键页面核验；实验数字均为作者报告，未独立复现。另核验作者项目页独立取回的25页补充文档；该补充不属于arXiv正文，来源URL、SHA-256和取回时间固定在审阅证据中。",
+    "ideaZh": "AvatarAnyone把服装层级判断与数值拟合拆开：VLM问卷决定层结构、初始化与包含/裤脚约束，agent拒绝不合格生成mesh，再联合优化独立身体、头发、上下衣和鞋层。作者报告100个scan上Chamfer从最佳mesh基线1.92降到1.36厘米，并展示换装/布料模拟。它拟合的是生成360度视频而非直接恢复未见真实表面，且只有一层上衣和下衣，值得作为可编辑mesh资产方案深读。",
+    "motivationZh": "融合表面或Gaussian avatar无法独立替换/模拟衣物，而不同服装类型需要不同初始化、层序及优化目标。",
+    "methodZh": "针对普通视频无法直接产出可换衣、可模拟mesh的问题，本文先从视频生成canonical view和360度序列，再用VLM语义问卷选择分层模型及优化配置。紧身部件从SMPL-X裁出，宽松衣物由Pixal3D初始化并经agent gate最多15候选检查，随后按mask/normal、层间包含及hem目标coarse-to-fine拟合，分层贴纹理和LBS。主文15页与作者项目25页补充已分开完整阅读；外部补充独立固定hash，不冒充arXiv正文。",
+    "methodFlow": [
+      "从普通视频生成canonical人物图及360度转身视频，提取labels、normals与body pose。",
+      "VLM回答服装/发型/层序问卷，形成层集合、包含关系和hem约束。",
+      "按语义从SMPL-X裁剪或生成初始化；agent检查错误并通过换seed/灰度/视图重试。",
+      "联合优化分层mesh的silhouette、normal、containment与hem目标，逐步提高分辨率。",
+      "检查遮挡层序并分层估计纹理/光照，输出独立mesh、texture与skinning以换装或模拟。"
+    ],
+    "experimentsZh": "静态20个X-Humans scan；animatable100 scan，THuman2.1/CustomHumans/2K2K/CAPE各25，75个有纹理。全部方法使用同一canonical image；baseline以nearest-vertex SMPL-X权重rig。25 YouTube视频前5秒输入后5秒图像评价，12视频/52参与者共624选择；另有作者项目补充的13人4D-DRESS逐服装分析。未独立复现。 作者报告100 scan CD1.36cm，最佳mesh基线1.92cm；F-score0.511。（Table 4, p. 7） 作者报告YouTube held-out PSNR15.64dB、LPIPS0.193，mesh基线最佳15.50/0.202；624个人类选择中79.81%选本方法。（Table 2, p. 6; Sec. 4.4, p. 7） 作者报告24-scan消融CD full1.40cm、无agents单表面1.99、无adaptive1.80、无gate1.76。（Table 3, p. 6） 比较边界：主文对五种mesh重建器，包含用于初始化的Pixal3D，比较同输入图但后续pipeline与rig不同。作者外部补充另与IDOL/LHM++做渲染比较并测4D-DRESS garment；这些不是arXiv正文内的附录，也没有与完整分层衣物重建器的同设置指标对照。 消融：24 scans删去agents且单表面、固定层优化、无初始化gate，支持各系统组件。首项同时改变agent及表示，不能独立归因语义推理；没有完整数值VLM准确率，外部补充只以原agent答案评价跨模型一致性。",
+    "insightZh": "将VLM结构判断用于构建个体化优化问题，并用agent gate控制生成初始化，得到显式分层且有独立纹理/skin weights的资产。不是新基础人体模型，也不是通用任意服装层分解；增益来自语义规划、生成先验和结构优化组合。",
+    "evidenceZh": "VLM答案改变层集合、初始化和包含/hem项，agent gate对生成初始化做视觉检查及重试。（Secs. 3.2-3.4, p. 4; Fig. 2, p. 3）。问题如裙/裤、tucked/untucked、长发决定优化结构；优化不改变拓扑，错误初始化不能靠后续拟合修复。 分层结构具有真实可编辑资产应用，而非仅视图渲染。（Secs. 4.5-4.6, p. 7; Figs. 6-7, p. 8）。展示从另一avatar替换衣服、Blender布料、Unreal及MuJoCo导入；物理demo不等于材料/动力学参数准确。 在指定scan和视频评测上报告改善，消融支持适配优化与初始化检查。（Tables 1-3, p. 6; Table 4, p. 7）。100 scan CD1.36cm，对照最佳1.92cm；24 scan full CD1.40，无adaptive1.80，无gate1.76。 补充的逐服装GT分析和失败例同时支持资产分层价值与外推边界。（Author-project supplementary PDF Sec. 2, Table 2, p. 2; Sec. 8, pp. 11-12）。External author-project supplementary, no arXiv version stamp: https://miraymen.github.io/avataranyone/assets/AvatarAnyone_supplementary.pdf ; SHA-256 5ed2cf38c92475710b81783fccb138f43f3aa40d3416fb675fc6fc753df05328 ; retrieved 2026-11-25T11:48:43.528550+00:00. 13人4D-DRESS garment合并CD0.98cm，仅对可见外表面；没有clean初始化可无输出，生成背部会固化错误，超出一上/一下层结构的服装失败。 agent问卷一致性不是答案准确率，输出仍依赖生成先验。（Author-project supplementary PDF Sec. 3, pp. 7-8; Sec. 12, pp. 21-24）。External author-project supplementary, no arXiv version stamp: https://miraymen.github.io/avataranyone/assets/AvatarAnyone_supplementary.pdf ; SHA-256 5ed2cf38c92475710b81783fccb138f43f3aa40d3416fb675fc6fc753df05328 ; retrieved 2026-11-25T11:48:43.528550+00:00. VLM比较以原agent为reference而无GT；实际优化154个generated/canonical views，背面由视频模型补全。",
+    "caveatZh": "作者限制：只有一层上衣与一层下衣，夹克和内衬合为一层；依赖商业image/language模型，约3美元API和2小时单GPU拟合（p. 8）。 生成360视频并非严格多视图一致，按face选view缓解而非解决；隐藏表面由先验补出（Sec. 3.4, p. 5）。 作者项目补充Sec. 8(pp. 11-12)展示15候选全失败时无输出、背面幻觉被保留和层结构之外服装破碎。 审阅边界：scan表面评测不充分验证被衣物遮挡的人体与衣物内部；换装/布料demo不等于工业可制造或真实材料参数。 canonical生成引入身份/体型不确定性，量化比较部分数据与baseline预训练可能重叠；同生成图输入缓解但不能排除全部先验偏差。 问卷分支含预设人群/发型规则，长尾样式泛化未知；代码仓库目前仅README/assets并承诺未来发布。 作者项目补充无arXiv版本戳，已固定独立来源/hash/取回时间，不能宣称其为exact-version正文证据。",
+    "whyRelevantZh": "显式独立mesh层、包含/hem约束与agent选择初始化直接服务可编辑3D角色资产与服装重组，是外围重建进入3D生成主线的具体迁移。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

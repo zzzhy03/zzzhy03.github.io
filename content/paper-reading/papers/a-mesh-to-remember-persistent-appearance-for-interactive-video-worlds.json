@@ -1,0 +1,98 @@
+{
+  "id": "arxiv:2611.32445",
+  "slug": "a-mesh-to-remember-persistent-appearance-for-interactive-video-worlds",
+  "title": "A Mesh to Remember: Persistent Appearance for Interactive Video Worlds",
+  "authors": [
+    "Joonghyuk Shin",
+    "Alex Trevithick",
+    "Katarína Tóthová",
+    "Liyuan Zhu",
+    "Shengyu Huang",
+    "Jaesik Park",
+    "Shalini De Mello",
+    "Laura Leal-Taixé",
+    "Riccardo de Lutio",
+    "Haithem Turki"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32445"
+  },
+  "abstract": "Video world models synthesize photorealistic observations in response to user actions but struggle to remain consistent over long interactions. Coding agents and text-to-3D models instead generate explicit 3D worlds whose geometry and state persist by construction, but whose appearance falls far short of photorealism. Recent methods combine the strengths of both by rendering such worlds into coarse proxies that guide a video model. However, since these proxies only specify where things are, the renderer must invent what they look like as the world is explored, and anything it forgets is reinvented when a surface reappears. Our key insight is that a mesh identifies which surface each pixel shows, across frames and views, even as objects move, allowing it to serve as an address for what the renderer generates. We propose M2R (Mesh to Remember), a few-step causal video renderer that stores its own features on the surfaces they depict, in each object's frame, and retrieves them by rasterizing the mesh whenever those surfaces come back into view. Appearance thus travels with objects wherever they move, persists across revisits, and is shared by every agent that observes it, while memory grows with the surfaces seen instead of the number of frames. Trained only on synthetic data, M2R transfers zero-shot to real indoor scans and to worlds authored by coding agents. It outperforms state-of-the-art methods in consistency across static, dynamic, and multi-agent benchmarks, more than doubling object permanence and nearly doubling cross-agent consistency, while rendering 720p video in real time (40 FPS).",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32445v1",
+  "keywords": [
+    "surface memory",
+    "generative rendering",
+    "object-local coordinates",
+    "KV cache",
+    "memory distillation",
+    "FastVAE"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "mesh",
+      "raster-image"
+    ],
+    "content-scope": [
+      "environment-world"
+    ],
+    "conditioning": [
+      "partial-3d",
+      "single-image"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "prior-data": [
+      "video-prior"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32445v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32445v1 的 30 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "M2R 用已知mesh的object-local surface cell给生成器K/V特征寻址，保留每cell首次和最近观测，因此物体移动及多agent重访仍能读回同一外观。配合palindromic rollout记忆蒸馏和FastVAE，作者报告单GB200的704×1280渲染41.1FPS、0.19秒首响应；显式几何/状态与相机逐帧外供，不能据此声称模型学会世界动力学或自动3D重建。",
+    "motivationZh": "显式3D世界可保留几何和状态，但视频生成器在重访、移动物体和多agent观察时会遗忘并重绘外观。",
+    "methodZh": "框架从每agent初始图、场景caption及粗无纹理mesh/agent boxes的当前渲染生成视频。与world-fixed point memory不同，cell由对象局部坐标、surface direction和多尺度划分，rasterizer确定当前token所见表面，再检索首次/最近两个旧token。token K/V跨层PCA到8192维FP8约18倍压缩，短temporal cache只留8帧和sink。通过回文路径让student读自己的历史memory，以full-context冻结teacher和DMD监督，学会避免重访时重绘。数据和消融支持结构可控动态场景的外观保持，但不是材质纹理资产输出。",
+    "methodFlow": [
+      "输入每agent初始图、caption和逐帧更新mesh/box状态，渲染无外观proxy",
+      "按object-local位置、表面方向和尺度把pixel/token映射到mesh cell",
+      "检索cell首次与最近观测的压缩K/V，解压并重定位到当前token上下文",
+      "少步causal模型结合geometry、8帧cache和surface memory生成新chunk",
+      "将新K/V写入共享cell，保留first/latest并丢弃无cell引用的旧token",
+      "用回文rollout与full-context teacher离线蒸馏，FastVAE加速编码及解码"
+    ],
+    "experimentsZh": "renderer在64GB200上用Isekai3D约200K合成60s episodes、223环境、850K单视图视频微调，base为预训练Cosmos3-Nano。静态评46ScanNet++及18Replica×4条357帧轨迹；动态5HSSD homes45条、8MutableWorlds52条；多agent30个双人/23个四人episode。基准16FPS轨迹，8001帧长rollout用30FPS；时延和吞吐在单GB200、704×1280、2步8帧chunk测。 作者报告ScanNet++ content persistence89.88、Replica92.16，AgentGarten89.49/91.72；视觉quality本方法72.52/72.91，并未优于所有baseline。（Table1, PDF p.5） 作者报告HSSD/MutableWorlds object permanence91.5/94.1，最佳baseline34.7/43.4；是DINO+VLM的0–100 composite，不是百分比成功率。（Table2 PDF p.6; AppendixG.2 PDF p.25） 作者报告两/四agent cross-agent consistency79.99/77.12，最佳baseline42.60/42.16；每agent使用自己的GPU。（Table3 PDF p.7; AppendixD PDF p.19） 作者报告8,001帧rollout低于45GiB，额外KV store5.95GiB；仅所观测scene的surface覆盖约束，不保证无限新场景恒定memory。（Fig.7 PDF p.7; AppendixD PDF p.18） 比较边界：比较SolarWM、Matrix-Game3.5、GEN3C、Lyra2/DMD、WorldDirector、CodeWorld/CodeVideo和AgentGarten。各baseline不同resolution、architecture和context；供同GT geometry给可用方法，3D缓存从该mesh depth生成。静态ScanNet++排除14/60穿墙轨迹，主表对每trajectory/metric取扫描mesh与LLM修补mesh两者较好值，所有方法同规则且附全60/分mesh表。多agent baseline不能共享view memory，故独立生成，未直接比较已有joint multi-agent generators。 消融：同16GPU/300iteration对照KV vs RGB/frustum、compression、palindromic rollout、self-distillation和FastVAE。KV在动态revisit/moved最好，但frustum静态content91.83高于KV89.83；first/latest、PCA维数与FP8、时间重定位和λ权衡均有附录分析。更大λ增一致性但降低texture sharpness，默认0.1；18倍指额外token存储，需保留口径。",
+    "insightZh": "具体推进是将生成器自身K/V特征挂到移动对象的表面地址，并跨agent共享，而非存world-space点、RGB或按相机frustum取旧帧。相同训练下RGB、frustum、KV和压缩对照支持其结构价值。FastVAE是另一独立吞吐贡献，不能把全部40FPS归因memory。系统渲染显式世界给定状态，并不自行产生物理演化。",
+    "evidenceZh": "surface memory定义在对象局部frame，保留first/latest，表面随物体移动后地址仍有效。（Sec.4.2 Eq.(1)-(2), Figs.2-4, PDF pp.3-5; AppendixD PDF pp.18-19）。mesh cell还按6方向和4尺度拆分，hole/sky/agent box有专用cell；每token检索最多两个旧token。 memory distillation让short-context student在重访时读取自己写出的特征。（Sec.4.3 Eq.(3), PDF pp.5-6; AppendixE AlgorithmA1 PDF p.20）。70%memory训练iteration为agent-free回文路径，L_DMD加λ0.1 clean-latent self-distillation。 作者报告KV优于同surface RGB且运行更快，FastVAE另贡献约两倍吞吐。（Table4, PDF p.8; TablesA1-A3 PDF pp.15-16）。RGB revisit79.56/FPS19.8，KV full86.78/41.1；无FastVAE19.2FPS；未压缩KV额外store3.70GiB降至0.21GiB，非总GPU内存缩18倍。 动态物体永久性分数显著提升，但属于指定轨迹、给定mesh状态的代理度量。（Table2 PDF p.6; AppendixG.2 PDF pp.24-25）。HSSD permanence91.5 vsAgentGarten34.7，MutableWorlds94.1 vs43.4；分数混合DINO与Gemini ratings，不是成功率或真实物理因果测试。 多agent共享外观有效，但比较对象没有跨view共享memory且每agent单独GPU。（Table3 PDF p.7; AppendixD PDF p.19; AppendixG.3/H PDF pp.25-26）。两agent cross-consistency79.99 vsAgentGarten42.60；baseline分别渲染各视角，本模型共享store，证明系统共享机制而非等共享输入下模型优势。 实时数字为特定高端硬件和chunk式输出，准确几何与初帧对齐是前提。（Table1 PDF p.5; Sec.5.1 PDF p.6; AppendixH PDF p.26）。作者报告单GB200、两步8帧chunk41.1FPS/0.19s latency/33.6GiB；每agent自己的GPU，不代表4agent共享单卡同速。",
+    "caveatZh": "作者限制：p.26要求粗mesh虽可简化但几何准确，mesh错误会进入video；更噪的image-reconstructed geometry尚待处理。 多agent首帧必须与mesh良好对齐，当前依赖高质量image model；未见agent侧面需猜测并靠若干推理规则保持身份。 非人角色只有34/401且少于5%训练视频，渲染较不可靠；renderer依赖预训练base与合成微调分布。 审阅边界：世界几何、每帧运动状态、camera及agent box由外部提供；不是learned simulator/world dynamics，也不等于3D generation方法已输出可编辑appearance assets。 多agent比较存在共享memory接口差异且每agent独占GPU；40FPS数字不能泛化到普通GPU或多agent同卡。 动态一致性大量使用精确重复camera路径及GT masks、DINO/VLM代理分数；未报告独立人评或真实互动任务成功率。 “synthetic-only”仅指renderer微调，FastVAE另用web videos且base已预训练；无公开实现，未独立复现。",
+    "whyRelevantZh": "为显式3D生成/设计世界提供可迁移的生成式appearance renderer：对象局部surface地址把编辑后的几何、运动状态与持久外观相连，跨视角复用自身特征而非反复生成新身份。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "id": "arxiv:2611.31239",
+  "slug": "lyris-layout-guided-long-video-generation-with-persistent-3d-memory",
+  "title": "Lyris: Layout-Guided Long Video Generation with Persistent 3D Memory",
+  "authors": [
+    "Chen Wang",
+    "Jiahui Huang",
+    "Riccardo de Lutio",
+    "Alex Trevithick",
+    "Bryan Chu",
+    "Jiawei Ren",
+    "Laura Leal-Taixé",
+    "Shengyu Huang",
+    "Lingjie Liu",
+    "Haithem Turki"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "3d-generation",
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.31239"
+  },
+  "abstract": "Exploring a scene from as little as a single photo requires generating a long, camera-controlled walkthrough that extends far beyond what was captured, yet remains consistent upon return. Memory-based video generation methods preserve what they have already seen, but have no anchor beyond it, where the camera drifts from its path and a text prompt can name objects but not place them. Layout-conditioned methods provide such an anchor and precise control over what appears where, but rely on layouts that are typically authored by hand. Both limitations arise because, beyond what was captured, nothing anchors the video model unless a human authors one. To overcome both, we propose Lyris, a long video generation framework that never leaves the video model without an anchor: a persistent point-cloud memory where the scene has been observed or generated, and a 3D layout that a vision-language model authors where it has not. Our key insight is that the interface between the two models can be surprisingly coarse. A layout of one labeled 3D box per object is simple enough for a vision-language model to author (and for a user to edit), yet expressive enough for a video model to follow once rendered along the camera path. We demonstrate walkthroughs of over three minutes and 50 meters from a single photo, passing through doorways into rooms it never shows. When evaluated on minute-long round trips across four datasets, Lyris outperforms state-of-the-art methods by a wide margin, reducing camera error by 3.8x and improving consistency upon return by 22% on average.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.31239v2",
+  "keywords": [
+    "long video generation",
+    "3D memory",
+    "layout planning",
+    "camera control",
+    "editable boxes"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "composition"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "point-cloud",
+      "discrete-program"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "diffusion"
+    ],
+    "output-property": [
+      "controllable",
+      "editable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.31239v2"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.31239v2 的 21 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "Lyris用VLM先为未见区域写可编辑3D对象盒，经几何检查/修复后渲染给视频模型，同时把已生成内容重建成持久点云。作者在分钟级round trips报告相机误差改善3.8倍、回访DINO一致性改善22%；价值是显式layout把设计意图和生成记忆接起来，尚非交互式完整3D世界。",
+    "motivationZh": "视频world model的memory只能锚定已见区域，未见空间缺少可编辑几何布局，导致camera漂移和回访不一致。",
+    "methodZh": "每chunk规划对象label/position/size/yaw，检查support、floor、free space、collision、visibility与relations；五proposal选最少违例者，VLM修订一次再确定性repair。MiniMax-H3的LoRA视频模型接收layout video、memory video、appearance refs和camera rays。Pi3X重建并对齐生成chunk，通过camera误差gate才写回memory，失败chunk仍保留在视频。已完整读取主文及Supplement A-E。",
+    "methodFlow": [
+      "从输入图建立点云和posed-frame bank，接收接下来相机路径与可选描述。",
+      "VLM为未见区提议labeled 3D boxes，经六类检查、修订和repair得到layout。",
+      "沿目标cameras渲染layout与memory，检索appearance references。",
+      "条件化LoRA视频diffusion生成chunk，保持prefix frame衔接。",
+      "重建chunk并对齐历史，通过可靠性检查后更新点云/frame memory与部分生成的boxes，再生成后续chunk。"
+    ],
+    "experimentsZh": "ScanNet++/CA-1M/DL3DV/SpatialVID各20场景；directed给后续描述，autonomous只给start caption，统一路径round trip最多744frames/12fps。9,926 DL3DV与747 ScanNet++ scenes训练，MiniMax-H3 33B+LoRA并DMD2八步采样。Supplement含smaller/open planners、8B backbone、novel return views及camera-filtered consistency。 作者报告directed ScanNet++ RotErr1.3°、PSNR20.19、Revisit0.826，CA-1M2.2°/18.50/0.755。（Table1,p.6） 作者报告autonomous四数据集RotErr1.5/4.7/0.9/7.2°，Revisit0.817/0.755/0.792/0.777。（Table2,p.7） 作者报告744frames在H100生成约28min，directed布局规划median10min，总约38min。（Sec.4.4 Timing,p.8） 作者报告只保留camera误差≤5°的pairs后仍领先Revisit；shifted-return视角一致性0.683 vs次优0.611。（Table9,p.15; Table10,p.16） 比较边界：6种官方memory/world baselines用默认配置和同path/input，AnyRecon官方为空prompt。Resolution统一下采样评价；每scene单seed，各方法backbone/训练资源不同，不是统一预算对照。PSNR等只测已观察区，不能证明新区域真实还原；adherence由估计depth，label adherence另用SAM3。 消融：剔除layout、pointcloud、appearance，比较text-only、walls/random objects、替换planner/backbone，诊断内容/相机/记忆作用。粗walls也能大幅减少漂移，故不能将camera所有收益归为planner语义智能。无多seed训练不确定性分析。",
+    "insightZh": "核心是粗粒度、可验证和可编辑的3D layout与persistent scene memory互补：前者锚定未见区，后者保留已见区。比仅自然语言规划或仅历史memory多出明确几何接口；不是新foundation backbone，也不生成可保证拓扑/物理正确的完整资产。",
+    "evidenceZh": "planner输出对象盒并经六类几何检查、一次VLM revision及确定性repair。（Sec.3.1,p.4; Appendix B.1,pp.17-18; Table12,p.18）。每chunk最多12boxes，gross-error tolerances不能视作精确物理可行性证明。 layout/memory渲染共同条件化视频，每chunk重建写回persistent点云。（Fig.2,p.3; Sec.3.2-3.3,pp.4-5; Appendix B.4,pp.18-19）。memory update被拒只阻止写回，不移除或修复该生成chunk。 作者报告directed CA-1M RotErr2.2°、Revisit0.755，SolarWM10.1°/0.475。（Table1,p.6）。同输入/路径/描述，摄像机由DA3从生成帧恢复；PSNR仅start-view可见区域。 移除layout或只用layout文字显著削弱相机控制。（Table3,p.8; Table11,p.16）。CA-1M autonomous full4.7°，no-layout12.2°、layout-as-text13.0°；walls-only也有camera收益，planner主要补具体对象布局。",
+    "caveatZh": "作者限制：估计depth与alignment误差会累积到长期memory。 训练仅静态场景，不建模真实动态世界。 对象仅labeled box，不能控制详细shape。 规划与采样串行，尚不interactive。 审阅边界：受DA3/ViPE估计器与场景筛选影响；只取慢速静态ground-level walkthroughs。 几何checks与memory gate不能保证生成图像满足所有boxes或物理一致。 新空间为合理扩展而非真实环境重建，不可用于未观测场地事实推断。 大backbone与128H100阶段训练、闭源planner和无公开代码限制复用。",
+    "whyRelevantZh": "具体可迁移的3D设计接口包含可编辑labeled boxes、rendered control和持久point memory；有实际移动/交换对象控制实验，比泛泛video-world潜力更直接。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

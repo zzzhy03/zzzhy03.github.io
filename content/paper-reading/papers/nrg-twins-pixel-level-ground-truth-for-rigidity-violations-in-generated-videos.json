@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2611.32431",
+  "slug": "nrg-twins-pixel-level-ground-truth-for-rigidity-violations-in-generated-videos",
+  "title": "NRG-Twins: Pixel-Level Ground Truth for Rigidity Violations in Generated Videos",
+  "authors": [
+    "Chenrui Fan",
+    "Qiyang Hu",
+    "Luca Scharr",
+    "Paolo Favaro"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32431"
+  },
+  "abstract": "Video generators now produce realistic clips of scenes and objects, which makes generated video an attractive source of 3D content. Yet generated video is not 3D consistent: static content slowly deforms or slides, 3D reconstruction degrades, and the errors are too subtle to label by hand. To make generators 3D consistent, or to build rewards and guidance that push them there, we need data that say where and by how much a generated video breaks rigidity, and these data must come from generated video itself. We obtain per-pixel ground-truth labels from real-generated twins: a real clip paired with its re-creation by a keyframe-conditioned video generator. After inserting real keyframes so that the twin camera roughly follows the real one, we measure per pixel, in degrees, how far the twin departs from a rigid scene seen along its own camera path. We release Non-Rigidly Generated Twins (NRG-Twins), 871 twins, the code that builds them for new generators, and a benchmark with an official test split. A detector trained on these data, the Non-Rigidly Generated Pixel Detector (NRG-PD), predicts the per-pixel angle from RGB alone. It separates inconsistent from consistent pixels with AUROC 0.85, against 0.40-0.74 for seven existing consistency and motion-segmentation methods, and its predictions improve 3DGS of video that contains generated content.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32431v1",
+  "keywords": [
+    "generated video",
+    "rigidity violation",
+    "real-generated twins",
+    "noise calibration",
+    "3D consistency",
+    "pixel detector"
+  ],
+  "facets": {
+    "task": [
+      "representation-learning",
+      "reconstruction"
+    ],
+    "prior-data": [
+      "video-prior",
+      "synthetic-data"
+    ],
+    "representation": [
+      "3d-gaussian"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "method": [
+      "self-supervised"
+    ],
+    "output-property": [
+      "physically-plausible"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32431v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32431v1 的 35 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "NRG-Twins用真实视频及其关键帧生成孪生片段，结合估计相机、深度、光流和关键帧噪声校准，构建像素级刚性偏离角度，再训练仅RGB输入的NRG-PD。作者报告pixel AUROC 0.851，筛除混合视频中的生成帧使3DGS比等量随机删帧高4.36 dB。它提供生成视频到3D的质量筛选机制；标签是带假设的估计几何监督，不能视为独立物理真值或通用一致性reward。",
+    "motivationZh": "生成视频的细微非刚性漂移难以人工定位，也会破坏作为3D重建输入的质量。",
+    "methodZh": "本文解决生成视频的细微非刚性漂移难以人工逐像素标注的问题。871个Wan/RealEstate10K孪生片段经自适应关键帧对齐，以七路深度、三路光流共识测量视线角度残差并扣除关键帧噪声。冻结VGGT加LoRA/DPT预测角度，在83个测试孪生及跨生成器prompt视频上评估；另以删帧或像素mask改善RobustSplat。标签覆盖、噪声和下游输入构造限制迁移结论，未独立复现。",
+    "methodFlow": [
+      "用真实首末帧驱动Wan生成81帧孪生，按相机旋转差插入关键帧。",
+      "对齐真实/生成相机，融合七路深度，将真实帧重投影到生成相机。",
+      "三路光流共识定位残差，换算视线夹角，并以关键帧估计噪声校正标签。",
+      "冻结VGGT，以LoRA和DPT头学习24帧RGB到像素角度的回归/ordinal监督。",
+      "依据预测及时间/相机邻域规则屏蔽不一致像素或删帧，再拟合3DGS。"
+    ],
+    "experimentsZh": "871个Wan2.1-Fun-1.3B-InP/RealEstate10K孪生，按原YouTube视频分702/82/87，测试仅83个关键帧可评分片段。VGGT-1B冻结，末8对blocks加rank-16 LoRA及DPT头，共36.85M可训练参数，3个seed。另用四种生成器、48个静态场景prompt共192片段做track检验，共有可评分支持为144片段。 作者报告测试pixel AUROC 0.851±0.036，Easi3R 0.735；AP 0.185，top-5% precision 0.089，clip correlation 0.112。（Table 2, p. 6） 作者报告混合视频删帧3DGS为34.31 dB，比等量随机删帧高4.36 dB，95%区间[1.02,7.11]。（Supplementary Table 6, PDF p. 26） 作者报告prompt视频track AUROC 0.848±0.025；该检验没有GT生成场景，使用清洁track拟合相机后的TN90误差。（Table 3 and Sec. 5.4, p. 8; supplementary Sec. I, PDF pp. 32-34） 比较边界：GeCo、MEt3R及五种运动分割/4D方法，官方权重及连续分数，报告共有像素支持、paired bootstrap；下游有无mask、等量随机、GT上界及全部基线。各基线原始任务与输出分辨率不同；prompt视频部分方法用不同有效clip子集，不能直接忽略支持差异。 消融：补充比较raw与noise-corrected标签、五种噪声估计、depth/flow规则、深度分桶及+injected训练。raw目标在最终test AUROC 0.863高于校正0.851，校正选择依据预留selection集。没有训练视频生成器或验证作为reward微调的效果；注入warp下的3DGS收益主要来自另训+injected版本。",
+    "insightZh": "贡献不是新视频生成器，而是real-generated twins的像素角度标注/噪声校准链、对应检测器及3D重建质量筛选。区别于仅clip评分或人工warp评测，直接测量生成片段；但所谓GT依赖估计camera/depth/flow及支持筛选，存在不可测残余误差。",
+    "evidenceZh": "标签来自受几何与光流可靠性规则筛选的视线角度残差。（Secs. 3.2-3.6, Eqs. 3-11, pp. 4-5; Fig. 4, p. 3）。七路深度median、至少两路flow同意、t-perp/Z不超过0.01；关键帧用于估计和插值噪声。 检测器在自建测试分布上比七种一致性/运动基线更能排列像素误差。（Table 2, p. 6; supplementary Table 12, PDF p. 35）。作者报告AUROC 0.851±0.036，对照最佳Easi3R 0.735；共有支持上的paired置信区间为正，但clip correlation仅0.112。 生成帧筛除可改善特定混合视频的3DGS。（Sec. 5.3, pp. 7-8; supplementary Table 6 and Sec. F, PDF pp. 25-27）。11片段×2拟合seed；真实片段接反放真实视频，部分正向帧替为生成帧，删帧相较随机提高4.36 dB；不是纯生成视频重建实验。 跨形变分布与标签噪声存在重要限制。（Supplementary Sec. A.4, PDF p. 17; Sec. B, PDF p. 24; Table 8, PDF p. 30）。关键帧校准后仍1.0%像素跨过0.6度；生成帧特有相机误差不可测；仅孪生训练的检测器在注入warp测试AUROC仅0.565。",
+    "caveatZh": "作者限制：标签假设关键帧噪声适用于生成帧，生成帧专属相机误差无法测量（supplement A.4, PDF p. 17）。 视线方向上的深度位移投影不变，角度为零；标签不覆盖这种3D错误（A.5, PDF p. 19）。 训练版仅Wan/RealEstate10K，LTX裁剪、ScanNet++高flow噪声及未完成DL3DV不纳入（A.5, PDF p. 21）。 输出是条件RMS角度，非每个像素的实际角度或均值；注入warp需额外训练才有强检测效果（B, PDF p. 24; G, PDF p. 30）。 整体clip排序困难；全帧持续形变下时间中位数mask收益很小，个别patio删帧损害明显（Sec. 5.2-5.3; supplement F, PDF p. 27）。 审阅边界：数据标注的估计监督与VGGT特征共享几何先验，独立物理真值验证有限；测量支持可能偏向可匹配的小baseline区域。 混合输入下删帧可利用重复真实视角，不等于修复纯生成视频或获得高质量可编辑3D资产。 缺少公开实现的印出URL，代码发布状态仅按PDF承诺；未复现结果。",
+    "whyRelevantZh": "对video prior驱动3D生成，能用几何监督训练一个RGB质量检测器并以其筛掉不一致视角，迁移机制和下游实验明确；深读价值在标注校准与筛选，而非纯benchmark。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

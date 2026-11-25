@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2611.32554",
+  "slug": "partagent-agentic-3d-part-segmentation-via-expert-integration-and-closed-loop-refinement",
+  "title": "PartAgent: Agentic 3D Part Segmentation via Expert Integration and Closed-Loop Refinement",
+  "authors": [
+    "Yang Cao",
+    "Zhe Zhu",
+    "Yiheng Zhang",
+    "Zhengqiang Zhang",
+    "Haoyuan Li",
+    "Le Wan",
+    "Dan Xu"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32554"
+  },
+  "abstract": "Segmenting a 3D object into semantically meaningful parts requires joint reasoning about geometric structure and semantic context. Pretrained 3D experts provide spatially grounded region proposals, while 2D experts provide semantic cues for identifying object parts. The challenge is to integrate these complementary capabilities into a framework that can both produce meaningful part segmentations and progressively refine them. We present PartAgent, a training-free agentic framework for 3D part segmentation built upon two complementary modules: (i) Structural-Semantic Expert Integration combines regions predicted by the 3D expert with multiview semantic evidence from the 2D expert through image-to-surface correspondences, constructing compositional part partitions at multiple granularities. (ii) Observation-Driven Closed-Loop Partition Refinement observes the current partition and its supporting evidence to select targeted inspection, evidence repair, composition, or reselection actions. It verifies proposed changes and uses the updated state and action outcomes to guide subsequent decisions. On PartObjaverse-Tiny-WT, PartAgent achieves 68.41 mIoU, outperforming the strongest competing method by 8.53 points. Across 3DCoMPaT200, PartNeXt, PartNetE, and PartObjaverse-Tiny, PartAgent achieves the highest mIoU on each dataset, averaging 69.36 across the four datasets, 7.28 points above the highest mean among competing methods.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32554v1",
+  "keywords": [
+    "3D part segmentation",
+    "expert integration",
+    "closed-loop refinement",
+    "mask DAG",
+    "visual verification"
+  ],
+  "facets": {
+    "task": [
+      "segmentation",
+      "tool-use"
+    ],
+    "content-scope": [
+      "object",
+      "part-assembly"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "part-aware"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32554v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32554v1 的 16 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "PartAgent把3D专家regions细化成语义leaves，再构造多粒度candidate bank，用VLM观察、组合、修2D证据和验证分区。作者报告五benchmark领先，但100物体消融中SSEI占主要收益，闭环只额外提升Mask Match 1.34点；其mIoU对候选mask/partition取GT最佳匹配，不能等同自动选中单一最终分区的准确率。",
+    "motivationZh": "3D region proposals碎片化或过度合并，跨视图2D语义不一致，难以得到完整合适粒度的parts。",
+    "methodZh": "P3-SAM提供3D regions，GPT-Image-2.5生成四视图彩色part masks，image-to-face融合拆细regions，再用tree+DAG组合候选。GPT-6.1-sol根据geometry、分区投影和历史选择Inspect/Compose/Repair 2D/Reselect/Finish，单独验证call决定是否采用更新。全文及Supplement A-C读取，包含剩余100物体复验和action ablations。",
+    "methodFlow": [
+      "渲染mesh四视图，保留pixel-face映射；冻结3D/2D专家分别产生regions和语义masks。",
+      "按跨view语义支持细化3D regions为不重叠leaves，构造tree+DAG多粒度候选。",
+      "VLM观察候选投影并选初始partition，保留其余候选。",
+      "根据当前分区和历史选择检查、leaf组合、2D证据修复或重选。",
+      "单独VLM核验proposal，通过则更新并记录反馈，直到Finish。"
+    ],
+    "experimentsZh": "两个PartObjaverse Tiny版本各200对象，3DCoMPaT200/PartNeXt/PartNetE各500 category-balanced对象；所有baseline同子集。默认P3-SAM+GPT-Image-2.5+GPT-6.1-sol，四固定view。主消融100物体，附录在剩余100物体重复核心模块。 作者报告WT overall68.41%，最强PartField59.88%，领先8.53点。（Table 1,p.5） 作者报告3DCoMPaT/PartNeXt/PartNetE/Part-T分别67.82/72.42/71.43/65.76，均值69.36。（Table 2,p.6） 作者报告100对象Mask Match：P3-SAM58.51→SSEI67.60→full68.94；剩余100对象full67.88。（Table 3,p.6; Table S1,p.11） 比较边界：比较Find3D、SAMPart3D、PartField、P3-SAM、PartSAM官方模型，并替换3D experts、2D expert、reasoning VLM。Mask Match对GT part从预测候选mask选最佳；Partition Match从完整候选分区取最高值，属于候选覆盖评价而非自动最终选择的独立准确率。 消融：拆分SSEI/CLR、leaf refinement/DAG、专家替换及Compose/Repair/Reselect，剩余100对象支持核心趋势。SSEI贡献大于后续6轮；缺API费用、runtime、candidate数量匹配和verifier错误率的充分分析。",
+    "insightZh": "实质是把几何proposal和可修复2D语义证据连接到受限leaf组合空间，再把检查/行动/验证闭环用于part partition；比简单多专家投票更完整。大部分提升来自SSEI初始化，不应把整体8.53点领先全归因于agent循环。",
+    "evidenceZh": "语义leaves细化原3D regions，candidate partitions保持全覆盖且互斥。（Sec.3.2,Eqs.(1)-(6),pp.4-5; Fig.3,p.3）。VLM组合的mask仍由固定face sets构成，不任意生成新geometry。 CLR包含观察、targeted actions和单独verification，repair影响局部区域。（Sec.3.3,Eqs.(7)-(9),pp.5-6; Fig.4,p.4）。接受或拒绝后的反馈影响后续动作，但verification仍是VLM判断。 作者报告PartObjaverse-Tiny-WT Mask Match68.41%，四其他数据集均值69.36%。（Table 1,p.5; Table 2,p.6）。前者200物体；大数据集每个仅category-balanced 500对象固定子集。 作者报告SSEI 67.60，完整68.94；去Repair 2D为68.85，去Compose67.78。（Table 3,p.6; Table S2,p.16）。100物体消融说明闭环尤其Compose贡献，Repair平均增益仅0.09。",
+    "caveatZh": "作者限制：API成本使大数据集只评固定500对象、主消融100对象（Sec.4.1,p.6）。 2D专家可能幻觉出不存在的parts，Appendix C.2,p.16给修复示例。 审阅边界：无独立limitations章节；四固定views可能漏不可见part，VLM审核不能保证事实正确。 候选最佳匹配指标可能高于实际自动返回单分区质量，需进一步核查selection与候选规模影响。 闭环增益相对SSEI小，且依赖闭源生成/推理API，无速度成本报告。 目前公开repo仅README/assets并明确未发布代码。",
+    "whyRelevantZh": "直接推进object/part segmentation，leaf组合与rendered observation闭环可服务生成资产的部件化、LEGO结构分析等；尚无LEGO专门验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

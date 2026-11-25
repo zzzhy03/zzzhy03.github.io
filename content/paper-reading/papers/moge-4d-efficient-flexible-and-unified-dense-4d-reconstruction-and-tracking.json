@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2611.32198",
+  "slug": "moge-4d-efficient-flexible-and-unified-dense-4d-reconstruction-and-tracking",
+  "title": "MoGe-4D: Efficient, Flexible, and Unified Dense 4D Reconstruction and Tracking",
+  "authors": [
+    "Ruicheng Wang",
+    "Linlin Xin",
+    "Sicheng Xu",
+    "Jianfeng Xiang",
+    "Zelong Lv",
+    "Yu Deng",
+    "Yue Dong",
+    "Guangzhong Sun",
+    "Tong Zhang",
+    "Jiaolong Yang"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32198"
+  },
+  "abstract": "Reconstructing dynamic scenes from RGB video requires reasoning about both 3D geometry and motion across viewpoints, yet existing methods either split reconstruction and tracking into fragmented pipelines or face prohibitive dense spatiotemporal decoding costs. We introduce MoGe-4D, a feed-forward framework that unifies geometry and motion prediction via ordered queries of paired allocentric and egocentric dynamic point maps. Each query maps source pixels to a target time simultaneously in both camera frames, resolving relative camera pose in closed form while flexibly serving depth, dynamic registration, and dense 3D tracking. For efficient dense querying, MoGe-4D decouples scene modeling from query decoding: a high-capacity context encoder caches coarse global spatiotemporal features once, while a lightweight query encoder rapidly decodes dense point maps at flexible resolutions. Furthermore, as supervising dense 4D queries demands continuous 3D correspondences whose raw trajectory storage is prohibitive, we introduce RigIDTrack, a synthetic data pipeline and dataset that compresses surface dynamics into rigidity-regularized affine bodies, recovering exact arbitrary-frame 3D trajectories with $\\sim15\\%$ storage overhead over RGB-D video. Across diverse benchmarks, MoGe-4D achieves state-of-the-art dense 3D tracking, matches dedicated 3D foundation models in reconstruction, and runs substantially faster than prior 4D baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32198v1",
+  "keywords": [
+    "dense 4D reconstruction",
+    "dynamic point maps",
+    "allocentric and egocentric",
+    "context-query encoder",
+    "RigIDTrack"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "representation-learning"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "prior-data": [
+      "native-3d",
+      "synthetic-data"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32198v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32198v1 的 38 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "MoGe-4D用同一source→target query同时预测allocentric/egocentric动态point maps，由共享几何求相对camera，再以cached context和轻量query encoder高效服务重建/追踪。作者报告6个tracking benchmark世界坐标RelEPE0.138→0.077，同时几何接近专用3D基础模型；是值得深读的统一4D表示推进，不能将170FPS query吞吐写成端到端长视频实时。",
+    "motivationZh": "动态3D重建和追踪往往分离，统一稀疏点查询又难以高效解码dense时空对应。",
+    "methodZh": "模型把source pixels在target time的位置同时写入source/target camera frame，按动态mask融合两种map；高容量context一次编码全序列，ViT-B query在任意预算输出dense maps。RigIDTrack用motion-consistent affine bodies压缩动态监督，并提供RGB-D派生标注。主文及Appendix A-C相关实现、数据、全部benchmark tables和长程结果已读。Exact v1正文标题写Dense Motion and Geometry，metadata/discovery标题写Dense 4D Reconstruction and Tracking，同ID作者一致。",
+    "methodFlow": [
+      "一次以coarse context encoder编码无pose视频并缓存跨帧features。",
+      "选择source/target query，轻量encoder重读source RGB并attend bridged source/target context。",
+      "同时解码allo/ego point maps、uncertainty、visibility/dynamic masks等。",
+      "由self-query恢复focal/depth shift，paired maps做相对pose，再以稀疏covisibility图同步全局pose/scale。",
+      "在world frame融合两种maps，按query组合输出多view动态重建或dense 3D trajectories。"
+    ],
+    "experimentsZh": "3个context variants DINOv2/V-JEPA2.1/VGGT-Ω，500ctx/900map tokens默认，训练160k steps/64A100与多源data，最大32frames。Tracking733 clips跨6benchmarks、32frames/5fps；reconstruction234clips跨6benchmarks、最多32frames且相邻overlap≥50%。另测13个500frame Oxford-Spires序列。RigIDTrack约18.99K训练sequences/5.07Mframes。 作者报告VJEPA世界坐标all-point AUC78.89%、RelEPE0.077；V-DPM72.65%/0.138。（Table2(a),p.9） 作者报告VGGT-Ω variant global-point RD0.045、AUC84.13%，原VGGT-Ω为0.048/85.81%；几何并非每指标领先专用模型。（Table2(b),p.9） 作者报告DINO未对齐metric depth Rel0.079、δ25 97.00%，DA3为0.103、89.34%。（Table3,p.10） 作者报告50frame全2500 dense-pair查询约快于4RC四倍；32frame示例8.5s vs假设dedup加速后的Open-D4RT81.7s为估算对照。（Sec.5.5,Fig.12,p.13） 比较边界：覆盖专用3D与unified4D模型，π3同数据/steps控制有价值；Open-D4RT是非官方复现且缺query dedup，速度不能当与原D4RT完全匹配。Table2为六数据集不加权均值，逐benchmark表显示如PointOdyssey仍有V-DPM优势。大部分geometry/tracking用scale/affine/Sim3对齐，metric-scale单独Table3。 消融：比较context/query容量、bridge预对齐、query self KV、camera token直接回归与token预算；bridge缺失AUC71.17→62.65，camera token降54.11。未完整拆分paired-map融合各自损失及RigIDTrack独立数据增益，不能把所有提升唯一归因某项。",
+    "insightZh": "实质推进是把geometry、motion与camera关联统一到成对dense point-map接口，同时用重context/轻query分配计算并配套可扩展4D数据格式。足以按major级通用重建/追踪表示关注，非单benchmark效率tweak；未声称首次query-based4D（D4RT先例明确）。RigIDTrack传输在压缩affine表示内直接计算，原非刚性mesh压缩有1e-3容差，不能称对原动画完全无损。",
+    "evidenceZh": "一个query的paired maps定位同一physical surface于两camera frame，可用3D-3D对齐求relative pose。（Sec.3.1,Eq.(1),p.4; Sec.3.4,pp.6-7; Appendix A.5,p.24）。intrinsics仍有LM/least-squares求解，global poses还需graph synchronization，不是全部camera参数直接闭式一步出。 context一次缓存，query re-encode source并从两帧context取KV，分辨率可独立调整。（Sec.3.2,Eq.(3),p.5; Fig.3,p.5）。global attention随context序列二次增长，query效率不消除长序列瓶颈。 作者报告VJEPA all-point camera RelEPE0.084、world0.077，V-DPM为0.160/0.138。（Table2(a),p.9）。六benchmark均值，camera对齐首帧scale，world经全序列Sim(3)；并非每个单独benchmark都最好。 作者报告同数据/预算DINO对照相对π3 global-point AUC73.41→79.26，RD0.079→0.063。（Table2(b),p.9; Sec.5.2,p.10）。有受控architecture对照，但不能隔离RigIDTrack与其余新增数据各自贡献。 motion record把面轨迹聚合为affine-body transforms，源depth+body ID可跨任意帧传输。（Sec.4,Eq.(5),p.7; Appendix B.2,Algorithm1,pp.25-27）。分组容差1e-3；RGB-D pseudo-label还依赖AllTracker/depth质量，不等于synthetic GT。",
+    "caveatZh": "作者限制：细薄结构与depth/motion边界会平滑，出现flying points。 脸部/手部等专域精度不在当前范围。 VJEPA超过100frames退化，DINO长序列较强但仍有二次global attention。 数百frame主要为generalization probe，非实用streaming部署。 procedural场景分布受手工规则限制，RGB-D labeling依赖depth/pose/2D tracker质量。 审阅边界：统一表示仍属faithful reconstruction/tracking，不是可编辑或生成式3D资产模型。 超过32frame的长程结果不能统一推广到全部variants，Oxford个别case仍有显著drift。 声称exact轨迹需限定在affine压缩格式内，原非刚体motion由容差近似。 项目代码和RigIDTrack仍Coming soon，训练资源大，复现尚未核验。",
+    "whyRelevantZh": "达到选择性3D reconstruction中major级统一表示与泛化门槛；对动态3D内容研究有重要基础作用，但本评阅不虚构生成/segmentation任务的已验证迁移。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

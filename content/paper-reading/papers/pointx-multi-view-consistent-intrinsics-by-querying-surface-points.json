@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2611.33157",
+  "slug": "pointx-multi-view-consistent-intrinsics-by-querying-surface-points",
+  "title": "PointX: Multi-View Consistent Intrinsics by Querying Surface Points",
+  "authors": [
+    "Miguel Farinha",
+    "Sam Sartor",
+    "Iliyan Georgiev",
+    "Giuseppe Vecchio",
+    "Ronald Clark",
+    "Michael Fischer"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33157"
+  },
+  "abstract": "The appearance of a scene is determined by the albedo, roughness, metallicity and normal of every point on its surface, and by the light that reaches it, its irradiance. Recovering these intrinsics from images is ambiguous, and methods that predict them per pixel give the same surface point a different decomposition in every view. We introduce PointX, a simple feed-forward model that predicts intrinsics per 3D surface point instead. A multi-view transformer encodes a set of unposed images, and for any queried surface point, PointX pools the point's tokens across the views in which it appears and decodes the point's intrinsics once. Each point of a 3D reconstruction of the scene, such as a point cloud or a mesh, thus receives a single prediction, which is exactly consistent across views by construction and enables view-consistent relighting and editing. The same model also predicts per-view maps, from one image or many, by querying the point seen at every pixel. These maps agree across views up to the precision of the estimated geometry and correspondences. PointX is significantly more consistent than existing methods, while remaining competitive in accuracy from a single image and improving as views are added. Project page: https://pointx-paper.github.io/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33157v1",
+  "keywords": [
+    "inverse rendering",
+    "surface-point queries",
+    "multi-view consistency",
+    "intrinsic decomposition",
+    "PBR materials"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "texture-material"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "output-property": [
+      "editable",
+      "asset-ready"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33157v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33157v1 的 23 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "PointX把预测单位从pixel改成3D表面点：同一点的多视图token先按可见性聚合，再一次解码albedo、irradiance、normal及材质，因此点级跨视图一致由结构保证。作者报告ETH3D albedo disagreement由MVInverse的0.161降到0.095；真实per-view maps仍受匹配误差影响，且并未验证真实roughness/metallicity精度。",
+    "motivationZh": "逐pixel预测intrinsics使同一3D表面在多视图中材质不一致，造成接缝与编辑闪烁。",
+    "methodZh": "冻结VGGT-Ω估计几何，另一可训练多视图transformer接收mean-frame几何通道并输出token maps；沿投影或RoMa-Ω tracks采样，置信加权平均后用MLP输出五类intrinsics。可直接查询点云点或mesh texel形成PBR资产，或查询pixels得到intrinsic maps。主文与附录分别测试点级accuracy、一致性、单/多图accuracy、消融及relighting/editing应用。",
+    "methodFlow": [
+      "输入静态同光照场景的单图/多图，估计或提供camera/depth与query tracks。",
+      "用mean-frame几何条件的多视图transformer和DPT生成逐view token map。",
+      "沿同一surface point的track采样各view token，以visibility confidence加权平均。",
+      "由独立MLP一次解码albedo、irradiance、normal、roughness、metallicity。",
+      "将结果附着point cloud/mesh texels，或输出per-view maps用于重光照与编辑。"
+    ],
+    "experimentsZh": "Hypersim/InteriorVerse合成GT、MAW真实albedo与ETH3D激光scan对应；sets最多8 views测试。PointX训练含三组in-house合成场景和1.06M单图pseudo-label照片，999M可训练参数，另需冻结VGGT-Ω和可选RoMa-Ω。附录A-E和额外结果均已读取。 作者报告ETH3D RoMa tracks下五属性disagreement分别0.095/0.146/2.9°/0.136/0.222。（Table 2,p.7） 作者报告InteriorVerse per-view albedo PSNR由单图24.09增至多图25.13，normal error 6.3°降到5.7°。（Table 3,p.8） 作者报告8张512×336图A100推理：GT tracks 1.6s、VGGT tracks2.0s、RoMa tracks5.8s。（Sec.4.4 Runtime,p.9） 比较边界：主表含single-image/video/multiview及GeoID；Appendix C.2补GenRecon与IIF，但IIF典型200-view全场景相对这里8-view局部输入不利，不能外推其整体劣势。RGB↔X在Hypersim test scenes训练过，论文排除排名。 消融：pooling主要带来consistency；multi-view transformer/global attention主要带来额外view的accuracy；geometry channels影响normal frame；confidence并非各指标都优（RoMa normals无confidence一致性更低）。Appendix C.5展示低overlap法线失败。",
+    "insightZh": "不是发明多视图feature pooling本身，而是把intrinsics的prediction unit改为surface point，在解码前共享证据，消除再融合独立view预测的需要。点级零disagreement是构造属性，真实pixel-map的一致性和属性准确率仍需实测；geometry/track不是该模型新估计能力。",
+    "evidenceZh": "单点预测不依赖reference view；token沿track按visibility加权后只解码一次。（Sec.3.1-3.2, Eqs.(1)-(3), pp.3-5; Fig.2,p.3）。点级一致性由共享query保证；per-view像素网格/几何/匹配误差会使tracks不同。 作者报告ETH3D使用RoMa-Ω tracks的albedo RMSEr为0.095，normal disagreement为2.9°。（Table 2, p.7）。对应MVInverse为0.161、9.6°；这是consistency而非真实材料accuracy。 移除pooling几乎不改accuracy，却降低一致性。（Table 4a, p.8）。8图InteriorVerse albedo PSNR 25.13 vs25.12；ETH3D RMSEr 0.095 vs0.141。 可查询mesh texels形成标准PBR材质用于path tracing、relighting和object insertion。（Sec.4.5 and Fig.6,p.9; Appendix D,p.23）。应用建立在激光scan/mesh上；图像relighting含原diffuse radiance缩放加新点光项。",
+    "caveatZh": "作者限制：geometry/tracks误差传递，RoMa pair matching成本随views二次增长。 不同可见view集合的相邻点可能出现小台阶，跨点平滑不由一致性保证。 假设静态与固定illumination，Hypersim albedo/irradiance不及最好baseline。 真实数据只测albedo accuracy与五属性consistency，未验证其余真实属性accuracy。 训练最多24views，跨sets长视频pooling留待未来。 审阅边界：一致性可由共享表示获得，但不意味着反照率/光照分解物理唯一正确。 大量in-house监督与外部geometry/matcher影响复现和整体成本。 应用基于已建几何，不是端到端自动生成完整3D资产。",
+    "whyRelevantZh": "表面点/texel共享属性是3D可编辑资产的直接表示机制，可为生成mesh补材质与一致重光照；适合借鉴把一致性放在表示/解码单元而非仅加loss。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

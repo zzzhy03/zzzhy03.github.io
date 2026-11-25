@@ -1,0 +1,90 @@
+{
+  "id": "arxiv:2611.29630",
+  "slug": "superfine3d-efficient-global-local-recursive-refinement-for-extremely-detailed-3d-geometry-generation",
+  "title": "SuperFine3D: Efficient Global-Local Recursive Refinement for Extremely Detailed 3D Geometry Generation",
+  "authors": [
+    "Lihan Li",
+    "Junwei Zhou",
+    "Yu-wing Tai"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-22",
+  "updatedAt": "2026-11-22",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.29630"
+  },
+  "abstract": "High-resolution images contain rich visual details that require fine geometric structures for faithful 3D reconstruction. However, generating extremely detailed 3D geometry from images requires substantial computational resources and training data, making high-resolution geometry generation challenging for existing state-of-the-art models. In this paper, we present SuperFine3D, an efficient framework for generating extremely detailed 3D geometry through global-local recursive refinement. SuperFine3D learns a shared refinement operator from paired coarse-to-fine representations and recursively reuses it to progressively synthesize finer geometry beyond the training resolutions, without requiring additional paired supervision at target resolutions. To make recursive refinement computationally efficient, we introduce spatial-cell attention, which restricts high-resolution interactions to local spatial neighborhoods while maintaining bounded communication across neighboring cells. We further propose spatially anchored cross-scale guidance, which leverages globally contextualized coarse geometry to guide local detail synthesis and preserve structural consistency. In addition, geometry-aware training objectives encourage the refinement process to preserve stable geometric structures while introducing fine-grained surface details. Experiments demonstrate that SuperFine3D generates geometry at a $4096^3$ decoder-grid resolution, corresponding to a sparse $256^3$ latent lattice, using a shared refinement operator trained only on $512^3$--$1024^3$ representations. Compared with a full-attention recursive baseline, SuperFine3D achieves a $9.4\\times$ speedup in end-to-end inference and reduces peak GPU memory usage by $23.0\\%$, while improving cross-scale structural consistency and producing cleaner surfaces with finer geometric details.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.29630v1",
+  "keywords": [
+    "recursive 3D refinement",
+    "spatial-cell attention",
+    "cross-scale guidance",
+    "normal injection",
+    "height field",
+    "sparse latent"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "voxel-triplane"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "output-property": [
+      "efficient",
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.29630v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://lihhan.github.io/SuperFine3D-page/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.29630v1 的 21 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "SuperFine3D不是只把隐式场采得更密：它每级把图像高频法线以有界height field注入mesh，再编码到更细稀疏格，复用仅在512/1024配对上训练的局部注意力refiner，生成到4096 decoder grid。作者报告细节质量0.6474，单资产端到端176.19秒，比递归全注意力基线快9.4倍。高频细节依赖真实输入分辨率和粗形状，不能将4096格理解为全局几何准确或未知面恢复。",
+    "motivationZh": "高分辨率3D生成的全局注意力成本和高分辨率配对监督不足，使图像细节难以变成稳定几何。",
+    "methodZh": "方法结合Pixal3D粗512形状、相机拟合、细节法线估计、显式沿视线height-field位移与共享LR-conditioned flow refinement。spatial-cell attention给高分辨率token线性邻域交互，全球LR流及坐标anchor保持结构；保留/细节/edge/plane损失限制错误累积。主要优势是输入可见的表面relief与高分辨率计算，200 Toys4K评测及离视角相关性提供证据；整体CD/FS收益很小，错误粗布局无法靠局部refinement修好。",
+    "methodFlow": [
+      "预训练生成器产生512粗形状，从silhouette/edge估计输入相机并预测高细节法线。",
+      "每级保持低频mesh法线，把图像高频法线通过有界height-field位移注入可见面。",
+      "冻结编码器把修正mesh编码到两倍格分辨率，部分加噪后仅一次网络求值refine。",
+      "HR spatial-cell attention结合边界邻居、全球LR上下文与连续anchor，复用同一算子到2048/4096。",
+      "解码并最终注入/封小孔，输出完整mesh；用几何保留和细节监督训练adapter。"
+    ],
+    "experimentsZh": "10,000资产512/1024 posterior-mean latent pairs，TRELLIS2 1024 flow初始化，30block rank16 HR attention LoRA及LR模块两stage训练；NiRNE另在480资产1961close-up训练，textured变体有额外数据。200共同有效Toys4K输入为4096render；另有高细节生成图、实物双视图、matched workload八资产kernel测试。 作者报告4096 DQ0.6474、输入view法线角误差27.46度、4-16pixel相关性0.368；TRELLIS2对应0.5444、35.40度、0.002。（Table 1, p. 6） 作者报告同单输入端到端176.19秒/48.54GiB，递归全注意力基线1654.14秒/63.07GiB；两refinement stage共19.6秒。（Table 2, p. 6; supplementary Table S5, p. 19） 作者报告输入可见匹配表面的4-16px相关性从0度0.368降到30度0.259、60度0.204；双视图个案held-out silhouette IoU0.22到0.64。（Supplementary Table S4, p. 18; Sec. 4.4, p. 7） 比较边界：TRELLIS2、Hunyuan3D2.1、Pixal3D、Direct3D-S2、UltraShape、SAM3D定量/定性覆盖；输出格与latent含义不同，只有UltraShape与递归TRELLIS有4096-class。UltraShape用host-memory chunked decoder，递归baseline未得到本作的训练和注入；各自默认采样，不能将全速比归因单一attention。 消融：删除注入、原NiRNE替代、无几何监督主要是选定实例定性；有粗起点对比、GT粗形状oracle、真实/插值分辨率和匹配kernel工作量分析。欠缺全benchmark模块去除和attention/anchor独立质量消融，figure使用flow warp/TTA及更强gain，与统一定量配置有区别（supplement C.5,p.15）。",
+    "insightZh": "贡献是图像高频注入与共享递归refiner的配合、适配超大稀疏支持的cell attention/跨尺度anchor及几何监督组合。不是纯上采样或只有kernel加速；关键细节来自法线/height-field，不能归功于refiner独立幻化细节。",
+    "evidenceZh": "高频细节显式注入mesh，递归生成在修正后的支持上进行。（Sec. 3.1, Eqs. 1-4, pp. 3-4; Fig. 2, p. 3）。法线低频来自当前mesh，高频来自估计器；位移沿视线受voxel尺度约束；1024是编码lift，真正refine在2048与4096。 稀疏局部注意力与全球LR路径使共享算子能在更细支持运行。（Sec. 3.2, Eqs. 5-9, p. 4; supplementary B.4-B.6, pp. 12-13）。cell内加有界26邻cell采样、LR global context、坐标对齐与缺失corner衰减；索引kernel避免邻域KV拷贝。 报告优势集中于表面细节，而非大幅改善全局形状。（Table 1, p. 6; supplementary Table S4, p. 18）。DQ0.6474 vs TRELLIS0.5444，normal angle27.46 vs35.40；CD-L1×1000仅15.660 vs15.711，F.00217.123% vs17.075%。离视角测试仍只匹配输入可见表面。 9.4倍速度来自单输入完整pipeline，不是数据集平均或kernel单因素。（Table 2, p. 6; supplementary Table S5, p. 19; Tables S6-S7, p. 21）。176.19 vs1654.14秒、48.54 vs63.07GiB；两stage只两次network求值、其他模型默认schedule不同，attention层525倍与block28倍不可混作端到端。",
+    "caveatZh": "作者限制：依赖输入几何线索与初始粗形状；法线不完全可靠、单视图结构偏差难修复（p. 8）。 真实高频图像才提供细节，插值放大只有像素数没有新信息，resolution gate也无法判别二者（supplement C.3-C.4, pp. 14-15）。 高分辨率输出仍需约48.5GiB，峰值来自decoding，局部refine只能移动有限voxel不能修正全局布局（supplement B.3,p.11; J.2,p.19）。 审阅边界：4096指decoder grid，对应稀疏256 latent；不是全dense体积或统一物理精度。高频注入只依赖可见面，未证明背面细节恢复。 200共同有效cohort排除各方法失败，细节类资产选择与无置信区间限制总体结论；离视角匹配不独立测试未见表面。 定性图与定量settings差异、单资产端到端时间及不同sampling都应保留；实现公开但未运行复现。",
+    "whyRelevantZh": "直接推进高分辨率3D几何生成与可控细节，跨尺度表示、结构保持损失和局部/全局路由对3D生成主线有方法价值。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

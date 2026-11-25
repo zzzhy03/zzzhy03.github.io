@@ -1,0 +1,106 @@
+{
+  "id": "arxiv:2611.31358",
+  "slug": "nemotron-labs-visualcreation-pixel-as-code-for-agentic-visual-creation",
+  "title": "Nemotron-Labs-VisualCreation: Pixel as Code for Agentic Visual Creation",
+  "authors": [
+    "Guo Chen",
+    "Fuxiao Liu",
+    "Haoqin Tu",
+    "Yiyang Zhou",
+    "Andrew Tao",
+    "Bryan Catanzaro",
+    "Cihang Xie",
+    "Yuyin Zhou",
+    "Huaxiu Yao",
+    "Didong Lu",
+    "Zongxia Li",
+    "Guilin Liu"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "2d-design",
+    "image-generation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.31358"
+  },
+  "abstract": "Visual creation demands expressive imagery together with precise control over text, layout, and structure. We introduce Nemotron-Labs-VisualCreation, an agentic framework that connects these capabilities through Pixel as Code. Raster images are represented by learned discrete visual tokens, while structured artifacts use explicit programs. A shared generation-and-rendering interface connects these representations to visual feedback across images, vector graphics, webpages, and documents. A Nemotron-native harness coordinates planning and raster candidate selection, with targeted repair for editable structured and hybrid artifacts. To support this interface, we develop Nemotron-Labs-Image-Tokenizer, the autoregressive raster generator Nemotron-Labs-Image-30B-A3B, and the structured-code model family Nemotron-Labs-VisionCode. On approximately 178K images spanning six visual domains, our tokenizer improves reconstruction PSNR from 26.08 to 29.57 dB over Emu3.5 IBQ. It also provides 7.13x faster encoding and 10.93x faster decoding at batch size one on A100. In standalone evaluation, one Nemotron-Labs-VisionCode variant surpasses Kimi K3.1 Pro on the aggregate across Chart2Code, MMSVG, Design2Code, and Image2Struct. At the system level, the Nemotron-native configuration raises GenEval2 Soft-TIFA GM from 31.71 to 52.56 using the same raster generator. With our best setting, Nemotron-Labs-VisualCreation achieves performance competitive with GPT Image 2 and Nano Banana Pro across most benchmarks with available comparisons.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.31358v1",
+  "keywords": [
+    "Pixel as Code",
+    "visual design agents",
+    "structured generation",
+    "visual tokenizer",
+    "render feedback",
+    "targeted repair"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing",
+      "tool-use"
+    ],
+    "representation": [
+      "raster-image",
+      "svg-vector",
+      "discrete-program"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "method": [
+      "autoregressive",
+      "reinforcement-learning",
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "editable",
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.31358v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://huggingface.co/nvidia/Nemotron-Labs-Image-30B-A3B"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.31358v1 的 51 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "Nemotron-Labs-VisualCreation 把raster视觉token与SVG/HTML等显式程序接到generate→render→inspect接口，并为浏览器产物冻结layout/checklist、定位因果owner、局部repair和保留较优checkpoint。作者报告同image generator的Nemotron-agent配置GenEval2由31.71升至52.56；这是整套工作流收益，不能归因于单个修复模块，VisionCode独立测试也不是Dual Coder harness效果。",
+    "motivationZh": "视觉创作需同时满足raster表现力、精确文字结构和可编辑产物，并把渲染反馈转成有归属的局部修复。",
+    "methodZh": "报告提供642M固定Leech-lattice tokenizer、30B-A3B自回归图像模型和30B/120B VisionCode模型，同时描述按产物类型路由的视觉设计agent。raster分支规划后生成至多4候选并视觉选择；浏览器structured/hybrid分支由Ultra和Super-VL独立实例化同一冻结计划，执行渲染、确定性检查、VLM诊断、owner校验和最多3次接受修复/8次尝试。VisionCode另以4.7M有效样本SFT与task reward RL训练和独立评估。当前公开实现只覆盖image generator/tokenizer，harness和VisionCode仍待release。",
+    "methodFlow": [
+      "路由请求到raster、structured、interactive、document或visual series，并按需检索参考",
+      "规划语义内容；结构化分支冻结layout contract、asset manifest和验收checklist",
+      "raster模型生成视觉token候选；structured分支生成显式代码或native格式",
+      "对应decoder/browser/compiler渲染，用确定性检查和VLM观察定位可见问题",
+      "浏览器分支把root cause分配给plan/asset/layout/code/content owner并做受限局部修复",
+      "盲pairwise比较候选与incumbent，遇tie/低置信保留既有checkpoint并输出可编辑产物"
+    ],
+    "experimentsZh": "Tokenizer在35数据集约178K图像、6视觉域评估，并测A100/L4 BF16 1024² encode/decode。Raster suite分组合、文字、广域质量、知识和商业设计；对照standalone、Nemotron-native和GPT-6-assisted同一image generator。Structured模型以thinking-enabled独立测Chart2Code、MMSVG image/text2SVG、Design2Code、Image2Struct，与各自base/Qwen/Kimi比较。 作者报告tokenizer整体PSNR29.57dB vs Emu3.5 IBQ26.08，LPIPS0.0713 vs0.0855；MUSIQ与CLIP-IQA略低，不能称所有质量指标更好。（Table5, PDF p.22） 作者报告Nemotron-agent配置GenEval2 Soft-TIFA GM31.71→52.56，WISE Verified46.30→88.60；同generator整workflow对照。（Tables6,9, PDF pp.25,28） 作者报告VisionCode120B在Chart2Code F1为78.51、执行99.17%，base为73.16/96.66%；Kimi仍在Img2SVG DINO/SSIM和Text2SVG美学领先。（Tables11-12, PDF p.30） 比较边界：Raster comparison主要汇总官方报告/leaderboard分数，缺项保留；agent rows增加planning/search/multiple candidates，未匹配inference compute。Nemotron-native商业设计64.7低于GPT Image2的83.2和Nano Banana Pro76.7，最佳GPT-6配置86.0不能冒充native成绩。Tokenizer主要对Emu3.5；VisionCode比较自base较清楚，但overall归一化依赖模型集，Qwen缺Text2SVG故没有combined分数。 消融：有mid-training→RL→agent的定性阶段示例、Stage-I saturation与reward-range诊断，appendix有native/2×encoding-scale比较；没有matched-budget拆分planning、search、candidate selection和repair，也没有browser repair模块的系统定量消融。不能将完整pipeline收益归因于因果owner或某一次修复。",
+    "insightZh": "价值是把新图像组件、视觉代码训练与产物级控制协议连成具体设计工作流，特别是稳定selector、冻结checklist、因果owner、局部修复和checkpoint retention。Discrete visual tokens不等同语义可编辑程序，也不是统一词表；报告明确两类representation仅共享接口。固定lattice量化和GRPO等本身沿用已有研究。Structured harness只给定性修复例和contracts，独立VisionCode提升不能替代harness组件消融。",
+    "evidenceZh": "直接raster分支是候选选择，只有browser structured/hybrid有具体targeted repair循环。（Sec.2.2, Fig.5, PDF pp.6-9; AppendixB PDF pp.45-47）。默认4 raster候选，browser最多3个accepted repairs/8 attempted cycles，pairwise置信低于0.75保留incumbent；native格式另有workflow。 Image tokenizer以固定196560个Leech-lattice码本将16×16patch量化并由ViT解码。（Sec.3.3.1 Table1 PDF pp.10-11; Sec.5.1 PDF pp.13-15）。642M，encoder/decoder各24层；训练153M images，670Ksteps，480K后冻结encoder。 作者报告同raster generator的Nemotron workflow提升GenEval2，但该对照不隔离agent组件。（Sec.6.2 and Table6, PDF pp.24-25）。standalone31.71、Nemotron52.56、GPT-6配置65.43；后两者的system参数和推理预算未与baseline匹配。 VisionCode为独立模型评测，双coder harness使用的是Ultra与Super-VL。（Secs.3.2.2/5.3/6.3, PDF pp.10,21,29-31）。120B Chart2Code F1 78.51、execution99.17%；combined98.27是相对当前模型集归一化的五任务描述分数，非统计显著性。 报告承认部分tokenizer感知/分布指标不改善，且TI2I与预算控制仍未评估。（Conclusion PDF p.32; Sec.6.2 PDF p.24; AppendixC Table18 PDF p.49）。ImageNet native tokenizer rFID0.8595差于Emu3.5的0.5482；2倍编码获得更好rFID但使用约4倍token。",
+    "caveatZh": "作者限制：p.24明确TI2I虽参与训练但尚未评估，editing/multi-reference仍为未来工作。 p.32明确workflow对比不隔离agent能力，VisionCode独立测试不同于harness Dual Coder；需要matched inference budget研究。 pp.22/48-49 tokenizer无参考质量和分布指标有权衡，细小文字与结构仍会改变。 审阅边界：可编辑structured agent的机制说明详细，但当前主定量收益集中raster整workflow；fig7只有代表性修复，不证明大规模交互设计可靠性。 公开code仅image generator和tokenizer；完整harness与VisionCode尚待legal clearance，复现报告的全系统收益暂受限。 Pixel as Code是接口抽象，visual token并非可直接操纵的对象/图层语义；不能据此声称raster本身变为结构化可编辑。 比较跨官方来源且预算、search和judge不同，不能概括全面超越闭源模型；指标聚合无统计显著性。",
+    "whyRelevantZh": "直接研究视觉产物规划、渲染观察和迭代修复，同时训练SVG/视觉代码与图像生成组件，符合Visual Design Agents并对structured 2D生成有实质贡献。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

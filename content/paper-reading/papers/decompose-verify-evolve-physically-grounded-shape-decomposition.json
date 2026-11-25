@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2611.31924",
+  "slug": "decompose-verify-evolve-physically-grounded-shape-decomposition",
+  "title": "Decompose, Verify, Evolve: Physically Grounded Shape Decomposition",
+  "authors": [
+    "Wenchao Ma",
+    "Rui Yu",
+    "Fan Zhu",
+    "Jiachen Liu",
+    "Sharon X. Huang"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.31924"
+  },
+  "abstract": "Shape decomposition represents 3D objects as a compact set of geometric primitives for interpretable modeling and simulation. However, existing decomposition methods are trained primarily for geometric fidelity, without explicit constraints on physical plausibility, and can therefore produce disconnected parts or physically unstable reconstructions. We present PhysDec, an agentic framework that draws on a pretrained vision-language model's semantic understanding and commonsense reasoning to predict material-aware primitive decompositions from a few images. Within this framework, PhysDec-Loop is an agentic pipeline that reasons about part structure and materials, using a reference 3D point cloud for geometric feedback and physical verifiers to guide iterative refinement. Through self-evolution, we further develop another agentic pipeline, PhysDec-Evolved, which learns from prior corrections to predict primitive decompositions from images without point-cloud feedback or a correction loop at inference. Experiments show that PhysDec-Loop improves geometric fidelity, physical plausibility and visual quality over geometry-focused baselines, while PhysDec-Evolved approaches its performance at substantially lower inference cost.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.31924v1",
+  "keywords": [
+    "primitive decomposition",
+    "physics verification",
+    "VLM agent",
+    "prompt evolution",
+    "retrieval library",
+    "reference-assisted evaluation"
+  ],
+  "facets": {
+    "task": [
+      "decomposition",
+      "reconstruction",
+      "tool-use"
+    ],
+    "representation": [
+      "discrete-program",
+      "hybrid-representation"
+    ],
+    "content-scope": [
+      "part-assembly",
+      "object"
+    ],
+    "method": [
+      "llm-vlm-guided",
+      "retrieval-composition"
+    ],
+    "output-property": [
+      "part-aware",
+      "editable",
+      "physically-plausible"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.31924v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.31924v1 的 48 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "PhysDec 用VLM提出带材质/结构形式的原语程序，再让几何误差、连通性和支撑类型物理检查驱动最多3轮修正；Evolved离线提炼prompt和retrieval，部署仅2次调用。作者报告ShapeNet物理检查通过率Loop99.3%、Evolved99.0%；但CD主表经过真值点云对齐与逐part优化，连通部件被焊成刚体，不能当成图像直出精度或真实接头强度证明。",
+    "motivationZh": "仅优化surface fit的原语分解可能缺失连接与支撑，需把结构、材质和几何纠错放到统一建模循环。",
+    "methodZh": "系统将1至4张图映射为superquadric及toroid、tube、taper/bend、radial array等显式原语，包含11类材质和solid/tube/shell的有效密度。Loop的Analyse→Propose→Verify→Critique循环利用reference point cloud、MuJoCo支撑测试和独立VLM视觉评分选保留结果。Evolved在260训练对象上收集纠错、用GEPA演化两个prompt blocks并建81 exemplars/144 insights库，推理只分析和提出，无在线verifier或reference feedback。实验支持有物理目标的结构建模agent，但其物理和几何评估有明确假设。",
+    "methodFlow": [
+      "从图像及已知相机分析类别、支撑、对称、parts与材质",
+      "生成包含原语几何、pose、material/form的JSON程序",
+      "用参考点云误差、连通/支撑检查与独立视觉review验证并生成局部诊断",
+      "最多3轮critique修订，优先选通过物理检查的最高分候选",
+      "离线将纠错演化为固定prompt、范例、insights及material priors，部署Evolved用两次VLM调用直接输出"
+    ],
+    "experimentsZh": "585 ShapeNet对象、13类各45；四张137²图及相机给agent，baseline用GT点云或SDF。Evolved离线用260训练/26validation对象、GEPA预算500evaluations；另测43个六类未见GSO、52个ASE partial objects、Replica scene与少数机器人操作。ShapeNet CD-L1×100以reference相似对齐、逐轴scale和逐part300步优化后测；物理/视觉描述对应生成原语，需区分。 作者报告Loop CD1.448、物理99.3%、Sonnet视觉78.0；SuperFlex CD1.543、物理81.7%、视觉58.4。CD包含reference-assisted fit，非同输入纯图重建。（Table1 PDF p.6; SupplementF PDF p.34） 作者报告Base物理88.4%、Evolved99.0%，两者均2次调用；Loop12.9调用、99.3%。（Table2, PDF p.6） 未见类别43 GSO中作者报告Evolved物理100.0%（Base86.0%），使用通用insights、无类别exemplar/material priors。（Table3 and Sec.4.3, PDF p.7） 5名参与者评65对象，作者报告两VLM与平均人评Spearman均0.81，pairwise agreement86.7%/86.4%；不是全585对象的人评。（Table6 PDF p.9; SupplementH TableS11 PDF p.37） 比较边界：比较SQ、EMS、Marching-Primitives、SuperDec、SuperFlex及ASE-tuned SuperFlex；baseline几何输入、原语词表和材质能力不同。无材质baseline统一1000kg/m³，本方法用推断effective density；radial array计一primitive影响compactness公平性。机器人仅selected bin/chair/lamp等示例且chair pull从多次motion中选择，不能当作普遍manipulation成功率。 消融：195对象逐项去physics、review、point-cloud反馈，单/双/四视图及替换VLM；verifier同时从反馈、score和selection移除。没有独立拆分GEPA、seed结构规则、retrieval三者，base-to-evolved只能说明组合效果。附录展示原始与演化prompt、insights、全部rubric与reference fit细节，证据可审计但非已复现。",
+    "insightZh": "实质贡献是把可执行part program、几何反馈和支撑特定物理检查连成闭环，再将已验证纠错压缩成prompt与retrieval经验；非新VLM权重。Base到Evolved同时增加结构规则、retrieval和prompt rewriting，不能归因为GEPA单独效果。紧凑性计数对radial array只算一条，与baseline原语数不是同等几何复杂度。",
+    "evidenceZh": "Loop以几何、物理和视觉反馈迭代显式原语结构，Evolved无在线验证。（Secs.3.2-3.4, Figs.4-6, PDF pp.4-5）。最高分通过物理/连通检查者优先；若无通过者仍返回最高分，故不是强有效性保证。 作者报告Loop99.3%与Evolved99.0%物理通过率，Evolved推理调用由12.9降为2。（Tables1-2, PDF p.6）。585 ShapeNet对象；调用数排除离线library/GEPA成本，不等于时延或token成本对照。 主表CD为reference-assisted fit，不是Evolved两次调用直接输出的CD。（SupplementF TableS9, PDF p.34）。ShapeNet Evolved unaligned3.961→similarity2.470→per-axis1.883→part refinement1.528；Loop3.773→1.448，使用reference点云300步Adam。 物理检查假设touching parts刚性连接，材料质量是推断假设。（SupplementG, PDF pp.35-36）。表面距离小于bbox diagonal2%或体积overlap即connected，整个connected component当一刚体；没有joint strength/attachment failure仿真或真值密度。 去physics会降低通过率，去point-cloud不意味着评估不使用reference。（Table5 PDF p.8; SupplementG PDF p.37）。195对象单次运行无重采样；w/o physics99.0→93.3%，w/o point cloud仍用共同reference-assisted CD协议。",
+    "caveatZh": "作者限制：p.10仅处理刚性parts，不处理articulation或deformation；支撑类型检查不能证明任意外力/交互鲁棒性。 闭源VLM为主；Qwen物理通过率高但几何与视觉质量较弱。 p.36明确材料密度与质量非真值，飞行/浮动物体的suspension只是balance proxy；touching parts假设刚性连接。 审阅边界：主表CD包含reference逐part优化，必须与两调用无反馈部署严格区分，不能宣称image-only输出达到1.528。 物理通过率受2%邻近连通、刚性焊接和指定支撑测试定义影响，不能外推到真实装配连接/受力或可制造性。 Base-to-Evolved混入手工seed rules和retrieval，调用数忽略offline与token长度，无法量化纯self-evolution或总成本优势。 只有少量现实/操控示例和5人视觉研究；没有真实材质、质量或物理实验验证。",
+    "whyRelevantZh": "将可编辑part-level representation与可执行验证及经验复用结合，直接符合Visual Design Agents；支撑约束和连接诊断对结构设计有方法参考，但不能当成LEGO或Fabrication已经验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

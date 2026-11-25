@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2611.32491",
+  "slug": "x-3dcomposer-feed-forward-3d-scene-composition-with-any-assets-from-any-views",
+  "title": "X-3DComposer: Feed-Forward 3D Scene Composition with Any Assets from Any Views",
+  "authors": [
+    "Zidian Qiu",
+    "Ancong Wu"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32491"
+  },
+  "abstract": "Composing an editable 3D scene from images requires an asset for each object and a layout that places the assets. 3D generation and CAD retrieval now supply the assets, but layout still lacks a general solution: scene generation methods couple it with generation, and pose estimators handle one object at a time and need true-size CAD models, depth, or iterative refinement. We present X-3DComposer, a feed-forward model that predicts the layout separately from asset generation. Given one or more images of a scene, the object masks, and an asset for each object from any source, it jointly predicts the rotation, translation, and per-axis scale of all objects in a single forward pass of about one second. The key idea is to treat objects as views: renders of the assets are processed together with the scene images by a multi-view geometry model adapted from VGGT-$Ω$, and each object pose follows in closed form from the cameras predicted for its renders. Camera intrinsics, camera poses, and depth are optional inputs. When the meshes produced by five scene generation methods are kept fixed and only their layout is replaced, the layouts of X-3DComposer are more accurate than the native layouts of these methods. Compared with the stand-alone layout model SceneMaker, it reduces the scene-level Chamfer distance by 52% on IndoorMix, our test set from six indoor datasets, and by 28% on 3D-FUTURE.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32491v1",
+  "keywords": [
+    "scene composition",
+    "objects as views",
+    "VGGT-Omega",
+    "9-DoF layout",
+    "identity embedding",
+    "closed-form pose"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "composition"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "method": [
+      "feed-forward"
+    ],
+    "output-property": [
+      "editable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32491v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/qiuzidian/X-3DComposer"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32491v1 的 19 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "X-3DComposer 将资产渲染图当作额外相机视图，与场景图和对象crop送入VGGT-Ω；由预测render camera闭式恢复所有对象旋转、平移及逐轴缩放。固定资产仅换layout的对照支持可编辑场景重组，作者报告单场景0.91秒；但所有实验用GT masks，且生成资产主表先作场景归一化与ICP，不能把相对layout指标当作绝对度量恢复。",
+    "motivationZh": "生成或检索获得的独立资产需要统一、可编辑、可跨来源的多对象场景布局估计。",
+    "methodZh": "目标是让给定资产在一或多张输入图中匹配场景对象，资产可来自生成器或CAD检索。方法用identity embedding关联mask、crop和asset renders，将对象布局转成多视角相机预测；在1B VGGT-Ω上加入rank32 LoRA、可选相机/深度编码及scale头。资产frame的已知render camera与预测scene camera组合成pose候选，均值和SVD融合为9DoF layout。训练包含camera/scale/pose一致性、辅助grounding和穿透/接地损失。该目标忠实恢复输入布局，应归3D Reconstruction，其直接价值是可编辑资产的组合接口。",
+    "methodFlow": [
+      "输入场景视图、每对象mask和任意来源的相似资产，预渲染资产视图",
+      "用identity embedding关联场景mask、对象crop与asset renders，并编码可选K/P/depth",
+      "将三类图像作为同一组视图送入LoRA适配的VGGT-Ω",
+      "预测render相机与逐轴log-scale，由已知资产相机闭式计算pose",
+      "融合各render候选，输出独立对象的旋转、平移和逐轴scale布局"
+    ],
+    "experimentsZh": "IndoorMix含400单视图和224多视图场景，来自六个训练来源的held-out scenes；另测3D-FUTURE和42个未训练3D-FRONT panorama houses。固定MIDI、SceneGen、FIRE3D、SAM3D、MV-SAM3D资产分别替换布局；另以GT true-size CAD比object pose methods。生成mesh主表独立归一化后场景rigid ICP，GT CAD表仅场景scale对齐。 作者报告四个single-view资产组平均CD-S相对SceneMaker降低IndoorMix52%、3D-FUTURE28%，不是生成几何改善。（Table1 and Sec.4.2, PDF pp.5-6） 作者报告MV-SAM3D固定mesh的IndoorMix CD-S由6.38降为1.61，F-S94.35→98.43。（Table1, PDF p.5） 作者报告单场景运行0.91s、5.2GB peak，相比SceneMaker5.8s/13.6GB；资产render需预先准备，未独立复现。（Table5, PDF p.8） 比较边界：比较多种scene generators的native layout、SceneMaker pose-only、FoundationPose、PoseGAM、AlignPose及Pano3DComposer。各类输入条件有差异，GT-size CAD实验将给定size替换本方法scale。只纳入所有比较方法均返回全对象pose的场景。六个测试数据集均在本方法训练来源中，多数baseline覆盖更少；补充泛化到generic objects是额外训练模型和定性HOPE照片，物体已在训练出现。 消融：3D-FRONT相同缩短schedule逐项去crop、identity、physics、grounding和pretraining，显示实例绑定和预训练作用；无physics几何指标略好但穿透更高。81场景视图数/render数分析显示更多视图通常改善，CD随render数非单调。没有predicted mask鲁棒性实验。",
+    "insightZh": "论文明确延续PoseGAM/Pano3DComposer的objects-as-views思想，新增整场景联合预测、实例identity绑定、逐轴scale与可选几何条件。优势由固定生成mesh只替换layout的对照支撑，而不是归功于新asset生成器。其物理项是训练软约束，不构成稳固、无碰撞场景保证。",
+    "evidenceZh": "对象视图与场景图共同预测render相机，再闭式读出9DoF布局。（Secs.3.1-3.3, Figs.2-3, Eqs.(1)-(5), PDF pp.3-4）。已知asset-frame相机加预测scene-frame相机决定pose；各向异性scale下camera-center变换是论文约定，不是一般投影几何恒等式。 在相同SAM3D资产上替换layout提高IndoorMix相对布局指标。（Table1, PDF p.5; metric alignment Sec.4.1 PDF p.6）。作者报告native CD-S6.08/F-S93.97/IoU0.590，ours3.43/97.02/0.702；CD均乘1000，归一化后作单次rigid ICP。 预测几何条件可能明显误导模型。（Table2, PDF p.7; Sec.4.5 PDF p.8）。IndoorMix多视图无条件CD-S0.85，估计K+P+D为75.95，GT K+P+D为0.52；不能声称额外几何条件总有益。 identity和预训练是该缩短训练消融中的关键组件，物理项有精度权衡。（Table4, PDF p.8）。无identity单视图F-S71.68 vs90.77；无physics穿透10.10% vs7.88%，但场景指标略好。 输入mask和泛化边界限制方法的自动化与any-assets表述。（Conclusion PDF p.9; Supplement F PDF p.19）。全部实验使用GT masks；室内为主要train/test，camera roll、首视图选择、小物体及错误条件是失败因素。",
+    "caveatZh": "作者限制：全部实验使用GT object masks，预测mask影响未测试。 主要模型仅室内train/test，对180度camera roll、侧放/倒置物体、首视图无对象和小物体有失败。 错误intrinsics/pose会误导，physics损失只能减少穿透，不能保证物理合理。 审阅边界：模型需要每个对象已有匹配/相似asset与mask，不是从任意图自动生成完整scene。 生成asset指标采用scene-level ICP，GT CAD表也用GT辅助scale评估，绝对单位恢复不能由主表直接推出。 部分数据集、CAD身份跨train/test重复；宽泛any-assets/any-views需受数据来源、姿态及64 identity容量限制。",
+    "whyRelevantZh": "对可编辑场景和3D生成资产组合有直接方法价值：layout与asset来源解耦，能把已有生成mesh组成与图像一致的独立对象场景。实际贡献按忠实恢复输入布局归Reconstruction。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

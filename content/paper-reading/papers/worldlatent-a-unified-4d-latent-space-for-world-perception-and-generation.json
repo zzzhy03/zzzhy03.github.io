@@ -1,0 +1,101 @@
+{
+  "id": "arxiv:2611.31209",
+  "slug": "worldlatent-a-unified-4d-latent-space-for-world-perception-and-generation",
+  "title": "WorldLatent: A Unified 4D Latent Space for World Perception and Generation",
+  "authors": [
+    "Jingxi Chen",
+    "Yujia Chen",
+    "Cornelia Fermuller",
+    "Yiannis Aloimonos",
+    "Wen-Sheng Chu",
+    "Du Tran"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation",
+    "3d-reconstruction",
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.31209"
+  },
+  "abstract": "Generative Pre-Training (GPT) represents a profound milestone in natural language processing, serving as the foundation for most of today's state-of-the-art large language models. By casting diverse understanding and generation problems into a shared token representation, GPT enables a single architecture and unified optimization loop to master heterogeneous tasks across massive corpora, giving rise to powerful foundation models for natural language. In contrast, 4D spatiotemporal vision lacks a common representational protocol: perception (such as depth and camera estimation) and generation are either handled by separate one-way pipelines or bolted together from unaligned single-modality spaces. In this work, we introduce WorldLatent, a framework that formulates a unified 4D latent space as a common protocol for both world perception and generation. Rather than relying on fragmented, task-specific models or stacked single-modality representations, our framework proposes a multimodal VAE architecture that compresses and fuses complex 4D visual appearance, geometry, and dynamics into a single structured latent representation. Within this formulation, perception and generation operate as complementary denoising processes over the same latent space, enabling one generative model to learn both capabilities simultaneously within a single training loop. Experiments across representative 4D benchmarks verify that our fused latent protocol achieves specialist-level zero-shot 4D perception, coherent 4D generation, and controllable editing from a single model. By demonstrating that diverse 4D tasks can be seamlessly unified under a shared representational protocol, our work provides a scalable foundation for general-purpose 4D spatial intelligence.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.31209v1",
+  "keywords": [
+    "WorldLatent",
+    "WorldVAE",
+    "4D generation",
+    "multimodal tokenizer",
+    "Any-to-4D"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing",
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene",
+      "environment-world"
+    ],
+    "representation": [
+      "point-cloud",
+      "hybrid-representation"
+    ],
+    "conditioning": [
+      "text",
+      "video",
+      "multimodal"
+    ],
+    "method": [
+      "diffusion",
+      "vae-gan"
+    ],
+    "output-property": [
+      "controllable",
+      "editable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.31209v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://worldlatent.github.io"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.31209v1 的 18 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "WorldLatent把RGB、depth和camera rays融合到同一32通道4D latent，以一个Wan微调模型统一感知、text-to-4D和深度条件编辑。共享表征/条件接口值得精读；但验证仅17帧短clip，1.3B多任务消融仍落后单任务，14B也非全面优于几何specialists，不能把统一任务直接等同更强物理推理。",
+    "motivationZh": "如何把视频外观、几何和相机运动放入可共同编码/生成的4D latent，避免感知与生成依赖互不对齐的一向pipeline。",
+    "methodZh": "论文解决视频生成与几何感知采用不对齐latent的问题。四个Wan VAE模态encoder输出经时空DPT融合为共享latent，decoder重建RGB、depth、Plücker ray direction/moment；冻结WorldVAE后，partial modality mask与text统一驱动同一diffusion模型预测完整4D状态。训练和短视频实验支持多任务接口、联合生成深度/相机及可控重渲染，但纯生成质量、尺度外推和物理一致性仍存在明确验证边界。",
+    "methodFlow": [
+      "把17帧视频、深度和Plücker相机ray方向/力矩对齐为同一时空网格",
+      "四路预训练Wan encoder经DPT跨模态融合，学习32通道WorldLatent；decoder用RGB/几何/pointmap/KL目标训练",
+      "以随机缺失模态mask训练partial encoding，使RGB-only、depth-only或空条件共享latent接口",
+      "冻结WorldVAE，全参微调Wan DiT，在统一loss中混合感知、文本生成与depth+text重渲染",
+      "解码完整latent得到RGB、depth、camera与unprojected动态点云；可先感知再用预测depth编辑外观"
+    ],
+    "experimentsZh": "约1.4M段17帧clips来自22个源，79.4%为real video pool，另有synthetic/real-sensor 3D pool；real-sensor也用DA3-Giant重标dense几何，Gemini生成caption。WorldVAE约528M；最终Wan2.1-14B在256 TPU、global batch256上108K步，task比例生成/编辑/感知.45/.30/.25。感知8NFE，生成/编辑25步；MPI Sintel、Bonn、ScanNet作zero-shot感知，55个held-out video-prompt pairs评估生成。 作者报告WorldVAE保持5120 DiT tokens，重建RGB PSNR32.23、depth AbsRel.056；相较RGB-only VAE PSNR35.13存在损失。（Table1, PDF p.5） 作者报告Sintel δ1 .769、AbsRel .247、pose AUC@30 .701；ScanNet AbsRel .042但RRE2.66°差于VGGT1.07°，并非全指标最优。（Table2, PDF p.6） 作者报告55组生成中camera rotation从base .99°到30.45°，dynamic degree .400到.964；但CLIP-T .264到.243、subject consistency .911到.856，warp/drift也没有优于静态base。（Table3, PDF p.7） 作者报告1.3B fused比separate camera AUC .599至.692、drift .108至.095，但AbsRel .205至.221、point error .419至.427变差。（Table4(b), PDF p.8） 比较边界：感知包括DUSt3R/MASt3R/MonST3R/CUT3R/VGGT/DA3及depth diffusion；部分baseline额外global alignment。14B生成仅对base Wan与real reference，缺少同数据微调RGB-only及已有unified world models的全面量化对照。55组生成样本规模有限，warp/drift操作细节与置信区间没有充分展开。 消融：1.3B同预算比较P/R/G单任务与joint，支持多任务可运行但joint各核心指标仍有退化；32ch fused与64ch concat有camera/drift收益和depth/point误差取舍。线性投影R².96和可视化显示appearance/geometry子空间相关结构，不能据此证明严格因果解耦。",
+    "insightZh": "实质推进是学习式跨模态tokenizer和统一的partial-condition/full-target协议，而非仅堆叠RGB-VAE编码后的几何通道。模型复用Wan encoders/DiT、DPT和DA3监督，并非从零训练的4D foundation模型；融合和多任务本身的收益需与额外数据、参数和compute区分。表示与task接口有直接研究价值，全面能力跃迁尚未由消融证明。",
+    "evidenceZh": "RGB、depth、camera direction/moment经四路VAE encoder和DPT融合；同一完整latent是各任务共同预测目标。（Sec.3.1-3.2, Fig.2, Eq.(1)-(4), PDF pp.3-5）。Stage1训练decoder与fusion，encoder冻结；Stage2全参微调Wan2.1，partial条件不是另训三个模型。 作者报告5120个DiT tokens可承载多模态，但共享VAE损失了部分RGB重建质量。（Table1, PDF p.5）。RGB PSNR35.13至32.23，LPIPS0.126至0.184；+0.02%是DiT每NFE FLOPs，不含整套四路VAE/decoder成本。 作者报告14B有竞争力的几何感知，但不是全部指标优于teacher/VGGT。（Table2, PDF p.6）。Sintel δ1 .769高于DA3 .763；AbsRel .247低于扩散基线却差于DA3 .194和VGGT .216，camera误差也有差距。 作者报告多任务1.3B可同时执行任务，但表4显示比相应单任务specialists有损失。（Table4(a)-(b), PDF p.8）。joint感知AbsRel .216对specialist .186；fusion camera AUC .692对.599有益，但AbsRel .221对.205更差；没有14B同规模单任务对照证明瓶颈已消除。 训练以DA3伪标签为主，作者明确将三个感知benchmark和55条生成评估clips从两stage排除。（Appendix B, Table5, PDF pp.13-14）。伪depth/camera并非真实几何标签；所有实验限512×512、17帧，难以推出长期可交互世界能力。",
+    "caveatZh": "作者限制：工业级参数、数据和计算规模仍未探索，是否出现空间/物理推理能力是未来开放问题（Discussion, pp.8-9）。 审阅边界：训练与所有展示限17帧512×512；短clip的depth+ray输出不等于长期持久、物理可交互或闭合3D资产。 主要geometry监督来自DA3 teacher，伪标签噪声与teacher偏差会传入生成；所谓metric/geometric fidelity需独立验证。 统一1.3B仍落后单任务，14B缺matched-size单任务消融，不能断言增大模型已解决negative transfer。 相较静态base更动态的输出伴随CLIP/subject/warp等取舍；不能只选background一致性和运动幅度作为全面更优证据。 +0.02%开销仅是DiT每NFE计算，整套WorldVAE约528M且多路编码/解码；无端到端时延和公开实现可核验。",
+    "whyRelevantZh": "联合appearance/geometry/camera的生成表示直接关联dynamic scene/4D内容生成与几何条件编辑；partial/full共享latent是值得借鉴的方法设计。输出仍为短clip深度/点云，尚未支持LEGO连接、部件editable CAD或制造约束。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

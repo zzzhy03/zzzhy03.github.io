@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2611.30424",
+  "slug": "spatial-zero-self-evolving-spatial-reasoning-in-vision-language-models-from-zero-data",
+  "title": "Spatial-Zero: Self-Evolving Spatial Reasoning in Vision-Language Models from Zero Data",
+  "authors": [
+    "Yutong Li",
+    "Haoyu Zhao",
+    "Daoguo Dong",
+    "Ziyi Ye",
+    "Yugang Jiang"
+  ],
+  "primaryTopicId": "vlm-mllm",
+  "topicIds": [
+    "vlm-mllm"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.30424"
+  },
+  "abstract": "Spatial reasoning requires a vision-language model~(VLM) to understand metric distances, three-dimensional relationships, and viewpoint-dependent geometry. Learning these capabilities typically requires externally curated training data. This paper introduces Spatial-Zero, a VLMs' training framework that can self-evolve through autonomous spatial exploration with zero data. Spatial-Zero addresses two key challenges in autonomous spatial exploration: reliably generating valid spatial interaction tasks and providing accurate supervision for learning from these tasks. Specifically, a proposer specifies object configurations and questions, and a Coder turns them into executable scene programs that produce multi-view images and explicit scene geometry. A Geometric Oracle checks spatial constraints, visibility, and answer uniqueness and derives ground-truth labels from executed geometry; these labels supervise the Solver and ground difficulty feedback, while validation outcomes guide subsequent task generation. Across six spatial reasoning benchmarks and three VLM backbones, Spatial-Zero yields consistent gains through iterative self-evolution. After three iterations, Qwen3.5-9B improves average accuracy by 3.23 percentage points; with Qwen3.5-4B, Spatial-Zero also outperforms existing VLM self-evolution methods. Our code is available at https://github.com/YutongLi2024/Spatial-Zero",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.30424v1",
+  "keywords": [
+    "geometric oracle",
+    "spatial reasoning",
+    "self-evolution",
+    "Blender programs",
+    "verifiable rewards"
+  ],
+  "facets": {
+    "task": [
+      "reasoning",
+      "generation"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "discrete-program"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "method": [
+      "reinforcement-learning",
+      "llm-vlm-guided"
+    ],
+    "prior-data": [
+      "synthetic-data"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.30424v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/YutongLi2024/Spatial-Zero"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.30424v1 的 19 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "Spatial-Zero共同演化任务Proposer、Blender Coder和视觉Solver，由固定几何oracle验证场景、可见性与答案唯一性，用执行几何生成标签而非模型投票。作者报告Qwen3.5-9B六benchmark均分50.14到53.37；Qwen4B几何标签比伪标签高2.97点。值得借鉴的是受约束场景生成/核验机制；“zero data”仅指无外部空间QA，仍用预训练模型、资产和模板，AABB检查不等于真实物理正确。",
+    "motivationZh": "自生成空间任务若没有独立几何和可回答性验证，会用模型投票固化系统性空间错误。",
+    "methodZh": "论文将自生成空间经验拆成三类可训练角色，并以顺序GRPO更新。Proposer提出配置与问题，Coder用固定constructor放置4-8对象并生成多视图，oracle根据AABB/相机变换和ray visibility过滤歧义问题。Solver只观察图像与问题，以几何正确性奖励学习；后续难度反馈推动任务变化。六评测、三个backbone及角色/标签/可见性/静态数据消融支持限定空间推理收益；具体可迁移的是场景布局验证与合成训练数据，而非已证明的资产生成质量提升。",
+    "methodFlow": [
+      "Proposer从资产/环境接口生成对象配置、约束和无答案的四选一空间问题。",
+      "Coder生成10个Blender程序，静态筛选并在最多两次render预算内尝试执行。",
+      "固定oracle检查AABB关系、碰撞/支撑、可见性和唯一性，保留问题并从几何算答案。",
+      "依次以难度/多样性/可实现性奖励训练Proposer、静态约束奖励训练Coder、正确性奖励训练Solver。",
+      "用更新后的Proposer/Coder单次生成新训练集，Solver反馈驱动下一轮。"
+    ],
+    "experimentsZh": "Qwen3.5-4B/9B及InternVL3.5-8B，三次演化，每轮Proposer/Coder/Solver各5/5/15步全参GRPO，八A800。Blender四张512平方render；六benchmark按各自指定类别聚合，最终等权平均，三个独立run。主要对照SpatialSkill/MM-Zero使用同Qwen4B，但保留各自方法预算。 作者报告4B均分47.78到50.53、9B50.14到53.37、InternVL45.34到47.45。（Table 1, p. 5） 作者报告4B Full50.53，Solver Only48.90，Frozen Proposer49.37，Frozen Coder49.70；静态数据Step45为48.63。（Table 2, p. 6; Fig. 3, p. 7） 作者报告4B三轮约12.02小时、9B16.69小时、InternVL35.81小时；小模型峰值轮次不同，继续训练并不持续提高。（Table 6, p. 17; Fig. 5 and Appendix E.1, pp. 18-19） 比较边界：基线模型与两种自演化方法同backbone同评测，角色冻结和静态数据对照匹配Solver步数；各基线保留原方法预算，未等GPU/生成成本。没有与全部程序化空间数据方法直接比较，也未测试CAD/LEGO或3D资产生成任务。 消融：角色更新、Proposer三reward、几何/伪标签、visibility/uniqueness、静态数据及规模轮数都有。伪标签去唯一性同时改变标签策略；多数结果未报告seed方差/置信区间，Full Valid100%由自身oracle定义，不应独立视为真实世界正确率。",
+    "insightZh": "把zero-annotation程序化自演化与独立几何标签/answerability过滤结合，避免仅用多数投票监督。GRPO、Blender及AABB谓词本身不是新算法；三角色共同更新及严格验证相对静态/冻结生成角色的消融是主要贡献。",
+    "evidenceZh": "训练中标签由执行几何而非模型预测确定，Solver不读取metadata。（Sec. 2.3, Eq. 2, p. 4; Appendix A.3-A.4, Algorithm 1, pp. 11-12）。oracle过滤不修写问题，场景/问题失败也不后处理对象位置；Solver只看到四视图与问题。 oracle提供可复用但近似的空间布局核验机制。（Appendix A.3, pp. 12-13; Table 4, p. 13）。采用AABB中心/底面、尺度阈值、10%可见且10pixel extent门槛；支撑和碰撞不是精确mesh接触或稳定性验证。 几何标签与完整answerability验证在相同backbone上更有效。（Table 3 and Sec. 3.3.3, p. 7）。Qwen4B Full50.53，伪标签47.56，无visibility48.78，无uniqueness48.58；后者还改变了labeling，非纯过滤因素。 主评测改善与人工answerability审核提供有限交叉证据。（Table 1, p. 5; Appendix D.1, Table 9, pp. 18-19）。9B均分50.14到53.37，三个seed均值；200题196可回答，195/196与oracle一致，两个标注者kappa0.85。",
+    "caveatZh": "作者限制：zero-data指无外部空间训练示例/标签，仍使用预训练模型及PolyHaven/ambientCG资产、环境模板（Appendix C.2, p. 16）。 rreal是混合静态与已渲染验证比例，未渲染候选保留静态eligibility，不是所有候选的render成功率（A.5.1, p. 13）。 不同规模训练峰值不同，延长演化会回落；基线保留各自方法预算（C.6, p. 18; E.1, p. 19）。 审阅边界：没有独立limitations节；AABB谓词和阈值限制语义、碰撞/支撑细节，不能推广到真实物理可制造性或复杂几何。 任务集合、固定constructor和模板限制开放世界泛化，缺少直接结构设计/生成迁移实验。 均分包含不同指标与类别聚合，不能当作单一准确率；独立代码存在但未运行复现。",
+    "whyRelevantZh": "可把Blender执行产生的metadata、AABB/视角/可见性核验和拒绝歧义机制用于3D scene/layout生成数据与设计agent训练，这是具体可复用机制；论文实际验证仍是VLM空间QA。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

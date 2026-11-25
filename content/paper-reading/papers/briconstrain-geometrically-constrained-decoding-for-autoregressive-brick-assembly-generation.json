@@ -1,0 +1,95 @@
+{
+  "id": "arxiv:2611.33135",
+  "slug": "briconstrain-geometrically-constrained-decoding-for-autoregressive-brick-assembly-generation",
+  "title": "BriConstrain: Geometrically Constrained Decoding for Autoregressive Brick Assembly Generation",
+  "authors": [
+    "Nadav Magar",
+    "Amir Hertz",
+    "Ariel Shamir",
+    "Or Patashnik"
+  ],
+  "primaryTopicId": "lego",
+  "topicIds": [
+    "lego",
+    "3d-generation",
+    "fabrication"
+  ],
+  "categories": [
+    "cs.CL",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33135"
+  },
+  "abstract": "Language models can generate LEGO$^\\circledR$ assemblies from text, but their builds often contain parts that collide or attach to nothing. The usual approach of rejecting and resampling invalid placements discards decoded tokens without guaranteeing a valid build. We present BriConstrain, a constrained decoding method that restricts a pretrained language model's next-token probabilities before sampling, steering it towards valid placements. Because the validity of a brick placement depends on the non-predetermined build state, it cannot be compiled into a fixed grammar and must be checked dynamically. However, checking the validity of a brick before sampling is challenging as the space of valid placements is combinatorially large and cannot be enumerated exhaustively. Our key idea is to narrow the search space by constraining how parts attach rather than which parts attach to each other. Concretely, given the model's predictions of the currently placed part, and the previously placed parent it wants to connect to, we constrain the model's choice of how they attach. This allows us to span the space of part attachments, using a precomputed geometric oracle, and to effectively filter out colliding options. With valid attachment candidates in hand, we bias the model's next-token distribution towards the remaining valid candidates. We evaluate our method on two LEGO$^\\circledR$ formats and models: BrickNet, which annotates connectivity explicitly, and our proposed Implicit Connectivity LDraw Format (ICLF), which uses numeric values for placements and leaves connectivity implicit. Our method raises collision-free builds from 31% to 91% on BrickNet and from 15% to 65% on ICLF, and outperforms rejection sampling on both formats at about 60% of its decoding cost.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33135v1",
+  "keywords": [
+    "LEGO",
+    "constrained decoding",
+    "geometric oracle",
+    "parent veto",
+    "ICLF"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "assembly-planning"
+    ],
+    "content-scope": [
+      "part-assembly",
+      "fabricatable-object"
+    ],
+    "representation": [
+      "discrete-program"
+    ],
+    "conditioning": [
+      "text"
+    ],
+    "method": [
+      "autoregressive"
+    ],
+    "output-property": [
+      "controllable",
+      "fabrication-aware"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33135v1"
+    },
+    {
+      "label": "Project",
+      "href": "https://nadmag.github.io/BriConstrain/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33135v1 的 18 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "BriConstrain把LEGO有效性检查前移到token采样前：LM仍选part/type，attachment oracle、GPU碰撞过滤与parent veto约束“怎样连接”。作者报告BrickNet无碰撞build从30.9%升至90.8%，但独立ColSAT仅64.1%；值得精读其动态约束接口，不能视为稳定、可实体装配或100%有效的保证。",
+    "motivationZh": "如何在多token brick placement采样之前排除碰撞和不兼容连接，避免反复rejection仍卡在无效parent的开销。",
+    "methodZh": "论文针对重采样无法修复无效parent且浪费解码的问题，将part-parent attachment的几何可行集合转换为prefix-tree next-token约束，并以parent veto避免无解父件。机制接入BrickNet显式connector语法和新ICLF相对数值语法；两种backbone内部实验均改善碰撞指标和相对rejection的成本，同时保留oracle缺失、checker误差、grammar fallback与语义造型限制。",
+    "methodFlow": [
+      "离线结合connector枚举与训练build的经验attachments，建立part-type pair几何oracle",
+      "LM提出新part type及parent候选；GPU检查oracle placements的碰撞与connector占用",
+      "parent veto排除无剩余attachment的parent；全部无解时仍退回grammar-only",
+      "把可行attachment字符串构成prefix tree，按当前prefix屏蔽或惩罚无效next tokens",
+      "将part加入assembly并循环，最终编译成LDraw；不约束整体稳定性或caption造型"
+    ],
+    "experimentsZh": "BN-val-512含512条held-out captions，每条4次，共2048 attempts；ICLF排除85条minifigure相关caption，剩427条/1708 attempts。BrickNet-14B不重训；ICLF以Qwen3.6-27B rank512 LoRA训练，四B200训练、单B200 shard解码。采用BrickNet mesh checker、独立ColSAT，以及SigLIP2/DINOv2/VQAScore；只比较各backbone内部的constraint配置。 作者报告BrickNet mesh-checker CF从30.9%升至90.8%，invalid parts由23.7%降至0.5%；ColSAT CF从25.7%至64.1%，invalid parts仍4.2%。（Table1, PDF p.5） 作者报告ICLF CF从14.6%升至65.2%，高于8次rejection的32.8%；但VQAScore从0.296降至0.262，视觉/文本对齐并非无损。（Table1, PDF p.5; Sec.6.1, PDF p.7） 作者报告ours每token成本为freeform的1.26倍/1.56倍，对比8次rejection的2.14倍/2.47倍。（TableS3-S4, PDF pp.13-14） 作者报告oracle覆盖32,248条validation edges的96.35%；离线枚举构建耗538秒/128 CPU cores。（Appendix C, TableS2, PDF p.13） 比较边界：同backbone对照freeform、grammar/catalog、connector-only/full-placement、parent veto和2/4/8次rejection；无实体装配/稳定性实验，也未对RL方法作matched训练预算比较。两种模型的数据和架构不同，不能从跨format数值评判表征优劣。 消融：Parent veto将BrickNet invalid parts从7.4%降至0.5%；附录显示B3中99.93%的invalid parts落在无candidate的parent fallback。Soft beta override多数仍碰撞，hard mask总体折中较好。Oracle来源拆分和GPU checker port有核验，但不能消除checker误差。",
+    "insightZh": "贡献是在多token placement和复杂LDraw连接中，让LM处理part/parent语义选择、几何oracle处理attachment可行性，再由parent veto与prefix tree接入动态解码。Constrained decoding、静态grammar和碰撞检查本身并非首次提出；ICLF的implicit-connectivity验证说明接口可迁移，但模型和训练数据不同，不能跨backbone直接断言语法优劣。",
+    "evidenceZh": "只对part-parent的attachment集合进行当前assembly几何过滤，再转成token约束；无候选时仍有fallback。（Sec.4.1-4.3, Fig.2, Eq.(1)-(3), PDF pp.3-5）。part type保持自由；hard mask不是对整个序列所有选择的全局有效性保证。 作者报告parent veto显著提高CF，但独立ColSAT的通过率明显较低。（Table1, PDF p.5; Sec.6.2, PDF pp.7-8）。BrickNet B3至B4的mesh-checker CF为47.4%至90.8%，ColSAT B4仅64.1%；两种checker均非精确几何真值。 作者报告每保留token成本1.26倍/1.56倍freeform，低于8次rejection的2.14倍/2.47倍。（Fig.4, PDF p.7; TableS3-S4, PDF pp.13-14）。包含rejection被丢弃tokens的解码时间；不是相对freeform加速，也不是完整build固定时延。 枚举与经验attachment的union仍未覆盖全部validation连接。（Appendix C, TableS2, PDF p.13）。作者报告96.35%总体coverage；axle67.58%、hinge92.46%，有限姿态栅格和每pair候选cap限制表达。 作者明确不检查稳定性，且base model造型能力不会因连接约束而自动提高。（Sec.7, Fig.6, PDF p.8）。必须区分碰撞/attachment有效与可稳定搭建、视觉语义保真。",
+    "caveatZh": "作者限制：只检查碰撞和attachment，不检查稳定性；无碰撞模型仍可能倒塌（Sec.7, p.8）。 依赖显式parent的关系语法；part type未约束，仍可能全部无可行parent而fallback（Sec.3-4/7）。 Oracle覆盖不完整，非watertight LDraw mesh使两种checker都可能误判；造型质量继承base LM（Sec.4-5/7）。 审阅边界：91% headline依赖解码查询的checker，独立ColSAT仅64.1%，应保留评估器差异。 ICLF训练和评估排除minifigure；单一validation caption来源、无实体搭建，不能外推任意catalog或自由铰链。 报告成本是每保留token，并非端到端build时延；离线oracle及GPU checker均有部署开销。",
+    "whyRelevantZh": "LEGO核心项目的直接技术工作。动态assembly状态、parent可行性和多token几何约束值得用于brick generation；但论文没有验证image-conditioned LEGO-Maker或实体稳定性，不能把两者等同。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

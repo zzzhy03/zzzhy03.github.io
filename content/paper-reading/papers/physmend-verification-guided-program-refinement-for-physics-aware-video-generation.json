@@ -1,0 +1,85 @@
+{
+  "id": "arxiv:2611.32821",
+  "slug": "physmend-verification-guided-program-refinement-for-physics-aware-video-generation",
+  "title": "PhysMend: Verification-Guided Program Refinement for Physics-Aware Video Generation",
+  "authors": [
+    "Meilong Xu",
+    "Ziyi Zhao",
+    "Bhagyashree Puranik",
+    "Shayda Moezzi",
+    "Yixiao Zhang",
+    "Kushan Thakkar"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32821"
+  },
+  "abstract": "Video generative models synthesize realistic scenes, yet their interactions often violate physics. A ball dropped onto sand should displace grains and settle into a crater, whereas a generated video may show it passing through the surface or leaving the sand flat. Post-hoc methods typically score generated videos with a vision-language model (VLM), but such scores offer limited guidance on which object or parameter to modify, and each correction costs another synthesis. Simulation-based pipelines instead run fixed stages before synthesis, so simulation errors reach the video. To address these limitations, we present PhysMend, a training-free framework for verification-guided program refinement. PhysMend describes the target event as an editable physical program of grounded objects, events, and required relations, paired with tunable execution parameters. Our key insight is to verify and repair the event on its simulated rollout and on the depth video that conditions the generator (depth control) rather than on generated videos, enabling quantitative violation measurement, targeted editing, and fast re-verification before synthesis. A hybrid verifier evaluates semantic event consistency, physical plausibility, solver stability, and visibility in the depth control. VLM judgments are confined to event semantics and cannot override failed physical measurements, which limits the impact of VLM hallucinations. Each failed check localizes the program fields eligible for repair, and its measured violation scales a bounded update of their parameters. Only accepted depth control reaches the generator, which runs once per input. Experiments on the commonly used benchmarks Physics-IQ, PhyGenBench, and VBench-2.0 demonstrate substantial gains across different generator backbones; for example, PhysMend raises the overall Physics-IQ score of Wan-VACE from 27.33 to 39.40.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32821v1",
+  "keywords": [
+    "physical program",
+    "verification-guided repair",
+    "design agents",
+    "depth control",
+    "simulation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing",
+      "tool-use"
+    ],
+    "representation": [
+      "discrete-program"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "physically-plausible",
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32821v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32821v1 的 22 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "PhysMend先编辑可执行物理程序，在仿真与depth control上量化检查并局部修复，RGB生成器最后只运行一次。作者报告Wan-VACE Physics-IQ27.33→39.40；有界、按违约残差缩放的修复比全局重建有效，但验证通过只约束估计仿真/控制，不保证最终视频物理正确，失败或不支持事件走无depth fallback。",
+    "motivationZh": "直接评估并重生成视频成本高，固定仿真也会出错；需要能定位、量化并修复视觉事件的中间程序。",
+    "methodZh": "SAM3 masks、DAv2相对深度和Claude Opus4.8构成typed objects/events/relations及可调参数，编译到Genesis rigid/MPM/SPH。Hybrid verifier将语义判给VLM，process、terminal、health和control visibility由直接测量处理；每失败record给owner/interval/eligible fields，最多初始+三次rollouts，结构错重规划、数值错有界更新，重检后接受、保留或rollback。相关Supplement A-K全部已读取。",
+    "methodFlow": [
+      "由初图和事件prompt生成typed physical program及camera-aligned几何，验证schema和simulator能力。",
+      "编译参数并执行Genesis，导出state、contact、particle ledgers和depth control。",
+      "以语义、过程、终态、数值健康和control可见性checks产生定位违约records。",
+      "仅修改失败check拥有的字段：结构重规划或按残差缩放有界参数更新，并重检/rollback。",
+      "通过则depth条件生成RGB一次；超预算或不支持时以同prompt/image和seed走无depth fallback。"
+    ],
+    "experimentsZh": "Physics-IQ66事件×3views=198样本，以switch frame生成5s；PhyGenBench160 prompts；VBench2仅三physics categories。默认Wan-VACE、另测Cosmos3-Nano及OmniWeaving；one RGB call、最多4 simulation attempts。作者给fullbenchmark确定seed，未独立复现。 作者报告Wan-VACE Original39.40，VLIPP同backbone35.11、NEWTON36.89；Cosmos3-Nano40.76→43.67。（Table1,p.7） 作者报告PhyGenBench Cosmos0.671→0.704；VBench2 OmniWeaving52.18→76.16，仍低于VideoCoCo77.88。（Table2,p.7; Table3,p.8） 作者报告simulation-only31.20，typed34.26，verified37.21，full39.40；hybrid39.40优于measurement-only37.28与VLM-only36.00。（Table4,p.8; Tables7-8,p.19） 作者报告H100完整平均16.31min/sample，其中simulation5.11min，RGB一次；NEWTON37.88min为3.4次生成的估算，不是同定义实测总时长。（Appendix F,p.19; Fig.6,p.20） 比较边界：包括直接生成、motion control、planning和agent workflows；部分T2V/I2V与backbone不同，不能视作统一budget/model比赛。Wan baseline已用expanded prompt，可隔离depth贡献。VBench evaluator过滤initial-state失败视频且只报三类，不代表全18维能力。 消融：typed/verified/repair、hybrid evidence、localized/global/no repair/full routing和control表示都有测试；full routing可回退，真实模拟accept/fallback覆盖率未细分，无法据总体收益估计具体物理域模拟成功率。",
+    "insightZh": "相对固定simulation或生成后VLM打分，贡献是将检查放在可测量中间表示、记录可编辑字段和残差，并据此做受限gradient-free repair与全项复查。不是通用自主物理发现：每check的参数方向/尺度规则仍需预定义，无法从record推出真实物理原因。",
+    "evidenceZh": "typed program区分discrete事件结构与continuous execution parameters，并限制字段owner与bounds。（Sec.3.3,p.4; Appendix A,pp.12-13; Table5,p.14）。schema和capability registry先于仿真，mask/depth只提供2.5D估计。 失败测量不能被VLM语义判断覆盖，repair由eligible fields和normalized residual驱动。（Sec.3.4-3.5,Eqs.(1)-(3),p.5; Fig.5,p.15）。单次repair重跑全部checks；只保留改进proposal，无residual的missing evidence不能数值更新。 作者报告Wan-VACE Physics-IQ Original27.33→39.40、Verified28.39→38.32。（Table1,p.7）。full benchmark含fallback，不是仅成功simulator案例。 作者报告localized repair38.66优于global rebuild37.78，full routing39.40。（Table4,p.8; Table9,p.19）。相同rollout预算支持localization机制；routing的额外收益与无depth fallback有关。",
+    "caveatZh": "作者限制：遮挡、透明和隐藏表面影响从mask/relative depth估计的contacts。 受simulator materials/interactions和verifier check覆盖范围限制。 depth控制只承载geometry/motion，不含温度、相变或光学状态。 审阅边界：Rollout/control通过不保证RGB generator忠实遵守，最终视频没有同等精确物理验收。 Check-specific更新方向/尺度是手工策略，缺完整公开实现难核验。 Fallback导致部分输出根本不由通过的物理控制生成，必须保留此边界。 图中correct video措辞不能作为形式保证；未报告独立随机重复方差。",
+    "whyRelevantZh": "真正生成、仿真观察、验证并迭代修改视觉事件程序，符合design agent定义；可借鉴在低成本可编辑中间表示上先修约束再调用昂贵生成器。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

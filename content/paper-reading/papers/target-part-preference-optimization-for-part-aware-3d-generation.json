@@ -1,0 +1,89 @@
+{
+  "id": "arxiv:2611.30472",
+  "slug": "target-part-preference-optimization-for-part-aware-3d-generation",
+  "title": "Target-Part Preference Optimization for Part-Aware 3D Generation",
+  "authors": [
+    "Zishan Qin",
+    "Rui Li",
+    "Zeyu Zhang",
+    "Sevvandi Kandanaarachchi",
+    "Lina Yao",
+    "Dong Gong"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.30472"
+  },
+  "abstract": "Part-aware 3D generation requires not only globally plausible objects but also complete, well-separated semantic parts, yet high-quality part decompositions remain too scarce to support large-scale supervised fine-tuning. We study whether preference fine-tuning based on Direct Preference Optimization (DPO) can adapt a pretrained part-aware generator from limited part-annotated data without architectural changes. We rank candidates generated with different random seeds against ground-truth (GT) geometric metrics, and select the (object, target-part) examples with the largest across-seed quality gap. Each selected example stores a seed pair whose two flow trajectories share one clean GT compositional latent and differ only in Gaussian noise. We derive a reference-relative target-block preference loss from FlowDPO that compares the two trajectories against a frozen reference model. GT flow-matching losses on the target block and complete part set provide absolute supervision, while only the diffusion transformer (DiT) is updated. Human-ranked controls test an alternative ordering source, and synthetic cropping provides controlled loser targets that are incomplete by construction. Among the three training-set scales, the medium-scale setting gives the strongest result on held-out Objaverse and outperforms both the pretrained generator and the reported direct supervised fine-tuning baseline on the multi-part aggregate. Further analysis shows sensitivity to pair ordering, target-part coverage, and the balance between pairwise and GT supervision. Cross-dataset experiments show less consistent gains under distribution shift.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.30472v1",
+  "keywords": [
+    "part-aware 3D generation",
+    "FlowDPO",
+    "target block",
+    "seed preference",
+    "PartCrafter",
+    "limited supervision"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "object",
+      "part-assembly"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "prior-data": [
+      "native-3d"
+    ],
+    "output-property": [
+      "part-aware"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.30472v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.30472v1 的 14 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "本文不改PartCrafter架构，而把生成候选的GT几何评分转成种子顺序，对同一个GT latent的两条噪声轨迹施加目标部件FlowDPO，再加目标及全部部件重建监督。作者报告最佳medium设置的Objaverse Part-FS从0.5453到0.5725，约5%相对提升；跨ABO/ShapeNet并不稳定。值得深读部件级偏好目标和归因对照，不宜称为摆脱GT的通用人类偏好对齐。",
+    "motivationZh": "对象整体看似合理时，局部部件仍可能缺失、融合或碎片化，而细粒度GT分解昂贵。",
+    "methodZh": "部件生成的局部缺失、融合与碎片可能被对象指标掩盖。论文在PartObjaverse-Tiny的140物体/796目标部件记录中，按多种几何评分筛选跨seed差距大的样本。主设置的winner/loser不是两套生成mesh latent，而是共享GT clean latent、由存储seed产生不同噪声。仅更新DiT，以参考模型相对的target-block误差差训练，分析数据规模、标签翻转、人工对照、cropping、beta和匹配的无pair-loss训练。证据支持限定设置下的方法增益，不支持普遍跨域改善。",
+    "methodFlow": [
+      "对每个输入图/目标部件从冻结生成器采样多seed候选，以GT对象/部件几何与连通性排序。",
+      "保留质量差距大的实例及winner/loser种子，VAE编码完整GT部件集合。",
+      "在同一timestep用两个seed对同一clean latent加噪，分别计算trainable/reference DiT目标block的flow误差。",
+      "优化reference-relative偏好log-sigmoid，加winner目标部件与全部部件GT重建损失，仅更新共享DiT。",
+      "从图像及指定部件数生成独立部件mesh，以对象及一对一匹配部件指标评估。"
+    ],
+    "experimentsZh": "冻结PartCrafter图像编码器和3D VAE，仅DiT训练。small为7物体/56对，medium50/363，large140/796且为续训并刷新pairs。主评测为200 Objaverse、52 ABO、200 ShapeNet多部件输入，排除所有训练身份；另有每域200单部件。指标为对象CD/FS及矩形一对一匹配part CD/FS。 作者报告medium Objaverse Part-FS0.5725，pretrained0.5453、普通SFT0.5509；增量约0.0272绝对/5%相对，非5个百分点。（Table 2, p. 6; Table 1, p. 5） 作者报告匹配medium recon/full Obj-CD0.2650/0.1941，Part-FS0.4552/0.5488；仅禁用pair项的bootstrap差异区间为正。（Table 4, p. 7; supplementary S5, PDF p. 13） 作者报告59个ShapeNet配对对象中medium最弱part FS0.1820到0.4272，但其余part均值降低0.046，95%区间[-0.110,0.018]。（Supplementary Table S3, PDF p. 13） 比较边界：主要pretrained PartCrafter、普通GT SFT和匹配reconstruction-only；人工排序、合成crop、反转/随机对照充分诊断训练信号。没有跨部件生成器或其他3D DPO算法的直接同预算实验；普通SFT使用不同数据组织与learning rate，不能独立归因给DPO。 消融：beta、pair-loss开关、训练规模、人工排序、crop、翻转和随机augmentation均有。medium/large存在首阶段与续训混杂，不能推断最佳样本数量；全局与局部beta最优不同，非目标part未显著下降不证明无损。",
+    "insightZh": "将已有FlowDPO的reference-relative结构局部化到PartCrafter目标part block，并系统分析存储seed顺序而非编码生成mesh的训练构造。它不是新表示，也不是无GT的输出偏好学习；匹配的pair-loss开关对照比与普通SFT的整体流程比较更能归因。",
+    "evidenceZh": "主构造共享一套GT clean latent，偏好只通过离线候选对应的噪声seed顺序进入。（Secs. 3.2, 4.1, pp. 3-4; Fig. 1, p. 2）。训练不编码被排序的候选mesh；目标part索引不是semantic class条件，也不限制参数更新只影响该part。 偏好项比较目标block相对reference的误差下降，另有GT绝对监督。（Sec. 4.3, Eqs. 3-5, p. 4）。pair项本身不保证loser误差下降；winner另有target/all reconstruction。 Objaverse上有增益，但数据规模/训练阶段和跨域结果不能简化成普遍改进。（Tables 1-2, pp. 5-6; supplementary Tables S1-S2, PDF pp. 12-13）。B2 Part-FS0.5725，pretrained0.5453；B3在ABO Part-FS0.4729低于0.4888，ShapeNet0.4396低于0.4457。 匹配训练的pair-loss开关支持偏好项贡献，但B2与F3不是同一次评测。（Table 4, p. 7; supplementary Sec. S5, PDF p. 13）。medium recon/full Part-FS0.4552/0.5488；200相同输入bootstrap改善区间为正，全文明确F3是独立rerun，不能混用B2结果。",
+    "caveatZh": "作者限制：Objaverse增益最强，ABO/ShapeNet迁移不稳定；仍需GT部件几何且依赖候选覆盖、排序可靠性（Sec. 6, p. 7）。 target-block损失更新共享DiT，仍可能影响整个对象；all-part重建不能消除耦合（Sec. 6, p. 7）。 规模结果非单因素，large是续训checkpoint；普通SFT比较是完整流程比较而非仅pair项（Secs. 5.2-5.3, p. 6）。 审阅边界：部件独立中心化/缩放会掩盖装配相对位置错误；额外预测part不进入GT平均，失败及大CD评测被排除（supplement S2, PDF pp. 11-12）。 seed偏好在共享GT轨迹上优化的泛化机制仍需更多生成seed及训练seed重复研究；不应称作一般人类审美偏好学习。 未给出本作实现URL或足够复现所有checkpoint/warmup的配置细节；未独立复现。",
+    "whyRelevantZh": "直接服务part-aware 3D generation；在少量有GT部件数据下局部化训练目标，对部件完整性和可编辑资产质量研究有具体启发。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

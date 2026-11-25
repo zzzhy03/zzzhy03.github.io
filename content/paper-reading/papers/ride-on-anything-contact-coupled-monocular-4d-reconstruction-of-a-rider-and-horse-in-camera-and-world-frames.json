@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2611.29435",
+  "slug": "ride-on-anything-contact-coupled-monocular-4d-reconstruction-of-a-rider-and-horse-in-camera-and-world-frames",
+  "title": "Ride on Anything: Contact-Coupled Monocular 4D Reconstruction of a Rider and Horse in Camera and World Frames",
+  "authors": [
+    "Zehang Weng",
+    "Ci Li"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-22",
+  "updatedAt": "2026-11-22",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.29435"
+  },
+  "abstract": "We address the reconstruction of a horse and its rider from a single video. When a human estimator and a horse estimator are applied independently, both meshes can fit their silhouettes well while the rider hovers beside or passes through the horse, slides along its back and jitters relative to it. These errors lie along the camera axis and are not visible in the input view. We present Ride on Anything (RoA), a general, training-free methodology for reconstructing a person riding an animal, which couples frozen estimators of the rider and the mount at test time. We instantiate it for horseback riding with SAM 3D Body and 4DEquine. RoA aligns both estimators on a common frame index, projects both subjects through one pixel-isotropic camera initialized from the horse estimator, and jointly optimizes bounded corrections under interaction terms defined in the horse's body frame, including a collision term based on generalized winding numbers that remains valid on the non-watertight horse mesh. The result is lifted to a levelled world frame using the camera rotation from the background and the field of view from MoGe-2. On our riding clips, the raw outputs of the two estimators leave the rider's pelvis 15 cm from the horse's back on average. RoA reduces this seat gap to 1 cm, the drift of the seat along and across the spine by 64% and 89%, the 90th-percentile penetration depth by 57%, and the share of rider surface inside the horse from 12.1% to 7.9%. The motion is markedly smoother (94% lower acceleration of the rider relative to the horse, 80% lower horse jerk), while the rider's silhouette IoU decreases from 0.59 to 0.52. Qualitatively, the rider stays seated on the horse and moves together with it. A quantitative evaluation of 3D accuracy awaits calibrated recordings of ridden animals. We also test a clip outside the task, a horse led on foot, and analyse the failure modes.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.29435v1",
+  "keywords": [
+    "contact-coupled reconstruction",
+    "generalized winding number",
+    "horse body frame",
+    "monocular 4D",
+    "physical plausibility"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "human-avatar"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "conditioning": [
+      "video"
+    ],
+    "output-property": [
+      "physically-plausible"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.29435v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://wengzehang.github.io/rideonanything/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.29435v1 的 13 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "RoA把现成人体与马体估计器在同一帧索引和相机下对齐，再用马体坐标接触、跨骑间隙及winding-number碰撞约束联合修正mesh。作者报告座位间隙14.9到1.1厘米、P90穿透27.5到11.7厘米，但骑手IoU从0.594降到0.522。它是可借鉴的交互资产物理约束案例；四个骑乘片段、目标同构指标和无GT3D不足以证明准确性或通用生成能力。",
+    "motivationZh": "独立人体与坐骑重建器的深度和相机不一致，单视图轮廓合理却可能在隐藏侧浮空、穿透并产生相对漂移。",
+    "methodZh": "该训练免除方法针对两套独立单体mesh在输入视图都合理、在隐藏侧却浮空穿透的问题，固定模型shape并优化有界平移、腿部变形及共享弱透视相机。接触关系在马体局部坐标定义，广义winding number处理非封闭马mesh，随后用背景旋转与MoGe-2视场估计抬升到世界坐标。全文含分组件及碰撞权重实验，但只在四个骑乘片段上报告合理性，仍有明显穿透、足滑与前后深度歧义；作为受限方法案例略读收录。",
+    "methodFlow": [
+      "按原视频帧索引取两估计器最长连续交集，统一坐标约定与共享pixel-isotropic相机。",
+      "在canonical马mesh定义语义区域，以躯干主方向建立每帧局部body frame。",
+      "联合优化有界mesh修正，结合mask/occlusion、saddle、straddle、winding碰撞、时间与先验项。",
+      "用背景homography估计相机旋转，以MoGe-2视场恢复近似世界轨迹和地面，并输出假设违反自检。"
+    ],
+    "experimentsZh": "五片段来自四公开stock视频，四骑乘片段计入均值，Lead非骑乘作失败测试；Walk与Jump-A用于开发，Jump-B未参与调参，Jump-A long来自同视频且用于pipeline调试。冻结SAM 3D Body和4DEquine，YOLO11 masks，300步Adam。对照为独立估计器原输出及逐组件删除；只测合理性和自动mask一致性，没有GT3D。 作者报告平均seat gap14.9到1.1cm、forward/lateral drift11.6/17.4到4.2/1.9cm，P90穿透27.5到11.7cm。（Tables 1 and 3, p. 8） 作者报告骑手IoU0.594到0.522；去winding碰撞后inside11.3%，full7.9%，但world axes变体inside5.0%更低，无法由此判断哪种更准确。（Table 3 and discussion, p. 8） 作者报告非骑乘Lead的person IoU0.709降至0.406；碰撞项令Walk优化约121到233秒，包含估计器共5-7分钟。（Tables 1 and 4, p. 8; Sec. 5.3, p. 9） 比较边界：有原单体估计器、无joint/contact/image/body-frame/collision变体及碰撞权重敏感性。未比较其他human-object交互重建方法，也没有校准多视图、其他骑乘动物或独立大规模视频集；两个jump片段来自同来源，不能当作独立泛化样本。 消融：组件对照支持共享相机、联合修正与碰撞项改善指定约束；局部body frame在转弯Walk更合理，但面向相机jump的world-axis变体部分指标更好。未证明约束最优等于几何准确，world lift的视场/平滑敏感性也明显。",
+    "insightZh": "主要是将固定拓扑坐骑语义、身体坐标接触、非watertight winding碰撞及相机/帧对齐整合成骑乘双体拟合。接触优化与winding本身已有工作；独立估计器的组合问题和实现诊断有实用价值，但不是重大重建或生成范式。",
+    "evidenceZh": "交互项使用canonical语义区域与每帧马体坐标，而非世界轴。（Sec. 3.3, p. 4; Fig. 2, p. 4）。固定拓扑提供seat/barrel/head/tail，躯干PCA给方向；换坐骑仍需对应模型、估计器与区域。 碰撞项以广义winding number判内外，刷新离散inside mask后对表面距离求梯度。（Sec. 3.4, Eqs. 4-5, p. 5; supplementary Table 6, p. 13）。900个人体下身采样对全部马三角形测试，每10步刷新；距离用4000马表面采样，不能保证完全去穿透。 约束合理性指标改善同时损失图像匹配，不能解释为3D准确性提升。（Tables 1-3, p. 8; Secs. 5.1-5.2, pp. 6-7）。作者报告平均gap14.9到1.1cm、inside12.1%到7.9%，IoU0.594到0.522；多个指标直接对应优化项。 样本和输出存在明确适用范围限制。（Sec. 6, pp. 10-11; Table 5, p. 9）。无GT3D，五片段四视频不足以建立泛化；世界抬升只假设旋转相机，stance slip1.2-2.7m/s仍明显。",
+    "caveatZh": "作者限制：无3D真值，约束指标与自动mask IoU只测合理性；五片段四视频不证明泛化（Sec. 6, p. 10）。 输出是有界mesh变形，不能完整回到MHR/VAREN参数空间，仍有7.9%穿透且膝盖表达受限（Secs. 5.3, 6, pp. 9-10）。 正向视角的纵向深度弱约束；world frame假设相机只旋转、定焦，足滑与朝向抖动未校正（Sec. 6, p. 11）。 只评马，其他动物需固定拓扑模型和估计器；Lead必须检测后禁用骑乘假设，当前并未实现自动gate（pp. 9, 11）。 审阅边界：优化和评价共享winding/接触定义，指标下降不足以支持真实隐侧几何正确。 可迁移的是类似人兽交互资产的物理约束设计，尚无生成任务迁移实验，不能称通用资产生成能力。 代码存在且可读，但未运行或复现实验，第三方权重及环境仍有依赖。",
+    "whyRelevantZh": "对生成的人兽交互3D/4D资产，可借用body-frame接触锚定与非封闭mesh碰撞项作为物理一致性约束；迁移仅是具体机制启发，论文实际实验仍是狭窄骑乘重建。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "id": "arxiv:2611.31689",
+  "slug": "geomvgen-joint-appearance-geometry-modeling-for-multi-view-video-generation-in-robotic-manipulation",
+  "title": "GeoMVGen: Joint Appearance-Geometry Modeling for Multi-View Video Generation in Robotic Manipulation",
+  "authors": [
+    "Qiaoqiao Jia",
+    "Guile Wu",
+    "Dongfeng Bai"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.31689"
+  },
+  "abstract": "Robotic manipulation requires predicting how robot-object interactions evolve over time, encompassing both visual appearance and scene geometry. In multi-camera settings, such predictions need to capture the evolving 3D scene consistently across viewpoints, while supporting controllable generation under different robot actions and camera configurations. Existing video generation models provide strong priors for visual appearance and motion but typically lack explicit geometric modeling. Meanwhile, recent advances in geometry-aware and multi-view generation have explored joint appearance-geometry modeling and cross-view consistency, yet generating temporally coherent appearance and geometry across multiple viewpoints under robotic manipulation conditions remains challenging. In this work, we propose GeoMVGen, a framework for joint multi-view RGB and pointmap video generation in robotic manipulation. Built on a video diffusion transformer, our framework employs modality-specific adaptation modules to capture the distinct characteristics of appearance and geometry, while using cross-modal residual connections to facilitate information exchange between the two modalities. To establish geometric correspondences across viewpoints, we further introduce a cross-view projection mechanism with complementary geometric supervisions, combining pointmap consistency with geometry foundation model-guided feature alignment. These designs enable controllable generation of temporally evolving multi-view observations with coherent appearance and geometrically consistent scene structures. Extensive experiments on 4D video generation dataset comprising simulated and real-world robotic manipulation scenarios demonstrate that GeoMVGen outperforms state-of-the-art methods in video quality, geometric accuracy, and cross-view consistency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.31689v1",
+  "keywords": [
+    "multi-view video",
+    "pointmap",
+    "cross-view consistency",
+    "modality LoRA",
+    "geometry prior"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "representation": [
+      "point-cloud"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "prior-data": [
+      "video-prior"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.31689v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.31689v1 的 10 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "GeoMVGen 把双视角未来 RGB 和 pointmap 作为独立 LoRA 模态，用跨模态残差交换信息，并以投影对应点和冻结 VGGT-Ω 特征约束几何一致性。作者报告仿真 FVD 为480.2/486.5、跨视角 Chamfer distance 0.013m，但真实数据训练与评估复用同40 episodes，不能据此声称域外动态3D能力。",
+    "motivationZh": "多视角未来视频外观逼真时，显式动态几何和跨视角位置仍可能不一致。",
+    "methodZh": "论文研究由双视角首帧 RGB、pointmap、语言和可选动作/相机条件生成未来观测。共享冻结视频 diffusion transformer 的两条模态流分别做 LoRA 适配，零初始化线性残差连接两流；训练时用真值几何和相机标定建立对应关系，施加带可见性及前景权重的 pointmap consistency 与 VGGT-Ω feature alignment。三项仿真任务采用留出相机视角，四项真实任务采用同40 episodes训练评估。方法对显式几何联合生成有参考价值，证据尚限于小规模机器人数据。",
+    "methodFlow": [
+      "输入双视角首帧 RGB/pointmap、语言和可选动作及相机映射",
+      "分别编码外观和几何 latent，经过共享 backbone 的模态专属 LoRA",
+      "以双向零初始化残差在线性层间交换模态特征",
+      "训练时按真值几何投影，联合优化 pointmap 与冻结几何特征跨视角一致性",
+      "解码未来双视角 RGB 视频及 pointmap 序列"
+    ],
+    "experimentsZh": "4DGen数据的3项仿真、4项真实操控任务；每样本双视角RGB和pointmap。仿真12个训练相机视点、4个留出视点，真实同40 episodes训练评估；指标为FVD、AbsRel/δ1、跨视角CD和gripper mIoU，另以SAM2跟踪10个未来帧计算ADE/FDE。 作者报告仿真FVD为480.2/486.5，4DGen为648.9/636.6；跨视角CD为0.013m，4DGen为0.029m。（Table1, PDF p.6） 作者报告真实场景FVD259.1/258.4，CD0.011m；该结果限于同episode的in-domain协议。（Table2, Sec.4.1, PDF pp.6-7） 作者报告相对4DGen的gripper ADE/FDE仅下降0.97%/0.61%，分别为29.55/40.55像素。（Fig.5, Sec.4.4, PDF p.8） 比较边界：主表比较Wan2.1、SVD、4DGen、TesserAct和Geometry Forcing；部分baseline无几何或跨视角输出，相关指标缺项。未主表比较相关工作中的MVISTA-4D/One4D，未验证开放世界或任意物体生成。 消融：Table3拆分模态LoRA与cross-modal residual，Table4拆分pointmap和feature监督；均只在PlaceAppleFromBowlIntoBin、每配置1000 steps上做。联合监督提升FVD/CD，但深度AbsRel与mIoU有权衡，未证明每项损失普遍受益。",
+    "insightZh": "相对4DGen、TesserAct和Geometry Forcing，贡献是将模态专属适配、双向残差交换与两类输出几何监督组合用于多视角机器人视频；LoRA或pointmap本身不是首次提出。MVISTA-4D仅在related work讨论，未进入主表，因此不能声称覆盖所有相近4D模型。",
+    "evidenceZh": "外观与pointmap两流使用共享冻结主干、各自LoRA与双向残差。（Sec.3.2, Eqs.(2)-(3), Fig.2, PDF pp.3-4）。r=α=64，LoRA B与残差投影零初始化，适配参数跨视角共享。 跨视角约束使用真值几何投影和可见性权重；不是推理时获取未来真值。（Sec.3.3, Eqs.(4)-(12), PDF pp.4-5）。pointmap损失直接约束对应3D坐标，冻结VGGT-Ω的feature loss梯度回传到预测RGB。 作者报告仿真平均CD由4DGen的0.029降至0.013m，mIoU由0.496至0.530。（Table1, PDF p.6）。三项仿真任务的平均；同表FVD分别480.2和486.5，非独立复现结果。 真实数据的训练评估episode重合，泛化结论必须受限。（Sec.4.1 Dataset, PDF p.6）。作者明确写两台固定相机和同40 episodes用于train/evaluation，关注in-domain generation。 联合几何监督在若干指标有权衡，并非所有消融指标都更优。（Table4, Sec.4.3, PDF p.8）。joint的FVD506.7与CD0.0159最优，但AbsRel0.051逊于feature-only0.045，mIoU0.501逊于pointmap-only0.508。",
+    "caveatZh": "作者限制：Sec.3.4 p.5明确camera motion不是主要研究目标。 Sec.4.1 p.6明确真实数据只评估in-domain，同40 episodes用于训练和评估。 Sec.4.3 pp.7-8受计算预算限制，消融只用一个任务和1000训练步；Sec.4.4承认gripper轨迹收益较小。 审阅边界：仅2个视角和小规模操控任务，尚不能推广为任意动态3D场景生成能力。 PDF提及supplementary evaluation protocols，但本10页版本未附这些细节；无公开实现URL，复现协议、生成耗时与规模难以核验。 跨视角训练依赖真值pointmap、相机标定和前景标注，对无标定真实数据迁移未验证。",
+    "whyRelevantZh": "提供外观与显式动态几何联合生成的具体训练机制，可作为3D/4D生成先验研究参考；其迁移价值来自pointmap联合表示与投影监督，而非机器人控制应用本身。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

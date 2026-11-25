@@ -1,0 +1,81 @@
+{
+  "id": "arxiv:2611.32742",
+  "slug": "a-morphological-approach-to-inverse-lithography",
+  "title": "A Morphological Approach to Inverse Lithography",
+  "authors": [
+    "Gijs Bellaard",
+    "Bart M. N. Smets",
+    "Tim van der Leek",
+    "Alexandru Onose",
+    "Remco Duits"
+  ],
+  "primaryTopicId": "fabrication",
+  "topicIds": [
+    "fabrication",
+    "2d-design"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32742"
+  },
+  "abstract": "Lithography is a critical step in the manufacturing of chips that works by projecting light through a patterned mask and subsequently focusing it onto a photosensitive layer on top of a wafer. The task of finding a mask that prints a desired pattern on the wafer is called inverse lithography technology (ILT). The design of the mask is complicated by the fact that it must satisfy a set of constraints in order to be manufacturable. In this paper we provide a mathematical characterization of these constraints. Next, we develop a scoring function that allows us to measure whether a given mask satisfies the manufacturing constraints and if not, how badly the constraints are violated. Since our scoring function is (sub-)differentiable it can be used as the regularizer in a gradient-based inverse problem solver. We show that the resulting MorphILT algorithm that we developed can generate manufacturable masks that have nearly the same print quality as the (unmanufacturable) masks obtained from unconstrained inverse lithography.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32742v1",
+  "keywords": [
+    "inverse lithography",
+    "mathematical morphology",
+    "dyamorph",
+    "manufacturability",
+    "differentiable regularization"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "2d-artifact"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "output-property": [
+      "fabrication-aware"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32742v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32742v1 的 13 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "MorphILT把mask最小feature/gap宽度、边界过渡和曲率约束写成可微形态学违约分数，并证明连续表示中零分数对应可制造dyamorph。作者在500个ICCAD-13目标上报告比CurvyILT更小nominal error和DMS，但PVB更高；实际优化仍需少量后处理，不能把软正则写成数值解的严格制造保证。",
+    "motivationZh": "逆光刻优化能拟合wafer目标，却可能产生过细feature/gap和不可制造mask。",
+    "methodZh": "论文先用r-open集合及允许一像素非二值边缘的dyamorph形式化mask，再构造closing/opening/Lipschitz/binary四项非负分数。r0,r1>1/2时证明零DMS与其约束等价；离散实现省去自动满足的Lipschitz项，将其余项加入nominal print和process-variation损失，以Adam和递增正则求解，最后round/close/open清理。",
+    "methodFlow": [
+      "输入目标wafer pattern和nominal/min/max曝光前向模型。",
+      "用feature/gap半径定义dyamorph制造约束及形态学opening/closing等违约分数。",
+      "将DMS正则与nominal fidelity、process variation band损失联合优化。",
+      "按递增正则schedule用Adam更新像素mask。",
+      "进行保留边缘的rounding和轻微opening/closing，输出mask与模拟print。"
+    ],
+    "experimentsZh": "500个ICCAD-13 targets、512×512 mask，ICCAD-13 min/nom/max曝光forward models，r0=5、r1=4，Adam与递增正则；对比CurvyILT及unregularized reference。 作者报告nominal error：MorphILT 20.9±8.1，CurvyILT 30.7±7.0，unregularized 18.5±8.1。（Table 1, p.11） 作者报告DMS×10²：MorphILT 0.041±0.013，CurvyILT 0.099±0.090，unregularized 2.186±0.279。（Table 1, p.11） 作者报告PVB 10.1±4.4，CurvyILT 6.5±6.8；time/mask 3.65s vs3.67s。（Table 1, p.11） 比较边界：只有CurvyILT和无正则reference，未覆盖多种现代ILT生成/优化器；DMS同时是提出的优化目标与评价指标，不能当独立工业mask rule-checker。 消融：没有逐项regularizer、schedule或postprocessing消融，也没有宽度半径、分辨率和工艺模型跨域测试；理论证明和示例score maps解释机制，但不替代数值消融。",
+    "insightZh": "核心新意是dyamorph连续mask模型、DMS可微局部违约量及双向等价证明，而非新生成网络。相对仅后处理CurvyILT，制造约束进入逆问题；定理需要连续域和r0,r1>1/2，不能直接推出非零DMS离散近似解严格可制造。",
+    "evidenceZh": "Dyamorph显式约束两侧r-open、Lipschitz及窄过渡，并导出曲率下界。（Definition 3, p.4; Lemma 2 and Proposition 1, pp.4-5）。允许离散友好的非二值边缘，曲率由宽度参数决定而非独立设置。 作者证明零DMS与dyamorph对应，反向需要r0,r1>1/2。（Definition 5 and Lemma 3, pp.6-7; Theorems 1-2, pp.9-10）。四项opening/closing/Lipschitz/binary分数为非负，零分数刻画连续域约束。 作者报告MorphILT nominal error 20.9±8.1，CurvyILT 30.7±7.0；表中DMS×10²为0.041±0.013与0.099±0.090。（Table 1, p.11）。同表PVB为10.1±4.4与6.5±6.8，不能声称所有指标均优。 实现仍做rounding、closing和opening后处理。（Sec. 5, p.11）。作者称其minor/non-destructive，但没有各项正则消融或物理曝光实验。",
+    "caveatZh": "作者限制：实验被定位为500 targets的proof of concept（Sec.5,p.11）。 Dyamorph空间非路径连通，直接约束优化困难；实现采用软正则并做最终清理。 审阅边界：非零有限penalty下没有精确数值制造保证；连续域定理的假设需保留。 PVB弱于CurvyILT，不能仅用nominal error和自定义DMS宣称全面优越。 没有真实曝光/制造验证；最小宽度模型不覆盖所有工业工艺规则。 PDF印出的代码仓库当前404，无法核验schedule或复现实现。",
+    "whyRelevantZh": "属于制造约束进入自动逆向设计；可微形态学约束可为有最小线宽/间隙的2D图案制造提供建模思路，迁移到刺绣仍需另加针迹、材料及路径约束。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

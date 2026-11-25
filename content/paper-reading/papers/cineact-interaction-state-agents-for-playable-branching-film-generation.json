@@ -1,0 +1,92 @@
+{
+  "id": "arxiv:2611.30613",
+  "slug": "cineact-interaction-state-agents-for-playable-branching-film-generation",
+  "title": "CineAct: Interaction-State Agents for Playable, Branching Film Generation",
+  "authors": [
+    "Junyan Lin",
+    "Jianqi Ma",
+    "Shujie Duan",
+    "Hanxin Zhu",
+    "Zhihao Hu",
+    "Jinming Liu",
+    "Shuai Li",
+    "Jun Zhang",
+    "Xin Jin",
+    "Chang Wen Chen",
+    "Weidong Zhang"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-23",
+  "updatedAt": "2026-11-23",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.30613"
+  },
+  "abstract": "Open video generators such as MiniMax-H3 produce short clips of only several to a dozen seconds per run. To synthesize longer sequences, existing methods either rely on agentic systems following preset scripts, or roll out autoregressively from the previous clip's last frame, losing off-screen states and accumulating hallucinations across turns. Consequently, users still cannot take an explicit goal, choose how to accomplish it, and see that choice persist across subsequent clips. We study goal-grounded interactive video generation, where one goal admits multiple valid approaches, the user's chosen approach must be executed on screen, and its consequences must persist across clips. To this end, we propose CineAct, a state-first agentic framework in which language-model agents handle reasoning while frozen image and video generators serve purely as renderers. Before interaction, the Architect initializes the world as a spatial layout with cameras, an asset library, and a scene graph; at each turn, the system deduces the planned state change, generates a target end frame with an image generator and rigorously verifies it, and synthesizes intermediate motion with an FL2V model. We further introduce a multi-space benchmark covering two suites: long-horizon step execution and open-intent branching admissibility. Experiments show that explicit world-state modeling boosts multi-step rollout consistency over the pixel-only baseline (+11.4 automated, +23.1 human points) and raises paired branching success toward a shared goal by +30.8 points.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.30613v1",
+  "keywords": [
+    "persistent world state",
+    "branching video",
+    "scene graph",
+    "goal reachability",
+    "target-frame verification",
+    "FL2V"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "reasoning",
+      "tool-use"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "conditioning": [
+      "multimodal"
+    ],
+    "method": [
+      "llm-vlm-guided"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.30613v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.30613v1 的 21 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "CineAct以固定房间布局/相机、资产身份库和符号scene graph维护交互电影世界；先检查操作与目标可达性，再生成并核验末帧，以冻结FL2V模型渲染10秒过渡。作者报告Qwen+H3的整体评分0.748到0.862，盲评0.611到0.842。方法价值是状态驱动设计闭环；planned graph不从实际视频自动重同步，固定相机和预设实体使它仍是回合制有限世界。",
+    "motivationZh": "视频只依赖上段末帧时，会丢失离屏对象状态和空间关系，使用户不同路线的后果在后续镜头中消失。",
+    "methodZh": "面向同一目标允许用户选择不同路线的多轮视觉创作，系统把意图映射成带precondition的操作，通过BFS检查goal reachability并diff出必须改变/保持的实体关系。Painter按当前图、目标房间记忆和身份crop合成目标帧，Inspector最多三次检查，Director按门与相机方位渲染动作。实际视频tail只刷新房间图像记忆，计划scene graph分开维护。40任务、571个分支提议与13组双路线测试支持有限世界中的一致性收益，而非开放世界实时互动或硬物理模拟。",
+    "methodFlow": [
+      "Architect初始化矩形房间/门与固定相机、实体身份crop、符号层级关系及至少两条可达路线。",
+      "Interpreter将用户文本/点击/拖动解析成操作，Planner检查前置条件、容量和目标可达性。",
+      "从计划图差分得到操作、变化、保持对象及相机规则，检索目标房间和非可见资产引用。",
+      "Painter生成目标末帧，Inspector按状态、身份和门位置反馈最多三次修正。",
+      "冻结FL2V生成10秒动作/镜头切换，实际tail更新访问房间的visual memory并开启下一轮。"
+    ],
+    "experimentsZh": "Hy4承担所有推理角色、任务生成和自动评测；Qwen-Image-2.1/FLUX.2-klein4B交叉MiniMax-H3/LTX-2.5四组合，冻结renderers。40任务按1-4空间各10；571提议含237valid/334invalid，过滤56模糊项。主盲评10故事、196clips、四核心项，由10raters完成；13故事双路线执行单独评测。 作者报告Qwen+H3自动All0.748到0.862，human0.611到0.842；四组合full均比baseline整体高。（Table 1 and Fig. 3, p. 7） 作者报告Open分支valid Accept0.810、invalid Reject0.964、Balanced0.887、Unsure4%；Forced Balanced0.905。（Table 2, p. 7） 作者报告13个故事both succeed and distinct0.615到0.923；FL2V状态项Unclear0/196，Ref2V51/196。（Table 4 and Sec. 6.4, p. 8） 比较边界：同冻结模型、动作、初始帧、seed及三次目标帧/一次视频预算的pixel-only、+layout、+assets、full累积消融，另有Ref2V接口比较。没有与全部现有goal/world-state agent直接同预算对照；baseline在branching判定时缺少offscreen事实，信息不对称是预期差异。 消融：布局/相机、资产、scene graph+符号推理+末帧验证以累积方式加入，不能独立分解后三者贡献；FLUX+H3只有base/full。自动评测Hy4与生成任务/推理角色同模型，盲评是重要补充，但仅10故事、无报告置信区间，自动与人二元一致率73%。",
+    "insightZh": "把goal reachability、多路线用户选择和明确状态差分/末帧核验整合到冻结生成器的视觉创作流程。显式world state与多agent本身已有先例；主要增量在交互目标与状态/资产/几何分工及配套评测。",
+    "evidenceZh": "scene graph存储计划状态，符号engine在渲染前检查动作及BFS目标可达性。（Secs. 4.1-4.2, Eq. 4, p. 5; supplementary Algorithm 1, p. 12）。Gt+1先按计划推进并与observed frames分开维护；不应称作自动从真实视频反推和校准的世界状态。 图像端点核验与几何镜头规则闭合生成循环。（Secs. 4.3-4.4, pp. 5-6; Fig. 2, p. 4）。Inspector逐项检查操作完成、身份、must-keep对象和门侧；FL2V渲染后只把actual tail写入房间记忆。 相同骨干/动作/预算下整体一致性有报告改善，并有盲人评交叉检查。（Table 1 and Fig. 3, p. 7; supplementary Table S2, p. 12）。Qwen+H3自动0.748到0.862、盲评0.611到0.842；但单项或轻量骨干的中间表示增加不一定单调改善。 分支gating与执行实验分开，执行成功不能由gating准确率替代。（Tables 2-4, pp. 7-8; supplementary Table S6, p. 16）。571提议仅开局判可行不生成视频；13组双路线另做盲评，both succeed and distinct为0.923，对照0.615。",
+    "caveatZh": "作者限制：每房间固定相机、跨房间cut，不支持连续3D相机；顺序推理/核验/10秒生成是回合制延迟（Sec. 7, p. 8）。 房间及实体由Architect预先固定；动态扩世界、post-clip state re-sync与streaming留待未来（Sec. 7, p. 8）。 Ref2V虽在可评分项分数相当，但常裁掉可交互目标；部分qualitative末尾穿门未确认（Sec. 6.4, p. 8; Fig. S2, p. 15）。 审阅边界：计划graph在渲染前推进而视频失败不自动重同步，逻辑正确不保证所见状态一致。 40任务由同Hy4辅助编写且主要自动判定，13组分支执行有限，不能推断开放世界分支泛化或真实物理能力。 论文没有本作代码URL/可访问实现承诺，精确拒绝/预算耗尽处理难以复现；未独立复现实验。",
+    "whyRelevantZh": "目标可达性、显式状态差分、身份资产检索与端点视觉核验直接推进visual-design-agents，不是单次让LLM写prompt的包装。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

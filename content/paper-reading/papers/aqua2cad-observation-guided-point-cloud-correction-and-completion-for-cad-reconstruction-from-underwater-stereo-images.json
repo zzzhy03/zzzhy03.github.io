@@ -1,0 +1,84 @@
+{
+  "id": "arxiv:2611.32835",
+  "slug": "aqua2cad-observation-guided-point-cloud-correction-and-completion-for-cad-reconstruction-from-underwater-stereo-images",
+  "title": "Aqua2CAD : Observation-Guided Point Cloud Correction and Completion for CAD Reconstruction from Underwater Stereo Images",
+  "authors": [
+    "Weizhao Huang",
+    "Jiayi Zhang",
+    "Pangkit Fong",
+    "Chongrong Fang",
+    "Jianping He"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32835"
+  },
+  "abstract": "Recovering editable computer-aided design (CAD) models from underwater stereo images requires accurate and complete geometry, yet stereo reconstruction produces displaced points and missing regions. The original views retain cross-view disagreement and ray evidence lost during point-cloud fusion. Aqua2CAD exploits this evidence in two stages: view-conditioned correction and quality filtering establish reliable geometric support, while multi-view observations condition a learned shape prior to infer missing surfaces in the original metric frame. The recovered points support surface fitting and solid assembly with manually revised face groups. On an OceanSim-based synthetic benchmark, Aqua2CAD reduces point-cloud Chamfer distance by 60% relative to the stereo reconstruction. Compared with a matched point-only completion backbone, it improves missing-region recovery at 5,mm from 16.27% to 24.16%. With a shared CAD backend, exterior acceptance increases from 6/19 to 14/19. Qualitative results on selected real underwater captures demonstrate recovery of the main structures of six 3D-printed objects.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32835v1",
+  "keywords": [
+    "CAD reconstruction",
+    "multi-view completion",
+    "ray evidence",
+    "underwater stereo",
+    "metric geometry"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction",
+      "completion"
+    ],
+    "representation": [
+      "point-cloud",
+      "cad-brep-parametric"
+    ],
+    "conditioning": [
+      "multi-view"
+    ],
+    "output-property": [
+      "editable",
+      "asset-ready"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32835v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32835v1 的 19 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "Aqua2CAD保留融合前的多视图深度/射线证据，先有界修正和筛点，再条件化UniCo补全，最后以人工修订face groups拟合可编辑CAD。作者报告R5从point-only16.27%增至24.16%，但CD几乎相同且宽松覆盖略降；CAD外观通过6/19→14/19主要来自修正/过滤，补全仅增加两例。",
+    "motivationZh": "水下stereo融合既产生错位点也丢失表面，单纯点云补全无法回访被融合丢弃的观测证据。",
+    "methodZh": "同一metric frame中的点更新受local spacing和几何向量基限制，HGB过滤依据原observations判断修正点质量。补全联合global image tokens、surface/free/occluded/unknown ray evidence及局部投影refinement，保留全部retained points并追加8192点。CAD为Point2CAD-derived拟合和Open CASCADE实体布尔，使用人工修订ParSeNet分组；真实水池输入还需人工foreground masks。",
+    "methodFlow": [
+      "由calibrated stereo/COLMAP/FoundationStereo形成metric点云，并保留view-associated RGB/depth/ray证据。",
+      "聚合各点多视图证据，预测有界几何位移，再用HGB质量分数过滤。",
+      "以global images、spatial ray memory和local projected refinement条件化UniCo补全。",
+      "把8192生成点映回metric frame并与保留点合并。",
+      "人工修订face grouping后拟合解析面、组装有限solid并检查STEP/B-rep和外形。"
+    ],
+    "experimentsZh": "OceanSim 185 CAD对象，148/18/19 object train/val/test，1472/180/190 stereo sequences；test 19对象中17有missing regions。外部denoisers在179 shared成功序列比较；completion全190，CAD随机每对象1序列共19。真实6个3D打印对象只做定性。相关Appendix A-F全部读取。 作者报告全pipeline point CD16.29→6.48mm，F5 41.75→61.40%，F20 82.86→94.31%。（Table IV,p.8） 作者报告同input UniCo R5 16.27→24.16%，但CD6.47→6.48mm、R20 83.91→83.54%。（Table II,p.6） 作者报告大gap组（>50%surface missing）R5仅1.76%、CD32.91mm，其他组R5 27.18%。（Table VIII; Appendix D-E,p.15） 比较边界：同in-domain数据训练和filtered inputs较公平；UniCo same budget最关键，单图baselines输入与生成点数不同。CADrille无in-domain fine-tune且另做normalized/aligned指标，不能直接当metric CAD的完全匹配对照。SuperPC适配训练并非官方完整实现。 消融：有correction/filter/completion阶段、fixed completion checkpoint、single-view及ray/global/local移除；local refinement对R5最大，global context很小。各variant只单次warm-start fine-tune，不能估计seed variance或等同从头无该组件。",
+    "insightZh": "新意是融合后仍回访原multi-view evidence，并为correction与completion赋予不同角色；ray evidence是network inputs而非硬free-space约束。没有提出全自动CAD backend，补全也不全面压过point-only，其收益集中tight-tolerance recovery。",
+    "evidenceZh": "修正受位移半径与观测/法线/射线向量span限制，保留无有效view的原坐标。（Sec.III-B,Eqs.(3)-(6),pp.3-4）。过滤用原始evidence的HGB估计修正后可靠性，分阶段训练。 completion从global、ray和local三个尺度取证，最终追加生成点而不替换保留点。（Sec.III-C,Eqs.(7)-(8),pp.4-5; Appendix A-C,p.10）。训练只有Chamfer，没有额外hard photometric/free-space loss。 作者报告对同filtered inputs，R5为24.16%而point-only16.27%。（Table II,p.6）。CD6.48 vs6.47mm、F20/R20稍低，不能宣称全面优越。 作者报告CAD exterior passes为6/19→12/19→14/19，三者均19/19 closed。（Table III,p.6; Appendix B-B/C,p.11）。共享人工分组策略和backend，close solid不等于正确形状，criteria含尺寸/体积/双向coverage。",
+    "caveatZh": "作者限制：Generated points在无观测处仍是假设，large gaps表现很差。 Face grouping人工辅助，surface selection与solid assembly仍是瓶颈。 真实案例有elbow台阶、Y-joint折痕和hollow cylinder被封闭。 审阅边界：真实水池既人工修mask又修face groups，不能宣称完全自动image-to-CAD。 19对象/少量工业几何和合成水体限制泛化，真实设计CAD未注册故没有mm定量验证。 对point-only改进主要是R5，CAD大部分收益在completion之前。",
+    "whyRelevantZh": "具体连接多视图条件补全与可编辑CAD资产，能启发generative completion中分离observed support和hypothesized regions；水下细节不必直接迁移。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

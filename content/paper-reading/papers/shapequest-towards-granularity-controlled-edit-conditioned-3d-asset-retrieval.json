@@ -1,0 +1,87 @@
+{
+  "id": "arxiv:2611.32621",
+  "slug": "shapequest-towards-granularity-controlled-edit-conditioned-3d-asset-retrieval",
+  "title": "ShapeQuest: Towards Granularity-Controlled Edit-Conditioned 3D Asset Retrieval",
+  "authors": [
+    "Faris Abu-Ali",
+    "Sankalp Sinha",
+    "Didier Stricker",
+    "Muhammad Zeshan Afzal"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-25",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.32621"
+  },
+  "abstract": "Given a reference asset and an instruction such as \"remove one armrest,\" a retriever must find variants that make the edit and preserve the other parts. This search is well established for images but remains underexplored for individual 3D assets. To study this problem, we introduce ShapeQuest and ShapeQuester, a new benchmark and model for edit-conditioned 3D asset retrieval. ShapeQuest's open-source pipeline edits textured meshes through part additions, removals, and material and colour changes. It controls edit granularity across five levels, defined by the fraction of the object's surface area each edit affects. It constructs multiple valid targets when an instruction leaves the choice of part open. A vision-language model judges each edit from views chosen to expose the edited parts, and human raters audit its judgments. ShapeQuest has 87,824 queries in 50 categories and a 50,919-shape gallery with competing edits. To distinguish these variants, ShapeQuester learns retrieval alongside reconstruction of the edited point cloud, with part masks supervising changed and preserved regions. With a frozen pretrained point encoder, ShapeQuester reaches 50.4 operation-macro mAP@10 on the test split, against 47.2 for the fusion baseline with the same inputs and 48.6 for the strongest baseline. Reconstruction adds 6.5 points on the validation split when the point encoder is trained from scratch, including 3.3 from part masks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.32621v1",
+  "keywords": [
+    "3D part editing",
+    "edit-conditioned retrieval",
+    "change preservation",
+    "multi-positive",
+    "part masks"
+  ],
+  "facets": {
+    "task": [
+      "editing",
+      "representation-learning"
+    ],
+    "content-scope": [
+      "object",
+      "part-assembly"
+    ],
+    "representation": [
+      "mesh",
+      "point-cloud"
+    ],
+    "conditioning": [
+      "text",
+      "partial-3d"
+    ],
+    "output-property": [
+      "part-aware",
+      "editable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.32621v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.32621v1 的 11 页全文及关键页面核验；实验数字均为作者报告，未独立复现。",
+    "ideaZh": "ShapeQuest值得读的是可控部件编辑数据构造：直接在原mesh上增删part/改材质，保留未改区域，按面积控制粒度并给欠指定指令多个正确目标。ShapeQuester用changed/kept masks监督训练期edited-point-cloud重建，但推理只做检索；作者报告test mAP@10为50.44%，不能写成新3D生成器的质量成绩。",
+    "motivationZh": "3D编辑检索缺少严格保持其余parts、控制修改粒度并允许多个正确目标的数据。",
+    "methodZh": "数据pipeline从PartNeXt层级part测量面积、LLM提议edit、确定性glTF脚本执行、选可见修改的视角、InternVL3-78B筛选与人工抽查，再构造多GT和反向addition。模型用文本FiLM调制PointBERT patch tokens，训练时同时做multi-positive retrieval和带部件mask的XYZ/RGB重建；decoder在推理弃用。",
+    "methodFlow": [
+      "按PartNeXt part面积定义五档granularity，提议删除/材质编辑。",
+      "确定性修改glTF，并保留未编辑parts；反向removal形成addition。",
+      "选择显露编辑区的view，VLM审核并人工抽查，构建多正确目标和按object UUID划分数据。",
+      "以文本FiLM和centres调制patch tokens，组成retrieval embedding。",
+      "训练时加changed/kept region的point-cloud reconstruction监督，推理仅检索gallery。"
+    ],
+    "experimentsZh": "87,824 triplets、126,417 released-mesh条目、50类；模型用59,276 operation-balanced queries，val/test gallery为50,919 shapes。按object UUID分split；PointBERT frozen pretrained与from-scratch两种设置，CLIP frozen；三随机种子，同10 epochs/L40S训练。 作者报告test operation-macro mAP@10：预训练ShapeQuester TP 50.44±0.13，fusion TP 47.23±0.22，combiner ITP 48.64±0.29。（Table 3, p.8） 作者报告from-scratch nearest grouping中重建使val score 40.42→46.89；global reconstruction为43.56，part masks再增3.33点。（Table 4, p.8） 作者报告抽查VLM accepted edits中382/400被5人多数认可，约95.5%。（Fig.3, p.5） 比较边界：比较由CIR适配的fusion、CLIP4Cir combiner及zero-shot sum，控制encoder/grouping/inputs；不是对现代3D生成编辑器的质量比较。作者承认OpenShape pretraining与PartNeXt来源重叠。 消融：验证patch tokens需重建监督、mask项和loss权重在from-scratch下的重要性；全局feature+重建46.76接近patch版本46.89且same-base hit@1更高，不能说patch普遍优势。更多S表和appendix在这份11页exact PDF中未附，未声称检查其细节。",
+    "insightZh": "非纯benchmark的价值是严格局部编辑、可控面积粒度、多正确目标及显式change/keep监督。ShapeQuester是retrieval模型，其生成式decoder只提供训练信号，主要性能收益不能等同开放式3D editing能力。",
+    "evidenceZh": "脚本直接删除指定part faces或修改PBR材质/颜色，未编辑部分保持一致。（Sec.3.2, stages 1-3, p.4; Fig.2, p.5）。源shape有part labels；addition由已有removal反转，非自由生成新几何。 作者报告人工多数确认382/400个VLM接受triplets，即95.5%。（Sec.3.2 stage 5, p.4; Fig.3, p.5）。共5人各评500 triplets，包括400 accepted和100 rejected，不能把抽样比例说成全数据准确率。 训练用part masks约束编辑和保留区，decoder在推理时弃用。（Sec.4, Eqs.(3)-(4), pp.6-7; Fig.4, p.6）。最终推理输出是已有gallery的ranking，而不是新mesh。 作者报告预训练PointBERT条件下test operation-macro mAP@10为50.44±0.13。（Table 3, p.8, pretrained ShapeQuester TP row）。对照same-input fusion为47.23±0.22，strongest combiner为48.64±0.29。",
+    "caveatZh": "作者限制：只增删/重着色带标签part，材质仅五种constant material且无texture map。 OpenShape预训练与PartNeXt来源重叠。 所有模型几何edit分数远低于材质edit。 审阅边界：依赖现有part标签、源mesh与可直接执行的编辑，不能当作任意3D对象编辑能力。 参考的B-E附录及S表不在当前11页PDF内，主文以外的loss权重和细分结果尚未核对。 数据/代码称open-source但PDF未印出项目或代码URL，未验证可公开下载。",
+    "whyRelevantZh": "可控part editing数据和change/keep监督可用于3D生成/编辑训练与评测；当前收录基于数据构造方法，而非小幅检索分数或其推理生成能力。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}
