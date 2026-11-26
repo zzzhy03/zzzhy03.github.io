@@ -1,0 +1,63 @@
+{
+  "id": "arxiv:2611.33655",
+  "slug": "recall4d-forgetting-not-misalignment-limits-long-horizon-feed-forward-4d-reconstruction",
+  "title": "Recall4D: Forgetting, Not Misalignment, Limits Long-Horizon Feed-Forward 4D Reconstruction",
+  "authors": [
+    "Tianle Lyu"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33655"
+  },
+  "abstract": "Feed-forward 4D trackers recover camera motion, depth, and point trajectories from short video clips, but chaining windows over long videos degrades their accuracy. We find that replacing inter-window alignment with ground-truth transforms leaves tracking error essentially unchanged. Static-point error instead grows with time since last observation: repeatedly predicting a static point from windows that no longer observe it corrupts previously recovered geometry. We call this failure forgetting. Merely retaining the last observed positions of unseen points reduces error by 26% on PointOdyssey without modifying the tracker. We introduce Recall4D, a training-free framework that augments a frozen tracker with a persistent world state and sparse motion anchors. Static points retain their world-space positions outside the camera view and are refined by averaging observations decoded at sparse keyframes while in view. For dynamic objects, the tracker decodes sparse representative anchors, while geometric skinning propagates their displacements to dense queries. Across two long-horizon benchmarks, Recall4D improves the accuracy of its backbone while running 7.6-9.0$\\times$ faster, and its accuracy gains carry over to five further backbones and three other long-sequence tasks, demonstrating its generality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33655v1",
+  "keywords": [
+    "persistent world state",
+    "4D tracking",
+    "sparse anchors",
+    "geometric skinning",
+    "forgetting"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33655v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33655v1 的 20 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "Recall4D把离屏静态几何当作应保留的world state，而非每个window重新预测；动态点只解码少量anchors并skinning。作者报告Point4D在2000帧由2019秒降至264秒、SR从0.178到0.362。应精读的是forgetting诊断与显式memory设计，收益主要来自静态点；first-frame masks漏掉的运动对象会被错误冻结，且动态预测仍受backbone限制。",
+    "motivationZh": "window-chained 4D trackers反复预测离屏已知静态点，使几何逐步forget。",
+    "methodZh": "在冻结window-chained 4D tracker上，以SAM3.1 first-frame instance masks区分静态/动态；静态位置由camera-frustum投影决定是否在view，keyframes解码观察经running mean融合，离屏保持。每动态instance用FPS选最多32 anchors，对dense points使用固定近邻距离权重融合anchor位移。方法不训练新模型，但依赖预训练segmentation和backbone相机/深度。",
+    "methodFlow": [
+      "视频/first-frame masks与query points → static/dynamic划分",
+      "静态queries lift到world coordinates → frustum内keyframe解码及running-mean融合",
+      "离屏static points保持state → 每帧直接readout",
+      "每动态instance FPS选anchors → frozen decoder轨迹 → 近邻displacement skinning",
+      "组合static/dynamic轨迹 → common-world long-horizon 4D结果"
+    ],
+    "experimentsZh": "PointOdyssey与Dynamic Replica的200-2000帧；500帧val消融。冻结Point4D，48帧window/8overlap，4keyframes，最多32anchors/instance、6近邻；H100 80GB限40GB，约6.2k queries，另测ADT300帧和五backbones/三tasks。 作者报告PointOdyssey500帧EPE0.979→0.836、SR0.370→0.440、582.1→74.9秒；Dynamic Replica500帧753.2→84.1秒。 (Table 2, p. 6) 作者报告2000帧Point4D SR0.178→0.362、2019→264秒；TrackEverything增益明显更小，且其APD/SR仍更高。 (Table 3, p. 6; Supp. D.1, p. 17) 比较SpatialTrackerV2、Point4D、多种chained 4D backbones与TrackEverything；TrackEverything dense/sparse按memory budget切换，论文详细披露OOM及逐序列结果。 state贡献几乎全部accuracy gain；anchors主要加速。GTmask/visibility未降总体EPE；learned fusion/gating、loop closure等无收益。诊断筛除scene-exiting tracks，主test表按standard保留，数字不能混用。",
+    "insightZh": "贡献是受控oracle实验表明特定chained trackers的长程误差主要来自静态几何forgetting，并以显式无训练状态和稀疏motion control修复；不是证明所有重建任务alignment都不重要。",
+    "evidenceZh": "作者报告GT-pose alignment几乎不改PointOdyssey val误差，简单hold unseen使EPE降26%。 (Sec. 3, Table 1, p. 3) 该诊断排除scene-exiting GT tracks，标准协议保留时hold收益是10%，需披露协议。 静态state投影仅测试camera frustum，不解析occlusion；动态skin weights在初始instance内固定。 (Sec. 4.2-4.3, Eqs. 4-9, pp. 4-5) mask、camera及错误static标记会影响state更新。 作者报告2000帧Point4D时间2019→264秒，EPE5.334→4.634，SR0.178→0.362。 (Table 3, p. 6) 是H100上tracker inference；未包含全部感知前处理成本。 精度提升主要来自persistent state，sparse anchors主要节省decode；动态能力未普遍提高。 (Table 4, p. 7; Supp. C.2/D.4, pp. 16,19) 动态SR有时略低于baseline；方法保留backbone动态运动误差。",
+    "caveatZh": "动态motion仍由backbone决定，未解决动态对象memory。 依赖first-frame instance masks，漏标moving object会当static。 frustum gate不解析遮挡，static/dynamic划分不能适应对象后来开始运动。 主长程定量为合成数据，real-world ADT仅300帧，不能视作真实2000帧量化证明。 runtime为tracker inference，附录说明classification比较不包含segmentation本身，端到端速度需另测。 显式memory可借鉴主线资产状态维护，但论文未验证生成、编辑或物理一致性。",
+    "whyRelevantZh": "显式世界坐标state与稀疏motion控制可为动态3D生成/编辑资产跨镜头维护几何提供机制参考；这是迁移建议，论文验证仍是tracking/reconstruction。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2611.34290",
+  "slug": "stateweaver-multi-agent-coordination-of-story-state-transitions-for-long-horizon-video-generation",
+  "title": "StateWeaver: Multi-Agent Coordination of Story-State Transitions for Long-Horizon Video Generation",
+  "authors": [
+    "Modi Jin",
+    "Xuying Zhang",
+    "Yijing Guo",
+    "Haoran Li",
+    "Yanwen Ma",
+    "Jing Wang",
+    "Chenyu Ge",
+    "Ming-Ming Cheng",
+    "Haoyang Huang"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "video-generation"
+  ],
+  "categories": [
+    "cs.AI",
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34290"
+  },
+  "abstract": "Modern video foundation models generate high-quality short clips, but preserving long-video consistency and correctly depicting event-driven state changes remain challenging. Existing agentic workflows face these challenges because continual planning and repair accumulate context, while reference updates remain limited. We introduce StateWeaver, which combines Active States and Hierarchical Collaboration to connect review-driven visual reference updates with cross-shot state inheritance. Active States translate state discrepancies identified during review into concrete visual asset requirements that guide reference construction, validation, and regeneration, preserving identity and already-correct content while repairing target attributes. Confirmed generation results are linked to the corresponding asset states, story time, and reference versions for verification and reuse by subsequent shots. Hierarchical Collaboration isolates execution contexts by task, clip, and repair round, and uses hierarchical memory to organize this process across multiple sets. Across multiple benchmarks, StateWeaver outperforms existing methods and produces long videos with sustained cross-shot consistency under predefined and autonomously planned storyboards.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34290v1",
+  "keywords": [
+    "active states",
+    "reference repair",
+    "hierarchical collaboration",
+    "state handoff",
+    "long-horizon design agents"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34290v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.34290v1 的 26 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "StateWeaver把review发现的状态缺陷转成新reference需求，并将被观察到的属性与story interval、asset state、source version绑定，跨set交接前再验证；task/clip/repair contexts隔离以控制长期生产上下文。作者在75项任务上报告多数连续性收益，但ST-Bench overall仅第二，错误杯数等compromise仍会流入后续镜头；“confirmed state”依然依赖视觉review。",
+    "motivationZh": "长视频workflow即使记录显式目标状态，也会因reference缺失、错误handoff与累积context导致修复不能被后续镜头正确继承。",
+    "methodZh": "screenwriter固定story facts，chief划分sets并管理共享asset/state，set directors按依赖计划、生成、review和修复。Active States将目标、真实观察和未知属性分开，必要时扩充state/view/layout reference并做defect-conditioned image synthesis。Hierarchical Collaboration用独立task/clip/round contexts与global/set memories，按event/time scope检索并在handoff验证具体属性、clip和reference版本；已提交产物保留原输入。",
+    "methodFlow": [
+      "固定story facts与events/story time，建立sets和asset state树",
+      "按时间/来源scope检索global与set memory并检查依赖",
+      "绑定exact references，在独立planning context生成candidate",
+      "独立review分开记录defects、需保留属性及缺失reference需求",
+      "扩充并验证defect-specific references，针对性重生成与复核",
+      "chief确认实际观察与版本scope后handoff，后续shots继承已实现状态"
+    ],
+    "experimentsZh": "从ST/ViMax/Entity/DirectorBench选择20/20/10/25 stories，共75任务；前50用原shot脚本，25项自主规划。所有framework统一GPT-6.1-sol、GPT-Image-2.5-Sunburst、MiniMax-H3-Sol，评估均无audio。自动指标结合feature/质量模型与GPT视觉评审；20人分组，每完整pair五票盲评。 作者报告overall：EntityBench0.850对ATAS0.815，DirectorBench0.724对0.648；ViMax0.686略高于ViMax0.685，ST0.451低于ATAS0.457。 (Table 1, p. 6) 作者报告DirectorBench去TCI+CCI从0.724降到0.683；去SF+OH为0.696，frozen references为0.703。 (Tables 2-3, p. 7) 作者报告相对MovieAgent的人评continuity净偏好+69.3、state transition+46.7，但visual为−2.7；这是G减B的净分，不是胜率或正确率。 (Table 4, Eq. (4), p. 8) 四个agentic workflows共享backbones，便于比较production机制；所用75项是选取子集而非四个benchmark全量。部分自动语义指标用同一GPT模型评估，human blind比较提供补充但没有广泛跨backbone验证。 reference expansion、DCS、task/round isolation、memory filtering与handoff均有局部消融；不能由overall差异推断单次repair必成功或归因某一个视觉行为，正文也明确限制这种归因。",
+    "insightZh": "把显式story states进一步连接到review-driven reference construction、实际观察的版本/时间范围及跨set交接，而非只记录目标状态；context隔离与memory scope filtering共同支持长期workflow。不是新image/video backbone，也不保证视觉review的正确性。",
+    "evidenceZh": "state tree保存stable identity、story interval、mutable attributes及parent evidence，目标状态不等于已实现证据。 (Sec. 3.2, Eq. (1), p. 4) 论文明确禁止用生成结果偏差倒改既定story requirements。 confirmed observations按attribute、event/time、source clip和reference version交接，并选择性重开受影响任务。 (Sec. 3.3, Eq. (3), pp. 5-7; Appendix B.3, p. 10) 依赖图检查可用证据scope；仍需chief的视觉确认判断。 作者报告EntityBench与DirectorBench overall改善，ST-Bench不居首。 (Table 1, p. 6) ST为0.451低于ATAS0.457，不能写成四benchmark全面SOTA。 selected compromises可保留错误杯数/方向，review遗漏也可能成为后续reference。 (Appendix E.5-F, pp. 14-17; Fig. E.5, p. 17) 失败案例直接体现状态账本与实际视觉/动作正确性的边界。",
+    "caveatZh": "仍受base video能力限制，compromise selection可能扩大残余错误的影响。 主要跟踪可见状态，对情绪/关系变化更弱。 视觉review漏掉复杂动作错误后，后续shots可能复用错误reference。 regular1fps、boundary4fps及有限帧grid不能保证连续动作完整发生；书本打开和笔迹运动是不同证据要求。 统一commercial backbones及选取75stories下的收益未证明跨模型、长时scale或audio一致性。 source/version绑定保留provenance，但不使错误的视觉观察变成事实；需持续保留unknown和residual defects。",
+    "whyRelevantZh": "为长期视觉设计agent维护目标、已观察事实、unknown及版本scope提供具体接口；可迁移到多步骤SVG/3D/制造设计的状态交接和局部修复。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

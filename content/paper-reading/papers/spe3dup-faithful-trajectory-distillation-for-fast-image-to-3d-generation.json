@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.34141",
+  "slug": "spe3dup-faithful-trajectory-distillation-for-fast-image-to-3d-generation",
+  "title": "Spe3DUp: Faithful Trajectory Distillation for Fast Image-to-3D Generation",
+  "authors": [
+    "Liangchao Xu",
+    "Jiaye Fu",
+    "Youtian Lin",
+    "Feihu Zhang",
+    "Yao Yao"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34141"
+  },
+  "abstract": "Recent 3D generative models can produce high-quality meshes with complex structures and fine geometric details, with broad applications in games, film, and digital design. However, high-quality generation typically relies on long multi-step sampling processes that repeatedly evaluate large networks, leading to long inference times. At the same time, reference-driven tasks such as game-asset reconstruction and product digitization demand close correspondence to the input image: generated geometry must faithfully reconstruct the specific reference object. Acceleration must therefore reduce sampling computation while preserving the model's ability to reconstruct that object. To enable fast and faithful 3D generation, we introduce Spe3DUp, a coarse-to-fine framework based on Faithful Trajectory Distillation (FTD). FTD directly supervises few-step students with the teacher's input-conditioned denoising trajectories to preserve its generation behavior. We apply FTD separately to coarse geometry generation and geometric refinement, compressing both sampling processes while maintaining correspondence to the reference input. We further accelerate the complete mesh-generation pipeline with efficient geometry decoding and parallel remeshing. Experiments show that Spe3DUp maintains geometric quality and input correspondence close to those of the teacher, accelerates the coarse and refinement DiTs by 10.0x and 19.9x, respectively, and achieves a 7.7x end-to-end speedup over the original teacher pipeline.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34141v1",
+  "keywords": [
+    "trajectory distillation",
+    "input fidelity",
+    "image-to-3D",
+    "field reuse",
+    "parallel mesh simplification"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34141v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.34141v1 的 11 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "Spe3DUp把guidance与teacher interval endpoints蒸馏到10/5步coarse/refinement，并用跨分辨率field reuse、关键区域重算和并行QEM压缩mesh交付延迟。作者报告累计7.74倍加速；匹配解码/后处理后蒸馏贡献为5.87倍。方法可借鉴，但exact PDF未附所引用的dataset/training appendix，结果宜保留复现边界。",
+    "motivationZh": "少步3D生成可损坏输入对应结构，采样变快后decoder和mesh处理又成为瓶颈。",
+    "methodZh": "在Hunyuan3D-2.1→UltraShape cascade中先折叠CFG，再以同起点和同输入条件下teacher多步终点监督student单步；decoder在潜在surface附近查询并重算可能改符号/连通性的query batches，mesh按空间region并行简化后全局QEM收尾。",
+    "methodFlow": [
+      "图像条件下coarse generator先产生全局mesh，refiner以图像和coarse geometry为条件",
+      "分别将CFG折叠至单conditional branch",
+      "同起点/条件下以teacher多步interval endpoint监督few-step student",
+      "跨分辨率复用scalar field并对critical/surface区域重算",
+      "区域并行QEM加全局收尾交付mesh"
+    ],
+    "experimentsZh": "比较Hunyuan3D-2.1 coarse与UltraShape refiner：teacher 50/50步CFG，DMD/FTD 10/5步；报告CD、F-score、normal、silhouette IoU与ULIP-2。系统延迟用NVIDIA L20，field时间另用A800；dataset和训练细节在正文指向未附appendix。 作者报告完整cascade CD×10³：teacher15.7、DMD29.1、FTD15.2；IoU为0.839/0.725/0.837。 (Table 1, p. 6) 作者报告原始teacher576.6s→74.5s为7.74倍；同优化geometry recovery下437.7s→74.5s为5.87倍。 (Fig. 2, p. 2; Sec. 4.4, p. 9) 作者报告field reuse11.1s、surface deviation6.59×10⁻⁴，critical recomputation12.3s、1.52×10⁻⁴。 (Table 4, p. 10) 主要对比teacher与DMD，固定teacher coarse进一步隔离refiner；FTD约1300 A800 GPU-hours而主DMD约570，延长DMD到1400后未弥补此recipe差距，不证明所有DMD配置劣于FTD。 分离coarse/refine及统一coarse对照解释误差来源；operator-only、field reuse与recompute显示速度/偏差取舍。当前PDF未附被引用的完整checkpoint曲线及topology分析。",
+    "insightZh": "将成熟guidance/progressive interval distillation应用到coarse/refinement并强调input-conditioned fidelity；系统贡献是decoder field reuse及critical recomputation与并行简化的组合，而非全新蒸馏原理。",
+    "evidenceZh": "FTD对齐同条件同起点teacher interval endpoints，coarse与refinement分开蒸馏。 (Sec. 3.2, Eqs. (3)-(7), pp. 3-4) refiner的image-null branch仍保留coarse geometry，不能混同完全无条件teacher。 field reuse可能改变局部sign/connectivity，因此对critical batches和surface endpoints重算。 (Sec. 3.3, Algorithm 1, p. 5) 算法设置迭代budget后必要时fallback全query，效率与复杂geometry有关。 作者报告5.87倍匹配后处理端到端加速，7.74倍相对原始未优化teacher。 (Sec. 1, Fig. 2, p. 2; Sec. 4.4, p. 9) 不把系统优化的累计收益全归于distillation。 dataset/training/额外topology细节被指向appendix，但本次11页exact PDF结尾为references。 (Sec. 4.1, p. 6; Secs. 4.3-4.5, pp. 9-10; PDF pp. 10-11) 只基于已获取exact PDF声明证据不足，不推断作者没有其它supplement。",
+    "caveatZh": "exact PDF中未找到所引用appendix，dataset名称、样本量及详细sampling/training grids缺失，复现与泛化难独立评估。 仅验证一个coarse/refine pipeline；近teacher平均指标不保证每个输入的细部/拓扑忠实。 16 workers的parallel QEM和decoder工程收益受CPU/GPU及mesh复杂度影响。",
+    "whyRelevantZh": "为image-conditioned 3D资产生成保留teacher输入响应的少步蒸馏及mesh交付优化提供直接参考。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

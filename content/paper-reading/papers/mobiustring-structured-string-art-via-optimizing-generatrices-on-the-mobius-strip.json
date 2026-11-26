@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.33918",
+  "slug": "mobiustring-structured-string-art-via-optimizing-generatrices-on-the-mobius-strip",
+  "title": "MöbiuString: Structured String Art via Optimizing Generatrices on the Möbius Strip",
+  "authors": [
+    "Xinding Zhu",
+    "Hanni Bao",
+    "Xinye Yang",
+    "Qinyi Wang",
+    "Xu Yuzhong",
+    "Jiazhou Chen"
+  ],
+  "primaryTopicId": "2d-design",
+  "topicIds": [
+    "2d-design",
+    "fabrication"
+  ],
+  "categories": [
+    "cs.GR"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33918"
+  },
+  "abstract": "String art is a worldwide handicraft that mimics an image with straight strings stretched between boundary pins. Existing image-driven methods primarily optimize individual strings for reconstruction fidelity, leaving the global organization of the strings weakly controlled.In this paper, we introduce the generatrix on the Möbius strip of unordered boundary-point pairs to formalize families of strings with finite generatrices, enabling explicit control over their arrangement. Based on this new formalization, we propose MöbiuString, a framework for generating structured, multi-color string art under a prescribed string budget. As an initialization, we place pins along boundaries of image-derived regions and select candidate string segments near each generatrix in the homeomorphic pin-index plane. During the iterative optimization, a 2DGS-based differentiable renderer jointly optimizes generatrix parameters and colors on multiple layers, while periodic discrete re-search revises string families to escape poor local configurations.To our knowledge, MöbiuString is the first automatic image-based method to generate string art with a structured string organization with freeform region boundaries. Evaluations with two datasets and a user study demonstrate the outperformance of MöbiuString over baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33918v1",
+  "keywords": [
+    "string art",
+    "Möbius chord space",
+    "generatrix",
+    "differentiable rendering",
+    "multicolor layers"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33918v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33918v1 的 15 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "MöbiuString把单根线优化提升为Möbius chord-space中的string families，联合优化多层颜色与generatrix，再用离散re-search修布局。作者在430张图上报告更好LPIPS/DINO，并做4件实物；适合精读结构化2D与工艺表示，但budget是软约束，路径允许切断/重启，不能写成精确线数或单根线连续制造保证。",
+    "motivationZh": "逐条greedy选择string通常只顾即时图像拟合，难以控制整体规则结构并协调多色层遮挡。",
+    "methodZh": "逐条greedy选择string通常只顾即时图像拟合，难以控制整体规则结构并协调多色层遮挡。SAM2/DINOv2/color分region，Bézier边界采pins；把unordered pin pairs映到Möbius pin-index chart，以固定±1 slope generatrices控制line families。2DGS alpha-compositing联合优化位置、extent及颜色，周期删除/再生/迁移/color swap，按binary-rendered loss验收。作者用180 Butterfly和250 FSS图、4个预算比较3个baseline，报告mean LPIPS 0.319/0.369；24人pairwise偏好实验及4件手工成品支持可视与制造可行性，未独立复现。",
+    "methodFlow": [
+      "Image+foreground mask+预算 → region partitions与boundary pins",
+      "合法pin pairs → periodic pin-index chord space → ±1 slope generatrices",
+      "多层2DGS differentiable rendering联合优化family与colors",
+      "周期discrete re-search修复局部布局，binary loss验收",
+      "region/color内Hierholzer路径分解 → 手工模板与winding指导"
+    ],
+    "experimentsZh": "180 Butterfly、250 FSS图，256×256 foreground/white background；B=128/256/512/1024，固定参数；24名参与者每人70组比较，外加4件手工实物。 作者报告Butterfly/FSS跨4预算mean LPIPS 0.319/0.369，DINO distance 0.558/0.742。 (Table 1, p. 7) 作者报告full对无generatrix的组织偏好59.6%，无明确选择30.8%，反向偏好9.6%。 (Fig. 7, p. 8) DanAla、Roy Multicolor及SpiderPrinter原实现默认参数；SpiderPrinter灰度与Roy低预算全白限制跨方法指标解释；baseline固定B，本方法实际K可偏离B。 同region/pins/chords/colors初始化比较greedy、无generatrix、无seam、无re-search，并在Appendix D剔除各loss；大部分结构组织依据定性和用户研究，而非独立组织metric。",
+    "insightZh": "贡献在低维structured chord family表示、seam-aware优化和多层共同目标；Möbius topology本身是已有数学，附录十种generatrices并非全部启用。",
+    "evidenceZh": "实际优化只用pin-index slope ±1的有限线段generatrices。 (Secs. 3.2–4.2, pp. 4–5; Appendix A.5, p. 13) 更丰富analytic catalog只是说明，不是额外可优化slots。 作者报告两个数据集所有预算mean LPIPS分别0.319/0.369。 (Table 1, p. 7; Sec. 5.1, p. 6) Butterfly被强制左右对称；grayscale SpiderPrinter另对gray target计分，Roy低预算大量全白。 有实体样例但允许cuts/restarts和soft count偏差。 (Fig. 1, p. 1; Sec. 5.4/Fig. 6, p. 8; Sec. 5.1, p. 6) 4件手工成品展示可行性，不保证单根线或精确预算。 作者报告结构化family带来perceived organization收益。 (Sec. 5.5, Fig. 7, p. 8) 24人、10 targets、7 pairs；full对无generatrix的组织偏好59.6%，30.8%无明确选择。",
+    "caveatZh": "仅用直线generatrices以控制搜索维度，复杂纹理/近均色毛发可能分区不佳。 缺少对density/scale/pin layout稳健的method-independent organization指标。 soft count不约束精确string总数，固定outline计数需单列。 手工fabrication允许cuts/restarts，不是全自动单spool winding或embroidery stitch规划。",
+    "whyRelevantZh": "family-level path参数化、layer occlusion与soft material budget直接契合structured2D/制造图案生成；对embroidery只能作为表示借鉴，未验证针迹工艺。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

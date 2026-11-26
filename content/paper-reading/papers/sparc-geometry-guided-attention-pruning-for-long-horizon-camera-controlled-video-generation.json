@@ -1,0 +1,77 @@
+{
+  "id": "arxiv:2611.34064",
+  "slug": "sparc-geometry-guided-attention-pruning-for-long-horizon-camera-controlled-video-generation",
+  "title": "SPARC: Geometry-Guided Attention Pruning for Long-Horizon Camera-Controlled Video Generation",
+  "authors": [
+    "Zesong Yang",
+    "Weikai Chen",
+    "Liyuan Cui",
+    "Yuan Li",
+    "Jiaxin Huang",
+    "Lutao Jiang",
+    "Runze Zhang",
+    "Yingda Yin",
+    "Xiaoyang Huang",
+    "Kai Yan",
+    "Keyang Luo",
+    "Xin Wang",
+    "Hujun Bao",
+    "Zhaopeng Cui"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34064"
+  },
+  "abstract": "We present SPARC, a geometry-guided attention pruning framework that turns the native self-attention of pretrained video diffusion transformers into a unified mechanism for camera control and persistent scene memory. Our key insight is that attention connectivity can simultaneously serve as geometric conditioning for camera control and spatial addressing for historical memory retrieval. Motivated by the asymmetric contextual requirements of reconstructing observed content and synthesizing novel regions, SPARC restricts observed tokens to geometrically corresponding historical tokens and local spatiotemporal context, while preserving dense attention for unobserved regions. Correspondence-aware attention biasing and order-invariant historical positioning further enable stable retrieval across long temporal gaps. Without introducing additional learnable control or memory modules, SPARC achieves precise camera adherence and faithful scene revisitation while substantially reducing attention computation. Extensive experiments demonstrate the effectiveness of aggressive attention pruning in improving camera adherence, revisit consistency, and visual fidelity, with an inference speedup of over 50x when combined with four-step distillation. Project page is available at https://zju3dv.github.io/SPARC.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34064v1",
+  "keywords": [
+    "geometry-guided attention",
+    "camera control",
+    "scene memory",
+    "historical RoPE",
+    "video diffusion"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34064v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.34064v1 的 12 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "SPARC以几何对应作为attention空间地址：旧区域读取对应history和local context，新区域保留dense attention。作者报告DL3DV ATE 0.0903，对比Lyra2 0.1964；值得借鉴camera control与重访共用的连接规则，但53.6×是pruning加4-step DMD的DiT计时，且仍依赖外部geometry。",
+    "motivationZh": "长camera-controlled视频的dense history attention昂贵，并可能读错位置或遗忘重访内容。",
+    "methodZh": "长camera-controlled视频的dense history attention昂贵，并可能读错位置或遗忘重访内容。估计depth反投影local mesh，经source/target face-ID rasterization对应latent tokens；observed queries只读matched history和local window，unobserved保留dense。匹配bias增强history，coverage keyframes共享RoPE，first/recent context保证rollout衔接。作者在DL3DV和50个WorldScore-Static scenes报告更好的camera/revisit表现；Wan2.1 finetune后再作DMD，53.6×仅固定配置per-chunk DiT推理；未独立复现。",
+    "methodFlow": [
+      "History depth/cameras → local meshes → face-ID token correspondence",
+      "Coverage检索first/coverage/recent keyframes",
+      "observed: matched history + local window；novel: dense attention",
+      "correspondence bias与shared historical RoPE → 生成chunk并更新bank",
+      "可选4-step DMD student加速sampling"
+    ],
+    "experimentsZh": "Wan2.1-I2V-14B、DL3DV 145-frame clips/480×832，32张96GB GPUs训练；DL3DV测camera/visual，WorldScore-Static测两次revisit，Tanks&Temples做消融。 作者报告DL3DV ATE 0.0903，对比Lyra2 0.1964；DMD为0.0760。 (Table 1, p. 6) 作者报告72-frame/9-history-latent DiT chunk从2436.1s到45.5s（53.6×）；未蒸馏local-window pruning为1090.4s（2.2×）。 (Table 4, p. 9) 比较Lyra2、Spatia、HY-WorldStereo、UCM、HY-WorldPlay、Lingbot-World与Infinite-World；camera/revisit强不代表所有视觉指标最优。 dense camera adapter、dense bias、history-only、local window、correspondence bias和shared/seq RoPE逐项比较；history-only会mosaic，local context恢复连贯，shared RoPE降低history permutation变化。",
+    "insightZh": "将attention connectivity本身作为geometry conditioning和history addressing，并按observed/unobserved非对称路由，不是一般稀疏加速。",
+    "evidenceZh": "geometry通过允许attention连接输入，而非独立pixel conditioning。 (Secs. 3.2–3.3, Fig. 3, pp. 3–4) shared triangle IDs建立空间地址，observed/unobserved有不同scope。 作者报告DL3DV ATE 0.0903，Lyra2为0.1964。 (Table 1, p. 6) camera由ViPE估计并alignment，FVD并非所有行最佳。 53.6×包含4-step DMD和去除CFG。 (Computational Analysis, p. 8; Table 4, p. 9) local-window pruning单独为2.2×；profile目标token 99%已观测。 主模型并非training-free，外部geometry仍有开销。 (Sec. 4.1, p. 6; Limitations and Fig. 10, p. 9) 3K attention fine-tune、2K DMD；dynamic展示是手动改correspondence，非完整物理验证。",
+    "caveatZh": "依赖外部geometry estimation建立correspondence，带来额外计算开销。 已观测区域占比低时dense分支变多，不能保证相同稀疏速度收益。 static-scene主评估和少量dynamic演示不能推出一般物理一致world model。",
+    "whyRelevantZh": "geometry-addressed memory对主线3D场景/资产的camera控制与重访有具体迁移价值，尚未验证可编辑3D mesh输出。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

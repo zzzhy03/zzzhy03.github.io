@@ -1,0 +1,69 @@
+{
+  "id": "arxiv:2611.33467",
+  "slug": "splatwam-splatting-world-action-models-for-real-time-3d-imagination",
+  "title": "SplatWAM: Splatting World Action Models for Real-Time 3D Imagination",
+  "authors": [
+    "Frank Tsu-Fang Lu",
+    "Karthik Sundar Senthilkumar",
+    "Christopher Thirgood",
+    "Oscar Mendez",
+    "Simon Hadfield"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.LG",
+    "cs.RO"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33467"
+  },
+  "abstract": "World models typically predict future observations in pixel or latent space, limiting their ability to directly represent true 3D scene evolution. We present SplatWAM (Splatting World Action Model), a generative world model that learns action-conditioned dynamics directly over compact 3D Gaussian primitives. A tokenizer SplatWAM-T first encodes a variable number of unposed views into a fixed budget of Gaussian tokens. A dynamics model SplatWAM-D then predicts future Gaussian states in a single forward pass per action, using log-Euclidean covariance coordinates and differentiable rendering supervision to facilitate learning in an explicit 3D space. Each predicted state can be rasterized from arbitrary viewpoints, enforcing a shared 3D representation across views by construction. On OGBench Scene, SplatWAM renders novel views 12x faster than video world models (~80 FPS on an RTX 5090) with up to 2.0 dB higher PSNR. We further introduce SplatWAM-P, a lightweight flow-matching policy head jointly trained with the dynamics model. Across 8 task suites, model-free Gaussian-token policies outperform pixel-based counterparts by up to 24.8 percentage points. SplatWAM-P improves over Latent Particle World Model (LPWM) by 12 percentage points and matches HIQL without a learned value function. On LIBERO, our ~1B model outperforms WorldVLA (~7B) and the robot-pretrained OpenVLA (~7B), while matching OpenVLA-OFT when both are trained without large-scale robot pretraining. Code and checkpoints will be released.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33467v1",
+  "keywords": [
+    "Gaussian world model",
+    "log-Euclidean covariance",
+    "shortcut forcing",
+    "explicit 3D state",
+    "action-conditioned dynamics"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33467v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33467v1 的 21 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "SplatWAM直接在2048个显式Gaussian states上生成action-conditioned dynamics，log-Euclidean covariance避开quaternion/scale歧义，单步shortcut与render监督让同一状态可任意视角rasterize。作者报告OGBench新视角约78.8FPS，但这是128×128评估及特定模拟任务；共享3D表示保证同状态跨view一致，不保证真实物理，policy也只读observed history而非想象rollout规划。",
+    "motivationZh": "pixel/latent world models无法直接给出可任意视角rasterize的共享3D动态状态。",
+    "methodZh": "Tokenizer以fine-tuned VGGT和fixed queries将unposed RGB views映射到2048Gaussians，借depth/normal distillation及shape regularizers约束几何。54M causal dynamics transformer以shortcut forcing直接预测Gaussian位置、颜色、opacity及六维log-covariance，并加入held-out-view render loss。Policy添加agent/goal tokens与flow-matching action head，复用backbone但独立policy pass使用null action tokens，joint training带来预测/控制梯度冲突。",
+    "methodFlow": [
+      "两张unposed RGB views → VGGT/fixed queries tokenizer → 2048 Gaussian state",
+      "位置、opacity、color与log-Euclidean covariance → action-conditioned causal dynamics",
+      "single-step shortcut denoise → 下一Gaussian state → deterministic novel-view rasterization",
+      "observed state history与goal/language → 独立policy pass的agent tokens",
+      "flow-matching action chunk → 执行并重新观测；policy不使用imagined rollouts"
+    ],
+    "experimentsZh": "OGBench Scene/Cube与LIBERO模拟操控，tokenizer2views/2048Gaussians，dynamics17frame window训练、测试H16/H32，RTX5090 batch1。World model400windows/100held-out episodes，128×128共同评估；policy三training seeds。 作者报告H32新视角PSNR23.02、LPIPS0.102、FVD313及78.8FPS；input-view FVD338弱于Cosmos3-Edge39。 (Table 2, p. 6) 作者报告OGBench Scene policy52±2%，LPWM40±1%；无robot pretraining的LIBERO平均92.3±0.3%。 (Table 4, p. 8) 作者报告counterfactual cube push仅13/32成功、no-action24/32，接触/重开drawer案例为32/32；评分来自predicted frames。 (Table B2, p. 15; App. B.4, pp. 15-16) 表示比较pixelSplat/MVSplat/AnySplat/C3G；world-model比较限单消费GPU的iVideoGPT/GWM/Cosmos3-Edge。未验证真实机器人、大尺度场景或高分辨率长视频；published policy比较有pretraining、camera/proprioception与checkpoint差异。 render监督贡献最大；3D PE主要加快收敛，log-cov改善PSNR但并非所有指标均好。Gaussian model-free policies在6/8suite优于pixel，Object/Goal两任务落后，增加views可缩小差距。",
+    "insightZh": "把紧凑可rasterize 3D state本身作为生成动态空间，并用log-covariance与render supervision处理Gaussian参数结构；并非所有Gaussian token具物理点对应，也未建立通用可编辑语义物体世界。",
+    "evidenceZh": "fixed query indexing只是跨帧索引约定，不要求physical point correspondence。 (Sec. 3.1, Eq. 5, p. 3) 不能将同token解释成真实同一物质点或稳定语义部件。 covariance在log-Euclidean空间预测并由matrix exponential恢复SPD。 (Sec. 3.2.1, Eqs. 15-17, p. 5) 保证协方差有效性，不保证collision/contact等物理约束。 作者报告H32新视角PSNR23.02、FVD313、78.8FPS；Cosmos3-Edge经同tokenizer lift后21.03、355、6.6FPS。 (Table 2, p. 6; App. B.3, p. 15) 同轨迹400windows、128×128共同output评估，RTX5090 batch1，FPS含必要lifting。 joint policy训练降低rollout PSNR，保留render loss可缓解；policy只读取observed history。 (App. C.3-C.4, Fig. C1, p. 17) 不能把行为克隆成绩表述成通过imagined rollouts进行model-based planning。",
+    "caveatZh": "action marginalization仍存在，训练稀少的cube pushing最难。 joint training存在预测/控制gradient interference。 未来需unordered/permutation-equivariant dynamics、语义属性及imagined rollout RL。 同一Gaussian状态跨视角一致不等于真实几何、contact或动力学正确。 固定query无physical point correspondence，不能直接当稳定部件编辑接口。 约80FPS针对特定128×128模拟protocol，不能外推高分辨率开放世界。 policy以observed history行为克隆，不是model-based imagined planning；counterfactual仅图像判定而非simulator-state误差。",
+    "whyRelevantZh": "显式固定预算3D生成状态、SPD covariance参数化与可微render supervision可借鉴动态3D资产生成；须补语义部件对应与可编辑属性才能用于具体设计。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

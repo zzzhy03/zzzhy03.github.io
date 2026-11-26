@@ -1,0 +1,61 @@
+{
+  "id": "arxiv:2611.33296",
+  "slug": "cosmo-a-compact-spectral-space-of-body-motion-in-video",
+  "title": "CoSMo: A Compact Spectral Space of Body Motion in Video",
+  "authors": [
+    "Maham Tanveer",
+    "Hao Zhang"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33296"
+  },
+  "abstract": "We introduce CoSMo, a compact spectral space of body motion in video, in which each motion is a single code that can be compared and edited without training, transferred to a new subject, interpolated, composed, scaled in intensity and detail, or sampled anew. Our encoder expresses how a clip's DINOv2 features change over time in a fixed temporal basis, the discrete cosine transform (DCT), and compresses this change into 384 numbers. Because each frequency band is the same cosine pattern in every code, codes are aligned in time, ordered from coarse to fine, and can be blended or added without matching frames. What stays constant over a clip cancels, and keeping fewer frequencies leaves less of the performer and scene. The encoder is trained on real videos and on synthetic motions of several characters, and lightweight adapters let a frozen image-to-video model render any code with any subject. On unseen videos, our code ranks the same motion on other bodies higher than DisMo, a per-frame representation, while its nearest neighbors show the same performer about 40% less often with a seven times more compact code. In generation, without per-motion training, CoSMo transfers motion more faithfully than FlexiAct and a text-prompt baseline, at least as faithfully as DisMo on automatic metrics and clearly better between humanoid bodies, and its blends keep much more of both source motions than DisMo's. Users rank CoSMo first nearly twice as often as DisMo for motion transfer (59% vs. 30%), place it top-two 94% of the time, and prefer it in 76% of the interpolation comparisons.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33296v1",
+  "keywords": [
+    "motion representation",
+    "DCT",
+    "conditional LoRA"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33296v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33296v1 的 10 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "CoSMo把DINOv2的时间变化压成24×16频段的motion code，再以inverse DCT与conditional LoRA驱动冻结视频模型；同一频率基使动作能直接插值、叠加和调强度。作者报告小型人评的transfer首选59%对DisMo30%，但code不对齐动作相位、绝对速度由输出时长决定，尚不是3D骨骼或物理控制器。",
+    "motivationZh": "面向跨body的可编辑动作，encoder先减首帧、在patch上做DCT，再按频段attention pooling；合成跨character对与真实视频训练motion code，冻结encoder后训练mapping/conditional LoRA。可迁移的设计思路是把持久控制压成统一时间坐标，而非复制逐帧source外观。",
+    "methodZh": "面向跨body的可编辑动作，encoder先减首帧、在patch上做DCT，再按频段attention pooling；合成跨character对与真实视频训练motion code，冻结encoder后训练mapping/conditional LoRA。可迁移的设计思路是把持久控制压成统一时间坐标，而非复制逐帧source外观。",
+    "methodFlow": [
+      "64帧视频经冻结DINOv2取patch features，减去首帧并保留16个DCT频段。",
+      "Transformer与各频段query pooling压为24×16 code，cross-character reconstruction/InfoNCE与regularization学习外观解耦。",
+      "对unit-norm code做插值、求和、频段裁剪或强度方向编辑。",
+      "inverse DCT按输出长度扩为per-frame embedding，以conditional LoRA驱动冻结Wan/CogVideoX生成。"
+    ],
+    "experimentsZh": "1704动画各5个character共8520合成clips，另IDEA400 12037与HAA500 6944；评价253segments/59真实OOD videos、两套72clip motion grids，120与300transfer pairs及150 blends。 作者报告Table1以384维对DisMo2688维，simple R@1 74%对71%，2-step同73%，same-character22/25%对37/42%。 (Table 1, p. 6) 作者报告CogVideoX transfer首选59%对30%，interpolation偏好76%对24%；在300对总体motion提升CI跨零。 (Table 2 and Sec. 4.3, pp. 6-7) 对比DisMo、FlexiAct、text；含同CogVideoX backbone对照及Wan版。原生输出长度不同、用户研究只10例，FlexiAct未跑300对。 same-size learned compression/pooled/DCT对比、无time axis、Lnce/DINOv2/首帧差分；DCT clean retrieval不优于pooled，优点在shake与body-to-body。消融训练步数较少。",
+    "insightZh": "相对DisMo的逐帧motion embeddings，主要增量是共享频率基下的fixed-size motion code及可直接运算的时间坐标；DCT动作描述与motion/content分离均已有先例。",
+    "evidenceZh": "384维是24 channels×16 frequencies；input统一resample到64帧，code经inverse DCT驱动conditional LoRA。 (Secs. 3.1-3.2, pp. 3-5; Fig. 3, p. 4) 频率对应相对clip时间，非绝对速度或phase alignment。 作者报告120对transfer上CogVideoX motion fidelity0.421，对DisMo0.378；300对差0.009且CI跨零，body-to-body差距更明确。 (Table 2 and Sec. 4.3, pp. 6-7) 比较须区分样本集和base model；不能把小集优势外推所有body。 作者报告29人10例transfer首选59%、DisMo30%；27人10对interpolation偏好76%。 (Sec. 4.3 and Table 2, p. 7) 用户研究有限；static PDF核验关键帧，未独立播放或复现动态实验。 强camera motion仍可能泄漏，blend不自动对齐phase。 (Conclusion, p. 8) 迁移到动态3D资产控制是方法参考，未由本论文直接验证。",
+    "caveatZh": "小于一latent frame的timing无法编码，sharp timing被soften；绝对speed由输出长度决定且blend不align phase。 strong camera motion仍会泄漏，主要测试body motion，尚缺learned prior保证blends plausible。 code/生成是video-space motion control，不是显式3D joints或物理约束。 用户研究例数小，300对总体提升CI包含零；无公开本作代码URL，未复现。",
+    "whyRelevantZh": "共享频率坐标、compact editable control和跨主体motion迁移可供动态内容设计参考；尚未验证在3D资产中的直接控制。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

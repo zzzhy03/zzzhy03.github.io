@@ -1,0 +1,66 @@
+{
+  "id": "arxiv:2611.34226",
+  "slug": "liverelight-sub-second-global-illumination-editing-for-gaussian-interiors",
+  "title": "LiveRelight: Sub-Second Global Illumination Editing for Gaussian Interiors",
+  "authors": [
+    "Noah Rothenberger",
+    "Dor Verbin",
+    "Serge Belongie",
+    "Bernhard Kerbl"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34226"
+  },
+  "abstract": "Relighting reconstructed 3D scenes remains challenging due to the complex nature of light transport: slow or approximate visual feedback restricts the editor's ability to fine-tune the results to satisfaction. We present a hybrid relighting approach that enables interactive, high-fidelity updates of direct and indirect indoor illumination without per-edit optimization. Our approach permits the editor to make a wide range of relighting edits at room-scale, with near-instant feedback. Our key insight is to precompute geometric light exchange rather than illumination responses, retaining an inexpensive transport solve that accommodates changes in emission and surface reflectance. We evaluate direct illumination on reconstructed 2D Gaussians using visibility-aware sampling of one-sided emitters, while propagating diffuse interreflection through sparse radiosity on a triangle proxy. A sparse projection fitted through Gaussian alpha compositing transfers the proxy solution to the reconstruction. Our formulation further supports fast fixture transformations and emitter insertion by recomputing light source injection. Across eight relighting conditions of our synthetic test suite, our sub-second edits improve relighting fidelity over prior path-traced editing by an average of 5\\,dB PSNR, while reducing editing latency by up to three orders of magnitude. Qualitative results further demonstrate realistic, interactive relighting of real-world captures.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34226v1",
+  "keywords": [
+    "editable relighting",
+    "Gaussian splatting",
+    "radiosity",
+    "emitter re-injection",
+    "alpha compositing"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34226v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.34226v1 的 23 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "LiveRelight预计算静态房间的几何光交换，让Gaussian直接光与proxy radiosity在每次发光、反射率或灯具移动后重新求解，作者报告540×360编辑首帧约0.15–0.52秒。它提供可编辑3D外观的实用分解，但不是任意几何编辑：预计算需数十分钟与大量显存，灯具移动后的部分遮挡和灯罩间接光仍沿用旧状态。",
+    "motivationZh": "Room-scale重光照逐次path tracing太慢，而固定每灯response限制材质和灯具编辑。",
+    "methodZh": "用有单面emitter的2D Gaussians保留可见发光/锐利直接光，以triangle proxy的固定form-factor矩阵传播2–8次漫反射，再由经alpha-compositing拟合的稀疏projection把proxy光照投回splats。改变albedo需重解transport；移动fixture以临时ray-tracing scene重算first-reflection injection，保持receiver-to-receiver算子。",
+    "methodFlow": [
+      "在单光照、多视图与radiometric calibration下重建2D Gaussians、albedo及单面emitters；用fixture masks与面积指定编辑。",
+      "TSDF提取proxy mesh，预计算稀疏form-factor F，并用analytic/random radiosity probes拟合triangle-to-Gaussian projection P。",
+      "对发光或albedo改动，用8-spp Gaussian NEE算直接光，以固定F传播2–8阶间接光。",
+      "对灯具Sim(3)改动，更新Gaussian geometry与临时tracing scene中的source injection，复用固定receiver transport。",
+      "合成发光、denoised直接光和projected间接光，快速预览编辑结果。"
+    ],
+    "experimentsZh": "4个synthetic interiors共8个条件，其中新增Kitchen/Living room各450posed views，393train/57test；两真实FIPT scenes仅qualitative。主要200k splats/200k proxy，真实500k/400k，RTX4090。 作者报告Kitchen Relit1–3 PSNR35.95/36.99/36.96，首帧0.244/0.307/0.287秒；EAG-PT28.08/33.83/32.14、147.2/142.7/134.5秒。 (Table 1, p. 6) 作者报告pendant移动2m re-injection36.35dB，冻结pattern32.73dB；两者移动fixture geometry的直接光相同。 (Table S4, p. 16) 作者报告1080×720首帧0.38–0.53秒，1620×1080为0.65–0.99秒；真实场景0.36–0.52秒。 (Sec. 5.3, p. 8; Table S8, p. 21) 主数值对照EAG-PT；LuxRemix/AEGIR编辑代码未发布，其他方法规模/输入不同。加入one-sided EAG-PT对照，但未覆盖所有泛化场景。 对比移除indirect、纯radiosity、P初始/nearest、proxy budget、NEE samples和F pruning。fitted P的composite收益约0.2–0.79dB；2倍proxy收益有限，pruning存在能量/质量损失。",
+    "insightZh": "在经典two-pass/radiosity基础上把几何exchange与emission/reflectance分离，并通过可微alpha compositing拟合proxy到Gaussian的映射；单面发光和emitter re-injection拓展room-scale编辑。不是首个PRT、radiosity或Gaussian relighting。",
+    "evidenceZh": "直接光在Gaussians上算，proxy仅贡献2–8次diffuse reflection，P按cached alpha-compositing fit。 (Secs. 3.2-3.4, pp. 3-4, Eqs. 1-8; Appendix C, pp. 13-14) 固定geometry/opacity时成立；无compatible triangles的Gaussians在indirect render省略。 作者报告8个synthetic relight条件平均约5dB PSNR提升，实际首帧0.149–0.307秒，对EAG-PT约134–184秒。 (Table 1, p. 6) 540×360，RTX4090，baseline path tracing1024spp；不是包括重建/预计算的端到端速度。 换上同样单面emission后，EAG-PT与本法差距缩至0.21–3.20dB；geometry/material恢复贡献了headline差距。 (Table 2 and Sec. 5.3, p. 8) 不能把全部5dB都归因radiosity或projection。 灯具移动只重算source-to-receiver visibility，其他receiver路径及fixture自身indirect shading仍为旧位置。 (Sec. 6, p. 8; Appendix F.2, p. 15) 不是完整动态scene GI更新；不得声称所有遮挡精确。 8阶截断仅在测试Kitchen条件保留约99%indirect power；reflectance改变要重新检查contraction。 (Appendix B.2-B.3, pp. 11-12, Tables S1-S2) 界限只针对固定离散solve，非整个renderer误差，生产固定8步而非残差自适应。",
+    "caveatZh": "Lambertian、可见emitters、fixture masks/areas；隐藏光源和translucent fixtures不在范围。 receiver geometry/opacity编辑会使F失效，source reinjection不更新所有其他遮挡与moved housing的间接光。 F需9–11分钟、proxy/P26–31分钟；真实scene F可达16.4–23.4GiB，Classroom需pruning。 合成数据的authored emission area是编辑控制，真实面积估计来自重建；不应表述为无辅助自动发现物理灯具。 反射/发光fractional coverage存在double attenuation与depth-order approximation；缺失geometry无法靠P修复。 只有4个synthetic/2个qualitative real scenes，几何编辑集中scaling/translation，缺任意受光对象大改证据；数字未复现。",
+    "whyRelevantZh": "对3D场景的lighting/material/fixture编辑，把可复用几何算子与每次控制更新解耦，具体支持可编辑资产工作流；普通静态NVS不是这里的主贡献。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

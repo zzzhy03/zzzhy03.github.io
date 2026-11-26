@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2611.34288",
+  "slug": "rehearse-in-3d-render-in-2d-physically-consistent-and-editable-robot-world-models",
+  "title": "Rehearse in 3D, Render in 2D: Physically Consistent and Editable Robot World Models",
+  "authors": [
+    "Guangyu Liu",
+    "Hanzhang Wang",
+    "Huijia Zhang",
+    "Hanbei Zhan",
+    "Linjie Hu",
+    "Bin Xiao",
+    "Xuan Zhou",
+    "Dong Zhang",
+    "Hanwei Liu"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34288"
+  },
+  "abstract": "Embodied world models aim to predict future interactions that are both visually realistic and physically consistent. Yet explicit 3D motion prediction alone does not guarantee that object structure and contact relationships are preserved. Beyond motion prediction, 3D representations provide an explicit state space for imposing structural and physical constraints. Building on this insight, we introduce RehearsalWorld, an editable robot world model driven by 3D Interaction Rehearsal (3DIR). Given an initial RGB-D observation and robot actions, Interaction-Consistent Rehearsal (ICR) uses a pretrained 3D point-flow model as a motion prior. It refines the predicted trajectories through response-aware object grouping, persistent grasp memory, and contact structure refiner, preserving scene stability, object structure, and grasp attachments. Rehearsal-Aligned Video Generation (RAVG) then uses geometric projections of the rehearsal as temporal conditioning. We fine-tune a video generator on projection-video pairs to synthesize realistic interaction videos. Thanks to the decoupling of physical response from visual synthesis, RehearsalWorld also supports independent editing of material properties and camera viewpoints. Compared with PointWorld on real DROID grasping sequences, RehearsalWorld reduces gripper-relative offset by approximately 79% to 84% across deformable, articulated, and rigid objects and lowers reference motion error. For video prediction, it achieves a PSNR of 23.92 dB and an FVD of 149.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34288v1",
+  "keywords": [
+    "3D interaction rehearsal",
+    "persistent grasp memory",
+    "position-based constraints",
+    "editable world model",
+    "render-conditioned video"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34288v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.34288v1 的 19 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "RehearsalWorld先用PointWorld预测3D motion，再以固定object groups、持久grasp memory及位置投影约束抑制漂移、伸长和滑脱，最后将粗几何render接到LoRA视频生成。作者报告抓取offset显著下降；材料编辑来自可控粒子约束而非校准物性，articulated对象也没有显式joint limits，不能等同通用物理模拟器。",
+    "motivationZh": "pointwise motion和好看的video都可能产生背景漂移、grasp滑脱及非物理伸长。",
+    "methodZh": "输入初始RGB-D、camera calibration、URDF及已给定robot actions。RAOG分离responsive对象与静态背景，PGM在抓取onset存gripper-frame reference，CSR迭代投影结构/接触/近似gravity/support/friction。TGP将轨迹通过surface skinning投影，RAVA以首帧及动态render条件生成未来video；material edits重跑粒子状态，camera edits重投影相同轨迹。",
+    "methodFlow": [
+      "初始RGB-D与robot action经冻结PointWorld生成point trajectories",
+      "RAOG确定response groups、类型并锚定静态背景",
+      "PGM记录抓取onset的局部坐标和contact set",
+      "CSR依序投影结构、环境接触及近似物理约束",
+      "以skinning/TGP产生动态render条件，LoRA RAVA合成video",
+      "改变粒子约束或camera path实现材料/视角编辑"
+    ],
+    "experimentsZh": "RAOG训练15,000 DROID序列，RAVA用2,700 DROID与300 BEHAVIOR render/RGB pairs；原生3D评估1,200 held-out DROID序列（500 deformable、200 articulated、500 rigid）。视频61帧、480×832、15fps，50人评价300场景；另在120个高精度deformable序列做solver消融。 作者报告gripper-relative offset：deformable 112.5→18.2mm，articulated 49.1→10.5mm，rigid 76.1→12.1mm。 (Table 1, p. 6) 作者报告相同TGP/RAVA下，PointWorld+RAVA到完整模型PSNR 21.95→23.92dB、FVD 215→149，2D trajectory error 9.58→8.12px。 (Table 2, p. 6) 作者报告human contact/motion为4.22/4.18，visual/temporal为4.15/4.09；后两项并未显著超过全部baseline。 (Table 3, p. 8) 对比PointWorld原始/几何平滑/rigid fit以及Wan、Ctrl-World、Kinema4D、TesserAct；PointWorld+同RAVA是更直接的受控比较。视频geometry由SpatialTrackerV2前端估计，依赖该估计器。 去PGM/interaction会大幅增offset；去RAVA保留轨迹改进却显著损PSNR；材料guidance权重在贴合轨迹与限制伸长间有取舍，最强guidance并非最少变形。",
+    "insightZh": "将真实交互学到的motion prior与object-level显式约束、持久attachment和render-aligned video适配组合，直接区分几何状态修正与像素外观恢复；核心价值在可编辑中间状态，不是从像素学习完备物理。",
+    "evidenceZh": "PGM在gripper closure存坐标并于release取消目标，CSR反复恢复contact targets。 (Sec. 3.2, pp. 3-4; Supplement S2.3-S2.4, pp. 14-15) 固定grasp references避免逐帧重估漂移，但projection只近似同时满足约束。 material solver控制shape/stretch/damping/attachment，连续参数没有校准stiffness含义。 (Sec. 3.4, p. 5; Supplement S3.1, pp. 16-17) Eq. S17明确s控制solver而非真实材料常数。 作者报告原生3D抓取offset与同生成器video指标均改善。 (Tables 1-2, p. 6) native trajectories和从RGB重建的诊断是不同层面的测量。 articulated groups未指定links、joint axes及angle limits。 (Supplement S2.4, p. 14) 本方法用局部边长约束近似articulation，不能推断真正运动学正确。",
+    "caveatZh": "主要评估grasping，材料编辑主要是定性示例。 articulated状态是point约束近似，未指定joint axes和angle limits。 材料参数控制solver response，不是校准物性。 依赖初始深度、calibration、URDF、已给定actions和response grouping；固定对象membership及只见表面会限制新接触/遮挡。 几何投影和approximate support/friction不保证完整碰撞、力学或任意材料真实响应。",
+    "whyRelevantZh": "显式attachment memory和约束投影可借鉴到动态3D资产及LEGO装配生成的中间状态检查，迁移尚需独立验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.33591",
+  "slug": "vivaworld-long-horizon-video-world-model-with-compositional-3d-priors",
+  "title": "VivaWorld: Long-Horizon Video World Model With Compositional 3D Priors",
+  "authors": [
+    "Ying Jiang",
+    "Donglai Xiang",
+    "Anita Hu",
+    "Masha Shugrina"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33591"
+  },
+  "abstract": "Long-horizon video generation is key to interactive world modeling, physical intelligence, and spatial reasoning, yet maintaining geometric consistency and accurate camera control remains challenging without 3D grounding. We introduce \\textbf{VivaWorld}, a framework for generating geometry- and view-consistent long videos from an image. We first construct a compositional hybrid 3D representation that combines reconstructed point clouds, which preserve observed scene geometry and appearance, with generated textured meshes, which provide complete object geometry across $360^\\circ$ novel views. We also introduce a connected-region filter removing inconsistent floating components for robust cross-view reconstruction and propose a hybrid camera embedding that combines global and object-anchored Plücker rays to capture both scene-level camera motion and camera-object relationships, and inject it together with the visual guidance into a video generation model via a control adapter. Extensive experiments show VivaWorld achieves state-of-the-art visual quality and camera control, while supporting controllable novel-view synthesis, long-horizon scene exploration, and physical AI. Project page is available at: https://research.nvidia.com/labs/sil/projects/vivaworld/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33591v1",
+  "keywords": [
+    "hybrid 3D priors",
+    "object-anchored camera",
+    "long video generation",
+    "mesh refinement",
+    "point-cloud memory"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33591v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33591v1 的 26 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "VivaWorld以观测pointcloud保留场景、生成textured meshes补足对象360度几何，再用object-anchored Plücker rays驱动冻结Wan的control adapter。它为camera-controlled长视频和3D-video协同精化提供具体方法；作者报告1000帧832×480需166.4分钟，仍有color drift，不能当实时世界模拟或真实几何恢复保证。",
+    "motivationZh": "单图长视频缺少不可见区域几何先验，global camera embedding容易积累漂移。",
+    "methodZh": "SAM分割后以RecGen或Astra生成foreground meshes，经per-axis-scale ICP配准至Pi3观测点；background pointcloud随generated chunk frames更新，mesh-seeded voxel flood-fill清理disconnected floaters。分别render pointcloud/mesh RGB-D，加global和object-relative camera moments，经VACE式3.05B control adapter条件化冻结Wan2.1-14B。主验证为20场景约200clips的短段和长视频，另展示agent mesh与video迭代及robot sitting应用。",
+    "methodFlow": [
+      "reference image、prompt、camera trajectory → SAM对象与Pi3 pointcloud",
+      "RecGen/Astra生成textured meshes → scaled ICP配准 → mesh-seeded connected-region filter",
+      "分开render pointcloud/mesh RGB-D → global与object-anchored Plücker camera编码",
+      "冻结Wan2.1-14B + 训练control adapter → chunk视频",
+      "已生成boundary frames更新pointcloud → autoregressive后续chunks；可选generated views反馈mesh agent"
+    ],
+    "experimentsZh": "DL3DV训练adapter3.05B和camera encoder，Wan2.1-14B冻结；64A100、约10000iterations。20个DL3DV/Tanks-and-Temples场景约200clips，832×480，长程分别1000/240frames；生成视频经DA3/3DGS评估。 作者报告长视频PSNR13.92、SSIM0.376、LPIPS0.529、Cam79.51；Lyra2为12.85/0.343/0.582/65.09。 (Table 1, p. 7) 作者报告长程RotErr6.908度、归一化TransErr0.060；单A1001000帧需166.4分钟。 (Table 2, p. 7; Table 7, p. 18) 比较AnyRecon、Gen3C、Voyager、Lyra2、VerseCrafter、NeoVerse；不同chunk长度只比较共有帧。GT-reference camera为ViPE估计，generated poses由DROID-SLAM恢复。3D质量以render指标，不是GT3D surface误差。 PC/PC+Gaussian/PC+mesh及global/hybrid camera分别消融；mesh-seeded filter在五cases均值+0.1387dB conditioning gain，允许按复杂场景调参；下游robustness仅少数scene。",
+    "insightZh": "互补的reconstructed pointcloud/generated mesh guidance与object-relative camera embedding是核心；off-the-shelf mesh/pose/segmentation和大规模adapter训练是前提，不是单纯训练免费拼接。",
+    "evidenceZh": "mesh与pointcloud提供互补完整性/观测保真，并作为RGB-D及object-relative camera控制。 (Sec. 3.1-3.3, Fig. 2, pp. 4-6) meshes由外部生成器补全，不等于从单图真实恢复不可见几何。 作者报告长视频PSNR13.92/LPIPS0.529、RotErr6.908度/TransErr0.060，优于所列长程baseline。 (Tables 1-2, p. 7) TransErr按trajectory extent归一化且拟合monocular scale，不是米；Cam分数经clipping/nonlinear normalization。 作者报告单A100生成1000帧总166.4分钟、44.76GiB；optional Astra迭代不计total。 (Supp. Tables 7-8, p. 18; Runtime and Memory, p. 20) 比Gen3C/AnyRecon慢，不能描述为实时。 长视频style比较相邻chunk anchors，可能漏掉gradual global drift；作者亦明确color drift未消除。 (Sec. 5, p. 10; Supp. Camera Evaluation, pp. 18-19) 局部相似指标不是全局外观一致性的充分保证。",
+    "caveatZh": "长视频仍有color drift。 mesh-seeded filtering的voxel size/connectivity radius可能随复杂场景与重建误差调整。 生成mesh不可见部分是先验补全，非真实观测；错误mesh/pose可能影响camera锚点与细部。 主定量多为静态场景camera motion；robot应用依赖GRAIL/SONIC RL与scene collision，不证明通用物理世界模拟。 1000帧166.4分钟，optional Astra更新成本另计，不能称实时交互。 局部style、归一化camera误差和render质量不能代替全局外观、metric geometry或物理正确性。",
+    "whyRelevantZh": "生成mesh与视频guidance互补、object-relative camera控制和generated-view mesh refinement可直接借鉴主线3D资产生产；可编辑对象表示比纯像素记忆更易定位控制边界。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

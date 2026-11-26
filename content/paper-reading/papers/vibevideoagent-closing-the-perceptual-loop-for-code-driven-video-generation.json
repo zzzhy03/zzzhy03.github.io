@@ -1,0 +1,72 @@
+{
+  "id": "arxiv:2611.34237",
+  "slug": "vibevideoagent-closing-the-perceptual-loop-for-code-driven-video-generation",
+  "title": "VibeVideoAgent: Closing the Perceptual Loop for Code-Driven Video Generation",
+  "authors": [
+    "Xuanyu Zheng",
+    "Luoyuan Zhang",
+    "Yancheng Long",
+    "Haoyang Xu",
+    "Muxi Diao",
+    "Yuzhe Chen",
+    "Kaiyu Jiang",
+    "Bin Wen",
+    "Tingting Gao"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34237"
+  },
+  "abstract": "Code-driven video generation asks a coding agent to write and run rendering programs. This gives exact control over typography, data visualizations, synchronized audio, and multi-shot scenes, and it leaves an editable project behind. A program that exits cleanly can still render overlapping labels, a camera aimed away from its subject, broken object interactions, or narration that drifts out of sync, and none of these raise a runtime error. Feeding rendered frames and audio back into the coding session bloats its long-horizon context, while critiquing only the finished full-resolution render turns early design mistakes into costly rewrites. We introduce VibeVideoAgent, a training-free framework that lets coding agents inspect their drafts throughout production. Multimodal perception runs in short-lived contexts kept apart from the coder and returns compact, grounded Findings. Seven primitives operate on a unified multi-clock representation of assets and drafts: they explore media from coarse to fine, verify quoted requirements with evidence from every required modality, compare a draft with a reference or an earlier revision on separate clocks, and measure stream signals locally. A lightweight staged protocol has the agent test its riskiest decision on a minimal preview first. On all 239 VibeVideoBench tasks, with matched agent runtimes and a fixed perception model, VibeVideoAgent improves holistic audiovisual quality (L3) for Claude Opus 5.5 (4.03 -> 4.43, while L2 rubric compliance rises from 98.87% to 99.35%), GPT-6 Astra (4.03 -> 4.27), and Claude Sonnet 5.5 (3.97 -> 4.10), with the largest gains in audio-visual synchronization (up to +0.56). Controlled ablations show that each component contributes, and trajectory audits show that the granularity of code edits governs the trade-off between rubric adherence and perceptual quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34237v1",
+  "keywords": [
+    "code-driven video",
+    "perceptual feedback",
+    "multi-clock verification",
+    "editable artifacts",
+    "design agents"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34237v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.34237v1 的 18 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "VibeVideoAgent用短上下文感知worker观察代码视频草稿，只把带时间、模态、box及hash的Findings送回coder，并以最小preview和跨版本双时钟比较驱动局部修复。作者在239项任务上报告三个coding模型的视听质量均改善，但较弱模型的rubric遵从反而下降；证据格式校验不能保证语义无误。",
+    "motivationZh": "代码执行成功仍会产生layout、时序及视听同步缺陷，原始媒体反馈使coder context膨胀。",
+    "methodZh": "统一source/excerpt/film三时钟Media对象寻址stills、片段和完整cut，七个primitive实现粗到细观察、带来源需求核验、双时钟修复比较和本地信号检查。controller约束时间、modality、box与版本hash；协议先验证最高风险设计，再组装、局部patch与最终probe。",
+    "methodFlow": [
+      "逐字引用brief需求并规划beats，选择风险最高的最小preview",
+      "渲染草稿并冻结三时钟媒体及source hashes",
+      "短上下文VLM观察与本地probe生成Findings",
+      "按模态/边界规则将无效证据降为uncertain",
+      "局部patch后重渲染，双时钟比较原缺陷并核验最终文件"
+    ],
+    "experimentsZh": "VibeVideoBench全部239任务、12类产物上配对三个原生coding agents；perception固定Gemini 3.8 Flash，Flash与Argon judges等权评分；36任务进行treatment-blind分层消融。 作者报告Opus L3 4.03→4.43、L2 98.87%→99.35%；Astra L3 4.03→4.27；Sonnet L3 3.97→4.10而L2 96.36%→94.61%。 (Table 1, p. 6) 作者报告36任务完整系统L3为4.40，去requirement check/compare/probe为4.29/4.30/4.33，Tools-Only为4.32。 (Table 3, p. 8) 作者在8任务诊断中报告perception输入与返回Findings之比平均6.5倍，属于单pass payload压缩。 (Appendix G, Table 6, p. 16) 各coder与其原生CLI在相同sandbox配对；Argon提供第二judge，但主实验仍依赖自动评分和commercial models。 去核验、比较、probe或计划/preview gate均降低局部指标；36项根据baseline和public metadata选取，不是全任务随机消融。",
+    "insightZh": "将可变视频草稿的跨时钟寻址、modality-gated核验与hash-bound修复审计统一为跨引擎接口；不是新视频生成器，也不是首次将感知移出planner context。",
+    "evidenceZh": "三时钟、crop-before-scale和SHA快照统一preview与full cut。 (Sec. 3.2, Fig. 2, pp. 4-5) 公式(4)-(5)定义时间映射、采样与不可变excerpt。 所需模态必须都有界内证据；same-hash修复不能报resolved。 (Sec. 3.3, Eq. (6), pp. 5-6; Appendix C, pp. 14-15) 这些是证据格式与provenance约束，不是视觉正确性证明。 作者报告三个模型L3均改善，但Sonnet L2下降。 (Table 1, p. 6; Sec. 4.2, pp. 7-8) Sonnet L2从96.36降至94.61；quality增益不等于rubric遵从。 有界采样与hash配对无法保证未观测片段无缺陷。 (Sec. 5, pp. 8-9) 作者明确区分可播放、观察到症状变化与语义/因果保证。",
+    "caveatZh": "采样上限16fps及有限窗口可漏掉sub-frame glitch与未检查段落。 可播放和hash-bound症状变化不构成语义完备性或程序因果证明。 外部感知可误读细文字/深度，额外render有延迟，API更新影响行为。 较弱coder整文件重写会引入新的rubric遗漏。 返回payload压缩不能直接外推总调用费用或walltime下降。",
+    "whyRelevantZh": "直接适用于SVG、Blender及视频设计agent的观察、局部修复与证据绑定。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

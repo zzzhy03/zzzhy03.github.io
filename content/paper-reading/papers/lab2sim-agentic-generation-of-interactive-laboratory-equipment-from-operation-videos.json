@@ -1,0 +1,73 @@
+{
+  "id": "arxiv:2611.33705",
+  "slug": "lab2sim-agentic-generation-of-interactive-laboratory-equipment-from-operation-videos",
+  "title": "Lab2Sim: Agentic Generation of Interactive Laboratory Equipment from Operation Videos",
+  "authors": [
+    "Yuxin Lin",
+    "Pei Ren",
+    "Yirong Yang",
+    "Xuxin Lv",
+    "Xingchuang Liao",
+    "Diyuan Hou",
+    "Jiale He",
+    "Zhengping Che",
+    "Yongfei Zhang",
+    "Wenjun Wu",
+    "Zhaoxin Fan"
+  ],
+  "primaryTopicId": "visual-design-agents",
+  "topicIds": [
+    "visual-design-agents",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.RO"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33705"
+  },
+  "abstract": "Generating laboratory assets that faithfully reproduce the appearance, structure, and joint motions of real equipment remains challenging. Existing asset generation methods struggle to directly generate simulation assets for all equipment observed in operation videos and to faithfully reproduce the appearance, joint motions, and internal cavities of the real equipment. To address the challenge, we present Lab2Sim, an agentic framework that generates editable, simulation-ready laboratory equipment assets from egocentric or multi-view operation videos. Lab2Sim comprises four specialized agents. The Evidence Agent combines video observations with laboratory knowledge to specify equipment parts, materials, and functional requirements, which guide the Asset Agent in constructing editable Blender assets. The independent Verifier checks the generated geometry and appearance against the evidence and requirements, providing targeted feedback for revision. The Simulation Integration Agent converts verified Blender assets into simulation instances with physical properties and articulated mechanisms, using execution feedback to refine their behavior. Experiments on human and robot laboratory scenes show that Lab2Sim achieves higher visual fidelity and stronger interaction capability than coding-agent and real-to-sim baselines, including a Codex baseline using the same underlying model. We further demonstrate valve-controlled drainage and use the generated asset library to reproduce laboratory scenes and operations in RoboTwin, supporting reusable simulation environments for robotic laboratory tasks.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33705v1",
+  "keywords": [
+    "real-to-sim",
+    "editable Blender assets",
+    "evidence contract",
+    "articulation"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33705v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33705v1 的 22 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "Lab2Sim把视频编成带出处的设备、材料和功能要求，经独立几何/render检查、有限repair和原生simulation执行生成可编辑Blender资产。值得精读“看起来像”与“能转动、开闭、排液”的分层验证；高分仅来自两个实验室场景，且机构依赖领域规则与工程preset。",
+    "motivationZh": "外形相似的资产仍可能缺内腔、流路或可用关节。",
+    "methodZh": "Evidence Agent冻结registry与观察/推断依据；Asset Agent生成具名parts、cavities和joints的build plan及sealed source；Verifier读回几何/材质并对照视频；Simulation Integration由密度/封闭mesh计算mass/inertia并配置colliders、joint presets与有限执行适配。两个场景包含29设备、83parts、48actions，评估区分完整性、视觉、关节和MPM排液。",
+    "methodFlow": [
+      "操作视频/领域知识 → 带camera、timestamp、region出处的registry与要求",
+      "具名parts/materials/cavities/joints plan → Blender代码和sealed source",
+      "独立几何读回与render核验 → Pass/Fail/Unresolved及局部repair",
+      "mass/inertia、colliders、joint presets → 有限simulation适配与原生执行",
+      "通过import检查 → 保留source verification状态的可复用资产"
+    ],
+    "experimentsZh": "ego场景57段共228秒、18设备；robot场景三相机130秒、11设备。每资产最多5次source repair和5次adaptation；Blender5.2/SAPIEN/RoboTwin，单RTX4090D。 作者报告C=86.9/98.3，相同GPT-6-Astra baseline为66.4/76.8；visual fidelity为78.1/78.9。 (Table 1, p. 6) 作者报告ego场景28完整加6部分完成动作，折合31/41 credits；robot为7/7完整完成。 (Supp. D, p. 16) 比较同videos/Blender MCP的Astra/Sol coding agents、Real2Gym及SimFoundry；不同原生simulator及非推荐view coverage影响解释，没有广域多seed或实体量测。 视频、feedback、adaptation和joint presets分别消融；Scene2移除adaptation无损失，收益依赖机构。",
+    "insightZh": "新增价值在设备特定evidence contract、源资产独立核验与simulation integration的分层闭环，尤其将内腔/流路与关节可操作性分成不同验收目标；不是新3D foundation model。",
+    "evidenceZh": "预算耗尽后允许sealed candidate进行diagnostic import，library保留source验证结果。 (Sec. 3.2, Eq. 3, p. 5; Supp. A.1, Algorithm 1, p. 12) 不能将全部library资产解释为所有source检查均通过。 作者报告两场景parts/articulation为86.9/98.3，同模型Codex为66.4/76.8。 (Table 1, p. 6) C是part presence与action completion各50分，不是物理参数精度。 作者报告移除feedback、adaptation或joint presets均使Scene1 drainage从100变为0。 (Tables 3-4, p. 7; Supp. D, p. 16) 仅一个funnel，支持该案例的闭环作用。 领域catalog/presets及同系列VLM judge限制一般化与物理真实性解释。 (Supp. A.2/A.6, pp. 13-14; Supp. B/C, pp. 15-16) 物理参数部分是工程默认值，视觉与action credit由GPT-6-Astra评判。",
+    "caveatZh": "两个场景、一个排液实例，外推任意设备证据不足。 catalog与engineering defaults不是由视频实测的物理参数。 生成与视觉/action判断同系列模型，缺独立human及多次运行统计。 diagnostic import需保留source未通过/Unresolved状态。",
+    "whyRelevantZh": "将视频证据转成具名part/joint程序并用原生执行约束repair，适合借鉴LEGO/装配与可制造资产的证据契约。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

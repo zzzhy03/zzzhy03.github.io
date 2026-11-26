@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.34067",
+  "slug": "when-to-respond-where-to-ground-streaming-3d-affordance-grounding",
+  "title": "When to Respond, Where to Ground: Streaming 3D Affordance Grounding",
+  "authors": [
+    "Wenting Luan",
+    "Weilong Yan",
+    "Siqi Lu",
+    "Ming Li",
+    "Beibei Lin",
+    "Yongbin Zheng",
+    "Robby T. Tan"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "topicIds": [
+    "3d-segmentation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34067"
+  },
+  "abstract": "Given a continuous RGB-D stream and a language request, streaming 3D affordance grounding requires an agent to decide when to respond and where to locate the requested functional part using only observations available so far. Existing 3D affordance grounding methods typically assume complete scene observations, while streaming vision-language models lack fine-grained 3D functional grounding. Our goal is to jointly determine response timing and functional-part localization during continuous scene observation. We propose StreamAff, an evidence-guided response strategy that makes both decisions from the grounding model's own visual evidence. The model scores the visual patches of the frames it reads: their combined support, weighed against a wait option, decides when to respond, and the highest-scoring patch selects the frame to ground in. A conditional look-back policy lets the model answer from an earlier observation at the moment of the request or wait for new evidence, and zoom-and-refine grounding segments the part named in the answer on the 3D points of the selected frame. We further introduce StreamFun3D, a benchmark derived from real-world 3D scenes that evaluates response timing and grounding across four evidence settings: Current, History, Future, and Unobserved, together with StreamIoU, a metric that credits a mask only when the response is timely and grounded in a valid source frame. We adapt offline 3D affordance grounding methods and build external-decider baselines that pair vision-language models with our mask decoder. StreamAff achieves 30.14% StreamIoU on 15-second streams, a 40.6% relative improvement over the strongest of these baselines.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34067v1",
+  "keywords": [
+    "3D affordance grounding",
+    "streaming segmentation",
+    "WAIT supervision",
+    "functional part",
+    "source frame"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34067v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.34067v1 的 19 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "StreamAff用patch-plus-WAIT head同时判断“证据是否足够”和“在哪帧分割”，再zoom/refine局部3D mask。作者报告15秒StreamIoU 30.14%，共享decoder的4B decider为21.43%；方法值得精读，但mask只覆盖单source frame，look-back和长历史仍会误触发。",
+    "motivationZh": "连续RGB-D指令可能依赖过去或尚未出现的functional part，离线分割无法决定何时回应。",
+    "methodZh": "连续RGB-D指令可能依赖过去或尚未出现的functional part，离线分割无法决定何时回应。冻结visual/3D encoders存储3D-aware tokens；patch与WAIT联合softmax决定响应并以最大patch选source，request时current-first/conditional look-back，随后读新帧；part phrase驱动crop zoom与26-neighbour voxel refinement。在SceneFun3D/ScanNet++派生的1fps 15/30秒流上，作者报告StreamIoU 30.14/28.46，Unobserved correct-wait 76.5/72.0%；未独立复现。",
+    "methodFlow": [
+      "RGB-D → visual/3D encoders → 存储3D-aware patch tokens",
+      "patch evidence与WAIT联合归一化，判断respond或等待",
+      "current-first/conditional look-back，最大patch选择source frame",
+      "part phrase → region zoom → voxel decoder/refinement → 该帧3D part mask"
+    ],
+    "experimentsZh": "SceneFun3D 15/30秒各650 requests（450 answerable、200 Unobserved）；ScanNet++294 requests；1fps、scene-disjoint；Ground3D-LMM/Qwen3-VL-4B上训练25M LoRA/任务参数。 作者报告15/30秒StreamIoU 30.14/28.46，15秒mIoU为37.25。 (Table 2, p. 7) 作者报告75秒prefix stress中，42个有效Future请求降6.66点StreamIoU，27个Unobserved请求correct-wait降14.8点。 (Supplement D.7, p. 19) Qwen3-VL-4B/8B仅做timing/source并共享本方法mask decoder；离线baselines看完整stream且训练不同，不能当完全对齐训练对比。 同数据/seed/5040 updates重训WAIT与zoom/refine四变体；另测无look-back、全历史读、conditional read与mask-confidence触发。look-back恢复History，也增加Future早答。",
+    "insightZh": "把timing、source与fine-grained functional-part mask放到一致证据契约中，WAIT监督与zoom/refine分别改进响应和mask。",
+    "evidenceZh": "响应与source由同一grounding patch证据决定。 (Secs. 4.1–4.3, Fig. 3, pp. 5–6) WAIT与patch同一softmax；生成part phrase后只分割选定帧。 作者报告15秒StreamIoU 30.14%，4B外部decider为21.43%。 (Table 2, p. 7) 外部decider共享answer/mask decoder，隔离timing/source差异。 WAIT与zoom/refine分别改善timing和mask。 (Table 4, p. 8; Supplement Sec. B, p. 15) full相对baseline提高15.63点；单删Zoom或Refine均降分。 不做跨帧mask fusion，长流及跨时reference存在明确边界。 (Supplement Sec. B, pp. 14–15; D.7, p. 19) 追加60帧stress后Future和correct-wait下降，不能泛化成多分钟稳健系统。",
+    "caveatZh": "post-request逐新帧读取，不能组合请求前reference object与之后的target part。 主要训练评估仅15/30秒，多分钟需更长训练或bounded look-back。 StreamIoU依赖visibility/size/geometry的annotation阈值，不能等同实体交互成功率。 高mask confidence不保证部件已出现；小部件和相似distractor仍会误触发。",
+    "whyRelevantZh": "直接推进语言指定functional part的3D segmentation、等待与证据充足性，对增量部件观察和grounding可借鉴。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

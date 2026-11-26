@@ -1,0 +1,68 @@
+{
+  "id": "arxiv:2611.33617",
+  "slug": "controllable-cad-generation-and-interactive-editing-of-fluid-rotors",
+  "title": "Controllable CAD Generation and Interactive Editing of Fluid Rotors",
+  "authors": [
+    "Shen Chen",
+    "Lei Li",
+    "Jiajun Sun",
+    "Zitian Wang",
+    "Huaping Zhang",
+    "Peng Wu"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.AI"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33617"
+  },
+  "abstract": "Computer-aided design (CAD) provides the geometric foundation for rotors in fluid rotating machinery. However, creating models for different rotors requires different modeling processes, making it difficult to control geometry through design intent and reuse existing models. We introduce VaneCraft, an agent-driven framework for rotor generation, inverse recovery, and editing through a unified analytical representation. The agent interprets design requests and invokes geometric modeling operations. The representation defines geometric controls through meridional geometry and independent boundary angle laws. An anisotropic partial differential equation (PDE) maps these controls to the blade surfaces. Geometric parameter correction (GPC) uses a joint geometric encoder and a parameter decoder to refine controls initialized from rotor category and dimensions. Inverse recovery maps existing CAD to the same geometric controls for reconstruction and continued editing. Experiments demonstrate that VaneCraft supports anisotropy control and parameter editing and outperforms representative baselines in rotor CAD generation tasks. Project page is available on \\href{https://github.com/shenchen333/vanecraft}{GitHub}.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33617v1",
+  "keywords": [
+    "parametric CAD",
+    "anisotropic PDE",
+    "inverse recovery",
+    "state inheritance",
+    "rotor generation"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33617v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33617v1 的 16 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "VaneCraft把rotor CAD压到有物理设计含义的meridional profiles、独立boundary angle laws与anisotropic PDE；生成、逆向恢复和连续编辑共用同一state，agent只调用几何算子并读回有效性。值得借鉴显式参数状态如何约束CAD编辑；论文验证的是特定rotor族的几何与少量CFD，不能当通用CAD生成或可制造保证。",
+    "motivationZh": "不同rotor建模流程难复用，mesh/B-rep本身不暴露angle/thickness等设计controls。",
+    "methodZh": "在Coons meridional域上，以hub/shroud角度边界求解anisotropic Laplace场，生成blade两侧并封闭为B-rep solids；GPC用joint mesh/curve encoder预测参数offset，改善初始模板。STEP/STL inverse recovery拟合同一参数并支持局部更新。ReAct agent通过sizing、construction、inspection与state merge控制生成/恢复/编辑，未请求参数被保留。",
+    "methodFlow": [
+      "设计要求/已有STEP或STL → rotor category与具名geometric state",
+      "meridional Bezier/Coons map与独立boundary angle laws → anisotropic PDE角场",
+      "可选GPC联合mesh/curve编码 → 修正controls并重建blade sides",
+      "B-spline侧面、edge closure、support/splitter/volute算子 → CAD solids及validity检查",
+      "agent读回工具结果 → partial state update、版本保存与继续编辑"
+    ],
+    "experimentsZh": "GPC以SHIFT-Pump、ParaturboCAD及NASA blade geometry训练，70/15/15 split；200 design cases、五configuration各40用于agent generation/recovery/edit checks。unit-cube/ICP几何比较；OpenFOAM v2606 steady MRF CFD。 作者报告主比较IoU0.1945、CD0.0093、HD0.2437；GPC消融从IoU0.20101至0.21332，二者为不同表格protocol不混用。 (Table 1(a,b), p. 6) 作者报告Qwen3.8-max参数支持使task accuracy0.316→0.974；GPT-6.1-sol/Claude Opus5.5在支持前后均1.000。 (Table 3, p. 6; Table 7, p. 15) 比较ArtiCraft、Text-to-CAD、Text2CAD、CADDesigner；domain-specialized算子对通用baseline有先验优势。generation timing4.445-9.966秒是CAD构建，不是包含LLM API的完整交互时间。 GPC与surface loss贡献分离，主要收益来自meridional correction；parameter support提高弱模型但强模型pass已饱和，不能将所有提升归因agent reasoning。",
+    "insightZh": "价值在rotor特定的语义参数化和PDE内场控制，将forward/inverse/edit统一；GPC是几何校正而非通用生成大模型，工程sizing/presets是能力的重要组成。",
+    "evidenceZh": "anisotropy调整内部角场而保持边界，正系数Jacobi stencil保留边界值范围。 (Sec. 3.1, Eqs. 3-7, pp. 3-4; Supp. S2, pp. 12-13) 该数学性质只保证角场边界与离散解，不等于最终solid有效或制造性能。 agent编辑以partial Merge继承state，并返回CAD paths、parts和validity/failure诊断。 (Sec. 3.5, Eqs. 14-15, p. 5) state inheritance是可控编辑核心，native CAD失败保留请求几何而非静默改写。 作者报告主几何比较IoU0.1945、CD0.0093、HD0.2437，优于所列baseline。 (Table 1(a), p. 6) unit-cube normalize和ICP后按rotor type等权；不是严格满足原始尺寸/工况的通用指标。 作者报告五closed hydraulic cases的CFD head absolute error0.05-2.55m，hydraulic efficiency74.82%-81.23%。 (Sec. 4.7, Table 5, p. 8) steady MRF/k-omega SST模拟，未实物制造测试，也未展示grid-convergence验证。",
+    "caveatZh": "固定rotor族和算子支持，未验证任意CAD topology、自由机械设计或加工可行性。 CFD为少量稳态案例，无实体试验与明确mesh convergence，不能写成已证实性能或制造保证。 主几何表与GPC消融数值protocol不同；native CAD秒数与LLM端到端时间应区分。 没有独立大规模跨设计分布泛化或制造公差测试。",
+    "whyRelevantZh": "显式geometric state、按请求覆盖参数与边界保持型PDE提供可解释3D CAD生成/编辑机制，对主线结构化资产与agent工具接口有借鉴价值。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

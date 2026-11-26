@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.33805",
+  "slug": "spiderskel-sub-pixel-multi-tangent-2d-skeletonization-from-inscribed-disc-geometry",
+  "title": "SpiderSkel: Sub-Pixel Multi-Tangent 2D Skeletonization from Inscribed-Disc Geometry",
+  "authors": [
+    "Zhexian Zhou",
+    "Lian Ren",
+    "Xiao Feng",
+    "Sebastian Scherer"
+  ],
+  "primaryTopicId": "2d-design",
+  "topicIds": [
+    "2d-design"
+  ],
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33805"
+  },
+  "abstract": "Skeletonization reduces a binary shape to a compact medial representation, but pixel-grid discretization perturbs the boundary-contact geometry underlying the medial axis, creating tension among connectivity, reconstruction fidelity, and skeleton compactness. SpiderSkel is a family of training-free two-dimensional skeletonization methods built on multi-tangent inscribed-disc geometry. A tie-aware exact Euclidean distance transform retains tied nearest boundary sites rather than collapsing them to a single label; medial candidates are localised to sub-pixel positions from the inscribed disc's tangent contacts, filtered by the angular span of those contacts, and completed by connectivity-aware refinement. Across nineteen public benchmarks comprising 11,323 images of shapes, retinal vessels, cracks and roads, and document images, a single operating point fixed across datasets yields skeletons that, on every image, have exact skeleton topology under the component/hole certificate, remain fully connected, and have exact per-object reconstruction topology. The three SpiderSkel variants are the only evaluated methods to satisfy all three properties across every category; within each category, every variant is Pareto-optimal with respect to all twenty-two baselines in strict sub-pixel reconstruction Dice versus reduction rate. Incremental engines for all three variants reproduce the skeleton of a complete recomputation exactly across 23,040 verified edit steps, with median update latencies of 15.4-18.1 ms per foreground edit and 4.3-4.4 ms per canvas edit, and speedups reaching 33.0-fold on canvas edits.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33805v1",
+  "keywords": [
+    "2D skeletonization",
+    "subpixel medial axis",
+    "tie-aware EDT",
+    "connectivity",
+    "incremental editing"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33805v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33805v1 的 19 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "SpiderSkel以tie-aware exact EDT、多切点subpixel插值与connectivity-aware refinement提取可重建2D skeleton，并维护增量编辑。作者报告19数据集无证书失败；可作显式2D path前处理参考，但阈值在evaluation corpus调优，retuned HJS差距很小，证书也不等于完整homotopy证明，建议略读后等公开实现。",
+    "motivationZh": "像素离散化扰乱medial axis切点，在紧凑skeleton、重建保真和拓扑连接之间产生冲突。",
+    "methodZh": "像素离散化扰乱medial axis切点，在紧凑skeleton、重建保真和拓扑连接之间产生冲突。保留exact EDT的ties并以有界代表集进行几何自适应邻域插值，在nearest participating shell读tangent-angle span，结合support sampling与离散连接/清理/细化。N8、DualC、Scaffold采用不同tail，增量引擎重用未触及对象并必要时重算。作者在19数据集11323图及31209 objects上报告证书均通过，N8 overall SkelReconQS91.09；23040记录edit steps增量与重算完全相同。阈值与composite均属于论文明确的evaluation协议，未独立复现。",
+    "methodFlow": [
+      "Binary shape → exact EDT与完整ties/有界代表sites",
+      "geometry-adaptive neighbour pairs → subpixel nearest-shell tangent candidates",
+      "angular-span与support sampling过滤",
+      "connect-aware offset/cleaning/thinning，或Scaffold anchored erosion",
+      "局部edit重用持久candidate field，必要时per-object complete recompute"
+    ],
+    "experimentsZh": "19公共binary-mask数据集（12 shape、3 retinal、3 crack/road、1 pooled documents），11323图；22 baselines；全图主协议、componentwise消融/robustness；阈值81-cell sweep在evaluation corpus选定。 作者报告N8/DualC overall SkelReconQS91.09%，medial-axis86.62%；所有11323图证书通过。 (Table II, p. 7) 作者报告foreground edit中位15.4–18.1ms、canvas4.3–4.4ms，23040验证步零差异；速度只代表该硬件/trace分布。 (Table V, p. 11; Sec. IV-D, pp. 10–11) 覆盖distance、Voronoi、thinning、flux与两种learned模型；主表使用默认实现，HJS retune后差距显著缩小；learned另在12 shape benchmark有held-out重训，不能泛称所有learned skeletonizers落后。 几何邻域与support sampling承载主要score；span/connection guards更多承载证书；单标签ties损失≤0.08pp，cap2–20 aggregate变化≤0.01pp。移除omission term会让HJS居首，metric设计需同时读。",
+    "insightZh": "exact multi-site feature transform和closest-point skeleton是已有工作；贡献在后续multi-tangent interpolation、span/support与连接修复集成及增量维护。ties单标签消融的aggregate损失很小，不能将全部收益归给tie-aware EDT。",
+    "evidenceZh": "新意主要在exact EDT之后的多切点插值与连接策略。 (Table I, p. 3; Sec. III/Fig. 2, pp. 3–6) 论文明确exact feature-transform先验；N8/DualC后处理是heuristics。 作者报告11323图所有拓扑/重建证书通过，overall score91.09%。 (Table II, p. 7; Sec. IV-B1, p. 8) 是component/hole-count证书的经验记录，不是homotopy theorem。 阈值在evaluation corpus选取，HJS retune后接近。 (Sec. IV-A5, p. 8; Supplement B.2/D.2, PDF pp. 15–17) 同语料选阈值后HJS约0.909 vs N8 0.911；不宜把默认baseline大差距当全面方法优势。 作者报告23040记录edit steps与complete recompute完全相同。 (Sec. IV-D/Table V, pp. 10–11; Supplement C, PDF p. 16) canvas edits多数不触物体，21–33×主要由retention；worst-case仍可接近对象重算。",
+    "caveatZh": "N8/DualC connection/cleaning是确定性heuristics，完整digital-homotopy证明仍开放。 二维范围；增量精确性只在记录streams验证，local-influence和全局exactness定理未给出。 近分辨率形状可能较密，thin-road terminal stub仍可能遗漏。 evaluation corpus调参及自定义omission-sensitive composite限制独立泛化解释。 binary medial skeleton不是语义stroke decomposition，未验证embroidery stitch、矢量编辑语义或3D。",
+    "whyRelevantZh": "显式subpixel skeleton和可重建拓扑可作为structured2D path extraction前处理；向embroidery/3D的迁移未经验证。",
+    "relevance": "medium",
+    "readingAction": "skim",
+    "evidenceMaturity": "mixed"
+  }
+}

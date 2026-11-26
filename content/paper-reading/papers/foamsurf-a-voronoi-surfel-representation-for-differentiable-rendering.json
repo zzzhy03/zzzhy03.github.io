@@ -1,0 +1,70 @@
+{
+  "id": "arxiv:2611.33462",
+  "slug": "foamsurf-a-voronoi-surfel-representation-for-differentiable-rendering",
+  "title": "FoamSurf: A Voronoi-Surfel Representation for Differentiable Rendering",
+  "authors": [
+    "Grzegorz Wilczyński",
+    "Julia Farganus",
+    "Krzysztof Byrski",
+    "Rafał Tobiasz",
+    "Mikołaj Zieliński",
+    "Dominik Belter",
+    "Przemysław Spurek"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction",
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33462"
+  },
+  "abstract": "Scenes inside a scattering medium contain solid surfaces, such as the seabed or rocks, and a semi-transparent medium, such as water, fog, or smoke. Recent Gaussian-based methods produce realistic images of scenes in scattering media, but traces of the medium can remain visible in surface-only renders. Neural fields separate surfaces and medium more accurately, but they are slow to train and difficult to edit. Both approaches evaluate the medium only along camera rays, so its effects along reflected and refracted rays are not modeled. These limitations prevent reliable surface recovery, independent editing of surfaces and the medium, and consistent rendering of inserted objects. We present FoamSurf, a hybrid representation that models surfaces with planar Gaussian surfels and the medium with space-filling Voronoi cells. A single differentiable ray tracer composites both along arbitrary rays, while training priors keep them separate without segmentation masks. Across real underwater scenes, synthetic scenes, and dense fog, FoamSurf achieves image quality on par with the state of the art and the most accurate surface-medium separation among the compared methods. The recovered components can be removed, edited, or stylized independently, and the same reconstruction supports inserted mesh objects with attenuation and scattering along both direct and reflected or refracted rays. Together, these capabilities enable scene restoration, editing, and composition within a single reconstructed model. Project page: https://grzegorzwilczynski.com/foamsurf/",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33462v1",
+  "keywords": [
+    "surface-medium separation",
+    "Voronoi cells",
+    "Gaussian surfels",
+    "ray tracing",
+    "editable scene composition"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33462v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33462v1 的 33 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "FoamSurf把surface放进planar Gaussian surfels、water/fog放进空间Voronoi cells，用同一ray tracer分段合成并以separation priors阻止相互“代偿”。具体价值是独立编辑、mesh插入及secondary rays，而非单纯去雾；作者报告分离分数0.901、约120FPS。恢复的是single-scattering外观系数，插入物体照明/灯光含近似，不能写成恢复真实光学或通用物理精确渲染。",
+    "motivationZh": "最终image拟合良好仍可能将water残留在surface，阻碍独立编辑与新物体插入。",
+    "methodZh": "从posed photographs联合优化surfels及固定数量的空间cells；tracer交错处理surfel hits和Voronoi边界，分别维护direct attenuation/backscatter transmittance并解析积分piecewise-constant medium。opacity coverage/clearing、chroma、overlap、smoothness和camera-water priors促进分离，PPISP及directional gain处理照片变化。训练后可变形surface、编辑cells、插入mesh与trace反射/折射；插入阶段forward-only，灯光/阴影和外部照明有明确近似。",
+    "methodFlow": [
+      "posed photos与SfM points → surfels及空间Voronoi medium初始化",
+      "交错surfel hit/cell boundary traversal → direct/backscatter独立transmittance与解析segment合成",
+      "photometric、multi-view及separation priors → 联合更新surfels/cells与camera model",
+      "surface或medium独立编辑 → 同一tracer重新render，无需重建",
+      "mesh插入/反射折射 → 从ray origin所在cell起追踪；灯光与shadow采用附录近似"
+    ],
+    "experimentsZh": "四SeaThru-NeRF真实场景、Lego/Ficus各200train/50test800×800带三clouds、Foggy Garden；多seed末iteration报告。真实场景5000cells、20000iterations，RTX4090测性能，train64/eval32 retained hits。 作者报告PSNR30.75±0.01、separation0.901±0.001、120FPS、训练28.7分钟；WaterSplatting+PPISP为30.71、0.616、164FPS。 (Table 1, p. 4) 作者报告Lego object/cloud PSNR34.77/38.04；Ficus32.89/45.12，分离明显优于所列baselines。 (Table 2, p. 6) 作者报告sphere插入ROI PSNR Lego33.39/Ficus30.22；hard-fog恢复16.81dB，但hard parameters拟合自已发表figure而非原文所列值。 (Tables 3-4, pp. 6-7; Supp. K/O, pp. 17-18,24-26) 比较SeaThru-NeRF两实现、Zip-NeRF、3DGS、RadFoam、SeaSplat、WaterSplatting含同PPISP、Plenodium；OceanSplat仅作者原报告。sphere baseline insertion为本文forward-kernel适配，非baseline原功能。无真实optical properties GT或复杂照明量化。 去medium导致最大PSNR损失；homogeneous water和无separation priors增加open-water surfel残留。camera model贡献也出现在baseline；逐prior消融揭示final-image与component指标可能相互掩盖，multi-view terms提升PSNR但降低分离score。",
+    "insightZh": "新增点是可独立修改的surface/medium显式表示与任意ray空间查询结合，并以分离priors防止只拟合最终照片却错误分配成分。exact只针对piecewise-constant model的保留segment/hits积分，不等于完整物理光传输。",
+    "evidenceZh": "统一tracer分别累计direct与backscatter，并以surfel opacity同时遮挡二者；cell segment为解析积分。 (Sec. 3.1-3.2, Eq. 2, pp. 3-4; Supp. B, pp. 11-12) 有限hit buffer、proxy support与early termination限定exactness边界。 作者报告四real underwater scenes均值PSNR30.75、LPIPS0.202、separation0.901、120FPS。 (Table 1, p. 4) LPIPS弱于最强baseline；separation是surface-only opacity对SAM评估mask的balanced classifier分数。 作者报告synthetic inserted sphere ROI PSNR为Lego33.39/Ficus30.22，比较测试隔离occlusion、attenuation和veiling。 (Table 3, p. 6; Supp. O, pp. 24-26) sphere固定发光只被camera rays看到，不投shadow、不照亮scene；不是定量验证复杂插入照明。 水系数仅重现appearance；插入stage forward-only并采用illumination、shadow及lamp近似。 (Limitations, p. 9; Supp. C, pp. 12-13) secondary rays复用camera方向SH色，lamp用平均medium及24sample numerical integration，不属Eq2 exact transport。 分离score可能掩盖seabed与water opacity同时增加；照片相似不代表component正确。 (Supp. T, Table S7, pp. 32-33) 逐prior消融解释PSNR几乎不变但分解差异；主线可编辑资产须检查component。",
+    "caveatZh": "恢复water appearance而非真实optical properties；是wideband single-scattering coefficients，每cell常数。 未观测背面没有surfels，编辑暴露后会缺失。 exact segment积分不涵盖所有插入灯光/阴影：forward-only stage用平均medium、启发式上方照明、有限bounce，secondary ray复用camera SH颜色。 synthetic insertion量化只验证固定radiance sphere的遮挡/衰减/veiling；真实scene插入、style与灯光主要定性。 separation依赖priors且balanced opacity score不能观察surface后方medium，需结合component render。 hard fog配置按原论文figure拟合；teaser的waves/sky/light shafts为视觉effects，不能当恢复或实验现象。",
+    "whyRelevantZh": "空间medium与surface独立表示、任意secondary-ray查询和component-level验证直接支持主线3D资产组合/外观编辑；Lego仅为synthetic对象，不是brick结构生成贡献。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

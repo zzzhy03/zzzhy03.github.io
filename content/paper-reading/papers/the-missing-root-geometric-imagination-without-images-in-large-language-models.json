@@ -1,0 +1,65 @@
+{
+  "id": "arxiv:2611.33841",
+  "slug": "the-missing-root-geometric-imagination-without-images-in-large-language-models",
+  "title": "The Missing Root: Geometric Imagination Without Images in Large Language Models",
+  "authors": [
+    "Loïc Magnan",
+    "Tomasz Kozlowski"
+  ],
+  "primaryTopicId": "2d-design",
+  "topicIds": [
+    "2d-design"
+  ],
+  "categories": [
+    "cs.CL",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-26",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.33841"
+  },
+  "abstract": "This paper proposes a new paradigm and method for giving large language models spatial understanding. Standard language models operate exclusively over discrete words (secondary representations of things rather than continuous space itself), forcing them to guess geometry verbally. Whereas most multimodal approaches equate spatial grounding with camera images or video frames, spatial structure itself is not a picture: it consists of coordinate frames, solid boundaries, and how objects move and relate to each other in continuous space. Motivated by this distinction, we place continuous object tokens combining pose (position, orientation, and scale) and signed-distance shape embeddings alongside word tokens inside a single uninterrupted transformer sequence, allowing language and geometry to attend to each other as object scenes are built and updated step by step. Control tokens switch output automatically between natural-language words and continuous object state updates to a persistent object workspace, while an attention mask blocks earlier prose when generating the answer, so responses must be read directly from settled geometry. To prove this method works, we attach a narrow parallel spatial stream (+4.4% weights) alongside unfrozen Qwen3-1.7B layers. In our two-dimensional tests, the model spawns and transforms multi-object scenes from English descriptions, transfers shapes to held-out nouns, and relies causally on the workspace to answer spatial questions.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.33841v1",
+  "keywords": [
+    "continuous object tokens",
+    "spatial workspace",
+    "SDF embedding",
+    "causal attention mask",
+    "2D scene editing"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.33841v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确 arXiv 版本 2611.33841v1 的 17 页全文及关键页面核验；数字均为作者报告，未独立复现。",
+    "ideaZh": "Missing Root将pose与SDF shape embeddings作为连续object tokens，与文本在同一序列中创建、移动并读取持久workspace。作者报告300个合成问题Normal准确率71%，LOOK置零后38%；有意思的是可干预的几何状态接口，但形状来自约50种library混合，实验仅2D，不能称任意几何想象、3D推理或物理规划。",
+    "motivationZh": "纯文字空间描述容易以语言捷径代替明确的坐标、边界与多步状态，难以验证回答是否真正读取几何。",
+    "methodZh": "纯文字空间描述容易以语言捷径代替明确的坐标、边界与多步状态，难以验证回答是否真正读取几何。2D object用5维pose与32维SDF shape embedding；控制tokens切换Word/Object heads，NEW/STEP创建或更新external float workspace，LOOK后屏蔽此前文本。Qwen3-1.7B加256维parallel spatial stream，后期解冻language layers；shape由2840 noun-to-form table的soft匹配加bounded residual产生。作者报告300题的Normal/Exact/Zeroed/Random LOOK准确率71/70/38/36%，32个held-out noun的shape IoU 0.79、3个library外形状0.63；WikiText PPL从16.38升至18.72，未独立复现。",
+    "methodFlow": [
+      "Text/object inputs → 5D pose+32D shape → continuous object tokens",
+      "coupled Qwen3与parallel spatial stream共同处理word/object sequence",
+      "NEW/STEP heads写入或更新persistent float workspace",
+      "LOOK屏蔽历史prose，重读最终geometry后回答"
+    ],
+    "experimentsZh": "36K synthetic outlines预训冻结shape AE；2840手标noun-to-form约50 silhouettes；合成2–5 objects/0–5 moves，held-out词与move ranges；Qwen3-1.7B加75.9M参数，训练后期unfreeze backbone。 作者报告300题Normal/Exact/Zeroed/Random LOOK准确率为71/70/38/36%，mean final position/scale error均0.03。 (Table 3, p. 14) 作者报告32个held-out noun shape IoU 0.79，3个未表示形状0.63；WikiText PPL 16.38→18.72。 (Tables 2–4, pp. 13–14) 主要为workspace干预、exact-state上界与language-retention对照；未给出与强文本CoT、外部geometry工具或其他workspace模型的完整任务对比。 在同300题上替换LOOK为exact、zero、random states，并比较direct answer/先description；支持state使用，不隔离新增stream、shape table与backbone unfreeze各自贡献。",
+    "insightZh": "可读写持续object state与LOOK因果遮罩形成清楚的语言—几何接口；贡献是受限2D proof of concept，不是已验证开放shape decoder或通用空间foundation model。",
+    "evidenceZh": "workspace不做外部几何计算，LOOK屏蔽此前文本以检验state依赖。 (Secs. 2.1–2.4, Fig. 1, pp. 3–5) 持续float memory保存37维state，Word/Object head在同一序列切换。 新shape来自固定library soft blend，不是任意形状发明。 (Sec. 3.2, pp. 6–7; Table 2/Fig. 7, p. 13) 约50 silhouettes、2840 noun keys与bounded residual；library外形状明显受限。 作者报告LOOK破坏后准确率显著下降。 (Table 3, p. 14) Normal71%、Exact70%、置零38%、随机36%，支持受限协议中workspace读取。 当前无碰撞检查，3D/physics属于future work。 (Sec. 5.1, p. 10; Sec. 6, p. 15) STEP是离散pose update，可穿过物体；不能解释为碰撞可行装配。",
+    "caveatZh": "library混合无法凭空构造完全未表示的形状，需更大库或generative decoder。 3D、hierarchical assemblies、physics与robotics均作为未来方向。 模板合成任务和被刻意遮掉prose的协议不能证明通用空间能力优于语言或工具基线。 无intermediate collision checking，几何最终状态正确不等于物理可执行。 语言PPL有所退化；加4.4%参数不代表backbone始终冻结。",
+    "whyRelevantZh": "可编辑object state、pose/shape解耦与因果干预可为structured2D设计表示提供参考；LEGO/3D装配仅是未来迁移设想。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
