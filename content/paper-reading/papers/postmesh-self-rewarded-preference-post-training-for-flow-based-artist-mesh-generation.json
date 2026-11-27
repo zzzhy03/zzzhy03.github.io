@@ -1,0 +1,79 @@
+{
+  "id": "arxiv:2611.34319",
+  "slug": "postmesh-self-rewarded-preference-post-training-for-flow-based-artist-mesh-generation",
+  "title": "PostMesh: Self-Rewarded Preference Post-Training for Flow-Based Artist Mesh Generation",
+  "authors": [
+    "Gihyun Kwon"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-27",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34319"
+  },
+  "abstract": "Artistic mesh generators turn a dense 3D object into an artist mesh: a compact, quad-dominant mesh that is easy to edit. Most of current models are auto-regressive methods which decode a mesh token by token, take tens to hundreds of seconds per mesh. Diffusion- and flow-based generators are much faster, but their meshes still fall short of artist quality. To our knowledge, PostMesh is the first post-training method for a diffusion- or flow-based artist mesh generator, and it needs no expensive artist-made ground truth: the generator is trained on its own samples, scored by a reward computed from the dense input and the output. We propose an artistic mesh reward that keeps the output consistent with the dense input while making the mesh structure into artistic. We also propose a multi-negative flow preference optimisation that transfers the reward to the generator. After a short LoRA post-training, PostMesh is comparable to or better than slow autoregressive generators on most artist-mesh quality metrics and in a blind VLM preference test, at a fraction of their time.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34319v1",
+  "keywords": [
+    "artist mesh",
+    "flow preference optimization",
+    "self-reward",
+    "quad strips",
+    "geometry gates"
+  ],
+  "facets": {
+    "task": [
+      "generation"
+    ],
+    "content-scope": [
+      "object"
+    ],
+    "representation": [
+      "mesh"
+    ],
+    "method": [
+      "flow-matching"
+    ],
+    "output-property": [
+      "editable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34319v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact arXiv 2611.34319v1的17页全文（含完整附录）及6页视觉核验；数值均为作者报告，未独立复现。PDF和官方abstract页未给出可确认的公开实现URL。",
+    "ideaZh": "PostMesh把dense输入一致性与quad strips、碎片等结构reward送到MeshFlow解码后的mesh，再用gated multi-negative DPO+RPO更新LoRA，提升低面数资产的edge flow。值得精读reward与筛选如何抵御“好指标、坏几何”；无需新artist mesh仅指post-training，VLM偏好和proxy指标不等于专业生产可用性。",
+    "motivationZh": "Flow artist meshes速度快但解码后的slivers、碎片和edge flow缺陷不被latent flow loss直接观察。",
+    "methodZh": "在MeshFlow冻结decoder后用dense-input多视图silhouette/depth及显式mesh结构reward打分，gates筛出保真winner和多losers，以shared-noise flow误差构成DPO proxy，加winner RPO，只更新LoRA。",
+    "methodFlow": [
+      "dense mesh的surface samples → 冻结MeshVAE、MeshFlow+LoRA每组采样16个mesh",
+      "8-view silhouette/depth一致性 + quad strips/tessellation、sliver/valence、碎片与face budget reward",
+      "组内CD/HD、flips、碎片和part-floor gates → winner及带权losers",
+      "fidelity/coverage/face-count/centering过滤 → shared-noise多negative DPO + winner RPO",
+      "只更新LoRA，两轮新输入自训练 → 保持flow sampler的快速artist-mesh生成"
+    ],
+    "experimentsZh": "2,000训练objects，两轮共2,000updates；300test、200ablation、60VLMobjects，约10L40S GPU-h。作者报告QS0.466→0.804、DFF0.206→0.121，2.53s/mesh；细分自交与non-manifold edges改善但不为零。 作者报告主测试QS 0.804、TS 0.706、DFF 0.121、Frag.0.647、2.53s/mesh；shape CD/HD略优于base，但ECD不及高面数AR。 (Table 1, p. 6) 作者报告经典QEM的DFF0.024、Frag.0.083，明显低于PostMesh；故其优势集中在生成的quad布局及速度，不是全面几何修复。 (Table 5, p. 14) 比较MeshAnything/V2、FastMesh、Mesh Silksong、MeshFlow和QEM/isotropic；AR token cap与不同face count影响比较，经典方法CPU与GPU时延不能作同硬件速度结论。 结构reward移除与SFT/RAFT/Flow-GRPO均降低QS；RPO独立作用作者明确说单run结果不确定，不能声称每一项都已证明必要。第一轮使用早期reward且缺silhouette/depth，最终规则不能回写成两轮完全相同。",
+    "insightZh": "针对flow artist-mesh的decoded-structure self-reward post-training，组合group gating与多negative偏好学习；价值在结构标准如何进入快速生成器。",
+    "evidenceZh": "reward观察解码后mesh，并结合输入渲染一致性与结构偏好，group gates避免以破坏形状换高分。 (Secs. 3.1-3.4, Figs. 2-4, pp. 3-5; Table 4, p. 12) geometry mode、冻结decoder、self-samples；这些gates是相对组内规则，不是绝对validity证明。 作者报告MeshFlow到PostMesh的QS 0.466→0.804、DFF 0.206→0.121，单L40S每mesh 2.17→2.53秒。 (Table 1, p. 6) 300个测试objects；QS/DFF与reward有重叠，不能仅据此认定艺术质量。 作者报告非reward代理的细分自交面3.43%→1.50%、non-manifold edges 11.04%→4.78%。 (Sec. F and Table 6, pp. 13-14) 仍非zero-defect；未验证绑定动画或真实编辑任务。 blind VLM相对Mesh Silksong的62.5%偏好不是professional artist用户研究，且AR baseline有token截断。 (Secs. 4.3-4.4, p. 8; Sec. G, pp. 13-14) 60个独立objects、两种展示顺序；51/300 Silksong与82/300 MeshAnythingV2达到token cap。 Eq. 8称weights和为1，但附录Eq. 13印出的系数相加为1.10。 (Eq. 8, p. 5; Sec. C, Eq. 13, p. 11) 已视觉核对原式；需要代码/作者澄清归一化，不能把打印公式当作完全可复现实现。",
+    "caveatZh": "预训练base仍依赖其原数据；reward与部分指标重叠，60例VLM偏好不是艺术家研究；AR token cap、不同face budgets与经典重网格的更低缺陷率限制全面优越论断。Eq.13打印系数和1.10与正文sum-to-one矛盾，RPO独立收益未建立；无已确认公开代码。",
+    "whyRelevantZh": "直接服务可编辑3D mesh资产生成；可借鉴显式结构reward+保真gates怎样约束生成，而不是只追求外观或单一quad score。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

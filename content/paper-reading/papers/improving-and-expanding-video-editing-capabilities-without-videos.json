@@ -1,0 +1,101 @@
+{
+  "id": "arxiv:2611.34941",
+  "slug": "improving-and-expanding-video-editing-capabilities-without-videos",
+  "title": "Improving and Expanding Video Editing Capabilities Without Videos",
+  "authors": [
+    "Ji Xie",
+    "Yanhao Jia",
+    "Xiangpeng Yang",
+    "Martin Q. Ma",
+    "Sihan Xu",
+    "Erik Cambria",
+    "Louis-Philippe Morency"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-27",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34941"
+  },
+  "abstract": "Image editing models can follow a wide range of instructions, but video editing models still lag behind, limited in part by the difficulty of collecting paired source and edited videos. Is it possible to transfer advanced image editing capabilities to video editors without new paired videos? We introduce Image-to-Video Transfer (I2VT), which improves pretrained video editors and expands them to new editing tasks using an image editor. It enables efficient post-training with no architectural changes and no new videos, using only individual images. Our key idea is to let the video editor role-play as an image editor: it edits an image as a one-frame video, with the image editor guiding the video editor's predictions at each denoising step. Although the video editor sees only single images during training, at test time it applies the improved and expanded capabilities to whole video clips while preserving temporal consistency. To push the boundaries of video editing, we introduce OpenVE++, an extension of OpenVE-Bench that adds four new editing tasks useful for video production, including action changes, expression changes, body movements, and scene relighting. Our experiments across three different video editors show that I2VT improves existing editing capabilities and expands them to new tasks, and our models achieve state-of-the-art (SOTA) performance on both OpenVE-Bench and OpenVE++.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34941v1",
+  "keywords": [
+    "image-to-video transfer",
+    "on-policy distillation",
+    "video editing",
+    "source-only training",
+    "LoRA",
+    "shared VAE"
+  ],
+  "facets": {
+    "task": [
+      "editing"
+    ],
+    "representation": [
+      "raster-image"
+    ],
+    "content-scope": [
+      "human-avatar",
+      "scene"
+    ],
+    "conditioning": [
+      "video",
+      "single-image",
+      "text"
+    ],
+    "method": [
+      "diffusion",
+      "flow-matching"
+    ],
+    "prior-data": [
+      "2d-prior",
+      "video-prior"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34941v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://i2v-transfer.github.io"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "已阅读全文2611.34941v1，共24页；视觉核验PDF pp.1,3,6,8,15,20,21。结果为作者报告，未复现。Code URL采用PDF p.1印出的 https://i2v-transfer.github.io；2026-11-27该官方页链接公开实现 https://github.com/HorizonWind2004/i2v-transfer，已确认repo含src/i2vt、scripts、configs、tests及pyproject.toml（execution内保留页面和tree证据）。available仅指实现公开，不代表已运行或复现。",
+    "ideaZh": "I2VT让现有video editor把单图当one-frame video，在自身denoising rollout上匹配冻结image editor的velocity，再把学到的编辑能力用于整段视频。它有价值的地方是用单图post-training扩展动作/表情/relighting，而不再造视频target；“Without Videos”只限定这次微调，依赖已有时序prior与共享VAE，评测也只显示时间质量总体相当，不能写成所有指标无损。",
+    "motivationZh": "高质量成对video edit target制作昂贵，尤其动作、表情、身体运动和relighting；预训练video editor受编辑数据覆盖限制。",
+    "methodZh": "将source image视作one-frame video，在student的10-step rollout各状态上匹配冻结image teacher的velocity，通过LoRA训练；teacher与states stop-gradient，推理沿用原video editor。",
+    "methodFlow": [
+      "从已有视频数据取单帧source image，构造语义相同的image/video editing instructions",
+      "将video editor当one-frame student，在共享Wan VAE latent中从噪声rollout",
+      "冻结image teacher对student每步当前latent预测target velocity",
+      "stop-gradient固定rollout states与teacher targets，velocity MSE训练student LoRA",
+      "移除teacher，按原video sampler对整段视频执行新编辑能力"
+    ],
+    "experimentsZh": "作者跨3个editors验证；joint I2VT-14B在同一Gemini 2.5 Pro口径下basic/OpenVE++ overall为3.58/3.34，base为3.33/2.44。matched offline对照支持on-policy收益，VBench时序分项有升有降。 作者报告joint I2VT-14B的OpenVE-Bench五类别overall从3.33升至3.58，OpenVE++ Gemini 2.5 Pro overall从2.44升至3.34。 (Table 3, p. 6) 作者报告匹配每次240个supervised states的Bernini-R-1.3B对照，I2VT basic/new overall为3.48/2.99，offline 24×10为3.19/2.74。 (Table 4, p. 6) 作者报告IVEBench short subset中I2VT-14B overall从71.0到71.5、instruction compliance从53.7到56.0；VideoCoF整体增幅更大，但并非所有quality/fidelity分项改善。 (Table 9, p. 8) 作者报告20名参与者的160次1.3B比较中I2VT win/tie/loss为68.1/25.0/6.9%；14B为50.6/34.4/15.0%。 (Appendix H, p. 20; Table S7, p. 21) 与现有open-source video editors比较；OpenVE-Bench部分baseline来自既有论文、starred rows重跑，所有OpenVE++由作者评估；没有直接比较ViFeEdit/ImVideoEdit，因缺weights或code。两个Gemini judges与小型human preference方向大致一致，尚非独立复现或客观物理/动作跟踪验证。 含offline的24×1、24×10、240×1配置、rollout/teacher/student CFG、velocity/clean-latent及MSE/cos、K和timeshift。默认velocity MSE overall最好，但clean-latent MSE等价引入t² timestep reweighting，故并非只改变loss空间；timeshift3略优于默认5，teacher guidance2仅在特定新任务有效。",
+    "insightZh": "不改现有video editor架构、不生成视频target，直接用image teacher监督single-frame student rollout；不同于既有离线image pair与多帧rollout蒸馏。",
+    "evidenceZh": "teacher在student自身denoising states上提供velocity target，states和teacher stop-gradient，推理只保留student。 (Sec. 2.3, Eqs. 2-4, Fig. 3, pp. 3-4; Algorithm S1, p. 16) 该机制不同于仅在teacher最终edited target上做offline distillation；video temporal prior仍来自pretrained editor。 teacher与三个student共享16-channel Wan VAE latent；训练单图来自OpenVE-3M视频首帧。 (Sec. 3.1, p. 4; Appendix B-C, pp. 16-17) “Without Videos”不是从零不使用视频，而是此次post-training不构建视频pair/多帧训练样本。 作者报告joint I2VT-14B在Gemini 2.5 Pro评价下basic score 3.58、OpenVE++ 3.34，base分别3.33、2.44。 (Table 3, p. 6) 这些为指定judge的1-5 rubric评分；不可与另一judge或不同训练pool的overall直接混比。 matched states/image更新数的offline baseline在basic和new-task overall上均低于I2VT，但部分单项offline更好。 (Sec. 3.5 and Table 4, p. 6) 并非所有任务和所有offline配置均被逐项支配。 temporal指标有升有降，IVEBench上Bernini-R-1.3B fidelity从80.2降至77.1。 (Sec. 4.3-4.4, Tables 8-9, p. 8) 支持总体时间质量接近，不支持所有时序/源内容指标无损。 用户偏好和第二judge提供方向一致的补充，但study仅20人、16clip配置。 (Appendix H, p. 20; Table S7 and Appendix I, p. 21) 研究由作者熟人志愿者完成；对复杂动作和长视频的广泛结论仍有限。",
+    "caveatZh": "“Without Videos”仅指这次post-training：首帧来自OpenVE视频，时序prior来自预训练；共享VAE是直接匹配前提。主要结果依赖作者benchmark和Gemini评分，不能声称任意长时序或全部质量指标无损。",
+    "whyRelevantZh": "对于visual creation workflow，可参考在共享latent中用强image editor对video editor做轻量、source-only能力迁移，尤其避免为新编辑能力大规模制作视频target；对结构化2D、刺绣或3D并未直接验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

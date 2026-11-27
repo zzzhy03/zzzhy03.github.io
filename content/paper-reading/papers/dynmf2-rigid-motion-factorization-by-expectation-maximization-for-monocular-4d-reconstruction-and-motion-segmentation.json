@@ -1,0 +1,83 @@
+{
+  "id": "arxiv:2611.34931",
+  "slug": "dynmf2-rigid-motion-factorization-by-expectation-maximization-for-monocular-4d-reconstruction-and-motion-segmentation",
+  "title": "DynMF2: Rigid Motion Factorization by Expectation-Maximization for Monocular 4D Reconstruction and Motion Segmentation",
+  "authors": [
+    "Agelos Kratimenos",
+    "Yile Hua",
+    "Kostas Daniilidis"
+  ],
+  "primaryTopicId": "3d-segmentation",
+  "topicIds": [
+    "3d-segmentation",
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-27",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34931"
+  },
+  "abstract": "A single casual video leaves a moving scene under-determined: a point seen once from each place can slide toward or away from the camera and still match every frame. We constrain the reconstruction with the structure of the motion itself. Building on DynMF, we model a scene's motion as a handful of SE(3) trajectories, each rigid, and let every point follow one of them alone, never a blend. DynMF2 computes this factorization directly from 3D point trajectories, with no rendering, by Expectation-Maximization (EM). Its M-step fits, in closed form, every rigid motion to the points assigned to it, and its E-step reassigns every point to the motion that explains it with the least error. The background is simply one more motion, the camera's, so no masks are needed. Three tools then revise the factorization: requery adds trajectories where the rendering shows parts the tracker missed, merge joins motions that move together, and split separates those that do not. Thus the number of motions follows the scene. Without masks, DynMF2 clearly outperforms the mask-based baselines in view synthesis on iPhone and NVIDIA and in 3D tracking on iPhone. It recovers what masks leave out, from thin parts and details to small movers far in the background. Its motions segment the moving parts of MOVi-F and iTACO scenes competitively, although DynMF2 is never trained to segment. What moves in a scene is not decided in advance: it emerges from the rigid motions themselves.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34931v1",
+  "keywords": [
+    "motion segmentation",
+    "rigid motion factorization",
+    "hard EM",
+    "SE(3)",
+    "dynamic Gaussian splatting"
+  ],
+  "facets": {
+    "task": [
+      "segmentation",
+      "reconstruction",
+      "representation-learning"
+    ],
+    "content-scope": [
+      "part-assembly",
+      "scene"
+    ],
+    "representation": [
+      "3d-gaussian",
+      "point-cloud"
+    ],
+    "method": [
+      "optimization-sds"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34931v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "全文为2611.34931v1，12页，已核对hash和首屏v1 stamp；主文8页加参考文献，未附文中所指supplement。以上证据只来自该PDF可见方法、表格和消融，所有数值为作者报告；未复现。未找到PDF打印的public code/project URL。 exact v1 PDF未印project/code URL；未据作者同名历史仓库猜测DynMF2实现。",
+    "ideaZh": "DynMF2把每条3D轨迹硬分配给一个SE(3)运动，闭式EM后再用requery/merge/split修正，分割与4D重建由同一运动结构产生。值得精读其“拟合—分组”循环；motion group不等于semantic part，仍会过分割，弯曲处soft blending更好，深度与缺失附录限制可复现性。",
+    "motivationZh": "单目动态场景under-determined；软混合运动和一次k-means初分组可隐藏错误，mask漏掉小moving parts。",
+    "methodZh": "从单目视频的point tracks、深度与给定camera估计出3D轨迹，k-means初始化后，用weighted Procrustes闭式M-step拟合每个刚体每帧的motion，E-step把整条trajectory重新分配给最能解释它的motion；background作为camera motion参与而非独立mask。Split/merge先修正motion groups，短暂Gaussian训练后以持续render error重查询缺失轨迹，再merge/refit并重新进行最终场景优化。每Gaussian始终跟随一个motion，assignments只由这些离散工具改变。",
+    "methodFlow": [
+      "单目视频 → tracker、depth与给定cameras → 3D trajectories",
+      "k-means初分组 → weighted Procrustes M-step闭式拟合SE(3)",
+      "E-step按全轨迹误差硬重分配，重复至assignment稳定",
+      "split/merge修组 → 短训练 → render-error requery新增/重分配轨迹",
+      "再merge及robust refit → 最终Gaussian训练 → motion masks、4D rendering与tracks"
+    ],
+    "experimentsZh": "按SoM协议在5个iPhone与7个NVIDIA场景评测masked novel-view metrics，iPhone的12个场景评测tracking（MoSca 11个）。另在iTACO 55 clips和MOVi-F公开validation的147 scenes评测SE(3)及assignment。输入用AllTracker/ARROW及给定camera，单目depth按video做scale/shift；所有结果为作者报告，未独立复现。 作者报告MOVi-F ARI=0.775高于MoSE3的0.743和Segment Any Motion的0.579；mIoU=0.627低于MoSE3的0.813，iTACO part IoU=0.661也低于MoSE3的0.784。 作者报告MOVi-F ARI=0.775高于MoSE3的0.743和Segment Any Motion的0.579；mIoU=0.627低于MoSE3的0.813，iTACO part IoU=0.661也低于MoSE3的0.784。 (Table 2, p. 7) 作者报告iPhone masked PSNR=18.05 dB、3D EPE=0.058 m，SoM分别为16.72 dB、0.082 m；NVIDIA masked PSNR=23.83 dB。比较严格依赖该camera/depth/test-pose协议。 (Table 1, p. 6; Sec. 4.1, pp. 6-7) 作者报告仅k-means分组、不用EM和tools会损失1.23 dB及0.288 mIoU；从hard改为soft/all-tools在NVIDIA反增0.27 dB，暴露弯曲运动的刚体边界。 (Fig. 5, p. 7; Sec. 4.3, p. 8) view/tracking比较SoM、MoSca、MBGS、Marbles，作者专门重跑MoSca以控制monocular depth及test-pose optimization。Segmentation比较Segment Any Motion、Trace Anything、4RC、Track4World和concurrent MoSE3。部分较新方法因generative priors、设置不明确或未发布code排除，因此“领先”限于实际表格协议；无静态semantic/open-vocabulary part benchmark。 逐项去requery/merge/split，对比k-means alone、不同初始K、hard/soft assignments及换tracker/depth，支持分组循环本身的价值。每场景one run；最终K并不完全不依赖初始化，且motion groups可能将同一对象切碎。主文提到的完整thresholds和exact-trajectory结果在未包含的supplement，未声称已核验。",
+    "insightZh": "把DynMF的可混合learned bases改成one-hot rigid SE(3) assignment，用已有3D tracks先计算factorization而非经renderer从零学习；再把轨迹集合和motion数量纳入requery/merge/split循环。EM/Procrustes是经典工具，创新在其作为dynamic Gaussian scene的motion model以及可双向修订的组结构，不应表述为新的通用EM算法。",
+    "evidenceZh": "每条trajectory绑定一个刚体motion，M-step闭式拟合，E-step重新选择整轨迹最低误差motion。 (Sec. 3.1, Eqs. (2)-(6), Fig. 2, pp. 3-4) hard EM降低轨迹能量至local minimum；one-hot assignment与现有soft-blend motion models形成实际区别。 render error用于补tracker未覆盖的点，merge/split根据噪声标度修正motions。 (Sec. 3.2, Fig. 3, pp. 4-6) requery要求新点在可见帧的固定比例上持续高误差；tools不修改原trajectory本身。 作者报告MOVi-F的ARI领先但mIoU与iTACO part IoU均落后MoSE3。 (Table 2, Sec. 4.2, p. 7) DynMF2 ARI=0.775、mIoU=0.627；MoSE3为0.743/0.813，iTACO IoU为0.661 vs 0.784，不是分割指标全面领先。 刚体硬分配与motion数量仍构成限制，弯曲区域soft assignment有更高view PSNR。 (Sec. 4.3, Fig. 5, pp. 7-8) soft/all-tools在NVIDIA增加0.27 dB；MOVi-F平均仍有14-20组对比7.5真对象，初始化数量影响mIoU。 评测mask不等于输入mask；view comparison受camera/depth/test-pose协议约束。 (Table 1, Sec. 4, pp. 6-7) 方法输入无foreground masks，但view metrics在covisibility masks内；MoSca被作者以无test-pose optimization、monocular depth重跑。",
+    "caveatZh": "motion group不等于semantic part；会过分割，静止或共动部件难分，弯曲处soft blending更好；依赖depth/camera且exact PDF没有supplement。",
+    "whyRelevantZh": "直接推进object/part的motion-driven 3D segmentation与representation：同一rigid factorization同时约束重建、产生motion masks和tracking，值得研究是否能成为可编辑部件的结构先验。该迁移限于可分辨的相对运动，未验证静态LEGO部件语义或装配连接。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

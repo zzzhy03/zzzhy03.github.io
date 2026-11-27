@@ -1,0 +1,74 @@
+{
+  "id": "arxiv:2611.34907",
+  "slug": "agentic-longlive-asynchronous-agentic-memory-for-long-video-generation",
+  "title": "Agentic LongLive: Asynchronous Agentic Memory for Long Video Generation",
+  "authors": [
+    "Shaoteng Liu",
+    "Shuai Yang",
+    "Wei Huang",
+    "Luozhou Wang",
+    "Song Han",
+    "Yukang Chen"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation",
+    "visual-design-agents"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-27",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34907"
+  },
+  "abstract": "Real-time autoregressive video generators stream minutes of video and accept new prompts on the fly, but struggle to keep people, objects, and places consistent over a long interactive story. Agent systems provide such memory for offline multi-shot generation, yet they read the whole script in advance, plan each shot before generating it, and regenerate failed shots, which a live stream does not allow. We present Agentic LongLive, an asynchronous agentic memory for long video generation. A memory agent on separate GPUs reads only the prompts revealed so far, never the generated video, and keeps a text state and evolving images for every person, object, and scene. From this entity memory it composes a global image and a per-shot memory image, which an auxiliary GPU prefills into the generator's attention sink before the next shot starts, and writes entity cards for the prompts that name them, so the video never waits for memory and video errors are not written back. A small language model, trained with reinforcement learning and an image reward calibrated using downstream video outcomes, decides what to remember before the next prompt is known. On LongStory-Online, a new benchmark of 25 stories (857 shots) revealed one shot at a time, Agentic LongLive improves persistent-state accuracy of LongLive-2.0, its base generator, by 26.3 points, protagonist identity by 44.9, and revisited-place consistency by 40.4, at about 1% extra generation time on H100. The full system streams faster than real time on one 8xB200 node with the generator in BF16 (34.3 FPS), keeps image quality stable over 14-minute stories, and improves identity on two MiniMax-H3 generators, one of which, LongLive-H3, also runs in real time with it. To our knowledge, it is the first real-time video generator with text and image memory kept by an LLM agent.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34907v1",
+  "keywords": [
+    "asynchronous memory",
+    "entity state",
+    "attention sink",
+    "streaming video",
+    "video-calibrated reward"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34907v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://github.com/NVlabs/LongLive/tree/main/Agentic-LongLive"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确arXiv版本2611.34907v1的28页全文（含附录）及6页视觉核验；数值为作者报告，未独立复现。 PDF第1页Code annotation指向此目录；公开README与scripts/run_story.py已取回200。README标示RL planner checkpoint coming soon，属于部分release。",
+    "ideaZh": "Agentic LongLive把慢速agent放在独立GPU上，按已揭示prompt维护实体图文状态，提前合成并prefill全局/镜头memory，让流式生成不中断。作者报告状态准确率38.2→64.5、回访一致性15.0→55.4；约1%是延迟增量，Wan配置GPU由2增至6。主系统不看生成视频，适合研究状态记忆与异步交接，但不能当作视觉结果已验证的闭环。",
+    "motivationZh": "实时AR视频只保留短KV且会将自身错误带入未来；下一prompt未知，不能等agent、不能回滚已播镜头。",
+    "methodZh": "prompt-only实体belief经带来源文本与多视图bank更新，合成G/M图；后台检查与commit，辅助GPU提前prefill sink；prompt到达时场景路由并追加实体cards。8B planner用hindsight文本+视频校准图像reward做GRPO。",
+    "methodFlow": [
+      "读取已揭示prompts，更新带来源和revocation的实体文本状态与图像bank",
+      "从实体参考图合成全局身份/状态图G及当前地点和活跃实体图M",
+      "后台check/redraw，提交可用版本并由辅助GPU预先计算sink K/V",
+      "新prompt到达时路由keep/recall/drop地点memory，并追加命名实体cards",
+      "冻结AR video generator交换最新已prefill memory，按固定attention window继续流式生成",
+      "训练小planner：RFT warm start后用hindsight文本/图像reward做GRPO，推理不读取未来或生成视频"
+    ],
+    "experimentsZh": "LongStory-Online共25故事857镜头约150分钟，9个人写故事+16个LLM写Hard故事，prompts逐镜头揭示、每镜头只生成一次。LongLive-2.0/Wan三seed；RAVEN和LongLive-H3两个seed。Gemini视觉judge检查每镜头4帧，GPT-5.5复核部分运行；32人便利样本人评只看每故事4镜头。速度与质量为分开的运行，另有B200 kernel路径盲评。 作者报告在LongLive-2.0上state38.2→64.5，identity44.1→89.0，revisit15.0→55.4，generation time15.8→16.0秒/镜头（标记+0.9%）。 (Table 1, p. 6) 作者报告B200上Wan全系统34.3FPS、0.00秒memory stall，使用1DiT+2auxiliary+3agent共6GPU；LongLive-H3为34.7FPS、4+1+3共8GPU。 (Table 2, p. 6; Table B1, p. 15) 作者报告仅image memory时RL planner较35B提高state3.6点、identity7.0点；加entity cards后相对35B差为+0.5/+1.8/+3.2（state/identity/revisit），均不显著。 (Table 4, p. 8; Table C2 and text, p. 17) 作者报告整体framing58.5→65.9，但planned close-up75.5→63.7；记忆中的全身/宽视图可能抑制特写。 (Appendix H, p. 27) 作者报告在LongLive-2.0上state38.2→64.5，identity44.1→89.0，revisit15.0→55.4，generation time15.8→16.0秒/镜头（标记+0.9%）。 (Table 1, p. 6) 作者报告B200上Wan全系统34.3FPS、0.00秒memory stall，使用1DiT+2auxiliary+3agent共6GPU；LongLive-H3为34.7FPS、4+1+3共8GPU。 (Table 2, p. 6; Table B1, p. 15) 作者报告仅image memory时RL planner较35B提高state3.6点、identity7.0点；加entity cards后相对35B差为+0.5/+1.8/+3.2（state/identity/revisit），均不显著。 (Table 4, p. 8; Table C2 and text, p. 17) 作者报告整体framing58.5→65.9，但planned close-up75.5→63.7；记忆中的全身/宽视图可能抑制特写。 (Appendix H, p. 27) 同一LongLive-2.0 backbone与内置memory的比较最能隔离memory机制；另比carried-K/V、多个较小Wan模型、两类H3 generator及offline systems。跨backbone的绝对排名混入模型与分辨率差异。第二judge部分复核使用较早G配置，不完全是最终部署设置；人评一seed、便利抽样且counterbalancing不全。 G/M数量、地点routing、entity cards、naive text history、foreground G和RL reward均有拆分。text-only reward尽管recall高却损害identity，支持图像槽位选择的重要性；cards削弱RL相对35B优势，不能将全系统收益归给RL单项。",
+    "insightZh": "贡献在严格在线时序约束下，把外部、带版本的图文entity memory异步交给冻结AR generator，并把有限图像槽位的选择学成小planner；不是新video backbone。相比直接继承生成KV，主系统不把生成错误写回memory。RL收益需按上下文解读：仅image memory时显著，添加entity cards后相对35B planner的增益不显著，价值主要是让8B替代35B。",
+    "evidenceZh": "主系统memory仅由已揭示prompts构造，不依赖生成视频；未完成新memory时复用最新提交版本。 (Sec. 2.1-2.2, Eq. (1), pp. 2-3) 定义open-loop及memory lag，不能把memory image checker称作生成video的反馈纠错。 G承载身份/长期物体，M承载当前地点与实体；sink注入与地点路由分开，并以entity cards补文本状态。 (Sec. 2.3, Fig. 3, pp. 3-4) Fig. 3直接示出实体版本、G/M组合和same/revisit/new路由。 作者报告LongLive-2.0状态准确率38.2→64.5、identity44.1→89.0、revisit15.0→55.4。 (Table 1, p. 6) 25故事857镜头、Wan三seed；VLM判断与人工偏好提供证据，未独立复现。 低延迟依赖独立agent与prefill ranks；Wan从2GPU到6GPU，B200快kernel路径full system为34.3FPS。 (Table 2, p. 6; Table B1, p. 15) 0.9%是wall-clock增量，不能解释为GPU资源或能耗仅增加约1%。 当前prompt第一次提出的变化可能晚一镜头才进入memory，旧地点图也可能带回过期属性；close-up framing退化。 (Appendix H, pp. 27-28) 作者报告planned close-up match75.5→63.7；状态账本并不保证实际视频实现了变化。 机器人附录variant改为读取生成视频，指令提前一段揭示，不能与正文C1/open-loop主协议混写。 (Appendix G, pp. 25-27) 附录明确说这一实验不测试C1，观察延迟亦依generator而变。",
+    "caveatZh": "约1%是延迟而非总算力：Wan GPU2→6；主系统不看生成视频，不能确认输出已实现状态。新变化可滞后一镜头，特写framing75.5→63.7；加cards后RL较35B增益不显著。机器人variant为会看视频且提前知指令的独立协议。代码公开但RL planner checkpoint尚coming soon。",
+    "whyRelevantZh": "可迁移到长时视觉设计agent的实体状态、来源标记、版本提交和异步产物交接；尤其值得和会读取生成结果的closed-loop state repair比较。对SVG/3D/制造的实际收益尚未实验验证。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "id": "arxiv:2611.34810",
+  "slug": "worldexpand-building-coherent-3d-worlds-via-sparse-joint-panoramic-expansion",
+  "title": "WorldExpand: Building Coherent 3D Worlds via Sparse Joint Panoramic Expansion",
+  "authors": [
+    "Yuyang Yin",
+    "Chenjie Cao",
+    "Xuhui Zuo",
+    "Yuning Gong",
+    "Pengfei Wang",
+    "Junta Wu",
+    "Zhenwei Wang",
+    "Yao Zhao",
+    "Tengfei Wang",
+    "Yunchao Wei",
+    "Chunchao Guo"
+  ],
+  "primaryTopicId": "3d-generation",
+  "topicIds": [
+    "3d-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-27",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34810"
+  },
+  "abstract": "Constructing complete 3D worlds from a single panorama is challenging because large portions of the scene remain unobserved. Existing panoramic-video methods expand spatial coverage through dense sequential generation, but neighboring frames contain substantial redundancy, long trajectories accumulate errors, and independently generated directions may be inconsistent. We present WorldExpand, which formulates single-panorama world expansion as the generation of sparse, complementary, and high-resolution panoramic observations. This representation concentrates the generation budget on informative scene regions and preserves the fine-grained details required for 3D construction. WorldExpand addresses two key challenges: where to observe and how to synthesize. Our Coverage-Guided View Selection identifies informative target locations using scene-adaptive quadrants and warp-based coverage scores, while our Joint Panoramic Diffusion uses Gaussian-splatting-based geometric warps to jointly synthesize four pose-grounded and cross-view-consistent panoramas. A diagnostic-guided global--local attention schedule retains global attention only in sensitive layers, reducing the training and inference costs of high-resolution joint generation. The resulting posed panoramas can be directly fed into an existing reconstruction pipeline to build an explicit 3D representation. Experiments show that WorldExpand recovers content behind occluders and around distant corners, improves both novel-view synthesis and downstream 3D reconstruction metrics across various datasets, and generalizes robustly to diverse in-the-wild scenes. WorldExpand runs significantly faster than the state-of-the-art panoramic-video method while producing higher-resolution observations with stronger cross-view consistency.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34810v1",
+  "keywords": [
+    "sparse panorama",
+    "coverage-guided views",
+    "joint diffusion",
+    "Gaussian warps",
+    "3D scene generation"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "completion"
+    ],
+    "content-scope": [
+      "scene"
+    ],
+    "representation": [
+      "3d-gaussian"
+    ],
+    "conditioning": [
+      "single-image"
+    ],
+    "method": [
+      "diffusion"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34810v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://yuyangyin.github.io/WorldExpand_web/"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据exact arXiv2611.34810v1的26页全文及6页视觉核验。PDFp.1印出的project URL已访问，链接公开实现https://github.com/YuyangYin/WorldExpand；README列infer/expand/train与公开weights，存在scripts/run.py等实现，未运行复现。数值均为作者报告。",
+    "ideaZh": "WorldExpand从单panorama挑选四个互补视点，用Gaussian warp锚定可见区域、joint diffusion补未观测区域，再接既有重建管线成为显式3D场景。应精读“把预算花在少量互补观测”的表示选择；8.6×仅是四方向denoising对照，wild深度与完整端到端性能仍有限，不能称实时或完整真实世界恢复。",
+    "motivationZh": "单panorama有全角度却无全空间覆盖；dense独立video浪费预算且跨方向不一致。",
+    "methodZh": "以source RGB-D与Gaussian warps规划四个互补pose，joint多stream diffusion补全新区域；逐layer诊断保留30global/30local，输出panoramas接HY-World2/WorldMirror2共享尺度重建与3DGS优化。",
+    "methodFlow": [
+      "单panorama+depth → source point cloud、相机高度边界与candidate cameras",
+      "collision/boundary过滤、旋转quadrants与unseen coverage分数 → 四个互补target poses",
+      "Gaussian splat RGB warp+disocclusion mask → source/text/四target多stream tokens",
+      "诊断60个DiT layers → 30global+30local联合生成四个2K panoramas",
+      "source+生成panoramas各21perspective crops → WorldMirror2 depth、共享scale alignment、1,500steps 3DGS优化"
+    ],
+    "experimentsZh": "UE和RealSee3D synthetic各64×4views，wild定性；作者报告UE/RealSee3D F@5cm29.02/41.44%，Matrix3D20.32/35.04%；joint与独立对照+1.89dB。 作者报告UE PSNR20.16dB、RealSee3D18.06dB；RealSee3D F@5cm41.44%，Matrix3D35.04%。 (Table 1, p. 7) 作者报告independent到joint的平均PSNR18.27→20.16dB；30local将training169s vs299s、82.7GB vs90.5GB，best PSNR比fullglobal低约0.33dB。 (Table 4, p. 21; Tables 6-8, pp. 22-23) GenEx和Matrix3D各四个独立轨迹，在相同source depth/target poses下比较；只有两个panoramicvideo baselines，没有同backbone同预算的全部组件隔离；geometry后端统一，但官方端到端系统不相同。 joint-vs-independent、warp renderer和localattention有对照；coverage选点未见独立的完整定量消融，无法单独归因。Table2 plainpoint LPIPS0.252略好于splat0.256，不能宣称每个指标都改善。",
+    "insightZh": "面向重建的稀疏互补panorama中间表示、scene-adaptive选视点、联合高分辨率生成与诊断attention；重建后端不是新贡献。",
+    "evidenceZh": "coverage以warp中未被source points覆盖像素计分，每个旋转90度quadrant选一camera。 (Sec. 3.1, Eqs. 1-2, Fig. 2, p. 4) 分数衡量source未观察区域，不能保证该区域可正确推断或最终几何真实。 joint stream用source warp/mask提供pose grounding，30/60局部层仅保留text和本view noisy tokens。 (Sec. 3.2, Eqs. 3-4, p. 5; Sec. E, Table 5, p. 22) 被local层省略的source/warp仍在global层出现。 作者报告RealSee3D F@5cm从Matrix3D35.04至41.44，UE从20.32至29.02；但UE mean completeness 2.50m→2.87m更差。 (Table 1, p. 7) 不是所有geometry metrics都改善；benchmark均用GT source depth。 8.6×指四方向denoising约45m26s对720p Matrix3D四clips约6h29m53s，WorldExpand端到端未单独profile。 (Sec. B and Table 3, p. 17) 1joint run生成4panoramas对4runs/324video frames，模型/输出分辨率也不同；不能当同任务端到端speedup。 定量用GT source geometry且相同selected poses；wild只用estimated depth作定性检查，重建非本文贡献。 (Sec. A.1, pp. 15-16; Limitations, p. 9) 可见跨数据集synthetic泛化，不足以证明野外metric geometry或动态一致性。",
+    "caveatZh": "定量使用GTsource depth，wild仅estimateddepth定性；UEmean completeness退步，局部warp LPIPS也非全面更优。8.6×只指四方向denoising45m26s对720pbaseline四clips，端到端未profile；只支持静态场景，coverage独立贡献尚缺充分消融。",
+    "whyRelevantZh": "直接推进从有限观测生成显式3D场景，互补观测budget和跨视点联合约束可用于geometry-conditioned asset/world生成设计。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

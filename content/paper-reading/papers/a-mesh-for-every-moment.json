@@ -1,0 +1,88 @@
+{
+  "id": "arxiv:2611.34939",
+  "slug": "a-mesh-for-every-moment",
+  "title": "A Mesh for Every Moment",
+  "authors": [
+    "Roy Or-El",
+    "Jeong Joon Park",
+    "Ira Kemelmacher-Shlizerman"
+  ],
+  "primaryTopicId": "3d-reconstruction",
+  "topicIds": [
+    "3d-reconstruction"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-27",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34939"
+  },
+  "abstract": "We present MEMO (a Mesh for Every MOment), a method that reconstructs the geometry of complete dynamic scenes, captured by multiple synchronized cameras, and extracts a mesh at every frame. Existing dynamic Gaussian splatting methods either model appearance alone or target isolated objects segmented by foreground masks, and all of them recover meshes by TSDF fusion or Poisson reconstruction, whose fixed grids limit the detail they can capture. At the core of MEMO is a per-Gaussian motion model inspired by Gaussian processes, which represents each Gaussian's position and rotation over time as a combination of temporal Gaussian kernels. The model keeps every Gaussian a valid surface element throughout the sequence and carries an implicit representation of the dynamic geometry, so a mesh can be derived at any time from a field defined by the Gaussians. Although common in real captures, large and fast motion poses a challenge that dynamic Gaussian splatting methods usually overlook. To account for it, we design a track-based initialization scheme that fits each Gaussian's initial trajectory to point tracks in closed form. We evaluate MEMO on Blender-Moments, a new benchmark of nine animated scenes with ground-truth meshes at every frame, and on two real-world datasets. MEMO reconstructs the most accurate geometry among state-of-the-art methods, and remains competitive in novel-view synthesis and training time. Project page: https://memo-4d.github.io",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34939v1",
+  "keywords": [
+    "dynamic surface reconstruction",
+    "temporal Gaussian kernels",
+    "Gaussian Wrapping",
+    "motion initialization",
+    "Blender-Moments"
+  ],
+  "facets": {
+    "task": [
+      "reconstruction"
+    ],
+    "content-scope": [
+      "scene",
+      "object"
+    ],
+    "representation": [
+      "3d-gaussian",
+      "mesh"
+    ],
+    "method": [
+      "optimization-sds"
+    ],
+    "prior-data": [
+      "multi-view-prior"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34939v1"
+    },
+    {
+      "label": "Code",
+      "href": "https://memo-4d.github.io"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "全文为2611.34939v1，27页（主文、参考文献及完整supplement），已核对PDF hash和v1 stamp。数值均为作者报告；未复现。Code使用PDF p.1所印官方project URL，页面链接的公开实现https://github.com/royorel/MEMO已核验memo/train.py；证据保存在execution/2611.34939v1.repository-check.json。 PDF p.1打印project URL；该官方页面的Code按钮指向https://github.com/royorel/MEMO，已确认公开repository且memo/train.py包含22111字节实现，非空README占位。",
+    "ideaZh": "MEMO把逐Gaussian的完整时域运动、oriented normal和vacancy field放进同一表示，从同步多视角视频逐帧提取细致mesh。值得精读的是轨迹初始化与surface有效性；逐帧mesh仍不共享拓扑，快速细杆会丢失，不能直接当作可编辑的时序一致资产。",
+    "motivationZh": "动态Gaussian appearance可以正确但提取mesh破碎；固定网格融合会丢细节，大运动又难从photometric梯度开始。",
+    "methodZh": "给定同步且标定的多相机视频，先从逐帧SfM点云用双向Kalman关联构造长轨迹，再以GP regression闭式拟合每个Gaussian的位置kernel weights。训练学习完整时域的position/rotation temporal Gaussian kernels、oriented normals与外观，通过RGB、depth-normal和oriented-normal losses维持表面。查询时对当前Gaussian pivots做Delaunay tetrahedralization，并从vacancy field的0.5 level set提取mesh。论文验证的是逐场景动态重建，不是生成新内容或具有固定连接关系的mesh动画。",
+    "methodFlow": [
+      "同步标定多视角视频 → 每帧SfM稀疏点云与多anchor轨迹",
+      "双向Kalman关联 → GP regression闭式初始化position kernel weights",
+      "逐Gaussian时间Gaussian kernels产生位置/旋转，并随旋转携带oriented normal",
+      "RGB、depth-normal与normal alignment联合优化，配合4D densification",
+      "查询时间t：Gaussian pivots → Delaunay tetrahedralization → vacancy 0.5 level set mesh"
+    ],
+    "experimentsZh": "9个Blender-Moments动画场景，每帧50 train/10 test cameras，100-170帧；几何在每场景10个时间点比较GT meshes。另有Neural 3D Video的6个场景与SelfCap的7个clips，真实场景无GT mesh。单A100 80GB训练；所有数值为作者报告，未独立复现。 作者报告Blender-Moments的FS=0.556、FR=0.746，D-2DGS为0.365/0.541；MEMO的normal Chamfer=24.6°，但point CD=0.51并不优于D-2DGS的0.46。 作者报告Blender-Moments的FS=0.556、FR=0.746，D-2DGS为0.365/0.541；MEMO的normal Chamfer=24.6°，但point CD=0.51并不优于D-2DGS的0.46。 (Table 1a, p. 6) 作者报告MEMO在Blender-Moments/Neural 3D Video/SelfCap的平均训练耗时为18/38/49分钟；这是training wall-clock，不覆盖采集、预处理或逐帧mesh extraction的总时间。 (Table 1b, p. 6; Appendix D.4, p. 20) 作者报告移除trajectory fit后，3个synthetic ablation场景PSNR由34.84降至26.88、FS由0.515降至0.295；真实场景全图PSNR变化较小会掩盖moving parts丢失。 (Table 2, p. 8; Table S2d/Fig. S3, p. 17) 比较4DGS、Deformable-3DGS、SC-GS、FreeTimeGS、AST-3DGS、D-2DGS和DG-Mesh；DG-Mesh仅能评估bounded synthetic objects。相同MEMO表示改用TSDF/Poisson隔离extraction贡献。真实场景几何只作定性展示；无下游编辑、物理交互或制造评测。 主文及附录逐一改变trajectory fit、kernel数量、boundary kernels、anchor设置、temporal参数学习、几何正则、densification与extraction，支持表示和初始化共同作用。主消融仅3 synthetic+4 real场景；kernel/anchor为按场景设置，不能外推为无需调节的任意长序列。",
+    "insightZh": "贡献在于让每个Gaussian的运动模型覆盖完整时间轴、与oriented normals所定义的隐式表面保持一致，并以跨序列轨迹初始化解决大位移。Gaussian Wrapping的场/mesh extraction和多个densification部件来自静态方法；这里做动态扩展。GP用于初始化和kernel形式启发，后续是可学习kernel参数，不是提供不确定性保证的完整GP推断。",
+    "evidenceZh": "时间kernel位置/旋转与oriented normals共同定义各时刻的surface elements。 (Sec. 4.1, Eqs. (4)-(7), Fig. 2, pp. 3-4) 尺度和opacity保持不随时间变化，normal由同一rotation delta携带；并不保证跨帧mesh连接关系。 长轨迹闭式初始化在训练前给出大幅运动的起点。 (Sec. 4.2, Fig. 4, p. 5; Table 2, p. 8; Table S2d, p. 17) 每帧SfM点经Kalman关联，再以GP regression拟合weights；无初始化版本在synthetic运动场景明显退化。 作者报告Blender-Moments surface/normal joint F-scores领先，point Chamfer并非最优。 (Table 1a, p. 6; Table S5, p. 22) MEMO的FS/FR为0.556/0.746；D-2DGS为0.365/0.541，但CD为0.46优于MEMO的0.51，避免把全部几何指标描述成全面领先。 逐帧独立提取、薄快部件轨迹失败和外观/深度歧义仍限制资产质量。 (Sec. 6, p. 8; Appendix A, pp. 13-14, Fig. S1) 作者展示Lego旋钮、Bicycle轮辐丢失和纹理/照明被解释成浮雕；没有时序共享vertices/faces保证。 真实数据依赖多视角预处理和静态背景点云，训练时间不等于完整采集/重建成本。 (Appendix D.3, pp. 19-20; Table 1b, p. 6) 各方法共享相机refinement与背景点云；Neural 3D Video还使用VGGT-Ω及手工移除subject/windows。",
+    "caveatZh": "多视角标定、SfM与背景预处理是前提；逐帧mesh无共享拓扑，薄快结构会丢失，真实几何无定量GT，CD不是最优。",
+    "whyRelevantZh": "为动态3D可编辑资产提供一种把运动与surface表示绑定的方法；尤其值得比较长轨迹初始化与surface约束如何避免纯appearance优化的floaters。Lego只是九个通用动态场景中的一个，论文未研究brick decomposition或装配，故不归LEGO；同样没有独立的新内容生成目标，不交叉归3D Generation。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

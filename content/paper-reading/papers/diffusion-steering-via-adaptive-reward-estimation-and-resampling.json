@@ -1,0 +1,67 @@
+{
+  "id": "arxiv:2611.34839",
+  "slug": "diffusion-steering-via-adaptive-reward-estimation-and-resampling",
+  "title": "Diffusion Steering via Adaptive Reward Estimation and Resampling",
+  "authors": [
+    "Abinitha Gourabathina",
+    "Sana Tonekaboni",
+    "Marzyeh Ghassemi",
+    "Akbar Rafiey"
+  ],
+  "primaryTopicId": "image-generation",
+  "topicIds": [
+    "image-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-27",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34839"
+  },
+  "abstract": "Text-to-image diffusion models can generate images that satisfy complex prompts, yet often produce images that omit requested objects, attributes, or relationships. We ask if models can more reliably generate text-aligned images by redistributing probability toward their more successful outcomes. We propose TrailMix, a training-free method that uses the base model's distribution of possible outcomes to adaptively guide generation toward better text alignment. During denoising, TrailMix generates inexpensive lookahead images from parallel trajectories (trails) and scores their alignment with the prompt using an external judge. The resulting distribution of reward scores allows us to estimate how strongly to steer generation toward a desired alignment level. We use these estimates to reweight and resample trajectories, favoring more promising outcomes. Across three text-to-image benchmarks, TrailMix outperforms existing baselines, with particularly strong gains on rare multi-object compositions. We further extend TrailMix to targeted image editing and introduce SEAM-Bench (Semantic Editing and Attribute Maintenance), a systematic benchmark evaluating whether semantic edits preserve other image content. Experiments on SEAM-Bench and existing benchmark PIE-Bench demonstrate the effectiveness of our approach for controlled image editing. Our results show how a model's own possible outcomes can inform reliable and controllable generation.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34839v1",
+  "keywords": [
+    "diffusion steering",
+    "lookahead reward",
+    "adaptive resampling",
+    "semantic editing",
+    "source preservation"
+  ],
+  "facets": {},
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34839v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "依据精确arXiv版本2611.34839v1的23页全文（含附录）及7页视觉核验；数值为作者报告，未独立复现。 PDF Appendix B p.12给出https://anonymous.4open.science/r/TrailMix-8045/；本次页面与README接口403，public implementation未确认，故Code link省略。",
+    "ideaZh": "TrailMix在并行denoising轨迹上生成短lookahead，由外部judge估计reward分布，自适应决定重采样力度，并校正先前选择的累计偏置。作者报告SDXL RareBench多物体69.0对Best-of-8的62.7，用928对1600次U-Net；但实际图像PIE编辑仅13.6%，SEAM的97.8%来自可复用原始noise的合成源图。适合作为设计agent的候选搜索模块，不能把judge分数或调用减少当作约束保证与普遍加速。",
+    "motivationZh": "单步preview太早，难辨多个对象/属性约束；完成所有低reward样本浪费搜索预算，固定steering也不能适应prompt难度。",
+    "methodZh": "对并行denoising粒子做短coarse lookahead，judge评分后求达到target mean reward的最小beta；用exp(beta*s-h_previous)校正继承选择并systematic resample，原state继续独立加噪，最终再选最高reward。",
+    "methodFlow": [
+      "从同一base diffusion model初始化并行particles，按常规sampler推进至checkpoint",
+      "复制每个particle做短coarse denoising lookahead，保持原checkpoint state不变",
+      "用外部ImageReward或VLM judge评分preview，估计当前reward分布",
+      "求达到target mean reward的最小steering强度；不可达时用Gaussian moment近似",
+      "按当前reward与继承log-score之差重采样，复制原state后用独立噪声继续",
+      "完成轨迹并选judge最高分图；编辑同时独立检查目标变化和非目标内容保持"
+    ],
+    "experimentsZh": "SDv1.4 512²和SDXL1024²，stochastic DDIM100步。三类生成评测为GenEval553prompts、RareBench320（按filter共同删少量）、T2I-CompBench++1500；ImageReward steering与独立benchmark evaluators分开。SEAM316定向编辑（有效source SD1.4为240、SDXL283）及192 counter-stereotypical edits；PIE700源图、698有问答且514有效。编辑用Qwen2.5-VL-7B steering、Gemma3-27B独立判断。 作者报告SDXL RareBench多物体69.0，高于Best-of-8的62.7；GenEval69.4对69.2，Counting71.3低于Best-of-8的73.8，Color attribution41.0低于43.0。 (Table 1, p. 5) 作者报告SEAM SD1.4 EditRate92.5%、preservation E0.217；SDXL EditRate97.8%。现有图像PIE为SD1.4 19.3%、SDXL13.6%，对应FK20.6/12.1与LiDAR26.5/15.6。 (Fig. 4 and Table 2, p. 7; Table 19-20, p. 22) 作者报告generation默认928U-Net/12judge，对Best-of-8为1600/8；单A100 24queries的generation9.2秒对FK8.9秒，SEAM均12.3秒。 (Table 1, p. 5; Table 22, p. 22) 作者报告四至六十四particles上GenEval优于FK/Best-of-N，但两particles时SD1.4 GenEval48.6低于Best-of-2的50.6；两粒子87%prompts最终共享初始祖先。 (Fig. 3, p. 6; Appendix D.3, Table 12, pp. 18-19) 作者报告SDXL RareBench多物体69.0，高于Best-of-8的62.7；GenEval69.4对69.2，Counting71.3低于Best-of-8的73.8，Color attribution41.0低于43.0。 (Table 1, p. 5) 作者报告SEAM SD1.4 EditRate92.5%、preservation E0.217；SDXL EditRate97.8%。现有图像PIE为SD1.4 19.3%、SDXL13.6%，对应FK20.6/12.1与LiDAR26.5/15.6。 (Fig. 4 and Table 2, p. 7; Table 19-20, p. 22) 作者报告generation默认928U-Net/12judge，对Best-of-8为1600/8；单A100 24queries的generation9.2秒对FK8.9秒，SEAM均12.3秒。 (Table 1, p. 5; Table 22, p. 22) 作者报告四至六十四particles上GenEval优于FK/Best-of-N，但两particles时SD1.4 GenEval48.6低于Best-of-2的50.6；两粒子87%prompts最终共享初始祖先。 (Fig. 3, p. 6; Appendix D.3, Table 12, pp. 18-19) 包括Single、Best-of4/8、FK、PSP/BFS/SVDD/DTS、LiDAR及部分guidance/attention控制，并替换judge和evaluator。主要验证是较早U-Net diffusion backbones；没有现代flow/DiT、SVG/几何或完整design-agent闭环验证。guidance基线为单trajectory且部分strength在evaluation set选，成本不能只看particle数。 preview长度、多个preview、固定/自适应beta、target reward、checkpoint、粒子/denoising预算、替代reward judges和SDEdit strength均有分析。8-step preview优于1-step但16-step未更好；更高target reward不必提高alignment。祖先保留指标不是视觉diversity保证。",
+    "insightZh": "在FK particle steering基础上将短lookahead的reward估计与按prompt分布自适应的选择强度结合，并用继承log-score防止每个checkpoint重复放大已有选择。价值是可插入生成候选搜索的training-free机制，而非新backbone或通用视觉设计agent；最小KL理论不自动成为实际有限粒子sampler的保证。",
+    "evidenceZh": "resampling用exp(beta*s-h_previous)，lookahead不改原轨迹state；最终还做best-image selection。 (Sec. 3.2-3.4, Algorithm 1, Eqs. (2), (6)-(7), pp. 3-4) 这是选择策略和reward估计的组合，不是利用reward梯度更新diffusion参数。 作者报告默认4particles、两次8-step preview的generation为928次U-Net及12次judge；Best-of-8为1600/8。 (Table 1, p. 5; Appendix B.4, Eq. (19), p. 14) 42%节省指denoiser evaluations，judge更多且不直接等价wall-clock。 SEAM源图由相同diffusion模型生成并复用原始noise；PIE现有图像改用固定SDEdit s=0.3。 (Sec. 4.2, p. 6; Appendix B.3, p. 14; Appendix C.2, pp. 15-16) 两种编辑任务难度/初始化不同，SEAM高EditRate不能移植为真实图像成功率。 作者报告SEAM SDXL EditRate97.8%，但PIE SDXL13.6%低于LiDAR15.6%；PIE SD1.4的19.3%低于FK20.6%。 (Fig. 4 and Table 2, p. 7; Table 20, p. 22) 保留与成功有tradeoff，不能写成所有编辑任务和backbone全面领先。 理想reward倾斜的最小KL解释不意味着当前coarse preview/有限粒子/最终best selection精确采样目标分布。 (Appendix A.2-A.3, pp. 11-12) 作者明确承认preview可有偏，理论与实际算法的边界应公开保留。 作者报告A100上TrailMix generation9.2秒对FK8.9秒，SEAM editing均12.3秒；judge时间减少由额外lookahead成本抵消。 (Appendix E.3, Table 22, pp. 21-22) 每任务24queries且只测SD1.4，不能把U-Net计数优势表述为普遍更低latency。",
+    "caveatZh": "SEAM高编辑率使用可复用原始noise的合成源图，PIE真实来源图像SDXL仅13.6%。U-Net调用节省不等价latency：9.2s对FK8.9s。外部judge、有限粒子和coarse preview无精确KL采样保证；结构化设计/完整agent迁移未验证。匿名代码链接403，本次不提供Code。",
+    "whyRelevantZh": "lookahead候选评价、继承选择修正和target reward接口可具体用于visual design agent的图像候选搜索，并把编辑成功与非目标属性保持拆开评估；这是一项机制迁移判断，论文没有验证完整agent或结构化2D/3D任务。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}

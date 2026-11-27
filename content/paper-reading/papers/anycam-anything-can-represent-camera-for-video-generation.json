@@ -1,0 +1,94 @@
+{
+  "id": "arxiv:2611.34944",
+  "slug": "anycam-anything-can-represent-camera-for-video-generation",
+  "title": "AnyCam: Anything Can Represent Camera for Video Generation",
+  "authors": [
+    "Weijie Lyu",
+    "Zhixin Shu",
+    "Yuntian Ke",
+    "Ming-Hsuan Yang"
+  ],
+  "primaryTopicId": "video-generation",
+  "topicIds": [
+    "video-generation"
+  ],
+  "categories": [
+    "cs.CV"
+  ],
+  "publishedAt": "2026-11-25",
+  "updatedAt": "2026-11-25",
+  "collectedAt": "2026-11-27",
+  "venue": "arXiv preprint",
+  "venueIds": [],
+  "publicationType": "preprint",
+  "identifiers": {
+    "arxiv": "2611.34944"
+  },
+  "abstract": "Camera-controlled video generation re-renders a video along a target camera trajectory, yet moving the camera around an object, the most natural way to change the viewpoint of an object-centric scene, remains difficult. Existing methods condition either on camera parameters, which are scale-ambiguous in monocular video, or on explicit geometry such as warped point clouds or depth, which breaks down under large viewpoint changes. We present AnyCam, a method that represents the camera with an anchor object in the scene: we reconstruct it in 3D and render it along the target trajectory, a camera signal that is scale-aware, view-complete and easy to specify relative to the object. A video diffusion model transfers the content and dynamics of the source video to the new viewpoint. Its H-Concat layout aligns source and target frames in time, so the model can be distilled into AnyCam-AR, a streaming few-step generator for on-the-fly camera control. Both models are trained on paired videos with pixel-aligned anchor renderings from multi-camera videos and static-scene captures. Experiments on diverse datasets and trajectories show that AnyCam performs favorably against camera-controlled video generation and 3D reconstruction methods in camera control and visual quality.",
+  "abstractIsOriginal": true,
+  "abstractSourceUrl": "https://arxiv.org/abs/2611.34944v1",
+  "keywords": [
+    "camera control",
+    "anchor rendering",
+    "H-Concat",
+    "video-to-video",
+    "autoregressive generation",
+    "3D conditioning"
+  ],
+  "facets": {
+    "task": [
+      "generation",
+      "editing"
+    ],
+    "representation": [
+      "raster-image",
+      "3d-gaussian"
+    ],
+    "content-scope": [
+      "object",
+      "scene"
+    ],
+    "conditioning": [
+      "video",
+      "single-image"
+    ],
+    "method": [
+      "diffusion",
+      "autoregressive"
+    ],
+    "prior-data": [
+      "2d-prior"
+    ],
+    "output-property": [
+      "controllable"
+    ]
+  },
+  "links": [
+    {
+      "label": "Paper",
+      "href": "https://arxiv.org/abs/2611.34944v1"
+    }
+  ],
+  "analysis": {
+    "sourceScope": "full_text",
+    "sourceNote": "已阅读全文2611.34944v1，共27页；视觉核验PDF pp.1,4,6,13,20,21。数字为作者报告，未复现。PDF p.1 printed project URL https://weijielyu.github.io/AnyCam redirects to https://www.wlyu.me/AnyCam/；2026-11-27公开页标为Code (coming soon)，关联repo只见media/README，故code=promised且不提供Code link。",
+    "ideaZh": "AnyCam把重建对象的rendering当作相机控制信号，再从源视频恢复外观与动态；H-Concat使相同时间的源/目标tokens可直接进入因果蒸馏。值得精读的是“显式几何负责控制、生成prior负责内容”的分工，但view-complete指条件有定义，不保证未见表面真实；单卡流式约3.6 FPS，双向模型另需约3分钟条件预处理。",
+    "motivationZh": "单目camera parameters没有确定metric scale，depth/pointcloud warp在大视角变化时缺失未观测面，难以指定绕对象的控制轨迹。",
+    "methodZh": "重建anchor并对齐source cameras，将source mask cut-out与target anchor rendering分别作为条件；source/target latent按高度拼接，共享时间index。Wan DiT负责外观与动态，teacher forcing + DMD得到causal AR版本。",
+    "methodFlow": [
+      "选择anchor并用SAM 2跟踪，SAM 3D重建其Gaussian表示",
+      "将anchor对齐到source cameras，沿目标对象相对轨迹渲染camera condition",
+      "将source与target latent按高度H-Concat，在同一时间index读取对应条件",
+      "flow matching微调视频DiT；teacher forcing + DMD得到few-step causal AnyCam-AR",
+      "从源视频取外观/动态，逐chunk输出目标视角视频"
+    ],
+    "experimentsZh": "作者在CO3D报告anchor IoU 0.814，对同数据Wan-Fun-Cam†的0.343；DAVIS translation改善但rotation并非全指标最优。单卡AR约3.6 FPS，4卡11.2 FPS，双向预处理约3分钟/clip。 作者报告CO3D AnyCam PSNR/LPIPS为14.08/0.500、anchor IoU 0.814；同数据Wan-Fun-Cam†为11.92/0.627、0.343。 (Table 1, p. 6) 作者报告DAVIS translation error 0.028，优于该表其他方法，但GEN3C和ReDirector的rotation error更低；非所有camera指标均第一。 (Table 2, p. 6) 作者报告RealEstate10K 417帧往返时AnyCam-AR的rotation error为10.94°，InSpatio-World为26.56°。 (Table 5, p. 8) 作者报告单卡streaming 3.6 FPS、首chunk 2.5秒；4卡pipeline 11.2 FPS、首chunk 2.4秒，另有一次性SAM 3 + SAM 3D 5.5秒。 (Table 9, p. 21) 包含点云/depth warp、Plücker-ray camera models、autoregressive world models，以及单图3D重建/SEVA。Wan-Fun-Cam†及其AR版本在相同数据和recipe上训练，支持camera representation归因；DAVIS无真实camera GT，由ViPE估计，CO3D/RE10K协议也非完整3D表面评测。 同数据Plücker-ray对照隔离camera signal影响；attention fine-tuning与rank-32 LoRA比较显示FID/IoU存在权衡。文中并未逐一充分隔离H-Concat相对于全部其他token layout的独立收益，且anchor switching主要为定性示例。",
+    "insightZh": "把对象重建当作可解释camera condition而非待复制的场景内容，并以H-Concat支持同步因果video-to-video。",
+    "evidenceZh": "anchor rendering只传递相机信号，source video提供场景外观和动态；未见侧由learned prior估计。 (Sec. 3.2, Fig. 3(a), Fig. 4, pp. 3-4) Fig. 4中的错误anchor纹理没有直接复制到生成视频，因此不能把条件rendering当作重建真值。 H-Concat让source/target在相同时间index上保持独立tokens，causal model只读取对应和历史chunks。 (Sec. 3.4-3.5, Fig. 3(b), pp. 4-5) AR模型仍需要teacher forcing与DMD，布局本身不等于few-step模型已经可用。 作者报告CO3D video-to-video中AnyCam anchor IoU为0.814，对同数据训练的Wan-Fun-Cam†为0.343。 (Table 1, p. 6; Sec. 4.5, p. 8) IoU比较generated anchor track与CO3D mask，不能解释为全场景几何精度。 约1%面积anchor会使输出旋转不足，错误anchor朝向/尺度会给出错误camera。 (Appendix B, p. 13; Fig. 15, p. 20) “Anything”受可重建、可见、朝向可辨等条件约束。 作者报告单GPU 3.6 FPS、四GPU流水线11.2 FPS，双向模型条件构建另需约3分钟/clip。 (Table 9 and Appendix D.3, p. 21) AR FPS包括逐帧条件，双向FPS只计生成；不应跨口径宣称统一端到端实时。",
+    "caveatZh": "anchor须可见、可重建且朝向可辨；小或对称anchor旋转控制弱。view-complete不等于未见侧真实，速度需区分预处理、单卡和四卡pipeline。",
+    "whyRelevantZh": "对3D/4D生成可参考对象相对、尺度一致的rendered control interface和source/target时间对齐表示；这是方法迁移建议，本文直接输出视频，并未生成经验证的可编辑3D资产。",
+    "relevance": "high",
+    "readingAction": "deep",
+    "evidenceMaturity": "mixed"
+  }
+}
